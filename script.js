@@ -3187,8 +3187,8 @@ document.addEventListener("DOMContentLoaded", function () {
               descricao: produto.descricao || "Produto inserido",
               tituloConteudo: produto.titulo || produto.nome || "Produto disponível",
               estabelecimento: nomeCliente,
-              imagem: produto.imagem || "",
-              imagens: produto.imagem ? [produto.imagem] : [],
+              imagem: produto.imagem || produto.imagens?.[0] || "",
+              imagens: produto.imagens?.length ? produto.imagens : (produto.imagem ? [produto.imagem] : []),
               dataCriacao: dataMs,
               destinoTipo: "produto",
               destinoId: clienteKey,
@@ -7731,34 +7731,45 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         value && typeof value === "object" ? { id, ...value } : { id, nome: value }
       ));
     return lista
-      .map((item, index) => ({
-        id: item.id || `produto-${normalizeName(est.name || "loja")}-${index}`,
-        titulo: item.titulo || item.nome || item.name || item.produto || "Produto",
-        descricao: item.descricao || item.description || item.obs || item.observacoes || "",
-        preco: item.preco || item.valor || item.price || "",
-        mostrarPreco: item.mostrarPreco === false ? false : true,
-        imagem: item.imagem || item.image || item.foto || item.fotoUrl || item.imagemUrl || "",
-        observacoes: item.observacoes || item.obs || item.detalhes || "",
-        categoria: item.categoria || item.tipo || "",
-        setor: item.setor || item.segmento || item.departamento || "",
-        marca: item.marca || item.brand || "",
-        modelo: item.modelo || item.model || "",
-        tipoMedida: item.tipoMedida || item.measureType || (item.volume ? "Volume" : item.medida ? "Medida" : item.tamanho ? "Tamanho" : ""),
-        tamanho: item.tamanho || item.medida || item.volume || item.size || "",
-        cores: item.cores || item.cor || item.colors || "",
-        variacoes: item.variacoes || item.variacao || item.variations || "",
-        condicao: item.condicao || item.condition || "",
-        disponibilidade: item.disponibilidade || item.availability || "",
-        entregaRetirada: item.entregaRetirada || item.fulfillment || item.entrega || "",
-        informacoesEspecificas: item.informacoesEspecificas || item.infoEspecificas || item.informacoes || "",
-        destaque: item.destaque === true || item.produtoDestaque === true,
-        ordem: item.ordem || item.ordemExibicao || item.order || "",
-        contato: item.contato || item.whatsapp || cliente.whatsapp || cliente.contact || est.whatsapp || est.contact || "",
-        status: item.status || "ativo",
-        ativo: item.ativo === false ? false : true,
-        createdAt: item.createdAt || item.criadoEm || "",
-        updatedAt: item.updatedAt || item.dataAtualizacao || ""
-      }))
+      .map((item, index) => {
+        const imagens = [
+          ...(Array.isArray(item.imagens) ? item.imagens : []),
+          item.imagem,
+          item.image,
+          item.foto,
+          item.fotoUrl,
+          item.imagemUrl
+        ].map((url) => String(url || "").trim()).filter(Boolean).slice(0, 4);
+        return {
+          id: item.id || `produto-${normalizeName(est.name || "loja")}-${index}`,
+          titulo: item.titulo || item.nome || item.name || item.produto || "Produto",
+          descricao: item.descricao || item.description || item.obs || item.observacoes || "",
+          preco: item.preco || item.valor || item.price || "",
+          mostrarPreco: item.mostrarPreco === false ? false : true,
+          imagem: imagens[0] || "",
+          imagens,
+          observacoes: item.observacoes || item.obs || item.detalhes || "",
+          categoria: item.categoria || item.tipo || "",
+          setor: item.setor || item.segmento || item.departamento || "",
+          marca: item.marca || item.brand || "",
+          modelo: item.modelo || item.model || "",
+          tipoMedida: item.tipoMedida || item.measureType || (item.volume ? "Volume" : item.medida ? "Medida" : item.tamanho ? "Tamanho" : ""),
+          tamanho: item.tamanho || item.medida || item.volume || item.size || "",
+          cores: item.cores || item.cor || item.colors || "",
+          variacoes: item.variacoes || item.variacao || item.variations || "",
+          condicao: item.condicao || item.condition || "",
+          disponibilidade: item.disponibilidade || item.availability || "",
+          entregaRetirada: item.entregaRetirada || item.fulfillment || item.entrega || "",
+          informacoesEspecificas: item.informacoesEspecificas || item.infoEspecificas || item.informacoes || "",
+          destaque: item.destaque === true || item.produtoDestaque === true,
+          ordem: item.ordem || item.ordemExibicao || item.order || "",
+          contato: item.contato || item.whatsapp || cliente.whatsapp || cliente.contact || est.whatsapp || est.contact || "",
+          status: item.status || "ativo",
+          ativo: item.ativo === false ? false : true,
+          createdAt: item.createdAt || item.criadoEm || "",
+          updatedAt: item.updatedAt || item.dataAtualizacao || ""
+        };
+      })
       .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo)
       .sort((a, b) => {
         if (Boolean(a.destaque) !== Boolean(b.destaque)) return a.destaque ? -1 : 1;
@@ -7946,6 +7957,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const isProduto = normalizeName(tituloPadrao || "").includes("produto");
     const preco = produtoPrecoPublico(item, isProduto ? "produto" : "promocao");
     const whatsapp = isProduto ? produtoWhatsappLink(item) : "";
+    const imagensProduto = (Array.isArray(item.imagens) && item.imagens.length ? item.imagens : (item.imagem ? [item.imagem] : [])).slice(0, 4);
     const detalheLinha = (label, value, icon = "fa-solid fa-circle-info") => (
       value ? `<p class="imovel-detalhes-endereco"><i class="${icon}"></i><span><strong>${escapePromoHtml(label)}:</strong> ${escapePromoHtml(value)}</span></p>` : ""
     );
@@ -7966,7 +7978,11 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       <section class="imovel-detalhes-dialog loja-produto-dialog" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(titulo)}">
         <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
         <div class="imovel-detalhes-media loja-produto-media">
-          ${item.imagem ? `<img src="${escapePromoHtml(item.imagem)}" alt="${escapePromoHtml(titulo)}" loading="lazy">` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-box-open"></i></div>`}
+          ${imagensProduto.length ? `
+            <div class="loja-produto-modal-galeria">
+              ${imagensProduto.map((img, index) => `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(titulo)} - imagem ${index + 1}" loading="lazy">`).join("")}
+            </div>
+          ` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-box-open"></i></div>`}
         </div>
         <div class="imovel-detalhes-conteudo">
           <div class="imovel-detalhes-topo">

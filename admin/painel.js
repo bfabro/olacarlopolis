@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 429,
-  label: "v435",
+  numero: 430,
+  label: "v436",
   data: "2026-07-08",
-  nota: "Combos da vitrine em ordem alfabetica e medida exibida por tipo escolhido."
+  nota: "Produtos da vitrine aceitam ate 4 imagens por cadastro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -804,6 +804,14 @@ function normalizeProdutos(items) {
     .map((item, index) => {
       const titulo = String(item?.titulo || item?.nome || item?.name || item?.produto || "").trim();
       const fallbackId = `produto-${slugify(titulo || `item-${index}`)}-${index}`;
+      const imagens = [
+        ...(Array.isArray(item?.imagens) ? item.imagens : []),
+        item?.imagem,
+        item?.image,
+        item?.foto,
+        item?.fotoUrl,
+        item?.imagemUrl
+      ].map((url) => String(url || "").trim()).filter(Boolean).slice(0, 4);
       return {
         id: item?.id || fallbackId,
         titulo,
@@ -824,7 +832,8 @@ function normalizeProdutos(items) {
         disponibilidade: String(item?.disponibilidade || item?.availability || "").trim(),
         entregaRetirada: String(item?.entregaRetirada || item?.fulfillment || item?.entrega || "").trim(),
         informacoesEspecificas: String(item?.informacoesEspecificas || item?.infoEspecificas || item?.informacoes || "").trim(),
-        imagem: String(item?.imagem || item?.image || item?.foto || item?.fotoUrl || item?.imagemUrl || "").trim(),
+        imagem: imagens[0] || "",
+        imagens,
         status: String(item?.status || "ativo").trim(),
         ativo: item?.ativo === false ? false : true,
         destaque: item?.destaque === true || item?.produtoDestaque === true,
@@ -3331,6 +3340,14 @@ function productSelectOptions(options = [], placeholder = "Selecione") {
     .join("");
 }
 
+function normalizeProductImagesInput(value = "") {
+  return String(value || "")
+    .split(/[\n,]+/)
+    .map((url) => url.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
 function clearPromoFields(prefix, scope = document) {
   ["Title", "Price", "Discount", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "OfferType", "Fulfillment", "PriceRange", "PriceMode", "Obs", "InstagramMsg", "ImageUrl"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Promo${suffix}`);
@@ -3429,7 +3446,7 @@ function fillProductFields(prefix, product, scope = document) {
   set("Fulfillment", product?.entregaRetirada);
   set("SpecificInfo", product?.informacoesEspecificas);
   set("Order", product?.ordem);
-  set("ImageUrl", product?.imagem);
+  set("ImageUrl", (Array.isArray(product?.imagens) && product.imagens.length ? product.imagens : (product?.imagem ? [product.imagem] : [])).join("\n"));
   const showPrice = scope.querySelector(`#${prefix}ProductShowPrice`);
   if (showPrice) showPrice.checked = product?.mostrarPreco !== false;
   const featured = scope.querySelector(`#${prefix}ProductFeatured`);
@@ -3463,7 +3480,8 @@ function readProductFields(prefix, scope = document, fallbackId = "") {
     disponibilidade: get("Availability"),
     entregaRetirada: get("Fulfillment"),
     informacoesEspecificas: get("SpecificInfo"),
-    imagem: get("ImageUrl"),
+    imagens: normalizeProductImagesInput(get("ImageUrl")),
+    imagem: normalizeProductImagesInput(get("ImageUrl"))[0] || "",
     destaque: checked("Featured", false),
     ordem: get("Order"),
     ativo: (get("Status") || "ativo") !== "inativo"
@@ -3726,6 +3744,7 @@ async function registrarProdutoNovidadeClienteAdmin({ clientId = "", clientName 
     tituloConteudo: tituloConteudoNovidadeAdmin("produto", payload),
     estabelecimento: clientName || clientId,
     imagem: payload.imagem,
+    imagens: payload.imagens || (payload.imagem ? [payload.imagem] : []),
     valor: payload.preco || payload.valor || "",
     categoria,
     destinoTipo: "produto",
@@ -3738,17 +3757,11 @@ async function registrarProdutoNovidadeClienteAdmin({ clientId = "", clientName 
 async function addClientProduct() {
   if (!validarProdutoVitrine("client", document)) return;
   const currentId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
-  let image = $("clientProductImageUrl")?.value.trim() || "";
-  const file = $("clientProductImageUpload")?.files?.[0];
-  if (file && !image) {
-    showToast("Enviando imagem do produto...");
-    image = await uploadPromoImageForClient(currentId, file);
-  }
+  await uploadSelectedProductImages("clientProductImageUpload", "clientProductImageUrl", currentId);
   const editingIndex = Number.isInteger(state.clientProductEditIndex) ? state.clientProductEditIndex : -1;
   state.clientProdutos = normalizeProdutos(state.clientProdutos);
   const current = editingIndex >= 0 ? state.clientProdutos[editingIndex] : null;
   const payload = readProductFields("client", document, current?.id || `produto-${Date.now()}`);
-  payload.imagem = image;
   const agora = Date.now();
   payload.createdAt = current?.createdAt || agora;
   payload.updatedAt = agora;
@@ -3996,6 +4009,39 @@ async function uploadSelectedPromoImage(inputId, targetInputId, clientId) {
     showToast("Nao foi possivel enviar a imagem da promocao.");
     return "";
   } finally {
+    setBusy(input, false);
+  }
+}
+
+async function uploadSelectedProductImages(inputId, targetInputId, clientId) {
+  const input = $(inputId);
+  const target = $(targetInputId);
+  const files = Array.from(input?.files || []);
+  if (!files.length || !target) return [];
+  const id = clientId || slugify($("clientName")?.value.trim()) || $("clientId")?.value || `cliente-${Date.now()}`;
+  const atuais = normalizeProductImagesInput(target.value);
+  const disponiveis = Math.max(0, 4 - atuais.length);
+  if (!disponiveis) {
+    showToast("Limite de 4 imagens por produto atingido.");
+    input.value = "";
+    return atuais;
+  }
+  const selecionados = files.slice(0, disponiveis);
+  try {
+    setBusy(input, true);
+    showToast(`Enviando ${selecionados.length} imagem${selecionados.length === 1 ? "" : "s"} do produto...`);
+    const urls = [];
+    for (const file of selecionados) urls.push(await uploadPromoImageForClient(id, file));
+    const todas = [...atuais, ...urls].slice(0, 4);
+    target.value = todas.join("\n");
+    showToast("Imagem do produto enviada.");
+    return todas;
+  } catch (error) {
+    console.error(error);
+    showToast("Nao foi possivel enviar a imagem do produto.");
+    return atuais;
+  } finally {
+    input.value = "";
     setBusy(input, false);
   }
 }
@@ -12403,8 +12449,8 @@ function renderClientOnlyEditor() {
             <label class="checkbox-line"><input id="coProductShowPrice" type="checkbox" checked> Mostrar preco?</label>
             <label>Produto ativo<select id="coProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
             <label class="wide">Descricao curta<textarea id="coProductDescription" rows="3" placeholder="Produto disponivel na loja. Consulte cores, tamanhos e disponibilidade pelo WhatsApp."></textarea></label>
-            <label>Imagem do produto<input id="coProductImageUpload" type="file" accept="image/*"></label>
-            <label>Ou URL da imagem<input id="coProductImageUrl" placeholder="https://..."></label>
+            <label>Imagens do produto<input id="coProductImageUpload" type="file" accept="image/*" multiple></label>
+            <label>URLs das imagens<textarea id="coProductImageUrl" rows="3" placeholder="Uma URL por linha. Maximo 4 imagens."></textarea></label>
             <div class="form-section-title wide"><i class="fa-solid fa-circle-info"></i><div><strong>2. Mais informacoes - opcional</strong><span>Campos genericos para varios tipos de comercio.</span></div></div>
             <label>Marca<input id="coProductBrand" placeholder="Ex.: Nike, JBL, Mondial"></label>
             <label>Modelo<input id="coProductModel" placeholder="Ex.: Bluetooth 5.0, 220V"></label>
@@ -12862,18 +12908,12 @@ function renderClientOnlyEditor() {
   mount.querySelector("#coAddProductButton")?.addEventListener("click", async () => {
     if (!validarProdutoVitrine("co", mount)) return;
 
-    let image = $("coProductImageUrl")?.value.trim() || "";
-    const imageFile = $("coProductImageUpload")?.files?.[0];
-    if (imageFile && !image) {
-      showToast("Enviando imagem do produto...");
-      image = await uploadPromoImageForClient(client.id, imageFile);
-    }
+    await uploadSelectedProductImages("coProductImageUpload", "coProductImageUrl", client.id);
 
     const editingIndex = coProductEditIndex;
     const listaProdutos = normalizeProdutos(produtos);
     const current = editingIndex >= 0 ? listaProdutos[editingIndex] : null;
     const payload = readProductFields("co", mount, current?.id || `produto-${Date.now()}`);
-    payload.imagem = image;
     const agora = Date.now();
     payload.createdAt = current?.createdAt || agora;
     payload.updatedAt = agora;
@@ -13029,8 +13069,7 @@ function renderClientOnlyEditor() {
   });
 
   mount.querySelector("#coProductImageUpload")?.addEventListener("change", async (event) => {
-    await uploadSelectedPromoImage("coProductImageUpload", "coProductImageUrl", client.id);
-    event.target.value = "";
+    await uploadSelectedProductImages("coProductImageUpload", "coProductImageUrl", client.id);
   });
 
   mount.querySelector("#coWhatsappGroupImageUpload")?.addEventListener("change", async (event) => {
@@ -13465,6 +13504,7 @@ function renderProdutosMarkup(produtos, removeAttr = "product-remove", editAttr 
         ].filter(Boolean).join(" - "))}</span>
         ${produto.destaque ? `<small>Destaque na vitrine</small>` : ""}
         ${produto.ordem ? `<small>Ordem: ${escapeHtml(produto.ordem)}</small>` : ""}
+        ${produto.imagens?.length ? `<small>${produto.imagens.length}/4 imagens</small>` : ""}
         ${produto.descricao ? `<small>${escapeHtml(produto.descricao)}</small>` : ""}
         ${produto.observacoes ? `<small>${escapeHtml(produto.observacoes)}</small>` : ""}
         ${produto.status === "inativo" || produto.ativo === false ? `<small>Inativo no site publico</small>` : ""}
@@ -14337,8 +14377,7 @@ function bindEvents() {
   });
   $("clientProductImageUpload")?.addEventListener("change", async (event) => {
     const targetId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
-    await uploadSelectedPromoImage("clientProductImageUpload", "clientProductImageUrl", targetId);
-    event.target.value = "";
+    await uploadSelectedProductImages("clientProductImageUpload", "clientProductImageUrl", targetId);
   });
   $("newEventButton").addEventListener("click", () => {
     resetEventForm();

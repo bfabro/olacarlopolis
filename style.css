@@ -21402,6 +21402,21 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   object-fit: cover;
 }
 
+.loja-produto-modal-galeria {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.loja-produto-modal-galeria img {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  object-fit: cover !important;
+}
+
 @media (max-width: 720px) {
   .loja-itens-wrap {
     margin-top: 10px;
