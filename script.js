@@ -7736,15 +7736,38 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         titulo: item.titulo || item.nome || item.name || item.produto || "Produto",
         descricao: item.descricao || item.description || item.obs || item.observacoes || "",
         preco: item.preco || item.valor || item.price || "",
+        mostrarPreco: item.mostrarPreco === false ? false : true,
         imagem: item.imagem || item.image || item.foto || item.fotoUrl || item.imagemUrl || "",
         observacoes: item.observacoes || item.obs || item.detalhes || "",
         categoria: item.categoria || item.tipo || "",
+        setor: item.setor || item.segmento || item.departamento || "",
+        marca: item.marca || item.brand || "",
+        modelo: item.modelo || item.model || "",
+        tamanho: item.tamanho || item.medida || item.volume || item.size || "",
+        cores: item.cores || item.cor || item.colors || "",
+        variacoes: item.variacoes || item.variacao || item.variations || "",
+        condicao: item.condicao || item.condition || "",
+        disponibilidade: item.disponibilidade || item.availability || "",
+        entregaRetirada: item.entregaRetirada || item.fulfillment || item.entrega || "",
+        informacoesEspecificas: item.informacoesEspecificas || item.infoEspecificas || item.informacoes || "",
+        destaque: item.destaque === true || item.produtoDestaque === true,
+        ordem: item.ordem || item.ordemExibicao || item.order || "",
+        contato: item.contato || item.whatsapp || cliente.whatsapp || cliente.contact || est.whatsapp || est.contact || "",
         status: item.status || "ativo",
         ativo: item.ativo === false ? false : true,
         createdAt: item.createdAt || item.criadoEm || "",
         updatedAt: item.updatedAt || item.dataAtualizacao || ""
       }))
-      .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo);
+      .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo)
+      .sort((a, b) => {
+        if (Boolean(a.destaque) !== Boolean(b.destaque)) return a.destaque ? -1 : 1;
+        const ordemA = Number(a.ordem);
+        const ordemB = Number(b.ordem);
+        const temOrdemA = Number.isFinite(ordemA) && ordemA > 0;
+        const temOrdemB = Number.isFinite(ordemB) && ordemB > 0;
+        if (temOrdemA || temOrdemB) return (temOrdemA ? ordemA : 999999) - (temOrdemB ? ordemB : 999999);
+        return novidadeCidadeMs(b.updatedAt || b.createdAt) - novidadeCidadeMs(a.updatedAt || a.createdAt);
+      });
   }
 
   function normalizarPromocoesPublicas(origem = [], contexto = {}) {
@@ -7801,10 +7824,26 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     return deduplicarPromocoesMesmoEstabelecimentoPublico(Array.from(porId.values()));
   }
 
-  function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
+  function produtoPrecoPublico(item = {}, tipo = "produto") {
+    if (tipo === "produto" && item.mostrarPreco === false) return "Consultar";
     const preco = formatarMoedaPromo(item.preco);
+    if (preco) return preco;
+    return tipo === "produto" ? "Consultar" : "";
+  }
+
+  function produtoWhatsappLink(item = {}) {
+    const contato = somenteDigitos(item.contato || item.whatsapp || item.telefone || "");
+    if (contato.length < 10) return "";
+    const mensagem = `Ola, vi no Ola Carlopolis o produto: ${item.titulo || item.nome || "Produto"}. Gostaria de mais informacoes.`;
+    return `https://api.whatsapp.com/send?phone=${numeroWhatsAppBrasil(contato)}&text=${encodeURIComponent(mensagem)}`;
+  }
+
+  function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
+    const preco = produtoPrecoPublico(item, tipo);
     const titulo = escapePromoHtml(item.titulo || "Produto");
     const descricao = escapePromoHtml(item.descricao || item.observacoes || "");
+    const setorCategoria = [item.setor, item.categoria].filter(Boolean).join(" / ");
+    const whatsapp = tipo === "produto" ? produtoWhatsappLink(item) : "";
     const id = String(item.id || `produto-${normalizeName(item.titulo || item.nome || "item")}`);
     const cacheKey = `${tipo}:${id}`;
     if (typeof window !== "undefined") {
@@ -7818,15 +7857,19 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ${item.imagem
                 ? `<img src="${escapePromoHtml(item.imagem)}" alt="${titulo}" loading="lazy">`
                 : `<div class="loja-produto-sem-imagem">Imagem do produto</div>`}
+              ${tipo === "produto" && item.destaque ? `<span class="loja-produto-badge">Destaque</span>` : ""}
           </div>
           <div class="loja-produto-info">
-            ${item.categoria ? `<div class="loja-produto-categoria">${escapePromoHtml(item.categoria)}</div>` : ""}
+            ${setorCategoria ? `<div class="loja-produto-categoria">${escapePromoHtml(setorCategoria)}</div>` : ""}
             <div class="loja-produto-nome">${titulo}</div>
             ${descricao ? `<div class="loja-produto-descricao">${descricao}</div>` : ""}
           </div>
           <div class="loja-produto-preco">
-            <span>${preco || "Ver detalhes"}</span>
+            <span>${escapePromoHtml(preco || "Ver detalhes")}</span>
           </div>
+          ${tipo === "produto" ? (whatsapp
+            ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>`
+            : `<button type="button" class="loja-produto-interesse is-disabled" disabled>Tenho interesse</button>`) : ""}
         </div>
       </article>
     `;
@@ -7894,7 +7937,23 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   function abrirModalProdutoEstabelecimento(item = {}, tituloPadrao = "Produto") {
     document.querySelector(".loja-produto-modal")?.remove();
     const titulo = item.titulo || tituloPadrao;
-    const preco = formatarMoedaPromo(item.preco);
+    const isProduto = normalizeName(tituloPadrao || "").includes("produto");
+    const preco = produtoPrecoPublico(item, isProduto ? "produto" : "promocao");
+    const whatsapp = isProduto ? produtoWhatsappLink(item) : "";
+    const detalheLinha = (label, value, icon = "fa-solid fa-circle-info") => (
+      value ? `<p class="imovel-detalhes-endereco"><i class="${icon}"></i><span><strong>${escapePromoHtml(label)}:</strong> ${escapePromoHtml(value)}</span></p>` : ""
+    );
+    const detalhesProdutoHtml = [
+      detalheLinha("Marca", item.marca, "fa-solid fa-copyright"),
+      detalheLinha("Modelo", item.modelo, "fa-solid fa-barcode"),
+      detalheLinha("Tamanho / medida / volume", item.tamanho, "fa-solid fa-ruler-combined"),
+      detalheLinha("Cores disponiveis", item.cores, "fa-solid fa-palette"),
+      detalheLinha("Variacoes", item.variacoes, "fa-solid fa-layer-group"),
+      detalheLinha("Condicao", item.condicao, "fa-solid fa-certificate"),
+      detalheLinha("Disponibilidade", item.disponibilidade, "fa-solid fa-circle-check"),
+      detalheLinha("Entrega ou retirada", item.entregaRetirada, "fa-solid fa-truck"),
+      item.informacoesEspecificas ? `<p>${escapePromoHtml(item.informacoesEspecificas)}</p>` : ""
+    ].filter(Boolean).join("");
     const modal = document.createElement("div");
     modal.className = "imovel-detalhes-modal loja-produto-modal";
     modal.innerHTML = `
@@ -7907,7 +7966,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${escapePromoHtml(titulo)}</h2>
-              ${item.categoria ? `<p class="imovel-detalhes-endereco"><i class="fa-solid fa-tag"></i><span>${escapePromoHtml(item.categoria)}</span></p>` : ""}
+              ${[item.setor, item.categoria].filter(Boolean).length ? `<p class="imovel-detalhes-endereco"><i class="fa-solid fa-tag"></i><span>${escapePromoHtml([item.setor, item.categoria].filter(Boolean).join(" / "))}</span></p>` : ""}
             </div>
             ${preco ? `<div class="imovel-detalhes-financeiro"><strong class="imovel-detalhes-valor">${escapePromoHtml(preco)}</strong></div>` : ""}
           </div>
@@ -7918,6 +7977,13 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}
             </section>
           ` : ""}
+          ${isProduto && detalhesProdutoHtml ? `
+            <section class="imovel-detalhes-descricao">
+              <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-list-check"></i><span>Informacoes do produto</span></div>
+              ${detalhesProdutoHtml}
+            </section>
+          ` : ""}
+          ${isProduto && whatsapp ? `<a class="auto-whatsapp-button loja-produto-whatsapp" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>` : ""}
         </div>
       </section>
     `;

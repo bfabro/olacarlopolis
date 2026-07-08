@@ -2614,6 +2614,26 @@ button[type="submit"]:hover,
   margin-top: 12px;
 }
 
+.promo-admin-form .checkbox-line {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-height: 42px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.promo-admin-form .checkbox-line input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
 .promo-weekdays {
   border: 1px solid var(--line);
   border-radius: 12px;

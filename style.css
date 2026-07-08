@@ -21281,6 +21281,7 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 }
 
 .loja-produto-media {
+  position: relative;
   overflow: hidden;
   border-radius: 12px;
   background: #eef4fb;
@@ -21303,6 +21304,21 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   font-weight: 900;
   text-align: center;
   padding: 10px;
+}
+
+.loja-produto-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: #f97316;
+  color: #fff;
+  font-size: .7rem;
+  font-weight: 950;
+  line-height: 1;
+  box-shadow: 0 6px 14px rgba(249, 115, 22, .28);
 }
 
 .loja-produto-info {
@@ -21350,6 +21366,34 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   font-weight: 950;
   line-height: 1.1;
   text-align: center;
+}
+
+.loja-produto-interesse,
+.loja-produto-interesse:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 38px;
+  border: 0;
+  border-radius: 10px;
+  background: #16a34a;
+  color: #fff;
+  font-size: .86rem;
+  font-weight: 950;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.loja-produto-interesse.is-disabled {
+  background: #cbd5e1;
+  color: #475569;
+  cursor: not-allowed;
+}
+
+.loja-produto-whatsapp {
+  margin-top: 12px;
+  text-decoration: none;
 }
 
 .loja-produto-dialog .loja-produto-media img {

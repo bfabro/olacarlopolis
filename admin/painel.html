@@ -411,20 +411,37 @@
               <section class="wide upload-panel">
                 <div class="section-head compact">
                   <div>
+                    <span class="feature-kicker">Vitrine</span>
                     <h3>Produtos</h3>
-                    <p>Produtos fixos exibidos na aba Produtos da tela publica do estabelecimento.</p>
+                    <p>Cadastre alguns produtos para mostrar aos clientes o que este comercio oferece.</p>
                   </div>
                   <span id="clientProductsCount" class="badge">0 itens</span>
                 </div>
                 <div class="promo-admin-form">
-                  <label>Nome do produto<input id="clientProductTitle" placeholder="Ex.: Dipirona 500mg"></label>
-                  <label>Preco<input id="clientProductPrice" placeholder="Ex.: 12,90"></label>
-                  <label>Categoria<input id="clientProductCategory" placeholder="Ex.: Medicamentos"></label>
-                  <label>Status<select id="clientProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
-                  <label class="wide">Descricao<textarea id="clientProductDescription" rows="3" placeholder="Detalhes do produto"></textarea></label>
-                  <label class="wide">Observacoes<textarea id="clientProductNotes" rows="2" placeholder="Opcional"></textarea></label>
+                  <div class="form-section-title wide"><i class="fa-solid fa-box-open"></i><div><strong>1. Dados do produto</strong><span>Campos principais da vitrine publica.</span></div></div>
+                  <label>Nome do produto<input id="clientProductTitle" placeholder="Ex.: Tenis Casual Feminino"></label>
+                  <label>Setor<select id="clientProductSector"><option value="">Selecione</option><option>Eletronicos</option><option>Roupas</option><option>Calcados</option><option>Alimentos</option><option>Casa e Decoracao</option><option>Brinquedos</option><option>Beleza e Cosmeticos</option><option>Saude e Farmacia</option><option>Pet</option><option>Ferramentas</option><option>Esporte e Lazer</option><option>Acessorios</option><option>Moveis</option><option>Papelaria</option><option>Outros</option></select></label>
+                  <label>Categoria<input id="clientProductCategory" placeholder="Ex.: Tenis, Camisetas, Celulares"></label>
+                  <label>Preco<input id="clientProductPrice" placeholder="Ex.: 89,90"></label>
+                  <label class="checkbox-line"><input id="clientProductShowPrice" type="checkbox" checked> Mostrar preco?</label>
+                  <label>Produto ativo<select id="clientProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
+                  <label class="wide">Descricao curta<textarea id="clientProductDescription" rows="3" placeholder="Produto disponivel na loja. Consulte cores, tamanhos e disponibilidade pelo WhatsApp."></textarea></label>
                   <label>Imagem do produto<input id="clientProductImageUpload" type="file" accept="image/*"></label>
                   <label>Ou URL da imagem<input id="clientProductImageUrl" placeholder="https://..."></label>
+                  <div class="form-section-title wide"><i class="fa-solid fa-circle-info"></i><div><strong>2. Mais informacoes - opcional</strong><span>Campos genericos para varios tipos de comercio.</span></div></div>
+                  <label>Marca<input id="clientProductBrand" placeholder="Ex.: Nike, JBL, Mondial"></label>
+                  <label>Modelo<input id="clientProductModel" placeholder="Ex.: Bluetooth 5.0, 220V"></label>
+                  <label>Tamanho / medida / volume<input id="clientProductSize" placeholder="Ex.: 500g, P ao GG, 1 litro"></label>
+                  <label>Cores disponiveis<input id="clientProductColors" placeholder="Ex.: Preto, branco, nude"></label>
+                  <label class="wide">Variacoes<textarea id="clientProductVariations" rows="2" placeholder="Ex.: Numeracao do 34 ao 39; sabores; cores disponiveis"></textarea></label>
+                  <label>Condicao<select id="clientProductCondition"><option value="">Nao informar</option><option>Novo</option><option>Usado</option><option>Seminovo</option><option>Sob encomenda</option><option>Nao se aplica</option></select></label>
+                  <label>Disponibilidade<select id="clientProductAvailability"><option value="">Nao informar</option><option>Disponivel</option><option>Indisponivel</option><option>Sob encomenda</option><option>Consultar estoque</option><option>Em breve</option></select></label>
+                  <label>Entrega ou retirada<select id="clientProductFulfillment"><option value="">Nao informar</option><option>Retirada na loja</option><option>Entrega disponivel</option><option>Consultar entrega</option><option>Somente encomenda</option><option>Nao se aplica</option></select></label>
+                  <label class="wide">Informacoes especificas<textarea id="clientProductSpecificInfo" rows="3" placeholder="Ex.: Produto bivolt. Consulte garantia e disponibilidade."></textarea></label>
+                  <label class="wide">Observacoes internas/opcionais<textarea id="clientProductNotes" rows="2" placeholder="Opcional"></textarea></label>
+                  <div class="form-section-title wide"><i class="fa-solid fa-eye"></i><div><strong>3. Exibicao</strong><span>Controle como o produto aparece na aba publica.</span></div></div>
+                  <label class="checkbox-line"><input id="clientProductFeatured" type="checkbox"> Produto em destaque</label>
+                  <label>Ordem de exibicao<input id="clientProductOrder" type="number" min="0" step="1" placeholder="Ex.: 1"></label>
                   <div class="promo-form-actions wide">
                     <button id="addClientProductButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar produto</button>
                     <button id="cancelClientProductEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>

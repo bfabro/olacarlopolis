@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 427,
-  label: "v433",
-  data: "2026-07-07",
-  nota: "Produtos e fotos do perfil publico mantem cards tambem no mobile."
+  numero: 428,
+  label: "v434",
+  data: "2026-07-08",
+  nota: "Cadastro de Produtos/Vitrine ganhou campos genericos e exibicao publica completa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -786,13 +786,26 @@ function normalizeProdutos(items) {
         id: item?.id || fallbackId,
         titulo,
         nome: String(item?.nome || item?.titulo || item?.name || item?.produto || "").trim(),
+        setor: String(item?.setor || item?.segmento || item?.departamento || "").trim(),
         categoria: String(item?.categoria || item?.tipo || "").trim(),
         preco: String(item?.preco || item?.valor || item?.price || "").trim(),
+        mostrarPreco: item?.mostrarPreco === false ? false : true,
         descricao: String(item?.descricao || item?.description || "").trim(),
         observacoes: String(item?.observacoes || item?.obs || item?.detalhes || "").trim(),
+        marca: String(item?.marca || item?.brand || "").trim(),
+        modelo: String(item?.modelo || item?.model || "").trim(),
+        tamanho: String(item?.tamanho || item?.medida || item?.volume || item?.size || "").trim(),
+        cores: String(item?.cores || item?.cor || item?.colors || "").trim(),
+        variacoes: String(item?.variacoes || item?.variacao || item?.variations || "").trim(),
+        condicao: String(item?.condicao || item?.condition || "").trim(),
+        disponibilidade: String(item?.disponibilidade || item?.availability || "").trim(),
+        entregaRetirada: String(item?.entregaRetirada || item?.fulfillment || item?.entrega || "").trim(),
+        informacoesEspecificas: String(item?.informacoesEspecificas || item?.infoEspecificas || item?.informacoes || "").trim(),
         imagem: String(item?.imagem || item?.image || item?.foto || item?.fotoUrl || item?.imagemUrl || "").trim(),
         status: String(item?.status || "ativo").trim(),
         ativo: item?.ativo === false ? false : true,
+        destaque: item?.destaque === true || item?.produtoDestaque === true,
+        ordem: String(item?.ordem || item?.ordemExibicao || item?.order || "").trim(),
         createdAt: item?.createdAt || item?.criadoEm || "",
         updatedAt: item?.updatedAt || item?.dataAtualizacao || ""
       };
@@ -3352,10 +3365,14 @@ function readPromoFields(prefix, scope = document, fallbackId = "") {
 }
 
 function clearProductFields(prefix, scope = document) {
-  ["Title", "Price", "Category", "Status", "Description", "Notes", "ImageUrl"].forEach((suffix) => {
+  ["Title", "Sector", "Price", "Category", "Status", "Description", "Notes", "Brand", "Model", "Size", "Colors", "Variations", "Condition", "Availability", "Fulfillment", "SpecificInfo", "Order", "ImageUrl"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Product${suffix}`);
     if (field) field.value = suffix === "Status" ? "ativo" : "";
   });
+  const showPrice = scope.querySelector(`#${prefix}ProductShowPrice`);
+  if (showPrice) showPrice.checked = true;
+  const featured = scope.querySelector(`#${prefix}ProductFeatured`);
+  if (featured) featured.checked = false;
   const upload = scope.querySelector(`#${prefix}ProductImageUpload`);
   if (upload) upload.value = "";
 }
@@ -3366,28 +3383,78 @@ function fillProductFields(prefix, product, scope = document) {
     if (field) field.value = value || "";
   };
   set("Title", product?.titulo || product?.nome);
+  set("Sector", product?.setor);
   set("Price", product?.preco);
   set("Category", product?.categoria);
   set("Status", product?.status || "ativo");
   set("Description", product?.descricao);
   set("Notes", product?.observacoes);
+  set("Brand", product?.marca);
+  set("Model", product?.modelo);
+  set("Size", product?.tamanho);
+  set("Colors", product?.cores);
+  set("Variations", product?.variacoes);
+  set("Condition", product?.condicao);
+  set("Availability", product?.disponibilidade);
+  set("Fulfillment", product?.entregaRetirada);
+  set("SpecificInfo", product?.informacoesEspecificas);
+  set("Order", product?.ordem);
   set("ImageUrl", product?.imagem);
+  const showPrice = scope.querySelector(`#${prefix}ProductShowPrice`);
+  if (showPrice) showPrice.checked = product?.mostrarPreco !== false;
+  const featured = scope.querySelector(`#${prefix}ProductFeatured`);
+  if (featured) featured.checked = Boolean(product?.destaque);
 }
 
 function readProductFields(prefix, scope = document, fallbackId = "") {
   const get = (suffix) => scope.querySelector(`#${prefix}Product${suffix}`)?.value.trim() || "";
+  const checked = (suffix, fallback = false) => {
+    const field = scope.querySelector(`#${prefix}Product${suffix}`);
+    return field ? Boolean(field.checked) : fallback;
+  };
   return {
     id: fallbackId || `produto-${Date.now()}`,
     titulo: get("Title"),
     nome: get("Title"),
+    setor: get("Sector"),
     preco: get("Price"),
+    mostrarPreco: checked("ShowPrice", true),
     categoria: get("Category"),
     status: get("Status") || "ativo",
     descricao: get("Description"),
     observacoes: get("Notes"),
+    marca: get("Brand"),
+    modelo: get("Model"),
+    tamanho: get("Size"),
+    cores: get("Colors"),
+    variacoes: get("Variations"),
+    condicao: get("Condition"),
+    disponibilidade: get("Availability"),
+    entregaRetirada: get("Fulfillment"),
+    informacoesEspecificas: get("SpecificInfo"),
     imagem: get("ImageUrl"),
+    destaque: checked("Featured", false),
+    ordem: get("Order"),
     ativo: (get("Status") || "ativo") !== "inativo"
   };
+}
+
+function validarProdutoVitrine(prefix, scope = document) {
+  const required = [
+    ["Title", "Informe o nome do produto."],
+    ["Sector", "Informe o setor do produto."],
+    ["Category", "Informe a categoria do produto."],
+    ["Description", "Informe a descricao curta do produto."],
+    ["Status", "Informe se o produto esta ativo ou inativo."]
+  ];
+  for (const [suffix, message] of required) {
+    const field = scope.querySelector(`#${prefix}Product${suffix}`);
+    if (!field || String(field.value || "").trim()) continue;
+    showToast(message);
+    field.focus?.();
+    return false;
+  }
+  return true;
 }
 
 function clearJobFields(prefix, scope = document) {
@@ -3638,11 +3705,7 @@ async function registrarProdutoNovidadeClienteAdmin({ clientId = "", clientName 
 }
 
 async function addClientProduct() {
-  const title = $("clientProductTitle")?.value.trim();
-  if (!title) {
-    showToast("Informe o nome do produto.");
-    return;
-  }
+  if (!validarProdutoVitrine("client", document)) return;
   const currentId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
   let image = $("clientProductImageUrl")?.value.trim() || "";
   const file = $("clientProductImageUpload")?.files?.[0];
@@ -12301,14 +12364,30 @@ function renderClientOnlyEditor() {
             <span id="coProductsCount" class="badge">${produtos.length} item${produtos.length === 1 ? "" : "s"}</span>
           </div>
           <div class="promo-admin-form">
-            <label>Nome do produto<input id="coProductTitle" placeholder="Ex.: Dipirona 500mg"></label>
-            <label>Preco<input id="coProductPrice" placeholder="Ex.: 12,90"></label>
-            <label>Categoria<input id="coProductCategory" placeholder="Ex.: Medicamentos"></label>
-            <label>Status<select id="coProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
-            <label class="wide">Descricao<textarea id="coProductDescription" rows="3" placeholder="Detalhes do produto"></textarea></label>
-            <label class="wide">Observacoes<textarea id="coProductNotes" rows="2" placeholder="Opcional"></textarea></label>
+            <div class="form-section-title wide"><i class="fa-solid fa-box-open"></i><div><strong>1. Dados do produto</strong><span>Campos principais da vitrine publica.</span></div></div>
+            <label>Nome do produto<input id="coProductTitle" placeholder="Ex.: Tenis Casual Feminino"></label>
+            <label>Setor<select id="coProductSector"><option value="">Selecione</option><option>Eletronicos</option><option>Roupas</option><option>Calcados</option><option>Alimentos</option><option>Casa e Decoracao</option><option>Brinquedos</option><option>Beleza e Cosmeticos</option><option>Saude e Farmacia</option><option>Pet</option><option>Ferramentas</option><option>Esporte e Lazer</option><option>Acessorios</option><option>Moveis</option><option>Papelaria</option><option>Outros</option></select></label>
+            <label>Categoria<input id="coProductCategory" placeholder="Ex.: Tenis, Camisetas, Celulares"></label>
+            <label>Preco<input id="coProductPrice" placeholder="Ex.: 89,90"></label>
+            <label class="checkbox-line"><input id="coProductShowPrice" type="checkbox" checked> Mostrar preco?</label>
+            <label>Produto ativo<select id="coProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
+            <label class="wide">Descricao curta<textarea id="coProductDescription" rows="3" placeholder="Produto disponivel na loja. Consulte cores, tamanhos e disponibilidade pelo WhatsApp."></textarea></label>
             <label>Imagem do produto<input id="coProductImageUpload" type="file" accept="image/*"></label>
             <label>Ou URL da imagem<input id="coProductImageUrl" placeholder="https://..."></label>
+            <div class="form-section-title wide"><i class="fa-solid fa-circle-info"></i><div><strong>2. Mais informacoes - opcional</strong><span>Campos genericos para varios tipos de comercio.</span></div></div>
+            <label>Marca<input id="coProductBrand" placeholder="Ex.: Nike, JBL, Mondial"></label>
+            <label>Modelo<input id="coProductModel" placeholder="Ex.: Bluetooth 5.0, 220V"></label>
+            <label>Tamanho / medida / volume<input id="coProductSize" placeholder="Ex.: 500g, P ao GG, 1 litro"></label>
+            <label>Cores disponiveis<input id="coProductColors" placeholder="Ex.: Preto, branco, nude"></label>
+            <label class="wide">Variacoes<textarea id="coProductVariations" rows="2" placeholder="Ex.: Numeracao do 34 ao 39; sabores; cores disponiveis"></textarea></label>
+            <label>Condicao<select id="coProductCondition"><option value="">Nao informar</option><option>Novo</option><option>Usado</option><option>Seminovo</option><option>Sob encomenda</option><option>Nao se aplica</option></select></label>
+            <label>Disponibilidade<select id="coProductAvailability"><option value="">Nao informar</option><option>Disponivel</option><option>Indisponivel</option><option>Sob encomenda</option><option>Consultar estoque</option><option>Em breve</option></select></label>
+            <label>Entrega ou retirada<select id="coProductFulfillment"><option value="">Nao informar</option><option>Retirada na loja</option><option>Entrega disponivel</option><option>Consultar entrega</option><option>Somente encomenda</option><option>Nao se aplica</option></select></label>
+            <label class="wide">Informacoes especificas<textarea id="coProductSpecificInfo" rows="3" placeholder="Ex.: Produto bivolt. Consulte garantia e disponibilidade."></textarea></label>
+            <label class="wide">Observacoes internas/opcionais<textarea id="coProductNotes" rows="2" placeholder="Opcional"></textarea></label>
+            <div class="form-section-title wide"><i class="fa-solid fa-eye"></i><div><strong>3. Exibicao</strong><span>Controle como o produto aparece na aba publica.</span></div></div>
+            <label class="checkbox-line"><input id="coProductFeatured" type="checkbox"> Produto em destaque</label>
+            <label>Ordem de exibicao<input id="coProductOrder" type="number" min="0" step="1" placeholder="Ex.: 1"></label>
             <div class="promo-form-actions wide">
               <button id="coAddProductButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar produto</button>
               <button id="coCancelProductEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>
@@ -12749,11 +12828,7 @@ function renderClientOnlyEditor() {
   });
 
   mount.querySelector("#coAddProductButton")?.addEventListener("click", async () => {
-    const title = $("coProductTitle")?.value.trim();
-    if (!title) {
-      showToast("Informe o nome do produto.");
-      return;
-    }
+    if (!validarProdutoVitrine("co", mount)) return;
 
     let image = $("coProductImageUrl")?.value.trim() || "";
     const imageFile = $("coProductImageUpload")?.files?.[0];
@@ -13351,7 +13426,13 @@ function renderProdutosMarkup(produtos, removeAttr = "product-remove", editAttr 
       ${produto.imagem ? `<img src="${escapeAttr(displayImageUrl(produto.imagem))}" alt="${escapeAttr(produto.titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : `<div class="promo-admin-empty"><i class="fa-solid fa-box-open"></i></div>`}
       <div>
         <strong>${escapeHtml(produto.titulo)}</strong>
-        <span>${escapeHtml([produto.preco ? `R$ ${produto.preco}` : "", produto.categoria].filter(Boolean).join(" - ") || "Sem preco/categoria")}</span>
+        <span>${escapeHtml([
+          produto.setor,
+          produto.categoria,
+          produto.mostrarPreco === false ? "Preco: Consultar" : (produto.preco ? `R$ ${produto.preco}` : "Sem preco")
+        ].filter(Boolean).join(" - "))}</span>
+        ${produto.destaque ? `<small>Destaque na vitrine</small>` : ""}
+        ${produto.ordem ? `<small>Ordem: ${escapeHtml(produto.ordem)}</small>` : ""}
         ${produto.descricao ? `<small>${escapeHtml(produto.descricao)}</small>` : ""}
         ${produto.observacoes ? `<small>${escapeHtml(produto.observacoes)}</small>` : ""}
         ${produto.status === "inativo" || produto.ativo === false ? `<small>Inativo no site publico</small>` : ""}
