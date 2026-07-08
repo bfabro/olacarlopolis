@@ -7673,6 +7673,13 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   function itemPertenceAoEstabelecimentoPublico(item = {}, est = {}) {
     const chaves = new Set(chavesEstabelecimentoPublico(est));
     if (!chaves.size) return false;
+    const cliente = clientePublicoDoEstabelecimento(est) || {};
+    [
+      cliente.id,
+      cliente.nome,
+      cliente.name,
+      cliente.nomeNormalizado
+    ].map(normalizeName).filter(Boolean).forEach((chave) => chaves.add(chave));
     const candidatos = [
       item.estabelecimentoId,
       item.clienteId,
@@ -7701,13 +7708,20 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       item.raw?.estabelecimento,
       ...(Array.isArray(item.corretores) ? item.corretores : [])
     ].map(normalizeName).filter(Boolean);
+    const chavesFortes = [...chaves].filter((chave) => chave.length >= 6);
+    const correspondeComoAliasForte = (valor, chave) => {
+      if (valor === chave) return true;
+      if (valor.length < 6 || chave.length < 6) return false;
+      const menor = valor.length < chave.length ? valor : chave;
+      const maior = valor.length < chave.length ? chave : valor;
+      if (menor.length < 6) return false;
+      const diferenca = maior.length - menor.length;
+      if (diferenca > 24) return false;
+      return maior.startsWith(menor) || maior.endsWith(menor);
+    };
     return candidatos.some((valor) => {
       if (chaves.has(valor)) return true;
-      return [...chaves].some((chave) => (
-        chave.length >= 4
-        && valor.length >= 4
-        && (valor.includes(chave) || chave.includes(valor))
-      ));
+      return chavesFortes.some((chave) => correspondeComoAliasForte(valor, chave));
     });
   }
 
