@@ -7802,15 +7802,27 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         entregaRetirada: item.entregaRetirada || "",
         faixaPreco: item.faixaPreco || "",
         modoPreco: item.modoPreco || "",
-        precoAntigo: item.precoAntigo || null,
+        precoAntigo: item.precoAntigo || item.precoReal || item.valorReal || item.precoOriginal || null,
         unidade: item.unidade || "",
         volume: item.volume || "",
         embalagem: item.embalagem || "",
         imagem: item.imagem || item.image || item.foto || item.fotoUrl || item.imagemUrl || "",
+        imagens: [
+          ...(Array.isArray(item.imagens) ? item.imagens : []),
+          item.imagem,
+          item.image,
+          item.foto,
+          item.fotoUrl,
+          item.imagemUrl
+        ].map((url) => String(url || "").trim()).filter(Boolean).slice(0, 4),
         validadeInicio: item.validadeInicio || item.validade || null,
         validadeFim: item.validadeFim || null,
         diasSemana: normalizarDiasSemanaPromocao(item.diasSemana || item.dias || item.recorrenciaDias || item.diaSemana),
         obs: item.obs || item.observacoes || "",
+        contato: item.contato || item.contact || item.whatsapp || contexto.contact || contexto.contato || "",
+        whatsapp: item.whatsapp || contexto.whatsapp || contexto.contact || contexto.contato || "",
+        telefone: item.telefone || contexto.telefone || "",
+        instagram: item.instagram || contexto.instagram || "",
         ativo: item.ativo === false ? false : true,
         status: item.status || "ativo"
       }))
@@ -7823,7 +7835,11 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const promocoesCliente = normalizarPromocoesPublicas(cliente.promocoes || est.promocoes || est.promotions || [], {
       estabelecimento: est.name || cliente.nome || cliente.name || "",
       estabelecimentoId: normalizeName(cliente.id || est.clienteId || cliente.nomeNormalizado || est.nomeNormalizado || est.name || ""),
-      categoria: cliente.categoria || est.categoria || ""
+      categoria: cliente.categoria || est.categoria || "",
+      contact: getPrimeiroContato(cliente.contato || cliente.whatsapp || est.contact || est.whatsapp || est.telefone || "") || "",
+      whatsapp: cliente.whatsapp || est.whatsapp || "",
+      telefone: cliente.telefone || est.telefone || "",
+      instagram: cliente.instagram || est.instagram || ""
     });
     const porId = new Map();
     [...coletarTodasPromocoes(), ...promocoesCliente]
@@ -7843,10 +7859,11 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     return tipo === "produto" ? "Consultar" : "";
   }
 
-  function produtoWhatsappLink(item = {}) {
+  function produtoWhatsappLink(item = {}, tipo = "produto") {
     const contato = somenteDigitos(item.contato || item.whatsapp || item.telefone || "");
     if (contato.length < 10) return "";
-    const mensagem = `Ola, vi no Ola Carlopolis o produto: ${item.titulo || item.nome || "Produto"}. Gostaria de mais informacoes.`;
+    const label = tipo === "promocao" ? "a promocao" : "o produto";
+    const mensagem = `Ola, vi no Ola Carlopolis ${label}: ${item.titulo || item.nome || "Produto"}. Gostaria de mais informacoes.`;
     return `https://api.whatsapp.com/send?phone=${numeroWhatsAppBrasil(contato)}&text=${encodeURIComponent(mensagem)}`;
   }
 
@@ -7856,11 +7873,22 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   }
 
   function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
+    const isPromocao = tipo === "promocao";
     const preco = produtoPrecoPublico(item, tipo);
+    const precoAntigo = formatarMoedaPromo(item.precoAntigo || item.precoReal || item.valorReal || item.precoOriginal || "");
     const titulo = escapePromoHtml(item.titulo || "Produto");
     const descricao = escapePromoHtml(item.descricao || item.observacoes || "");
-    const setorCategoria = [item.setor, item.categoria].filter(Boolean).join(" / ");
-    const whatsapp = tipo === "produto" ? produtoWhatsappLink(item) : "";
+    const dataPromocaoBR = (value) => {
+      const parts = String(value || "").split("-");
+      return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : String(value || "");
+    };
+    const infoPromocao = [
+      item.validadeFim ? `Valido ate ${dataPromocaoBR(item.validadeFim)}` : "",
+      item.desconto ? `Desconto: ${item.desconto}` : "",
+      item.entregaRetirada || ""
+    ].filter(Boolean).join(" | ");
+    const setorCategoria = isPromocao ? "Promocao" : [item.setor, item.categoria].filter(Boolean).join(" / ");
+    const whatsapp = produtoWhatsappLink(item, tipo);
     const id = String(item.id || `produto-${normalizeName(item.titulo || item.nome || "item")}`);
     const cacheKey = `${tipo}:${id}`;
     if (typeof window !== "undefined") {
@@ -7868,23 +7896,25 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       window.__lojaProdutosDetalhes[cacheKey] = { ...item, id };
     }
     return `
-      <article class="loja-produto-card loja-card-produto" data-loja-produto="${escapePromoHtml(id)}" data-loja-produto-tipo="${tipo}" data-loja-produto-key="${escapePromoHtml(cacheKey)}">
+      <article class="loja-produto-card loja-card-produto ${isPromocao ? "loja-card-promocao" : ""}" data-loja-produto="${escapePromoHtml(id)}" data-loja-produto-tipo="${tipo}" data-loja-produto-key="${escapePromoHtml(cacheKey)}">
         <div class="loja-produto-card-body">
           <div class="loja-produto-media">
               ${item.imagem
                 ? `<img src="${escapePromoHtml(item.imagem)}" alt="${titulo}" loading="lazy">`
                 : `<div class="loja-produto-sem-imagem">Imagem do produto</div>`}
-              ${tipo === "produto" && item.destaque ? `<span class="loja-produto-badge">Destaque</span>` : ""}
+              ${isPromocao ? `<span class="loja-produto-badge loja-promocao-badge">Promoção</span>` : (item.destaque ? `<span class="loja-produto-badge">Destaque</span>` : "")}
           </div>
           <div class="loja-produto-info">
             ${setorCategoria ? `<div class="loja-produto-categoria">${escapePromoHtml(setorCategoria)}</div>` : ""}
             <div class="loja-produto-nome">${titulo}</div>
             ${descricao ? `<div class="loja-produto-descricao">${descricao}</div>` : ""}
+            ${isPromocao && infoPromocao ? `<div class="loja-produto-promocao-info">${escapePromoHtml(infoPromocao)}</div>` : ""}
           </div>
-          <div class="loja-produto-preco">
-            <span>${escapePromoHtml(preco || "Ver detalhes")}</span>
+          <div class="loja-produto-preco ${isPromocao ? "loja-promocao-preco" : ""}">
+            ${isPromocao && precoAntigo ? `<small>De <s>${escapePromoHtml(precoAntigo)}</s></small>` : ""}
+            <span>${escapePromoHtml(preco || (isPromocao ? "Ver promoção" : "Ver detalhes"))}</span>
           </div>
-          ${tipo === "produto" ? (whatsapp
+          ${(tipo === "produto" || isPromocao) ? (whatsapp
             ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>`
             : `<button type="button" class="loja-produto-interesse is-disabled" disabled>Tenho interesse</button>`) : ""}
         </div>
@@ -7955,8 +7985,9 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     document.querySelector(".loja-produto-modal")?.remove();
     const titulo = item.titulo || tituloPadrao;
     const isProduto = normalizeName(tituloPadrao || "").includes("produto");
+    const isPromocao = normalizeName(tituloPadrao || "").includes("promocao");
     const preco = produtoPrecoPublico(item, isProduto ? "produto" : "promocao");
-    const whatsapp = isProduto ? produtoWhatsappLink(item) : "";
+    const whatsapp = (isProduto || isPromocao) ? produtoWhatsappLink(item, isPromocao ? "promocao" : "produto") : "";
     const imagensProduto = [
       ...(Array.isArray(item.imagens) ? item.imagens : []),
       ...(Array.isArray(item.fotos) ? item.fotos : []),
@@ -8018,7 +8049,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ${detalhesProdutoHtml}
             </section>
           ` : ""}
-          ${isProduto && whatsapp ? `<a class="auto-whatsapp-button loja-produto-whatsapp" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>` : ""}
+          ${(isProduto || isPromocao) && whatsapp ? `<a class="auto-whatsapp-button loja-produto-whatsapp" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>` : ""}
         </div>
       </section>
     `;
@@ -11129,14 +11160,23 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (deveMostrarAbaPromocoes) {
         abasInseridas = adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
           const promocoesUnicas = deduplicarPromocoesMesmoEstabelecimentoPublico(promocoes);
+          const contatoPromocaoPadrao = getPrimeiroContato(est.contact || est.contato || est.whatsapp || est.telefone || "") || "";
           const itens = promocoesUnicas.map((promo) => ({
             id: promo.id,
             titulo: promo.titulo,
             descricao: promo.descricao || promo.obs,
             preco: promo.preco,
+            precoAntigo: promo.precoAntigo || promo.precoReal || promo.valorReal || promo.precoOriginal || "",
             imagem: promo.imagem,
+            imagens: promo.imagens || (promo.imagem ? [promo.imagem] : []),
+            validadeFim: promo.validadeFim || "",
+            desconto: promo.desconto || "",
+            entregaRetirada: promo.entregaRetirada || "",
             observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
-            categoria: "Promocao"
+            categoria: "Promocao",
+            contato: getPrimeiroContato(promo.contato || promo.contact || promo.whatsapp || "") || contatoPromocaoPadrao,
+            whatsapp: promo.whatsapp || promo.contato || promo.contact || contatoPromocaoPadrao,
+            telefone: promo.telefone || est.telefone || ""
           }));
           pane.innerHTML = `<section class="loja-itens-wrap loja-promocoes-wrap promo-city-screen"><div class="loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {

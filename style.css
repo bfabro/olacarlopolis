@@ -21321,6 +21321,17 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   box-shadow: 0 6px 14px rgba(249, 115, 22, .28);
 }
 
+.loja-card-promocao {
+  background:
+    linear-gradient(135deg, rgba(249, 115, 22, .11), rgba(255, 247, 237, .78) 38%, rgba(255,255,255,1) 39%),
+    #fff;
+  border-color: #fed7aa;
+}
+
+.loja-promocao-badge {
+  background: #f97316;
+}
+
 .loja-produto-info {
   display: flex;
   flex-direction: column;
@@ -21352,6 +21363,16 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   -webkit-box-orient: vertical;
 }
 
+.loja-produto-promocao-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  color: #9a3412;
+  font-size: .76rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
 .loja-produto-preco {
   display: flex;
   align-items: center;
@@ -21366,6 +21387,25 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   font-weight: 950;
   line-height: 1.1;
   text-align: center;
+}
+
+.loja-promocao-preco {
+  flex-direction: column;
+  gap: 2px;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.loja-promocao-preco small {
+  color: #64748b;
+  font-size: .72rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.loja-promocao-preco span {
+  color: #c2410c;
+  font-size: 1rem;
 }
 
 .loja-produto-interesse,
