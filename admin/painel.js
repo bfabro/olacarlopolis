@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 435,
-  label: "v441",
+  numero: 436,
+  label: "v442",
   data: "2026-07-08",
-  nota: "Perfil publico filtra veiculos por vinculo exato do cliente."
+  nota: "Revendas de veiculos usam categoria unificada e vinculo por cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

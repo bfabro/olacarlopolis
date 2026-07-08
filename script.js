@@ -20658,7 +20658,27 @@ plotarPinsImoveis(stateImoveis.filtered);
         return palavra;
       });
     const chave = palavras.join("");
-    return aliases[chave] || chave;
+    const chaveNormalizada = aliases[chave] || chave;
+    if (/^(revenda|loja|concessionaria)?(de)?(auto|autos|automovel|automoveis|veiculo|veiculos|carro|carros|moto|motos)+$/.test(chaveNormalizada)) return "revendaveiculo";
+    if (/(revenda|loja|concessionaria).*(auto|automovel|veiculo|carro|moto)/.test(chaveNormalizada)) return "revendaveiculo";
+    if (/(auto|automovel|veiculo|carro|moto).*(revenda|loja|concessionaria)/.test(chaveNormalizada)) return "revendaveiculo";
+    return chaveNormalizada;
+  }
+
+  function tituloCanonicoCategoriaAdmin(tituloCategoria = "") {
+    const chave = chaveMenuCategoriaAdmin(tituloCategoria);
+    if (chave === "revendaveiculo") return "Revenda de Veículos";
+    return String(tituloCategoria || "Outros").trim() || "Outros";
+  }
+
+  function encontrarCategoriaPorSlugAdmin(slugOuTitulo = "") {
+    const slug = normalizeName(slugOuTitulo);
+    const chave = chaveMenuCategoriaAdmin(slugOuTitulo);
+    return categories.find((cat) => normalizeName(cat.title || "") === slug || chaveMenuCategoriaAdmin(cat.title || "") === chave) || null;
+  }
+
+  function hashCategoriaAdmin(tituloCategoria = "") {
+    return "#comercios-" + normalizeName(tituloCanonicoCategoriaAdmin(tituloCategoria));
   }
 
   function iconClassCategoriaAdmin(meta) {
@@ -20671,7 +20691,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function garantirCategoriaAdmin(tituloCategoria, meta = {}) {
-    const title = String(tituloCategoria || "Outros").trim() || "Outros";
+    const title = tituloCanonicoCategoriaAdmin(tituloCategoria);
     const slug = normalizeName(title);
     const chaveMenu = chaveMenuCategoriaAdmin(title);
     let categoria = categories.find((cat) => normalizeName(cat.title) === slug || chaveMenuCategoriaAdmin(cat.title) === chaveMenu);
@@ -20734,8 +20754,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     link.dataset.adminCategoryBound = "true";
     link.addEventListener("click", function (event) {
       event.preventDefault();
-      location.hash = "#comercios-" + slug;
-      const cat = categories.find((item) => normalizeName(item.title) === slug);
+      location.hash = hashCategoriaAdmin(title);
+      const cat = encontrarCategoriaPorSlugAdmin(title) || categories.find((item) => normalizeName(item.title) === slug);
       if (cat) loadContent(cat.title, cat.establishments);
     });
   }
@@ -22667,7 +22687,9 @@ ${produtosIniciaisLoja.length ? `
     const m = h.match(/^#comercios-(.+)$/);
     if (m) {
       const slug = m[1]; // ex.: "adega"
-      const cat = categories.find(c => normalizeName(c.title) === slug);
+      const cat = typeof encontrarCategoriaPorSlugAdmin === "function"
+        ? encontrarCategoriaPorSlugAdmin(slug)
+        : categories.find(c => normalizeName(c.title) === slug);
       if (cat) {
         prepararMenuParaCategoria(cat);
         return loadContent(cat.title, cat.establishments);
