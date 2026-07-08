@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 428,
-  label: "v434",
+  numero: 429,
+  label: "v435",
   data: "2026-07-08",
-  nota: "Cadastro de Produtos/Vitrine ganhou campos genericos e exibicao publica completa."
+  nota: "Combos da vitrine em ordem alfabetica e medida exibida por tipo escolhido."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -59,6 +59,28 @@ let automovelArteDragState = null;
 let automovelArteDragFrame = null;
 let automovelArtePreviewRendering = false;
 let automovelArtePreviewQueued = false;
+
+const PRODUCT_SECTOR_OPTIONS = [
+  "Acessorios",
+  "Alimentos",
+  "Beleza e Cosmeticos",
+  "Brinquedos",
+  "Calcados",
+  "Casa e Decoracao",
+  "Eletronicos",
+  "Esporte e Lazer",
+  "Ferramentas",
+  "Moveis",
+  "Outros",
+  "Papelaria",
+  "Pet",
+  "Roupas",
+  "Saude e Farmacia"
+];
+const PRODUCT_CONDITION_OPTIONS = ["Nao se aplica", "Novo", "Seminovo", "Sob encomenda", "Usado"];
+const PRODUCT_AVAILABILITY_OPTIONS = ["Consultar estoque", "Disponivel", "Em breve", "Indisponivel", "Sob encomenda"];
+const PRODUCT_FULFILLMENT_OPTIONS = ["Consultar entrega", "Entrega disponivel", "Nao se aplica", "Retirada na loja", "Somente encomenda"];
+const PRODUCT_MEASURE_TYPE_OPTIONS = ["Medida", "Tamanho", "Volume"];
 
 let state = {
   user: null,
@@ -794,6 +816,7 @@ function normalizeProdutos(items) {
         observacoes: String(item?.observacoes || item?.obs || item?.detalhes || "").trim(),
         marca: String(item?.marca || item?.brand || "").trim(),
         modelo: String(item?.modelo || item?.model || "").trim(),
+        tipoMedida: String(item?.tipoMedida || item?.measureType || (item?.volume ? "Volume" : item?.medida ? "Medida" : item?.tamanho ? "Tamanho" : "")).trim(),
         tamanho: String(item?.tamanho || item?.medida || item?.volume || item?.size || "").trim(),
         cores: String(item?.cores || item?.cor || item?.colors || "").trim(),
         variacoes: String(item?.variacoes || item?.variacao || item?.variations || "").trim(),
@@ -3302,6 +3325,12 @@ function clearClientPromoFields() {
   $("cancelClientPromoEditButton")?.classList.add("hidden");
 }
 
+function productSelectOptions(options = [], placeholder = "Selecione") {
+  return [`<option value="">${escapeHtml(placeholder)}</option>`]
+    .concat(options.map((option) => `<option value="${escapeAttr(option)}">${escapeHtml(option)}</option>`))
+    .join("");
+}
+
 function clearPromoFields(prefix, scope = document) {
   ["Title", "Price", "Discount", "OldPrice", "Unit", "Volume", "Pack", "Start", "End", "OfferType", "Fulfillment", "PriceRange", "PriceMode", "Obs", "InstagramMsg", "ImageUrl"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Promo${suffix}`);
@@ -3365,7 +3394,7 @@ function readPromoFields(prefix, scope = document, fallbackId = "") {
 }
 
 function clearProductFields(prefix, scope = document) {
-  ["Title", "Sector", "Price", "Category", "Status", "Description", "Notes", "Brand", "Model", "Size", "Colors", "Variations", "Condition", "Availability", "Fulfillment", "SpecificInfo", "Order", "ImageUrl"].forEach((suffix) => {
+  ["Title", "Sector", "Price", "Category", "Status", "Description", "Notes", "Brand", "Model", "MeasureType", "Size", "Colors", "Variations", "Condition", "Availability", "Fulfillment", "SpecificInfo", "Order", "ImageUrl"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Product${suffix}`);
     if (field) field.value = suffix === "Status" ? "ativo" : "";
   });
@@ -3391,6 +3420,7 @@ function fillProductFields(prefix, product, scope = document) {
   set("Notes", product?.observacoes);
   set("Brand", product?.marca);
   set("Model", product?.modelo);
+  set("MeasureType", product?.tipoMedida);
   set("Size", product?.tamanho);
   set("Colors", product?.cores);
   set("Variations", product?.variacoes);
@@ -3425,6 +3455,7 @@ function readProductFields(prefix, scope = document, fallbackId = "") {
     observacoes: get("Notes"),
     marca: get("Brand"),
     modelo: get("Model"),
+    tipoMedida: get("MeasureType"),
     tamanho: get("Size"),
     cores: get("Colors"),
     variacoes: get("Variations"),
@@ -12366,7 +12397,7 @@ function renderClientOnlyEditor() {
           <div class="promo-admin-form">
             <div class="form-section-title wide"><i class="fa-solid fa-box-open"></i><div><strong>1. Dados do produto</strong><span>Campos principais da vitrine publica.</span></div></div>
             <label>Nome do produto<input id="coProductTitle" placeholder="Ex.: Tenis Casual Feminino"></label>
-            <label>Setor<select id="coProductSector"><option value="">Selecione</option><option>Eletronicos</option><option>Roupas</option><option>Calcados</option><option>Alimentos</option><option>Casa e Decoracao</option><option>Brinquedos</option><option>Beleza e Cosmeticos</option><option>Saude e Farmacia</option><option>Pet</option><option>Ferramentas</option><option>Esporte e Lazer</option><option>Acessorios</option><option>Moveis</option><option>Papelaria</option><option>Outros</option></select></label>
+            <label>Setor<select id="coProductSector">${productSelectOptions(PRODUCT_SECTOR_OPTIONS)}</select></label>
             <label>Categoria<input id="coProductCategory" placeholder="Ex.: Tenis, Camisetas, Celulares"></label>
             <label>Preco<input id="coProductPrice" placeholder="Ex.: 89,90"></label>
             <label class="checkbox-line"><input id="coProductShowPrice" type="checkbox" checked> Mostrar preco?</label>
@@ -12377,12 +12408,13 @@ function renderClientOnlyEditor() {
             <div class="form-section-title wide"><i class="fa-solid fa-circle-info"></i><div><strong>2. Mais informacoes - opcional</strong><span>Campos genericos para varios tipos de comercio.</span></div></div>
             <label>Marca<input id="coProductBrand" placeholder="Ex.: Nike, JBL, Mondial"></label>
             <label>Modelo<input id="coProductModel" placeholder="Ex.: Bluetooth 5.0, 220V"></label>
-            <label>Tamanho / medida / volume<input id="coProductSize" placeholder="Ex.: 500g, P ao GG, 1 litro"></label>
+            <label>Tipo de medida<select id="coProductMeasureType">${productSelectOptions(PRODUCT_MEASURE_TYPE_OPTIONS)}</select></label>
+            <label>Valor<input id="coProductSize" placeholder="Ex.: 500g, P ao GG, 1 litro"></label>
             <label>Cores disponiveis<input id="coProductColors" placeholder="Ex.: Preto, branco, nude"></label>
             <label class="wide">Variacoes<textarea id="coProductVariations" rows="2" placeholder="Ex.: Numeracao do 34 ao 39; sabores; cores disponiveis"></textarea></label>
-            <label>Condicao<select id="coProductCondition"><option value="">Nao informar</option><option>Novo</option><option>Usado</option><option>Seminovo</option><option>Sob encomenda</option><option>Nao se aplica</option></select></label>
-            <label>Disponibilidade<select id="coProductAvailability"><option value="">Nao informar</option><option>Disponivel</option><option>Indisponivel</option><option>Sob encomenda</option><option>Consultar estoque</option><option>Em breve</option></select></label>
-            <label>Entrega ou retirada<select id="coProductFulfillment"><option value="">Nao informar</option><option>Retirada na loja</option><option>Entrega disponivel</option><option>Consultar entrega</option><option>Somente encomenda</option><option>Nao se aplica</option></select></label>
+            <label>Condicao<select id="coProductCondition">${productSelectOptions(PRODUCT_CONDITION_OPTIONS, "Nao informar")}</select></label>
+            <label>Disponibilidade<select id="coProductAvailability">${productSelectOptions(PRODUCT_AVAILABILITY_OPTIONS, "Nao informar")}</select></label>
+            <label>Entrega ou retirada<select id="coProductFulfillment">${productSelectOptions(PRODUCT_FULFILLMENT_OPTIONS, "Nao informar")}</select></label>
             <label class="wide">Informacoes especificas<textarea id="coProductSpecificInfo" rows="3" placeholder="Ex.: Produto bivolt. Consulte garantia e disponibilidade."></textarea></label>
             <label class="wide">Observacoes internas/opcionais<textarea id="coProductNotes" rows="2" placeholder="Opcional"></textarea></label>
             <div class="form-section-title wide"><i class="fa-solid fa-eye"></i><div><strong>3. Exibicao</strong><span>Controle como o produto aparece na aba publica.</span></div></div>

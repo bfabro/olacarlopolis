@@ -7743,6 +7743,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         setor: item.setor || item.segmento || item.departamento || "",
         marca: item.marca || item.brand || "",
         modelo: item.modelo || item.model || "",
+        tipoMedida: item.tipoMedida || item.measureType || (item.volume ? "Volume" : item.medida ? "Medida" : item.tamanho ? "Tamanho" : ""),
         tamanho: item.tamanho || item.medida || item.volume || item.size || "",
         cores: item.cores || item.cor || item.colors || "",
         variacoes: item.variacoes || item.variacao || item.variations || "",
@@ -7836,6 +7837,11 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     if (contato.length < 10) return "";
     const mensagem = `Ola, vi no Ola Carlopolis o produto: ${item.titulo || item.nome || "Produto"}. Gostaria de mais informacoes.`;
     return `https://api.whatsapp.com/send?phone=${numeroWhatsAppBrasil(contato)}&text=${encodeURIComponent(mensagem)}`;
+  }
+
+  function produtoMedidaLabel(item = {}) {
+    const label = item.tipoMedida || "";
+    return ["Tamanho", "Medida", "Volume"].includes(label) ? label : "Tamanho";
   }
 
   function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
@@ -7946,7 +7952,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const detalhesProdutoHtml = [
       detalheLinha("Marca", item.marca, "fa-solid fa-copyright"),
       detalheLinha("Modelo", item.modelo, "fa-solid fa-barcode"),
-      detalheLinha("Tamanho / medida / volume", item.tamanho, "fa-solid fa-ruler-combined"),
+      detalheLinha(produtoMedidaLabel(item), item.tamanho, "fa-solid fa-ruler-combined"),
       detalheLinha("Cores disponiveis", item.cores, "fa-solid fa-palette"),
       detalheLinha("Variacoes", item.variacoes, "fa-solid fa-layer-group"),
       detalheLinha("Condicao", item.condicao, "fa-solid fa-certificate"),
