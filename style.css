@@ -21403,18 +21403,58 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 }
 
 .loja-produto-modal-galeria {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
+  position: relative;
+  display: block;
   width: 100%;
+  height: 100%;
+  min-height: 320px;
 }
 
-.loja-produto-modal-galeria img {
+.loja-produto-modal-galeria .loja-produto-modal-img {
   width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
+  height: 100% !important;
+  min-height: 320px;
+  border-radius: 14px;
   object-fit: cover !important;
+}
+
+.loja-produto-galeria-seta {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .78);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transform: translateY(-50%);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .24);
+}
+
+.loja-produto-galeria-seta.anterior {
+  left: 14px;
+}
+
+.loja-produto-galeria-seta.proxima {
+  right: 14px;
+}
+
+.loja-produto-galeria-contador {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 3;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .78);
+  color: #fff;
+  font-size: .8rem;
+  font-weight: 900;
 }
 
 @media (max-width: 720px) {

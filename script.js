@@ -7957,7 +7957,14 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const isProduto = normalizeName(tituloPadrao || "").includes("produto");
     const preco = produtoPrecoPublico(item, isProduto ? "produto" : "promocao");
     const whatsapp = isProduto ? produtoWhatsappLink(item) : "";
-    const imagensProduto = (Array.isArray(item.imagens) && item.imagens.length ? item.imagens : (item.imagem ? [item.imagem] : [])).slice(0, 4);
+    const imagensProduto = [
+      ...(Array.isArray(item.imagens) ? item.imagens : []),
+      ...(Array.isArray(item.fotos) ? item.fotos : []),
+      item.imagem,
+      item.image,
+      item.foto,
+      item.banner
+    ].map((img) => String(img || "").trim()).filter(Boolean).filter((img, index, arr) => arr.indexOf(img) === index).slice(0, 4);
     const detalheLinha = (label, value, icon = "fa-solid fa-circle-info") => (
       value ? `<p class="imovel-detalhes-endereco"><i class="${icon}"></i><span><strong>${escapePromoHtml(label)}:</strong> ${escapePromoHtml(value)}</span></p>` : ""
     );
@@ -7979,8 +7986,13 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
         <div class="imovel-detalhes-media loja-produto-media">
           ${imagensProduto.length ? `
-            <div class="loja-produto-modal-galeria">
-              ${imagensProduto.map((img, index) => `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(titulo)} - imagem ${index + 1}" loading="lazy">`).join("")}
+            <div class="loja-produto-modal-galeria" data-produto-galeria>
+              <img class="loja-produto-modal-img" src="${escapePromoHtml(imagensProduto[0])}" alt="${escapePromoHtml(titulo)} - imagem 1" data-produto-galeria-img loading="lazy">
+              ${imagensProduto.length > 1 ? `
+                <button type="button" class="loja-produto-galeria-seta anterior" data-produto-galeria-prev aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                <button type="button" class="loja-produto-galeria-seta proxima" data-produto-galeria-next aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
+                <span class="loja-produto-galeria-contador" data-produto-galeria-count>1/${imagensProduto.length}</span>
+              ` : ""}
             </div>
           ` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-box-open"></i></div>`}
         </div>
@@ -8018,6 +8030,29 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       if (event.key === "Escape") fechar();
     };
     modal.querySelector(".loja-produto-fechar")?.addEventListener("click", fechar);
+    if (imagensProduto.length > 1) {
+      let imagemAtual = 0;
+      const imgEl = modal.querySelector("[data-produto-galeria-img]");
+      const contadorEl = modal.querySelector("[data-produto-galeria-count]");
+      const atualizarGaleria = () => {
+        if (!imgEl) return;
+        imgEl.src = imagensProduto[imagemAtual];
+        imgEl.alt = `${titulo} - imagem ${imagemAtual + 1}`;
+        if (contadorEl) contadorEl.textContent = `${imagemAtual + 1}/${imagensProduto.length}`;
+      };
+      modal.querySelector("[data-produto-galeria-prev]")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        imagemAtual = (imagemAtual - 1 + imagensProduto.length) % imagensProduto.length;
+        atualizarGaleria();
+      });
+      modal.querySelector("[data-produto-galeria-next]")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        imagemAtual = (imagemAtual + 1) % imagensProduto.length;
+        atualizarGaleria();
+      });
+    }
     modal.addEventListener("click", (event) => {
       if (event.target === modal) fechar();
     });

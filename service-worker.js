@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-08-promo-product-modal-v403'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-08-product-promo-modal-gallery-v404'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
