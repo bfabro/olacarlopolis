@@ -3571,7 +3571,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const destaque = novidadeDestaquePrincipal(item);
     const infos = novidadeInfoRapida(item);
     const telefone = novidadeTelefone(item);
-    const destinoTipoAcao = novidadeEhEvento(item) ? "evento" : (item.destinoTipo || item.tipo);
+    const destinoTipoAcao = tipoRef.includes("produto") ? "estabelecimento" : (novidadeEhEvento(item) ? "evento" : (item.destinoTipo || item.tipo));
     const isGrupoWhatsapp = tipoRef.includes("grupo") || tipoRef.includes("whatsapp");
     const grupoLink = isGrupoWhatsapp ? String(item.link || item.raw?.link || item.raw?.url || "").trim() : "";
     const whatsappTexto = [
@@ -3712,10 +3712,9 @@ document.addEventListener("DOMContentLoaded", function () {
       return destacarElementoNovidade(alvo);
     }
     if (tipo.includes("produto")) {
-      const id = normalizeName(item.destinoId || item.estabelecimento || item.raw?.clienteId || item.raw?.clienteNome || "");
+      const id = resolverClienteDestinoNovidadeProduto(item);
       if (id) {
-        location.hash = `#${id}`;
-        return carregarEstabelecimentoPeloHash();
+        return navegarParaEstabelecimentoPublico(id);
       }
     }
     if (tipo.includes("imovel")) {
@@ -3750,6 +3749,38 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     location.hash = "#ondecomer";
     return mostrarOndeComer();
+  }
+
+  function resolverClienteDestinoNovidadeProduto(item = {}) {
+    const candidatos = [
+      item.clienteId,
+      item.raw?.clienteId,
+      item.raw?.idCliente,
+      item.estabelecimentoId,
+      item.raw?.estabelecimentoId,
+      item.destinoClienteId,
+      item.raw?.destinoClienteId,
+      item.clienteNome,
+      item.raw?.clienteNome,
+      item.estabelecimento,
+      item.raw?.estabelecimento,
+      item.raw?.nomeCliente,
+      item.raw?.nomeEstabelecimento,
+      item.destinoId
+    ].map((value) => normalizeName(value)).filter(Boolean);
+    const direto = candidatos.find((chave) => encontrarCategoriaEstabelecimentoPublico(chave));
+    if (direto) return direto;
+
+    const produtoId = String(item.itemId || item.raw?.itemId || item.raw?.produtoId || item.destinoId || "").trim();
+    if (!produtoId) return candidatos[0] || "";
+    for (const categoria of categories || []) {
+      for (const est of categoria.establishments || []) {
+        const produtos = produtosDoEstabelecimentoPublico(est);
+        const encontrouProduto = produtos.some((produto) => String(produto.id || "") === produtoId);
+        if (encontrouProduto) return normalizeName(est.nomeNormalizado || est.clienteId || est.name || est.nome || "");
+      }
+    }
+    return candidatos[0] || "";
   }
 
   function dataEventoPublico(evento) {
