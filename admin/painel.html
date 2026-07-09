@@ -1166,8 +1166,30 @@
                   <span>Detalhes rapidos para facilitar o filtro e a leitura no site publico.</span>
                 </div>
               </div>
-              <label>Combustivel<input id="automovelCombustivel" placeholder="Ex: Flex, Gasolina, Diesel"></label>
-              <label>Cambio<input id="automovelCambio" placeholder="Ex: Manual, Automatico"></label>
+              <label>Combustivel
+                <select id="automovelCombustivel">
+                  <option value="">Selecione</option>
+                  <option>Gasolina</option>
+                  <option>Etanol</option>
+                  <option>Flex</option>
+                  <option>Diesel</option>
+                  <option>GNV</option>
+                  <option>Elétrico</option>
+                  <option>Híbrido</option>
+                  <option>Híbrido Plug-in</option>
+                </select>
+              </label>
+              <label>Cambio
+                <select id="automovelCambio">
+                  <option value="">Selecione</option>
+                  <option>Manual</option>
+                  <option>Automático</option>
+                  <option>Automatizado</option>
+                  <option>CVT</option>
+                  <option>Sequencial</option>
+                  <option>Semi-automático</option>
+                </select>
+              </label>
               <label>Cor<input id="automovelCor" placeholder="Ex: Prata"></label>
               <label>Consumo medio<input id="automovelConsumoMedio" placeholder="Ex: 12 km/l"></label>
               <label>Aceita troca
@@ -1184,7 +1206,15 @@
                   <option value="Nao">Nao</option>
                 </select>
               </label>
-              <label>Documentacao<input id="automovelDocumentacao" placeholder="Ex: Em dia, recibo aberto"></label>
+              <label>Documentacao
+                <select id="automovelDocumentacao">
+                  <option value="">Selecione</option>
+                  <option>Sim</option>
+                  <option>Não</option>
+                  <option>Em regularização</option>
+                  <option>Consultar vendedor</option>
+                </select>
+              </label>
               <label>Motor<input id="automovelMotor" placeholder="Ex: 1.0, 2.8, 160cc"></label>
               <label>Direcao<input id="automovelDirecao" placeholder="Ex: Hidraulica, Eletrica"></label>
               <label>Vidro eletrico
@@ -1614,6 +1644,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=382"></script>
+  <script type="module" src="painel.js?v=383"></script>
 </body>
 </html>

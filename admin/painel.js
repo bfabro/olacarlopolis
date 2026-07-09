@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 443,
-  label: "v449",
+  numero: 444,
+  label: "v450",
   data: "2026-07-09",
-  nota: "Cadastro aceita quatro telefones e galerias publicas ganharam ajustes visuais."
+  nota: "Cadastro de veiculos usa listas para combustivel, cambio e documentacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5675,6 +5675,24 @@ function atualizarCamposTipoAutomovel() {
   toggleAutomovelFieldGroup(veiculoFields, !hasType || !isMoto);
 }
 
+function preencherSelectAutomovel(id, value = "") {
+  const select = $(id);
+  if (!select) return;
+  const safeValue = String(value || "").trim();
+  if (!safeValue) {
+    select.value = "";
+    return;
+  }
+  const exists = [...select.options].some((option) => option.value === safeValue || option.textContent === safeValue);
+  if (!exists) {
+    const option = document.createElement("option");
+    option.value = safeValue;
+    option.textContent = safeValue;
+    select.appendChild(option);
+  }
+  select.value = safeValue;
+}
+
 function fillAutomovelForm(item) {
   if (!itemBelongsToCurrentClient(item)) {
     showToast("Voce nao tem permissao para editar este automovel.");
@@ -5694,13 +5712,13 @@ function fillAutomovelForm(item) {
   $("automovelContato").value = item.contato || "";
   $("automovelVendedor").value = item.vendedor || item.loja || "";
   $("automovelInstagram").value = item.instagram || "";
-  $("automovelCombustivel").value = item.combustivel || "";
-  $("automovelCambio").value = item.cambio || "";
+  preencherSelectAutomovel("automovelCombustivel", item.combustivel || "");
+  preencherSelectAutomovel("automovelCambio", item.cambio || "");
   $("automovelCor").value = item.cor || "";
   $("automovelConsumoMedio").value = item.consumoMedio || "";
   $("automovelAceitaTroca").value = item.aceitaTroca || "";
   $("automovelAceitaFinanciamento").value = item.aceitaFinanciamento || "";
-  $("automovelDocumentacao").value = item.documentacao || "";
+  preencherSelectAutomovel("automovelDocumentacao", item.documentacao || "");
   $("automovelMotor").value = item.motor || "";
   $("automovelDirecao").value = item.direcao || "";
   $("automovelVidroEletrico").value = item.vidroEletrico || "";
@@ -5747,13 +5765,13 @@ function getAutomovelFormData() {
     clienteNome: linkedClient?.nome || vendedor,
     estabelecimentoId: linkedClient?.nomeNormalizado || slugify(linkedClient?.nome || vendedor),
     instagram: $("automovelInstagram").value.trim() || linkedClient?.instagram || "",
-    combustivel: $("automovelCombustivel").value.trim(),
-    cambio: $("automovelCambio").value.trim(),
+    combustivel: $("automovelCombustivel").value,
+    cambio: $("automovelCambio").value,
     cor: $("automovelCor").value.trim(),
     consumoMedio: $("automovelConsumoMedio").value.trim(),
     aceitaTroca: $("automovelAceitaTroca").value,
     aceitaFinanciamento: $("automovelAceitaFinanciamento").value,
-    documentacao: $("automovelDocumentacao").value.trim(),
+    documentacao: $("automovelDocumentacao").value,
     motor: $("automovelMotor").value.trim(),
     direcao: $("automovelDirecao").value.trim(),
     vidroEletrico: $("automovelVidroEletrico").value,
