@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 442,
-  label: "v448",
-  data: "2026-07-08",
-  nota: "Aliases com hifen das revendas nao agrupam clientes diferentes."
+  numero: 443,
+  label: "v449",
+  data: "2026-07-09",
+  nota: "Cadastro aceita quatro telefones e galerias publicas ganharam ajustes visuais."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -749,6 +749,9 @@ function normalizeClientContactDetails(client = {}) {
     { numero: client.contact2, whatsapp: false },
     { numero: client.contato3, whatsapp: false },
     { numero: client.contact3, whatsapp: false },
+    { numero: client.contato4, whatsapp: false },
+    { numero: client.contact4, whatsapp: false },
+    { numero: client.telefone4, whatsapp: false },
     { numero: client.telefone, whatsapp: false }
   ];
   const byNumber = new Map();
@@ -2819,7 +2822,8 @@ function getClientFormData() {
   const contatosDetalhados = [
     { numero: $("clientContact").value.trim(), referencia: $("clientContactReference")?.value.trim() || "", whatsapp: Boolean($("clientContactIsWhatsapp")?.checked) },
     { numero: $("clientWhatsapp").value.trim(), referencia: $("clientWhatsappReference")?.value.trim() || "", whatsapp: Boolean($("clientWhatsappIsWhatsapp")?.checked) },
-    { numero: $("clientContact3")?.value.trim() || "", referencia: $("clientContact3Reference")?.value.trim() || "", whatsapp: Boolean($("clientContact3IsWhatsapp")?.checked) }
+    { numero: $("clientContact3")?.value.trim() || "", referencia: $("clientContact3Reference")?.value.trim() || "", whatsapp: Boolean($("clientContact3IsWhatsapp")?.checked) },
+    { numero: $("clientContact4")?.value.trim() || "", referencia: $("clientContact4Reference")?.value.trim() || "", whatsapp: Boolean($("clientContact4IsWhatsapp")?.checked) }
   ].filter((item) => item.numero);
   const contatos = contatosDetalhados.map((item) => item.numero);
   const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
@@ -3162,12 +3166,15 @@ function fillClientForm(client) {
   $("clientContact").value = contatos[0]?.numero || "";
   $("clientWhatsapp").value = contatos[1]?.numero || "";
   if ($("clientContact3")) $("clientContact3").value = contatos[2]?.numero || "";
+  if ($("clientContact4")) $("clientContact4").value = contatos[3]?.numero || "";
   if ($("clientContactReference")) $("clientContactReference").value = contatos[0]?.referencia || "";
   if ($("clientWhatsappReference")) $("clientWhatsappReference").value = contatos[1]?.referencia || "";
   if ($("clientContact3Reference")) $("clientContact3Reference").value = contatos[2]?.referencia || "";
+  if ($("clientContact4Reference")) $("clientContact4Reference").value = contatos[3]?.referencia || "";
   if ($("clientContactIsWhatsapp")) $("clientContactIsWhatsapp").checked = Boolean(contatos[0]?.whatsapp);
   if ($("clientWhatsappIsWhatsapp")) $("clientWhatsappIsWhatsapp").checked = Boolean(contatos[1]?.whatsapp);
   if ($("clientContact3IsWhatsapp")) $("clientContact3IsWhatsapp").checked = Boolean(contatos[2]?.whatsapp);
+  if ($("clientContact4IsWhatsapp")) $("clientContact4IsWhatsapp").checked = Boolean(contatos[3]?.whatsapp);
   setAllClientSectionsExpanded(false);
   $("clientAddress").value = client.endereco || client.address || "";
   $("clientHours").value = client.horario || client.hours || "";
@@ -12316,9 +12323,10 @@ function renderClientOnlyEditor() {
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
         ${(() => {
           const contactDetails = normalizeClientContactDetails(client);
-          return [0, 1, 2].map((index) => `
+          const contactInputIds = ["coContact", "coWhatsapp", "coContact3", "coContact4"];
+          return [0, 1, 2, 3].map((index) => `
             <div class="contact-admin-field">
-              <label class="admin-field-line">Telefone ${index + 1}<input id="${index === 0 ? "coContact" : (index === 1 ? "coWhatsapp" : "coContact3")}" value="${escapeAttr(contactDetails[index]?.numero || "")}"></label>
+              <label class="admin-field-line">Telefone ${index + 1}<input id="${contactInputIds[index]}" value="${escapeAttr(contactDetails[index]?.numero || "")}"></label>
               <label class="admin-field-line">Referencia do telefone<input id="coContact${index + 1}Reference" maxlength="50" value="${escapeAttr(contactDetails[index]?.referencia || "")}" placeholder="Ex.: Nome / Local"></label>
               <label class="contact-whatsapp-flag"><input id="coContact${index + 1}IsWhatsapp" type="checkbox" ${contactDetails[index]?.whatsapp ? "checked" : ""}> É WhatsApp</label>
             </div>
@@ -12686,6 +12694,7 @@ function renderClientOnlyEditor() {
     bindPhoneMask("coContact");
     bindPhoneMask("coWhatsapp");
     bindPhoneMask("coContact3");
+    bindPhoneMask("coContact4");
   }
   if (canViewRelatorios) {
     bindClientMetricReportControls(client);
@@ -13348,7 +13357,8 @@ function renderClientOnlyEditor() {
       const contatosDetalhados = [
         { numero: $("coContact").value.trim(), referencia: $("coContact1Reference")?.value.trim() || "", whatsapp: Boolean($("coContact1IsWhatsapp")?.checked) },
         { numero: $("coWhatsapp").value.trim(), referencia: $("coContact2Reference")?.value.trim() || "", whatsapp: Boolean($("coContact2IsWhatsapp")?.checked) },
-        { numero: $("coContact3")?.value.trim() || "", referencia: $("coContact3Reference")?.value.trim() || "", whatsapp: Boolean($("coContact3IsWhatsapp")?.checked) }
+        { numero: $("coContact3")?.value.trim() || "", referencia: $("coContact3Reference")?.value.trim() || "", whatsapp: Boolean($("coContact3IsWhatsapp")?.checked) },
+        { numero: $("coContact4")?.value.trim() || "", referencia: $("coContact4Reference")?.value.trim() || "", whatsapp: Boolean($("coContact4IsWhatsapp")?.checked) }
       ].filter((item) => item.numero);
       const contatos = contatosDetalhados.map((item) => item.numero);
       const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
@@ -14215,6 +14225,7 @@ function bindEvents() {
   bindPhoneMask("clientContact");
   bindPhoneMask("clientWhatsapp");
   bindPhoneMask("clientContact3");
+  bindPhoneMask("clientContact4");
   bindPhoneMask("paymentBillingWhatsapp");
   bindPhoneMask("newsWhatsapp");
   resetNewsForm();

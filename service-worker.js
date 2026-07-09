@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-08-resale-hyphen-aliases-v448-v414'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-09-contact-gallery-v449-v415'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

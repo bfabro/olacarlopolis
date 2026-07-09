@@ -3591,6 +3591,7 @@ document.addEventListener("DOMContentLoaded", function () {
     overlay.className = "novidade-preview-overlay";
     overlay.innerHTML = `
       <div class="novidade-preview-modal ${tipoClass}" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.titulo)}">
+        <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
         <div class="novidade-preview-badges">
           <span class="novidade-preview-badge categoria"><i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>${escapePromoHtml(categoria.label)}</span>
           ${codRef ? `<span class="novidade-preview-badge ref">Ref. ${escapePromoHtml(codRef)}</span>` : ""}
@@ -3605,7 +3606,6 @@ document.addEventListener("DOMContentLoaded", function () {
         ` : ""}
         ${imagens.length ? `
           <div class="novidade-preview-gallery">
-            <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
             <div class="novidade-preview-track">
               ${imagens.map((img, index) => `<img src="${escapePromoHtml(img)}" alt="${escapePromoHtml(destino || item.estabelecimento || "Novidade")}" data-novidade-img="${index}" loading="lazy" decoding="async">`).join("")}
             </div>
@@ -3617,7 +3617,6 @@ document.addEventListener("DOMContentLoaded", function () {
           </div>
         ` : `
           <div class="novidade-preview-gallery novidade-preview-placeholder">
-            <button type="button" class="novidade-preview-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
             <i class="fa-solid ${escapePromoHtml(categoria.icon)}"></i>
           </div>
         `}
