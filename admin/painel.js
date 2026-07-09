@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 444,
-  label: "v450",
+  numero: 445,
+  label: "v451",
   data: "2026-07-09",
-  nota: "Cadastro de veiculos usa listas para combustivel, cambio e documentacao."
+  nota: "Upload de fotos de veiculos ficou mais tolerante para iPhone e renderiza por imagem enviada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4061,6 +4061,13 @@ async function uploadAutomovelImages(id, files) {
     urls.push(await uploadFileWithProgress(fileRef, file, "Enviando fotos do automovel", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
   }
   return urls;
+}
+
+async function uploadAutomovelImage(id, file, index = 0, total = 1) {
+  const name = file?.name || `foto-${index + 1}`;
+  const path = `conteudosInformativos/automoveis/${id}/${Date.now()}-${slugify(name || "automovel")}`;
+  const fileRef = storageRef(storage, path);
+  return uploadFileWithProgress(fileRef, file, "Enviando fotos do automovel", `${name} (${index + 1}/${total})`);
 }
 
 async function uploadImovelImages(id, files) {
@@ -14487,12 +14494,34 @@ function bindEvents() {
     gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, "premium45", opcoesArteAutomovel());
   });
   const handleAutomovelImagesUpload = async (event) => {
+    const input = event.target;
+    const files = Array.from(input.files || []).filter(Boolean);
+    if (!files.length) return;
     const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;
-    const urls = await uploadAutomovelImages(id, event.target.files);
-    state.automovelImages.push(...urls);
-    if (!$("automovelImagem").value && state.automovelImages[0]) $("automovelImagem").value = state.automovelImages[0];
-    renderAutomovelImagesPreview();
-    event.target.value = "";
+    const failed = [];
+    setBusy(input, true);
+    try {
+      for (let index = 0; index < files.length; index += 1) {
+        try {
+          const url = await uploadAutomovelImage(id, files[index], index, files.length);
+          if (!url) continue;
+          state.automovelImages.push(url);
+          if (!$("automovelImagem").value) $("automovelImagem").value = url;
+          renderAutomovelImagesPreview();
+        } catch (error) {
+          console.error("Erro ao enviar foto do automovel.", error);
+          failed.push(files[index]?.name || `foto ${index + 1}`);
+        }
+      }
+      if (state.automovelImages.length) {
+        showToast(failed.length ? `Algumas fotos nao foram enviadas: ${failed.join(", ")}` : "Fotos do automovel enviadas.");
+      } else {
+        showToast("Nao foi possivel enviar as fotos. No iPhone, tente selecionar em JPEG/JPG ou tirar uma nova foto.");
+      }
+    } finally {
+      input.value = "";
+      setBusy(input, false);
+    }
   };
   $("automovelImagesUpload")?.addEventListener("change", handleAutomovelImagesUpload);
   $("automovelCameraUpload")?.addEventListener("change", handleAutomovelImagesUpload);
