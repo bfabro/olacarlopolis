@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-08-vehicle-resale-category-link-v408'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-08-auto-seller-profile-link-v409'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

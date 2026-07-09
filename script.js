@@ -10392,6 +10392,36 @@ plotarPinsImoveis(stateImoveis.filtered);
     };
   }
 
+  function resolverDestinoPublicoAutomovel(item = {}) {
+    const candidatos = [
+      item.clienteId,
+      item.idCliente,
+      item.clienteSlug,
+      item.clienteNome,
+      item.nomeCliente,
+      item.estabelecimentoId,
+      item.estabelecimentoNome,
+      item.nomeEstabelecimento,
+      item.lojaNome,
+      item.nomeLoja,
+      item.loja,
+      item.vendedor,
+      item.empresa,
+      item.anunciante,
+      item.raw?.clienteId,
+      item.raw?.idCliente,
+      item.raw?.clienteSlug,
+      item.raw?.clienteNome,
+      item.raw?.nomeCliente,
+      item.raw?.estabelecimentoId,
+      item.raw?.estabelecimento,
+      item.raw?.loja,
+      item.raw?.vendedor
+    ].map(normalizeName).filter(Boolean);
+    const direto = candidatos.find((chave) => encontrarCategoriaEstabelecimentoPublico(chave));
+    return direto || candidatos[0] || "";
+  }
+
   function renderImoveisCardsEstabelecimento(lista = [], box) {
     if (!box) return;
     const encontrarImovel = (identificador) => {
@@ -10537,7 +10567,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         ["Cidade", item.cidade]
       ].filter(([, valor]) => valor);
       const vendedor = item.vendedor || item.loja || "";
-      const sellerSlug = normalizeName(item.estabelecimentoId || item.clienteNome || item.clienteId || vendedor || "");
+      const sellerSlug = resolverDestinoPublicoAutomovel(item);
       const whatsappTexto = [
         "Ola! Vi este automovel no Ola Carlopolis e quero mais informacoes.",
         `Referencia: ${codigoReferencia}`,
@@ -10584,6 +10614,11 @@ plotarPinsImoveis(stateImoveis.filtered);
       `;
     }).join("");
     configurarGaleriasAutomoveis(box);
+    box.querySelectorAll(".auto-seller-link[data-public-client-link]").forEach((link) => {
+      link.addEventListener("click", (event) => {
+        navegarParaEstabelecimentoPublico(link.dataset.publicClientLink || link.getAttribute("href")?.replace(/^#/, "") || "", event);
+      });
+    });
     box.querySelectorAll(".auto-card").forEach((card) => {
       const item = lista.find((entry) => String(entry.id) === String(card.dataset.autoId));
       if (!item) return;
@@ -10614,7 +10649,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const valorFormatado = item.preco ? formatarPrecoAutomoveis(item.preco) : "Consulte";
     const contato = String(item.contato || "").replace(/\D/g, "");
     const vendedor = item.vendedor || item.loja || item.clienteNome || "";
-    const vendedorSlug = normalizeName(item.estabelecimentoId || item.clienteNome || item.clienteId || vendedor || "");
+    const vendedorSlug = resolverDestinoPublicoAutomovel(item);
     const instagram = String(item.instagram || "").trim();
     const instagramUrl = instagram && instagram.startsWith("http") ? instagram : (instagram ? `https://instagram.com/${instagram.replace(/^@/, "")}` : "");
     const whatsappTexto = [
