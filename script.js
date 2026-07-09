@@ -20757,7 +20757,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function tituloCanonicoCategoriaAdmin(tituloCategoria = "") {
     const chave = chaveMenuCategoriaAdmin(tituloCategoria);
-    if (chave === "revendaveiculo") return "Revenda de Veículos";
+    if (chave === "revendaveiculo") return "Revenda de Veiculos";
     return String(tituloCategoria || "Outros").trim() || "Outros";
   }
 
