@@ -20540,6 +20540,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       "carros",
       "comercio",
       "comercios",
+      "deautomovel",
+      "deautomoveis",
+      "decarro",
+      "decarros",
+      "deveiculo",
+      "deveiculos",
       "loja",
       "lojas",
       "outro",
@@ -20547,6 +20553,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       "produto",
       "produtos",
       "revenda",
+      "revendade",
       "revendadeveiculo",
       "revendadeveiculos",
       "revendaveiculo",
@@ -20558,6 +20565,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     const chaveGenerica = (value) => {
       const key = normalizeName(value);
       if (!key) return true;
+      if (/^(de|do|da|dos|das).+/.test(key) && categoriaKeys.has(key.replace(/^(de|do|da|dos|das)/, ""))) return true;
+      if (/^(outro|outros)cliente$/.test(key)) return true;
       return categoriaKeys.has(key) || chavesGenericas.has(key);
     };
     const add = (value, options = {}) => {
