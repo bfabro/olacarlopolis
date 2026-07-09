@@ -7565,12 +7565,50 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     return deduplicarPromocoesPublicas(itens);
   }
 
+  function chavePublicaGenericaEstabelecimento(value = "") {
+    const key = normalizeName(value);
+    if (!key) return true;
+    const genericas = new Set([
+      "automovel",
+      "automoveis",
+      "auto",
+      "autos",
+      "carro",
+      "carros",
+      "carveiculos",
+      "deautomovel",
+      "deautomoveis",
+      "decarro",
+      "decarros",
+      "deveiculo",
+      "deveiculos",
+      "loja",
+      "lojas",
+      "outro",
+      "outros",
+      "outroscliente",
+      "outrocliente",
+      "revenda",
+      "revendade",
+      "revendadeautomovel",
+      "revendadeautomoveis",
+      "revendadecarro",
+      "revendadecarros",
+      "revendadeveiculo",
+      "revendadeveiculos",
+      "revendaveiculo",
+      "veiculo",
+      "veiculos"
+    ]);
+    return genericas.has(key);
+  }
+
   function chavesEstabelecimentoPublico(est = {}) {
     const aliases = est.aliases || est.apelidos || [];
     const aliasValues = Array.isArray(aliases)
       ? aliases
       : [...Object.keys(aliases || {}), ...Object.values(aliases || {})];
-    return [
+    const principais = [
       est.id,
       est.clienteId,
       est.clienteNome,
@@ -7579,9 +7617,12 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       est.__adminOriginalSlug,
       est.__adminOriginalName,
       est.name,
-      est.nome,
-      ...aliasValues
+      est.nome
     ].map((value) => normalizeName(value)).filter(Boolean);
+    const aliasesEspecificos = aliasValues
+      .map((value) => normalizeName(value))
+      .filter((value) => value && !chavePublicaGenericaEstabelecimento(value));
+    return [...new Set([...principais, ...aliasesEspecificos])];
   }
 
   function usuariosPublicosDoCliente(clienteId = "") {
@@ -7663,13 +7704,20 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   function encontrarCategoriaEstabelecimentoPublico(chave = "") {
     const alvo = normalizeName(chave);
     if (!alvo) return null;
+    const corresponde = (item) => {
+      if (item === alvo) return true;
+      if (item.length < 12 || alvo.length < 12) return false;
+      const menor = item.length < alvo.length ? item : alvo;
+      const maior = item.length < alvo.length ? alvo : item;
+      if (chavePublicaGenericaEstabelecimento(menor)) return false;
+      if (menor.length < 12) return false;
+      if (maior.length - menor.length > 24) return false;
+      return maior.startsWith(menor) || maior.endsWith(menor);
+    };
     for (const categoria of categories || []) {
       for (const estabelecimento of categoria.establishments || []) {
         const chaves = chavesEstabelecimentoPublico(estabelecimento);
-        const encontrou = chaves.some((item) => (
-          item === alvo
-          || (item.length >= 4 && alvo.length >= 4 && (item.includes(alvo) || alvo.includes(item)))
-        ));
+        const encontrou = chaves.some(corresponde);
         if (encontrou) return { categoria, estabelecimento };
       }
     }
@@ -7714,13 +7762,14 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       item.raw?.estabelecimento,
       ...(Array.isArray(item.corretores) ? item.corretores : [])
     ].map(normalizeName).filter(Boolean);
-    const chavesFortes = [...chaves].filter((chave) => chave.length >= 6);
+    const chavesFortes = [...chaves].filter((chave) => chave.length >= 12);
     const correspondeComoAliasForte = (valor, chave) => {
       if (valor === chave) return true;
-      if (valor.length < 6 || chave.length < 6) return false;
+      if (valor.length < 12 || chave.length < 12) return false;
       const menor = valor.length < chave.length ? valor : chave;
       const maior = valor.length < chave.length ? chave : valor;
-      if (menor.length < 6) return false;
+      if (menor.length < 12) return false;
+      if (chavePublicaGenericaEstabelecimento(menor)) return false;
       const diferenca = maior.length - menor.length;
       if (diferenca > 24) return false;
       return maior.startsWith(menor) || maior.endsWith(menor);
@@ -20538,6 +20587,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       "autos",
       "carro",
       "carros",
+      "carveiculos",
       "comercio",
       "comercios",
       "deautomovel",
@@ -20554,6 +20604,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       "produtos",
       "revenda",
       "revendade",
+      "revendadeautomovel",
+      "revendadeautomoveis",
+      "revendadecarro",
+      "revendadecarros",
       "revendadeveiculo",
       "revendadeveiculos",
       "revendaveiculo",
