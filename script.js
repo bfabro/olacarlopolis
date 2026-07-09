@@ -659,6 +659,7 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
   });
 
   return new Promise((resolve) => {
+    const finalizar = (resultado) => resolve(resultado);
     refContador.transaction(
       (atual) => (atual || 0) + 1,
       async (erro) => {
@@ -666,20 +667,25 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
           if (!erroPermissaoFirebase(erro)) {
             console.warn("[CliqueBotao] Erro no contador:", erro);
           }
-          resolve({ ok: false, erroContador: true });
+          finalizar({ ok: false, erroContador: true });
           return;
         }
         try {
           await Promise.all([refLog.set(payload), metricaCliente]);
-          resolve({ ok: true });
+          finalizar({ ok: true });
         } catch (e) {
           if (!erroPermissaoFirebase(e)) {
             console.warn("[CliqueBotao] Erro ao salvar detalhado:", e);
           }
-          resolve({ ok: true, logFalhou: true });
+          finalizar({ ok: true, logFalhou: true });
         }
       }
-    );
+    ).catch((erro) => {
+      if (!erroPermissaoFirebase(erro)) {
+        console.warn("[CliqueBotao] Erro no contador:", erro);
+      }
+      finalizar({ ok: false, erroContador: true });
+    });
   });
 }
 window.registrarCliqueBotao = registrarCliqueBotao;
@@ -23709,7 +23715,9 @@ function registrarCliqueMenuLateral(labelMenu) {
   if (!idMenu) return;
   try {
     if (!window.firebase || !firebase.database) return;
-    firebase.database().ref(`cliquesMenuLateral/${hoje}/${idMenu}`).transaction(valorAtual => (valorAtual || 0) + 1);
+    firebase.database().ref(`cliquesMenuLateral/${hoje}/${idMenu}`)
+      .transaction(valorAtual => (valorAtual || 0) + 1)
+      .catch((error) => console.warn("Nao foi possivel registrar clique no menu lateral.", error));
   } catch (error) {
     console.warn("Nao foi possivel registrar clique no menu lateral.", error);
   }
