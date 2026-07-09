@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 445,
-  label: "v451",
+  numero: 446,
+  label: "v452",
   data: "2026-07-09",
-  nota: "Upload de fotos de veiculos ficou mais tolerante para iPhone e renderiza por imagem enviada."
+  nota: "Upload de imagens de veiculos preserva o tipo do arquivo para artes exportadas do Canva."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -343,6 +343,29 @@ function slugify(text) {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 80);
+}
+
+function inferFileContentType(file) {
+  const rawType = String(file?.type || "").trim().toLowerCase();
+  if (rawType && rawType !== "application/octet-stream") return rawType;
+  const extension = String(file?.name || "").trim().toLowerCase().match(/\.([a-z0-9]+)$/)?.[1] || "";
+  return {
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    webp: "image/webp",
+    gif: "image/gif",
+    heic: "image/heic",
+    heif: "image/heif",
+    avif: "image/avif",
+    svg: "image/svg+xml",
+    bmp: "image/bmp"
+  }[extension] || "";
+}
+
+function uploadMetadataForFile(file) {
+  const contentType = inferFileContentType(file);
+  return contentType ? { contentType } : undefined;
 }
 
 function normalizeName(text) {
@@ -1874,7 +1897,7 @@ function hideUploadProgress(delay = 800) {
 function uploadFileWithProgress(fileRef, file, title = "Enviando arquivo", detail = "") {
   return new Promise((resolve, reject) => {
     setUploadProgress(0, title, detail || file?.name || "");
-    const task = uploadBytesResumable(fileRef, file);
+    const task = uploadBytesResumable(fileRef, file, uploadMetadataForFile(file));
     task.on("state_changed", (snapshot) => {
       const percent = snapshot.totalBytes
         ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100
@@ -1899,7 +1922,7 @@ function uploadFileWithProgress(fileRef, file, title = "Enviando arquivo", detai
 function uploadPrivateFileWithProgress(fileRef, file, title = "Enviando arquivo", detail = "") {
   return new Promise((resolve, reject) => {
     setUploadProgress(0, title, detail || file?.name || "");
-    const task = uploadBytesResumable(fileRef, file);
+    const task = uploadBytesResumable(fileRef, file, uploadMetadataForFile(file));
     task.on("state_changed", (snapshot) => {
       const percent = snapshot.totalBytes
         ? (snapshot.bytesTransferred / snapshot.totalBytes) * 100
