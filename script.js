@@ -20519,16 +20519,56 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function chavesFortesClienteAdmin(clienteId, cliente) {
     const keys = new Set();
-    const add = (value) => {
+    const categoriaKeys = new Set([
+      cliente?.categoria,
+      cliente?.categoriaId,
+      tituloCanonicoCategoriaAdmin(cliente?.categoria || cliente?.categoriaId || ""),
+      chaveMenuCategoriaAdmin(cliente?.categoria || cliente?.categoriaId || "")
+    ].map((value) => normalizeName(value)).filter(Boolean));
+    const chavesGenericas = new Set([
+      "automovel",
+      "automoveis",
+      "auto",
+      "autos",
+      "carro",
+      "carros",
+      "comercio",
+      "comercios",
+      "loja",
+      "lojas",
+      "outro",
+      "outros",
+      "produto",
+      "produtos",
+      "revenda",
+      "revendadeveiculo",
+      "revendadeveiculos",
+      "revendaveiculo",
+      "servico",
+      "servicos",
+      "veiculo",
+      "veiculos"
+    ]);
+    const chaveGenerica = (value) => {
+      const key = normalizeName(value);
+      if (!key) return true;
+      return categoriaKeys.has(key) || chavesGenericas.has(key);
+    };
+    const add = (value, options = {}) => {
       const normalized = normalizeName(value);
       const slug = normalizeName(adminSlug(value));
-      if (normalized) keys.add(normalized);
-      if (slug) keys.add(slug);
+      if (normalized && (options.permitirGenerica || !chaveGenerica(normalized))) keys.add(normalized);
+      if (slug && (options.permitirGenerica || !chaveGenerica(slug))) keys.add(slug);
     };
-    add(clienteId);
-    add(adminClientCanonicalId(cliente?.categoria || cliente?.categoriaId || "outros", cliente?.nome || clienteId));
+    add(clienteId, { permitirGenerica: true });
+    add(cliente?.id, { permitirGenerica: true });
+    add(cliente?.uid, { permitirGenerica: true });
+    add(cliente?.nome);
+    add(cliente?.name);
+    add(cliente?.nomeNormalizado);
+    add(adminClientCanonicalId(cliente?.categoria || cliente?.categoriaId || "outros", cliente?.nome || clienteId), { permitirGenerica: true });
     aliasesClienteAdmin(cliente).forEach(add);
-    add(`${cliente?.categoria || cliente?.categoriaId || "outros"}-${cliente?.nome || clienteId}`);
+    add(`${cliente?.categoria || cliente?.categoriaId || "outros"}-${cliente?.nome || clienteId}`, { permitirGenerica: true });
     return Array.from(keys);
   }
 
@@ -20716,6 +20756,12 @@ plotarPinsImoveis(stateImoveis.filtered);
     return "#comercios-" + normalizeName(tituloCanonicoCategoriaAdmin(tituloCategoria));
   }
 
+  function linkFixoCategoriaAdmin(title) {
+    const chave = chaveMenuCategoriaAdmin(title);
+    if (chave === "revendaveiculo") return document.getElementById("menuRevendaVeiculo");
+    return null;
+  }
+
   function iconClassCategoriaAdmin(meta) {
     return String(meta?.icon || "fa-solid fa-store").replace(/[^a-zA-Z0-9\-\s]/g, "").trim() || "fa-solid fa-store";
   }
@@ -20777,6 +20823,8 @@ plotarPinsImoveis(stateImoveis.filtered);
   function encontrarLinkCategoriaAdmin(submenu, title) {
     const slug = normalizeName(title);
     const chaveMenu = chaveMenuCategoriaAdmin(title);
+    const linkFixo = linkFixoCategoriaAdmin(title);
+    if (linkFixo && submenu.contains(linkFixo)) return linkFixo;
     const existing = submenu.querySelector(`[data-admin-category="${slug}"]`);
     if (existing) return existing;
     return Array.from(submenu.querySelectorAll("a.nav_link.sublink"))
@@ -20868,7 +20916,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const vistos = new Map();
     Array.from(submenu.querySelectorAll("a.nav_link.sublink")).forEach((link) => {
-      const slug = chaveMenuCategoriaAdmin(textoLinkCategoriaAdmin(link));
+      const slug = link.id === "menuRevendaVeiculo"
+        ? "revendaveiculo"
+        : chaveMenuCategoriaAdmin(link.dataset.adminCategory || textoLinkCategoriaAdmin(link));
       if (!slug) return;
 
       const atual = vistos.get(slug);
