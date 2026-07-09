@@ -7568,6 +7568,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   function chavePublicaGenericaEstabelecimento(value = "") {
     const key = normalizeName(value);
     if (!key) return true;
+    const compacta = key.replace(/[^a-z0-9]/g, "");
     const genericas = new Set([
       "automovel",
       "automoveis",
@@ -7600,7 +7601,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       "veiculo",
       "veiculos"
     ]);
-    return genericas.has(key);
+    return genericas.has(key) || genericas.has(compacta);
   }
 
   function chavesEstabelecimentoPublico(est = {}) {
@@ -20574,12 +20575,16 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function chavesFortesClienteAdmin(clienteId, cliente) {
     const keys = new Set();
-    const categoriaKeys = new Set([
+    const categoriaKeysBase = [
       cliente?.categoria,
       cliente?.categoriaId,
       tituloCanonicoCategoriaAdmin(cliente?.categoria || cliente?.categoriaId || ""),
       chaveMenuCategoriaAdmin(cliente?.categoria || cliente?.categoriaId || "")
-    ].map((value) => normalizeName(value)).filter(Boolean));
+    ].map((value) => normalizeName(value)).filter(Boolean);
+    const categoriaKeys = new Set([
+      ...categoriaKeysBase,
+      ...categoriaKeysBase.map((value) => value.replace(/[^a-z0-9]/g, ""))
+    ].filter(Boolean));
     const chavesGenericas = new Set([
       "automovel",
       "automoveis",
@@ -20618,10 +20623,11 @@ plotarPinsImoveis(stateImoveis.filtered);
     ]);
     const chaveGenerica = (value) => {
       const key = normalizeName(value);
+      const compacta = key.replace(/[^a-z0-9]/g, "");
       if (!key) return true;
-      if (/^(de|do|da|dos|das).+/.test(key) && categoriaKeys.has(key.replace(/^(de|do|da|dos|das)/, ""))) return true;
-      if (/^(outro|outros)cliente$/.test(key)) return true;
-      return categoriaKeys.has(key) || chavesGenericas.has(key);
+      if (/^(de|do|da|dos|das).+/.test(compacta) && categoriaKeys.has(compacta.replace(/^(de|do|da|dos|das)/, ""))) return true;
+      if (/^(outro|outros)cliente$/.test(compacta)) return true;
+      return categoriaKeys.has(key) || categoriaKeys.has(compacta) || chavesGenericas.has(key) || chavesGenericas.has(compacta);
     };
     const add = (value, options = {}) => {
       const normalized = normalizeName(value);
