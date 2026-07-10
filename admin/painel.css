@@ -2445,14 +2445,15 @@ button[type="submit"]:hover,
 
 .automovel-art-panel .auto-art-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   grid-column: 1 / -1;
   align-self: end;
 }
 
 .automovel-art-panel #generateAutomovelArtButton,
-.automovel-art-panel #previewAutomovelArtButton {
+.automovel-art-panel #previewAutomovelArtButton,
+.automovel-art-panel #generateSelectedAutomovelArtsButton {
   display: inline-flex;
   align-items: center;
   min-width: 0;
@@ -2468,6 +2469,73 @@ button[type="submit"]:hover,
   background: #fff;
   color: var(--brand);
   border: 1px solid #bfdbfe;
+}
+
+.auto-art-screen-card {
+  max-width: 1180px;
+}
+
+.auto-art-batch-panel {
+  grid-column: 1 / -1;
+  padding: 12px;
+  border: 1px solid #d8e4f5;
+  border-radius: 14px;
+  background: rgba(255,255,255,.78);
+}
+
+.auto-art-batch-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 8px 0 10px;
+}
+
+.auto-art-batch-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 8px;
+  max-height: 260px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.auto-art-batch-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+  padding: 9px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.auto-art-batch-item input {
+  margin-top: 3px;
+}
+
+.auto-art-batch-item strong,
+.auto-art-batch-item small {
+  display: block;
+}
+
+.auto-art-batch-item small {
+  color: #64748b;
+  font-size: .78rem;
+  line-height: 1.25;
+  margin-top: 3px;
+}
+
+@media (max-width: 760px) {
+  .automovel-art-panel .auto-art-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .auto-art-batch-list {
+    grid-template-columns: 1fr;
+    max-height: 320px;
+  }
 }
 
 .auto-art-preview {

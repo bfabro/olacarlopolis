@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 447,
-  label: "v453",
-  data: "2026-07-09",
-  nota: "Novidades preservam eventos individuais de veiculos e evitam limpeza por ID vazio."
+  numero: 448,
+  label: "v454",
+  data: "2026-07-10",
+  nota: "Artes de veiculos agora ficam em tela separada com geracao em lote."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -125,6 +125,7 @@ let state = {
   staffPromoEditIndex: null,
   selectedPromoArtId: "",
   selectedAutomovelArtId: "",
+  selectedAutomovelArtIds: new Set(),
   selectedAutomovelArtLayout: "showroom",
   selectedStoryTemplate: "vitrine",
   storyCustomImage: "",
@@ -296,6 +297,7 @@ const views = {
   noticias: $("noticiasView"),
   imoveis: $("imoveisView"),
   automoveis: $("automoveisView"),
+  automoveisArtes: $("automoveisArtesView"),
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
   relatorios: $("relatoriosView"),
@@ -318,6 +320,7 @@ const viewCopy = {
   noticias: ["Noticias", "Cadastre materias para a home e para a pagina publica de noticias."],
   imoveis: ["Imoveis", "Cadastre imoveis para venda ou aluguel no site publico."],
   automoveis: ["Automoveis", "Cadastre veiculos para venda no site publico."],
+  automoveisArtes: ["Artes de veiculos", "Gere imagens para Instagram de um ou varios veiculos."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   relatorios: ["Relatorios", "Indicadores e pontos de atencao do painel."],
@@ -585,6 +588,7 @@ function canAccessView(viewName) {
   if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenInvoice(currentClientRecord());
   if (viewName === "imoveis") return canAccessImoveis();
   if (viewName === "automoveis") return canAccessAutomoveis();
+  if (viewName === "automoveisArtes") return canGenerateVeiculoImages();
   if (viewName === "noticias") return canManageClients() || hasPermission("noticias");
   if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
@@ -2634,7 +2638,9 @@ function switchView(name) {
   if (target === "imoveis") renderImoveisList();
   if (target === "automoveis") {
     renderAutomoveisList();
-    aplicarPermissaoLogoArteAutomovel();
+  }
+  if (target === "automoveisArtes") {
+    renderAutomovelArteView();
   }
   if (target === "informacoes" && !canManageInformacoes()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
@@ -6992,6 +6998,90 @@ function renderAutomovelArteOptions() {
   if (state.selectedAutomovelArtId && state.selectedAutomovelArtId !== anterior && $("automovelArtePreview")) {
     agendarPreviaArteAutomovel(150);
   }
+  renderAutomovelArteBatchList();
+}
+
+function tituloAutomovelAdmin(item = {}) {
+  return [item.marca, item.modelo, item.ano].filter(Boolean).join(" ") || item.codRef || item.id || "Veiculo";
+}
+
+function ensureAutomovelArteViewMounted() {
+  const mount = $("automovelArteViewMount");
+  const panel = document.querySelector(".automovel-art-panel");
+  if (!mount || !panel) return;
+  if (!mount.contains(panel)) mount.appendChild(panel);
+  panel.removeAttribute("data-permission");
+  if (!$("automovelArteBatchList")) {
+    const vehicleLabel = $("automovelArteItem")?.closest("label");
+    vehicleLabel?.insertAdjacentHTML("afterend", `
+      <section class="auto-art-batch-panel auto-art-wide">
+        <div class="section-head compact">
+          <div>
+            <h3>Gerar em lote</h3>
+            <p>Marque os veiculos que devem usar o layout configurado abaixo.</p>
+          </div>
+          <span id="automovelArteBatchCount" class="badge">0 selecionados</span>
+        </div>
+        <div class="auto-art-batch-actions">
+          <button id="selectAllAutomovelArtButton" type="button" class="ghost-button"><i class="fa-solid fa-check-double"></i> Selecionar todos</button>
+          <button id="clearAutomovelArtSelectionButton" type="button" class="ghost-button"><i class="fa-solid fa-eraser"></i> Limpar</button>
+        </div>
+        <div id="automovelArteBatchList" class="auto-art-batch-list"></div>
+      </section>
+    `);
+  }
+  if (!$("generateSelectedAutomovelArtsButton")) {
+    $("generateAutomovelArtButton")?.insertAdjacentHTML("afterend", `
+      <button id="generateSelectedAutomovelArtsButton" type="button" class="auto-art-batch-generate"><i class="fa-solid fa-layer-group"></i> Baixar selecionados</button>
+    `);
+  }
+}
+
+function renderAutomovelArteBatchList() {
+  const box = $("automovelArteBatchList");
+  if (!box) return;
+  const selected = state.selectedAutomovelArtIds instanceof Set ? state.selectedAutomovelArtIds : new Set();
+  const list = state.automoveis.filter(itemBelongsToCurrentClient);
+  const validIds = new Set(list.map((item) => item.id));
+  [...selected].forEach((id) => {
+    if (!validIds.has(id)) selected.delete(id);
+  });
+  state.selectedAutomovelArtIds = selected;
+  if (!list.length) {
+    box.innerHTML = `<div class="list-meta">Nenhum veiculo cadastrado para gerar arte.</div>`;
+  } else {
+    box.innerHTML = list.map((item) => {
+      const titulo = tituloAutomovelAdmin(item);
+      const checked = selected.has(item.id) ? "checked" : "";
+      return `
+        <label class="auto-art-batch-item">
+          <input type="checkbox" value="${escapeAttr(item.id)}" ${checked}>
+          <span>
+            <strong>${escapeHtml(titulo)}</strong>
+            <small>${escapeHtml([item.codRef || item.codigo, item.preco, item.vendedor || item.loja].filter(Boolean).join(" - ") || "Sem detalhes")}</small>
+          </span>
+        </label>
+      `;
+    }).join("");
+  }
+  const count = selected.size;
+  if ($("automovelArteBatchCount")) $("automovelArteBatchCount").textContent = `${count} selecionado${count === 1 ? "" : "s"}`;
+  box.querySelectorAll("input[type='checkbox']").forEach((input) => {
+    input.addEventListener("change", () => {
+      if (input.checked) selected.add(input.value);
+      else selected.delete(input.value);
+      if ($("automovelArteBatchCount")) $("automovelArteBatchCount").textContent = `${selected.size} selecionado${selected.size === 1 ? "" : "s"}`;
+    });
+  });
+}
+
+function renderAutomovelArteView() {
+  ensureAutomovelArteViewMounted();
+  aplicarPermissaoLogoArteAutomovel();
+  renderAutomovelArteOptions();
+  preencherDefaultsTarjaAutomovel(false);
+  atualizarVisibilidadeLayoutAutomovelArte();
+  if ($("automovelArtePreview")) agendarPreviaArteAutomovel(120);
 }
 
 async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = "premium45", options = opcoesArteAutomovel()) {
@@ -7078,6 +7168,37 @@ async function gerarArteInstagramAutomovel(autoId = $("automovelArteItem")?.valu
   }
 }
 
+async function gerarArtesInstagramAutomoveisSelecionados() {
+  const selected = [...(state.selectedAutomovelArtIds || new Set())];
+  if (!selected.length) {
+    showToast("Selecione pelo menos um veiculo para gerar em lote.");
+    return;
+  }
+  const button = $("generateSelectedAutomovelArtsButton");
+  if (button) button.disabled = true;
+  showToast(`Gerando ${selected.length} arte${selected.length === 1 ? "" : "s"} de veiculo...`);
+  const options = opcoesArteAutomovel();
+  let geradas = 0;
+  try {
+    for (let index = 0; index < selected.length; index += 1) {
+      const autoId = selected[index];
+      const result = await criarCanvasArteAutomovel(autoId, "premium45", options);
+      if (!result?.canvas) continue;
+      const blob = await canvasParaBlob(result.canvas);
+      const ordem = String(index + 1).padStart(2, "0");
+      baixarBlobCanvas(blob, `${ordem}-arte-veiculo-${slugify(result.item.codRef || result.item.marca || result.item.id)}.png`);
+      geradas += 1;
+      await new Promise((resolve) => setTimeout(resolve, 220));
+    }
+    showToast(`${geradas} arte${geradas === 1 ? "" : "s"} gerada${geradas === 1 ? "" : "s"}.`);
+  } catch (error) {
+    console.error("Erro ao gerar artes em lote de veiculos.", error);
+    showToast("Nao foi possivel gerar todas as artes selecionadas.");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
 function renderAutomoveisList() {
   const box = $("automoveisList");
   if (!box) return;
@@ -7103,20 +7224,12 @@ function renderAutomoveisList() {
         <div class="list-meta">${escapeHtml([item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ") || "Sem contato")}</div>
         <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
         <div class="list-card-actions">
-          ${canGenerateVeiculoImages() ? `<button type="button" data-art-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte premium</button>` : ""}
           ${hasPermission("veiculos") ? `<button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>` : ""}
           ${hasPermission("veiculos") ? `<button type="button" class="danger-mini" data-delete-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-trash"></i> Excluir</button>` : ""}
         </div>
       </article>
     `;
   }).join("");
-  box.querySelectorAll("[data-art-automovel]").forEach((button) => {
-    button.addEventListener("click", () => {
-      if ($("automovelArteItem")) $("automovelArteItem").value = button.dataset.artAutomovel || "";
-      state.selectedAutomovelArtId = button.dataset.artAutomovel || "";
-      gerarArteInstagramAutomovel(button.dataset.artAutomovel, "premium45");
-    });
-  });
   box.querySelectorAll("[data-edit-automovel]").forEach((button) => {
     button.addEventListener("click", () => {
       const item = state.automoveis.find((auto) => auto.id === button.dataset.editAutomovel && itemBelongsToCurrentClient(auto));
@@ -14270,6 +14383,7 @@ function bindAdminIdleTimer() {
 
 function bindEvents() {
   prepareClientFormSections();
+  ensureAutomovelArteViewMounted();
   bindCurrencyMask($("imovelValor"));
   bindCurrencyMask($("automovelPreco"));
   bindPhoneMask("imovelTelefone");
@@ -14519,6 +14633,15 @@ function bindEvents() {
   $("generateAutomovelArtButton")?.addEventListener("click", () => {
     gerarArteInstagramAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, "premium45", opcoesArteAutomovel());
   });
+  $("selectAllAutomovelArtButton")?.addEventListener("click", () => {
+    state.selectedAutomovelArtIds = new Set(state.automoveis.filter(itemBelongsToCurrentClient).map((item) => item.id));
+    renderAutomovelArteBatchList();
+  });
+  $("clearAutomovelArtSelectionButton")?.addEventListener("click", () => {
+    state.selectedAutomovelArtIds = new Set();
+    renderAutomovelArteBatchList();
+  });
+  $("generateSelectedAutomovelArtsButton")?.addEventListener("click", gerarArtesInstagramAutomoveisSelecionados);
   const handleAutomovelImagesUpload = async (event) => {
     const input = event.target;
     const files = Array.from(input.files || []).filter(Boolean);

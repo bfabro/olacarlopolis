@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=334">
+  <link rel="stylesheet" href="painel.css?v=335">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -77,6 +77,7 @@
           <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Noticias</button>
           <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
           <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
+          <button data-view="automoveisArtes" data-permission="gerar_imagens_veiculos"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de veiculos</button>
         </section>
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestao</span>
@@ -1395,6 +1396,18 @@
         </div>
       </section>
 
+      <section id="automoveisArtesView" class="panel-view hidden">
+        <section class="panel-card auto-art-screen-card" data-permission="gerar_imagens_veiculos">
+          <div class="section-head">
+            <div>
+              <h2>Artes para Instagram - veiculos</h2>
+              <p>Configure o layout, selecione um ou varios veiculos e baixe as imagens em sequencia.</p>
+            </div>
+          </div>
+          <div id="automovelArteViewMount"></div>
+        </section>
+      </section>
+
       <section id="usuariosView" class="panel-view hidden">
         <div class="split-layout">
           <section class="panel-card form-collapsed">
@@ -1645,6 +1658,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=386"></script>
+  <script type="module" src="painel.js?v=387"></script>
 </body>
 </html>
