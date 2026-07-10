@@ -9077,6 +9077,16 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
   cursor: pointer;
 }
 
+.auto-total-disponiveis {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #0f766e;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .auto-filter-chevron {
   transition: transform .18s ease;
 }
@@ -9087,6 +9097,19 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 
 #filtrosAutomoveis.auto-filter-collapsed .grid-filtros {
   display: none;
+}
+
+@media (max-width: 520px) {
+  #filtrosAutomoveis .topbar {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .auto-total-disponiveis {
+    order: 3;
+    flex-basis: 100%;
+    text-align: left;
+  }
 }
 
 #filtrosAutomoveis .filtro-titulo {

@@ -11022,6 +11022,7 @@ plotarPinsImoveis(stateImoveis.filtered);
               <span>Filtro</span>
               <i class="fa-solid fa-chevron-down auto-filter-chevron"></i>
             </button>
+            <span id="autoTotalDisponiveis" class="auto-total-disponiveis">Carregando veículos...</span>
             <label class="switch auto-cards-switch" title="Mostrar automoveis em cards menores">
               <input type="checkbox" id="autoModoCards" ${window.__automoveisModoCards ? "checked" : ""}>
               <span class="track"><span class="thumb"></span></span>
@@ -11031,7 +11032,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           <div class="grid-filtros">
             <div class="campo"><label>Tipo</label><select id="autoFiltroTipo"><option value="">Todos</option></select></div>
             <div class="campo"><label>Marca</label><select id="autoFiltroMarca"><option value="">Todas</option></select></div>
-            <div class="campo"><label>Modelo</label><input id="autoFiltroModelo" placeholder="Modelo"></div>
+            <div class="campo"><label>Modelo</label><select id="autoFiltroModelo"><option value="">Todos</option></select></div>
             <div class="campo"><label>Ano</label><input id="autoFiltroAno" placeholder="Ex: 2020"></div>
             <div class="campo"><label>Valor ate</label><input id="autoFiltroValor" placeholder="Ex: 50000"></div>
             <div class="campo"><label>Vendedor</label><select id="autoFiltroVendedor"><option value="">Todos</option></select></div>
@@ -11051,6 +11052,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const box = document.getElementById("automoveisLista");
     const filtroBox = document.getElementById("filtrosAutomoveis");
     const toggleFiltros = document.getElementById("autoToggleFiltros");
+    const totalDisponiveis = document.getElementById("autoTotalDisponiveis");
     let lista = Array.isArray(window.__automoveisCache) ? window.__automoveisCache : [];
 
     configurarDetalhesAutomoveisEmBox(box, () => lista);
@@ -11065,10 +11067,21 @@ plotarPinsImoveis(stateImoveis.filtered);
     const preencherFiltros = () => {
       preencherSelect("autoFiltroTipo", "tipo");
       preencherSelect("autoFiltroMarca", "marca");
+      preencherSelect("autoFiltroModelo", "modelo");
       preencherSelect("autoFiltroCondicao", "condicao");
       preencherSelect("autoFiltroCombustivel", "combustivel");
       preencherSelect("autoFiltroCambio", "cambio");
       preencherSelect("autoFiltroVendedor", "vendedor");
+    };
+
+    const atualizarTotalAutomoveis = (filtrados = lista) => {
+      if (!totalDisponiveis) return;
+      const total = lista.length;
+      const exibidos = filtrados.length;
+      const totalTexto = `${total} veículo${total === 1 ? "" : "s"}`;
+      totalDisponiveis.textContent = total
+        ? `${exibidos} de ${totalTexto}`
+        : "Nenhum veículo disponível";
     };
 
     const aplicarModoCards = () => {
@@ -11088,7 +11101,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       const filtros = {
         tipo: document.getElementById("autoFiltroTipo")?.value || "",
         marca: document.getElementById("autoFiltroMarca")?.value || "",
-        modelo: normalizarTextoAutomoveis(document.getElementById("autoFiltroModelo")?.value || ""),
+        modelo: document.getElementById("autoFiltroModelo")?.value || "",
         ano: normalizarTextoAutomoveis(document.getElementById("autoFiltroAno")?.value || ""),
         valor: numeroAutomoveis(document.getElementById("autoFiltroValor")?.value || ""),
         vendedor: document.getElementById("autoFiltroVendedor")?.value || "",
@@ -11102,7 +11115,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         const hay = normalizarTextoAutomoveis(`${item.tipo} ${item.marca} ${item.modelo} ${item.ano} ${item.preco} ${item.vendedor || item.loja} ${item.condicao} ${item.km} ${item.combustivel} ${item.cambio} ${item.cor} ${item.cidade} ${item.opcionais} ${item.descricao}`);
         if (filtros.tipo && item.tipo !== filtros.tipo) return false;
         if (filtros.marca && item.marca !== filtros.marca) return false;
-        if (filtros.modelo && !normalizarTextoAutomoveis(item.modelo).includes(filtros.modelo)) return false;
+        if (filtros.modelo && item.modelo !== filtros.modelo) return false;
         if (filtros.ano && !normalizarTextoAutomoveis(item.ano).includes(filtros.ano)) return false;
         if (filtros.valor && numeroAutomoveis(item.preco) > filtros.valor) return false;
         if (filtros.vendedor && (item.vendedor || item.loja) !== filtros.vendedor) return false;
@@ -11113,6 +11126,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (filtros.busca && !hay.includes(filtros.busca)) return false;
         return true;
       });
+      atualizarTotalAutomoveis(filtrados);
       renderAutomoveisCards(filtrados, box);
     };
 
@@ -11126,6 +11140,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       el.addEventListener("change", aplicar);
     });
     aplicarModoCards();
+    atualizarTotalAutomoveis();
 
     if (lista.length) {
       preencherFiltros();
@@ -11143,6 +11158,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       filtroBox?.classList.remove("auto-filter-loading");
     }
     if (!lista.length) {
+      atualizarTotalAutomoveis([]);
       box.innerHTML = `<div class="list-meta">Nenhum automovel anunciado no momento.</div>`;
       return;
     }
