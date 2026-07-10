@@ -568,6 +568,14 @@ function resolverChaveMetricaCliente(idEstabelecimento) {
   return fuzzyMatch?.[1] || normalized;
 }
 
+function chaveFirebaseMetrica(valor, fallback = "sem-identificacao") {
+  const chave = String(valor || "").trim()
+    .replace(/[.#$/[\]]/g, "-")
+    .replace(/\s+/g, " ")
+    .slice(0, 180);
+  return chave || fallback;
+}
+
 function variantesChaveMetricaCliente(valor) {
   const bruto = String(valor || "").trim();
   if (!bruto) return [];
@@ -639,9 +647,8 @@ function erroPermissaoFirebase(erro) {
 function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes = {}) {
   const hoje = getHojeBR();
   const db = firebase.database();
-
-  const refContador = db.ref(`cliquesPorBotao/${hoje}/${idEstabelecimento}/${tipo}`);
-  const refLog = db.ref(`cliquesPorBotaoDetalhado/${hoje}/${idEstabelecimento}`).push();
+  const chaveEstabelecimento = chaveFirebaseMetrica(idEstabelecimento);
+  const chaveTipo = chaveFirebaseMetrica(tipo, "clique");
 
   const agora = new Date();
   const payload = {
@@ -658,34 +665,22 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
     ...detalhes
   });
 
-  return new Promise((resolve) => {
-    const finalizar = (resultado) => resolve(resultado);
-    refContador.transaction(
-      (atual) => (atual || 0) + 1,
-      async (erro) => {
-        if (erro) {
-          if (!erroPermissaoFirebase(erro)) {
-            console.warn("[CliqueBotao] Erro no contador:", erro);
-          }
-          finalizar({ ok: false, erroContador: true });
-          return;
-        }
-        try {
-          await Promise.all([refLog.set(payload), metricaCliente]);
-          finalizar({ ok: true });
-        } catch (e) {
-          if (!erroPermissaoFirebase(e)) {
-            console.warn("[CliqueBotao] Erro ao salvar detalhado:", e);
-          }
-          finalizar({ ok: true, logFalhou: true });
-        }
-      }
-    ).catch((erro) => {
-      if (!erroPermissaoFirebase(erro)) {
-        console.warn("[CliqueBotao] Erro no contador:", erro);
-      }
-      finalizar({ ok: false, erroContador: true });
-    });
+  const gravacoes = [metricaCliente];
+  try {
+    gravacoes.push(db.ref(`cliquesPorBotao/${hoje}/${chaveEstabelecimento}/${chaveTipo}`).transaction((atual) => (atual || 0) + 1));
+    gravacoes.push(db.ref(`cliquesPorBotaoDetalhado/${hoje}/${chaveEstabelecimento}`).push().set(payload));
+  } catch (erro) {
+    if (!erroPermissaoFirebase(erro)) {
+      console.warn("[CliqueBotao] Erro ao preparar contador:", erro);
+    }
+  }
+
+  return Promise.allSettled(gravacoes).then((resultados) => {
+    const ok = resultados.some((resultado) => resultado.status === "fulfilled");
+    resultados
+      .filter((resultado) => resultado.status === "rejected" && !erroPermissaoFirebase(resultado.reason))
+      .forEach((resultado) => console.warn("[CliqueBotao] Erro ao registrar clique:", resultado.reason));
+    return { ok };
   });
 }
 window.registrarCliqueBotao = registrarCliqueBotao;
@@ -21193,7 +21188,9 @@ plotarPinsImoveis(stateImoveis.filtered);
           aliases.forEach((alias) => {
             variantesChaveMetricaCliente(alias).forEach((variant) => {
               const key = normalizeName(variant || "");
+              const metricKey = normalizarChaveMetricaCliente(variant || "");
               if (key) window.__metricClientIds[key] = clienteId;
+              if (metricKey) window.__metricClientIds[metricKey] = clienteId;
             });
           });
         });
