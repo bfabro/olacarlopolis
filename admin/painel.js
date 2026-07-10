@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 455,
-  label: "v461",
+  numero: 456,
+  label: "v462",
   data: "2026-07-10",
-  nota: "Uploads de imagens de veiculos sao otimizados para carregar mais rapido."
+  nota: "Campo marca de automoveis passou a usar lista padronizada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5784,7 +5784,7 @@ function fillAutomovelForm(item) {
   state.selectedAutomovelId = item.id;
   state.automovelImages = Array.isArray(item.imagens) ? item.imagens : (item.imagem ? [item.imagem] : []);
   $("automovelId").value = item.id || "";
-  $("automovelMarca").value = item.marca || "";
+  preencherSelectAutomovel("automovelMarca", item.marca || "");
   $("automovelModelo").value = item.modelo || "";
   $("automovelAno").value = item.ano || "";
   $("automovelPreco").value = formatExistingCurrency(item.preco || "");
