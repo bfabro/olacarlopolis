@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-10-auto-topbar-sem-quebra-v455-v453'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-10-auto-capa-consulte-v456-v456'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

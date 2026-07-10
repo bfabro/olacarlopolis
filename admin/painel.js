@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 449,
-  label: "v455",
+  numero: 450,
+  label: "v456",
   data: "2026-07-10",
-  nota: "Editor de arte de veiculos reutiliza imagens carregadas para arraste mais fluido."
+  nota: "Automoveis permitem escolher foto de capa e documentacao Em dia."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5836,13 +5836,25 @@ function getAutomovelFormData() {
 function renderAutomovelImagesPreview() {
   const box = $("automovelImagesPreview");
   if (!box) return;
+  const coverInput = $("automovelImagem");
+  if (coverInput && state.automovelImages.length && !state.automovelImages.includes(coverInput.value.trim())) coverInput.value = state.automovelImages[0];
+  if (coverInput && !state.automovelImages.length) coverInput.value = "";
+  const cover = $("automovelImagem")?.value.trim() || state.automovelImages[0] || "";
   $("automovelImagesCount").textContent = `${state.automovelImages.length} imagen${state.automovelImages.length === 1 ? "" : "s"}`;
   box.innerHTML = state.automovelImages.map((url, index) => `
-    <article>
+    <article class="${url === cover ? "is-cover" : ""}">
       <img src="${escapeAttr(displayImageUrl(url))}" alt="Foto ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+      <button type="button" class="cover-button" data-cover-auto-image="${index}">${url === cover ? "Capa atual" : "Usar como capa"}</button>
       <button type="button" data-remove-auto-image="${index}">Remover</button>
     </article>
   `).join("") || `<div class="list-meta">Nenhuma foto adicionada.</div>`;
+  box.querySelectorAll("[data-cover-auto-image]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const url = state.automovelImages[Number(button.dataset.coverAutoImage)] || "";
+      if ($("automovelImagem")) $("automovelImagem").value = url;
+      renderAutomovelImagesPreview();
+    });
+  });
   box.querySelectorAll("[data-remove-auto-image]").forEach((button) => {
     button.addEventListener("click", () => {
       state.automovelImages.splice(Number(button.dataset.removeAutoImage), 1);

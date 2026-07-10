@@ -2396,6 +2396,11 @@ button[type="submit"]:hover,
   background: #fff;
 }
 
+#automovelImagesPreview article.is-cover {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, .18);
+}
+
 #imovelImagesPreview img,
 #automovelImagesPreview img {
   width: 100%;
@@ -2413,6 +2418,16 @@ button[type="submit"]:hover,
   color: var(--danger);
   font-size: 11px;
   font-weight: 800;
+}
+
+#automovelImagesPreview .cover-button {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+#automovelImagesPreview article.is-cover .cover-button {
+  background: #2563eb;
+  color: #fff;
 }
 
 .automovel-art-panel {

@@ -10627,12 +10627,13 @@ plotarPinsImoveis(stateImoveis.filtered);
         ["Cidade", item.cidade]
       ].filter(([, valor]) => valor);
       const vendedor = item.vendedor || item.loja || "";
+      const precoCard = formatarPrecoAutomoveis(item.preco) || "Consulte";
       const sellerSlug = resolverDestinoPublicoAutomovel(item);
       const whatsappTexto = [
         "Ola! Vi este automovel no Ola Carlopolis e quero mais informacoes.",
         `Referencia: ${codigoReferencia}`,
         `Produto: ${titulo}`,
-        item.preco ? `Valor: ${formatarPrecoAutomoveis(item.preco)}` : "",
+        `Valor: ${precoCard}`,
         vendedor ? `Loja/Vendedor: ${vendedor}` : "",
         imagemPrincipal ? `Imagem: ${imagemPrincipal}` : ""
       ].filter(Boolean).join("\n");
@@ -10650,7 +10651,7 @@ plotarPinsImoveis(stateImoveis.filtered);
                 <button class="auto-gallery-nav auto-gallery-next" type="button" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
               ` : ""}
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
-            ${item.preco ? `<strong class="auto-price">${textoSeguroAutomoveis(formatarPrecoAutomoveis(item.preco))}</strong>` : ""}
+            <strong class="auto-price">${textoSeguroAutomoveis(precoCard)}</strong>
             ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
           </div>
           <div class="im-card-body">
