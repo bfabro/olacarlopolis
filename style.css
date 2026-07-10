@@ -19421,13 +19421,15 @@ body.vaga-modal-open {
 @media (max-width: 640px) {
   #filtrosAutomoveis .topbar {
     display: grid !important;
-    grid-template-columns: auto auto !important;
-    justify-content: center !important;
-    gap: 10px !important;
+    grid-template-columns: minmax(88px, auto) minmax(58px, 1fr) minmax(88px, auto) !important;
+    align-items: center !important;
+    justify-content: stretch !important;
+    gap: 8px !important;
   }
 
   #filtrosAutomoveis .auto-cards-switch {
     min-height: 40px;
+    justify-self: end;
   }
 
   .automoveis-page.auto-cards-mode #automoveisLista {
@@ -20792,6 +20794,34 @@ body.vaga-modal-open {
   .im-cards-switch {
     min-height: 40px !important;
     font-size: 13px !important;
+  }
+
+  #filtrosAutomoveis .topbar {
+    display: grid !important;
+    grid-template-columns: minmax(88px, auto) minmax(56px, 1fr) minmax(82px, auto) !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  #filtrosAutomoveis .auto-cards-switch {
+    justify-self: end !important;
+    gap: 7px !important;
+    padding: 0 !important;
+  }
+
+  #filtrosAutomoveis .auto-cards-switch .track {
+    width: 42px !important;
+    flex-basis: 42px !important;
+  }
+
+  #filtrosAutomoveis .auto-cards-switch input:checked + .track .thumb {
+    left: 19px !important;
+  }
+
+  .auto-total-disponiveis {
+    justify-self: stretch;
+    flex: none;
+    padding-inline: 6px;
   }
 }
 
