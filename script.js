@@ -10556,8 +10556,11 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function formatarPrecoAutomoveis(valor) {
+    const texto = String(valor || "").trim();
+    if (!texto) return "";
+    if (/^consulte$/i.test(texto)) return "Consulte";
     const numero = numeroAutomoveis(valor);
-    if (!numero) return String(valor || "").trim();
+    if (!numero) return texto;
     return numero.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
