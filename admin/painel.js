@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 448,
-  label: "v454",
+  numero: 449,
+  label: "v455",
   data: "2026-07-10",
-  nota: "Artes de veiculos agora ficam em tela separada com geracao em lote."
+  nota: "Editor de arte de veiculos reutiliza imagens carregadas para arraste mais fluido."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -59,6 +59,7 @@ let automovelArteDragState = null;
 let automovelArteDragFrame = null;
 let automovelArtePreviewRendering = false;
 let automovelArtePreviewQueued = false;
+const canvasImageCache = new Map();
 
 const PRODUCT_SECTOR_OPTIONS = [
   "Acessorios",
@@ -7126,7 +7127,7 @@ async function atualizarPreviaArteAutomovel({ silent = false } = {}) {
   }
   automovelArtePreviewRendering = true;
   const button = $("previewAutomovelArtButton");
-  if (button) button.disabled = true;
+  if (button && !silent) button.disabled = true;
   if (!silent) showToast("Atualizando previa do veiculo...");
   try {
     const result = await criarCanvasArteAutomovel($("automovelArteItem")?.value || state.selectedAutomovelArtId, "premium45", opcoesArteAutomovel());
@@ -7142,7 +7143,7 @@ async function atualizarPreviaArteAutomovel({ silent = false } = {}) {
     if (!silent) showToast("Nao foi possivel atualizar a previa.");
   } finally {
     automovelArtePreviewRendering = false;
-    if (button) button.disabled = false;
+    if (button && !silent) button.disabled = false;
     if (automovelArtePreviewQueued) {
       automovelArtePreviewQueued = false;
       atualizarPreviaArteAutomovel({ silent: true });
@@ -7507,12 +7508,14 @@ async function carregarImagemCanvas(url) {
   const src = normalizarImagemArteAdmin(url);
   if (!src) return null;
   const resolved = imagemCanvasUrlAdmin(src);
+  if (canvasImageCache.has(resolved)) return canvasImageCache.get(resolved);
+  const loader = (async () => {
   const controller = new AbortController();
   const fetchTimeout = window.setTimeout(() => controller.abort(), 12000);
   try {
     const response = await fetch(resolved, {
       mode: "cors",
-      cache: "no-store",
+      cache: "force-cache",
       signal: controller.signal
     });
     if (response.ok) {
@@ -7538,6 +7541,15 @@ async function carregarImagemCanvas(url) {
     };
     img.src = resolved;
   });
+  })();
+  canvasImageCache.set(resolved, loader);
+  const imagem = await loader;
+  if (!imagem) canvasImageCache.delete(resolved);
+  if (canvasImageCache.size > 120) {
+    const primeiraChave = canvasImageCache.keys().next().value;
+    if (primeiraChave) canvasImageCache.delete(primeiraChave);
+  }
+  return imagem;
 }
 
 async function carregarPrimeiraImagemCanvas(urls = []) {
