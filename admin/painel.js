@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 450,
-  label: "v456",
+  numero: 451,
+  label: "v457",
   data: "2026-07-10",
-  nota: "Automoveis permitem escolher foto de capa e documentacao Em dia."
+  nota: "Geracao em lote de artes de veiculos usa os dados de cada automovel."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6026,6 +6026,22 @@ function opcoesArteAutomovel() {
   };
 }
 
+function opcoesArteAutomovelParaLote(item = {}, baseOptions = opcoesArteAutomovel()) {
+  const defaults = defaultsTarjaAutomovel(item);
+  return {
+    ...baseOptions,
+    title: "",
+    subtitle: "",
+    subtitle2: "",
+    threePhotos: {
+      ...(baseOptions.threePhotos || {}),
+      line1: defaults.line1,
+      line2: defaults.line2,
+      price: defaults.price
+    }
+  };
+}
+
 function clientePodeEscolherLogoArteAutomovel() {
   return canManageClients() || Boolean(state.profile?.permissoes?.ocultar_logo_arte_veiculo);
 }
@@ -7195,7 +7211,9 @@ async function gerarArtesInstagramAutomoveisSelecionados() {
   try {
     for (let index = 0; index < selected.length; index += 1) {
       const autoId = selected[index];
-      const result = await criarCanvasArteAutomovel(autoId, "premium45", options);
+      const item = state.automoveis.find((auto) => auto.id === autoId && itemBelongsToCurrentClient(auto));
+      if (!item) continue;
+      const result = await criarCanvasArteAutomovel(autoId, "premium45", opcoesArteAutomovelParaLote(item, options));
       if (!result?.canvas) continue;
       const blob = await canvasParaBlob(result.canvas);
       const ordem = String(index + 1).padStart(2, "0");
