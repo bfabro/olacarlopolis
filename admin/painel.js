@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 451,
-  label: "v457",
+  numero: 452,
+  label: "v458",
   data: "2026-07-10",
-  nota: "Geracao em lote de artes de veiculos usa os dados de cada automovel."
+  nota: "Imagens de veiculos podem ser reordenadas no cadastro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5844,10 +5844,26 @@ function renderAutomovelImagesPreview() {
   box.innerHTML = state.automovelImages.map((url, index) => `
     <article class="${url === cover ? "is-cover" : ""}">
       <img src="${escapeAttr(displayImageUrl(url))}" alt="Foto ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+      <div class="auto-image-order-actions">
+        <button type="button" data-move-auto-image="${index}" data-direction="-1" ${index === 0 ? "disabled" : ""} title="Mover para a esquerda"><i class="fa-solid fa-arrow-left"></i></button>
+        <span>${index + 1}</span>
+        <button type="button" data-move-auto-image="${index}" data-direction="1" ${index === state.automovelImages.length - 1 ? "disabled" : ""} title="Mover para a direita"><i class="fa-solid fa-arrow-right"></i></button>
+      </div>
       <button type="button" class="cover-button" data-cover-auto-image="${index}">${url === cover ? "Capa atual" : "Usar como capa"}</button>
       <button type="button" data-remove-auto-image="${index}">Remover</button>
     </article>
   `).join("") || `<div class="list-meta">Nenhuma foto adicionada.</div>`;
+  box.querySelectorAll("[data-move-auto-image]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.moveAutoImage);
+      const direction = Number(button.dataset.direction);
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= state.automovelImages.length) return;
+      const [url] = state.automovelImages.splice(index, 1);
+      state.automovelImages.splice(nextIndex, 0, url);
+      renderAutomovelImagesPreview();
+    });
+  });
   box.querySelectorAll("[data-cover-auto-image]").forEach((button) => {
     button.addEventListener("click", () => {
       const url = state.automovelImages[Number(button.dataset.coverAutoImage)] || "";
