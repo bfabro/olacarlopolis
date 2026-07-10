@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 454,
-  label: "v460",
+  numero: 455,
+  label: "v461",
   data: "2026-07-10",
-  nota: "Lista de automoveis cadastrados ganhou visualizacao ampla com imagem sem corte."
+  nota: "Uploads de imagens de veiculos sao otimizados para carregar mais rapido."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4089,18 +4089,61 @@ async function uploadSelectedProductImages(inputId, targetInputId, clientId) {
 async function uploadAutomovelImages(id, files) {
   const urls = [];
   for (const file of Array.from(files || [])) {
-    const path = `conteudosInformativos/automoveis/${id}/${Date.now()}-${slugify(file.name || "automovel")}`;
+    const optimizedFile = await optimizeAutomovelImageFile(file);
+    const path = `conteudosInformativos/automoveis/${id}/${Date.now()}-${slugify(optimizedFile.name || file.name || "automovel")}`;
     const fileRef = storageRef(storage, path);
-    urls.push(await uploadFileWithProgress(fileRef, file, "Enviando fotos do automovel", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
+    urls.push(await uploadFileWithProgress(fileRef, optimizedFile, "Enviando fotos do automovel", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
   }
   return urls;
 }
 
 async function uploadAutomovelImage(id, file, index = 0, total = 1) {
-  const name = file?.name || `foto-${index + 1}`;
+  const optimizedFile = await optimizeAutomovelImageFile(file);
+  const name = optimizedFile?.name || file?.name || `foto-${index + 1}`;
   const path = `conteudosInformativos/automoveis/${id}/${Date.now()}-${slugify(name || "automovel")}`;
   const fileRef = storageRef(storage, path);
-  return uploadFileWithProgress(fileRef, file, "Enviando fotos do automovel", `${name} (${index + 1}/${total})`);
+  return uploadFileWithProgress(fileRef, optimizedFile, "Enviando fotos do automovel", `${file?.name || name} (${index + 1}/${total})`);
+}
+
+function loadImageElementFromFile(file) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    const url = URL.createObjectURL(file);
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      resolve(image);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Nao foi possivel ler a imagem."));
+    };
+    image.src = url;
+  });
+}
+
+async function optimizeAutomovelImageFile(file) {
+  if (!file || !/^image\//i.test(file.type || "") || /svg|gif/i.test(file.type || "")) return file;
+  try {
+    const image = await loadImageElementFromFile(file);
+    const maxSide = 1600;
+    const ratio = Math.min(1, maxSide / Math.max(image.naturalWidth || image.width, image.naturalHeight || image.height));
+    const width = Math.max(1, Math.round((image.naturalWidth || image.width) * ratio));
+    const height = Math.max(1, Math.round((image.naturalHeight || image.height) * ratio));
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    ctx.fillStyle = "#fff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.82));
+    if (!blob || blob.size >= file.size) return file;
+    const baseName = String(file.name || "automovel").replace(/\.[^.]+$/, "");
+    return new File([blob], `${baseName}.jpg`, { type: "image/jpeg", lastModified: Date.now() });
+  } catch (error) {
+    console.warn("Nao foi possivel otimizar a imagem do automovel; enviando original.", error);
+    return file;
+  }
 }
 
 async function uploadImovelImages(id, files) {

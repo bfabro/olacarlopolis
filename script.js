@@ -10639,7 +10639,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           <div class="auto-card-media" data-auto-gallery="${imagensJson}" data-auto-title="${textoSeguroAutomoveis(titulo)}">
             ${imagens.length ? `
               <div class="auto-gallery-track">
-                ${imagens.map((url, index) => `<img class="auto-card-img auto-gallery-img" src="${textoSeguroAutomoveis(url)}" alt="${textoSeguroAutomoveis(titulo)}" data-auto-gallery-index="${index}" loading="lazy" decoding="async">`).join("")}
+                <img class="auto-card-img auto-gallery-img" src="${textoSeguroAutomoveis(imagens[0])}" alt="${textoSeguroAutomoveis(titulo)}" data-auto-gallery-index="0" loading="lazy" decoding="async" fetchpriority="low">
               </div>
               ${imagens.length > 1 ? `
                 <button class="auto-gallery-nav auto-gallery-prev" type="button" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
@@ -10870,12 +10870,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       media.querySelector(".auto-gallery-prev")?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        track?.scrollBy({ left: -track.clientWidth, behavior: "smooth" });
+        abrirGaleriaAutomovel(imagens, Math.max(0, imagens.length - 1), media.dataset.autoTitle || "Automovel");
       });
       media.querySelector(".auto-gallery-next")?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        track?.scrollBy({ left: track.clientWidth, behavior: "smooth" });
+        abrirGaleriaAutomovel(imagens, Math.min(1, imagens.length - 1), media.dataset.autoTitle || "Automovel");
       });
       media.querySelectorAll(".auto-gallery-img").forEach((img) => {
         img.addEventListener("click", (event) => {
