@@ -10641,10 +10641,6 @@ plotarPinsImoveis(stateImoveis.filtered);
               <div class="auto-gallery-track">
                 <img class="auto-card-img auto-gallery-img" src="${textoSeguroAutomoveis(imagens[0])}" alt="${textoSeguroAutomoveis(titulo)}" data-auto-gallery-index="0" loading="lazy" decoding="async" fetchpriority="low">
               </div>
-              ${imagens.length > 1 ? `
-                <button class="auto-gallery-nav auto-gallery-prev" type="button" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
-                <button class="auto-gallery-nav auto-gallery-next" type="button" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
-              ` : ""}
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
             <strong class="auto-price">${textoSeguroAutomoveis(precoCard)}</strong>
             ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
@@ -10669,7 +10665,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         </article>
       `;
     }).join("");
-    configurarGaleriasAutomoveis(box);
     box.querySelectorAll(".auto-seller-link[data-public-client-link]").forEach((link) => {
       link.addEventListener("click", (event) => {
         navegarParaEstabelecimentoPublico(link.dataset.publicClientLink || link.getAttribute("href")?.replace(/^#/, "") || "", event);
@@ -10684,9 +10679,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         event.__autoDetalhesHandled = true;
         registrarCliqueAutomovel("visualizacao", item);
         abrirModalDetalhesAutomovel(item);
-      });
-      card.querySelectorAll(".auto-gallery-img").forEach((image) => {
-        image.addEventListener("click", () => registrarCliqueAutomovel("fotos", item));
       });
       card.querySelector(".auto-whatsapp-button")?.addEventListener("click", () => {
         registrarCliqueAutomovel("whatsapp", item);
@@ -10863,28 +10855,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function configurarGaleriasAutomoveis(box) {
-    box.querySelectorAll(".auto-card-media").forEach((media) => {
-      const track = media.querySelector(".auto-gallery-track");
-      const imagens = lerImagensGaleriaAutomovel(media);
-
-      media.querySelector(".auto-gallery-prev")?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        abrirGaleriaAutomovel(imagens, Math.max(0, imagens.length - 1), media.dataset.autoTitle || "Automovel");
-      });
-      media.querySelector(".auto-gallery-next")?.addEventListener("click", (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        abrirGaleriaAutomovel(imagens, Math.min(1, imagens.length - 1), media.dataset.autoTitle || "Automovel");
-      });
-      media.querySelectorAll(".auto-gallery-img").forEach((img) => {
-        img.addEventListener("click", (event) => {
-          event.preventDefault();
-          event.stopPropagation();
-          abrirGaleriaAutomovel(imagens, Number(img.dataset.autoGalleryIndex || 0), media.dataset.autoTitle || "Automovel");
-        });
-      });
-    });
+    // Mantido para compatibilidade: o card agora abre detalhes; a galeria abre dentro da modal.
   }
 
   function lerImagensGaleriaAutomovel(media) {
