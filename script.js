@@ -11017,7 +11017,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     area.innerHTML = `
       <section class="imoveis-wrap automoveis-page">
-        <h2 class="highlighted"><span><i class="fa-solid fa-car"></i> AUTOMOVEIS</span></h2>
+        <h2 class="highlighted"><span><i class="fa-solid fa-car"></i> AUTOMOVEIS</span><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></h2>
         <aside id="filtrosAutomoveis" class="im-filtros painel-filtros auto-filter-collapsed">
           <div class="topbar">
             <button id="autoToggleFiltros" class="auto-filter-toggle" type="button" aria-expanded="false">

@@ -9032,6 +9032,7 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 
 .automoveis-page {
   grid-template-columns: 320px 1fr;
+  gap: 12px;
 }
 
 .automoveis-page .imoveis-head {
@@ -9040,22 +9041,47 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 
 .automoveis-page > .highlighted {
   grid-column: 1 / -1;
-  margin: 0 0 0;
+  min-height: 50px;
+  margin: 0;
+  padding: 0 16px;
+  border-radius: 9px 9px 0 0;
+  background: linear-gradient(100deg, #2f8df4 0%, #2f8df4 34%, #f5a430 58%, #2f8df4 100%);
+  color: #fff;
+  box-shadow: none;
+  font-size: 19px;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.automoveis-page > .highlighted span,
+.automoveis-page > .highlighted > i {
+  display: inline-flex;
+  align-items: center;
+}
+
+.automoveis-page > .highlighted span {
+  gap: 7px;
+}
+
+.automoveis-page > .highlighted > i {
+  font-size: 18px;
 }
 
 #filtrosAutomoveis.painel-filtros {
   background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 6px 20px rgba(10, 20, 40, .18);
-  padding: 16px 18px 18px;
+  border: 1px solid #e5e7eb;
+  border-top: 0;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 7px 14px rgba(15, 23, 42, .13);
+  padding: 12px 6px 12px;
 }
 
 #filtrosAutomoveis .topbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
+  gap: 10px;
+  margin-bottom: 12px;
 }
 
 #filtrosAutomoveis.auto-filter-collapsed .topbar {
@@ -9070,10 +9096,10 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
   min-height: 40px;
   border: 1px solid #fb923c;
   border-radius: 12px;
-  background: #fff7ed;
+  background: #fff;
   color: #9a3412;
   font-weight: 900;
-  padding: 8px 12px;
+  padding: 8px 11px;
   cursor: pointer;
 }
 
@@ -9174,8 +9200,8 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
   align-items: center;
   gap: 10px;
   cursor: pointer;
-  font-weight: 700;
-  color: #374151;
+  font-weight: 900;
+  color: #065f46;
   user-select: none;
 }
 
@@ -9217,11 +9243,41 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 
 @media (max-width: 640px) {
   #filtrosAutomoveis .topbar {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
   }
 
   #filtrosAutomoveis .grid-filtros {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .automoveis-page > .highlighted {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 18px;
+  }
+
+  #filtrosAutomoveis.painel-filtros {
+    padding-inline: 6px;
+  }
+
+  .auto-filter-toggle {
+    min-height: 40px;
+    padding-inline: 10px;
+  }
+
+  .auto-total-disponiveis {
+    flex-basis: 60px;
+    min-height: 36px;
+  }
+
+  #filtrosAutomoveis .switch {
+    gap: 8px;
+  }
+
+  #filtrosAutomoveis .switch .track {
+    width: 45px;
   }
 }
 
