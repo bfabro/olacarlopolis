@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 446,
-  label: "v452",
+  numero: 447,
+  label: "v453",
   data: "2026-07-09",
-  nota: "Upload de imagens de veiculos preserva o tipo do arquivo para artes exportadas do Canva."
+  nota: "Novidades preservam eventos individuais de veiculos e evitam limpeza por ID vazio."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3152,12 +3152,15 @@ async function removerNovidadesPorDestino(tipo, destinoId, itemId = "") {
       const novidadeTipo = normalizeName(novidade.destinoTipo || novidade.tipo || "");
       const mesmoTipo = !tipoNorm || novidadeTipo.includes(tipoNorm) || tipoNorm.includes(novidadeTipo);
       const mesmoDestino = destino && String(novidade.destinoId || "") === destino;
-      const mesmoItem = item && (
-        String(novidade.itemId || "") === item ||
-        String(novidade.destinoCardId || "").includes(item) ||
-        String(item).includes(String(novidade.itemId || "")) ||
-        String(item).includes(String(novidade.destinoCardId || "")) ||
-        String(novidade.id || "").includes(item)
+      const novidadeItemId = String(novidade.itemId || "");
+      const novidadeCardId = String(novidade.destinoCardId || "");
+      const novidadeId = String(novidade.id || child.key || "");
+      const mesmoItem = Boolean(item) && (
+        novidadeItemId === item ||
+        (novidadeCardId && novidadeCardId.includes(item)) ||
+        (novidadeItemId && item.includes(novidadeItemId)) ||
+        (novidadeCardId && item.includes(novidadeCardId)) ||
+        (novidadeId && novidadeId.includes(item))
       );
       if (mesmoTipo && (mesmoItem || (!item && mesmoDestino))) updates[`novidades/${child.key}`] = null;
       return false;

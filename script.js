@@ -10398,6 +10398,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       marca: item.Marca || item.marca || "",
       modelo: item.Modelo || item.modelo || item.titulo || item.Titulo || "",
       ano: item.Ano || item.ano || "",
+      createdAt: item.createdAt || item.criadoEm || item.dataCriacao || "",
+      updatedAt: item.updatedAt || item.dataAtualizacao || item.atualizadoEm || "",
       codRef: item.codRef || item.codigo || item.Codigo || item["Codigo Referencia"] || item["Código Referencia"] || item["Cod Ref"] || key || "",
       preco: item.Preco || item.Preço || item.preco || item.valor || "",
       condicao: item.Condicao || item.condicao || item.estado || "",
