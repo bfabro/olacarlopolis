@@ -11022,7 +11022,10 @@ plotarPinsImoveis(stateImoveis.filtered);
               <span>Filtro</span>
               <i class="fa-solid fa-chevron-down auto-filter-chevron"></i>
             </button>
-            <span id="autoTotalDisponiveis" class="auto-total-disponiveis">Carregando veículos...</span>
+            <span id="autoTotalDisponiveis" class="auto-total-disponiveis" aria-label="Veículos disponíveis">
+              <i class="fa-solid fa-car-side"></i>
+              <strong>...</strong>
+            </span>
             <label class="switch auto-cards-switch" title="Mostrar automoveis em cards menores">
               <input type="checkbox" id="autoModoCards" ${window.__automoveisModoCards ? "checked" : ""}>
               <span class="track"><span class="thumb"></span></span>
@@ -11074,14 +11077,14 @@ plotarPinsImoveis(stateImoveis.filtered);
       preencherSelect("autoFiltroVendedor", "vendedor");
     };
 
-    const atualizarTotalAutomoveis = (filtrados = lista) => {
+    const atualizarTotalAutomoveis = () => {
       if (!totalDisponiveis) return;
       const total = lista.length;
-      const exibidos = filtrados.length;
-      const totalTexto = `${total} veículo${total === 1 ? "" : "s"}`;
-      totalDisponiveis.textContent = total
-        ? `${exibidos} de ${totalTexto}`
-        : "Nenhum veículo disponível";
+      totalDisponiveis.setAttribute("aria-label", `${total} veículo${total === 1 ? "" : "s"} disponível${total === 1 ? "" : "is"}`);
+      totalDisponiveis.innerHTML = `
+        <i class="fa-solid fa-car-side" aria-hidden="true"></i>
+        <strong>${total}</strong>
+      `;
     };
 
     const aplicarModoCards = () => {
@@ -11126,7 +11129,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (filtros.busca && !hay.includes(filtros.busca)) return false;
         return true;
       });
-      atualizarTotalAutomoveis(filtrados);
+      atualizarTotalAutomoveis();
       renderAutomoveisCards(filtrados, box);
     };
 
@@ -11158,7 +11161,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       filtroBox?.classList.remove("auto-filter-loading");
     }
     if (!lista.length) {
-      atualizarTotalAutomoveis([]);
+      atualizarTotalAutomoveis();
       box.innerHTML = `<div class="list-meta">Nenhum automovel anunciado no momento.</div>`;
       return;
     }

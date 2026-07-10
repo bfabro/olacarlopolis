@@ -9078,13 +9078,30 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 }
 
 .auto-total-disponiveis {
-  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 82px;
+  gap: 7px;
   min-width: 0;
+  min-height: 40px;
+  border: 1px solid rgba(15, 118, 110, .2);
+  border-radius: 12px;
+  background: #f0fdfa;
   color: #0f766e;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 900;
   text-align: center;
   white-space: nowrap;
+}
+
+.auto-total-disponiveis i {
+  font-size: 15px;
+}
+
+.auto-total-disponiveis strong {
+  font-size: 18px;
+  line-height: 1;
 }
 
 .auto-filter-chevron {
@@ -9101,14 +9118,12 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 
 @media (max-width: 520px) {
   #filtrosAutomoveis .topbar {
-    flex-wrap: wrap;
     gap: 8px;
   }
 
   .auto-total-disponiveis {
-    order: 3;
-    flex-basis: 100%;
-    text-align: left;
+    flex: 0 1 64px;
+    padding: 0 8px;
   }
 }
 
