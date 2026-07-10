@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 453,
-  label: "v459",
+  numero: 454,
+  label: "v460",
   data: "2026-07-10",
-  nota: "Imagens de veiculos podem ser reordenadas arrastando no cadastro."
+  nota: "Lista de automoveis cadastrados ganhou visualizacao ampla com imagem sem corte."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -7301,19 +7301,45 @@ function renderAutomoveisList() {
     return;
   }
   box.innerHTML = list.map((item) => {
-    const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || item.id;
+    const titulo = [item.marca, item.modelo].filter(Boolean).join(" ") || item.titulo || item.id;
     const codigoRef = item.codRef || item.codigo || item.id || "";
+    const imagem = item.imagem || (Array.isArray(item.imagens) ? item.imagens[0] : "");
+    const detalhes = [
+      item.tipo,
+      item.condicao,
+      item.ano,
+      item.cambio,
+      item.combustivel,
+      item.km ? `${item.km} km` : "",
+      item.cor
+    ].filter(Boolean);
+    const lojaContato = [item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ");
     return `
-      <article class="list-card event-card">
-        ${item.imagem ? `<img src="${escapeAttr(displayImageUrl(item.imagem))}" alt="${escapeAttr(titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
-        <div class="list-title">${escapeHtml(titulo)}</div>
-        <div class="list-meta"><strong>Codigo de referencia:</strong> ${escapeHtml(codigoRef || "Sem codigo")}</div>
-        <div class="list-meta">${escapeHtml([item.tipo, item.condicao, item.ano, item.preco].filter(Boolean).join(" - ") || "Sem valor")}</div>
-        <div class="list-meta">${escapeHtml([item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ") || "Sem contato")}</div>
-        <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
-        <div class="list-card-actions">
-          ${hasPermission("veiculos") ? `<button type="button" data-edit-automovel="${escapeAttr(item.id)}">Editar</button>` : ""}
-          ${hasPermission("veiculos") ? `<button type="button" class="danger-mini" data-delete-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-trash"></i> Excluir</button>` : ""}
+      <article class="list-card event-card automovel-admin-card">
+        <div class="automovel-admin-thumb">
+          ${imagem
+            ? `<img src="${escapeAttr(displayImageUrl(imagem))}" alt="${escapeAttr(titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>`
+            : `<div class="automovel-admin-thumb-empty"><i class="fa-solid fa-car-side"></i></div>`}
+        </div>
+        <div class="automovel-admin-info">
+          <div class="automovel-admin-main">
+            <div>
+              <div class="list-title">${escapeHtml(titulo)}</div>
+              <div class="list-meta"><strong>Referencia:</strong> ${escapeHtml(codigoRef || "Sem codigo")}</div>
+            </div>
+            <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
+          </div>
+          <div class="automovel-admin-tags">
+            ${detalhes.map((detail) => `<span>${escapeHtml(detail)}</span>`).join("") || `<span>Sem detalhes</span>`}
+          </div>
+          <div class="automovel-admin-meta">
+            <strong>${escapeHtml(item.preco || "Consulte")}</strong>
+            <span>${escapeHtml(lojaContato || "Sem contato")}</span>
+          </div>
+          <div class="list-card-actions">
+            ${hasPermission("veiculos") ? `<button type="button" data-edit-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-pen"></i> Editar</button>` : ""}
+            ${hasPermission("veiculos") ? `<button type="button" class="danger-mini" data-delete-automovel="${escapeAttr(item.id)}"><i class="fa-solid fa-trash"></i> Excluir</button>` : ""}
+          </div>
         </div>
       </article>
     `;
