@@ -2491,10 +2491,15 @@ button[type="submit"]:hover,
 #automovelImagesPreview article {
   position: relative;
   cursor: grab;
-  touch-action: none;
+  touch-action: pan-y;
   user-select: none;
   transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease, border-color 150ms ease;
   will-change: transform;
+}
+
+#automovelImagesPreview article.is-hold-pending {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, .12);
 }
 
 #automovelImagesPreview article.is-dragging {
@@ -2507,6 +2512,10 @@ button[type="submit"]:hover,
 
 #automovelImagesPreview article.is-shifting {
   box-shadow: 0 8px 20px rgba(37, 99, 235, .14);
+}
+
+body.admin-auto-image-dragging {
+  overflow: hidden;
 }
 
 #automovelImagesPreview article.is-drag-over {

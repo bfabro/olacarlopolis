@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 459,
-  label: "v465",
+  numero: 460,
+  label: "v466",
   data: "2026-07-11",
-  nota: "Arraste das fotos de veiculos agora usa troca visual leve antes de salvar a ordem."
+  nota: "Ordenacao das fotos de veiculos agora ativa apenas ao segurar."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5894,6 +5894,8 @@ function renderAutomovelImagesPreview() {
     </article>
   `).join("") || `<div class="list-meta">Nenhuma foto adicionada.</div>`;
   let dragState = null;
+  const HOLD_DRAG_AUTOMOVEL_IMAGE_MS = 320;
+  const MOVE_CANCEL_AUTOMOVEL_IMAGE_PX = 10;
   const reorderImage = (fromIndex, toIndex, renderAfter = true) => {
     if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= state.automovelImages.length || toIndex >= state.automovelImages.length) return;
     const [url] = state.automovelImages.splice(fromIndex, 1);
@@ -5902,16 +5904,19 @@ function renderAutomovelImagesPreview() {
   };
   const limparArrasteAutomovelImages = () => {
     if (!dragState) return;
+    if (dragState.holdTimer) clearTimeout(dragState.holdTimer);
     if (dragState.frame) cancelAnimationFrame(dragState.frame);
-    dragState.cards.forEach((card) => {
+    (dragState.cards || [dragState.card]).forEach((card) => {
       card.classList.remove("is-dragging", "is-shifting");
       card.style.transform = "";
       card.style.transition = "";
     });
+    dragState.card?.classList.remove("is-hold-pending");
     box.classList.remove("is-reordering");
+    document.body.classList.remove("admin-auto-image-dragging");
   };
   const indiceAutomovelImagePorPonto = (x, y) => {
-    if (!dragState?.rects?.length) return -1;
+    if (!dragState?.active || !dragState.rects?.length) return -1;
     let melhorIndice = dragState.startIndex;
     let melhorDistancia = Infinity;
     dragState.rects.forEach((rect, index) => {
@@ -5934,7 +5939,7 @@ function renderAutomovelImagesPreview() {
     return melhorIndice;
   };
   const aplicarArrasteAutomovelImages = () => {
-    if (!dragState) return;
+    if (!dragState?.active) return;
     dragState.frame = null;
     const dxDrag = dragState.lastX - dragState.startX;
     const dyDrag = dragState.lastY - dragState.startY;
@@ -5959,11 +5964,37 @@ function renderAutomovelImagesPreview() {
     });
   };
   const agendarArrasteAutomovelImages = () => {
-    if (!dragState || dragState.frame) return;
+    if (!dragState?.active || dragState.frame) return;
     dragState.frame = requestAnimationFrame(aplicarArrasteAutomovelImages);
+  };
+  const ativarArrasteAutomovelImages = () => {
+    if (!dragState || dragState.active) return;
+    const cards = [...box.querySelectorAll("[data-reorder-auto-image]")];
+    const startIndex = Number(dragState.card.dataset.reorderAutoImage);
+    dragState.active = true;
+    dragState.cards = cards;
+    dragState.rects = cards.map((card) => card.getBoundingClientRect());
+    dragState.startIndex = startIndex;
+    dragState.targetIndex = startIndex;
+    dragState.frame = null;
+    dragState.card.classList.remove("is-hold-pending");
+    dragState.card.classList.add("is-dragging");
+    box.classList.add("is-reordering");
+    document.body.classList.add("admin-auto-image-dragging");
+    dragState.card.setPointerCapture?.(dragState.pointerId);
+    agendarArrasteAutomovelImages();
+  };
+  const cancelarArrasteAutomovelImages = (event) => {
+    if (!dragState || (event?.pointerId !== undefined && event.pointerId !== dragState.pointerId)) return;
+    limparArrasteAutomovelImages();
+    dragState = null;
   };
   const finishAutomovelImageDrag = (event, shouldRender = true) => {
     if (!dragState || (event?.pointerId !== undefined && event.pointerId !== dragState.pointerId)) return;
+    if (!dragState.active) {
+      cancelarArrasteAutomovelImages(event);
+      return;
+    }
     const { card, pointerId, startIndex, targetIndex } = dragState;
     card.releasePointerCapture?.(pointerId);
     limparArrasteAutomovelImages();
@@ -5971,31 +6002,32 @@ function renderAutomovelImagesPreview() {
     if (targetIndex !== startIndex) reorderImage(startIndex, targetIndex, shouldRender);
   };
   box.querySelectorAll("[data-reorder-auto-image]").forEach((article) => {
+    article.addEventListener("contextmenu", (event) => {
+      if (dragState?.card === article) event.preventDefault();
+    });
     article.addEventListener("pointerdown", (event) => {
       if (event.target.closest("button")) return;
-      event.preventDefault();
-      const cards = [...box.querySelectorAll("[data-reorder-auto-image]")];
-      const startIndex = Number(article.dataset.reorderAutoImage);
+      cancelarArrasteAutomovelImages();
       dragState = {
         pointerId: event.pointerId,
         card: article,
-        cards,
-        rects: cards.map((card) => card.getBoundingClientRect()),
-        startIndex,
-        targetIndex: startIndex,
+        active: false,
         startX: event.clientX,
         startY: event.clientY,
         lastX: event.clientX,
         lastY: event.clientY,
-        frame: null
+        holdTimer: window.setTimeout(ativarArrasteAutomovelImages, event.pointerType === "mouse" ? 180 : HOLD_DRAG_AUTOMOVEL_IMAGE_MS)
       };
-      article.classList.add("is-dragging");
-      box.classList.add("is-reordering");
-      article.setPointerCapture?.(event.pointerId);
-      agendarArrasteAutomovelImages();
+      article.classList.add("is-hold-pending");
     });
     article.addEventListener("pointermove", (event) => {
       if (!dragState || event.pointerId !== dragState.pointerId) return;
+      if (!dragState.active) {
+        if (Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY) > MOVE_CANCEL_AUTOMOVEL_IMAGE_PX) {
+          cancelarArrasteAutomovelImages(event);
+        }
+        return;
+      }
       event.preventDefault();
       dragState.lastX = event.clientX;
       dragState.lastY = event.clientY;
