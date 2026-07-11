@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 458,
-  label: "v464",
+  numero: 459,
+  label: "v465",
   data: "2026-07-11",
-  nota: "Ordenacao das fotos de veiculos ficou mais leve com arraste animado."
+  nota: "Arraste das fotos de veiculos agora usa troca visual leve antes de salvar a ordem."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5894,80 +5894,114 @@ function renderAutomovelImagesPreview() {
     </article>
   `).join("") || `<div class="list-meta">Nenhuma foto adicionada.</div>`;
   let dragState = null;
-  const syncAutomovelImageOrderDom = () => {
-    box.querySelectorAll("[data-reorder-auto-image]").forEach((article, index) => {
-      article.dataset.reorderAutoImage = String(index);
-      article.querySelector(".auto-image-order-badge").textContent = String(index + 1);
-      article.querySelector("[data-cover-auto-image]")?.setAttribute("data-cover-auto-image", String(index));
-      article.querySelector("[data-remove-auto-image]")?.setAttribute("data-remove-auto-image", String(index));
-    });
-  };
-  const animateAutomovelImageCards = (beforeRects) => {
-    box.querySelectorAll("[data-reorder-auto-image]").forEach((article) => {
-      const before = beforeRects.get(article);
-      if (!before) return;
-      const after = article.getBoundingClientRect();
-      const dx = before.left - after.left;
-      const dy = before.top - after.top;
-      if (!dx && !dy) return;
-      article.style.transition = "none";
-      article.style.transform = `translate(${dx}px, ${dy}px)`;
-      requestAnimationFrame(() => {
-        article.style.transition = "transform 150ms ease";
-        article.style.transform = "";
-      });
-    });
-  };
   const reorderImage = (fromIndex, toIndex, renderAfter = true) => {
     if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= state.automovelImages.length || toIndex >= state.automovelImages.length) return;
     const [url] = state.automovelImages.splice(fromIndex, 1);
     state.automovelImages.splice(toIndex, 0, url);
     if (renderAfter) renderAutomovelImagesPreview();
   };
-  const reorderImageDuringDrag = (toIndex) => {
-    if (!dragState || toIndex === dragState.index || toIndex < 0 || toIndex >= state.automovelImages.length) return;
-    const cards = [...box.querySelectorAll("[data-reorder-auto-image]")];
-    const beforeRects = new Map(cards.map((card) => [card, card.getBoundingClientRect()]));
-    const target = cards[toIndex];
-    reorderImage(dragState.index, toIndex, false);
-    if (dragState.index < toIndex) {
-      box.insertBefore(dragState.card, target.nextSibling);
-    } else {
-      box.insertBefore(dragState.card, target);
-    }
-    dragState.index = toIndex;
-    syncAutomovelImageOrderDom();
-    animateAutomovelImageCards(beforeRects);
+  const limparArrasteAutomovelImages = () => {
+    if (!dragState) return;
+    if (dragState.frame) cancelAnimationFrame(dragState.frame);
+    dragState.cards.forEach((card) => {
+      card.classList.remove("is-dragging", "is-shifting");
+      card.style.transform = "";
+      card.style.transition = "";
+    });
+    box.classList.remove("is-reordering");
   };
-  const automovelImageIndexFromPoint = (x, y) => {
-    const target = document.elementFromPoint(x, y)?.closest?.("[data-reorder-auto-image]");
-    return target && box.contains(target) ? Number(target.dataset.reorderAutoImage) : -1;
+  const indiceAutomovelImagePorPonto = (x, y) => {
+    if (!dragState?.rects?.length) return -1;
+    let melhorIndice = dragState.startIndex;
+    let melhorDistancia = Infinity;
+    dragState.rects.forEach((rect, index) => {
+      const dentroX = x >= rect.left && x <= rect.right;
+      const dentroY = y >= rect.top && y <= rect.bottom;
+      if (dentroX && dentroY) {
+        melhorIndice = index;
+        melhorDistancia = -1;
+        return;
+      }
+      if (melhorDistancia < 0) return;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const distancia = Math.hypot(x - cx, y - cy);
+      if (distancia < melhorDistancia) {
+        melhorDistancia = distancia;
+        melhorIndice = index;
+      }
+    });
+    return melhorIndice;
+  };
+  const aplicarArrasteAutomovelImages = () => {
+    if (!dragState) return;
+    dragState.frame = null;
+    const dxDrag = dragState.lastX - dragState.startX;
+    const dyDrag = dragState.lastY - dragState.startY;
+    const start = dragState.startIndex;
+    const target = dragState.targetIndex;
+    dragState.cards.forEach((card, index) => {
+      if (card === dragState.card) {
+        card.style.transform = `translate(${dxDrag}px, ${dyDrag}px) scale(.96)`;
+        return;
+      }
+      let destino = null;
+      if (target > start && index > start && index <= target) destino = dragState.rects[index - 1];
+      if (target < start && index >= target && index < start) destino = dragState.rects[index + 1];
+      if (!destino) {
+        card.classList.remove("is-shifting");
+        card.style.transform = "";
+        return;
+      }
+      const atual = dragState.rects[index];
+      card.classList.add("is-shifting");
+      card.style.transform = `translate(${destino.left - atual.left}px, ${destino.top - atual.top}px)`;
+    });
+  };
+  const agendarArrasteAutomovelImages = () => {
+    if (!dragState || dragState.frame) return;
+    dragState.frame = requestAnimationFrame(aplicarArrasteAutomovelImages);
   };
   const finishAutomovelImageDrag = (event, shouldRender = true) => {
     if (!dragState || (event?.pointerId !== undefined && event.pointerId !== dragState.pointerId)) return;
-    dragState.card.releasePointerCapture?.(dragState.pointerId);
-    dragState.card.classList.remove("is-dragging");
-    box.classList.remove("is-reordering");
+    const { card, pointerId, startIndex, targetIndex } = dragState;
+    card.releasePointerCapture?.(pointerId);
+    limparArrasteAutomovelImages();
     dragState = null;
-    if (shouldRender) renderAutomovelImagesPreview();
+    if (targetIndex !== startIndex) reorderImage(startIndex, targetIndex, shouldRender);
   };
   box.querySelectorAll("[data-reorder-auto-image]").forEach((article) => {
     article.addEventListener("pointerdown", (event) => {
       if (event.target.closest("button")) return;
       event.preventDefault();
+      const cards = [...box.querySelectorAll("[data-reorder-auto-image]")];
+      const startIndex = Number(article.dataset.reorderAutoImage);
       dragState = {
         pointerId: event.pointerId,
         card: article,
-        index: Number(article.dataset.reorderAutoImage)
+        cards,
+        rects: cards.map((card) => card.getBoundingClientRect()),
+        startIndex,
+        targetIndex: startIndex,
+        startX: event.clientX,
+        startY: event.clientY,
+        lastX: event.clientX,
+        lastY: event.clientY,
+        frame: null
       };
       article.classList.add("is-dragging");
       box.classList.add("is-reordering");
       article.setPointerCapture?.(event.pointerId);
+      agendarArrasteAutomovelImages();
     });
     article.addEventListener("pointermove", (event) => {
       if (!dragState || event.pointerId !== dragState.pointerId) return;
       event.preventDefault();
-      reorderImageDuringDrag(automovelImageIndexFromPoint(event.clientX, event.clientY));
+      dragState.lastX = event.clientX;
+      dragState.lastY = event.clientY;
+      const novoIndice = indiceAutomovelImagePorPonto(event.clientX, event.clientY);
+      if (novoIndice >= 0) dragState.targetIndex = novoIndice;
+      agendarArrasteAutomovelImages();
     });
     article.addEventListener("pointerup", (event) => {
       finishAutomovelImageDrag(event);

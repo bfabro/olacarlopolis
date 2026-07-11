@@ -2500,9 +2500,13 @@ button[type="submit"]:hover,
 #automovelImagesPreview article.is-dragging {
   z-index: 3;
   cursor: grabbing;
-  opacity: .84;
+  opacity: .9;
   box-shadow: 0 14px 32px rgba(15, 23, 42, .2);
   transform: scale(.96);
+}
+
+#automovelImagesPreview article.is-shifting {
+  box-shadow: 0 8px 20px rgba(37, 99, 235, .14);
 }
 
 #automovelImagesPreview article.is-drag-over {
