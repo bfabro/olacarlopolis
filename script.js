@@ -10787,14 +10787,20 @@ plotarPinsImoveis(stateImoveis.filtered);
       modal.remove();
     };
     let indiceImagem = 0;
+    let fotoContabilizadaNestaModal = false;
     const galeriaTrack = modal.querySelector("[data-auto-detalhes-galeria-track]");
     const atualizarGaleria = (novoIndice) => {
       if (!galeriaTrack || !imagens.length) return;
       indiceImagem = (novoIndice + imagens.length) % imagens.length;
       galeriaTrack.style.transform = `translateX(-${indiceImagem * 100}%)`;
     };
-    const navegarGaleria = (direcao) => {
+    const registrarFotoUmaVezNaModal = () => {
+      if (fotoContabilizadaNestaModal) return;
+      fotoContabilizadaNestaModal = true;
       registrarCliqueAutomovel("fotos", item);
+    };
+    const navegarGaleria = (direcao) => {
+      registrarFotoUmaVezNaModal();
       atualizarGaleria(indiceImagem + direcao);
     };
     const fecharComEsc = (event) => {
@@ -10809,7 +10815,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     modal.querySelector("[data-auto-detalhes-galeria-anterior]")?.addEventListener("click", () => navegarGaleria(-1));
     modal.querySelector("[data-auto-detalhes-galeria-proxima]")?.addEventListener("click", () => navegarGaleria(1));
     galeriaTrack?.addEventListener("click", () => {
-      registrarCliqueAutomovel("fotos", item);
+      registrarFotoUmaVezNaModal();
       fechar();
       abrirGaleriaAutomovel(imagens, indiceImagem, titulo);
     });
