@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 460,
-  label: "v466",
+  numero: 461,
+  label: "v467",
   data: "2026-07-11",
-  nota: "Ordenacao das fotos de veiculos agora ativa apenas ao segurar."
+  nota: "Ordenacao das fotos de veiculos ficou imediata no PC e sem recarregar a grade."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5886,7 +5886,7 @@ function renderAutomovelImagesPreview() {
   const cover = $("automovelImagem")?.value.trim() || state.automovelImages[0] || "";
   $("automovelImagesCount").textContent = `${state.automovelImages.length} imagen${state.automovelImages.length === 1 ? "" : "s"}`;
   box.innerHTML = state.automovelImages.map((url, index) => `
-    <article class="${url === cover ? "is-cover" : ""}" data-reorder-auto-image="${index}" title="Arraste para mudar a ordem">
+    <article class="${url === cover ? "is-cover" : ""}" data-reorder-auto-image="${index}" data-auto-image-url="${escapeAttr(url)}" title="Arraste para mudar a ordem">
       <span class="auto-image-order-badge">${index + 1}</span>
       <img src="${escapeAttr(displayImageUrl(url))}" alt="Foto ${index + 1}" draggable="false" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <button type="button" class="cover-button" data-cover-auto-image="${index}">${url === cover ? "Capa atual" : "Usar como capa"}</button>
@@ -5901,6 +5901,32 @@ function renderAutomovelImagesPreview() {
     const [url] = state.automovelImages.splice(fromIndex, 1);
     state.automovelImages.splice(toIndex, 0, url);
     if (renderAfter) renderAutomovelImagesPreview();
+  };
+  const sincronizarAutomovelImagesPreview = () => {
+    const coverAtual = $("automovelImagem")?.value.trim() || state.automovelImages[0] || "";
+    if ($("automovelImagem") && !($("automovelImagem").value || "").trim() && coverAtual) $("automovelImagem").value = coverAtual;
+    box.querySelectorAll("[data-reorder-auto-image]").forEach((article, index) => {
+      const isCover = article.dataset.autoImageUrl === coverAtual;
+      article.dataset.reorderAutoImage = String(index);
+      article.classList.toggle("is-cover", isCover);
+      const badge = article.querySelector(".auto-image-order-badge");
+      if (badge) badge.textContent = String(index + 1);
+      const coverButton = article.querySelector("[data-cover-auto-image]");
+      if (coverButton) {
+        coverButton.dataset.coverAutoImage = String(index);
+        coverButton.textContent = isCover ? "Capa atual" : "Usar como capa";
+      }
+      const removeButton = article.querySelector("[data-remove-auto-image]");
+      if (removeButton) removeButton.dataset.removeAutoImage = String(index);
+    });
+  };
+  const moverAutomovelImageCardNoDom = (card, fromIndex, toIndex) => {
+    if (!card || fromIndex === toIndex) return;
+    const target = [...box.querySelectorAll("[data-reorder-auto-image]")][toIndex];
+    if (!target || target === card) return;
+    if (fromIndex < toIndex) box.insertBefore(card, target.nextSibling);
+    else box.insertBefore(card, target);
+    sincronizarAutomovelImagesPreview();
   };
   const limparArrasteAutomovelImages = () => {
     if (!dragState) return;
@@ -5999,7 +6025,10 @@ function renderAutomovelImagesPreview() {
     card.releasePointerCapture?.(pointerId);
     limparArrasteAutomovelImages();
     dragState = null;
-    if (targetIndex !== startIndex) reorderImage(startIndex, targetIndex, shouldRender);
+    if (targetIndex !== startIndex) {
+      reorderImage(startIndex, targetIndex, false);
+      if (shouldRender) moverAutomovelImageCardNoDom(card, startIndex, targetIndex);
+    }
   };
   box.querySelectorAll("[data-reorder-auto-image]").forEach((article) => {
     article.addEventListener("contextmenu", (event) => {
@@ -6016,9 +6045,14 @@ function renderAutomovelImagesPreview() {
         startY: event.clientY,
         lastX: event.clientX,
         lastY: event.clientY,
-        holdTimer: window.setTimeout(ativarArrasteAutomovelImages, event.pointerType === "mouse" ? 180 : HOLD_DRAG_AUTOMOVEL_IMAGE_MS)
+        holdTimer: event.pointerType === "mouse" ? null : window.setTimeout(ativarArrasteAutomovelImages, HOLD_DRAG_AUTOMOVEL_IMAGE_MS)
       };
-      article.classList.add("is-hold-pending");
+      if (event.pointerType === "mouse") {
+        event.preventDefault();
+        ativarArrasteAutomovelImages();
+      } else {
+        article.classList.add("is-hold-pending");
+      }
     });
     article.addEventListener("pointermove", (event) => {
       if (!dragState || event.pointerId !== dragState.pointerId) return;

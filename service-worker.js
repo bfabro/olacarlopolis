@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-11-admin-auto-fotos-segurar-mover-v464'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-11-admin-auto-fotos-pc-imediato-v465'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
