@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 457,
-  label: "v463",
+  numero: 458,
+  label: "v464",
   data: "2026-07-11",
-  nota: "Previa de artes de veiculos ficou mais fluida ao ajustar imagens."
+  nota: "Ordenacao das fotos de veiculos ficou mais leve com arraste animado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5886,67 +5886,94 @@ function renderAutomovelImagesPreview() {
   const cover = $("automovelImagem")?.value.trim() || state.automovelImages[0] || "";
   $("automovelImagesCount").textContent = `${state.automovelImages.length} imagen${state.automovelImages.length === 1 ? "" : "s"}`;
   box.innerHTML = state.automovelImages.map((url, index) => `
-    <article class="${url === cover ? "is-cover" : ""}" draggable="true" data-reorder-auto-image="${index}" title="Arraste para mudar a ordem">
+    <article class="${url === cover ? "is-cover" : ""}" data-reorder-auto-image="${index}" title="Arraste para mudar a ordem">
       <span class="auto-image-order-badge">${index + 1}</span>
       <img src="${escapeAttr(displayImageUrl(url))}" alt="Foto ${index + 1}" draggable="false" ${lazyImageAttrs()} ${imageFallbackAttr()}>
       <button type="button" class="cover-button" data-cover-auto-image="${index}">${url === cover ? "Capa atual" : "Usar como capa"}</button>
       <button type="button" data-remove-auto-image="${index}">Remover</button>
     </article>
   `).join("") || `<div class="list-meta">Nenhuma foto adicionada.</div>`;
-  let dragIndex = null;
-  const reorderImage = (fromIndex, toIndex) => {
+  let dragState = null;
+  const syncAutomovelImageOrderDom = () => {
+    box.querySelectorAll("[data-reorder-auto-image]").forEach((article, index) => {
+      article.dataset.reorderAutoImage = String(index);
+      article.querySelector(".auto-image-order-badge").textContent = String(index + 1);
+      article.querySelector("[data-cover-auto-image]")?.setAttribute("data-cover-auto-image", String(index));
+      article.querySelector("[data-remove-auto-image]")?.setAttribute("data-remove-auto-image", String(index));
+    });
+  };
+  const animateAutomovelImageCards = (beforeRects) => {
+    box.querySelectorAll("[data-reorder-auto-image]").forEach((article) => {
+      const before = beforeRects.get(article);
+      if (!before) return;
+      const after = article.getBoundingClientRect();
+      const dx = before.left - after.left;
+      const dy = before.top - after.top;
+      if (!dx && !dy) return;
+      article.style.transition = "none";
+      article.style.transform = `translate(${dx}px, ${dy}px)`;
+      requestAnimationFrame(() => {
+        article.style.transition = "transform 150ms ease";
+        article.style.transform = "";
+      });
+    });
+  };
+  const reorderImage = (fromIndex, toIndex, renderAfter = true) => {
     if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= state.automovelImages.length || toIndex >= state.automovelImages.length) return;
     const [url] = state.automovelImages.splice(fromIndex, 1);
     state.automovelImages.splice(toIndex, 0, url);
-    renderAutomovelImagesPreview();
+    if (renderAfter) renderAutomovelImagesPreview();
+  };
+  const reorderImageDuringDrag = (toIndex) => {
+    if (!dragState || toIndex === dragState.index || toIndex < 0 || toIndex >= state.automovelImages.length) return;
+    const cards = [...box.querySelectorAll("[data-reorder-auto-image]")];
+    const beforeRects = new Map(cards.map((card) => [card, card.getBoundingClientRect()]));
+    const target = cards[toIndex];
+    reorderImage(dragState.index, toIndex, false);
+    if (dragState.index < toIndex) {
+      box.insertBefore(dragState.card, target.nextSibling);
+    } else {
+      box.insertBefore(dragState.card, target);
+    }
+    dragState.index = toIndex;
+    syncAutomovelImageOrderDom();
+    animateAutomovelImageCards(beforeRects);
+  };
+  const automovelImageIndexFromPoint = (x, y) => {
+    const target = document.elementFromPoint(x, y)?.closest?.("[data-reorder-auto-image]");
+    return target && box.contains(target) ? Number(target.dataset.reorderAutoImage) : -1;
+  };
+  const finishAutomovelImageDrag = (event, shouldRender = true) => {
+    if (!dragState || (event?.pointerId !== undefined && event.pointerId !== dragState.pointerId)) return;
+    dragState.card.releasePointerCapture?.(dragState.pointerId);
+    dragState.card.classList.remove("is-dragging");
+    box.classList.remove("is-reordering");
+    dragState = null;
+    if (shouldRender) renderAutomovelImagesPreview();
   };
   box.querySelectorAll("[data-reorder-auto-image]").forEach((article) => {
-    article.addEventListener("dragstart", (event) => {
-      if (event.target.closest("button")) {
-        event.preventDefault();
-        return;
-      }
-      dragIndex = Number(article.dataset.reorderAutoImage);
-      article.classList.add("is-dragging");
-      event.dataTransfer.effectAllowed = "move";
-      event.dataTransfer.setData("text/plain", String(dragIndex));
-    });
-    article.addEventListener("dragover", (event) => {
-      event.preventDefault();
-      article.classList.add("is-drag-over");
-      event.dataTransfer.dropEffect = "move";
-    });
-    article.addEventListener("dragleave", () => {
-      article.classList.remove("is-drag-over");
-    });
-    article.addEventListener("drop", (event) => {
-      event.preventDefault();
-      article.classList.remove("is-drag-over");
-      const fromIndex = dragIndex ?? Number(event.dataTransfer.getData("text/plain"));
-      const toIndex = Number(article.dataset.reorderAutoImage);
-      reorderImage(fromIndex, toIndex);
-    });
-    article.addEventListener("dragend", () => {
-      dragIndex = null;
-      box.querySelectorAll(".is-dragging, .is-drag-over").forEach((item) => item.classList.remove("is-dragging", "is-drag-over"));
-    });
     article.addEventListener("pointerdown", (event) => {
-      if (event.pointerType === "mouse" || event.target.closest("button")) return;
-      dragIndex = Number(article.dataset.reorderAutoImage);
+      if (event.target.closest("button")) return;
+      event.preventDefault();
+      dragState = {
+        pointerId: event.pointerId,
+        card: article,
+        index: Number(article.dataset.reorderAutoImage)
+      };
       article.classList.add("is-dragging");
+      box.classList.add("is-reordering");
       article.setPointerCapture?.(event.pointerId);
     });
-    article.addEventListener("pointerup", (event) => {
-      if (event.pointerType === "mouse" || dragIndex === null) return;
-      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.("[data-reorder-auto-image]");
-      const toIndex = target ? Number(target.dataset.reorderAutoImage) : dragIndex;
-      dragIndex = null;
-      box.querySelectorAll(".is-dragging").forEach((item) => item.classList.remove("is-dragging"));
-      reorderImage(Number(article.dataset.reorderAutoImage), toIndex);
+    article.addEventListener("pointermove", (event) => {
+      if (!dragState || event.pointerId !== dragState.pointerId) return;
+      event.preventDefault();
+      reorderImageDuringDrag(automovelImageIndexFromPoint(event.clientX, event.clientY));
     });
-    article.addEventListener("pointercancel", () => {
-      dragIndex = null;
-      article.classList.remove("is-dragging");
+    article.addEventListener("pointerup", (event) => {
+      finishAutomovelImageDrag(event);
+    });
+    article.addEventListener("pointercancel", (event) => {
+      finishAutomovelImageDrag(event);
     });
   });
   box.querySelectorAll("[data-cover-auto-image]").forEach((button) => {

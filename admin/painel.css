@@ -2491,12 +2491,18 @@ button[type="submit"]:hover,
 #automovelImagesPreview article {
   position: relative;
   cursor: grab;
+  touch-action: none;
+  user-select: none;
+  transition: transform 150ms ease, box-shadow 150ms ease, opacity 150ms ease, border-color 150ms ease;
+  will-change: transform;
 }
 
 #automovelImagesPreview article.is-dragging {
+  z-index: 3;
   cursor: grabbing;
-  opacity: .62;
-  transform: scale(.98);
+  opacity: .84;
+  box-shadow: 0 14px 32px rgba(15, 23, 42, .2);
+  transform: scale(.96);
 }
 
 #automovelImagesPreview article.is-drag-over {
