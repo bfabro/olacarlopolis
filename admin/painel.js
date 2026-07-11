@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 456,
-  label: "v462",
-  data: "2026-07-10",
-  nota: "Campo marca de automoveis passou a usar lista padronizada."
+  numero: 457,
+  label: "v463",
+  data: "2026-07-11",
+  nota: "Previa de artes de veiculos ficou mais fluida ao ajustar imagens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -59,6 +59,7 @@ let automovelArteDragState = null;
 let automovelArteDragFrame = null;
 let automovelArtePreviewRendering = false;
 let automovelArtePreviewQueued = false;
+let automovelArtePreviewResources = null;
 const canvasImageCache = new Map();
 
 const PRODUCT_SECTOR_OPTIONS = [
@@ -6202,11 +6203,36 @@ function setValorControleArteAutomovel(id, valor, dispatch = true) {
   if (dispatch) input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
+function recursosArteAutomovelProntos(autoId = $("automovelArteItem")?.value || state.selectedAutomovelArtId) {
+  return automovelArtePreviewResources
+    && String(automovelArtePreviewResources.autoId || "") === String(autoId || "")
+    && Array.isArray(automovelArtePreviewResources.fotos)
+    && automovelArtePreviewResources.fotos.length;
+}
+
+function desenharPreviaArteAutomovelComRecursos(options = opcoesArteAutomovel()) {
+  const preview = $("automovelArtePreview");
+  if (!preview || !recursosArteAutomovelProntos()) return false;
+  const { item, client, fotos, logo, siteLogo } = automovelArtePreviewResources;
+  preview.width = 1080;
+  preview.height = 1350;
+  const ctx = preview.getContext("2d");
+  ctx.clearRect(0, 0, preview.width, preview.height);
+  if ((options.formato || "premium45") === "tresFotosTarjas") {
+    desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo || siteLogo, siteLogo, options);
+  } else {
+    desenharArteAutomovelPremium45(ctx, item, client, fotos, logo || siteLogo, siteLogo, options);
+  }
+  return true;
+}
+
 function redesenharArteAutomovelDuranteArraste() {
   if (automovelArteDragFrame) return;
   automovelArteDragFrame = requestAnimationFrame(() => {
     automovelArteDragFrame = null;
-    atualizarPreviaArteAutomovel({ silent: true });
+    if (!desenharPreviaArteAutomovelComRecursos()) {
+      atualizarPreviaArteAutomovel({ silent: true });
+    }
   });
 }
 
@@ -6330,6 +6356,7 @@ function iniciarArrasteArteAutomovel(event) {
   };
   canvas.setPointerCapture?.(event.pointerId);
   canvas.style.cursor = "grabbing";
+  canvas.classList.add("is-dragging");
 }
 
 function moverArrasteArteAutomovel(event) {
@@ -6354,8 +6381,13 @@ function finalizarArrasteArteAutomovel(event) {
   if (!automovelArteDragState || event.pointerId !== automovelArteDragState.pointerId) return;
   canvas?.releasePointerCapture?.(event.pointerId);
   automovelArteDragState = null;
+  if (automovelArteDragFrame) {
+    cancelAnimationFrame(automovelArteDragFrame);
+    automovelArteDragFrame = null;
+  }
   if (canvas) canvas.style.cursor = "grab";
-  atualizarPreviaArteAutomovel({ silent: true });
+  canvas?.classList.remove("is-dragging");
+  desenharPreviaArteAutomovelComRecursos() || atualizarPreviaArteAutomovel({ silent: true });
 }
 
 function textoTituloAutomovelArte(item = {}, options = {}) {
@@ -7213,7 +7245,7 @@ function renderAutomovelArteView() {
   if ($("automovelArtePreview")) agendarPreviaArteAutomovel(120);
 }
 
-async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = "premium45", options = opcoesArteAutomovel()) {
+async function carregarRecursosArteAutomovel(autoId = $("automovelArteItem")?.value) {
   if (!canGenerateVeiculoImages()) return showToast("A geracao de imagens de veiculos nao esta liberada para este usuario.");
   const item = state.automoveis.find((auto) => auto.id === autoId && itemBelongsToCurrentClient(auto));
   if (!item) return showToast("Selecione um veiculo para gerar a imagem.");
@@ -7229,16 +7261,28 @@ async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, 
     showToast("Nao foi possivel carregar as fotos deste veiculo.");
     return null;
   }
+  return { autoId, item, client, fotos, logo, siteLogo };
+}
+
+function criarCanvasArteAutomovelComRecursos(recursos, options = opcoesArteAutomovel()) {
+  if (!recursos?.fotos?.length) return null;
   const canvas = document.createElement("canvas");
   canvas.width = 1080;
   canvas.height = 1350;
   const ctx = canvas.getContext("2d");
-  if ((options.formato || layoutKey) === "tresFotosTarjas") {
-    desenharArteAutomovelTresFotosTarjas(ctx, item, client, fotos, logo || siteLogo, siteLogo, options);
+  if ((options.formato || "premium45") === "tresFotosTarjas") {
+    desenharArteAutomovelTresFotosTarjas(ctx, recursos.item, recursos.client, recursos.fotos, recursos.logo || recursos.siteLogo, recursos.siteLogo, options);
   } else {
-    desenharArteAutomovelPremium45(ctx, item, client, fotos, logo || siteLogo, siteLogo, options);
+    desenharArteAutomovelPremium45(ctx, recursos.item, recursos.client, recursos.fotos, recursos.logo || recursos.siteLogo, recursos.siteLogo, options);
   }
-  return { canvas, item };
+  return { canvas, item: recursos.item };
+}
+
+async function criarCanvasArteAutomovel(autoId = $("automovelArteItem")?.value, layoutKey = "premium45", options = opcoesArteAutomovel()) {
+  const recursos = await carregarRecursosArteAutomovel(autoId);
+  if (!recursos) return null;
+  automovelArtePreviewResources = recursos;
+  return criarCanvasArteAutomovelComRecursos(recursos, options);
 }
 
 function agendarPreviaArteAutomovel(delay = 450) {

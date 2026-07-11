@@ -2703,6 +2703,11 @@ button[type="submit"]:hover,
   user-select: none;
 }
 
+.auto-art-preview canvas.is-dragging {
+  cursor: grabbing;
+  will-change: contents;
+}
+
 @media (max-width: 980px) {
   .automovel-art-panel {
     grid-template-columns: 1fr 1fr;
