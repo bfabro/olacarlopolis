@@ -576,6 +576,67 @@ function chaveFirebaseMetrica(valor, fallback = "sem-identificacao") {
   return chave || fallback;
 }
 
+function salvarOrigemCliqueLocal(info = {}) {
+  try {
+    const dados = {
+      cidade: info.city || info.cidade || "",
+      estado: info.region || info.estado || "",
+      pais: info.country || info.pais || "",
+      timezone: info.timezone || "",
+      origem: info.origem || "",
+      canal: info.canal || "",
+      dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
+      atualizadoEm: Date.now()
+    };
+    sessionStorage.setItem("ola_carlopolis_origem_clique", JSON.stringify(dados));
+    localStorage.setItem("ola_carlopolis_origem_clique", JSON.stringify(dados));
+  } catch (error) {
+    console.warn("Nao foi possivel salvar origem local do clique.", error);
+  }
+}
+
+function origemAcessoAtual() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const origemUrl = params.get("o");
+    if (origemUrl) return origemUrl;
+    if (document.referrer.includes("instagram.com")) return "instagram";
+    if (window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true) return "app";
+  } catch (error) {}
+  return "site";
+}
+
+function canalAcessoAtual() {
+  try {
+    const isStandalone =
+      window.matchMedia?.("(display-mode: standalone)").matches ||
+      window.matchMedia?.("(display-mode: fullscreen)").matches ||
+      window.matchMedia?.("(display-mode: minimal-ui)").matches ||
+      window.navigator.standalone === true;
+    return isStandalone ? "App (PWA)" : "Site (Navegador)";
+  } catch (error) {
+    return "Site (Navegador)";
+  }
+}
+
+function origemCliqueAtual(extra = {}) {
+  let dados = {};
+  try {
+    dados = JSON.parse(sessionStorage.getItem("ola_carlopolis_origem_clique") || localStorage.getItem("ola_carlopolis_origem_clique") || "{}") || {};
+  } catch (error) {
+    dados = {};
+  }
+  return {
+    cidade: extra.cidadeOrigem || extra.cidadeAcesso || extra.clickCidade || dados.cidade || extra.cidade || extra.city || "",
+    estado: extra.estadoOrigem || extra.estadoAcesso || extra.clickEstado || dados.estado || extra.estado || extra.region || "",
+    pais: extra.paisOrigem || extra.paisAcesso || extra.clickPais || dados.pais || extra.pais || extra.country || "",
+    timezone: extra.timezone || dados.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "",
+    origem: extra.origem || dados.origem || origemAcessoAtual(),
+    canal: extra.canal || dados.canal || canalAcessoAtual(),
+    dispositivo: extra.dispositivo || dados.dispositivo || (/Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop")
+  };
+}
+
 function variantesChaveMetricaCliente(valor) {
   const bruto = String(valor || "").trim();
   if (!bruto) return [];
@@ -625,10 +686,12 @@ function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) 
     ? `metricasClientes/${clienteKey}/${hoje}/${grupo}/${tipo}`
     : `metricasClientes/${clienteKey}/${hoje}/${grupo}`;
   const contador = db.ref(contadorPath).transaction((atual) => (atual || 0) + 1);
+  const origemClique = origemCliqueAtual(detalhes);
   const log = db.ref(`metricasClientes/${clienteKey}/${hoje}/detalhes`).push().set({
     grupo,
     tipo: tipo || grupo,
     ...detalhes,
+    ...origemClique,
     horario: new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" }),
     dataHoraISO: new Date().toISOString(),
     ts: firebase.database.ServerValue.TIMESTAMP,
@@ -651,10 +714,12 @@ function registrarCliqueBotao(tipo, idEstabelecimento, area = "botoes", detalhes
   const chaveTipo = chaveFirebaseMetrica(tipo, "clique");
 
   const agora = new Date();
+  const origemClique = origemCliqueAtual(detalhes);
   const payload = {
     area,
     tipo,
     ...detalhes,
+    ...origemClique,
     horario: agora.toLocaleTimeString("pt-BR"),
     dataHoraISO: agora.toISOString(),
     ts: firebase.database.ServerValue.TIMESTAMP,
@@ -2276,6 +2341,11 @@ document.addEventListener("DOMContentLoaded", function () {
     refTotal.transaction((acessos) => (acessos || 0) + 1);
 
     function salvarDados(info) {
+      salvarOrigemCliqueLocal({
+        ...info,
+        origem: origemFinal,
+        canal: detectarCanalAcesso()
+      });
       refDetalhado.set({
         ip: info.ip || "sem_ip",
         cidade: info.city || "Desconhecida",
@@ -23755,9 +23825,11 @@ function registrarCliqueOndeComerDetalhado(nomeEstabelecimento, tipo) {
   const db = firebase.database();
   const ref = db.ref(`cliquesOndeComerDetalhado/${hoje}/${nomeEstabelecimento}`).push();
   const agora = new Date();
+  const origemClique = origemCliqueAtual();
   return ref.set({
     area: "onde-comer",
     tipo,
+    ...origemClique,
     horario: agora.toLocaleTimeString("pt-BR"),
     dataHoraISO: agora.toISOString(),
     ts: firebase.database.ServerValue.TIMESTAMP,
@@ -23807,6 +23879,7 @@ function registrarCliqueNaPromocao(nomeComercio, detalhes = {}) {
     area: "promocoes",
     ...detalhes
   });
+  const origemClique = origemCliqueAtual(detalhes);
   firebase.database().ref(`cliquesPromocoesDetalhado/${hoje}/${nomeComercio}`).push({
     area: "promocoes",
     tipo: tipoMetrica,
@@ -23816,6 +23889,7 @@ function registrarCliqueNaPromocao(nomeComercio, detalhes = {}) {
     promoTitulo: detalhes.promoTitulo || detalhes.titulo || "",
     promocaoTitulo: detalhes.promoTitulo || detalhes.titulo || "",
     clicouWhatsAppPromocao: acao === "whatsapp",
+    ...origemClique,
     horario: new Date().toLocaleTimeString("pt-BR"),
     ts: firebase.database.ServerValue.TIMESTAMP,
     pagina: window.location.href

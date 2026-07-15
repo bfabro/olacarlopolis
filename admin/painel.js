@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 461,
-  label: "v467",
-  data: "2026-07-11",
-  nota: "Ordenacao das fotos de veiculos ficou imediata no PC e sem recarregar a grade."
+  numero: 462,
+  label: "v468",
+  data: "2026-07-15",
+  nota: "Relatorio do cliente ganhou cards organizados e cidade de origem dos cliques."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -10213,6 +10213,23 @@ function formatReportTime(item = {}, fallbackDate = "") {
   return fallbackDate || "-";
 }
 
+function clickCityLabel(item = {}) {
+  const cidade = String(item.cidade || item.city || "").trim();
+  const estado = String(item.estado || item.region || item.uf || "").trim();
+  const pais = String(item.pais || item.country || "").trim();
+  if (cidade && estado) return `${cidade} - ${estado}`;
+  if (cidade) return cidade;
+  if (estado) return estado;
+  if (pais) return pais;
+  return "Desconhecida";
+}
+
+function aggregateClickCities(rows = [], limit = 12) {
+  const map = new Map();
+  rows.forEach((row) => incrementMetric(map, row.cidade || "Desconhecida", 1));
+  return topFromMap(map, limit, "clique", "cliques");
+}
+
 function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
   const rows = [];
   const pushRow = (date, area, cliente, tipo, item = {}) => {
@@ -10226,6 +10243,7 @@ function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
       promocao: item.promocaoTitulo || item.promoTitulo || item.tituloPromocao || item.titulo || "",
       promocaoId: item.promocaoId || item.promoId || "",
       tituloConteudo: item.tituloConteudo || item.estabelecimento || "",
+      cidade: clickCityLabel(item),
       acao: item.acao || "",
       codigoReferencia: item.codRef || item.codigoReferencia || "",
       itemId: item.imovelId || item.veiculoId || "",
@@ -10462,6 +10480,7 @@ function renderClientTimelineTable(rows, emptyMessage) {
             <th>Recurso</th>
             <th>Data</th>
             <th>Horario</th>
+            <th>Cidade</th>
             <th>Origem do clique</th>
             <th>Descricao</th>
           </tr>
@@ -10480,6 +10499,7 @@ function renderClientTimelineTable(rows, emptyMessage) {
                 <td><strong>${escapeHtml(clientReportCategory(row))}</strong></td>
                 <td>${escapeHtml(formatDateBR(row.date))}</td>
                 <td><strong>${escapeHtml(row.hora)}</strong></td>
+                <td>${escapeHtml(row.cidade || "Desconhecida")}</td>
                 <td>${escapeHtml(row.origemDescricao || row.area || "Site publico")}</td>
                 <td>${escapeHtml(details.join(" - ") || "-")}</td>
               </tr>
@@ -10496,13 +10516,14 @@ function renderClientModuleTimelineTable(rows, moduleLabel, emptyMessage) {
   return `
     <div class="report-table-wrap">
       <table class="report-click-table client-report-click-table">
-        <thead><tr><th>Data</th><th>Horario</th><th>Acao</th><th>Codigo de referencia</th><th>Anuncio</th><th>Origem do clique</th></tr></thead>
+        <thead><tr><th>Data</th><th>Horario</th><th>Acao</th><th>Cidade</th><th>Codigo de referencia</th><th>Anuncio</th><th>Origem do clique</th></tr></thead>
         <tbody>
           ${rows.slice(0, 200).map((row) => `
             <tr title="${escapeAttr(row.pagina || "")}">
               <td>${escapeHtml(formatDateBR(row.date))}</td>
               <td><strong>${escapeHtml(row.hora)}</strong></td>
               <td>${escapeHtml(row.tipo || moduleLabel)}</td>
+              <td>${escapeHtml(row.cidade || "Desconhecida")}</td>
               <td>${escapeHtml(row.codigoReferencia || row.itemId || "-")}</td>
               <td>${escapeHtml(row.tituloConteudo || "-")}</td>
               <td>${escapeHtml(row.origemDescricao || row.area || "Site publico")}</td>
@@ -10678,6 +10699,7 @@ function renderClientMetricReportContent(client = {}) {
   const itemAccessRows = buildItemAccessRows(state.metricas, range, keys);
   const imovelAccessRows = itemAccessRows.filter((row) => row.kind === "imovel");
   const veiculoAccessRows = itemAccessRows.filter((row) => row.kind === "veiculo");
+  const cidadesClique = aggregateClickCities(timeline);
 
   return `
     ${renderClientReportPeriodControls(range)}
@@ -10690,6 +10712,11 @@ function renderClientMetricReportContent(client = {}) {
         <section class="panel-card report-card">
           <h3>Resumo por tipo</h3>
           ${renderReportList(resourceEntries.filter((entry) => entry.count > 0).map((entry) => ({ title: entry.label, meta: `${entry.count} clique${entry.count === 1 ? "" : "s"}` })), "Ainda nao ha cliques registrados para este cliente no periodo.")}
+        </section>
+        <section class="panel-card report-card">
+          <h3>Cidades de origem dos cliques</h3>
+          <p class="list-meta">Cidade identificada no acesso do visitante quando o clique foi registrado.</p>
+          ${renderReportList(cidadesClique, "Ainda nao ha dados de cidade nos cliques deste cliente.")}
         </section>
         ${availability.imoveis ? `<section class="panel-card report-card report-wide">
           <h3>Modulo especial: Imoveis</h3>
