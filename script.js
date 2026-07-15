@@ -2084,10 +2084,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const onlineUsersRef = firebase.database().ref("onlineUsers");
     const connectedRef = firebase.database().ref(".info/connected");
-    const INACTIVE_LIMIT_MS = 5 * 60 * 1000;
+    const INACTIVE_LIMIT_MS = 20 * 60 * 1000;
+    const ACTIVITY_WRITE_THROTTLE_MS = 45 * 1000;
     let myUserRef = null;
     let inactiveTimer = null;
     let presenceStarted = false;
+    let lastPresenceWriteAt = 0;
 
     const clearInactiveTimer = () => {
       if (inactiveTimer) clearTimeout(inactiveTimer);
@@ -2101,6 +2103,7 @@ document.addEventListener("DOMContentLoaded", function () {
       try { myUserRef.onDisconnect().cancel(); } catch (e) {}
       myUserRef = null;
       presenceStarted = false;
+      lastPresenceWriteAt = 0;
     };
 
     const startPresence = () => {
@@ -2116,6 +2119,44 @@ document.addEventListener("DOMContentLoaded", function () {
         lastSeen: firebase.database.ServerValue.TIMESTAMP
       });
       myUserRef.onDisconnect().remove();
+      lastPresenceWriteAt = Date.now();
+      scheduleIdleExpiration();
+    };
+
+    const markPresenceInactive = () => {
+      if (!myUserRef) return;
+      myUserRef.update({
+        active: false,
+        inactivePending: true,
+        inactiveAt: firebase.database.ServerValue.TIMESTAMP
+      }).catch(() => {});
+    };
+
+    const scheduleIdleExpiration = () => {
+      clearInactiveTimer();
+      if (!myUserRef) return;
+      inactiveTimer = setTimeout(markPresenceInactive, INACTIVE_LIMIT_MS);
+    };
+
+    const touchPresence = ({ force = false, pagina = false } = {}) => {
+      if (document.hidden) return;
+      if (!myUserRef) {
+        startPresence();
+        return;
+      }
+      const agora = Date.now();
+      scheduleIdleExpiration();
+      if (!force && (agora - lastPresenceWriteAt) < ACTIVITY_WRITE_THROTTLE_MS) return;
+      lastPresenceWriteAt = agora;
+      const payload = {
+        active: true,
+        inactivePending: false,
+        inactiveAt: null,
+        hiddenAt: null,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      };
+      if (pagina) payload.pagina = location.pathname + location.hash;
+      myUserRef.update(payload).catch(() => {});
     };
 
     const scheduleInactiveRemoval = () => {
@@ -2141,6 +2182,8 @@ document.addEventListener("DOMContentLoaded", function () {
             hiddenAt: null,
             lastSeen: firebase.database.ServerValue.TIMESTAMP
           }).catch(() => {});
+          lastPresenceWriteAt = Date.now();
+          scheduleIdleExpiration();
         } else {
           startPresence();
         }
@@ -2153,13 +2196,20 @@ document.addEventListener("DOMContentLoaded", function () {
       if (snap.val() === true) startPresence();
     });
 
+    ["click", "keydown", "wheel", "scroll", "touchstart", "pointerdown", "mousemove"].forEach((eventName) => {
+      window.addEventListener(eventName, () => touchPresence(), { passive: true });
+    });
+    window.addEventListener("hashchange", () => touchPresence({ force: true, pagina: true }));
+    window.addEventListener("popstate", () => touchPresence({ force: true, pagina: true }));
+    window.addEventListener("focus", () => touchPresence({ force: true, pagina: true }));
+
     onlineUsersRef.on("value", (snapshot) => {
       const agora = Date.now();
       let userCount = 0;
       snapshot.forEach((child) => {
         const user = child.val() || {};
         const lastSeen = Number(user.lastSeen || user.timestamp || 0);
-        const recente = !Number.isFinite(lastSeen) || !lastSeen || (agora - lastSeen) <= INACTIVE_LIMIT_MS;
+        const recente = Number.isFinite(lastSeen) && lastSeen > 0 && (agora - lastSeen) <= INACTIVE_LIMIT_MS;
         const ativo = user.active !== false && recente;
         if (ativo) userCount += 1;
       });
