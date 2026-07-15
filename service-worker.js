@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-15-auto-total-filtrado-v468'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-15-relatorio-desktop-cards-v469'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

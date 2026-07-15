@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 462,
-  label: "v468",
+  numero: 463,
+  label: "v469",
   data: "2026-07-15",
-  nota: "Relatorio do cliente ganhou cards organizados e cidade de origem dos cliques."
+  nota: "Relatorio do cliente usa melhor o espaco no desktop e deixa os cards mais legiveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -10743,7 +10743,7 @@ function renderClientMetricReportContent(client = {}) {
 }
 
 function renderClientMetricReport(client = {}) {
-  return `<div id="clientMetricReportMount">${renderClientMetricReportContent(client)}</div>`;
+  return `<div id="clientMetricReportMount" class="client-metric-report-mount wide">${renderClientMetricReportContent(client)}</div>`;
 }
 
 function bindClientMetricReportControls(client = {}) {

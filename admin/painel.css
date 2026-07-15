@@ -1324,14 +1324,23 @@ button[type="submit"]:hover,
   margin-bottom: 14px;
 }
 
+.client-metric-report-mount {
+  width: 100%;
+  min-width: 0;
+}
+
 .client-report-summary {
   display: grid;
   gap: 18px;
 }
 
 .client-report-stats {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
   align-items: stretch;
+}
+
+.client-report-stats .stat-card {
+  min-height: 132px;
 }
 
 .client-report-stats .stat-card:first-child {
@@ -1340,7 +1349,7 @@ button[type="submit"]:hover,
 }
 
 .client-report-grid {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   align-items: start;
 }
 
@@ -1350,6 +1359,55 @@ button[type="submit"]:hover,
 
 .client-report-grid .report-card h3 {
   margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .feature-relatorios.client-module-panel.active {
+    padding: 20px;
+  }
+
+  .feature-relatorios .client-report-period-card,
+  .feature-relatorios .client-report-grid .report-card {
+    padding: 18px;
+  }
+
+  .feature-relatorios .client-report-period-card {
+    display: grid;
+    grid-template-columns: minmax(220px, .75fr) minmax(0, 1.25fr);
+    gap: 18px 22px;
+    align-items: start;
+  }
+
+  .feature-relatorios .client-report-period-card .section-head {
+    margin-bottom: 0;
+  }
+
+  .feature-relatorios .client-report-period-card .report-period-tabs {
+    align-content: start;
+  }
+
+  .feature-relatorios .client-report-period-card .report-custom-range {
+    grid-column: 2;
+  }
+
+  .feature-relatorios .client-report-stats {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .feature-relatorios .client-report-grid {
+    gap: 18px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .feature-relatorios .client-report-stats {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  }
+
+  .feature-relatorios .client-report-grid {
+    grid-template-columns: repeat(2, minmax(420px, 1fr));
+  }
 }
 
 .report-kpis {
@@ -2161,6 +2219,7 @@ button[type="submit"]:hover,
 .client-feature-card > .form-section-title,
 .client-feature-card > .section-head,
 .client-feature-card > .schedule-panel,
+.client-feature-card > .client-metric-report-mount,
 .client-feature-card > .image-grid,
 .client-feature-card > .manual-image-form,
 .client-feature-card > .promo-admin-form,
