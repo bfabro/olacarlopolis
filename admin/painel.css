@@ -2856,9 +2856,17 @@ body.admin-auto-image-dragging {
   cursor: pointer;
 }
 
-.vehicle-photo-upload input,
-.hidden-file-input {
+.vehicle-photo-upload input {
   display: none !important;
+}
+
+.hidden-file-input {
+  position: fixed;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
 }
 
 .vehicle-photo-actions .ghost-button {

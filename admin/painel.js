@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 463,
-  label: "v469",
+  numero: 464,
+  label: "v470",
   data: "2026-07-15",
-  nota: "Relatorio do cliente usa melhor o espaco no desktop e deixa os cards mais legiveis."
+  nota: "Captura de foto em veiculos ficou presa ao cadastro novo sem sair da tela."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5725,6 +5725,8 @@ function resetAutomovelForm() {
   state.automovelImages = [];
   $("automovelForm")?.reset();
   if ($("automovelId")) $("automovelId").value = "";
+  if ($("automovelImagesUpload")) $("automovelImagesUpload").value = "";
+  if ($("automovelCameraUpload")) $("automovelCameraUpload").value = "";
   if ($("automovelStatus")) $("automovelStatus").value = "ativo";
   atualizarCamposTipoAutomovel();
   $("deleteAutomovelButton")?.classList.add("hidden");
@@ -5824,10 +5826,23 @@ function fillAutomovelForm(item) {
   openFormForEdit("automovelForm");
 }
 
+function ensureAutomovelDraftId() {
+  const input = $("automovelId");
+  const currentId = String(input?.value || "").trim();
+  if (currentId) return currentId;
+  const marca = $("automovelMarca")?.value.trim() || "";
+  const modelo = $("automovelModelo")?.value.trim() || "";
+  const linkedClient = currentClientRecord();
+  const base = slugify(`${marca} ${modelo}`) || slugify(linkedClient?.nome || $("automovelVendedor")?.value || "automovel") || "automovel";
+  const id = `${base}-${Date.now()}`;
+  if (input) input.value = id;
+  return id;
+}
+
 function getAutomovelFormData() {
   const marca = $("automovelMarca").value.trim();
   const modelo = $("automovelModelo").value.trim();
-  const id = $("automovelId").value || `${slugify(`${marca}-${modelo}`)}-${Date.now()}`;
+  const id = ensureAutomovelDraftId();
   const imagens = [...state.automovelImages].filter(Boolean);
   const imagem = $("automovelImagem")?.value.trim() || imagens[0] || "";
   const linkedClient = currentClientRecord();
@@ -15010,9 +15025,11 @@ function bindEvents() {
   $("generateSelectedAutomovelArtsButton")?.addEventListener("click", gerarArtesInstagramAutomoveisSelecionados);
   const handleAutomovelImagesUpload = async (event) => {
     const input = event.target;
+    event.preventDefault();
     const files = Array.from(input.files || []).filter(Boolean);
     if (!files.length) return;
-    const id = $("automovelId").value || slugify(`${$("automovelMarca").value}-${$("automovelModelo").value}`) || `automovel-${Date.now()}`;
+    openFormForEdit("automovelForm");
+    const id = ensureAutomovelDraftId();
     const failed = [];
     setBusy(input, true);
     try {
@@ -15040,8 +15057,14 @@ function bindEvents() {
   };
   $("automovelImagesUpload")?.addEventListener("change", handleAutomovelImagesUpload);
   $("automovelCameraUpload")?.addEventListener("change", handleAutomovelImagesUpload);
-  $("automovelCameraButton")?.addEventListener("click", () => {
-    $("automovelCameraUpload")?.click();
+  $("automovelCameraButton")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    openFormForEdit("automovelForm");
+    const input = $("automovelCameraUpload");
+    if (!input) return;
+    input.value = "";
+    input.click();
   });
   $("newInfoDeathNoticeButton")?.addEventListener("click", () => {
     resetInfoDeathNoticeForm();
