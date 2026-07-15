@@ -9113,38 +9113,6 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
   line-height: 1;
 }
 
-.auto-resultados-resumo {
-  grid-column: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin: 0 0 10px;
-  padding: 10px 12px;
-  border: 1px solid #bfdbfe;
-  border-radius: 12px;
-  background: #eff6ff;
-  color: #1e3a8a;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.auto-resultados-resumo span {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.auto-resultados-resumo small {
-  min-width: 0;
-  color: #475569;
-  font-size: 12px;
-  font-weight: 700;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .auto-filter-chevron {
   transition: transform .18s ease;
 }
@@ -9259,16 +9227,6 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 @media (max-width: 640px) {
   #filtrosAutomoveis .topbar {
     flex-wrap: nowrap;
-  }
-
-  .auto-resultados-resumo {
-    grid-column: 1;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .auto-resultados-resumo small {
-    white-space: normal;
   }
 
   #filtrosAutomoveis .grid-filtros {
@@ -9833,7 +9791,6 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 
   .automoveis-page > .highlighted,
   #filtrosAutomoveis,
-  .auto-resultados-resumo,
   .automoveis-page #automoveisLista {
     grid-column: 1 / -1;
     grid-row: auto;
@@ -19366,7 +19323,6 @@ body.vaga-modal-open {
 
 .automoveis-page.auto-cards-mode > .highlighted,
 .automoveis-page.auto-cards-mode #filtrosAutomoveis,
-.automoveis-page.auto-cards-mode .auto-resultados-resumo,
 .automoveis-page.auto-cards-mode #automoveisLista {
   grid-column: 1 / -1;
   grid-row: auto;
