@@ -9044,6 +9044,9 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 }
 
 #filtrosAutomoveis.painel-filtros {
+  grid-column: 1;
+  grid-row: 2 / span 2;
+  align-self: start;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
@@ -9103,6 +9106,43 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 .auto-total-disponiveis strong {
   font-size: 18px;
   line-height: 1;
+}
+
+.auto-total-label {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.auto-resultados-resumo {
+  grid-column: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin: 0 0 10px;
+  padding: 10px 12px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #eff6ff;
+  color: #1e3a8a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.auto-resultados-resumo span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.auto-resultados-resumo small {
+  min-width: 0;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .auto-filter-chevron {
@@ -9221,6 +9261,16 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
     flex-wrap: nowrap;
   }
 
+  .auto-resultados-resumo {
+    grid-column: 1;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .auto-resultados-resumo small {
+    white-space: normal;
+  }
+
   #filtrosAutomoveis .grid-filtros {
     grid-template-columns: 1fr;
   }
@@ -9258,6 +9308,7 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 }
 
 .automoveis-page #automoveisLista {
+  grid-column: 2;
   grid-template-columns: 1fr;
 }
 
@@ -9782,8 +9833,10 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
 
   .automoveis-page > .highlighted,
   #filtrosAutomoveis,
+  .auto-resultados-resumo,
   .automoveis-page #automoveisLista {
     grid-column: 1 / -1;
+    grid-row: auto;
     width: 100%;
   }
 
@@ -19313,8 +19366,10 @@ body.vaga-modal-open {
 
 .automoveis-page.auto-cards-mode > .highlighted,
 .automoveis-page.auto-cards-mode #filtrosAutomoveis,
+.automoveis-page.auto-cards-mode .auto-resultados-resumo,
 .automoveis-page.auto-cards-mode #automoveisLista {
   grid-column: 1 / -1;
+  grid-row: auto;
 }
 
 .automoveis-page.auto-cards-mode #automoveisLista {

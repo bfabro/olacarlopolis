@@ -11142,6 +11142,9 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div class="campo"><label>Busca geral</label><input id="autoFiltroBusca" placeholder="Marca, modelo, opcionais..."></div>
           </div>
         </aside>
+        <div id="autoResultadosResumo" class="auto-resultados-resumo" aria-live="polite">
+          Carregando automoveis...
+        </div>
         <div id="automoveisLista" class="im-grid">
           <div class="list-meta">Carregando automoveis...</div>
         </div>
@@ -11152,6 +11155,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const filtroBox = document.getElementById("filtrosAutomoveis");
     const toggleFiltros = document.getElementById("autoToggleFiltros");
     const totalDisponiveis = document.getElementById("autoTotalDisponiveis");
+    const resultadosResumo = document.getElementById("autoResultadosResumo");
     let lista = Array.isArray(window.__automoveisCache) ? window.__automoveisCache : [];
 
     configurarDetalhesAutomoveisEmBox(box, () => lista);
@@ -11173,13 +11177,45 @@ plotarPinsImoveis(stateImoveis.filtered);
       preencherSelect("autoFiltroVendedor", "vendedor");
     };
 
-    const atualizarTotalAutomoveis = () => {
-      if (!totalDisponiveis) return;
-      const total = lista.length;
-      totalDisponiveis.setAttribute("aria-label", `${total} veículo${total === 1 ? "" : "s"} disponível${total === 1 ? "" : "is"}`);
-      totalDisponiveis.innerHTML = `
-        <i class="fa-solid fa-car-side" aria-hidden="true"></i>
-        <strong>${total}</strong>
+    const filtrosAtivosAutomoveis = (filtros = {}) => {
+      const labels = {
+        tipo: "Tipo",
+        marca: "Marca",
+        modelo: "Modelo",
+        ano: "Ano",
+        valor: "Valor ate",
+        vendedor: "Vendedor",
+        condicao: "Novo/usado",
+        km: "KM ate",
+        combustivel: "Combustivel",
+        cambio: "Cambio",
+        busca: "Busca"
+      };
+      return Object.entries(filtros)
+        .filter(([, valor]) => valor !== "" && valor !== 0 && valor !== null && valor !== undefined)
+        .map(([key, valor]) => `${labels[key] || key}: ${valor}`);
+    };
+
+    const atualizarTotalAutomoveis = (totalFiltrado = lista.length, filtros = {}) => {
+      const totalGeral = lista.length;
+      const filtrosAtivos = filtrosAtivosAutomoveis(filtros);
+      const temFiltro = filtrosAtivos.length > 0;
+      const labelContador = temFiltro
+        ? `filtrado${totalFiltrado === 1 ? "" : "s"}`
+        : `dispon${totalFiltrado === 1 ? "ivel" : "iveis"}`;
+      if (totalDisponiveis) {
+        totalDisponiveis.setAttribute("aria-label", `${totalFiltrado} veículo${totalFiltrado === 1 ? "" : "s"} ${labelContador}`);
+        totalDisponiveis.innerHTML = `
+          <i class="fa-solid fa-car-side" aria-hidden="true"></i>
+          <strong>${totalFiltrado}</strong>
+          <span class="auto-total-label">${labelContador}</span>
+        `;
+      }
+      if (!resultadosResumo) return;
+      const textoTotal = `Mostrando ${totalFiltrado} de ${totalGeral} automovel${totalGeral === 1 ? "" : "s"}`;
+      resultadosResumo.innerHTML = `
+        <span><i class="fa-solid fa-list-check"></i> ${textoSeguroAutomoveis(textoTotal)}</span>
+        ${temFiltro ? `<small>Filtros: ${textoSeguroAutomoveis(filtrosAtivos.join(" | "))}</small>` : `<small>Sem filtros aplicados</small>`}
       `;
     };
 
@@ -11225,7 +11261,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (filtros.busca && !hay.includes(filtros.busca)) return false;
         return true;
       });
-      atualizarTotalAutomoveis();
+      atualizarTotalAutomoveis(filtrados.length, filtros);
       renderAutomoveisCards(filtrados, box);
     };
 
