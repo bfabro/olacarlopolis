@@ -41,17 +41,18 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 464,
-  label: "v470",
-  data: "2026-07-15",
-  nota: "Captura de foto em veiculos ficou presa ao cadastro novo sem sair da tela."
+  numero: 465,
+  label: "v472",
+  data: "2026-07-16",
+  nota: "Sessao do painel agora aguarda 60 minutos e pausa durante camera ou upload de fotos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
-const ADMIN_IDLE_TIMEOUT_MS = 10 * 60 * 1000;
+const ADMIN_IDLE_TIMEOUT_MS = 60 * 60 * 1000;
 let adminIdleTimer = null;
+const adminIdlePauseReasons = new Set();
 let clientMetricsRealtimeUnsubscribers = [];
 let clientMetricsRealtimeSignature = "";
 let automovelArtePreviewTimer = null;
@@ -14740,9 +14741,47 @@ function stopAdminIdleTimer() {
   adminIdleTimer = null;
 }
 
+function clearAdminIdlePauseReasons() {
+  adminIdlePauseReasons.clear();
+}
+
+function pauseAdminIdleTimer(reason = "manual") {
+  adminIdlePauseReasons.add(reason);
+  stopAdminIdleTimer();
+}
+
+function resumeAdminIdleTimer(reason = "manual") {
+  adminIdlePauseReasons.delete(reason);
+  if (!adminIdlePauseReasons.size) resetAdminIdleTimer();
+}
+
+function pauseAdminIdleForExternalPicker(reason) {
+  pauseAdminIdleTimer(reason);
+  let resolved = false;
+  let fallbackTimer = null;
+  const cleanup = () => {
+    window.removeEventListener("focus", resume);
+    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    if (fallbackTimer) clearTimeout(fallbackTimer);
+  };
+  const resume = () => {
+    if (resolved) return;
+    resolved = true;
+    cleanup();
+    window.setTimeout(() => resumeAdminIdleTimer(reason), 1200);
+  };
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === "visible") resume();
+  };
+  window.addEventListener("focus", resume);
+  document.addEventListener("visibilitychange", handleVisibilityChange);
+  fallbackTimer = window.setTimeout(resume, ADMIN_IDLE_TIMEOUT_MS * 2);
+}
+
 function resetAdminIdleTimer() {
   stopAdminIdleTimer();
   if (!auth.currentUser) return;
+  if (adminIdlePauseReasons.size) return;
   adminIdleTimer = setTimeout(async () => {
     stopAdminIdleTimer();
     try {
@@ -15026,11 +15065,14 @@ function bindEvents() {
   const handleAutomovelImagesUpload = async (event) => {
     const input = event.target;
     event.preventDefault();
+    const pickerIdleReason = input?.id === "automovelCameraUpload" ? "automovel-camera-picker" : "automovel-file-picker";
     const files = Array.from(input.files || []).filter(Boolean);
+    resumeAdminIdleTimer(pickerIdleReason);
     if (!files.length) return;
     openFormForEdit("automovelForm");
     const id = ensureAutomovelDraftId();
     const failed = [];
+    pauseAdminIdleTimer("automovel-image-upload");
     setBusy(input, true);
     try {
       for (let index = 0; index < files.length; index += 1) {
@@ -15053,15 +15095,22 @@ function bindEvents() {
     } finally {
       input.value = "";
       setBusy(input, false);
+      resumeAdminIdleTimer("automovel-image-upload");
     }
   };
-  $("automovelImagesUpload")?.addEventListener("change", handleAutomovelImagesUpload);
-  $("automovelCameraUpload")?.addEventListener("change", handleAutomovelImagesUpload);
+  const regularImagesInput = $("automovelImagesUpload");
+  const cameraImagesInput = $("automovelCameraUpload");
+  regularImagesInput?.addEventListener("click", () => pauseAdminIdleForExternalPicker("automovel-file-picker"));
+  regularImagesInput?.addEventListener("cancel", () => resumeAdminIdleTimer("automovel-file-picker"));
+  regularImagesInput?.addEventListener("change", handleAutomovelImagesUpload);
+  cameraImagesInput?.addEventListener("click", () => pauseAdminIdleForExternalPicker("automovel-camera-picker"));
+  cameraImagesInput?.addEventListener("cancel", () => resumeAdminIdleTimer("automovel-camera-picker"));
+  cameraImagesInput?.addEventListener("change", handleAutomovelImagesUpload);
   $("automovelCameraButton")?.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
     openFormForEdit("automovelForm");
-    const input = $("automovelCameraUpload");
+    const input = cameraImagesInput;
     if (!input) return;
     input.value = "";
     input.click();
@@ -15725,6 +15774,7 @@ onAuthStateChanged(auth, async (user) => {
   state.user = user;
   if (!user) {
     stopAdminIdleTimer();
+    clearAdminIdlePauseReasons();
     stopClientMetricsRealtime();
     state.profile = null;
     hidePanelLoading();
