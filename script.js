@@ -595,10 +595,27 @@ function salvarOrigemCliqueLocal(info = {}) {
   }
 }
 
+function origemParametroAtual() {
+  try {
+    const fontes = [
+      window.location.search || "",
+      window.location.hash.includes("?") ? `?${window.location.hash.split("?").slice(1).join("?")}` : ""
+    ].filter(Boolean);
+    for (const fonte of fontes) {
+      const params = new URLSearchParams(fonte);
+      const origemDireta = params.get("o") || params.get("origem") || params.get("qr") || params.get("qrcode");
+      if (origemDireta) return origemDireta;
+      const utmSource = params.get("utm_source");
+      const utmCampaign = params.get("utm_campaign");
+      if (utmSource || utmCampaign) return [utmSource, utmCampaign].filter(Boolean).join(" / ");
+    }
+  } catch (error) {}
+  return "";
+}
+
 function origemAcessoAtual() {
   try {
-    const params = new URLSearchParams(window.location.search);
-    const origemUrl = params.get("o");
+    const origemUrl = origemParametroAtual();
     if (origemUrl) return origemUrl;
     if (document.referrer.includes("instagram.com")) return "instagram";
     if (window.matchMedia?.("(display-mode: standalone)").matches || window.navigator.standalone === true) return "app";
@@ -694,6 +711,47 @@ function registrarMetricaCliente(idEstabelecimento, grupo, tipo, detalhes = {}) 
     ...origemClique,
     horario: new Date().toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" }),
     dataHoraISO: new Date().toISOString(),
+    ts: firebase.database.ServerValue.TIMESTAMP,
+    pagina: window.location.href
+  });
+
+  return Promise.allSettled([contador, log]);
+}
+
+function registrarOrigemPaginaCliente(idEstabelecimento, detalhes = {}) {
+  const explicitClientId = String(detalhes.clienteId || "").trim();
+  const explicitClientKey = /^[a-z0-9-]+$/.test(explicitClientId) ? explicitClientId : "";
+  const metricCandidates = [
+    explicitClientKey,
+    detalhes.clienteId,
+    detalhes.estabelecimentoId,
+    detalhes.clienteNome,
+    detalhes.estabelecimento,
+    idEstabelecimento
+  ].filter(Boolean);
+  const clienteKey = explicitClientKey || metricCandidates.map(resolverChaveMetricaCliente).find(Boolean);
+  if (!clienteKey) return Promise.resolve();
+
+  const hoje = getHojeBR();
+  const origemInfo = origemCliqueAtual();
+  const origemBruta = String(origemInfo.origem || "site").trim() || "site";
+  const origemKey = chaveFirebaseMetrica(origemBruta, "acesso-direto");
+  const dedupeKey = `${clienteKey}|${hoje}|${origemKey}|${window.location.pathname}${window.location.search}${window.location.hash}`;
+  window.__origemPaginaClienteRegistrada = window.__origemPaginaClienteRegistrada || new Set();
+  if (window.__origemPaginaClienteRegistrada.has(dedupeKey)) return Promise.resolve();
+  window.__origemPaginaClienteRegistrada.add(dedupeKey);
+
+  const agora = new Date();
+  const db = firebase.database();
+  const contador = db.ref(`metricasClientes/${clienteKey}/${hoje}/origensPagina/${origemKey}`).transaction((atual) => (atual || 0) + 1);
+  const log = db.ref(`metricasClientes/${clienteKey}/${hoje}/detalhesOrigemPagina`).push().set({
+    grupo: "origensPagina",
+    tipo: "origem_pagina",
+    origem: origemBruta,
+    ...origemInfo,
+    ...detalhes,
+    horario: agora.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo" }),
+    dataHoraISO: agora.toISOString(),
     ts: firebase.database.ServerValue.TIMESTAMP,
     pagina: window.location.href
   });
@@ -1637,8 +1695,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // ================================
   (function registrarOrigemAcesso() {
     try {
-      const params = new URLSearchParams(window.location.search);
-      const origem = params.get("o");
+      const origem = origemParametroAtual();
 
       if (!origem) return;
 
@@ -2319,8 +2376,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // 1. IDENTIFICAR A ORIGEM (Prioridade: Link > App > Site)
-    const urlParams = new URLSearchParams(window.location.search);
-    const origemLink = urlParams.get("o");
+    const origemLink = origemParametroAtual();
     const isApp = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
 
@@ -4143,6 +4199,11 @@ document.addEventListener("DOMContentLoaded", function () {
     registrarCliqueBotao("perfil", idEst, "perfil-cliente", {
       estabelecimento: estabelecimento?.name || "",
       origem: "atalho-home"
+    }).catch(() => { });
+    registrarOrigemPaginaCliente(idEst, {
+      estabelecimento: estabelecimento?.name || "",
+      categoria: categoriaEncontrada.title || "",
+      origemEvento: "atalho-home"
     }).catch(() => { });
     // 2) Abre a categoria sem disparar click programatico no menu lateral
     prepararMenuParaCategoria(categoriaEncontrada);
@@ -22468,6 +22529,11 @@ ${produtosIniciaisLoja.length ? `
           estabelecimento: clientName,
           origem: "pagina-cliente"
         }).catch(() => { });
+        registrarOrigemPaginaCliente(clientId || clientName, {
+          estabelecimento: clientName,
+          categoria: title,
+          origemEvento: "clique-card"
+        }).catch(() => { });
       });
     });
 
@@ -23322,7 +23388,7 @@ ${produtosIniciaisLoja.length ? `
   ///////////// inicio botao compartilhamento
 
   document.addEventListener("DOMContentLoaded", () => {
-    const hash = window.location.hash.replace("#", "").toLowerCase();
+    const hash = window.location.hash.replace("#", "").split("?")[0].toLowerCase();
     if (!hash) return;
 
     // Procura o estabelecimento com nome normalizado igual ao hash
@@ -23330,6 +23396,11 @@ ${produtosIniciaisLoja.length ? `
       categoria.establishments?.forEach((est) => {
         const nomeNormalizado = normalizeName(est.name);
         if (nomeNormalizado === hash) {
+          registrarOrigemPaginaCliente(nomeNormalizado, {
+            estabelecimento: est.name || "",
+            categoria: categoria.title || "",
+            origemEvento: "link-direto"
+          }).catch(() => { });
           // Abre o menu correspondente
           if (categoria.link) categoria.link.click();
 
@@ -23353,7 +23424,7 @@ ${produtosIniciaisLoja.length ? `
 
 
   window.addEventListener("load", () => {
-    const hash = window.location.hash.replace("#", "");
+    const hash = window.location.hash.replace("#", "").split("?")[0].toLowerCase();
     if (!hash) return;
 
     const categoriaAlvo = categories.find(cat =>
@@ -23361,6 +23432,14 @@ ${produtosIniciaisLoja.length ? `
     );
 
     if (categoriaAlvo && categoriaAlvo.link) {
+      const estDireto = categoriaAlvo.establishments?.find(est => normalizeName(est.name) === hash);
+      if (estDireto) {
+        registrarOrigemPaginaCliente(hash, {
+          estabelecimento: estDireto.name || "",
+          categoria: categoriaAlvo.title || "",
+          origemEvento: "link-direto"
+        }).catch(() => { });
+      }
       categoriaAlvo.link.click(); // simula o clique
 
       const tentarRolar = () => {

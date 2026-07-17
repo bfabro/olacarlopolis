@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 465,
-  label: "v472",
-  data: "2026-07-16",
-  nota: "Sessao do painel agora aguarda 60 minutos e pausa durante camera ou upload de fotos."
+  numero: 466,
+  label: "v473",
+  data: "2026-07-17",
+  nota: "Relatorio do cliente ganhou modulo liberavel de origem dos acessos e QR Codes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1164,6 +1164,8 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
     cliquesOndeComerDetalhado: {},
     cliquesPromocoesDetalhado: {},
     cliquesPorMenuDetalhado: {},
+    origemPaginaCliente: {},
+    origemPaginaClienteDetalhado: {},
     origemAcessos: {},
     instalacoesPWA: {},
     usoPWA: {}
@@ -1175,6 +1177,8 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
     const ondeComer = day?.ondeComer || {};
     const promocoes = day?.promocoes || {};
     const detalhes = day?.detalhes || {};
+    const origensPagina = day?.origensPagina || {};
+    const detalhesOrigemPagina = day?.detalhesOrigemPagina || {};
 
     if (Object.keys(botoes).length) metrics.cliquesBotoes[date] = { [clientKey]: botoes };
     ["whatsapp_promocao", "instagram_promocao", "facebook", "tiktok", "site"].forEach((tipo) => {
@@ -1196,6 +1200,11 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
         : (group === "promocoes" ? "cliquesPromocoesDetalhado" : "cliquesBotoesDetalhado");
       if (!metrics[target][date]) metrics[target][date] = { [clientKey]: {} };
       metrics[target][date][clientKey][logId] = item;
+    });
+    if (Object.keys(origensPagina).length) metrics.origemPaginaCliente[date] = { [clientKey]: origensPagina };
+    Object.entries(detalhesOrigemPagina).forEach(([logId, item]) => {
+      if (!metrics.origemPaginaClienteDetalhado[date]) metrics.origemPaginaClienteDetalhado[date] = { [clientKey]: {} };
+      metrics.origemPaginaClienteDetalhado[date][clientKey][logId] = item;
     });
   });
 
@@ -1991,7 +2000,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -2045,7 +2054,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -2248,6 +2257,8 @@ async function loadAllData(onProgress = null) {
     cliquesOndeComerDetalhado: cliquesOndeComerDetalhadoSnap.exists() ? cliquesOndeComerDetalhadoSnap.val() : {},
     cliquesPromocoesDetalhado: cliquesPromocoesDetalhadoSnap.exists() ? cliquesPromocoesDetalhadoSnap.val() : {},
     cliquesPorMenuDetalhado: cliquesPorMenuSnap.exists() ? cliquesPorMenuSnap.val() : {},
+    origemPaginaCliente: {},
+    origemPaginaClienteDetalhado: {},
     origemAcessos: origemAcessosSnap.exists() ? origemAcessosSnap.val() : {},
     instalacoesPWA: instalacoesPWASnap.exists() ? instalacoesPWASnap.val() : {},
     usoPWA: usoPWASnap.exists() ? usoPWASnap.val() : {}
@@ -10246,6 +10257,66 @@ function aggregateClickCities(rows = [], limit = 12) {
   return topFromMap(map, limit, "clique", "cliques");
 }
 
+function aggregateClientPageOrigins(data = {}, keys = [], limit = 12) {
+  const map = new Map();
+  Object.values(data || {}).forEach((dia) => {
+    Object.entries(dia || {}).forEach(([clientKey, origens]) => {
+      if (keys?.length && !metricKeyBelongsToClient(clientKey, keys)) return;
+      Object.entries(origens || {}).forEach(([origem, count]) => {
+        incrementMetric(map, origemLabel(origem), Number(count || 0));
+      });
+    });
+  });
+  return topFromMap(map, limit, "acesso", "acessos");
+}
+
+function buildClientPageOriginTimeline(data = {}, range = getReportDateRange(), keys = []) {
+  const rows = [];
+  Object.entries(data || {}).forEach(([date, dia]) => {
+    if (date < range.start || date > range.end) return;
+    Object.entries(dia || {}).forEach(([clientKey, logs]) => {
+      if (keys?.length && !metricKeyBelongsToClient(clientKey, keys)) return;
+      Object.values(logs || {}).forEach((item) => {
+        rows.push({
+          date,
+          hora: formatReportTime(item, date),
+          origem: origemLabel(item?.origem || item?.origemLabel || "site"),
+          canal: item?.canal || "-",
+          cidade: [item?.cidade || "Desconhecida", item?.estado || ""].filter(Boolean).join(" - "),
+          dispositivo: item?.dispositivo || "-",
+          evento: item?.origemEvento || "-",
+          pagina: item?.pagina || ""
+        });
+      });
+    });
+  });
+  return rows.sort((a, b) => `${b.date} ${b.hora}`.localeCompare(`${a.date} ${a.hora}`));
+}
+
+function renderClientPageOriginTable(rows = [], emptyMessage = "Ainda nao ha origem de acesso registrada para este cliente.") {
+  if (!rows.length) return `<div class="list-meta">${escapeHtml(emptyMessage)}</div>`;
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table client-report-click-table">
+        <thead><tr><th>Origem</th><th>Data</th><th>Horario</th><th>Cidade</th><th>Canal</th><th>Dispositivo</th><th>Entrada</th></tr></thead>
+        <tbody>
+          ${rows.slice(0, 200).map((row) => `
+            <tr title="${escapeAttr(row.pagina || "")}">
+              <td><strong>${escapeHtml(row.origem)}</strong></td>
+              <td>${escapeHtml(formatDateBR(row.date))}</td>
+              <td>${escapeHtml(row.hora)}</td>
+              <td>${escapeHtml(row.cidade || "Desconhecida")}</td>
+              <td>${escapeHtml(row.canal || "-")}</td>
+              <td>${escapeHtml(row.dispositivo || "-")}</td>
+              <td>${escapeHtml(row.evento || "-")}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
   const rows = [];
   const pushRow = (date, area, cliente, tipo, item = {}) => {
@@ -10716,6 +10787,13 @@ function renderClientMetricReportContent(client = {}) {
   const imovelAccessRows = itemAccessRows.filter((row) => row.kind === "imovel");
   const veiculoAccessRows = itemAccessRows.filter((row) => row.kind === "veiculo");
   const cidadesClique = aggregateClickCities(timeline);
+  const canShowOrigemAcessos = hasPermission("origem_acessos");
+  const origemPaginaResumo = canShowOrigemAcessos
+    ? aggregateClientPageOrigins(filterDailyMetrics(state.metricas.origemPaginaCliente, range), keys)
+    : [];
+  const origemPaginaTimeline = canShowOrigemAcessos
+    ? buildClientPageOriginTimeline(state.metricas.origemPaginaClienteDetalhado, range, keys)
+    : [];
 
   return `
     ${renderClientReportPeriodControls(range)}
@@ -10734,6 +10812,13 @@ function renderClientMetricReportContent(client = {}) {
           <p class="list-meta">Cidade identificada no acesso do visitante quando o clique foi registrado.</p>
           ${renderReportList(cidadesClique, "Ainda nao ha dados de cidade nos cliques deste cliente.")}
         </section>
+        ${canShowOrigemAcessos ? `<section class="panel-card report-card report-wide">
+          <h3>Origem dos acessos a pagina</h3>
+          <p class="list-meta">Mostra de onde vieram os acessos ao perfil do cliente. Para QR Codes, use links com <strong>?o=nome-do-qrcode</strong>, <strong>?qr=nome</strong> ou UTM.</p>
+          ${renderReportList(origemPaginaResumo, "Ainda nao ha acessos com origem registrada para este cliente no periodo.")}
+          <h3>Acessos detalhados por origem</h3>
+          ${renderClientPageOriginTable(origemPaginaTimeline)}
+        </section>` : ""}
         ${availability.imoveis ? `<section class="panel-card report-card report-wide">
           <h3>Modulo especial: Imoveis</h3>
           <p class="list-meta">Acessos dos imoveis vinculados ao cliente, separados por referencia.</p>
