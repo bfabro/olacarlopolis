@@ -462,14 +462,14 @@ function canManageClients() {
 }
 
 function clienteAssociadoImoveis(client = {}, includeCurrentPermission = false) {
-  const category = normalizeName(client.categoria || client.category || client.categoriaId || "");
+  const category = normalizeName(client?.categoria || client?.category || client?.categoriaId || "");
   const categoryMatches = category.includes("imove") || category.includes("imobili");
   const permissionMatches = includeCurrentPermission && Boolean(state.profile?.permissoes?.imoveis);
   return categoryMatches || permissionMatches;
 }
 
 function clienteAssociadoAutomoveis(client = {}, includeCurrentPermission = false) {
-  const category = normalizeName(client.categoria || client.category || client.categoriaId || client.tipoCliente || client.tipo || "");
+  const category = normalizeName(client?.categoria || client?.category || client?.categoriaId || client?.tipoCliente || client?.tipo || "");
   const categoryMatches = /automovel|veiculo|revenda|carro|moto/.test(category);
   const permissionMatches = includeCurrentPermission && Boolean(state.profile?.permissoes?.veiculos);
   return categoryMatches || permissionMatches;

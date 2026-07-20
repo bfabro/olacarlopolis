@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-17-origem-acessos-cliente-v473'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-20-admin-null-client-v474'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
