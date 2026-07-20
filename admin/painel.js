@@ -5732,6 +5732,51 @@ async function uploadEventImage(file) {
   showToast("Imagem do evento enviada.");
 }
 
+const MARCAS_AUTOMOVEIS = {
+  carros: `ABARTH|ACURA|AGRALE|ALFA ROMEO|AM GEN|ASIA MOTORS|ASTON MARTIN|AUDI|BABY|BMW|BRM|BUGRE|BYD|CAB MOTORS|CADILLAC|CAOA CHERY|CBT JIPE|CHANA|CHANGAN|CHRYSLER|CITROËN|CROSS LANDER|DAEWOO|DAIHATSU|DODGE|EFFA|ENGESA|ENVEMO|FERRARI|FIAT|FIBRAVAN|FORD|FOTON|FYBER|GEELY|GM - CHEVROLET|GURGEL|GWM|HAFEI|HONDA|HYUNDAI|ISUZU|IVECO|JAC|JAGUAR|JEEP|JINBEI|JPX|KIA MOTORS|LADA|LAMBORGHINI|LAND ROVER|LEXUS|LIFAN|LOBINI|LOTUS|MAHINDRA|MASERATI|MATRA|MAZDA|MCLAREN|MERCEDES-BENZ|MERCURY|MG|MINI|MITSUBISHI|MIURA|NISSAN|PEUGEOT|PLYMOUTH|PONTIAC|PORSCHE|RAM|RELY|RENAULT|ROLLS-ROYCE|ROVER|SAAB|SATURN|SEAT|SHINERAY|SMART|SSANGYONG|SUBARU|SUZUKI|TAC|TOYOTA|TROLLER|VOLVO|VW - VOLKSWAGEN|WAKE|WALK`.split("|"),
+  motos: `ADLY|AGRALE|AMAZONAS|APRILIA|ATALA|AVELLOZ|BAJAJ|BEE|BETA|BIMOTA|BMW|BRANDY|BRAVA|BRP|BUELL|BUENO|BULL|BENELLI|CAGIVA|CALOI|CFMOTO|DAELIM|DAFRA|DAYANG|DAYUN|DERBI|DUCATI|EMME|FEVER|FOX|FUSCO MOTOSEGURA|FYM|GARINNI|GAS GAS|GREEN|HAOBAO|HAOJUE|HARLEY-DAVIDSON|HARTFORD|HERO|HONDA|HUSABERG|HUSQVARNA|HISUN|INDIAN|IROS|JIAPENG VOLCANO|JOHNNYPAG|JONNY|KAHENA|KASINSKI|KAWASAKI|KTM|KYMCO|L'AQUILA|LANDUM|LAVRALE|LERIVO|LEVA|LIFAN|LON-V|MAGRÃO TRICICLOS|MIZA|MOTO GUZZI|MOTOCAR|MOTOMORINI|MOTORINO|MRX|MV AGUSTA|MVK|MALAGUTI|MOBÍLLI|NIU|ORCA|PEGASSI|PEUGEOT|PIAGGIO|POLARIS|REGAL RAPTOR|RIGUETE|ROYAL ENFIELD|SANYANG|SBM|SHINERAY|SIAMOTO|SUNDOWN|SUPER SOCO|SUZUKI|SWM|TARGOS|TIGER|TRAXX|TRIUMPH|VENTO|VESPA|VOLTZ|VENTANE MOTORS|WATTS|WUYANG|YAMAHA|ZONTES|BYCRISTO`.split("|"),
+  pesados: `AGRALE|ARROW|BEPOBUS|CHEVROLET|CICCOBUS|DAF|EFFA-JMC|FIAT|FORD|FOTON|GMC|HYUNDAI|IVECO|JAC|MAN|MARCOPOLO|MASCARELLO|MAXIBUS|MERCEDES-BENZ|NAVISTAR|NEOBUS|PUMA-ALFA|SAAB-SCANIA|SCANIA|SHACMAN|SINOTRUK|VOLKSWAGEN|VOLVO|WALKBUS`.split("|")
+};
+
+function categoriaMarcaAutomovel(tipo = "") {
+  const normalized = normalizeName(tipo);
+  if (normalized.includes("moto") || normalized.includes("scooter") || normalized.includes("triciclo") || normalized.includes("quadriciclo")) return "motos";
+  if (normalized.includes("caminhao") || normalized.includes("onibus") || normalized.includes("micro-onibus")) return "pesados";
+  if (normalized === "outro") return "";
+  return normalized ? "carros" : "";
+}
+
+function atualizarCampoOutraMarcaAutomovel() {
+  const isOutra = $("automovelMarca")?.value === "Outra marca";
+  $("automovelOutraMarcaField")?.classList.toggle("hidden", !isOutra);
+  if ($("automovelOutraMarca")) $("automovelOutraMarca").required = isOutra;
+}
+
+function atualizarMarcasAutomovel(marcaAtual = "") {
+  const select = $("automovelMarca");
+  if (!select) return;
+  const tipo = $("automovelTipo")?.value || "";
+  const categoria = categoriaMarcaAutomovel(tipo);
+  const marcas = MARCAS_AUTOMOVEIS[categoria] || [];
+  select.innerHTML = `<option value="">${tipo ? "Selecione a marca" : "Selecione primeiro o tipo"}</option>`;
+  marcas.forEach((marca) => select.add(new Option(marca, marca)));
+  if (tipo) select.add(new Option("Outra marca", "Outra marca"));
+  const atual = String(marcaAtual || "").trim();
+  if (atual && marcas.some((marca) => normalizeName(marca) === normalizeName(atual))) {
+    select.value = marcas.find((marca) => normalizeName(marca) === normalizeName(atual));
+  } else if (atual) {
+    select.value = "Outra marca";
+    if ($("automovelOutraMarca")) $("automovelOutraMarca").value = atual === "Outra marca" ? "" : atual;
+  }
+  atualizarCampoOutraMarcaAutomovel();
+}
+
+function formatarDataInclusaoAutomovel(value) {
+  const timestamp = typeof value === "number" ? value : Number(value?.toMillis?.() || value?.seconds * 1000 || value || 0);
+  if (!timestamp || !Number.isFinite(timestamp)) return "Não disponível";
+  return new Intl.DateTimeFormat("pt-BR").format(new Date(timestamp));
+}
+
 function resetAutomovelForm() {
   state.selectedAutomovelId = null;
   state.automovelImages = [];
@@ -5740,6 +5785,7 @@ function resetAutomovelForm() {
   if ($("automovelImagesUpload")) $("automovelImagesUpload").value = "";
   if ($("automovelCameraUpload")) $("automovelCameraUpload").value = "";
   if ($("automovelStatus")) $("automovelStatus").value = "ativo";
+  if ($("automovelDataInclusao")) $("automovelDataInclusao").value = new Intl.DateTimeFormat("pt-BR").format(new Date());
   atualizarCamposTipoAutomovel();
   $("deleteAutomovelButton")?.classList.add("hidden");
   renderAutomovelImagesPreview();
@@ -5763,7 +5809,7 @@ function toggleAutomovelFieldGroup(ids = [], visible = true) {
   });
 }
 
-function atualizarCamposTipoAutomovel() {
+function atualizarCamposTipoAutomovel(preservarMarca = false) {
   const tipo = normalizeName($("automovelTipo")?.value || "");
   const isMoto = tipo.includes("moto");
   const hasType = Boolean(tipo);
@@ -5771,6 +5817,10 @@ function atualizarCamposTipoAutomovel() {
   const veiculoFields = ["automovelMotor", "automovelDirecao", "automovelVidroEletrico", "automovelTravaEletrica", "automovelPortas", "automovelFreioAbs"];
   toggleAutomovelFieldGroup(motoFields, !hasType || isMoto);
   toggleAutomovelFieldGroup(veiculoFields, !hasType || !isMoto);
+  const marcaAtual = preservarMarca
+    ? ($("automovelMarca")?.value === "Outra marca" ? $("automovelOutraMarca")?.value : $("automovelMarca")?.value)
+    : "";
+  atualizarMarcasAutomovel(marcaAtual || "");
 }
 
 function preencherSelectAutomovel(id, value = "") {
@@ -5799,11 +5849,11 @@ function fillAutomovelForm(item) {
   state.selectedAutomovelId = item.id;
   state.automovelImages = Array.isArray(item.imagens) ? item.imagens : (item.imagem ? [item.imagem] : []);
   $("automovelId").value = item.id || "";
-  preencherSelectAutomovel("automovelMarca", item.marca || "");
+  preencherSelectAutomovel("automovelTipo", item.tipo || "");
+  atualizarMarcasAutomovel(item.marca || "");
   $("automovelModelo").value = item.modelo || "";
   $("automovelAno").value = item.ano || "";
   $("automovelPreco").value = formatExistingCurrency(item.preco || "");
-  $("automovelTipo").value = item.tipo || "";
   $("automovelCondicao").value = item.condicao || "";
   $("automovelKm").value = item.km || "";
   $("automovelStatus").value = item.status || "ativo";
@@ -5831,8 +5881,9 @@ function fillAutomovelForm(item) {
   $("automovelAcessorios").value = item.acessorios || "";
   $("automovelOpcionais").value = item.opcionais || "";
   $("automovelDescricao").value = item.descricao || "";
+  $("automovelDataInclusao").value = formatarDataInclusaoAutomovel(item.createdAt || item.dataInclusao);
   $("automovelImagem").value = item.imagem || state.automovelImages[0] || "";
-  atualizarCamposTipoAutomovel();
+  atualizarCamposTipoAutomovel(true);
   $("deleteAutomovelButton")?.classList.remove("hidden");
   renderAutomovelImagesPreview();
   openFormForEdit("automovelForm");
@@ -5852,7 +5903,8 @@ function ensureAutomovelDraftId() {
 }
 
 function getAutomovelFormData() {
-  const marca = $("automovelMarca").value.trim();
+  const marcaSelecionada = $("automovelMarca").value.trim();
+  const marca = marcaSelecionada === "Outra marca" ? $("automovelOutraMarca").value.trim() : marcaSelecionada;
   const modelo = $("automovelModelo").value.trim();
   const id = ensureAutomovelDraftId();
   const imagens = [...state.automovelImages].filter(Boolean);
@@ -7555,6 +7607,7 @@ function renderAutomoveisList() {
       item.cor
     ].filter(Boolean);
     const lojaContato = [item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ");
+    const dataInclusao = formatarDataInclusaoAutomovel(item.createdAt || item.dataInclusao);
     return `
       <article class="list-card event-card automovel-admin-card">
         <div class="automovel-admin-thumb">
@@ -7566,7 +7619,7 @@ function renderAutomoveisList() {
           <div class="automovel-admin-main">
             <div>
               <div class="list-title">${escapeHtml(titulo)}</div>
-              <div class="list-meta"><strong>Referencia:</strong> ${escapeHtml(codigoRef || "Sem codigo")}</div>
+              <div class="list-meta"><strong>Referencia:</strong> ${escapeHtml(codigoRef || "Sem codigo")} <span aria-hidden="true">•</span> <strong>Inclusão:</strong> ${escapeHtml(dataInclusao)}</div>
             </div>
             <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
           </div>
@@ -15110,7 +15163,8 @@ function bindEvents() {
     openFormForEdit("automovelForm");
   });
   $("closeAutomovelFormButton")?.addEventListener("click", resetAutomovelForm);
-  $("automovelTipo")?.addEventListener("change", atualizarCamposTipoAutomovel);
+  $("automovelTipo")?.addEventListener("change", () => atualizarCamposTipoAutomovel());
+  $("automovelMarca")?.addEventListener("change", atualizarCampoOutraMarcaAutomovel);
   $("automovelSearch")?.addEventListener("input", renderAutomoveisList);
   $("automovelArteItem")?.addEventListener("change", (event) => {
     state.selectedAutomovelArtId = event.target.value || "";
@@ -15710,6 +15764,7 @@ function bindEvents() {
       payload.codRef = await gerarCodigoReferenciaIncremental("automovel");
     } else {
       const original = state.automoveis.find((item) => item.id === state.selectedAutomovelId) || {};
+      payload.createdAt = original.createdAt || original.dataInclusao || serverTimestamp();
       payload.codRef = original.codRef || original.codigo || await gerarCodigoReferenciaIncremental("automovel");
     }
     const updates = { [`conteudosInformativos/automoveis/${id}`]: payload };

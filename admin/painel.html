@@ -1130,63 +1130,19 @@
               <label>Tipo
                 <select id="automovelTipo">
                   <option value="">Selecione o tipo</option>
-                   <option value="Caminhao">Caminhao</option>
-                  <option value="Caminhonete">Caminhonete</option>
-                  <option value="Carro">Carro</option>
-                  <option value="Moto">Moto</option>                  
-                  <option value="SUV">SUV</option>
-                  <option value="Utilitario">Utilitario</option>
-                  <option value="Van">Van</option>
-                 
+                  <option value="Carros e utilitários">Carros e utilitários</option>
+                  <option value="Motos, scooters, triciclos e quadriciclos">Motos, scooters, triciclos e quadriciclos</option>
+                  <option value="Caminhões, ônibus e micro-ônibus">Caminhões, ônibus e micro-ônibus</option>
                   <option value="Outro">Outro</option>
                 </select>
               </label>
               <label>Marca
                 <select id="automovelMarca" required>
-                  <option value="">Selecione a marca</option>
-                  <option>Agrale</option>
-                  <option>Alfa Romeo</option>
-                  <option>Audi</option>
-                  <option>BMW</option>
-                  <option>BYD</option>
-                  <option>Caoa Chery</option>
-                  <option>Chevrolet</option>
-                  <option>Chrysler</option>
-                  <option>Citroën</option>
-                  <option>Dodge</option>
-                  <option>Ferrari</option>
-                  <option>Fiat</option>
-                  <option>Ford</option>
-                  <option>GWM</option>
-                  <option>Honda</option>
-                  <option>Hyundai</option>
-                  <option>Iveco</option>
-                  <option>JAC Motors</option>
-                  <option>Jaguar</option>
-                  <option>Jeep</option>
-                  <option>Kia</option>
-                  <option>Lamborghini</option>
-                  <option>Land Rover</option>
-                  <option>Lexus</option>
-                  <option>Maserati</option>
-                  <option>Mercedes-Benz</option>
-                  <option>Mini</option>
-                  <option>Mitsubishi</option>
-                  <option>Nissan</option>
-                  <option>Peugeot</option>
-                  <option>Porsche</option>
-                  <option>RAM</option>
-                  <option>Renault</option>
-                  <option>Subaru</option>
-                  <option>Suzuki</option>
-                  <option>Toyota</option>
-                  <option>Volkswagen</option>
-                  <option>Volvo</option>
-                  <option>Outra marca</option>
-                  <option>Não informado</option>
-                  <option>Marca importada</option>
-                  <option>Veículo artesanal/modificado</option>
+                  <option value="">Selecione primeiro o tipo</option>
                 </select>
+              </label>
+              <label id="automovelOutraMarcaField" class="hidden">Outra marca
+                <input id="automovelOutraMarca" maxlength="80" placeholder="Digite a marca">
               </label>
               <label>Modelo<input id="automovelModelo" required placeholder="Ex: Gol 1.0"></label>
               <label>Ano<input id="automovelAno" placeholder="Ex: 2018"></label>
@@ -1206,6 +1162,9 @@
                   <option value="inativo">Inativo</option>
                   <option value="vendido">Vendido</option>
                 </select>
+              </label>
+              <label>Data de inclusão
+                <input id="automovelDataInclusao" value="Não disponível" readonly aria-readonly="true" title="Preenchida automaticamente no cadastro">
               </label>
               <div class="form-section-title wide">
                 <i class="fa-solid fa-gears"></i>
