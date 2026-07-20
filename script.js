@@ -7098,7 +7098,21 @@ carlopdiesel:"s",
         </div>
         <div id="xadrezConfigInfo" class="chess-tournament-card hidden"></div>
         <div id="xadrezStatus" class="chess-status">Sua vez. Toque em uma peça branca.</div>
-        <div id="xadrezBoard" class="chess-board" aria-label="Tabuleiro de xadrez"></div>
+        <div class="chess-player-strip chess-player-strip--opponent">
+          <strong>IA — Pretas</strong>
+          <span id="xadrezCapturadasPretas" class="chess-captured" aria-label="Peças pretas capturadas">Nenhuma peça capturada</span>
+        </div>
+        <div class="chess-play-area">
+          <div id="xadrezBoard" class="chess-board" aria-label="Tabuleiro de xadrez"></div>
+          <aside class="chess-move-panel" aria-label="Histórico de movimentos">
+            <strong>Movimentos</strong>
+            <div id="xadrezMoveList" class="chess-move-list"><span class="chess-move-empty">As posições aparecerão aqui.</span></div>
+          </aside>
+        </div>
+        <div class="chess-player-strip chess-player-strip--player">
+          <strong>Você — Brancas</strong>
+          <span id="xadrezCapturadasBrancas" class="chess-captured" aria-label="Peças brancas capturadas">Nenhuma peça capturada</span>
+        </div>
         <div class="flappy-buttons">
           <button class="fechar-menu" onclick="location.hash='jogos'; mostrarJogos()">Voltar</button>
           <button id="xadrezRestart" type="button">Reiniciar</button>
@@ -7114,11 +7128,16 @@ carlopdiesel:"s",
     let finished = false;
     let timerStarted = false;
     let plyCount = 0;
+    let moveHistory = [];
+    let capturedPieces = { w: [], b: [] };
     let remainingSeconds = 10 * 60;
     if (window.xadrezTimerId) clearInterval(window.xadrezTimerId);
     const boardEl = document.getElementById("xadrezBoard");
     const statusEl = document.getElementById("xadrezStatus");
     const timerEl = document.getElementById("xadrezTimer");
+    const moveListEl = document.getElementById("xadrezMoveList");
+    const capturedWhiteEl = document.getElementById("xadrezCapturadasBrancas");
+    const capturedBlackEl = document.getElementById("xadrezCapturadasPretas");
 
     const setStatus = (text) => { statusEl.textContent = text; };
     const formatTimer = (seconds) => {
@@ -7163,11 +7182,48 @@ carlopdiesel:"s",
       if (move?.enPassant) return "Passante";
       return "";
     };
+    const squareName = (square) => `${"abcdefgh"[square.c]}${8 - square.r}`;
+    const registerMove = (move) => {
+      if (!move) return;
+      const piece = board[move.from.r][move.from.c];
+      const captured = move.capture || board[move.to.r][move.to.c] || "";
+      if (captured) capturedPieces[xadrezCor(captured)].push(captured);
+      moveHistory.push({
+        color: xadrezCor(piece),
+        piece,
+        from: squareName(move.from),
+        to: squareName(move.to),
+        captured,
+        special: describeMove(move)
+      });
+    };
+    const renderGameInfo = () => {
+      const renderCaptured = (element, pieces) => {
+        if (!element) return;
+        element.innerHTML = pieces.length
+          ? pieces.map((piece) => `<span class="chess-captured-piece" title="Peça capturada">${XADREZ_PECAS[piece]}</span>`).join("")
+          : `<span class="chess-captured-empty">Nenhuma peça capturada</span>`;
+      };
+      renderCaptured(capturedWhiteEl, capturedPieces.w);
+      renderCaptured(capturedBlackEl, capturedPieces.b);
+      if (!moveListEl) return;
+      moveListEl.innerHTML = moveHistory.length
+        ? moveHistory.map((entry, index) => `
+          <div class="chess-move-entry">
+            <span>${Math.floor(index / 2) + 1}${entry.color === "b" ? "..." : "."}</span>
+            <strong>${XADREZ_PECAS[entry.piece]}</strong>
+            <span>${entry.from} → ${entry.to}</span>
+            ${entry.captured ? `<small>capturou ${XADREZ_PECAS[entry.captured]}</small>` : ""}
+            ${entry.special ? `<small>${entry.special}</small>` : ""}
+          </div>`).join("")
+        : `<span class="chess-move-empty">As posições aparecerão aqui.</span>`;
+      moveListEl.scrollTop = moveListEl.scrollHeight;
+    };
     const statusDepoisDoLance = (baseText, checkColor) => {
       const isCheck = xadrezEmXeque(board, checkColor, gameState);
       if (baseText && isCheck) return `${baseText} - Check`;
       if (isCheck) return "Check";
-      return baseText || (checkColor === "b" ? "A IA está pensando..." : "Sua vez.");
+      return baseText || (checkColor === "w" ? "Sua vez." : "");
     };
     const checkGameEnd = (color) => {
       const moves = xadrezLegalMoves(board, color, gameState);
@@ -7190,16 +7246,18 @@ carlopdiesel:"s",
         return `<button type="button" class="chess-square ${dark} ${key === selectedKey ? "selected" : ""} ${legalKeys.has(key) ? "target" : ""}" data-r="${r}" data-c="${c}" ${locked || finished ? "disabled" : ""}>${piece ? `<span class="chess-piece">${XADREZ_PECAS[piece]}</span>` : ""}</button>`;
       }).join("")).join("");
       boardEl.querySelectorAll(".chess-square").forEach((btn) => btn.addEventListener("click", onSquareClick));
+      renderGameInfo();
     };
     const aiTurn = (previousMessage = "") => {
       if (checkGameEnd("b")) return;
       locked = true;
-      setStatus(previousMessage ? `${previousMessage} - IA pensando...` : "A IA está pensando...");
+      setStatus(previousMessage || "");
       render();
       setTimeout(() => {
         const move = xadrezBestMove(board, gameState, 2);
         const moveText = describeMove(move);
         if (move) {
+          registerMove(move);
           const next = xadrezMovePosition(board, gameState, move);
           board = next.board;
           gameState = next.state;
@@ -7210,7 +7268,7 @@ carlopdiesel:"s",
           setStatus(statusDepoisDoLance(moveText, "w"));
           render();
         }
-      }, 250);
+      }, 50);
     };
     function onSquareClick(event) {
       const r = Number(event.currentTarget.dataset.r);
@@ -7220,6 +7278,7 @@ carlopdiesel:"s",
       if (chosenMove) {
         ensureTimerStarted();
         const moveText = describeMove(chosenMove);
+        registerMove(chosenMove);
         const next = xadrezMovePosition(board, gameState, chosenMove);
         board = next.board;
         gameState = next.state;
@@ -7254,6 +7313,8 @@ carlopdiesel:"s",
       finished = false;
       timerStarted = false;
       plyCount = 0;
+      moveHistory = [];
+      capturedPieces = { w: [], b: [] };
       remainingSeconds = 10 * 60;
       renderTimer();
       setStatus("Sua vez. Toque em uma peça branca.");

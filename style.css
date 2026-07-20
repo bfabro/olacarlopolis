@@ -6719,8 +6719,109 @@ html {
 }
 
 .chess-game {
-  max-width: 560px;
+  max-width: 720px;
   margin: 0 auto;
+}
+
+.chess-play-area {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(180px, 1fr);
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px auto;
+}
+
+.chess-player-strip {
+  width: min(100%, 620px);
+  min-height: 46px;
+  margin: 6px auto;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 11px;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.chess-player-strip--opponent {
+  background: #111827;
+  border-color: #111827;
+  color: #fff;
+}
+
+.chess-captured {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 1px;
+  font-size: 13px;
+}
+
+.chess-captured-piece {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.chess-captured-empty,
+.chess-move-empty {
+  opacity: .68;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.chess-move-panel {
+  min-width: 0;
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: 1px solid #dbeafe;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.chess-move-panel > strong {
+  padding-bottom: 8px;
+  border-bottom: 1px solid #dbeafe;
+}
+
+.chess-move-list {
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  padding-top: 8px;
+}
+
+.chess-move-entry {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 28px 24px minmax(82px, 1fr);
+  align-items: center;
+  gap: 3px;
+  padding: 5px 6px;
+  border-radius: 7px;
+  background: #fff;
+  font-size: 12px;
+}
+
+.chess-move-entry strong {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.chess-move-entry small {
+  grid-column: 3;
+  color: #64748b;
+  font-size: 10px;
 }
 
 .chess-status,
@@ -6755,7 +6856,7 @@ html {
 .chess-board {
   width: min(92vw, 420px);
   aspect-ratio: 1;
-  margin: 12px auto;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(8, 1fr);
   grid-auto-rows: 1fr;
@@ -20919,6 +21020,41 @@ body.vaga-modal-open {
     padding: 8px 10px !important;
     font-size: 12px !important;
     line-height: 1.25 !important;
+  }
+
+  .content_area.tela-xadrez-mobile .chess-player-strip {
+    width: 100% !important;
+    min-height: 40px !important;
+    margin: 3px auto !important;
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+
+  .content_area.tela-xadrez-mobile .chess-captured-piece {
+    font-size: 21px !important;
+  }
+
+  .content_area.tela-xadrez-mobile .chess-play-area {
+    width: 100% !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 6px !important;
+    margin: 3px auto !important;
+  }
+
+  .content_area.tela-xadrez-mobile .chess-move-panel {
+    width: min(92vw, 360px) !important;
+    max-height: 150px !important;
+    margin: 0 auto !important;
+    padding: 8px !important;
+  }
+
+  .content_area.tela-xadrez-mobile .chess-move-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .content_area.tela-xadrez-mobile .chess-move-entry {
+    grid-template-columns: 24px 22px minmax(70px, 1fr) !important;
+    font-size: 11px !important;
   }
 
   .content_area.tela-xadrez-mobile .chess-board {
