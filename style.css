@@ -22409,6 +22409,18 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 }
 
 /* ===== Arte comercial: composicao fiel ao modelo de referencia v2 ===== */
+body.business-art-capturing-background .content_area,
+body.business-art-capturing-background .toast-compartilhar,
+body.business-art-capturing-background .business-art-dialog {
+  visibility: hidden !important;
+}
+
+body.business-art-capturing-background .home-quick-banner,
+body.business-art-capturing-background .home-cards-intro {
+  display: block !important;
+  visibility: visible !important;
+}
+
 .business-art-card {
   top: 245px;
   width: 820px;

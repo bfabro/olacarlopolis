@@ -636,6 +636,7 @@ async function detectarEnquadramentoArteComercial(imageUrl, configured = "auto")
 
 async function capturarFundoSiteArteComercial() {
   if (typeof html2canvas !== "function") return "";
+  document.body.classList.add("business-art-capturing-background");
   try {
     const canvas = await html2canvas(document.body, {
       width: window.innerWidth,
@@ -655,6 +656,50 @@ async function capturarFundoSiteArteComercial() {
   } catch (error) {
     console.warn("Nao foi possivel capturar o fundo atual do site.", error);
     return "";
+  } finally {
+    document.body.classList.remove("business-art-capturing-background");
+  }
+}
+
+async function prepararImagemArteComercial(imageUrl) {
+  const source = urlAbsolutaArteComercial(imageUrl);
+  if (!source || source.startsWith("data:")) return source;
+  const blobToDataUrl = (blob) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+  const fetchAsDataUrl = async (url) => {
+    const response = await fetch(url, { mode: "cors", cache: "force-cache" });
+    if (!response.ok) throw new Error(`Imagem indisponivel (${response.status})`);
+    const blob = await response.blob();
+    if (!String(blob.type || "").toLowerCase().startsWith("image/")) throw new Error("Resposta nao e uma imagem");
+    return blobToDataUrl(blob);
+  };
+  try {
+    return await fetchAsDataUrl(source);
+  } catch (directError) {
+    try {
+      const parsed = new URL(source);
+      if (!["firebasestorage.googleapis.com", "storage.googleapis.com"].includes(parsed.hostname)) return source;
+      const proxyPath = `/.netlify/functions/image-proxy?url=${encodeURIComponent(source)}`;
+      const proxyCandidates = [proxyPath];
+      if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
+        proxyCandidates.push(`https://www.olacarlopolis.com${proxyPath}`);
+      }
+      for (const proxyUrl of proxyCandidates) {
+        try {
+          return await fetchAsDataUrl(proxyUrl);
+        } catch (proxyCandidateError) {
+          // Tenta a proxima rota de proxy disponivel.
+        }
+      }
+      throw new Error("Nenhum proxy de imagem respondeu.");
+    } catch (proxyError) {
+      console.warn("Nao foi possivel preparar a imagem de perfil para a arte.", directError, proxyError);
+      return source;
+    }
   }
 }
 
@@ -745,14 +790,16 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   }
 
   mostrarToast("Preparando a previa da arte...");
-  const [fundoUrl, imageFit] = await Promise.all([
+  const dados = dadosArteComercial(establishment, categoriaAtual);
+  const [fundoUrl, imageFit, imagemPreparada] = await Promise.all([
     capturarFundoSiteArteComercial(),
     detectarEnquadramentoArteComercial(
-      urlAbsolutaArteComercial(establishment.image || establishment.imagem || establishment.logo || ""),
+      dados.imagem,
       establishment.imagemEnquadramento || establishment.imageFit || "auto"
-    )
+    ),
+    prepararImagemArteComercial(dados.imagem)
   ]);
-  const dados = dadosArteComercial(establishment, categoriaAtual);
+  if (imagemPreparada) dados.imagem = imagemPreparada;
   const logoSiteUrl = urlAbsolutaArteComercial("images/img_padrao_site/logo_1.png");
   const dialog = document.createElement("div");
   dialog.className = "business-art-dialog";
@@ -2165,6 +2212,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // pega o ID do estabelecimento a partir do container das abas
     const abasConteudo = icone.closest(".abas-conteudo");
     const estId = abasConteudo?.dataset.estab;
+    const businessArtToken = abasConteudo?.dataset.businessArtToken || "";
 
     if (!estId) {
       console.warn("Não consegui achar data-estab no container das abas");
@@ -2174,34 +2222,24 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    const fonteCategorias =
-      typeof categories !== "undefined"
-        ? categories
-        : (window.categories || []);
+    const exactEntry = businessArtToken ? window.__businessArtClients?.get(businessArtToken) : null;
+    let est = exactEntry?.establishment || null;
+    let categoriaAtual = exactEntry?.categoria || "";
 
-    let est = null;
-    let categoriaAtual = "";
-
-    for (const cat of fonteCategorias) {
-      if (!cat?.establishments) continue;
-
-      for (const e of cat.establishments) {
-        const norm = e.nomeNormalizado ||
-          (typeof normalizeName === "function"
-            ? normalizeName(e.name || "")
-            : String(e.name || "")
-              .toLowerCase()
-              .normalize("NFD")
-              .replace(/[\u0300-\u036f]/g, "")
-              .replace(/\s+/g, "-"));
-
-        if (norm === estId) {
-          est = e;
-          categoriaAtual = cat.title || "";
-          break;
-        }
+    // Compatibilidade com cards antigos que ainda nao possuem o token unico.
+    if (!est) {
+      const fonteCategorias = typeof categories !== "undefined" ? categories : (window.categories || []);
+      for (const cat of fonteCategorias) {
+        if (!cat?.establishments) continue;
+        const matches = cat.establishments.filter((item) => {
+          const itemId = item.clienteId || item.id || item.nomeNormalizado || normalizarArteComercial(item.name || "");
+          return itemId === estId || normalizarArteComercial(item.name || "") === estId;
+        });
+        if (matches.length !== 1) continue;
+        est = matches[0];
+        categoriaAtual = cat.title || "";
+        break;
       }
-      if (est) break;
     }
 
     if (!est) {
@@ -22495,13 +22533,17 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     }
 
 
+    const businessArtClients = new Map();
+    window.__businessArtClients = businessArtClients;
     contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><ul>
 
       
           
-      ${paidEstablishments.map((establishment) => {
+      ${paidEstablishments.map((establishment, establishmentIndex) => {
       establishment.__categoriaPublica = title;
       const slugEstabelecimentoPublico = normalizeName(establishment.name);
+      const businessArtToken = `${establishment.clienteId || slugEstabelecimentoPublico}::${establishmentIndex}`;
+      businessArtClients.set(businessArtToken, { establishment, categoria: title });
       let veiculosIniciaisLoja = [];
       let produtosIniciaisLoja = [];
       let mostrarAbaVeiculosInicial = false;
@@ -22615,7 +22657,7 @@ ${!establishment.descricaoFalecido ? `
 
 </div>
 
-<div class="abas-conteudo" data-estab="${slugEstabelecimentoPublico}">
+<div class="abas-conteudo" data-estab="${slugEstabelecimentoPublico}" data-business-art-token="${escapePromoHtml(businessArtToken)}">
   <div class="aba aba-info visible" id="info-${slugEstabelecimentoPublico}">
        <!-- TODO: aqui ficam as info-box (funcionamento, endereço, etc.) -->
 
