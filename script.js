@@ -269,7 +269,7 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
 
 
 
-async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
+async function gerarImagemCardEstabelecimentoLegado(establishment, categoriaAtual, slugId) {
   try {
     const nomeRaw = (establishment.name ?? establishment.nome ?? establishment.title ?? "");
     const nomeLimpo = String(nomeRaw)
@@ -566,6 +566,308 @@ function resolverChaveMetricaCliente(idEstabelecimento) {
     })
     .sort((a, b) => String(b[0]).length - String(a[0]).length)[0];
   return fuzzyMatch?.[1] || normalized;
+}
+
+function escaparArteComercial(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function textoLimpoArteComercial(value) {
+  const holder = document.createElement("div");
+  holder.innerHTML = String(value || "");
+  return String(holder.textContent || holder.innerText || "").replace(/\s+/g, " ").trim();
+}
+
+function normalizarArteComercial(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function valorPreenchidoArteComercial(value) {
+  const text = textoLimpoArteComercial(value);
+  return /^(?:-|--|nao informado|não informado|nao possui|não possui|n\/a)$/i.test(text) ? "" : text;
+}
+
+function urlAbsolutaArteComercial(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  try {
+    return new URL(raw, window.location.href).href;
+  } catch (error) {
+    return raw;
+  }
+}
+
+function aguardarImagensArteComercial(root) {
+  return Promise.all([...root.querySelectorAll("img")].map((img) => {
+    if (img.complete) return Promise.resolve();
+    return new Promise((resolve) => {
+      img.addEventListener("load", resolve, { once: true });
+      img.addEventListener("error", resolve, { once: true });
+    });
+  }));
+}
+
+async function detectarEnquadramentoArteComercial(imageUrl, configured = "auto") {
+  if (["contain", "cover"].includes(configured)) return configured;
+  if (!imageUrl) return "contain";
+  const fileHint = String(imageUrl).toLowerCase();
+  if (/logo|perfil|profile|marca|icone|icon/.test(fileHint)) return "contain";
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const ratio = img.naturalWidth / Math.max(1, img.naturalHeight);
+      resolve(ratio > 1.45 || ratio < 0.7 ? "contain" : "cover");
+    };
+    img.onerror = () => resolve("contain");
+    img.src = imageUrl;
+  });
+}
+
+async function capturarFundoSiteArteComercial() {
+  if (typeof html2canvas !== "function") return "";
+  try {
+    const canvas = await html2canvas(document.body, {
+      width: window.innerWidth,
+      height: window.innerHeight,
+      windowWidth: window.innerWidth,
+      windowHeight: window.innerHeight,
+      scrollX: -window.scrollX,
+      scrollY: -window.scrollY,
+      scale: Math.min(1.35, window.devicePixelRatio || 1),
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      backgroundColor: "#eef4ff",
+      ignoreElements: (element) => element.classList?.contains("business-art-dialog")
+    });
+    return canvas.toDataURL("image/jpeg", 0.86);
+  } catch (error) {
+    console.warn("Nao foi possivel capturar o fundo atual do site.", error);
+    return "";
+  }
+}
+
+function dadosArteComercial(establishment = {}, categoriaAtual = "") {
+  const contatos = getContatosDetalhadosEstabelecimento(establishment);
+  const whatsapp = contatos.find((item) => item.whatsapp)?.numero
+    || establishment.whatsapp
+    || contatos[0]?.numero
+    || establishment.contact
+    || establishment.contato
+    || "";
+  const imagens = [
+    establishment.image,
+    establishment.imagem,
+    establishment.logo,
+    ...(Array.isArray(establishment.novidadesImages) ? establishment.novidadesImages : []),
+    ...(Array.isArray(establishment.divulgacaoImages) ? establishment.divulgacaoImages : [])
+  ].filter(Boolean);
+  const tipo = normalizarArteComercial(establishment.tipoCliente || establishment.tipo || "comercio");
+  const tipoLabel = tipo === "servico" || tipo === "servicos"
+    ? "Serviço"
+    : (tipo === "institucional" ? "Institucional" : "Comércio");
+  const descricao = establishment.descricaoCurta
+    || establishment.shortDescription
+    || establishment.descricao
+    || establishment.description
+    || establishment.infoAdicional
+    || (Array.isArray(establishment.novidadesDescriptions) ? establishment.novidadesDescriptions.find(Boolean) : "")
+    || "";
+  return {
+    nome: textoLimpoArteComercial(establishment.name || establishment.nome || establishment.title || "Estabelecimento"),
+    descricao: textoLimpoArteComercial(descricao).slice(0, 220),
+    categoria: textoLimpoArteComercial(categoriaAtual || establishment.categoria || establishment.category || ""),
+    tipoLabel,
+    whatsapp: formatarTelefonePublico(whatsapp),
+    cidade: valorPreenchidoArteComercial(establishment.cidade || establishment.city || establishment.localidade || ""),
+    endereco: valorPreenchidoArteComercial(establishment.address || establishment.endereco || ""),
+    imagem: urlAbsolutaArteComercial(imagens[0] || ""),
+    imagemEnquadramento: establishment.imagemEnquadramento || establishment.imageFit || "auto"
+  };
+}
+
+function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit }) {
+  const story = formato === "story";
+  const imageBlock = dados.imagem
+    ? `<img class="business-art-main-image" src="${escaparArteComercial(dados.imagem)}" alt="" crossorigin="anonymous" style="object-fit:${imageFit}">`
+    : `<div class="business-art-placeholder"><i class="fa-solid fa-store"></i><span>${escaparArteComercial(dados.categoria || dados.tipoLabel)}</span></div>`;
+  const contactCards = [
+    dados.whatsapp ? `<div class="business-art-info-card"><i class="fa-brands fa-whatsapp"></i><span><small>WhatsApp</small><strong>${escaparArteComercial(dados.whatsapp)}</strong></span></div>` : "",
+    dados.cidade ? `<div class="business-art-info-card"><i class="fa-solid fa-location-dot"></i><span><small>Cidade</small><strong>${escaparArteComercial(dados.cidade)}</strong></span></div>` : ""
+  ].filter(Boolean);
+  const background = fundoUrl
+    ? `background-image:url('${fundoUrl}');`
+    : "background:linear-gradient(145deg,#e6efff 0%,#ffffff 44%,#dbeafe 100%);";
+
+  return `
+    <div class="business-art-background" style="${background}"></div>
+    <div class="business-art-shade"></div>
+    <article class="business-art-card">
+      <header class="business-art-header">
+        <span class="business-art-kind"><i class="fa-solid fa-store"></i>${escaparArteComercial(dados.tipoLabel)}</span>
+        ${dados.categoria ? `<strong>${escaparArteComercial(dados.categoria)}</strong>` : ""}
+      </header>
+      <div class="business-art-picture">${imageBlock}</div>
+      <section class="business-art-identity">
+        <h1>${escaparArteComercial(dados.nome)}</h1>
+        <span class="business-art-name-line"></span>
+        ${dados.descricao ? `<p>${escaparArteComercial(dados.descricao)}</p>` : ""}
+      </section>
+      ${(contactCards.length || dados.endereco) ? `
+        <section class="business-art-info">
+          ${contactCards.length ? `<div class="business-art-info-grid ${contactCards.length === 1 ? "is-single" : ""}">${contactCards.join("")}</div>` : ""}
+          ${dados.endereco ? `<div class="business-art-info-card is-address"><i class="fa-solid fa-map-location-dot"></i><span><small>Endereço</small><strong>${escaparArteComercial(dados.endereco)}</strong></span></div>` : ""}
+        </section>` : ""}
+      <footer class="business-art-footer">
+        <div><i class="fa-solid fa-globe"></i><span><small>Encontre no</small><strong>www.olacarlopolis.com</strong></span></div>
+        <img src="${escaparArteComercial(logoSiteUrl)}" alt="Ola Carlopolis" crossorigin="anonymous">
+      </footer>
+    </article>
+    <div class="business-art-disclaimer"><i class="fa-solid fa-lock"></i> Informações fornecidas pelo estabelecimento.</div>
+  `;
+}
+
+async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
+  if (!establishment || document.querySelector(".business-art-dialog")) return;
+  if (typeof html2canvas !== "function") {
+    mostrarToast("O gerador de imagens ainda esta carregando. Tente novamente.");
+    return;
+  }
+
+  mostrarToast("Preparando a previa da arte...");
+  const [fundoUrl, imageFit] = await Promise.all([
+    capturarFundoSiteArteComercial(),
+    detectarEnquadramentoArteComercial(
+      urlAbsolutaArteComercial(establishment.image || establishment.imagem || establishment.logo || ""),
+      establishment.imagemEnquadramento || establishment.imageFit || "auto"
+    )
+  ]);
+  const dados = dadosArteComercial(establishment, categoriaAtual);
+  const logoSiteUrl = urlAbsolutaArteComercial("images/img_padrao_site/logo_1.png");
+  const dialog = document.createElement("div");
+  dialog.className = "business-art-dialog";
+  dialog.setAttribute("role", "dialog");
+  dialog.setAttribute("aria-modal", "true");
+  dialog.setAttribute("aria-label", "Pre-visualizacao da arte do estabelecimento");
+  dialog.innerHTML = `
+    <div class="business-art-panel">
+      <div class="business-art-toolbar">
+        <div><strong>Arte para divulgacao</strong><small>Escolha o formato e confira antes de baixar.</small></div>
+        <div class="business-art-format" role="group" aria-label="Formato da imagem">
+          <button type="button" class="active" data-business-format="story">Story <small>1080 x 1920</small></button>
+          <button type="button" data-business-format="feed">Feed <small>1080 x 1350</small></button>
+        </div>
+        <button type="button" class="business-art-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="business-art-preview"><div class="business-art-scale"><div class="business-art-stage is-story"></div></div></div>
+      <div class="business-art-actions">
+        <span class="business-art-resolution">PNG 1080 x 1920</span>
+        <button type="button" class="business-art-download"><i class="fa-solid fa-download"></i> Baixar imagem</button>
+      </div>
+    </div>`;
+
+  const previousOverflow = document.documentElement.style.overflow;
+  document.documentElement.style.overflow = "hidden";
+  document.body.appendChild(dialog);
+  const stage = dialog.querySelector(".business-art-stage");
+  const scaleBox = dialog.querySelector(".business-art-scale");
+  const preview = dialog.querySelector(".business-art-preview");
+  let formato = "story";
+
+  const render = async () => {
+    const height = formato === "story" ? 1920 : 1350;
+    stage.className = `business-art-stage is-${formato}`;
+    stage.style.width = "1080px";
+    stage.style.height = `${height}px`;
+    stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit });
+    dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
+    await aguardarImagensArteComercial(stage);
+    requestAnimationFrame(resize);
+  };
+
+  const resize = () => {
+    const height = formato === "story" ? 1920 : 1350;
+    const availableWidth = Math.max(240, preview.clientWidth - 24);
+    const availableHeight = Math.max(320, Math.min(window.innerHeight * 0.7, preview.clientHeight || window.innerHeight * 0.7) - 24);
+    const scale = Math.min(availableWidth / 1080, availableHeight / height);
+    scaleBox.style.width = `${1080 * scale}px`;
+    scaleBox.style.height = `${height * scale}px`;
+    scaleBox.style.transform = "none";
+    stage.style.transform = `scale(${scale})`;
+    stage.style.transformOrigin = "top left";
+  };
+
+  const close = () => {
+    window.removeEventListener("resize", resize);
+    document.removeEventListener("keydown", closeOnEscape);
+    document.documentElement.style.overflow = previousOverflow;
+    dialog.remove();
+  };
+
+  dialog.querySelectorAll("[data-business-format]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      formato = button.dataset.businessFormat;
+      dialog.querySelectorAll("[data-business-format]").forEach((item) => item.classList.toggle("active", item === button));
+      await render();
+    });
+  });
+  dialog.querySelector(".business-art-close").addEventListener("click", close);
+  dialog.addEventListener("click", (event) => { if (event.target === dialog) close(); });
+  window.addEventListener("resize", resize);
+  document.addEventListener("keydown", function closeOnEscape(event) {
+    if (event.key !== "Escape" || !dialog.isConnected) return;
+    document.removeEventListener("keydown", closeOnEscape);
+    close();
+  });
+  dialog.querySelector(".business-art-download").addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    const original = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando PNG...';
+    try {
+      await aguardarImagensArteComercial(stage);
+      if (document.fonts?.ready) await document.fonts.ready;
+      const height = formato === "story" ? 1920 : 1350;
+      const previousTransform = stage.style.transform;
+      stage.style.transform = "none";
+      const canvas = await html2canvas(stage, {
+        width: 1080,
+        height,
+        scale: 1,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: null,
+        logging: false
+      });
+      stage.style.transform = previousTransform;
+      const link = document.createElement("a");
+      const safeName = normalizarArteComercial(dados.nome) || slugId || "estabelecimento";
+      link.download = `ola-carlopolis-${safeName}-${formato}.png`;
+      link.href = canvas.toDataURL("image/png", 1);
+      link.click();
+      mostrarToast("Imagem pronta para compartilhar!");
+    } catch (error) {
+      console.error("Erro ao exportar a arte do estabelecimento.", error);
+      mostrarToast("Nao foi possivel gerar a imagem. Tente novamente.");
+    } finally {
+      button.disabled = false;
+      button.innerHTML = original;
+      resize();
+    }
+  });
+
+  await render();
 }
 
 function chaveFirebaseMetrica(valor, fallback = "sem-identificacao") {
@@ -1735,6 +2037,13 @@ document.addEventListener("DOMContentLoaded", function () {
     if (id) {
       compartilharEstabelecimento(id, nome, categoria);
     }
+  });
+
+  document.addEventListener("keydown", (ev) => {
+    const icon = ev.target.closest?.(".info-icon.fa-share-alt[role='button']");
+    if (!icon || !["Enter", " "].includes(ev.key)) return;
+    ev.preventDefault();
+    icon.click();
   });
 
   document.addEventListener("click", (ev) => {
@@ -20591,6 +20900,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.contact3 = contatos[2] || "";
     }
     if (campoExiste(cliente, "endereco")) est.address = cliente.endereco || "";
+    if (campoExiste(cliente, "cidade")) est.cidade = cliente.cidade || "";
+    if (campoExiste(cliente, "descricaoCurta")) est.descricaoCurta = cliente.descricaoCurta || "";
+    if (campoExiste(cliente, "imagemEnquadramento")) est.imagemEnquadramento = cliente.imagemEnquadramento || "auto";
     if (campoExiste(cliente, "funcionamento24Horas")) {
       est.funcionamento24Horas = Boolean(cliente.funcionamento24Horas);
     }
@@ -20670,6 +20982,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       horarios: cliente.horarios || null,
       statusAberto: cliente.funcionamento24Horas || cliente.horarios ? "a" : "",
       address: cliente.endereco || "",
+      cidade: cliente.cidade || "",
+      descricaoCurta: cliente.descricaoCurta || "",
+      imagemEnquadramento: cliente.imagemEnquadramento || "auto",
       contatosDetalhados,
       contatos,
       contact: contatos[0] || "",
@@ -22451,7 +22766,7 @@ ${!establishment.descricaoFalecido ? `
 
                   ${(establishment.instagram || establishment.instagram2 || establishment.facebook || establishment.tiktok || establishment.site) ? `
   <div class="info-box">
-    <i class="fas fa-share-alt info-icon"></i>
+    <i class="fas fa-share-alt info-icon" role="button" tabindex="0" title="Gerar arte para divulgacao" aria-label="Gerar arte para divulgacao"></i>
     <div>
       <div class="info-label">Redes Sociais</div>
       <div class="social-icons">

@@ -210,6 +210,13 @@
                   <label>Enviar foto de perfil<input id="clientProfileUpload" type="file" accept="image/*"></label>
                 </div>
                 <input id="clientImage" type="hidden">
+                <label class="profile-fit-field">Enquadramento na arte
+                  <select id="clientImageFit">
+                    <option value="auto">Automatico</option>
+                    <option value="contain">Logo inteira (sem corte)</option>
+                    <option value="cover">Foto preenchendo a area</option>
+                  </select>
+                </label>
               </section>
               <div class="form-section-title wide">
                 <i class="fa-solid fa-id-card"></i>
@@ -219,6 +226,9 @@
                 </div>
               </div>
               <label>Nome do cliente/comercio<input id="clientName" required></label>
+              <label class="wide">Descricao curta para divulgacao
+                <textarea id="clientShortDescription" rows="3" maxlength="220" placeholder="Ex.: Solucoes completas em instalacoes eletricas, manutencoes e projetos."></textarea>
+              </label>
               <label>Categoria
                 <select id="clientCategory"></select>
               </label>
@@ -278,6 +288,7 @@
                 <label class="contact-whatsapp-flag"><input id="clientContact4IsWhatsapp" type="checkbox"> É WhatsApp</label>
               </div>
               <label>Endereco<input id="clientAddress"></label>
+              <label>Cidade/UF<input id="clientCity" placeholder="Ex.: Carlopolis - PR"></label>
               <label>Horario de funcionamento<input id="clientHours"></label>
               <section class="wide schedule-panel">
                 <div class="section-head compact">
@@ -1665,6 +1676,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=400"></script>
+  <script type="module" src="painel.js?v=401"></script>
 </body>
 </html>

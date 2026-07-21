@@ -21828,3 +21828,575 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 .promo-event-title-btn {
   padding: 0;
 }
+
+/* ===== Gerador de arte comercial ===== */
+.business-art-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(8, 18, 40, .78);
+  backdrop-filter: blur(8px);
+}
+
+.business-art-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(980px, 100%);
+  height: min(94vh, 1040px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .4);
+  border-radius: 26px;
+  background: #f7f9fd;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .34);
+}
+
+.business-art-toolbar,
+.business-art-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 20px;
+  background: #fff;
+}
+
+.business-art-toolbar {
+  border-bottom: 1px solid #dce4f1;
+}
+
+.business-art-toolbar > div:first-child {
+  display: grid;
+  margin-right: auto;
+}
+
+.business-art-toolbar > div:first-child strong {
+  color: #08275a;
+  font-size: 18px;
+}
+
+.business-art-toolbar > div:first-child small,
+.business-art-resolution {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.business-art-format {
+  display: flex;
+  gap: 7px;
+  padding: 5px;
+  border-radius: 14px;
+  background: #eef3fb;
+}
+
+.business-art-format button {
+  display: grid;
+  gap: 1px;
+  min-width: 104px;
+  padding: 8px 13px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #49617f;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.business-art-format button small {
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.business-art-format button.active {
+  background: #0b63e6;
+  color: #fff;
+  box-shadow: 0 5px 14px rgba(11, 99, 230, .25);
+}
+
+.business-art-close {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border: 0;
+  border-radius: 50%;
+  background: #eef3fb;
+  color: #183153;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.business-art-preview {
+  display: grid;
+  place-items: center;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  background-color: #d9e1ec;
+  background-image: linear-gradient(45deg, rgba(255,255,255,.4) 25%, transparent 25%), linear-gradient(-45deg, rgba(255,255,255,.4) 25%, transparent 25%), linear-gradient(45deg, transparent 75%, rgba(255,255,255,.4) 75%), linear-gradient(-45deg, transparent 75%, rgba(255,255,255,.4) 75%);
+  background-size: 28px 28px;
+  background-position: 0 0, 0 14px, 14px -14px, -14px 0;
+}
+
+.business-art-scale {
+  position: relative;
+  flex: 0 0 auto;
+  box-shadow: 0 16px 46px rgba(15, 23, 42, .32);
+}
+
+.business-art-stage {
+  position: absolute;
+  inset: 0 auto auto 0;
+  overflow: hidden;
+  color: #0b1f43;
+  font-family: "Poppins", Arial, sans-serif;
+  isolation: isolate;
+}
+
+.business-art-background,
+.business-art-shade {
+  position: absolute;
+  inset: -18px;
+}
+
+.business-art-background {
+  z-index: -3;
+  background-position: center;
+  background-size: cover;
+  filter: blur(10px) saturate(.85);
+  transform: scale(1.04);
+}
+
+.business-art-shade {
+  z-index: -2;
+  background: rgba(15, 31, 60, .62);
+}
+
+.business-art-card {
+  position: absolute;
+  top: 112px;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  width: 820px;
+  min-height: 1540px;
+  padding: 36px;
+  border: 2px solid rgba(255,255,255,.78);
+  border-radius: 54px;
+  background: rgba(255,255,255,.98);
+  box-shadow: 0 26px 70px rgba(0, 21, 62, .3);
+  transform: translateX(-50%);
+}
+
+.business-art-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 76px;
+  margin-bottom: 22px;
+}
+
+.business-art-header > strong {
+  max-width: 48%;
+  color: #0864df;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: 1.1;
+  text-align: right;
+}
+
+.business-art-kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 15px;
+  min-height: 66px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: #e8f1ff;
+  color: #075fd8;
+  font-size: 25px;
+  font-weight: 850;
+}
+
+.business-art-kind i {
+  font-size: 29px;
+}
+
+.business-art-picture {
+  display: grid;
+  place-items: center;
+  height: 570px;
+  overflow: hidden;
+  border: 1px solid #e4e9f1;
+  border-radius: 35px;
+  background: #f5f7fb;
+  box-shadow: 0 14px 35px rgba(15, 38, 76, .13);
+}
+
+.business-art-main-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #f8fafc;
+}
+
+.business-art-placeholder {
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 50% 35%, #eef6ff, #d7e8ff);
+  color: #1167dc;
+  font-size: 28px;
+  font-weight: 850;
+}
+
+.business-art-placeholder i {
+  font-size: 116px;
+  opacity: .82;
+}
+
+.business-art-identity {
+  display: grid;
+  justify-items: center;
+  padding: 26px 20px 22px;
+  text-align: center;
+}
+
+.business-art-identity h1 {
+  max-width: 100%;
+  margin: 0;
+  color: #091d42;
+  font-size: 49px;
+  font-weight: 950;
+  letter-spacing: -1.3px;
+  line-height: 1.08;
+  overflow-wrap: anywhere;
+}
+
+.business-art-name-line {
+  width: 74px;
+  height: 5px;
+  margin: 15px 0 13px;
+  border-radius: 999px;
+  background: #1674ee;
+}
+
+.business-art-identity p {
+  display: -webkit-box;
+  max-width: 690px;
+  margin: 0;
+  overflow: hidden;
+  color: #344258;
+  font-size: 23px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.business-art-info {
+  display: grid;
+  gap: 14px;
+  margin-top: auto;
+}
+
+.business-art-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.business-art-info-grid.is-single {
+  grid-template-columns: 1fr;
+}
+
+.business-art-info-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+  min-height: 104px;
+  padding: 16px 21px;
+  border: 1px solid #dfe7f3;
+  border-radius: 25px;
+  background: linear-gradient(135deg, #f9fbff, #eef4fc);
+}
+
+.business-art-info-card > i {
+  width: 51px;
+  flex: 0 0 51px;
+  color: #0868e8;
+  font-size: 47px;
+  text-align: center;
+}
+
+.business-art-info-card .fa-whatsapp {
+  color: #0abf63;
+}
+
+.business-art-info-card span {
+  display: grid;
+  min-width: 0;
+}
+
+.business-art-info-card small {
+  color: #536176;
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.business-art-info-card strong {
+  color: #101d38;
+  font-size: 22px;
+  font-weight: 850;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.business-art-info-card.is-address {
+  width: 100%;
+}
+
+.business-art-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  min-height: 130px;
+  margin-top: 25px;
+  padding: 18px 25px 18px 30px;
+  overflow: hidden;
+  border-radius: 31px;
+  background: linear-gradient(120deg, #0879f9 0%, #063eb9 100%);
+  color: #fff;
+}
+
+.business-art-footer > div {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.business-art-footer > div > i {
+  font-size: 48px;
+}
+
+.business-art-footer span {
+  display: grid;
+}
+
+.business-art-footer small {
+  font-size: 20px;
+  line-height: 1.1;
+}
+
+.business-art-footer strong {
+  font-size: 27px;
+  font-weight: 900;
+}
+
+.business-art-footer img {
+  width: 142px;
+  height: 100px;
+  flex: 0 0 142px;
+  object-fit: contain;
+}
+
+.business-art-disclaimer {
+  position: absolute;
+  bottom: 54px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  max-width: 90%;
+  color: #fff;
+  font-size: 20px;
+  text-shadow: 0 2px 8px rgba(0,0,0,.45);
+  transform: translateX(-50%);
+}
+
+.business-art-stage.is-feed .business-art-card {
+  top: 48px;
+  width: 920px;
+  min-height: 1190px;
+  padding: 30px;
+  border-radius: 46px;
+}
+
+.business-art-stage.is-feed .business-art-header {
+  min-height: 60px;
+  margin-bottom: 16px;
+}
+
+.business-art-stage.is-feed .business-art-kind {
+  min-height: 54px;
+  padding: 0 21px;
+  font-size: 21px;
+}
+
+.business-art-stage.is-feed .business-art-header > strong {
+  font-size: 27px;
+}
+
+.business-art-stage.is-feed .business-art-picture {
+  height: 400px;
+  border-radius: 30px;
+}
+
+.business-art-stage.is-feed .business-art-identity {
+  padding: 19px 18px 14px;
+}
+
+.business-art-stage.is-feed .business-art-identity h1 {
+  font-size: 42px;
+}
+
+.business-art-stage.is-feed .business-art-name-line {
+  margin: 10px 0 8px;
+}
+
+.business-art-stage.is-feed .business-art-identity p {
+  font-size: 20px;
+  line-height: 1.35;
+  -webkit-line-clamp: 2;
+}
+
+.business-art-stage.is-feed .business-art-info-card {
+  min-height: 85px;
+  padding: 11px 17px;
+  border-radius: 21px;
+}
+
+.business-art-stage.is-feed .business-art-info-card > i {
+  width: 43px;
+  flex-basis: 43px;
+  font-size: 39px;
+}
+
+.business-art-stage.is-feed .business-art-info-card small {
+  font-size: 15px;
+}
+
+.business-art-stage.is-feed .business-art-info-card strong {
+  font-size: 19px;
+}
+
+.business-art-stage.is-feed .business-art-footer {
+  min-height: 102px;
+  margin-top: 16px;
+  padding: 12px 22px;
+  border-radius: 25px;
+}
+
+.business-art-stage.is-feed .business-art-footer > div > i {
+  font-size: 39px;
+}
+
+.business-art-stage.is-feed .business-art-footer small {
+  font-size: 17px;
+}
+
+.business-art-stage.is-feed .business-art-footer strong {
+  font-size: 23px;
+}
+
+.business-art-stage.is-feed .business-art-footer img {
+  width: 118px;
+  height: 82px;
+  flex-basis: 118px;
+}
+
+.business-art-stage.is-feed .business-art-disclaimer {
+  bottom: 18px;
+  font-size: 17px;
+}
+
+.business-art-actions {
+  justify-content: flex-end;
+  border-top: 1px solid #dce4f1;
+}
+
+.business-art-resolution {
+  margin-right: auto;
+  font-weight: 750;
+}
+
+.business-art-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 44px;
+  padding: 0 19px;
+  border: 0;
+  border-radius: 13px;
+  background: #0865df;
+  color: #fff;
+  font: inherit;
+  font-weight: 850;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(8, 101, 223, .25);
+}
+
+.business-art-download:disabled {
+  cursor: wait;
+  opacity: .7;
+}
+
+@media (max-width: 700px) {
+  .business-art-dialog {
+    padding: 0;
+  }
+
+  .business-art-panel {
+    width: 100%;
+    height: 100dvh;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .business-art-toolbar {
+    position: relative;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .business-art-toolbar > div:first-child {
+    width: calc(100% - 52px);
+  }
+
+  .business-art-toolbar > div:first-child small {
+    display: none;
+  }
+
+  .business-art-format {
+    width: 100%;
+  }
+
+  .business-art-format button {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .business-art-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+  }
+
+  .business-art-actions {
+    padding: 11px 12px;
+  }
+
+  .business-art-download {
+    min-height: 46px;
+  }
+}

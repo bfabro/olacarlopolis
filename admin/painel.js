@@ -2827,6 +2827,9 @@ function resetClientForm() {
   if ($("clientPaymentStatus")) $("clientPaymentStatus").value = "em_aberto";
   syncClientPaymentByType();
   if ($("clientCreci")) $("clientCreci").value = "";
+  if ($("clientShortDescription")) $("clientShortDescription").value = "";
+  if ($("clientCity")) $("clientCity").value = "Carlopolis - PR";
+  if ($("clientImageFit")) $("clientImageFit").value = "auto";
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = false;
   if ($("clientJobActive")) $("clientJobActive").checked = false;
   if ($("clientFeaturedWeeks")) $("clientFeaturedWeeks").value = "1";
@@ -2877,6 +2880,7 @@ function getClientFormData() {
     id,
     nome: name,
     nomeNormalizado: normalizeName(name),
+    descricaoCurta: $("clientShortDescription")?.value.trim() || "",
     categoria: category,
     categoriaId: slugify(category),
     tipoCliente,
@@ -2891,6 +2895,7 @@ function getClientFormData() {
     contato3: contatos[2] || "",
     creci: $("clientCreci")?.value.trim() || "",
     endereco: $("clientAddress").value.trim(),
+    cidade: $("clientCity")?.value.trim() || "",
     funcionamento24Horas,
     horario: horarioTexto,
     ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
@@ -2906,6 +2911,7 @@ function getClientFormData() {
     destaqueCobranca: $("clientFeaturedBilling")?.value || "mensalidade",
     destaqueValor: $("clientFeaturedWeek").checked ? destaqueValueForClient({ destaqueSemanas: $("clientFeaturedWeeks")?.value || 1 }) : 0,
     imagem: $("clientImage").value.trim(),
+    imagemEnquadramento: $("clientImageFit")?.value || "auto",
     imagens: normalizeImageItems(state.clientImages),
     cardapioAtivo: Boolean($("clientMenuEnabled")?.checked),
     cardapioLink: $("clientMenuLink").value.trim(),
@@ -3198,6 +3204,7 @@ function fillClientForm(client) {
   $("clientForm").dataset.originalName = client.nome || client.name || "";
   $("clientId").value = client.id || "";
   $("clientName").value = client.nome || client.name || "";
+  if ($("clientShortDescription")) $("clientShortDescription").value = client.descricaoCurta || client.shortDescription || "";
   fillClientCategorySelect(client.categoria || client.category || "");
   if ($("clientType")) $("clientType").value = client.tipoCliente || client.tipo || "comercio";
   if ($("clientCreci")) $("clientCreci").value = client.creci || client.registroCreci || "";
@@ -3223,6 +3230,7 @@ function fillClientForm(client) {
   if ($("clientContact4IsWhatsapp")) $("clientContact4IsWhatsapp").checked = Boolean(contatos[3]?.whatsapp);
   setAllClientSectionsExpanded(false);
   $("clientAddress").value = client.endereco || client.address || "";
+  if ($("clientCity")) $("clientCity").value = client.cidade || client.city || "Carlopolis - PR";
   $("clientHours").value = client.horario || client.hours || "";
   if ($("clientOpen24Hours")) $("clientOpen24Hours").checked = Boolean(client.funcionamento24Horas);
   $("clientInstagram").value = client.instagram || "";
@@ -3234,6 +3242,7 @@ function fillClientForm(client) {
   if ($("clientFeaturedBilling")) $("clientFeaturedBilling").value = destaqueBillingForClient(client);
   refreshClientFeaturedSummary();
   $("clientImage").value = client.imagem || client.image || "";
+  if ($("clientImageFit")) $("clientImageFit").value = client.imagemEnquadramento || client.imageFit || "auto";
   renderProfilePreview("clientImage", "clientProfilePreview");
   state.clientImages = normalizeImageItems(client.imagens);
   renderScheduleEditor("clientScheduleEditor", client.horarios || {});

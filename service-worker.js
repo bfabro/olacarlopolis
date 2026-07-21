@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-21-eletricistas-v476'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-21-arte-clientes-v479'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
