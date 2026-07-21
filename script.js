@@ -642,8 +642,8 @@ async function capturarFundoSiteArteComercial() {
       height: window.innerHeight,
       windowWidth: window.innerWidth,
       windowHeight: window.innerHeight,
-      scrollX: -window.scrollX,
-      scrollY: -window.scrollY,
+      scrollX: 0,
+      scrollY: 0,
       scale: Math.min(1.35, window.devicePixelRatio || 1),
       useCORS: true,
       allowTaint: false,
@@ -690,7 +690,7 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     categoria: textoLimpoArteComercial(categoriaAtual || establishment.categoria || establishment.category || ""),
     tipoLabel,
     whatsapp: formatarTelefonePublico(whatsapp),
-    cidade: valorPreenchidoArteComercial(establishment.cidade || establishment.city || establishment.localidade || ""),
+    cidade: valorPreenchidoArteComercial(establishment.cidade || establishment.city || establishment.localidade || "Carlópolis - PR"),
     endereco: valorPreenchidoArteComercial(establishment.address || establishment.endereco || ""),
     imagem: urlAbsolutaArteComercial(imagens[0] || ""),
     imagemEnquadramento: establishment.imagemEnquadramento || establishment.imageFit || "auto"
@@ -698,7 +698,6 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
 }
 
 function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit }) {
-  const story = formato === "story";
   const imageBlock = dados.imagem
     ? `<img class="business-art-main-image" src="${escaparArteComercial(dados.imagem)}" alt="" crossorigin="anonymous" style="object-fit:${imageFit}">`
     : `<div class="business-art-placeholder"><i class="fa-solid fa-store"></i><span>${escaparArteComercial(dados.categoria || dados.tipoLabel)}</span></div>`;
@@ -718,7 +717,7 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
         <span class="business-art-kind"><i class="fa-solid fa-store"></i>${escaparArteComercial(dados.tipoLabel)}</span>
         ${dados.categoria ? `<strong>${escaparArteComercial(dados.categoria)}</strong>` : ""}
       </header>
-      <div class="business-art-picture">${imageBlock}</div>
+      <div class="business-art-picture is-${imageFit}">${imageBlock}</div>
       <section class="business-art-identity">
         <h1>${escaparArteComercial(dados.nome)}</h1>
         <span class="business-art-name-line"></span>
@@ -731,7 +730,7 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
         </section>` : ""}
       <footer class="business-art-footer">
         <div><i class="fa-solid fa-globe"></i><span><small>Encontre no</small><strong>www.olacarlopolis.com</strong></span></div>
-        <img src="${escaparArteComercial(logoSiteUrl)}" alt="Ola Carlopolis" crossorigin="anonymous">
+        <span class="business-art-brand-logo"><img src="${escaparArteComercial(logoSiteUrl)}" alt="Ola Carlopolis" crossorigin="anonymous"></span>
       </footer>
     </article>
     <div class="business-art-disclaimer"><i class="fa-solid fa-lock"></i> Informações fornecidas pelo estabelecimento.</div>
@@ -765,14 +764,14 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       <div class="business-art-toolbar">
         <div><strong>Arte para divulgacao</strong><small>Escolha o formato e confira antes de baixar.</small></div>
         <div class="business-art-format" role="group" aria-label="Formato da imagem">
-          <button type="button" class="active" data-business-format="story">Story <small>1080 x 1920</small></button>
-          <button type="button" data-business-format="feed">Feed <small>1080 x 1350</small></button>
+          <button type="button" data-business-format="story">Story <small>1080 x 1920</small></button>
+          <button type="button" class="active" data-business-format="feed">Feed <small>1080 x 1350</small></button>
         </div>
         <button type="button" class="business-art-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="business-art-preview"><div class="business-art-scale"><div class="business-art-stage is-story"></div></div></div>
+      <div class="business-art-preview"><div class="business-art-scale"><div class="business-art-stage is-feed"></div></div></div>
       <div class="business-art-actions">
-        <span class="business-art-resolution">PNG 1080 x 1920</span>
+        <span class="business-art-resolution">PNG 1080 x 1350</span>
         <button type="button" class="business-art-download"><i class="fa-solid fa-download"></i> Baixar imagem</button>
       </div>
     </div>`;
@@ -783,7 +782,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const stage = dialog.querySelector(".business-art-stage");
   const scaleBox = dialog.querySelector(".business-art-scale");
   const preview = dialog.querySelector(".business-art-preview");
-  let formato = "story";
+  let formato = "feed";
 
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
@@ -793,6 +792,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit });
     dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
     await aguardarImagensArteComercial(stage);
+    const card = stage.querySelector(".business-art-card");
+    const disclaimer = stage.querySelector(".business-art-disclaimer");
+    if (card && disclaimer) {
+      disclaimer.style.top = `${Math.min(height - 58, card.offsetTop + card.offsetHeight + 24)}px`;
+      disclaimer.style.bottom = "auto";
+    }
     requestAnimationFrame(resize);
   };
 
