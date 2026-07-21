@@ -22668,3 +22668,73 @@ body.business-art-capturing-background .home-cards-intro {
   bottom: 24px;
   font-size: 18px;
 }
+
+/* ===== Arte comercial: acabamento final do PNG v3 ===== */
+.business-art-background {
+  inset: 0;
+  z-index: 0;
+  background-color: #071120;
+  filter: none;
+  transform: none;
+}
+
+.business-art-shade {
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(2, 7, 18, .9), rgba(4, 12, 28, .94));
+}
+
+.business-art-card,
+.business-art-header,
+.business-art-identity,
+.business-art-info {
+  background-color: #fff;
+}
+
+.business-art-card {
+  z-index: 2;
+  overflow: visible;
+}
+
+.business-art-disclaimer {
+  z-index: 2;
+}
+
+.business-art-identity h1,
+.business-art-stage.is-feed .business-art-identity h1 {
+  padding: 10px 28px 12px;
+  border: 1px solid #cfe1ff;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #eef5ff, #fff);
+  box-shadow: 0 9px 22px rgba(13, 86, 190, .13);
+}
+
+.business-art-info-card .fa-whatsapp,
+.business-art-stage.is-feed .business-art-info-card .fa-whatsapp {
+  background: #25d366;
+  color: #fff;
+  box-shadow: 0 7px 16px rgba(37, 211, 102, .28);
+}
+
+.business-art-brand-logo,
+.business-art-footer .business-art-brand-logo,
+.business-art-stage.is-feed .business-art-brand-logo {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  flex: 0 0 92px;
+  overflow: visible;
+}
+
+.business-art-footer img,
+.business-art-stage.is-feed .business-art-footer img,
+.business-art-brand-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 92px;
+  max-height: 92px;
+  object-fit: contain;
+  transform: none;
+}

@@ -885,24 +885,78 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   dialog.querySelector(".business-art-download").addEventListener("click", async (event) => {
     const button = event.currentTarget;
     const original = button.innerHTML;
+    let exportHost = null;
     button.disabled = true;
     button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando PNG...';
     try {
       await aguardarImagensArteComercial(stage);
       if (document.fonts?.ready) await document.fonts.ready;
       const height = formato === "story" ? 1920 : 1350;
-      const previousTransform = stage.style.transform;
-      stage.style.transform = "none";
-      const canvas = await html2canvas(stage, {
+
+      // O preview fica dentro de um contêiner reduzido e com overflow. Renderizar
+      // o próprio elemento ali faz o html2canvas herdar esse recorte. A cópia
+      // isolada preserva o layout real de 1080 px sem interferência da modal.
+      exportHost = document.createElement("div");
+      exportHost.setAttribute("aria-hidden", "true");
+      Object.assign(exportHost.style, {
+        position: "fixed",
+        left: "0",
+        top: "0",
+        width: "1080px",
+        height: `${height}px`,
+        overflow: "hidden",
+        pointerEvents: "none",
+        zIndex: "0"
+      });
+      const exportStage = stage.cloneNode(true);
+      Object.assign(exportStage.style, {
+        position: "relative",
+        inset: "auto",
+        width: "1080px",
+        height: `${height}px`,
+        isolation: "auto",
+        transform: "none",
+        transformOrigin: "top left"
+      });
+      const exportBackground = exportStage.querySelector(".business-art-background");
+      const capturedBackground = exportBackground?.style.backgroundImage || "";
+      Object.assign(exportStage.style, {
+        backgroundColor: "#071120",
+        backgroundImage: capturedBackground
+          ? `linear-gradient(rgba(2, 7, 18, .91), rgba(4, 12, 28, .95)), ${capturedBackground}`
+          : "linear-gradient(180deg, #071120, #040c1c)",
+        backgroundPosition: "center",
+        backgroundSize: "cover"
+      });
+      exportBackground?.remove();
+      exportStage.querySelector(".business-art-shade")?.remove();
+      const exportCard = exportStage.querySelector(".business-art-card");
+      if (exportCard) {
+        exportCard.style.zIndex = "1";
+        exportCard.style.overflow = "visible";
+        exportCard.style.background = "#fff";
+        exportCard.style.border = "none";
+        exportCard.style.boxShadow = "none";
+      }
+      const exportDisclaimer = exportStage.querySelector(".business-art-disclaimer");
+      if (exportDisclaimer) exportDisclaimer.style.zIndex = "1";
+      exportHost.appendChild(exportStage);
+      document.body.appendChild(exportHost);
+      await aguardarImagensArteComercial(exportStage);
+
+      const canvas = await html2canvas(exportStage, {
         width: 1080,
         height,
         scale: 1,
         useCORS: true,
         allowTaint: false,
         backgroundColor: null,
-        logging: false
+        logging: false,
+        scrollX: 0,
+        scrollY: 0,
+        windowWidth: 1080,
+        windowHeight: height
       });
-      stage.style.transform = previousTransform;
       const link = document.createElement("a");
       const safeName = normalizarArteComercial(dados.nome) || slugId || "estabelecimento";
       link.download = `ola-carlopolis-${safeName}-${formato}.png`;
@@ -913,6 +967,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       console.error("Erro ao exportar a arte do estabelecimento.", error);
       mostrarToast("Nao foi possivel gerar a imagem. Tente novamente.");
     } finally {
+      exportHost?.remove();
       button.disabled = false;
       button.innerHTML = original;
       resize();
