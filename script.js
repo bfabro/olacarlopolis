@@ -20867,6 +20867,15 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!key) return true;
       if (/^(de|do|da|dos|das).+/.test(compacta) && categoriaKeys.has(compacta.replace(/^(de|do|da|dos|das)/, ""))) return true;
       if (/^(outro|outros)cliente$/.test(compacta)) return true;
+      // Aliases antigos podem conter apenas a categoria repetida (por exemplo,
+      // "eletricista-eletricista"). Eles nao identificam uma empresa e faziam
+      // clientes distintos da mesma categoria serem consolidados em um so.
+      if ([...categoriaKeys].some((categoriaKey) => {
+        const categoriaCompacta = normalizeName(categoriaKey).replace(/[^a-z0-9]/g, "");
+        if (!categoriaCompacta || compacta.length < categoriaCompacta.length) return false;
+        return compacta.length % categoriaCompacta.length === 0
+          && compacta === categoriaCompacta.repeat(compacta.length / categoriaCompacta.length);
+      })) return true;
       return categoriaKeys.has(key) || categoriaKeys.has(compacta) || chavesGenericas.has(key) || chavesGenericas.has(compacta);
     };
     const add = (value, options = {}) => {
