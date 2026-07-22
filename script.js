@@ -882,7 +882,7 @@ function criarSombraRasterArteComercial(width, height, effect = "soft", rounded 
     ctx.restore();
   }
   return {
-    dataUrl: canvas.toDataURL("image/png"),
+    canvas,
     left: -padX,
     top: -padTop,
     width: canvas.width,
@@ -986,18 +986,16 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       picture.style.setProperty("--business-picture-height", `${fittedHeight}px`);
       const shadow = criarSombraRasterArteComercial(fittedWidth, fittedHeight, efeitoFoto, cantosArredondados);
       if (shadow) {
-        const shadowImage = document.createElement("img");
-        shadowImage.className = "business-art-shadow-raster";
-        shadowImage.alt = "";
-        shadowImage.setAttribute("aria-hidden", "true");
-        shadowImage.src = shadow.dataUrl;
-        Object.assign(shadowImage.style, {
+        const shadowCanvas = shadow.canvas;
+        shadowCanvas.className = "business-art-shadow-raster";
+        shadowCanvas.setAttribute("aria-hidden", "true");
+        Object.assign(shadowCanvas.style, {
           left: `${shadow.left}px`,
           top: `${shadow.top}px`,
           width: `${shadow.width}px`,
           height: `${shadow.height}px`
         });
-        picture.prepend(shadowImage);
+        picture.prepend(shadowCanvas);
       }
     }
     const disclaimer = stage.querySelector(".business-art-disclaimer");
@@ -1120,6 +1118,17 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         transform: "none",
         transformOrigin: "top left"
       });
+      const sourceShadowCanvases = stage.querySelectorAll("canvas.business-art-shadow-raster");
+      const exportShadowCanvases = exportStage.querySelectorAll("canvas.business-art-shadow-raster");
+      sourceShadowCanvases.forEach((sourceCanvas, index) => {
+        const targetCanvas = exportShadowCanvases[index];
+        const targetContext = targetCanvas?.getContext("2d");
+        if (!targetCanvas || !targetContext) return;
+        targetCanvas.width = sourceCanvas.width;
+        targetCanvas.height = sourceCanvas.height;
+        targetContext.clearRect(0, 0, targetCanvas.width, targetCanvas.height);
+        targetContext.drawImage(sourceCanvas, 0, 0);
+      });
       exportHost.appendChild(exportStage);
       document.body.appendChild(exportHost);
       await aguardarImagensArteComercial(exportStage);
@@ -1140,6 +1149,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         windowWidth: 1080,
         windowHeight: height
       });
+      window.__debugUltimaArteComercialCanvas = canvas;
       const link = document.createElement("a");
       const safeName = normalizarArteComercial(dados.nome) || slugId || "estabelecimento";
       link.download = `ola-carlopolis-${safeName}-${formato}-${layoutArte}.png`;
