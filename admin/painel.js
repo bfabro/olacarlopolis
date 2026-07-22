@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 472,
-  label: "v479",
+  numero: 473,
+  label: "v480",
   data: "2026-07-22",
-  nota: "PNG da arte agora preserva exatamente layout, cores, efeitos, cantos e moldura configurados na previa."
+  nota: "Exportacao PNG corrigida para preservar o fundo e eliminar blocos cinza nas areas semitransparentes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

@@ -1116,7 +1116,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         inset: "auto",
         width: "1080px",
         height: `${height}px`,
-        isolation: "auto",
+        isolation: "isolate",
         transform: "none",
         transformOrigin: "top left"
       });
@@ -1133,7 +1133,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         scale: 1,
         useCORS: true,
         allowTaint: false,
-        backgroundColor: null,
+        backgroundColor: layoutArte === "showcase" ? "#f7faff" : "#071120",
         logging: false,
         scrollX: 0,
         scrollY: 0,
