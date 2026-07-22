@@ -21170,6 +21170,27 @@ plotarPinsImoveis(stateImoveis.filtered);
       })[0];
   }
 
+  function montarImagensAdminComLogoAtual(cliente = {}) {
+    const imagensGaleria = Array.isArray(cliente.imagens)
+      ? cliente.imagens
+          .map((item) => typeof item === "string" ? { url: item, texto: "" } : { ...item })
+          .filter((item) => item && String(item.url || "").trim())
+      : [];
+    const logoAtual = String(cliente.imagem || cliente.image || "").trim();
+
+    if (!logoAtual) return imagensGaleria.slice(0, 10);
+
+    const indiceLogo = imagensGaleria.findIndex((item) => String(item.url || "").trim() === logoAtual);
+    const dadosLogo = indiceLogo >= 0 ? imagensGaleria[indiceLogo] : null;
+    const demaisImagens = imagensGaleria.filter((_, indice) => indice !== indiceLogo);
+
+    return [{
+      ...(dadosLogo || {}),
+      url: logoAtual,
+      texto: dadosLogo?.texto || cliente.descricaoCurta || ""
+    }, ...demaisImagens].slice(0, 10);
+  }
+
   function aplicarClienteAdminNoEstabelecimento(est, cliente, clienteId = "") {
     if (!est || !cliente) return;
     preservarIdentidadeAdminEstabelecimento(est);
@@ -21179,9 +21200,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     est.clienteNome = cliente.nome || est.clienteNome || "";
     if (cliente.aliases) est.aliases = cliente.aliases;
     est.nomeNormalizado = est.__adminOriginalSlug || normalizeName(est.name);
-    const imagensAdmin = Array.isArray(cliente.imagens)
-      ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
-      : [];
+    const imagensAdmin = montarImagensAdminComLogoAtual(cliente);
 
     if (campoExiste(cliente, "imagem")) {
       est.image = cliente.imagem || (imagensAdmin[0]?.url || "");
@@ -21261,9 +21280,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function montarEstabelecimentoDoClienteAdmin(cliente, clienteId) {
-    const imagensAdmin = Array.isArray(cliente.imagens)
-      ? cliente.imagens.map((item) => typeof item === "string" ? { url: item, texto: "" } : item).filter((item) => item && item.url)
-      : [];
+    const imagensAdmin = montarImagensAdminComLogoAtual(cliente);
 
     const temControleCardapio = campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio");
     const cardapioAtivo = temControleCardapio

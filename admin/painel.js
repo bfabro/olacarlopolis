@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 477,
-  label: "v484",
+  numero: 478,
+  label: "v485",
   data: "2026-07-22",
-  nota: "Moldura branca removida da foto no layout Destaque, preservando a imagem sem bordas."
+  nota: "Logo principal do comercio agora aparece primeiro em Novidades, sem duplicacao na galeria."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
