@@ -23561,6 +23561,18 @@ body.business-art-capturing-background .home-cards-intro {
   background: linear-gradient(110deg, #063aa8 0%, var(--business-name-color) 58%, #1592ff 100%);
 }
 
+/* O html2canvas transforma algumas sombras CSS do layout Atual em blocos
+   retangulares. A sombra editavel da foto continua sendo desenhada pelo
+   canvas proprio e nao e afetada por estas regras. */
+.business-art-stage.layout-classic .business-art-card,
+.business-art-stage.layout-classic .business-art-kind,
+.business-art-stage.layout-classic .business-art-picture,
+.business-art-stage.layout-classic .business-art-identity h1,
+.business-art-stage.layout-classic .business-art-info-card,
+.business-art-stage.layout-classic .business-art-footer {
+  box-shadow: none !important;
+}
+
 .business-art-footer,
 .business-art-stage.is-feed .business-art-footer,
 .business-art-stage.is-story .business-art-footer {
