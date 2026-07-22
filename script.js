@@ -860,7 +860,14 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     stage.style.transformOrigin = "top left";
   };
 
+  let dialogClosed = false;
+  const closeOnEscape = (event) => {
+    if (event.key !== "Escape" || !dialog.isConnected) return;
+    close();
+  };
   const close = () => {
+    if (dialogClosed) return;
+    dialogClosed = true;
     window.removeEventListener("resize", resize);
     document.removeEventListener("keydown", closeOnEscape);
     document.documentElement.style.overflow = previousOverflow;
@@ -874,14 +881,16 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       await render();
     });
   });
-  dialog.querySelector(".business-art-close").addEventListener("click", close);
+  const closeButton = dialog.querySelector(".business-art-close");
+  closeButton.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    close();
+  }, { once: true });
+  closeButton.addEventListener("click", close);
   dialog.addEventListener("click", (event) => { if (event.target === dialog) close(); });
   window.addEventListener("resize", resize);
-  document.addEventListener("keydown", function closeOnEscape(event) {
-    if (event.key !== "Escape" || !dialog.isConnected) return;
-    document.removeEventListener("keydown", closeOnEscape);
-    close();
-  });
+  document.addEventListener("keydown", closeOnEscape);
   dialog.querySelector(".business-art-download").addEventListener("click", async (event) => {
     const button = event.currentTarget;
     const original = button.innerHTML;

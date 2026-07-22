@@ -22871,3 +22871,157 @@ body.business-art-capturing-background .home-cards-intro {
 .business-art-stage.is-story .business-art-disclaimer {
   display: none;
 }
+
+/* ===== Arte comercial: Feed ampliado ===== */
+.business-art-stage.is-feed .business-art-card {
+  top: 35px;
+  width: 990px;
+  height: 1280px;
+  padding: 34px;
+  box-sizing: border-box;
+  border-radius: 48px;
+}
+
+.business-art-stage.is-feed .business-art-header {
+  min-height: 68px;
+  margin-bottom: 18px;
+}
+
+.business-art-stage.is-feed .business-art-kind {
+  min-height: 62px;
+  padding: 0 25px;
+  font-size: 25px;
+}
+
+.business-art-stage.is-feed .business-art-kind i {
+  font-size: 28px;
+}
+
+.business-art-stage.is-feed .business-art-header > strong {
+  font-size: 31px;
+}
+
+.business-art-stage.is-feed .business-art-picture {
+  height: 520px;
+  flex: 0 0 520px;
+  border-radius: 32px;
+  background: #f5f7fb;
+}
+
+.business-art-stage.is-feed .business-art-picture.is-contain,
+.business-art-stage.is-feed .business-art-picture.is-contain .business-art-main-image {
+  background: #f5f7fb;
+}
+
+.business-art-stage.is-feed .business-art-picture .business-art-main-image,
+.business-art-stage.is-feed .business-art-picture.is-contain .business-art-main-image {
+  object-fit: cover !important;
+  max-width: none !important;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+.business-art-stage.is-feed .business-art-identity {
+  padding: 22px 20px 18px;
+}
+
+.business-art-stage.is-feed .business-art-identity h1 {
+  padding: 10px 30px 12px;
+  font-size: 52px;
+  border-radius: 19px;
+  background: #eef5ff;
+  box-shadow: none;
+}
+
+.business-art-stage.is-feed .business-art-name-line {
+  width: 78px;
+  height: 5px;
+  margin: 11px 0 10px;
+}
+
+.business-art-stage.is-feed .business-art-identity p {
+  display: block;
+  max-width: 860px;
+  overflow: visible;
+  font-size: 23px;
+  line-height: 1.38;
+  -webkit-line-clamp: unset;
+}
+
+.business-art-stage.is-feed .business-art-info {
+  gap: 16px;
+  margin-top: auto;
+}
+
+.business-art-stage.is-feed .business-art-info-grid {
+  gap: 16px;
+}
+
+.business-art-stage.is-feed .business-art-info-card {
+  min-height: 112px;
+  padding: 16px 22px;
+  border-radius: 26px;
+}
+
+.business-art-stage.is-feed .business-art-info-card > i {
+  width: 62px;
+  height: 62px;
+  flex-basis: 62px;
+  font-size: 33px;
+}
+
+.business-art-stage.is-feed .business-art-info-card small {
+  font-size: 19px;
+}
+
+.business-art-stage.is-feed .business-art-info-card strong {
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.business-art-stage.is-feed .business-art-footer {
+  min-height: 128px;
+  margin-top: 20px;
+  padding: 14px 25px 14px 29px;
+  border-radius: 28px;
+}
+
+.business-art-stage.is-feed .business-art-footer small {
+  font-size: 19px;
+}
+
+.business-art-stage.is-feed .business-art-footer strong {
+  font-size: 27px;
+}
+
+.business-art-stage.is-feed .business-art-disclaimer {
+  display: none;
+}
+
+/* Contatos maiores também no Story. */
+.business-art-stage.is-story .business-art-info-card {
+  min-height: 124px;
+  padding: 18px 24px;
+}
+
+.business-art-stage.is-story .business-art-info-card > i {
+  width: 68px;
+  height: 68px;
+  flex-basis: 68px;
+  font-size: 36px;
+}
+
+.business-art-stage.is-story .business-art-info-card small {
+  font-size: 20px;
+}
+
+.business-art-stage.is-story .business-art-info-card strong {
+  font-size: 28px;
+  line-height: 1.2;
+}
+
+.business-art-close {
+  z-index: 20;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
