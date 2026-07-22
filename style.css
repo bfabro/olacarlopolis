@@ -22738,3 +22738,136 @@ body.business-art-capturing-background .home-cards-intro {
   object-fit: contain;
   transform: none;
 }
+
+/* ===== Arte comercial: Story em tela cheia ===== */
+.business-art-stage.is-story .business-art-card {
+  top: 70px;
+  width: 970px;
+  height: 1780px;
+  padding: 38px;
+  box-sizing: border-box;
+  border-radius: 54px;
+}
+
+.business-art-stage.is-story .business-art-header {
+  min-height: 76px;
+  margin-bottom: 22px;
+}
+
+.business-art-stage.is-story .business-art-kind {
+  min-height: 68px;
+  padding: 0 28px;
+  font-size: 27px;
+}
+
+.business-art-stage.is-story .business-art-kind i {
+  font-size: 30px;
+}
+
+.business-art-stage.is-story .business-art-header > strong {
+  font-size: 34px;
+}
+
+.business-art-stage.is-story .business-art-picture {
+  height: 780px;
+  flex: 0 0 780px;
+  border-radius: 34px;
+  background: #f5f7fb;
+}
+
+.business-art-stage.is-story .business-art-picture.is-contain,
+.business-art-stage.is-story .business-art-picture.is-contain .business-art-main-image {
+  background: #f5f7fb;
+}
+
+.business-art-stage.is-story .business-art-picture .business-art-main-image,
+.business-art-stage.is-story .business-art-picture.is-contain .business-art-main-image {
+  object-fit: cover !important;
+  max-width: none !important;
+  margin-bottom: 0;
+  border-radius: 0;
+}
+
+.business-art-stage.is-story .business-art-identity {
+  padding: 30px 22px 24px;
+}
+
+.business-art-stage.is-story .business-art-identity h1 {
+  padding: 12px 34px 14px;
+  font-size: 58px;
+  border-radius: 21px;
+  background: #eef5ff;
+  box-shadow: none;
+}
+
+.business-art-stage.is-story .business-art-name-line {
+  width: 84px;
+  height: 5px;
+  margin: 14px 0 13px;
+}
+
+.business-art-stage.is-story .business-art-identity p {
+  display: block;
+  max-width: 850px;
+  overflow: visible;
+  font-size: 25px;
+  line-height: 1.44;
+  -webkit-line-clamp: unset;
+}
+
+.business-art-stage.is-story .business-art-info {
+  margin-top: auto;
+}
+
+.business-art-stage.is-story .business-art-info-card {
+  min-height: 116px;
+  padding: 17px 23px;
+  border-radius: 27px;
+}
+
+.business-art-stage.is-story .business-art-info-card > i {
+  width: 64px;
+  height: 64px;
+  flex-basis: 64px;
+  font-size: 34px;
+}
+
+.business-art-stage.is-story .business-art-info-card small {
+  font-size: 18px;
+}
+
+.business-art-stage.is-story .business-art-info-card strong {
+  font-size: 24px;
+}
+
+.business-art-stage.is-story .business-art-footer {
+  min-height: 138px;
+  margin-top: 26px;
+  padding: 16px 28px 16px 32px;
+  border-radius: 30px;
+}
+
+.business-art-stage.is-story .business-art-footer > div > i {
+  font-size: 49px;
+}
+
+.business-art-stage.is-story .business-art-footer small {
+  font-size: 20px;
+}
+
+.business-art-stage.is-story .business-art-footer strong {
+  font-size: 29px;
+}
+
+.business-art-stage.is-story .business-art-brand-logo,
+.business-art-stage.is-story .business-art-brand-logo img {
+  width: 104px;
+  height: 104px;
+  max-width: 104px;
+  max-height: 104px;
+  flex-basis: 104px;
+}
+
+.business-art-stage.is-story .business-art-disclaimer {
+  display: none;
+}
