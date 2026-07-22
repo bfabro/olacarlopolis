@@ -854,6 +854,17 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
     await aguardarImagensArteComercial(stage);
     const card = stage.querySelector(".business-art-card");
+    const picture = stage.querySelector(".business-art-picture");
+    const mainImage = picture?.querySelector(".business-art-main-image");
+    if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
+      const maxWidth = picture.clientWidth || card?.clientWidth || 900;
+      const maxHeight = formato === "story" ? 760 : 450;
+      const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
+      const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
+      const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));
+      picture.style.setProperty("--business-picture-width", `${fittedWidth}px`);
+      picture.style.setProperty("--business-picture-height", `${fittedHeight}px`);
+    }
     const disclaimer = stage.querySelector(".business-art-disclaimer");
     if (card && disclaimer) {
       disclaimer.style.top = `${Math.min(height - 58, card.offsetTop + card.offsetHeight + 24)}px`;

@@ -23171,3 +23171,45 @@ body.business-art-capturing-background .home-cards-intro {
   z-index: 1;
   filter: brightness(1.24) contrast(1.03) saturate(1.06);
 }
+
+/* ===== Arte comercial: foto sem faixas e marca no visual original ===== */
+.business-art-stage.is-feed .business-art-picture,
+.business-art-stage.is-story .business-art-picture {
+  width: var(--business-picture-width, 100%);
+  height: var(--business-picture-height, 450px);
+  flex: 0 0 var(--business-picture-height, 450px);
+  align-self: center;
+  border: 0;
+  background: transparent !important;
+  box-shadow: none;
+}
+
+.business-art-stage.is-feed .business-art-picture .business-art-main-image,
+.business-art-stage.is-feed .business-art-picture.is-contain .business-art-main-image,
+.business-art-stage.is-story .business-art-picture .business-art-main-image,
+.business-art-stage.is-story .business-art-picture.is-contain .business-art-main-image {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  background: transparent !important;
+  object-fit: contain !important;
+}
+
+.business-art-footer .business-art-brand-logo,
+.business-art-stage.is-feed .business-art-brand-logo,
+.business-art-stage.is-story .business-art-brand-logo {
+  isolation: auto;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.business-art-footer .business-art-brand-logo::before,
+.business-art-footer .business-art-brand-logo::after {
+  content: none;
+}
+
+.business-art-footer .business-art-brand-logo img {
+  filter: none;
+}
