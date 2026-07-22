@@ -896,12 +896,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     });
   });
   const closeButton = dialog.querySelector(".business-art-close");
-  closeButton.addEventListener("pointerdown", (event) => {
+  closeButton.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
+    event.stopImmediatePropagation();
     close();
   }, { once: true });
-  closeButton.addEventListener("click", close);
   dialog.addEventListener("click", (event) => { if (event.target === dialog) close(); });
   window.addEventListener("resize", resize);
   document.addEventListener("keydown", closeOnEscape);

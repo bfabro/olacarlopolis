@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-21-imagem-proxy-v501'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-22-fechar-arte-v502'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
