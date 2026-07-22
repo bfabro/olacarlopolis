@@ -23025,3 +23025,47 @@ body.business-art-capturing-background .home-cards-intro {
   pointer-events: auto;
   touch-action: manipulation;
 }
+
+/* ===== Arte comercial: refinamento final do Feed ===== */
+.business-art-stage.is-feed .business-art-picture {
+  height: 480px;
+  flex-basis: 480px;
+  background: #080b10;
+}
+
+.business-art-stage.is-feed .business-art-picture.is-contain,
+.business-art-stage.is-feed .business-art-picture.is-contain .business-art-main-image {
+  background: #080b10;
+}
+
+.business-art-stage.is-feed .business-art-picture .business-art-main-image,
+.business-art-stage.is-feed .business-art-picture.is-contain .business-art-main-image {
+  width: 100% !important;
+  height: 480px !important;
+  object-fit: contain !important;
+  max-height: none !important;
+}
+
+.business-art-stage.is-feed .business-art-identity p {
+  max-width: 890px;
+  font-size: 26px;
+  line-height: 1.36;
+}
+
+.business-art-stage.is-feed .business-art-footer {
+  width: 100%;
+  min-height: 132px;
+  flex: 0 0 132px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.business-art-stage.is-feed .business-art-footer small {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.business-art-stage.is-feed .business-art-footer strong {
+  font-size: 32px;
+  line-height: 1.12;
+}
