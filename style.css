@@ -23112,3 +23112,62 @@ body.business-art-capturing-background .home-cards-intro {
   line-height: 1.12;
   font-weight: 600;
 }
+
+/* ===== Arte comercial: proporcao original, rodape seguro e luz pontual ===== */
+.business-art-stage.is-feed .business-art-picture {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 450px;
+  flex-basis: 450px;
+}
+
+.business-art-stage.is-feed .business-art-picture .business-art-main-image,
+.business-art-stage.is-feed .business-art-picture.is-contain .business-art-main-image {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 450px !important;
+  flex: 0 0 auto;
+  object-fit: contain !important;
+}
+
+.business-art-stage.is-feed .business-art-footer {
+  position: static;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.business-art-footer .business-art-brand-logo {
+  isolation: isolate;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+
+.business-art-footer .business-art-brand-logo::before {
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  z-index: 3;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 7px 4px rgba(255, 255, 255, .98),
+    0 0 18px 10px rgba(202, 232, 255, .88),
+    0 12px 27px 15px rgba(154, 211, 255, .52);
+  content: "";
+  transform: translateX(-50%);
+}
+
+.business-art-footer .business-art-brand-logo::after {
+  content: none;
+}
+
+.business-art-footer .business-art-brand-logo img {
+  position: relative;
+  z-index: 1;
+  filter: brightness(1.24) contrast(1.03) saturate(1.06);
+}
