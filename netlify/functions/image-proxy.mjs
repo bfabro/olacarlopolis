@@ -16,7 +16,7 @@ export async function handler(event) {
   }
 
   try {
-    const source = event.queryStringParameters?.url;
+    const source = event.queryStringParameters?.url?.replace(/&amp;/gi, "&");
     if (!source) {
       return { statusCode: 400, headers: CORS_HEADERS, body: "URL da imagem nao informada." };
     }
@@ -27,7 +27,12 @@ export async function handler(event) {
     }
 
     const imageResponse = await fetch(imageUrl.toString(), {
-      headers: { accept: "image/avif,image/webp,image/png,image/jpeg,image/*" }
+      cache: "no-store",
+      redirect: "follow",
+      headers: {
+        accept: "image/avif,image/webp,image/png,image/jpeg,image/*",
+        "cache-control": "no-cache"
+      }
     });
     if (!imageResponse.ok) {
       return {
@@ -52,7 +57,7 @@ export async function handler(event) {
       headers: {
         ...CORS_HEADERS,
         "content-type": contentType,
-        "cache-control": "public, max-age=3600, s-maxage=86400"
+        "cache-control": "public, max-age=300, s-maxage=3600"
       },
       isBase64Encoded: true,
       body: imageBuffer.toString("base64")

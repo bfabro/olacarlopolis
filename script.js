@@ -662,7 +662,7 @@ async function capturarFundoSiteArteComercial() {
 }
 
 async function prepararImagemArteComercial(imageUrl) {
-  const source = urlAbsolutaArteComercial(imageUrl);
+  const source = urlAbsolutaArteComercial(imageUrl).replace(/&amp;/gi, "&");
   if (!source || source.startsWith("data:")) return source;
   const blobToDataUrl = (blob) => new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -670,37 +670,51 @@ async function prepararImagemArteComercial(imageUrl) {
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
-  const fetchAsDataUrl = async (url) => {
-    const response = await fetch(url, { mode: "cors", cache: "force-cache" });
+  const fetchAsDataUrl = async (url, cache = "no-store") => {
+    const response = await fetch(url, { mode: "cors", cache });
     if (!response.ok) throw new Error(`Imagem indisponivel (${response.status})`);
     const blob = await response.blob();
     if (!String(blob.type || "").toLowerCase().startsWith("image/")) throw new Error("Resposta nao e uma imagem");
     return blobToDataUrl(blob);
   };
+  let parsed;
   try {
-    return await fetchAsDataUrl(source);
-  } catch (directError) {
+    parsed = new URL(source);
+  } catch (error) {
+    return source;
+  }
+
+  const isFirebaseStorage = ["firebasestorage.googleapis.com", "storage.googleapis.com"].includes(parsed.hostname);
+  if (!isFirebaseStorage) {
     try {
-      const parsed = new URL(source);
-      if (!["firebasestorage.googleapis.com", "storage.googleapis.com"].includes(parsed.hostname)) return source;
-      const proxyPath = `/.netlify/functions/image-proxy?url=${encodeURIComponent(source)}`;
-      const proxyCandidates = [proxyPath];
-      if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
-        proxyCandidates.push(`https://www.olacarlopolis.com${proxyPath}`);
-      }
-      for (const proxyUrl of proxyCandidates) {
-        try {
-          return await fetchAsDataUrl(proxyUrl);
-        } catch (proxyCandidateError) {
-          // Tenta a proxima rota de proxy disponivel.
-        }
-      }
-      throw new Error("Nenhum proxy de imagem respondeu.");
-    } catch (proxyError) {
-      console.warn("Nao foi possivel preparar a imagem de perfil para a arte.", directError, proxyError);
+      return await fetchAsDataUrl(source, "force-cache");
+    } catch (directError) {
       return source;
     }
   }
+
+  // O download direto do Firebase Storage pode reutilizar uma resposta 304 sem
+  // os cabecalhos CORS. Para a arte, use sempre o proxy do proprio dominio.
+  const encodedSource = encodeURIComponent(source);
+  const proxyPaths = [
+    `/api/image-proxy?url=${encodedSource}`,
+    `/.netlify/functions/image-proxy?url=${encodedSource}`
+  ];
+  const proxyCandidates = [...proxyPaths];
+  if (["localhost", "127.0.0.1", "::1"].includes(window.location.hostname)) {
+    proxyCandidates.push(...proxyPaths.map((path) => `https://www.olacarlopolis.com${path}`));
+  }
+
+  for (const proxyUrl of proxyCandidates) {
+    try {
+      return await fetchAsDataUrl(proxyUrl);
+    } catch (proxyCandidateError) {
+      // Tenta a proxima rota de proxy disponivel.
+    }
+  }
+
+  console.warn("Nao foi possivel converter a imagem de perfil; mantendo a rota segura do proxy.");
+  return proxyCandidates[0];
 }
 
 function dadosArteComercial(establishment = {}, categoriaAtual = "") {
@@ -791,15 +805,15 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
   mostrarToast("Preparando a previa da arte...");
   const dados = dadosArteComercial(establishment, categoriaAtual);
-  const [fundoUrl, imageFit, imagemPreparada] = await Promise.all([
-    capturarFundoSiteArteComercial(),
-    detectarEnquadramentoArteComercial(
-      dados.imagem,
-      establishment.imagemEnquadramento || establishment.imageFit || "auto"
-    ),
-    prepararImagemArteComercial(dados.imagem)
-  ]);
+  const imagemPreparada = await prepararImagemArteComercial(dados.imagem);
+  // A arte usa fundo escuro proprio. Capturar a pagina faria o html2canvas
+  // tentar reler imagens de outros clientes e dispararia requisicoes CORS.
+  const fundoUrl = "";
   if (imagemPreparada) dados.imagem = imagemPreparada;
+  const imageFit = await detectarEnquadramentoArteComercial(
+    dados.imagem,
+    establishment.imagemEnquadramento || establishment.imageFit || "auto"
+  );
   const logoSiteUrl = urlAbsolutaArteComercial("images/img_padrao_site/logo_1.png");
   const dialog = document.createElement("div");
   dialog.className = "business-art-dialog";
