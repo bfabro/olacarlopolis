@@ -775,6 +775,8 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
   return `
     <div class="business-art-background" style="${background}"></div>
     <div class="business-art-shade"></div>
+    <div class="business-art-layout-decoration business-art-layout-decoration-left" aria-hidden="true"></div>
+    <div class="business-art-layout-decoration business-art-layout-decoration-dots" aria-hidden="true"></div>
     <article class="business-art-card">
       <header class="business-art-header">
         <span class="business-art-kind"><i class="fa-solid fa-store"></i>${escaparArteComercial(dados.tipoLabel)}</span>
@@ -920,6 +922,14 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           <button type="button" data-business-format="story">Story <small>1080 x 1920</small></button>
           <button type="button" class="active" data-business-format="feed">Feed <small>1080 x 1350</small></button>
         </div>
+        <div class="business-art-layout" role="group" aria-label="Layout da arte">
+          <button type="button" class="active" data-business-layout="classic"><i class="fa-regular fa-rectangle-list"></i><small>Atual</small></button>
+          <button type="button" data-business-layout="showcase"><i class="fa-solid fa-wand-magic-sparkles"></i><small>Destaque</small></button>
+        </div>
+        <div class="business-art-color-controls is-hidden" aria-label="Cores do layout Destaque">
+          <label title="Cor da faixa com o nome"><input type="color" data-business-color="name" value="#075fd5"><small>Nome</small></label>
+          <label title="Cor do detalhe decorativo esquerdo"><input type="color" data-business-color="detail" value="#0b63e6"><small>Detalhe</small></label>
+        </div>
         <div class="business-art-effect" role="group" aria-label="Efeito ao redor da foto">
           <button type="button" class="active" data-business-effect="soft" title="Sombra suave"><i class="fa-regular fa-circle"></i><small>Suave</small></button>
           <button type="button" data-business-effect="outline" title="Sombra com contorno"><i class="fa-solid fa-circle-half-stroke"></i><small>Contorno</small></button>
@@ -945,14 +955,19 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const scaleBox = dialog.querySelector(".business-art-scale");
   const preview = dialog.querySelector(".business-art-preview");
   let formato = "feed";
+  let layoutArte = "classic";
+  let corNome = "#075fd5";
+  let corDetalhe = "#0b63e6";
   let efeitoFoto = "soft";
   let cantosArredondados = true;
 
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
-    stage.className = `business-art-stage is-${formato} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"}`;
+    stage.className = `business-art-stage is-${formato} layout-${layoutArte} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"}`;
     stage.style.width = "1080px";
     stage.style.height = `${height}px`;
+    stage.style.setProperty("--business-name-color", corNome);
+    stage.style.setProperty("--business-detail-color", corDetalhe);
     stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit });
     dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
     await aguardarImagensArteComercial(stage);
@@ -961,7 +976,9 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const mainImage = picture?.querySelector(".business-art-main-image");
     if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
-      const maxHeight = formato === "story" ? 670 : 325;
+      const maxHeight = layoutArte === "showcase"
+        ? (formato === "story" ? 720 : 420)
+        : (formato === "story" ? 670 : 325);
       const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
       const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
       const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));
@@ -1021,6 +1038,21 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     button.addEventListener("click", async () => {
       formato = button.dataset.businessFormat;
       dialog.querySelectorAll("[data-business-format]").forEach((item) => item.classList.toggle("active", item === button));
+      await render();
+    });
+  });
+  dialog.querySelectorAll("[data-business-layout]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      layoutArte = button.dataset.businessLayout || "classic";
+      dialog.querySelectorAll("[data-business-layout]").forEach((item) => item.classList.toggle("active", item === button));
+      dialog.querySelector(".business-art-color-controls")?.classList.toggle("is-hidden", layoutArte !== "showcase");
+      await render();
+    });
+  });
+  dialog.querySelectorAll("[data-business-color]").forEach((input) => {
+    input.addEventListener("input", async () => {
+      if (input.dataset.businessColor === "name") corNome = input.value;
+      if (input.dataset.businessColor === "detail") corDetalhe = input.value;
       await render();
     });
   });
@@ -1087,10 +1119,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       const exportBackground = exportStage.querySelector(".business-art-background");
       const capturedBackground = exportBackground?.style.backgroundImage || "";
       Object.assign(exportStage.style, {
-        backgroundColor: "#071120",
-        backgroundImage: capturedBackground
-          ? `linear-gradient(rgba(2, 7, 18, .91), rgba(4, 12, 28, .95)), ${capturedBackground}`
-          : "linear-gradient(180deg, #071120, #040c1c)",
+        backgroundColor: layoutArte === "showcase" ? "#f7faff" : "#071120",
+        backgroundImage: layoutArte === "showcase"
+          ? "linear-gradient(145deg, #ffffff 0%, #f4f8ff 56%, #e8f1ff 100%)"
+          : (capturedBackground
+            ? `linear-gradient(rgba(2, 7, 18, .91), rgba(4, 12, 28, .95)), ${capturedBackground}`
+            : "linear-gradient(180deg, #071120, #040c1c)"),
         backgroundPosition: "center",
         backgroundSize: "cover"
       });

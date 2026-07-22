@@ -21863,12 +21863,22 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
 }
 
 .business-art-toolbar {
+  position: relative;
+  flex-wrap: wrap;
+  padding-right: 72px;
   border-bottom: 1px solid #dce4f1;
 }
 
 .business-art-toolbar > div:first-child {
   display: grid;
-  margin-right: auto;
+  flex: 1 1 170px;
+  margin-right: 0;
+}
+
+.business-art-toolbar > .business-art-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
 }
 
 .business-art-toolbar > div:first-child strong {
@@ -23339,6 +23349,218 @@ body.business-art-capturing-background .home-cards-intro {
   box-shadow: 0 5px 14px rgba(11, 99, 230, .25);
 }
 
+/* ===== Arte comercial: layout alternativo Destaque ===== */
+.business-art-layout,
+.business-art-color-controls {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 14px;
+  background: #eef3fb;
+}
+
+.business-art-layout button,
+.business-art-color-controls label {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-width: 58px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #49617f;
+  font: inherit;
+  cursor: pointer;
+}
+
+.business-art-layout button i {
+  font-size: 15px;
+}
+
+.business-art-layout button small,
+.business-art-color-controls small {
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.business-art-layout button.active {
+  background: #0b63e6;
+  color: #fff;
+  box-shadow: 0 5px 14px rgba(11, 99, 230, .25);
+}
+
+.business-art-color-controls.is-hidden {
+  display: none;
+}
+
+.business-art-color-controls input[type="color"] {
+  width: 28px;
+  height: 22px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #cbd8ea;
+  border-radius: 7px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.business-art-layout-decoration {
+  display: none;
+}
+
+.business-art-stage.layout-showcase {
+  background: linear-gradient(145deg, #fff 0%, #f5f8fe 58%, #eaf2ff 100%);
+}
+
+.business-art-stage.layout-showcase .business-art-background {
+  background: linear-gradient(145deg, #fff 0%, #f5f8fe 58%, #eaf2ff 100%) !important;
+}
+
+.business-art-stage.layout-showcase .business-art-shade {
+  display: none;
+}
+
+.business-art-stage.layout-showcase .business-art-layout-decoration {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  pointer-events: none;
+}
+
+.business-art-stage.layout-showcase .business-art-layout-decoration-left {
+  top: 260px;
+  left: -105px;
+  width: 270px;
+  height: 610px;
+  border-radius: 46% 54% 58% 42% / 35% 44% 56% 65%;
+  background: linear-gradient(155deg, var(--business-detail-color), var(--business-detail-color));
+  box-shadow: 20px 24px 55px rgba(15, 50, 105, .22);
+  transform: rotate(-8deg);
+}
+
+.business-art-stage.layout-showcase .business-art-layout-decoration-dots {
+  top: 500px;
+  right: 28px;
+  width: 92px;
+  height: 116px;
+  opacity: .42;
+  background-image: radial-gradient(circle, var(--business-detail-color) 3px, transparent 4px);
+  background-size: 26px 26px;
+}
+
+.business-art-stage.layout-showcase .business-art-card {
+  z-index: 2;
+  overflow: visible;
+  border: 1px solid #e0e8f5;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 26px 70px rgba(22, 53, 95, .18);
+}
+
+.business-art-stage.layout-showcase .business-art-header,
+.business-art-stage.layout-showcase .business-art-identity,
+.business-art-stage.layout-showcase .business-art-info {
+  background: transparent;
+}
+
+.business-art-stage.layout-showcase .business-art-header > strong {
+  color: var(--business-name-color);
+}
+
+.business-art-stage.layout-showcase .business-art-header > strong::after {
+  display: block;
+  width: 72px;
+  height: 5px;
+  margin: 13px 0 0 auto;
+  border-radius: 999px;
+  background: var(--business-name-color);
+  content: "";
+}
+
+.business-art-stage.layout-showcase .business-art-kind {
+  border: 2px solid #d9e3f1;
+  background: rgba(255,255,255,.94);
+  color: var(--business-name-color);
+  box-shadow: 0 7px 18px rgba(24, 65, 119, .08);
+}
+
+.business-art-stage.layout-showcase .business-art-picture {
+  border: 14px solid rgba(255,255,255,.95);
+  background: #f1f6ff !important;
+  box-shadow: 0 22px 46px rgba(16, 42, 82, .18);
+}
+
+.business-art-stage.layout-showcase .business-art-identity h1,
+.business-art-stage.layout-showcase.is-feed .business-art-identity h1,
+.business-art-stage.layout-showcase.is-story .business-art-identity h1 {
+  width: min(860px, 100%);
+  box-sizing: border-box;
+  border: 0;
+  background: linear-gradient(135deg, var(--business-name-color), var(--business-name-color));
+  color: #fff;
+  box-shadow: 0 15px 30px rgba(15, 50, 105, .22);
+}
+
+.business-art-stage.layout-showcase .business-art-name-line {
+  background: var(--business-name-color);
+}
+
+.business-art-stage.layout-showcase .business-art-info-card {
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 9px 22px rgba(24, 54, 96, .08);
+}
+
+.business-art-stage.layout-showcase.is-story .business-art-card {
+  top: 24px;
+  width: 1030px;
+  height: 1872px;
+  padding: 54px 62px 42px;
+  border-radius: 72px;
+}
+
+.business-art-stage.layout-showcase.is-story .business-art-picture {
+  max-width: 850px;
+  margin-top: 16px;
+  margin-bottom: 62px;
+}
+
+.business-art-stage.layout-showcase.is-story .business-art-identity {
+  padding-top: 8px;
+}
+
+.business-art-stage.layout-showcase.is-story .business-art-identity h1 {
+  padding: 20px 34px 22px;
+  border-radius: 28px;
+  font-size: 58px;
+}
+
+.business-art-stage.layout-showcase.is-feed .business-art-card {
+  top: 24px;
+  width: 1030px;
+  height: 1302px;
+  padding: 34px 48px 30px;
+  border-radius: 58px;
+}
+
+.business-art-stage.layout-showcase.is-feed .business-art-picture {
+  max-width: 900px;
+  margin-bottom: 48px;
+}
+
+.business-art-stage.layout-showcase.is-feed .business-art-identity {
+  padding-top: 4px;
+}
+
+.business-art-stage.layout-showcase.is-feed .business-art-identity h1 {
+  padding: 15px 30px 17px;
+  border-radius: 24px;
+  font-size: 48px;
+}
+
+.business-art-stage.layout-showcase .business-art-footer {
+  background: linear-gradient(110deg, #063aa8 0%, var(--business-name-color) 58%, #1592ff 100%);
+}
+
 .business-art-footer,
 .business-art-stage.is-feed .business-art-footer,
 .business-art-stage.is-story .business-art-footer {
@@ -23352,7 +23574,9 @@ body.business-art-capturing-background .home-cards-intro {
 
 @media (max-width: 700px) {
   .business-art-effect,
-  .business-art-photo-option {
+  .business-art-photo-option,
+  .business-art-layout,
+  .business-art-color-controls {
     width: 100%;
   }
 
@@ -23363,5 +23587,10 @@ body.business-art-capturing-background .home-cards-intro {
 
   .business-art-photo-option button {
     width: 100%;
+  }
+
+  .business-art-layout button,
+  .business-art-color-controls label {
+    flex: 1;
   }
 }
