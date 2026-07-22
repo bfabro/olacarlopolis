@@ -1087,6 +1087,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     button.disabled = true;
     button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando PNG...';
     try {
+      // Reconstroi a arte com o estado mais recente antes de clonar. Assim, uma
+      // troca de layout, cor, efeito ou cantos feita logo antes do clique tambem
+      // fica garantida no arquivo final.
+      await render();
       await aguardarImagensArteComercial(stage);
       if (document.fonts?.ready) await document.fonts.ready;
       const height = formato === "story" ? 1920 : 1350;
@@ -1116,33 +1120,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         transform: "none",
         transformOrigin: "top left"
       });
-      const exportBackground = exportStage.querySelector(".business-art-background");
-      const capturedBackground = exportBackground?.style.backgroundImage || "";
-      Object.assign(exportStage.style, {
-        backgroundColor: layoutArte === "showcase" ? "#f7faff" : "#071120",
-        backgroundImage: layoutArte === "showcase"
-          ? "linear-gradient(145deg, #ffffff 0%, #f4f8ff 56%, #e8f1ff 100%)"
-          : (capturedBackground
-            ? `linear-gradient(rgba(2, 7, 18, .91), rgba(4, 12, 28, .95)), ${capturedBackground}`
-            : "linear-gradient(180deg, #071120, #040c1c)"),
-        backgroundPosition: "center",
-        backgroundSize: "cover"
-      });
-      exportBackground?.remove();
-      exportStage.querySelector(".business-art-shade")?.remove();
-      const exportCard = exportStage.querySelector(".business-art-card");
-      if (exportCard) {
-        exportCard.style.zIndex = "1";
-        exportCard.style.overflow = "visible";
-        exportCard.style.background = "#fff";
-        exportCard.style.border = "none";
-        exportCard.style.boxShadow = "none";
-      }
-      const exportDisclaimer = exportStage.querySelector(".business-art-disclaimer");
-      if (exportDisclaimer) exportDisclaimer.style.zIndex = "1";
       exportHost.appendChild(exportStage);
       document.body.appendChild(exportHost);
       await aguardarImagensArteComercial(exportStage);
+      // Duas molduras garantem que estilos, fontes e imagens estejam calculados
+      // no clone exatamente como aparecem na previa antes do html2canvas.
+      await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
       const canvas = await html2canvas(exportStage, {
         width: 1080,
@@ -1159,7 +1142,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       });
       const link = document.createElement("a");
       const safeName = normalizarArteComercial(dados.nome) || slugId || "estabelecimento";
-      link.download = `ola-carlopolis-${safeName}-${formato}.png`;
+      link.download = `ola-carlopolis-${safeName}-${formato}-${layoutArte}.png`;
       link.href = canvas.toDataURL("image/png", 1);
       link.click();
       mostrarToast("Imagem pronta para compartilhar!");

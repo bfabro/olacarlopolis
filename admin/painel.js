@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 471,
-  label: "v478",
+  numero: 472,
+  label: "v479",
   data: "2026-07-22",
-  nota: "Novo layout Destaque para artes, com cores independentes para nome e detalhe lateral."
+  nota: "PNG da arte agora preserva exatamente layout, cores, efeitos, cantos e moldura configurados na previa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
