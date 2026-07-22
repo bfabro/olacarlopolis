@@ -1149,7 +1149,6 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         windowWidth: 1080,
         windowHeight: height
       });
-      window.__debugUltimaArteComercialCanvas = canvas;
       const link = document.createElement("a");
       const safeName = normalizarArteComercial(dados.nome) || slugId || "estabelecimento";
       link.download = `ola-carlopolis-${safeName}-${formato}-${layoutArte}.png`;
