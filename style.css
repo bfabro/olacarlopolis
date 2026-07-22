@@ -23253,20 +23253,15 @@ body.business-art-capturing-background .home-cards-intro {
 }
 
 .business-art-stage.effect-soft .business-art-picture {
-  box-shadow: 0 16px 34px rgba(8, 25, 58, .3);
+  box-shadow: none;
 }
 
 .business-art-stage.effect-outline .business-art-picture {
-  box-shadow:
-    0 0 0 6px rgba(255, 255, 255, .96),
-    0 0 0 12px rgba(26, 116, 239, .24),
-    0 18px 36px rgba(7, 29, 70, .3);
+  box-shadow: none;
 }
 
 .business-art-stage.effect-deep .business-art-picture {
-  box-shadow:
-    0 12px 0 rgba(5, 19, 45, .18),
-    0 30px 48px rgba(3, 16, 42, .46);
+  box-shadow: none;
 }
 
 .business-art-stage .business-art-picture {
@@ -23274,7 +23269,7 @@ body.business-art-capturing-background .home-cards-intro {
   z-index: 0;
   isolation: isolate;
   overflow: visible;
-  margin-bottom: 80px;
+  margin-bottom: 70px;
 }
 
 .business-art-stage .business-art-picture .business-art-main-image {
@@ -23283,56 +23278,65 @@ body.business-art-capturing-background .home-cards-intro {
   border-radius: inherit;
 }
 
-.business-art-stage.effect-neon .business-art-picture::before,
-.business-art-stage.effect-aura .business-art-picture::before,
-.business-art-stage.effect-stage3d .business-art-picture::before,
-.business-art-stage.effect-stage3d .business-art-picture::after {
+.business-art-stage.effect-lift .business-art-picture {
+  transform: translateY(-12px);
+  box-shadow: none;
+}
+
+.business-art-shadow-raster {
   position: absolute;
+  z-index: 1;
+  display: block;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: fill;
   pointer-events: none;
-  content: "";
 }
 
-.business-art-stage.effect-neon .business-art-picture::before {
-  inset: -28px -135px -42px;
-  z-index: 0;
-  border-radius: 58px;
-  background:
-    radial-gradient(ellipse at center, rgba(84, 42, 230, .82) 0%, rgba(0, 174, 255, .52) 46%, rgba(37, 99, 235, 0) 78%);
-  box-shadow:
-    0 0 34px rgba(77, 69, 255, .48),
-    0 26px 52px rgba(3, 27, 75, .34);
+.business-art-stage.photo-rounded .business-art-picture,
+.business-art-stage.photo-rounded .business-art-main-image {
+  border-radius: 32px !important;
 }
 
-.business-art-stage.effect-aura .business-art-picture::before {
-  inset: -34px -150px -46px;
-  z-index: 0;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 28% 38%, rgba(25, 214, 255, .65), rgba(25, 214, 255, 0) 36%),
-    radial-gradient(circle at 72% 38%, rgba(255, 112, 190, .58), rgba(255, 112, 190, 0) 38%),
-    radial-gradient(ellipse at 50% 65%, rgba(97, 71, 255, .52), rgba(97, 71, 255, 0) 68%);
-  box-shadow: 0 24px 48px rgba(58, 45, 150, .28);
+.business-art-stage.photo-square .business-art-picture,
+.business-art-stage.photo-square .business-art-main-image {
+  border-radius: 0 !important;
 }
 
-.business-art-stage.effect-stage3d .business-art-picture::before {
-  inset: -24px -110px -38px;
-  z-index: 0;
-  border: 2px solid rgba(255, 255, 255, .68);
-  border-radius: 48px;
-  background: linear-gradient(145deg, rgba(8, 42, 118, .94), rgba(33, 113, 222, .76) 52%, rgba(81, 196, 255, .55));
-  box-shadow:
-    0 14px 0 rgba(4, 27, 81, .22),
-    0 34px 58px rgba(2, 20, 60, .42);
+.business-art-photo-option {
+  display: flex;
+  padding: 5px;
+  border-radius: 14px;
+  background: #eef3fb;
 }
 
-.business-art-stage.effect-stage3d .business-art-picture::after {
-  right: -145px;
-  bottom: -62px;
-  left: -145px;
-  z-index: -1;
-  height: 76px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, rgba(5, 31, 85, .38), rgba(5, 31, 85, 0) 72%);
+.business-art-photo-option button {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-width: 58px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #49617f;
+  font: inherit;
+  cursor: pointer;
+}
+
+.business-art-photo-option button i {
+  font-size: 15px;
+}
+
+.business-art-photo-option button small {
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.business-art-photo-option button.active {
+  background: #0b63e6;
+  color: #fff;
+  box-shadow: 0 5px 14px rgba(11, 99, 230, .25);
 }
 
 .business-art-footer,
@@ -23342,17 +23346,22 @@ body.business-art-capturing-background .home-cards-intro {
 }
 
 .business-art-stage.is-feed .business-art-picture {
-  height: var(--business-picture-height, 315px);
-  flex-basis: var(--business-picture-height, 315px);
+  height: var(--business-picture-height, 325px);
+  flex-basis: var(--business-picture-height, 325px);
 }
 
 @media (max-width: 700px) {
-  .business-art-effect {
+  .business-art-effect,
+  .business-art-photo-option {
     width: 100%;
   }
 
   .business-art-effect button {
     flex: 1;
     min-width: 0;
+  }
+
+  .business-art-photo-option button {
+    width: 100%;
   }
 }

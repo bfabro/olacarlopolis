@@ -796,6 +796,94 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
   `;
 }
 
+function criarSombraRasterArteComercial(width, height, effect = "soft", rounded = true) {
+  const padX = 70;
+  const padTop = 65;
+  const padBottom = 110;
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(width + (padX * 2));
+  canvas.height = Math.ceil(height + padTop + padBottom);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+  const radius = rounded ? Math.min(32, width / 5, height / 5) : 0;
+  const path = () => {
+    const x = padX;
+    const y = padTop;
+    const w = width;
+    const h = height;
+    const r = Math.max(0, Math.min(radius, w / 2, h / 2));
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  };
+  const layers = {
+    soft: [
+      { color: "rgba(5, 20, 48, .48)", blur: 36, y: 22 }
+    ],
+    outline: [
+      { color: "rgba(5, 23, 58, .5)", blur: 38, y: 24 }
+    ],
+    deep: [
+      { color: "rgba(5, 19, 45, .3)", blur: 14, y: 15 },
+      { color: "rgba(3, 16, 42, .62)", blur: 40, y: 30 }
+    ],
+    lift: [
+      { color: "rgba(4, 21, 54, .36)", blur: 22, y: 20 },
+      { color: "rgba(2, 14, 38, .6)", blur: 38, y: 34 }
+    ]
+  }[effect] || [];
+  layers.forEach((layer) => {
+    ctx.save();
+    ctx.fillStyle = "#0b1830";
+    ctx.shadowColor = layer.color;
+    ctx.shadowBlur = layer.blur;
+    ctx.shadowOffsetY = layer.y;
+    path();
+    ctx.fill();
+    ctx.restore();
+  });
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-out";
+  ctx.fillStyle = "#000";
+  path();
+  ctx.fill();
+  ctx.restore();
+  if (effect === "outline") {
+    ctx.save();
+    path();
+    ctx.strokeStyle = "rgba(26, 116, 239, .5)";
+    ctx.lineWidth = 24;
+    ctx.stroke();
+    path();
+    ctx.strokeStyle = "rgba(255, 255, 255, .96)";
+    ctx.lineWidth = 11;
+    ctx.stroke();
+    ctx.restore();
+  } else if (effect === "lift") {
+    ctx.save();
+    path();
+    ctx.strokeStyle = "rgba(255, 255, 255, .74)";
+    ctx.lineWidth = 8;
+    ctx.stroke();
+    ctx.restore();
+  }
+  return {
+    dataUrl: canvas.toDataURL("image/png"),
+    left: -padX,
+    top: -padTop,
+    width: canvas.width,
+    height: canvas.height
+  };
+}
+
 async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   if (!establishment || document.querySelector(".business-art-dialog")) return;
   if (typeof html2canvas !== "function") {
@@ -832,9 +920,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           <button type="button" class="active" data-business-effect="soft" title="Sombra suave"><i class="fa-regular fa-circle"></i><small>Suave</small></button>
           <button type="button" data-business-effect="outline" title="Sombra com contorno"><i class="fa-solid fa-circle-half-stroke"></i><small>Contorno</small></button>
           <button type="button" data-business-effect="deep" title="Sombra profunda"><i class="fa-solid fa-circle"></i><small>Profunda</small></button>
-          <button type="button" data-business-effect="neon" title="Fundo neon"><i class="fa-solid fa-wand-magic-sparkles"></i><small>Neon</small></button>
-          <button type="button" data-business-effect="aura" title="Fundo aura"><i class="fa-solid fa-sun"></i><small>Aura</small></button>
-          <button type="button" data-business-effect="stage3d" title="Palco tridimensional"><i class="fa-solid fa-cubes"></i><small>Palco 3D</small></button>
+          <button type="button" data-business-effect="lift" title="Imagem saltando"><i class="fa-solid fa-up-long"></i><small>Saltando</small></button>
+        </div>
+        <div class="business-art-photo-option" role="group" aria-label="Formato dos cantos da foto">
+          <button type="button" class="active" data-business-rounded aria-pressed="true" title="Ativar ou desativar cantos arredondados"><i class="fa-solid fa-border-top-left"></i><small>Cantos</small></button>
         </div>
         <button type="button" class="business-art-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -853,10 +942,11 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const preview = dialog.querySelector(".business-art-preview");
   let formato = "feed";
   let efeitoFoto = "soft";
+  let cantosArredondados = true;
 
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
-    stage.className = `business-art-stage is-${formato} effect-${efeitoFoto}`;
+    stage.className = `business-art-stage is-${formato} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"}`;
     stage.style.width = "1080px";
     stage.style.height = `${height}px`;
     stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit });
@@ -867,12 +957,27 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const mainImage = picture?.querySelector(".business-art-main-image");
     if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
-      const maxHeight = formato === "story" ? 660 : 315;
+      const maxHeight = formato === "story" ? 670 : 325;
       const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
       const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
       const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));
       picture.style.setProperty("--business-picture-width", `${fittedWidth}px`);
       picture.style.setProperty("--business-picture-height", `${fittedHeight}px`);
+      const shadow = criarSombraRasterArteComercial(fittedWidth, fittedHeight, efeitoFoto, cantosArredondados);
+      if (shadow) {
+        const shadowImage = document.createElement("img");
+        shadowImage.className = "business-art-shadow-raster";
+        shadowImage.alt = "";
+        shadowImage.setAttribute("aria-hidden", "true");
+        shadowImage.src = shadow.dataUrl;
+        Object.assign(shadowImage.style, {
+          left: `${shadow.left}px`,
+          top: `${shadow.top}px`,
+          width: `${shadow.width}px`,
+          height: `${shadow.height}px`
+        });
+        picture.prepend(shadowImage);
+      }
     }
     const disclaimer = stage.querySelector(".business-art-disclaimer");
     if (card && disclaimer) {
@@ -921,6 +1026,13 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       dialog.querySelectorAll("[data-business-effect]").forEach((item) => item.classList.toggle("active", item === button));
       await render();
     });
+  });
+  dialog.querySelector("[data-business-rounded]")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    cantosArredondados = !cantosArredondados;
+    button.classList.toggle("active", cantosArredondados);
+    button.setAttribute("aria-pressed", String(cantosArredondados));
+    await render();
   });
   const closeButton = dialog.querySelector(".business-art-close");
   closeButton.addEventListener("click", (event) => {

@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 468,
-  label: "v475",
+  numero: 469,
+  label: "v476",
   data: "2026-07-22",
-  nota: "Descricao ampliada para 260 caracteres e editor de artes com seis efeitos visuais."
+  nota: "Editor de artes com sombras reforcadas, efeito saltando e cantos configuraveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
