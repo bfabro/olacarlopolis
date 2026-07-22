@@ -405,6 +405,17 @@ label {
   color: #344054;
 }
 
+.field-character-count {
+  justify-self: end;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.field-character-count.is-limit {
+  color: #b42318;
+}
+
 .form-section-title {
   display: flex;
   align-items: center;

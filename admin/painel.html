@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=341">
+  <link rel="stylesheet" href="painel.css?v=342">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -227,7 +227,8 @@
               </div>
               <label>Nome do cliente/comercio<input id="clientName" required></label>
               <label class="wide">Descricao curta para divulgacao
-                <textarea id="clientShortDescription" rows="3" maxlength="220" placeholder="Ex.: Solucoes completas em instalacoes eletricas, manutencoes e projetos."></textarea>
+                <textarea id="clientShortDescription" rows="3" maxlength="260" aria-describedby="clientShortDescriptionHelp" placeholder="Ex.: Solucoes completas em instalacoes eletricas, manutencoes e projetos."></textarea>
+                <small id="clientShortDescriptionHelp" class="field-character-count"><span id="clientShortDescriptionCount">0</span>/260 caracteres permitidos</small>
               </label>
               <label>Categoria
                 <select id="clientCategory"></select>
@@ -1676,6 +1677,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=402"></script>
+  <script type="module" src="painel.js?v=403"></script>
 </body>
 </html>

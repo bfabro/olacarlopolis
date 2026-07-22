@@ -745,7 +745,7 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     || "";
   return {
     nome: textoLimpoArteComercial(establishment.name || establishment.nome || establishment.title || "Estabelecimento"),
-    descricao: textoLimpoArteComercial(descricao).slice(0, 220),
+    descricao: textoLimpoArteComercial(descricao).slice(0, 260),
     categoria: textoLimpoArteComercial(categoriaAtual || establishment.categoria || establishment.category || ""),
     tipoLabel,
     whatsapp: formatarTelefonePublico(whatsapp),
@@ -832,6 +832,9 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           <button type="button" class="active" data-business-effect="soft" title="Sombra suave"><i class="fa-regular fa-circle"></i><small>Suave</small></button>
           <button type="button" data-business-effect="outline" title="Sombra com contorno"><i class="fa-solid fa-circle-half-stroke"></i><small>Contorno</small></button>
           <button type="button" data-business-effect="deep" title="Sombra profunda"><i class="fa-solid fa-circle"></i><small>Profunda</small></button>
+          <button type="button" data-business-effect="neon" title="Fundo neon"><i class="fa-solid fa-wand-magic-sparkles"></i><small>Neon</small></button>
+          <button type="button" data-business-effect="aura" title="Fundo aura"><i class="fa-solid fa-sun"></i><small>Aura</small></button>
+          <button type="button" data-business-effect="stage3d" title="Palco tridimensional"><i class="fa-solid fa-cubes"></i><small>Palco 3D</small></button>
         </div>
         <button type="button" class="business-art-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -864,7 +867,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const mainImage = picture?.querySelector(".business-art-main-image");
     if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
-      const maxHeight = formato === "story" ? 760 : 430;
+      const maxHeight = formato === "story" ? 660 : 315;
       const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
       const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
       const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));

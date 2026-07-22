@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 467,
-  label: "v474",
+  numero: 468,
+  label: "v475",
   data: "2026-07-22",
-  nota: "Editor de artes ganhou efeitos de sombra, foto proporcional e rodape protegido."
+  nota: "Descricao ampliada para 260 caracteres e editor de artes com seis efeitos visuais."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -289,6 +289,16 @@ function renderPanelVersion() {
   if ($("dashboardVersionDate")) {
     $("dashboardVersionDate").textContent = `${PANEL_VERSION.data}: ${PANEL_VERSION.nota}`;
   }
+}
+
+function updateClientShortDescriptionCount() {
+  const field = $("clientShortDescription");
+  const count = $("clientShortDescriptionCount");
+  const help = $("clientShortDescriptionHelp");
+  if (!field || !count) return;
+  const length = String(field.value || "").length;
+  count.textContent = String(length);
+  help?.classList.toggle("is-limit", length >= 260);
 }
 
 const views = {
@@ -2828,6 +2838,7 @@ function resetClientForm() {
   syncClientPaymentByType();
   if ($("clientCreci")) $("clientCreci").value = "";
   if ($("clientShortDescription")) $("clientShortDescription").value = "";
+  updateClientShortDescriptionCount();
   if ($("clientCity")) $("clientCity").value = "Carlopolis - PR";
   if ($("clientImageFit")) $("clientImageFit").value = "auto";
   if ($("clientMenuEnabled")) $("clientMenuEnabled").checked = false;
@@ -3205,6 +3216,7 @@ function fillClientForm(client) {
   $("clientId").value = client.id || "";
   $("clientName").value = client.nome || client.name || "";
   if ($("clientShortDescription")) $("clientShortDescription").value = client.descricaoCurta || client.shortDescription || "";
+  updateClientShortDescriptionCount();
   fillClientCategorySelect(client.categoria || client.category || "");
   if ($("clientType")) $("clientType").value = client.tipoCliente || client.tipo || "comercio";
   if ($("clientCreci")) $("clientCreci").value = client.creci || client.registroCreci || "";
@@ -15496,6 +15508,7 @@ function bindEvents() {
     });
   });
 
+  $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);
   $("clientForm").addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!canManageClients()) return;
@@ -15916,6 +15929,7 @@ function bindEvents() {
 }
 
 renderPanelVersion();
+updateClientShortDescriptionCount();
 bindEvents();
 bindAdminIdleTimer();
 

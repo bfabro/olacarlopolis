@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-22-editor-efeitos-v508'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-22-editor-efeitos-v509'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
