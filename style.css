@@ -23069,3 +23069,46 @@ body.business-art-capturing-background .home-cards-intro {
   font-size: 32px;
   line-height: 1.12;
 }
+
+/* ===== Arte comercial: mais leitura e destaque da marca ===== */
+.business-art-footer .business-art-brand-logo {
+  position: relative;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .42) 0%, rgba(255, 255, 255, .18) 52%, rgba(255, 255, 255, 0) 74%);
+  box-shadow: 0 0 26px rgba(255, 255, 255, .58);
+}
+
+.business-art-footer .business-art-brand-logo img {
+  filter: brightness(1.2) contrast(1.04) saturate(1.08);
+}
+
+.business-art-stage.is-feed .business-art-identity p {
+  font-size: 29px;
+  line-height: 1.34;
+}
+
+.business-art-stage.is-story .business-art-identity p {
+  font-size: 28px;
+  line-height: 1.4;
+}
+
+.business-art-stage.is-feed .business-art-footer small {
+  font-size: 26px;
+  line-height: 1.12;
+}
+
+.business-art-stage.is-feed .business-art-picture {
+  height: 460px;
+  flex-basis: 460px;
+}
+
+.business-art-stage.is-feed .business-art-picture .business-art-main-image,
+.business-art-stage.is-feed .business-art-picture.is-contain .business-art-main-image {
+  height: 460px !important;
+}
+
+.business-art-stage.is-story .business-art-footer small {
+  font-size: 25px;
+  line-height: 1.12;
+  font-weight: 600;
+}
