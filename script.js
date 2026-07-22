@@ -1104,16 +1104,23 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         top: "0",
         width: "1080px",
         height: `${height}px`,
+        margin: "0",
+        padding: "0",
         overflow: "hidden",
+        boxSizing: "border-box",
+        background: layoutArte === "showcase" ? "#f7faff" : "#071120",
         pointerEvents: "none",
         zIndex: "0"
       });
       const exportStage = stage.cloneNode(true);
       Object.assign(exportStage.style, {
-        position: "relative",
-        inset: "auto",
+        position: "absolute",
+        inset: "0",
         width: "1080px",
         height: `${height}px`,
+        margin: "0",
+        padding: "0",
+        boxSizing: "border-box",
         isolation: "isolate",
         transform: "none",
         transformOrigin: "top left"
@@ -1136,7 +1143,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       // no clone exatamente como aparecem na previa antes do html2canvas.
       await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
-      const canvas = await html2canvas(exportStage, {
+      const capturedCanvas = await html2canvas(exportHost, {
         width: 1080,
         height,
         scale: 1,
@@ -1149,6 +1156,14 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         windowWidth: 1080,
         windowHeight: height
       });
+      const canvas = document.createElement("canvas");
+      canvas.width = 1080;
+      canvas.height = height;
+      const canvasContext = canvas.getContext("2d");
+      if (!canvasContext) throw new Error("Canvas de exportacao indisponivel.");
+      canvasContext.fillStyle = layoutArte === "showcase" ? "#f7faff" : "#071120";
+      canvasContext.fillRect(0, 0, canvas.width, canvas.height);
+      canvasContext.drawImage(capturedCanvas, 0, 0, 1080, height, 0, 0, 1080, height);
       const link = document.createElement("a");
       const safeName = normalizarArteComercial(dados.nome) || slugId || "estabelecimento";
       link.download = `ola-carlopolis-${safeName}-${formato}-${layoutArte}.png`;
