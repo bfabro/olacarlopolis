@@ -828,6 +828,11 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           <button type="button" data-business-format="story">Story <small>1080 x 1920</small></button>
           <button type="button" class="active" data-business-format="feed">Feed <small>1080 x 1350</small></button>
         </div>
+        <div class="business-art-effect" role="group" aria-label="Efeito ao redor da foto">
+          <button type="button" class="active" data-business-effect="soft" title="Sombra suave"><i class="fa-regular fa-circle"></i><small>Suave</small></button>
+          <button type="button" data-business-effect="outline" title="Sombra com contorno"><i class="fa-solid fa-circle-half-stroke"></i><small>Contorno</small></button>
+          <button type="button" data-business-effect="deep" title="Sombra profunda"><i class="fa-solid fa-circle"></i><small>Profunda</small></button>
+        </div>
         <button type="button" class="business-art-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="business-art-preview"><div class="business-art-scale"><div class="business-art-stage is-feed"></div></div></div>
@@ -844,10 +849,11 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const scaleBox = dialog.querySelector(".business-art-scale");
   const preview = dialog.querySelector(".business-art-preview");
   let formato = "feed";
+  let efeitoFoto = "soft";
 
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
-    stage.className = `business-art-stage is-${formato}`;
+    stage.className = `business-art-stage is-${formato} effect-${efeitoFoto}`;
     stage.style.width = "1080px";
     stage.style.height = `${height}px`;
     stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit });
@@ -858,7 +864,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const mainImage = picture?.querySelector(".business-art-main-image");
     if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
-      const maxHeight = formato === "story" ? 760 : 450;
+      const maxHeight = formato === "story" ? 760 : 430;
       const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
       const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
       const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));
@@ -903,6 +909,13 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     button.addEventListener("click", async () => {
       formato = button.dataset.businessFormat;
       dialog.querySelectorAll("[data-business-format]").forEach((item) => item.classList.toggle("active", item === button));
+      await render();
+    });
+  });
+  dialog.querySelectorAll("[data-business-effect]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      efeitoFoto = button.dataset.businessEffect || "soft";
+      dialog.querySelectorAll("[data-business-effect]").forEach((item) => item.classList.toggle("active", item === button));
       await render();
     });
   });

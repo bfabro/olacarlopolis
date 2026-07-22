@@ -23213,3 +23213,80 @@ body.business-art-capturing-background .home-cards-intro {
 .business-art-footer .business-art-brand-logo img {
   filter: none;
 }
+
+/* ===== Arte comercial: efeitos editaveis e rodape protegido ===== */
+.business-art-effect {
+  display: flex;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 14px;
+  background: #eef3fb;
+}
+
+.business-art-effect button {
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  min-width: 65px;
+  padding: 7px 8px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #49617f;
+  font: inherit;
+  cursor: pointer;
+}
+
+.business-art-effect button i {
+  font-size: 15px;
+}
+
+.business-art-effect button small {
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.business-art-effect button.active {
+  background: #0b63e6;
+  color: #fff;
+  box-shadow: 0 5px 14px rgba(11, 99, 230, .25);
+}
+
+.business-art-stage.effect-soft .business-art-picture {
+  box-shadow: 0 16px 34px rgba(8, 25, 58, .3);
+}
+
+.business-art-stage.effect-outline .business-art-picture {
+  box-shadow:
+    0 0 0 6px rgba(255, 255, 255, .96),
+    0 0 0 12px rgba(26, 116, 239, .24),
+    0 18px 36px rgba(7, 29, 70, .3);
+}
+
+.business-art-stage.effect-deep .business-art-picture {
+  box-shadow:
+    0 12px 0 rgba(5, 19, 45, .18),
+    0 30px 48px rgba(3, 16, 42, .46);
+}
+
+.business-art-footer,
+.business-art-stage.is-feed .business-art-footer,
+.business-art-stage.is-story .business-art-footer {
+  background: linear-gradient(110deg, #063aa8 0%, #075fd5 52%, #1592ff 100%);
+}
+
+.business-art-stage.is-feed .business-art-picture {
+  height: var(--business-picture-height, 430px);
+  flex-basis: var(--business-picture-height, 430px);
+}
+
+@media (max-width: 700px) {
+  .business-art-effect {
+    width: 100%;
+  }
+
+  .business-art-effect button {
+    flex: 1;
+    min-width: 0;
+  }
+}
