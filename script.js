@@ -736,13 +736,17 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
   const tipoLabel = tipo === "servico" || tipo === "servicos"
     ? "Serviço"
     : (tipo === "institucional" ? "Institucional" : "Comércio");
-  const descricao = establishment.descricaoCurta
-    || establishment.shortDescription
-    || establishment.descricao
-    || establishment.description
-    || establishment.infoAdicional
-    || (Array.isArray(establishment.novidadesDescriptions) ? establishment.novidadesDescriptions.find(Boolean) : "")
-    || "";
+  const primeiraDescricaoPreenchida = [
+    establishment.descricaoCurta,
+    establishment.shortDescription,
+    establishment.infoAdicional,
+    establishment.informacoesComplementares,
+    establishment.descricao,
+    establishment.description,
+    ...(Array.isArray(establishment.novidadesDescriptions) ? establishment.novidadesDescriptions : []),
+    ...(Array.isArray(establishment.divulgacaoDescriptions) ? establishment.divulgacaoDescriptions : [])
+  ].find((texto) => textoLimpoArteComercial(texto || ""));
+  const descricao = primeiraDescricaoPreenchida || "";
   return {
     nome: textoLimpoArteComercial(establishment.name || establishment.nome || establishment.title || "Estabelecimento"),
     descricao: textoLimpoArteComercial(descricao).slice(0, 260),

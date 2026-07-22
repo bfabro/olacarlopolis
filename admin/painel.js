@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 469,
-  label: "v476",
+  numero: 470,
+  label: "v477",
   data: "2026-07-22",
-  nota: "Editor de artes com sombras reforcadas, efeito saltando e cantos configuraveis."
+  nota: "Descricao curta disponivel no admin cliente, com limite de 260 caracteres e fallback para outros textos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -13025,6 +13025,10 @@ function renderClientOnlyEditor() {
           </div>
         </div>
         <label class="admin-field-line field-company">Nome da empresa<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
+        <label class="wide">Descricao curta para divulgacao
+          <textarea id="coShortDescription" rows="3" maxlength="260" aria-describedby="coShortDescriptionHelp" placeholder="Ex.: Solucoes completas, atendimento de qualidade e seguranca.">${escapeHtml(client.descricaoCurta || client.shortDescription || "")}</textarea>
+          <small id="coShortDescriptionHelp" class="field-character-count"><span id="coShortDescriptionCount">${String(client.descricaoCurta || client.shortDescription || "").length}</span>/260 caracteres permitidos</small>
+        </label>
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
         ${(() => {
           const contactDetails = normalizeClientContactDetails(client);
@@ -13901,6 +13905,18 @@ function renderClientOnlyEditor() {
     });
   });
 
+  const coShortDescription = mount.querySelector("#coShortDescription");
+  const updateCoShortDescriptionCount = () => {
+    const count = mount.querySelector("#coShortDescriptionCount");
+    const help = mount.querySelector("#coShortDescriptionHelp");
+    if (!coShortDescription || !count) return;
+    const length = String(coShortDescription.value || "").length;
+    count.textContent = String(length);
+    help?.classList.toggle("is-limit", length >= 260);
+  };
+  coShortDescription?.addEventListener("input", updateCoShortDescriptionCount);
+  updateCoShortDescriptionCount();
+
   mount.querySelectorAll("[data-co-remove]").forEach((button) => {
     button.addEventListener("click", async () => {
       const index = Number(button.dataset.coRemove);
@@ -14070,6 +14086,7 @@ function renderClientOnlyEditor() {
       Object.assign(payload, {
         nome,
         nomeNormalizado: normalizeName(nome),
+        descricaoCurta: $("coShortDescription")?.value.trim() || "",
         contatosDetalhados,
         contatos,
         contato: contatos[0] || "",
