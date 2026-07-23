@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 478,
-  label: "v485",
+  numero: 479,
+  label: "v486",
   data: "2026-07-22",
-  nota: "Logo principal do comercio agora aparece primeiro em Novidades, sem duplicacao na galeria."
+  nota: "Nova tela exclusiva do Master mostra em tempo real onde os usuarios estao navegando."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -55,6 +55,10 @@ let adminIdleTimer = null;
 const adminIdlePauseReasons = new Set();
 let clientMetricsRealtimeUnsubscribers = [];
 let clientMetricsRealtimeSignature = "";
+const ONLINE_PRESENCE_RECENT_MS = 2 * 60 * 1000;
+let onlinePresenceUnsubscribe = null;
+let onlinePresenceTicker = null;
+let onlinePresenceData = {};
 let automovelArtePreviewTimer = null;
 let automovelArteDragState = null;
 let automovelArteDragFrame = null;
@@ -314,6 +318,7 @@ const views = {
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
   relatorios: $("relatoriosView"),
+  usuariosOnline: $("usuariosOnlineView"),
   pagamentoSistema: $("pagamentoSistemaView"),
   paginaInicialSite: $("paginaInicialSiteView"),
   novidadesConfig: $("novidadesConfigView"),
@@ -337,6 +342,7 @@ const viewCopy = {
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   relatorios: ["Relatorios", "Indicadores e pontos de atencao do painel."],
+  usuariosOnline: ["Usuarios online", "Acompanhe em tempo real quais telas do site publico estao sendo acessadas."],
   pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
   paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
@@ -591,6 +597,7 @@ function canManageInformacoes() {
 function canAccessView(viewName) {
   if (viewName === "dashboard") return canManageClients();
   if (canManageClients()) {
+    if (viewName === "usuariosOnline") return isMaster();
     if (viewName === "pagamentoSistema") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
     if (viewName === "novidadesConfig") return isMaster();
@@ -2631,6 +2638,201 @@ function roleLabel(role) {
   }[key] || "Sem perfil";
 }
 
+function onlinePresencePageInfo(rawPage = "") {
+  let page = String(rawPage || "/").trim();
+  try {
+    page = decodeURIComponent(page);
+  } catch (error) {
+    // Mantem a rota original quando houver codificacao incompleta.
+  }
+
+  const [pathnameRaw, hashAndQuery = ""] = page.split("#");
+  const pathname = String(pathnameRaw || "/").toLowerCase();
+  const hashRaw = String(hashAndQuery || "").split("?")[0].replace(/^#/, "").trim();
+  const hash = normalizeName(hashRaw);
+  const exactLabels = {
+    ondecomer: ["Onde Comer", "fa-utensils"],
+    cep: ["Busca CEP", "fa-location-dot"],
+    buscacep: ["Busca CEP", "fa-location-dot"],
+    promocoes: ["Promocoes", "fa-tags"],
+    eventos: ["Eventos", "fa-calendar-days"],
+    imoveis: ["Imoveis", "fa-house"],
+    automoveis: ["Automoveis", "fa-car"],
+    veiculos: ["Automoveis", "fa-car"],
+    vagastrabalho: ["Vagas de trabalho", "fa-briefcase"],
+    informacoes: ["Informacoes", "fa-circle-info"],
+    grupos: ["Grupos de WhatsApp", "fa-comments"],
+    jogos: ["Jogos", "fa-gamepad"],
+    xadrez: ["Jogo de xadrez", "fa-chess"],
+    tetrix: ["Jogo Tetrix", "fa-shapes"],
+    canos: ["Jogo dos canos", "fa-puzzle-piece"],
+    luz: ["Economia de energia", "fa-bolt"],
+    represa: ["Represa Chavantes", "fa-water"],
+    represachavantes: ["Represa Chavantes", "fa-water"],
+    noticias: ["Noticias", "fa-newspaper"],
+    ondecomprar: ["Onde Comprar", "fa-store"]
+  };
+
+  if (exactLabels[hash]) {
+    const [label, icon] = exactLabels[hash];
+    return { key: hash, label, icon, route: page };
+  }
+
+  if (hash.startsWith("promocoes")) return { key: "promocoes", label: "Promocoes", icon: "fa-tags", route: page };
+  if (hash.startsWith("comercios")) {
+    const categoryRaw = hashRaw.replace(/^comercios[-_]?/i, "");
+    const categoryLabel = categoryRaw
+      ? categoryRaw.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
+      : "Comercios e servicos";
+    return { key: `comercios-${normalizeName(categoryRaw) || "todos"}`, label: categoryLabel, icon: "fa-store", route: page };
+  }
+
+  if (hashRaw) {
+    const label = hashRaw.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+    return { key: hash || "outra", label, icon: "fa-window-maximize", route: page };
+  }
+  if (pathname.includes("cnpj")) return { key: "cnpj", label: "Busca CNPJ", icon: "fa-building", route: page };
+  return { key: "inicio", label: "Pagina inicial", icon: "fa-house", route: page };
+}
+
+function onlinePresenceOriginLabel(origin = "") {
+  return {
+    app: "Aplicativo",
+    insta: "Instagram",
+    site: "Site"
+  }[String(origin || "").toLowerCase()] || "Site";
+}
+
+function onlinePresenceRelativeTime(timestamp, now = Date.now()) {
+  const elapsed = Math.max(0, now - Number(timestamp || 0));
+  if (elapsed < 10_000) return "agora";
+  if (elapsed < 60_000) return `ha ${Math.floor(elapsed / 1000)} s`;
+  return `ha ${Math.max(1, Math.floor(elapsed / 60_000))} min`;
+}
+
+function onlinePresenceClock(timestamp) {
+  const date = new Date(Number(timestamp || 0));
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function activeOnlinePresenceSessions(now = Date.now()) {
+  return Object.entries(onlinePresenceData || {})
+    .map(([id, value]) => {
+      const session = value && typeof value === "object" ? value : {};
+      const lastSeen = Number(session.lastSeen || session.timestamp || 0);
+      return {
+        id,
+        ...session,
+        lastSeen,
+        pageInfo: onlinePresencePageInfo(session.pagina || "/")
+      };
+    })
+    .filter((session) => session.active !== false
+      && session.lastSeen > 0
+      && (now - session.lastSeen) <= ONLINE_PRESENCE_RECENT_MS)
+    .sort((a, b) => b.lastSeen - a.lastSeen);
+}
+
+function renderOnlinePresence() {
+  if (!isMaster() || !$("usuariosOnlineView")) return;
+  const now = Date.now();
+  const sessions = activeOnlinePresenceSessions(now);
+  const groups = new Map();
+  sessions.forEach((session) => {
+    const current = groups.get(session.pageInfo.key) || { ...session.pageInfo, count: 0 };
+    current.count += 1;
+    groups.set(session.pageInfo.key, current);
+  });
+  const pageGroups = [...groups.values()].sort((a, b) => b.count - a.count || a.label.localeCompare(b.label, "pt-BR"));
+  const maxPageCount = Math.max(1, ...pageGroups.map((item) => item.count));
+  const siteCount = sessions.filter((session) => String(session.origem || "site").toLowerCase() !== "app").length;
+  const appCount = sessions.filter((session) => String(session.origem || "").toLowerCase() === "app").length;
+
+  if ($("onlinePresenceTotal")) $("onlinePresenceTotal").textContent = String(sessions.length);
+  if ($("onlinePresencePages")) $("onlinePresencePages").textContent = String(pageGroups.length);
+  if ($("onlinePresenceSite")) $("onlinePresenceSite").textContent = String(siteCount);
+  if ($("onlinePresenceApp")) $("onlinePresenceApp").textContent = String(appCount);
+  if ($("onlinePresenceUpdatedAt")) {
+    $("onlinePresenceUpdatedAt").textContent = `Atualizado as ${new Date(now).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })}`;
+  }
+
+  const pageList = $("onlinePresencePageList");
+  if (pageList) {
+    pageList.innerHTML = pageGroups.length
+      ? pageGroups.map((item) => `
+          <article class="online-presence-page-item" title="${escapeAttr(item.route)}">
+            <span class="online-presence-page-icon"><i class="fa-solid ${escapeAttr(item.icon)}"></i></span>
+            <div>
+              <strong>${escapeHtml(item.label)}</strong>
+              <span><i style="width: ${(item.count / maxPageCount) * 100}%"></i></span>
+            </div>
+            <b>${item.count}</b>
+          </article>
+        `).join("")
+      : `<div class="online-presence-empty"><i class="fa-solid fa-user-clock"></i><strong>Nenhum usuario online agora</strong><span>As novas sessoes aparecerao aqui automaticamente.</span></div>`;
+  }
+
+  const tableBody = $("onlinePresenceTableBody");
+  if (tableBody) {
+    tableBody.innerHTML = sessions.length
+      ? sessions.map((session, index) => `
+          <tr title="${escapeAttr(session.pageInfo.route)}">
+            <td><span class="online-presence-visitor"><i class="fa-solid fa-user"></i> Visitante ${index + 1}</span></td>
+            <td><strong>${escapeHtml(session.pageInfo.label)}</strong></td>
+            <td><span class="online-presence-channel">${escapeHtml(onlinePresenceOriginLabel(session.origem))}</span></td>
+            <td>${escapeHtml(onlinePresenceClock(session.timestamp || session.lastSeen))}</td>
+            <td><span class="online-presence-activity"><i></i> ${escapeHtml(onlinePresenceRelativeTime(session.lastSeen, now))}</span></td>
+          </tr>
+        `).join("")
+      : `<tr><td colspan="5" class="online-presence-table-empty">Nenhuma sessao ativa nos ultimos 2 minutos.</td></tr>`;
+  }
+}
+
+function stopOnlinePresenceMonitor() {
+  if (onlinePresenceUnsubscribe) onlinePresenceUnsubscribe();
+  onlinePresenceUnsubscribe = null;
+  if (onlinePresenceTicker) clearInterval(onlinePresenceTicker);
+  onlinePresenceTicker = null;
+}
+
+function startOnlinePresenceMonitor() {
+  if (!isMaster()) return;
+  renderOnlinePresence();
+  if (!onlinePresenceUnsubscribe) {
+    onlinePresenceUnsubscribe = onValue(ref(db, "onlineUsers"), (snapshot) => {
+      onlinePresenceData = snapshot.val() || {};
+      renderOnlinePresence();
+    }, (error) => {
+      console.error("Falha ao acompanhar usuarios online.", error);
+      if ($("onlinePresencePageList")) {
+        $("onlinePresencePageList").innerHTML = `<div class="online-presence-empty"><strong>Nao foi possivel carregar os usuarios online.</strong><span>Tente novamente em alguns instantes.</span></div>`;
+      }
+    });
+  }
+  if (!onlinePresenceTicker) onlinePresenceTicker = setInterval(renderOnlinePresence, 10_000);
+
+  const refreshButton = $("onlinePresenceRefresh");
+  if (refreshButton && refreshButton.dataset.bound !== "true") {
+    refreshButton.dataset.bound = "true";
+    refreshButton.addEventListener("click", async () => {
+      refreshButton.disabled = true;
+      refreshButton.classList.add("is-loading");
+      try {
+        const snapshot = await get(ref(db, "onlineUsers"));
+        onlinePresenceData = snapshot.val() || {};
+        renderOnlinePresence();
+      } catch (error) {
+        console.error("Falha ao atualizar usuarios online.", error);
+        showToast("Nao foi possivel atualizar os usuarios online.");
+      } finally {
+        refreshButton.disabled = false;
+        refreshButton.classList.remove("is-loading");
+      }
+    });
+  }
+}
+
 function switchView(name) {
   const target = views[name] ? name : "dashboard";
   if (!canAccessView(target)) {
@@ -2657,6 +2859,8 @@ function switchView(name) {
   if (target === "xadrezConfig") renderXadrezConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "relatorios") renderReports();
+  if (target === "usuariosOnline") startOnlinePresenceMonitor();
+  else stopOnlinePresenceMonitor();
   if (target === "promocoesClientes") renderStaffPromocoesView();
   if (target === "noticias") renderNewsAdminList();
   if (target === "imoveis") renderImoveisList();
@@ -15956,6 +16160,7 @@ onAuthStateChanged(auth, async (user) => {
     stopAdminIdleTimer();
     clearAdminIdlePauseReasons();
     stopClientMetricsRealtime();
+    stopOnlinePresenceMonitor();
     state.profile = null;
     hidePanelLoading();
     $("loginView").classList.remove("hidden");

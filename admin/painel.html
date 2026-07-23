@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=342">
+  <link rel="stylesheet" href="painel.css?v=343">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -83,6 +83,7 @@
           <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestao</span>
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
           <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
+          <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuarios online</button>
         </section>
         <section class="nav-admin-group" data-master="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
@@ -793,6 +794,73 @@
 
       <section id="relatoriosView" class="panel-view hidden">
         <div id="reportsMount" class="reports-layout"></div>
+      </section>
+
+      <section id="usuariosOnlineView" class="panel-view hidden">
+        <section class="panel-card online-presence-hero">
+          <div>
+            <span class="online-presence-live"><i></i> Atualizacao em tempo real</span>
+            <h2>Usuarios navegando agora</h2>
+            <p>Visualizacao anonima das telas abertas no site publico. As sessoes inativas deixam de aparecer automaticamente.</p>
+          </div>
+          <button id="onlinePresenceRefresh" type="button" class="ghost-button"><i class="fa-solid fa-rotate"></i> Atualizar agora</button>
+        </section>
+
+        <div class="online-presence-stats">
+          <article class="online-presence-stat is-primary">
+            <span>Total online</span>
+            <strong id="onlinePresenceTotal">0</strong>
+            <small>Sessoes ativas</small>
+          </article>
+          <article class="online-presence-stat">
+            <span>Telas acessadas</span>
+            <strong id="onlinePresencePages">0</strong>
+            <small>Areas diferentes</small>
+          </article>
+          <article class="online-presence-stat">
+            <span>Pelo site</span>
+            <strong id="onlinePresenceSite">0</strong>
+            <small>Navegador comum</small>
+          </article>
+          <article class="online-presence-stat">
+            <span>Pelo aplicativo</span>
+            <strong id="onlinePresenceApp">0</strong>
+            <small>PWA instalado</small>
+          </article>
+        </div>
+
+        <div class="online-presence-layout">
+          <section class="panel-card online-presence-card">
+            <div class="section-head compact">
+              <div>
+                <h2>Usuarios por tela</h2>
+                <p>Quantidade de sessoes ativas em cada area do site.</p>
+              </div>
+            </div>
+            <div id="onlinePresencePageList" class="online-presence-page-list">
+              <div class="online-presence-empty">Carregando acessos...</div>
+            </div>
+          </section>
+
+          <section class="panel-card online-presence-card">
+            <div class="section-head compact">
+              <div>
+                <h2>Sessoes ativas</h2>
+                <p id="onlinePresenceUpdatedAt">Aguardando a primeira atualizacao...</p>
+              </div>
+            </div>
+            <div class="online-presence-table-wrap">
+              <table class="online-presence-table">
+                <thead>
+                  <tr><th>Visitante</th><th>Tela atual</th><th>Canal</th><th>Entrou</th><th>Ultima atividade</th></tr>
+                </thead>
+                <tbody id="onlinePresenceTableBody">
+                  <tr><td colspan="5">Carregando sessoes...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
       </section>
 
       <section id="pagamentoSistemaView" class="panel-view hidden">
@@ -1677,6 +1745,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=413"></script>
+  <script type="module" src="painel.js?v=414"></script>
 </body>
 </html>

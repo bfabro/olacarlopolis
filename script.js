@@ -2821,6 +2821,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const onlineUsersRef = firebase.database().ref("onlineUsers");
     const connectedRef = firebase.database().ref(".info/connected");
     const INACTIVE_LIMIT_MS = 20 * 60 * 1000;
+    const PRESENCE_RECENT_LIMIT_MS = 2 * 60 * 1000;
+    const PRESENCE_HEARTBEAT_MS = 30 * 1000;
+    const HIDDEN_REMOVE_DELAY_MS = 60 * 1000;
     const ACTIVITY_WRITE_THROTTLE_MS = 45 * 1000;
     let myUserRef = null;
     let inactiveTimer = null;
@@ -2849,7 +2852,6 @@ document.addEventListener("DOMContentLoaded", function () {
       myUserRef.set({
         origem: getOrigemAcesso(),
         pagina: location.pathname + location.hash,
-        userAgent: navigator.userAgent,
         active: true,
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         lastSeen: firebase.database.ServerValue.TIMESTAMP
@@ -2899,12 +2901,12 @@ document.addEventListener("DOMContentLoaded", function () {
       clearInactiveTimer();
       if (!myUserRef) return;
       myUserRef.update({
-        active: true,
+        active: false,
         inactivePending: true,
         hiddenAt: firebase.database.ServerValue.TIMESTAMP,
         lastSeen: firebase.database.ServerValue.TIMESTAMP
       }).catch(() => {});
-      inactiveTimer = setTimeout(stopPresence, INACTIVE_LIMIT_MS);
+      inactiveTimer = setTimeout(stopPresence, HIDDEN_REMOVE_DELAY_MS);
     };
 
     document.addEventListener("visibilitychange", () => {
@@ -2929,7 +2931,13 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("beforeunload", stopPresence);
 
     connectedRef.on("value", (snap) => {
-      if (snap.val() === true) startPresence();
+      if (snap.val() === true) {
+        startPresence();
+      } else {
+        myUserRef = null;
+        presenceStarted = false;
+        lastPresenceWriteAt = 0;
+      }
     });
 
     ["click", "keydown", "wheel", "scroll", "touchstart", "pointerdown", "mousemove"].forEach((eventName) => {
@@ -2938,6 +2946,7 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("hashchange", () => touchPresence({ force: true, pagina: true }));
     window.addEventListener("popstate", () => touchPresence({ force: true, pagina: true }));
     window.addEventListener("focus", () => touchPresence({ force: true, pagina: true }));
+    setInterval(() => touchPresence({ force: true, pagina: true }), PRESENCE_HEARTBEAT_MS);
 
     onlineUsersRef.on("value", (snapshot) => {
       const agora = Date.now();
@@ -2945,7 +2954,7 @@ document.addEventListener("DOMContentLoaded", function () {
       snapshot.forEach((child) => {
         const user = child.val() || {};
         const lastSeen = Number(user.lastSeen || user.timestamp || 0);
-        const recente = Number.isFinite(lastSeen) && lastSeen > 0 && (agora - lastSeen) <= INACTIVE_LIMIT_MS;
+        const recente = Number.isFinite(lastSeen) && lastSeen > 0 && (agora - lastSeen) <= PRESENCE_RECENT_LIMIT_MS;
         const ativo = user.active !== false && recente;
         if (ativo) userCount += 1;
       });

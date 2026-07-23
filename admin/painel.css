@@ -1137,6 +1137,328 @@ button[type="submit"]:hover,
   gap: 18px;
 }
 
+/* ===== Usuarios online em tempo real ===== */
+.online-presence-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 24px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(37, 99, 235, .16), transparent 34%),
+    linear-gradient(135deg, #fff, #f8fbff);
+}
+
+.online-presence-hero h2 {
+  margin-top: 9px;
+  font-size: clamp(22px, 3vw, 30px);
+}
+
+.online-presence-hero p {
+  max-width: 720px;
+  margin-bottom: 0;
+}
+
+.online-presence-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.online-presence-live i,
+.online-presence-activity i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 5px rgba(34, 197, 94, .13);
+  animation: online-presence-pulse 1.8s ease-out infinite;
+}
+
+@keyframes online-presence-pulse {
+  0%, 45% { box-shadow: 0 0 0 3px rgba(34, 197, 94, .17); }
+  80%, 100% { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+}
+
+.online-presence-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.online-presence-stat {
+  position: relative;
+  min-height: 132px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 20px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+
+.online-presence-stat::after {
+  content: "";
+  position: absolute;
+  right: -24px;
+  bottom: -38px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, .07);
+}
+
+.online-presence-stat.is-primary {
+  border-color: transparent;
+  background: linear-gradient(135deg, #0f3f9b, #1677f2);
+  color: #fff;
+}
+
+.online-presence-stat.is-primary::after {
+  background: rgba(255, 255, 255, .12);
+}
+
+.online-presence-stat span,
+.online-presence-stat small {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.online-presence-stat.is-primary span,
+.online-presence-stat.is-primary small {
+  color: rgba(255, 255, 255, .84);
+}
+
+.online-presence-stat strong {
+  display: block;
+  margin: 6px 0 3px;
+  font-size: 38px;
+  line-height: 1;
+}
+
+.online-presence-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, .75fr) minmax(520px, 1.35fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.online-presence-card {
+  min-width: 0;
+  padding: 22px;
+}
+
+.online-presence-page-list {
+  display: grid;
+  gap: 10px;
+}
+
+.online-presence-page-item {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e5edf8;
+  border-radius: 14px;
+  padding: 12px;
+  background: #fbfdff;
+}
+
+.online-presence-page-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: #eaf2ff;
+  color: #1767d7;
+  font-size: 17px;
+}
+
+.online-presence-page-item > div {
+  min-width: 0;
+}
+
+.online-presence-page-item strong {
+  display: block;
+  overflow: hidden;
+  color: #17233c;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.online-presence-page-item > div > span {
+  display: block;
+  height: 5px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e6edf7;
+}
+
+.online-presence-page-item > div > span i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #0f52bd, #1f9dff);
+}
+
+.online-presence-page-item b {
+  min-width: 34px;
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: #eaf2ff;
+  color: #0f52bd;
+  text-align: center;
+}
+
+.online-presence-empty {
+  display: flex;
+  min-height: 210px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 24px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.online-presence-empty > i {
+  color: #94a3b8;
+  font-size: 30px;
+}
+
+.online-presence-empty strong {
+  color: var(--ink);
+}
+
+.online-presence-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid #e5edf8;
+  border-radius: 14px;
+}
+
+.online-presence-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.online-presence-table th,
+.online-presence-table td {
+  padding: 13px 14px;
+  border-bottom: 1px solid #edf2f7;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.online-presence-table th {
+  background: #f8fafc;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.online-presence-table td {
+  color: #475569;
+  font-size: 13px;
+}
+
+.online-presence-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.online-presence-visitor,
+.online-presence-channel,
+.online-presence-activity {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.online-presence-visitor {
+  color: #17233c;
+  font-weight: 800;
+}
+
+.online-presence-visitor i {
+  color: #1767d7;
+}
+
+.online-presence-channel {
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.online-presence-activity {
+  color: #15803d;
+  font-weight: 800;
+}
+
+.online-presence-activity i {
+  width: 7px;
+  height: 7px;
+}
+
+.online-presence-table-empty {
+  height: 160px;
+  color: var(--muted) !important;
+  text-align: center !important;
+}
+
+#onlinePresenceRefresh.is-loading i {
+  animation: online-presence-spin .7s linear infinite;
+}
+
+@keyframes online-presence-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 640px) {
+  .online-presence-hero {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 20px;
+  }
+
+  .online-presence-hero .ghost-button {
+    justify-content: center;
+  }
+
+  #usuariosOnlineView .online-presence-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .online-presence-stat {
+    min-height: 116px;
+  }
+
+  .online-presence-card {
+    padding: 16px;
+  }
+}
+
 .report-period-card {
   gap: 14px;
 }
@@ -3566,6 +3888,14 @@ button.admin-button-loading::after {
 
   .client-billing-alert-actions {
     display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .online-presence-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .online-presence-layout {
     grid-template-columns: 1fr;
   }
 
