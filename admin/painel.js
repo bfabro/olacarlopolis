@@ -313,7 +313,7 @@ function updateClientShortDescriptionCount() {
   if (!field || !count) return;
   const length = String(field.value || "").length;
   count.textContent = String(length);
-  help?.classList.toggle("is-limit", length >= 260);
+  help?.classList.toggle("is-limit", length >= 400);
 }
 
 const views = {
@@ -14446,7 +14446,7 @@ function renderClientOnlyEditor() {
     if (!coShortDescription || !count) return;
     const length = String(coShortDescription.value || "").length;
     count.textContent = String(length);
-    help?.classList.toggle("is-limit", length >= 260);
+    help?.classList.toggle("is-limit", length >= 400);
   };
   coShortDescription?.addEventListener("input", updateCoShortDescriptionCount);
   updateCoShortDescriptionCount();
