@@ -1491,6 +1491,16 @@ button[type="submit"]:hover,
   background: linear-gradient(90deg, #f0fdf4, #fbfffd);
 }
 
+.online-presence-history-item.is-click:not(.is-current) {
+  border-color: #bfdbfe;
+  background: linear-gradient(90deg, #eff6ff, #fbfdff);
+}
+
+.online-presence-history-item.is-click .online-presence-history-icon {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
 .online-presence-history-index {
   display: inline-flex;
   align-items: center;

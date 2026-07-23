@@ -2832,8 +2832,12 @@ document.addEventListener("DOMContentLoaded", function () {
     let lastPresenceWriteAt = 0;
     let navigationHistory = [];
     let lastNavigationPage = "";
+    let logicalPresencePage = location.pathname + location.hash;
+    let lastClickSignature = "";
+    let lastClickAt = 0;
 
-    const currentPresencePage = () => location.pathname + location.hash;
+    const browserPresencePage = () => location.pathname + location.hash;
+    const currentPresencePage = () => logicalPresencePage || browserPresencePage();
 
     const appendNavigationHistory = (type = "navegacao") => {
       const page = currentPresencePage();
@@ -2845,6 +2849,115 @@ document.addEventListener("DOMContentLoaded", function () {
         timestamp: Date.now()
       });
       navigationHistory = navigationHistory.slice(-NAVIGATION_HISTORY_LIMIT);
+      return true;
+    };
+
+    const cleanClickLabel = (value = "") => String(value || "")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 90);
+
+    const navigationClickDetails = (target) => {
+      if (!(target instanceof Element)) return null;
+      const element = target.closest([
+        "[data-home-quick-action]",
+        ".botao-menu-topo[data-target]",
+        ".sidebar .nav_link",
+        ".busca-item",
+        ".card-divulgacao-pequeno",
+        ".onde-comer-card a",
+        ".onde-comer-card button",
+        ".aba-tab[data-target]",
+        "[data-public-client-link]",
+        "[data-promo-est-link]",
+        "[data-promo-detail-key]",
+        "a[href^='#']"
+      ].join(","));
+      if (!element) return null;
+
+      let area = "Site";
+      let label = "";
+      let destinationPage = "";
+      if (element.matches("[data-home-quick-action]")) {
+        area = "Acesso rapido";
+        const action = element.dataset.homeQuickAction || "";
+        label = element.querySelector("span")?.textContent || action;
+        const actionPages = {
+          destaques: "/#destaques",
+          eventos: "/#eventos",
+          novidades: "/#novidades",
+          cep: "/#cep",
+          "onde-comer": "/#ondecomer",
+          promocoes: "/#promocoes"
+        };
+        destinationPage = actionPages[action] || "";
+      } else if (element.matches(".botao-menu-topo[data-target]")) {
+        area = "Menu da pagina inicial";
+        label = element.textContent;
+        const targetName = element.dataset.target || "";
+        const targetPages = {
+          divulgacao: "/#destaques",
+          eventos: "/#eventos",
+          "novidades-cidade": "/#novidades"
+        };
+        destinationPage = targetPages[targetName] || "";
+      } else if (element.matches(".sidebar .nav_link")) {
+        area = "Menu lateral";
+        label = element.querySelector(".navlink")?.textContent || element.textContent;
+      } else if (element.matches(".busca-item")) {
+        area = "Resultado da busca";
+        label = element.querySelector("strong")?.textContent || element.textContent;
+      } else if (element.matches(".aba-tab[data-target]")) {
+        area = "Pagina do cliente";
+        label = element.querySelector(".cliente-tab-label")?.textContent || element.textContent;
+      } else if (element.closest(".onde-comer-card")) {
+        area = "Onde Comer";
+        const card = element.closest(".onde-comer-card");
+        const establishment = card?.querySelector("h3")?.textContent || "estabelecimento";
+        const action = element.getAttribute("aria-label") || element.textContent || element.title || "Abrir";
+        label = `${cleanClickLabel(action)} - ${cleanClickLabel(establishment)}`;
+      } else if (element.matches(".card-divulgacao-pequeno")) {
+        area = element.querySelector(".card-divulgacao-categoria")?.textContent || "Card";
+        label = element.querySelector("h4, h3, strong")?.textContent || element.getAttribute("aria-label") || element.textContent;
+      } else {
+        area = element.matches("[data-promo-detail-key]") ? "Promocao" : "Conteudo";
+        label = element.getAttribute("aria-label")
+          || element.getAttribute("title")
+          || element.querySelector("h4, h3, strong")?.textContent
+          || element.textContent;
+      }
+
+      label = cleanClickLabel(label);
+      if (!label) return null;
+      const href = element.getAttribute("href") || "";
+      return {
+        area,
+        label,
+        destination: cleanClickLabel(element.dataset.target || element.dataset.homeQuickAction || href || label),
+        destinationPage
+      };
+    };
+
+    const appendNavigationClick = (details) => {
+      if (!details) return false;
+      const now = Date.now();
+      const signature = `${details.area}|${details.label}|${details.destination}`;
+      if (signature === lastClickSignature && (now - lastClickAt) < 700) return false;
+      lastClickSignature = signature;
+      lastClickAt = now;
+      navigationHistory.push({
+        pagina: details.destinationPage || currentPresencePage(),
+        tipo: "clique",
+        rotulo: details.label,
+        area: details.area,
+        destino: details.destination,
+        timestamp: now
+      });
+      navigationHistory = navigationHistory.slice(-NAVIGATION_HISTORY_LIMIT);
+      if (details.destinationPage) {
+        logicalPresencePage = details.destinationPage;
+        lastNavigationPage = details.destinationPage;
+      }
       return true;
     };
 
@@ -2919,8 +3032,22 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const trackNavigation = () => {
+      logicalPresencePage = browserPresencePage();
       const changed = appendNavigationHistory("navegacao");
       touchPresence({ force: true, pagina: true, historico: changed });
+    };
+
+    const trackNavigationClick = (event) => {
+      if (event.isTrusted === false) return;
+      const details = navigationClickDetails(event.target);
+      if (!details) return;
+      appendNavigationHistory("entrada");
+      if (!appendNavigationClick(details)) return;
+      if (!myUserRef) {
+        startPresence();
+        return;
+      }
+      touchPresence({ force: true, pagina: Boolean(details.destinationPage), historico: true });
     };
 
     const scheduleInactiveRemoval = () => {
@@ -2969,6 +3096,7 @@ document.addEventListener("DOMContentLoaded", function () {
     ["click", "keydown", "wheel", "scroll", "touchstart", "pointerdown", "mousemove"].forEach((eventName) => {
       window.addEventListener(eventName, () => touchPresence(), { passive: true });
     });
+    document.addEventListener("click", trackNavigationClick, true);
     window.addEventListener("hashchange", trackNavigation);
     window.addEventListener("popstate", trackNavigation);
     window.addEventListener("focus", () => touchPresence({ force: true, pagina: true }));

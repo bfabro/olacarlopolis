@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 480,
-  label: "v487",
+  numero: 481,
+  label: "v488",
   data: "2026-07-22",
-  nota: "Usuarios online agora exibem o historico anonimo das ultimas 20 telas acessadas por sessao."
+  nota: "Historico online agora registra os cliques reais em acessos rapidos, menus, categorias, cards e abas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2655,8 +2655,10 @@ function onlinePresencePageInfo(rawPage = "") {
     ondecomer: ["Onde Comer", "fa-utensils"],
     cep: ["Busca CEP", "fa-location-dot"],
     buscacep: ["Busca CEP", "fa-location-dot"],
+    destaques: ["Destaques", "fa-star"],
     promocoes: ["Promocoes", "fa-tags"],
     eventos: ["Eventos", "fa-calendar-days"],
+    novidades: ["Novidades", "fa-bell"],
     imoveis: ["Imoveis", "fa-house"],
     automoveis: ["Automoveis", "fa-car"],
     veiculos: ["Automoveis", "fa-car"],
@@ -2758,7 +2760,10 @@ function onlinePresenceHistoryItems(session = {}) {
     .filter((item) => item && typeof item === "object" && item.pagina)
     .map((item) => ({
       pagina: String(item.pagina || "/"),
-      tipo: item.tipo === "entrada" ? "entrada" : "navegacao",
+      tipo: ["entrada", "clique"].includes(item.tipo) ? item.tipo : "navegacao",
+      rotulo: String(item.rotulo || ""),
+      area: String(item.area || ""),
+      destino: String(item.destino || ""),
       timestamp: Number(item.timestamp || 0)
     }))
     .sort((a, b) => a.timestamp - b.timestamp)
@@ -2770,6 +2775,21 @@ function onlinePresenceHistoryItems(session = {}) {
     tipo: "entrada",
     timestamp: Number(session.timestamp || session.lastSeen || Date.now())
   }];
+}
+
+function onlinePresenceHistoryIcon(item = {}, pageInfo = {}) {
+  if (item.tipo !== "clique") return pageInfo.icon || "fa-window-maximize";
+  const value = normalizeName(`${item.area || ""} ${item.rotulo || ""} ${item.destino || ""}`);
+  if (value.includes("evento")) return "fa-calendar-days";
+  if (value.includes("cep") || value.includes("endereco")) return "fa-location-dot";
+  if (value.includes("ondecomer") || value.includes("cardapio")) return "fa-utensils";
+  if (value.includes("promoc")) return "fa-tags";
+  if (value.includes("novidade")) return "fa-bell";
+  if (value.includes("destaque")) return "fa-star";
+  if (value.includes("busca")) return "fa-magnifying-glass";
+  if (value.includes("whatsapp")) return "fa-comments";
+  if (value.includes("categoria") || value.includes("menu") || value.includes("cliente")) return "fa-store";
+  return "fa-arrow-pointer";
 }
 
 function renderOnlinePresenceHistory(sessions = []) {
@@ -2793,15 +2813,20 @@ function renderOnlinePresenceHistory(sessions = []) {
     $("onlinePresenceHistoryTimeline").innerHTML = history.map((item, index) => {
       const pageInfo = onlinePresencePageInfo(item.pagina);
       const isCurrent = index === history.length - 1;
+      const isClick = item.tipo === "clique";
+      const itemLabel = isClick && item.rotulo ? item.rotulo : pageInfo.label;
+      const detailLabel = item.tipo === "entrada"
+        ? "Entrada no site"
+        : (isClick ? `Clique em ${item.area || "conteudo"}` : "Mudanca de tela");
       return `
-        <article class="online-presence-history-item ${isCurrent ? "is-current" : ""}">
+        <article class="online-presence-history-item ${isCurrent ? "is-current" : ""} ${isClick ? "is-click" : ""}">
           <span class="online-presence-history-index">${index + 1}</span>
-          <span class="online-presence-history-icon"><i class="fa-solid ${escapeAttr(pageInfo.icon)}"></i></span>
+          <span class="online-presence-history-icon"><i class="fa-solid ${escapeAttr(onlinePresenceHistoryIcon(item, pageInfo))}"></i></span>
           <div>
-            <strong>${escapeHtml(pageInfo.label)}</strong>
-            <small>${item.tipo === "entrada" ? "Entrada no site" : "Navegacao"} - ${escapeHtml(onlinePresenceClock(item.timestamp))}</small>
+            <strong>${escapeHtml(itemLabel)}</strong>
+            <small>${escapeHtml(detailLabel)} - ${escapeHtml(onlinePresenceClock(item.timestamp))}</small>
           </div>
-          ${isCurrent ? `<b><i></i> Tela atual</b>` : `<i class="fa-solid fa-arrow-right online-presence-history-arrow"></i>`}
+          ${isCurrent ? `<b><i></i> ${isClick ? "Ultima acao" : "Tela atual"}</b>` : `<i class="fa-solid fa-arrow-right online-presence-history-arrow"></i>`}
         </article>
       `;
     }).join("");
