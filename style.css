@@ -9731,6 +9731,38 @@ body.home-quick-banner-route-hidden .home-news-section{display:none!important}
   left: 8px;
 }
 
+.auto-owner-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: rgba(15, 118, 110, .94);
+  color: #fff;
+  font-size: .76rem;
+  font-weight: 900;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, .2);
+  backdrop-filter: blur(5px);
+}
+
+.auto-owner-highlight {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 7px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #ccfbf1;
+  color: #0f766e;
+  font-size: .82rem;
+  font-weight: 900;
+}
+
 .auto-seller {
   display: inline-flex;
   align-items: center;

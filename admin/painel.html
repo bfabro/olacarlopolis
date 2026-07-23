@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=347">
+  <link rel="stylesheet" href="painel.css?v=348">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1224,8 +1224,8 @@
       </section>
 
       <section id="automoveisView" class="panel-view hidden">
-        <div class="split-layout">
-          <section class="panel-card form-collapsed" data-permission="veiculos_manage">
+        <div class="split-layout automoveis-admin-layout">
+          <section class="panel-card form-collapsed automoveis-form-card" data-permission="veiculos_manage">
             <div class="section-head">
               <div>
                 <h2>Cadastrar ou editar automovel</h2>
@@ -1273,14 +1273,21 @@
                   <option value="Seminovo">Seminovo</option>
                 </select>
               </label>
+              <label>Origem do veiculo (interno)
+                <select id="automovelOrigemVeiculo">
+                  <option value="">Não informado</option>
+                  <option value="proprio">Próprio</option>
+                  <option value="consignado">Consignado</option>
+                </select>
+              </label>
               <label>KM<input id="automovelKm" placeholder="Ex: 45.000 km"></label>
               <label>Status
                 <select id="automovelStatus">
                   <option value="ativo">Ativo</option>
                   <option value="inativo">Inativo</option>
-                  <option value="vendido">Vendido</option>
                 </select>
               </label>
+              <label class="check-row"><input id="automovelUnicoDono" type="checkbox"> Único dono</label>
               <label>Data de inclusão
                 <input id="automovelDataInclusao" value="Não disponível" readonly aria-readonly="true" title="Preenchida automaticamente no cadastro">
               </label>
@@ -1507,7 +1514,7 @@
             </div>
           </section>
 
-          <section class="panel-card">
+          <section class="panel-card automoveis-list-card">
             <div class="section-head">
               <div>
                 <h2>Automoveis cadastrados</h2>
@@ -1783,6 +1790,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=418"></script>
+  <script type="module" src="painel.js?v=419"></script>
 </body>
 </html>

@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 483,
-  label: "v490",
+  numero: 484,
+  label: "v491",
   data: "2026-07-23",
-  nota: "Usuarios online agora exibem o total de acessos das sessoes ativas e um historico visual permanente da navegacao."
+  nota: "Automoveis ganharam controle interno de origem, indicador de unico dono e lista com rolagem independente no desktop."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -6304,6 +6304,23 @@ function formatarDataInclusaoAutomovel(value) {
   return new Intl.DateTimeFormat("pt-BR").format(new Date(timestamp));
 }
 
+function normalizarStatusAutomovel(status = "") {
+  const normalized = normalizeName(status);
+  return normalized === "inativo" || normalized === "vendido" ? "inativo" : "ativo";
+}
+
+function automovelUnicoDonoAtivo(value) {
+  if (value === true) return true;
+  return ["1", "sim", "true"].includes(normalizeName(value));
+}
+
+function labelOrigemAutomovel(value = "") {
+  return {
+    proprio: "Próprio",
+    consignado: "Consignado"
+  }[normalizeName(value)] || "";
+}
+
 function resetAutomovelForm() {
   state.selectedAutomovelId = null;
   state.automovelImages = [];
@@ -6312,6 +6329,8 @@ function resetAutomovelForm() {
   if ($("automovelImagesUpload")) $("automovelImagesUpload").value = "";
   if ($("automovelCameraUpload")) $("automovelCameraUpload").value = "";
   if ($("automovelStatus")) $("automovelStatus").value = "ativo";
+  if ($("automovelOrigemVeiculo")) $("automovelOrigemVeiculo").value = "";
+  if ($("automovelUnicoDono")) $("automovelUnicoDono").checked = false;
   if ($("automovelDataInclusao")) $("automovelDataInclusao").value = new Intl.DateTimeFormat("pt-BR").format(new Date());
   atualizarCamposTipoAutomovel();
   $("deleteAutomovelButton")?.classList.add("hidden");
@@ -6382,8 +6401,12 @@ function fillAutomovelForm(item) {
   $("automovelAno").value = item.ano || "";
   $("automovelPreco").value = formatExistingCurrency(item.preco || "");
   $("automovelCondicao").value = item.condicao || "";
+  $("automovelOrigemVeiculo").value = ["proprio", "consignado"].includes(normalizeName(item.origemVeiculo))
+    ? normalizeName(item.origemVeiculo)
+    : "";
   $("automovelKm").value = item.km || "";
-  $("automovelStatus").value = item.status || "ativo";
+  $("automovelStatus").value = normalizarStatusAutomovel(item.status);
+  $("automovelUnicoDono").checked = automovelUnicoDonoAtivo(item.unicoDono);
   $("automovelContato").value = item.contato || "";
   $("automovelVendedor").value = item.vendedor || item.loja || "";
   $("automovelInstagram").value = item.instagram || "";
@@ -6446,8 +6469,10 @@ function getAutomovelFormData() {
     preco: $("automovelPreco").value.trim(),
     tipo: $("automovelTipo").value,
     condicao: $("automovelCondicao").value,
+    origemVeiculo: $("automovelOrigemVeiculo").value,
     km: $("automovelKm").value.trim(),
-    status: $("automovelStatus").value,
+    status: normalizarStatusAutomovel($("automovelStatus").value),
+    unicoDono: Boolean($("automovelUnicoDono").checked),
     contato: $("automovelContato").value.trim() || linkedClient?.whatsapp || linkedClient?.contato || "",
     vendedor,
     loja: vendedor,
@@ -8113,7 +8138,7 @@ function renderAutomoveisList() {
   renderAutomovelArteOptions();
   const q = String($("automovelSearch")?.value || "").toLowerCase().trim();
   const list = state.automoveis.filter(itemBelongsToCurrentClient).filter((item) => {
-    const hay = `${item.codRef || ""} ${item.codigo || ""} ${item.tipo || ""} ${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""} ${item.vendedor || ""} ${item.loja || ""}`.toLowerCase();
+    const hay = `${item.codRef || ""} ${item.codigo || ""} ${item.tipo || ""} ${item.marca || ""} ${item.modelo || ""} ${item.ano || ""} ${item.preco || ""} ${item.vendedor || ""} ${item.loja || ""} ${labelOrigemAutomovel(item.origemVeiculo)} ${automovelUnicoDonoAtivo(item.unicoDono) ? "unico dono" : ""}`.toLowerCase();
     return !q || hay.includes(q);
   });
   if (!list.length) {
@@ -8127,6 +8152,8 @@ function renderAutomoveisList() {
     const detalhes = [
       item.tipo,
       item.condicao,
+      labelOrigemAutomovel(item.origemVeiculo) ? `${labelOrigemAutomovel(item.origemVeiculo)} (interno)` : "",
+      automovelUnicoDonoAtivo(item.unicoDono) ? "Único dono" : "",
       item.ano,
       item.cambio,
       item.combustivel,
@@ -8135,6 +8162,7 @@ function renderAutomoveisList() {
     ].filter(Boolean);
     const lojaContato = [item.vendedor || item.loja, item.contato].filter(Boolean).join(" - ");
     const dataInclusao = formatarDataInclusaoAutomovel(item.createdAt || item.dataInclusao);
+    const statusAutomovel = normalizarStatusAutomovel(item.status);
     return `
       <article class="list-card event-card automovel-admin-card">
         <div class="automovel-admin-thumb">
@@ -8148,7 +8176,7 @@ function renderAutomoveisList() {
               <div class="list-title">${escapeHtml(titulo)}</div>
               <div class="list-meta"><strong>Referencia:</strong> ${escapeHtml(codigoRef || "Sem codigo")} <span aria-hidden="true">•</span> <strong>Inclusão:</strong> ${escapeHtml(dataInclusao)}</div>
             </div>
-            <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
+            <span class="badge ${escapeAttr(statusAutomovel)}">${statusLabel(statusAutomovel)}</span>
           </div>
           <div class="automovel-admin-tags">
             ${detalhes.map((detail) => `<span>${escapeHtml(detail)}</span>`).join("") || `<span>Sem detalhes</span>`}

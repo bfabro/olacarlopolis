@@ -11492,7 +11492,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       cidade: item.Cidade || item.cidade || item.local || "",
       acessorios: item.acessorios || item.Acessorios || item["Acessórios"] || "",
       opcionais: item.Opcionais || item.opcionais || "",
-      status: item.status || "ativo",
+      unicoDono: item.unicoDono === true
+        || item.UnicoDono === true
+        || ["1", "sim", "true"].includes(String(item.unicoDono ?? item.UnicoDono ?? item["Único dono"] ?? "").trim().toLowerCase()),
+      status: ["inativo", "vendido"].includes(String(item.status || "ativo").trim().toLowerCase()) ? "inativo" : "ativo",
       ativo: item.ativo === false ? false : true
     };
   }
@@ -11686,7 +11689,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         imagemPrincipal ? `Imagem: ${imagemPrincipal}` : ""
       ].filter(Boolean).join("\n");
       return `
-        <article id="${novidadeDomId("veiculo", item.id)}" class="auto-card ${item.status === "vendido" ? "is-sold" : ""}"
+        <article id="${novidadeDomId("veiculo", item.id)}" class="auto-card"
           data-auto-id="${textoSeguroAutomoveis(item.id || "")}"
           data-novidade-destino="veiculo-${textoSeguroAutomoveis(item.id || "")}">
           <div class="auto-card-media" data-auto-gallery="${imagensJson}" data-auto-title="${textoSeguroAutomoveis(titulo)}">
@@ -11696,7 +11699,7 @@ plotarPinsImoveis(stateImoveis.filtered);
               </div>
             ` : `<div class="auto-card-img auto-card-img-empty"><i class="fa-solid fa-car-side"></i></div>`}
             <strong class="auto-price">${textoSeguroAutomoveis(precoCard)}</strong>
-            ${item.status === "vendido" ? `<span class="auto-status auto-status-media">Vendido</span>` : ""}
+            ${item.unicoDono ? `<span class="auto-owner-badge"><i class="fa-solid fa-key"></i> Único dono</span>` : ""}
           </div>
           <div class="im-card-body">
             <div class="auto-card-top">
@@ -11764,6 +11767,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ["Marca", item.marca],
       ["Modelo", item.modelo],
       ["Condicao", item.condicao],
+      ["Proprietario", item.unicoDono ? "Único dono" : ""],
       ["Ano", item.ano],
       ["KM", item.km],
       ["Cambio", item.cambio],
@@ -11806,6 +11810,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${textoSeguroAutomoveis(titulo)}</h2>
+              ${item.unicoDono ? `<span class="auto-owner-highlight"><i class="fa-solid fa-key"></i> Único dono</span>` : ""}
               ${vendedor ? `<p class="imovel-detalhes-endereco auto-detalhes-vendedor"><i class="fa-solid fa-store"></i><a href="#${textoSeguroAutomoveis(vendedorSlug)}" data-public-client-link="${textoSeguroAutomoveis(vendedorSlug)}">${textoSeguroAutomoveis(vendedor)}</a></p>` : ""}
             </div>
             <div class="imovel-detalhes-financeiro">

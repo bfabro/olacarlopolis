@@ -2251,6 +2251,47 @@ button[type="submit"]:hover,
   align-items: start;
 }
 
+@media (min-width: 981px) {
+  #automoveisView .automoveis-form-card {
+    position: sticky;
+    top: 18px;
+  }
+
+  #automoveisView .automoveis-list-card {
+    position: sticky;
+    top: 18px;
+    display: grid;
+    grid-template-rows: auto auto minmax(0, 1fr);
+    height: min(760px, calc(100vh - 150px));
+    min-height: 520px;
+    overflow: hidden;
+  }
+
+  #automoveisView .automoveis-list-card .entity-list {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 6px;
+    scrollbar-color: #94a3b8 #eef2f7;
+    scrollbar-width: thin;
+  }
+
+  #automoveisView .automoveis-list-card .entity-list::-webkit-scrollbar {
+    width: 9px;
+  }
+
+  #automoveisView .automoveis-list-card .entity-list::-webkit-scrollbar-track {
+    border-radius: 999px;
+    background: #eef2f7;
+  }
+
+  #automoveisView .automoveis-list-card .entity-list::-webkit-scrollbar-thumb {
+    border: 2px solid #eef2f7;
+    border-radius: 999px;
+    background: #94a3b8;
+  }
+}
+
 .info-admin-block {
   margin-top: 18px;
 }
