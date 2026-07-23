@@ -749,7 +749,7 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
   const descricao = primeiraDescricaoPreenchida || "";
   return {
     nome: textoLimpoArteComercial(establishment.name || establishment.nome || establishment.title || "Estabelecimento"),
-    descricao: textoLimpoArteComercial(descricao).slice(0, 260),
+    descricao: textoLimpoArteComercial(descricao).slice(0, 400),
     categoria: textoLimpoArteComercial(categoriaAtual || establishment.categoria || establishment.category || ""),
     tipoLabel,
     whatsapp: formatarTelefonePublico(whatsapp),
@@ -963,7 +963,11 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
-    stage.className = `business-art-stage is-${formato} layout-${layoutArte} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"}`;
+    const descriptionLength = dados.descricao.length;
+    const descriptionClass = descriptionLength > 340
+      ? "description-xlong"
+      : (descriptionLength > 260 ? "description-long" : "");
+    stage.className = `business-art-stage is-${formato} layout-${layoutArte} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"} ${descriptionClass}`;
     stage.style.width = "1080px";
     stage.style.height = `${height}px`;
     stage.style.setProperty("--business-name-color", corNome);
@@ -976,9 +980,18 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const mainImage = picture?.querySelector(".business-art-main-image");
     if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
-      const maxHeight = layoutArte === "showcase"
+      let maxHeight = layoutArte === "showcase"
         ? (formato === "story" ? 720 : 420)
         : (formato === "story" ? 670 : 325);
+      if (descriptionClass === "description-long") {
+        maxHeight = layoutArte === "showcase"
+          ? (formato === "story" ? 660 : 360)
+          : (formato === "story" ? 620 : 310);
+      } else if (descriptionClass === "description-xlong") {
+        maxHeight = layoutArte === "showcase"
+          ? (formato === "story" ? 620 : 310)
+          : (formato === "story" ? 560 : 270);
+      }
       const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
       const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
       const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));

@@ -23639,3 +23639,51 @@ body.business-art-capturing-background .home-cards-intro {
     flex: 1;
   }
 }
+
+/* ===== Arte comercial: descricoes de ate 400 caracteres ===== */
+.business-art-stage.description-long .business-art-identity p,
+.business-art-stage.description-xlong .business-art-identity p {
+  display: block !important;
+  max-height: none;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  -webkit-line-clamp: unset;
+}
+
+.business-art-stage.is-feed.description-long .business-art-identity {
+  padding-top: 14px;
+  padding-bottom: 14px;
+}
+
+.business-art-stage.is-feed.description-long .business-art-identity p {
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.business-art-stage.is-feed.description-xlong .business-art-identity {
+  padding: 12px 16px;
+}
+
+.business-art-stage.is-feed.description-xlong .business-art-identity p {
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.business-art-stage.is-story.description-long .business-art-identity {
+  padding-top: 20px;
+  padding-bottom: 18px;
+}
+
+.business-art-stage.is-story.description-long .business-art-identity p {
+  font-size: 25px;
+  line-height: 1.32;
+}
+
+.business-art-stage.is-story.description-xlong .business-art-identity {
+  padding: 17px 20px 16px;
+}
+
+.business-art-stage.is-story.description-xlong .business-art-identity p {
+  font-size: 22px;
+  line-height: 1.28;
+}
