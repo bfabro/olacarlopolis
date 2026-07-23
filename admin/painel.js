@@ -13691,8 +13691,8 @@ function renderClientOnlyEditor() {
         </div>
         <label class="admin-field-line field-company">Nome da empresa<input id="coName" value="${escapeAttr(client.nome || "")}"></label>
         <label class="wide">Descricao curta para divulgacao
-          <textarea id="coShortDescription" rows="3" maxlength="260" aria-describedby="coShortDescriptionHelp" placeholder="Ex.: Solucoes completas, atendimento de qualidade e seguranca.">${escapeHtml(client.descricaoCurta || client.shortDescription || "")}</textarea>
-          <small id="coShortDescriptionHelp" class="field-character-count"><span id="coShortDescriptionCount">${String(client.descricaoCurta || client.shortDescription || "").length}</span>/260 caracteres permitidos</small>
+          <textarea id="coShortDescription" rows="3" maxlength="400" aria-describedby="coShortDescriptionHelp" placeholder="Ex.: Solucoes completas, atendimento de qualidade e seguranca.">${escapeHtml(client.descricaoCurta || client.shortDescription || "")}</textarea>
+          <small id="coShortDescriptionHelp" class="field-character-count"><span id="coShortDescriptionCount">${String(client.descricaoCurta || client.shortDescription || "").length}</span>/400 caracteres permitidos</small>
         </label>
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
         ${(() => {
