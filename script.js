@@ -725,13 +725,34 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     || establishment.contact
     || establishment.contato
     || "";
-  const imagens = [
+  const imagens = [];
+  const adicionarImagem = (valor) => {
+    if (!valor) return;
+    if (Array.isArray(valor)) {
+      valor.forEach(adicionarImagem);
+      return;
+    }
+    if (typeof valor === "object") {
+      adicionarImagem(valor.url || valor.src || valor.imagem || valor.image || valor.link);
+      return;
+    }
+    const url = urlAbsolutaArteComercial(valor);
+    if (url && !imagens.includes(url)) imagens.push(url);
+  };
+  [
     establishment.image,
     establishment.imagem,
     establishment.logo,
-    ...(Array.isArray(establishment.novidadesImages) ? establishment.novidadesImages : []),
-    ...(Array.isArray(establishment.divulgacaoImages) ? establishment.divulgacaoImages : [])
-  ].filter(Boolean);
+    establishment.logoUrl,
+    establishment.profileImage,
+    establishment.perfil,
+    establishment.imagemPerfil,
+    establishment.images,
+    establishment.imagens,
+    establishment.fotos,
+    establishment.novidadesImages,
+    establishment.divulgacaoImages
+  ].forEach(adicionarImagem);
   const tipo = normalizarArteComercial(establishment.tipoCliente || establishment.tipo || "comercio");
   const tipoLabel = tipo === "servico" || tipo === "servicos"
     ? "Serviço"
@@ -755,18 +776,24 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     whatsapp: formatarTelefonePublico(whatsapp),
     cidade: valorPreenchidoArteComercial(establishment.cidade || establishment.city || establishment.localidade || "Carlópolis - PR"),
     endereco: valorPreenchidoArteComercial(establishment.address || establishment.endereco || ""),
-    imagem: urlAbsolutaArteComercial(imagens[0] || ""),
+    imagem: imagens[0] || "",
+    imagens,
     imagemEnquadramento: establishment.imagemEnquadramento || establishment.imageFit || "auto"
   };
 }
 
-function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit }) {
-  const imageBlock = dados.imagem
-    ? `<img class="business-art-main-image" src="${escaparArteComercial(dados.imagem)}" alt="" crossorigin="anonymous" style="object-fit:${imageFit}">`
-    : `<div class="business-art-placeholder"><i class="fa-solid fa-store"></i><span>${escaparArteComercial(dados.categoria || dados.tipoLabel)}</span></div>`;
+function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte }) {
+  const imagensMosaico = (dados.imagens || []).slice(0, 4);
+  const imageBlock = layoutArte === "mosaic" && imagensMosaico.length
+    ? `<div class="business-art-mosaic business-art-mosaic-count-${imagensMosaico.length}">
+        ${imagensMosaico.map((imagem, index) => `<img class="business-art-mosaic-image" src="${escaparArteComercial(imagem)}" alt="Imagem ${index + 1} de ${escaparArteComercial(dados.nome)}" crossorigin="anonymous">`).join("")}
+      </div>`
+    : (dados.imagem
+      ? `<img class="business-art-main-image" src="${escaparArteComercial(dados.imagem)}" alt="" crossorigin="anonymous" style="object-fit:${imageFit}">`
+      : `<div class="business-art-placeholder"><i class="fa-solid fa-store"></i><span>${escaparArteComercial(dados.categoria || dados.tipoLabel)}</span></div>`);
   const contactCards = [
-    dados.whatsapp ? `<div class="business-art-info-card"><i class="fa-brands fa-whatsapp"></i><span><small>WhatsApp</small><strong>${escaparArteComercial(dados.whatsapp)}</strong></span></div>` : "",
-    dados.cidade ? `<div class="business-art-info-card"><i class="fa-solid fa-location-dot"></i><span><small>Cidade</small><strong>${escaparArteComercial(dados.cidade)}</strong></span></div>` : ""
+    dados.whatsapp ? `<div class="business-art-info-card is-whatsapp"><i class="fa-brands fa-whatsapp"></i><span><small>WhatsApp</small><strong>${escaparArteComercial(dados.whatsapp)}</strong></span></div>` : "",
+    dados.cidade ? `<div class="business-art-info-card is-city"><i class="fa-solid fa-location-dot"></i><span><small>Cidade</small><strong>${escaparArteComercial(dados.cidade)}</strong></span></div>` : ""
   ].filter(Boolean);
   const background = fundoUrl
     ? `background-image:url('${fundoUrl}');`
@@ -782,7 +809,7 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
         <span class="business-art-kind"><i class="fa-solid fa-store"></i>${escaparArteComercial(dados.tipoLabel)}</span>
         ${dados.categoria ? `<strong>${escaparArteComercial(dados.categoria)}</strong>` : ""}
       </header>
-      <div class="business-art-picture is-${imageFit}">${imageBlock}</div>
+      <div class="business-art-picture ${layoutArte === "mosaic" ? "is-mosaic" : `is-${imageFit}`}">${imageBlock}</div>
       <section class="business-art-identity">
         <h1>${escaparArteComercial(dados.nome)}</h1>
         <span class="business-art-name-line"></span>
@@ -899,11 +926,16 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
 
   mostrarToast("Preparando a previa da arte...");
   const dados = dadosArteComercial(establishment, categoriaAtual);
-  const imagemPreparada = await prepararImagemArteComercial(dados.imagem);
+  const imagensOriginais = (dados.imagens || []).slice(0, 4);
+  const imagensPreparadas = await Promise.all(imagensOriginais.map(async (imagem) => {
+    const preparada = await prepararImagemArteComercial(imagem);
+    return preparada || imagem;
+  }));
   // A arte usa fundo escuro proprio. Capturar a pagina faria o html2canvas
   // tentar reler imagens de outros clientes e dispararia requisicoes CORS.
   const fundoUrl = "";
-  if (imagemPreparada) dados.imagem = imagemPreparada;
+  dados.imagens = imagensPreparadas.filter(Boolean);
+  dados.imagem = dados.imagens[0] || dados.imagem;
   const imageFit = await detectarEnquadramentoArteComercial(
     dados.imagem,
     establishment.imagemEnquadramento || establishment.imageFit || "auto"
@@ -925,8 +957,9 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         <div class="business-art-layout" role="group" aria-label="Layout da arte">
           <button type="button" class="active" data-business-layout="classic"><i class="fa-regular fa-rectangle-list"></i><small>Atual</small></button>
           <button type="button" data-business-layout="showcase"><i class="fa-solid fa-wand-magic-sparkles"></i><small>Destaque</small></button>
+          <button type="button" data-business-layout="mosaic" title="Usar ate quatro imagens cadastradas"><i class="fa-solid fa-table-cells-large"></i><small>Mosaico</small></button>
         </div>
-        <div class="business-art-color-controls is-hidden" aria-label="Cores do layout Destaque">
+        <div class="business-art-color-controls is-hidden" aria-label="Cores do layout selecionado">
           <label title="Cor da faixa com o nome"><input type="color" data-business-color="name" value="#075fd5"><small>Nome</small></label>
           <label title="Cor do detalhe decorativo esquerdo"><input type="color" data-business-color="detail" value="#0b63e6"><small>Detalhe</small></label>
         </div>
@@ -938,6 +971,20 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         </div>
         <div class="business-art-photo-option" role="group" aria-label="Formato dos cantos da foto">
           <button type="button" class="active" data-business-rounded aria-pressed="true" title="Ativar ou desativar cantos arredondados"><i class="fa-solid fa-border-top-left"></i><small>Cantos</small></button>
+        </div>
+        <div class="business-art-font-controls" aria-label="Tamanho das fontes da arte">
+          <label>
+            <span>Descrição <output data-business-font-output="description">26</output></span>
+            <input type="range" min="18" max="32" value="26" step="1" data-business-font="description">
+          </label>
+          <label>
+            <span>WhatsApp <output data-business-font-output="whatsapp">28</output></span>
+            <input type="range" min="20" max="36" value="28" step="1" data-business-font="whatsapp">
+          </label>
+          <label>
+            <span>Cidade <output data-business-font-output="city">28</output></span>
+            <input type="range" min="20" max="36" value="28" step="1" data-business-font="city">
+          </label>
         </div>
         <button type="button" class="business-art-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -960,6 +1007,13 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let corDetalhe = "#0b63e6";
   let efeitoFoto = "soft";
   let cantosArredondados = true;
+  let fonteDescricao = dados.descricao.length > 320 ? 22 : (dados.descricao.length > 220 ? 24 : 26);
+  let fonteWhatsapp = 28;
+  let fonteCidade = 28;
+  const descricaoInput = dialog.querySelector('[data-business-font="description"]');
+  if (descricaoInput) descricaoInput.value = String(fonteDescricao);
+  const descricaoOutput = dialog.querySelector('[data-business-font-output="description"]');
+  if (descricaoOutput) descricaoOutput.value = String(fonteDescricao);
 
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
@@ -976,13 +1030,17 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     stage.style.height = `${height}px`;
     stage.style.setProperty("--business-name-color", corNome);
     stage.style.setProperty("--business-detail-color", corDetalhe);
-    stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit });
+    stage.style.setProperty("--business-description-font-size", `${fonteDescricao}px`);
+    stage.style.setProperty("--business-whatsapp-font-size", `${fonteWhatsapp}px`);
+    stage.style.setProperty("--business-city-font-size", `${fonteCidade}px`);
+    stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte });
     dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
     await aguardarImagensArteComercial(stage);
     const card = stage.querySelector(".business-art-card");
     const picture = stage.querySelector(".business-art-picture");
     const mainImage = picture?.querySelector(".business-art-main-image");
-    if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
+    const mosaic = picture?.querySelector(".business-art-mosaic");
+    if (picture && (mosaic || (mainImage?.naturalWidth && mainImage?.naturalHeight))) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
       const pictureHeights = {
         showcase: {
@@ -994,11 +1052,27 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             "description-xlong": 600
           },
           feed: {
-            "description-empty": 500,
-            "description-short": 480,
-            "description-medium": 420,
-            "description-long": 350,
-            "description-xlong": 300
+            "description-empty": 540,
+            "description-short": 520,
+            "description-medium": 470,
+            "description-long": 410,
+            "description-xlong": 350
+          }
+        },
+        mosaic: {
+          story: {
+            "description-empty": 820,
+            "description-short": 790,
+            "description-medium": 720,
+            "description-long": 640,
+            "description-xlong": 570
+          },
+          feed: {
+            "description-empty": 530,
+            "description-short": 510,
+            "description-medium": 460,
+            "description-long": 400,
+            "description-xlong": 340
           }
         },
         classic: {
@@ -1010,32 +1084,50 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             "description-xlong": 540
           },
           feed: {
-            "description-empty": 440,
-            "description-short": 420,
-            "description-medium": 360,
-            "description-long": 310,
-            "description-xlong": 270
+            "description-empty": 520,
+            "description-short": 500,
+            "description-medium": 450,
+            "description-long": 390,
+            "description-xlong": 340
           }
         }
       };
       const maxHeight = pictureHeights[layoutArte][formato][descriptionClass];
-      const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
-      const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
-      const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));
-      picture.style.setProperty("--business-picture-width", `${fittedWidth}px`);
-      picture.style.setProperty("--business-picture-height", `${fittedHeight}px`);
-      const shadow = criarSombraRasterArteComercial(fittedWidth, fittedHeight, efeitoFoto, cantosArredondados);
-      if (shadow) {
-        const shadowCanvas = shadow.canvas;
-        shadowCanvas.className = "business-art-shadow-raster";
-        shadowCanvas.setAttribute("aria-hidden", "true");
-        Object.assign(shadowCanvas.style, {
-          left: `${shadow.left}px`,
-          top: `${shadow.top}px`,
-          width: `${shadow.width}px`,
-          height: `${shadow.height}px`
-        });
-        picture.prepend(shadowCanvas);
+      if (mosaic) {
+        picture.style.setProperty("--business-picture-width", `${maxWidth}px`);
+        picture.style.setProperty("--business-picture-height", `${maxHeight}px`);
+        const shadow = criarSombraRasterArteComercial(maxWidth, maxHeight, efeitoFoto, cantosArredondados);
+        if (shadow) {
+          const shadowCanvas = shadow.canvas;
+          shadowCanvas.className = "business-art-shadow-raster";
+          shadowCanvas.setAttribute("aria-hidden", "true");
+          Object.assign(shadowCanvas.style, {
+            left: `${shadow.left}px`,
+            top: `${shadow.top}px`,
+            width: `${shadow.width}px`,
+            height: `${shadow.height}px`
+          });
+          picture.prepend(shadowCanvas);
+        }
+      } else {
+        const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
+        const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
+        const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));
+        picture.style.setProperty("--business-picture-width", `${fittedWidth}px`);
+        picture.style.setProperty("--business-picture-height", `${fittedHeight}px`);
+        const shadow = criarSombraRasterArteComercial(fittedWidth, fittedHeight, efeitoFoto, cantosArredondados);
+        if (shadow) {
+          const shadowCanvas = shadow.canvas;
+          shadowCanvas.className = "business-art-shadow-raster";
+          shadowCanvas.setAttribute("aria-hidden", "true");
+          Object.assign(shadowCanvas.style, {
+            left: `${shadow.left}px`,
+            top: `${shadow.top}px`,
+            width: `${shadow.width}px`,
+            height: `${shadow.height}px`
+          });
+          picture.prepend(shadowCanvas);
+        }
       }
     }
     const disclaimer = stage.querySelector(".business-art-disclaimer");
@@ -1083,7 +1175,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     button.addEventListener("click", async () => {
       layoutArte = button.dataset.businessLayout || "classic";
       dialog.querySelectorAll("[data-business-layout]").forEach((item) => item.classList.toggle("active", item === button));
-      dialog.querySelector(".business-art-color-controls")?.classList.toggle("is-hidden", layoutArte !== "showcase");
+      dialog.querySelector(".business-art-color-controls")?.classList.toggle("is-hidden", layoutArte === "classic");
       await render();
     });
   });
@@ -1092,6 +1184,23 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       if (input.dataset.businessColor === "name") corNome = input.value;
       if (input.dataset.businessColor === "detail") corDetalhe = input.value;
       await render();
+    });
+  });
+  dialog.querySelectorAll("[data-business-font]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const value = Number(input.value);
+      const fontType = input.dataset.businessFont;
+      if (fontType === "description") fonteDescricao = value;
+      if (fontType === "whatsapp") fonteWhatsapp = value;
+      if (fontType === "city") fonteCidade = value;
+      const output = dialog.querySelector(`[data-business-font-output="${fontType}"]`);
+      if (output) output.value = String(value);
+      const variable = {
+        description: "--business-description-font-size",
+        whatsapp: "--business-whatsapp-font-size",
+        city: "--business-city-font-size"
+      }[fontType];
+      if (variable) stage.style.setProperty(variable, `${value}px`);
     });
   });
   dialog.querySelectorAll("[data-business-effect]").forEach((button) => {

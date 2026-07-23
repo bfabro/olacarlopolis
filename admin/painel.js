@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 488,
-  label: "v495",
+  numero: 489,
+  label: "v496",
   data: "2026-07-23",
-  nota: "A composicao das artes agora redistribui os espacos conforme o tamanho da descricao."
+  nota: "Arte para divulgacao ganhou foto maior no Feed, controles de fonte e layout Mosaico com ate quatro imagens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);

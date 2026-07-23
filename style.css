@@ -23733,3 +23733,158 @@ body.business-art-capturing-background .home-cards-intro {
   font-size: 22px;
   line-height: 1.28;
 }
+
+/* ===== Arte comercial: controles de texto e layout Mosaico ===== */
+.business-art-font-controls {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f4f7fc;
+}
+
+.business-art-font-controls label {
+  display: grid;
+  flex: 1;
+  gap: 5px;
+  min-width: 150px;
+  color: #334a68;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.business-art-font-controls label span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.business-art-font-controls output {
+  min-width: 28px;
+  padding: 2px 6px;
+  border-radius: 7px;
+  background: #e1ebfb;
+  color: #075fd5;
+  font-size: 10px;
+  text-align: center;
+}
+
+.business-art-font-controls input[type="range"] {
+  width: 100%;
+  accent-color: #0b63e6;
+  cursor: pointer;
+}
+
+.business-art-stage .business-art-identity p {
+  font-size: var(--business-description-font-size, 26px) !important;
+}
+
+.business-art-stage .business-art-info-card.is-whatsapp strong {
+  font-size: var(--business-whatsapp-font-size, 28px) !important;
+}
+
+.business-art-stage .business-art-info-card.is-city strong {
+  font-size: var(--business-city-font-size, 28px) !important;
+}
+
+/* A foto do Feed cresce para ocupar a composicao e o nome fica mais proximo. */
+.business-art-stage.is-feed .business-art-picture {
+  margin-bottom: 40px;
+}
+
+.business-art-stage.is-feed .business-art-identity {
+  padding-top: 10px;
+}
+
+.business-art-stage.layout-mosaic .business-art-card {
+  border-color: rgba(194, 214, 241, .92);
+}
+
+.business-art-stage.layout-mosaic .business-art-header > strong {
+  color: var(--business-name-color);
+}
+
+.business-art-stage.layout-mosaic .business-art-name-line {
+  background: var(--business-name-color);
+}
+
+.business-art-stage.layout-mosaic .business-art-identity h1 {
+  border-color: rgba(7, 95, 213, .28);
+}
+
+.business-art-stage.layout-mosaic .business-art-picture.is-mosaic {
+  display: block;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.business-art-stage.layout-mosaic .business-art-mosaic {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  gap: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 8px solid #fff;
+  border-radius: inherit;
+  background: #eaf2ff;
+}
+
+.business-art-stage.layout-mosaic .business-art-mosaic-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  object-fit: cover;
+}
+
+.business-art-stage.layout-mosaic .business-art-mosaic-count-2,
+.business-art-stage.layout-mosaic .business-art-mosaic-count-4 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.business-art-stage.layout-mosaic .business-art-mosaic-count-3 {
+  grid-template-columns: 1.12fr .88fr;
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.business-art-stage.layout-mosaic .business-art-mosaic-count-3 .business-art-mosaic-image:first-child {
+  grid-row: 1 / 3;
+}
+
+.business-art-stage.layout-mosaic .business-art-mosaic-count-4 {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.business-art-stage.layout-mosaic.effect-outline .business-art-mosaic {
+  border-color: var(--business-name-color);
+}
+
+.business-art-stage.layout-mosaic .business-art-footer {
+  background: linear-gradient(110deg, #063aa8 0%, var(--business-name-color) 58%, #1592ff 100%);
+}
+
+.business-art-stage.layout-mosaic.is-feed .business-art-picture {
+  margin-bottom: 28px;
+}
+
+@media (max-width: 700px) {
+  .business-art-font-controls {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .business-art-font-controls label {
+    min-width: 0;
+  }
+}
