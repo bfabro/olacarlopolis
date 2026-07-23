@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=345">
+  <link rel="stylesheet" href="painel.css?v=346">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -861,6 +861,20 @@
             </div>
           </section>
         </div>
+
+        <section class="panel-card online-clients-card">
+          <div class="section-head compact">
+            <div>
+              <span class="online-clients-kicker"><i class="fa-solid fa-user-shield"></i> Area administrativa</span>
+              <h2>Clientes logados agora</h2>
+              <p>Clientes autenticados no painel, separados dos visitantes do site publico.</p>
+            </div>
+            <span class="online-clients-total"><strong id="onlineClientsTotal">0</strong> online</span>
+          </div>
+          <div id="onlineClientsList" class="online-clients-list">
+            <div class="online-presence-empty">Carregando clientes logados...</div>
+          </div>
+        </section>
 
         <section id="onlinePresenceHistoryCard" class="panel-card online-presence-history-card hidden">
           <div class="section-head compact">
@@ -1757,6 +1771,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=416"></script>
+  <script type="module" src="painel.js?v=417"></script>
 </body>
 </html>

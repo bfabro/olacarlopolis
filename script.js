@@ -2826,18 +2826,40 @@ document.addEventListener("DOMContentLoaded", function () {
     const HIDDEN_REMOVE_DELAY_MS = 60 * 1000;
     const ACTIVITY_WRITE_THROTTLE_MS = 45 * 1000;
     const NAVIGATION_HISTORY_LIMIT = 20;
+    const PRESENCE_SESSION_ID_KEY = "oc_presence_session_id_v1";
+    const PRESENCE_HISTORY_KEY = "oc_presence_history_v1";
     let myUserRef = null;
     let inactiveTimer = null;
     let presenceStarted = false;
     let lastPresenceWriteAt = 0;
     let navigationHistory = [];
-    let lastNavigationPage = "";
+    try {
+      const storedHistory = JSON.parse(sessionStorage.getItem(PRESENCE_HISTORY_KEY) || "[]");
+      if (Array.isArray(storedHistory)) navigationHistory = storedHistory.slice(-NAVIGATION_HISTORY_LIMIT);
+    } catch (error) {
+      navigationHistory = [];
+    }
+    let lastNavigationPage = [...navigationHistory].reverse().find((item) => item?.tipo !== "clique")?.pagina || "";
     let logicalPresencePage = location.pathname + location.hash;
     let lastClickSignature = "";
     let lastClickAt = 0;
+    let presenceSessionId = "";
+    try {
+      presenceSessionId = sessionStorage.getItem(PRESENCE_SESSION_ID_KEY) || "";
+    } catch (error) {
+      presenceSessionId = "";
+    }
+    if (!presenceSessionId) {
+      presenceSessionId = onlineUsersRef.push().key || `sessao-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      try { sessionStorage.setItem(PRESENCE_SESSION_ID_KEY, presenceSessionId); } catch (error) { }
+    }
 
     const browserPresencePage = () => location.pathname + location.hash;
     const currentPresencePage = () => logicalPresencePage || browserPresencePage();
+
+    const persistPresenceHistory = () => {
+      try { sessionStorage.setItem(PRESENCE_HISTORY_KEY, JSON.stringify(navigationHistory.slice(-NAVIGATION_HISTORY_LIMIT))); } catch (error) { }
+    };
 
     const appendNavigationHistory = (type = "navegacao") => {
       const page = currentPresencePage();
@@ -2849,6 +2871,7 @@ document.addEventListener("DOMContentLoaded", function () {
         timestamp: Date.now()
       });
       navigationHistory = navigationHistory.slice(-NAVIGATION_HISTORY_LIMIT);
+      persistPresenceHistory();
       return true;
     };
 
@@ -2871,7 +2894,10 @@ document.addEventListener("DOMContentLoaded", function () {
         "[data-public-client-link]",
         "[data-promo-est-link]",
         "[data-promo-detail-key]",
-        "a[href^='#']"
+        "a[href^='#']",
+        "a[href='index.html']",
+        "a[href='./']",
+        "a[href='/']"
       ].join(","));
       if (!element) return null;
 
@@ -2904,6 +2930,8 @@ document.addEventListener("DOMContentLoaded", function () {
       } else if (element.matches(".sidebar .nav_link")) {
         area = "Menu lateral";
         label = element.querySelector(".navlink")?.textContent || element.textContent;
+        const homeHref = String(element.getAttribute("href") || "").toLowerCase();
+        if (["index.html", "./", "/"].includes(homeHref)) destinationPage = "/";
       } else if (element.matches(".busca-item")) {
         area = "Resultado da busca";
         label = element.querySelector("strong")?.textContent || element.textContent;
@@ -2920,11 +2948,15 @@ document.addEventListener("DOMContentLoaded", function () {
         area = element.querySelector(".card-divulgacao-categoria")?.textContent || "Card";
         label = element.querySelector("h4, h3, strong")?.textContent || element.getAttribute("aria-label") || element.textContent;
       } else {
-        area = element.matches("[data-promo-detail-key]") ? "Promocao" : "Conteudo";
+        const homeHref = String(element.getAttribute("href") || "").toLowerCase();
+        const isHomeLink = ["index.html", "./", "/"].includes(homeHref);
+        area = isHomeLink ? "Cabecalho" : (element.matches("[data-promo-detail-key]") ? "Promocao" : "Conteudo");
         label = element.getAttribute("aria-label")
           || element.getAttribute("title")
           || element.querySelector("h4, h3, strong")?.textContent
-          || element.textContent;
+          || element.textContent
+          || (isHomeLink ? "Ola Carlopolis" : "");
+        if (isHomeLink) destinationPage = "/";
       }
 
       label = cleanClickLabel(label);
@@ -2954,6 +2986,7 @@ document.addEventListener("DOMContentLoaded", function () {
         timestamp: now
       });
       navigationHistory = navigationHistory.slice(-NAVIGATION_HISTORY_LIMIT);
+      persistPresenceHistory();
       if (details.destinationPage) {
         logicalPresencePage = details.destinationPage;
         lastNavigationPage = details.destinationPage;
@@ -2982,6 +3015,7 @@ document.addEventListener("DOMContentLoaded", function () {
       appendNavigationHistory("entrada");
       myUserRef = onlineUsersRef.push();
       myUserRef.set({
+        sessionId: presenceSessionId,
         origem: getOrigemAcesso(),
         pagina: currentPresencePage(),
         historico: navigationHistory,

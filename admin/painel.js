@@ -14,6 +14,8 @@ import {
   query,
   limitToLast,
   onValue,
+  push,
+  onDisconnect,
   set as firebaseSet,
   update as firebaseUpdate,
   remove as firebaseRemove,
@@ -41,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 481,
-  label: "v488",
+  numero: 482,
+  label: "v489",
   data: "2026-07-22",
-  nota: "Historico online agora registra os cliques reais em acessos rapidos, menus, categorias, cards e abas."
+  nota: "Navegacao pelo Inicio preserva a sessao e o Master agora ve clientes autenticados online separadamente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -60,6 +62,14 @@ let onlinePresenceUnsubscribe = null;
 let onlinePresenceTicker = null;
 let onlinePresenceData = {};
 let onlinePresenceSelectedSessionId = "";
+let onlineClientsUnsubscribe = null;
+let onlineClientsData = {};
+let authenticatedClientPresenceRef = null;
+let authenticatedClientPresenceDisconnect = null;
+let authenticatedClientPresenceConnectedUnsubscribe = null;
+let authenticatedClientPresenceHeartbeat = null;
+let authenticatedClientPresenceView = "Minha empresa";
+let authenticatedClientPresenceEventsBound = false;
 let automovelArtePreviewTimer = null;
 let automovelArteDragState = null;
 let automovelArteDragFrame = null;
@@ -2639,6 +2649,62 @@ function roleLabel(role) {
   }[key] || "Sem perfil";
 }
 
+function authenticatedClientPresencePayload(active = !document.hidden) {
+  const client = currentClientRecord() || {};
+  return {
+    clienteId: currentClientId(),
+    clienteNome: client.nome || "",
+    categoria: client.categoria || "",
+    active: Boolean(active),
+    pagina: authenticatedClientPresenceView || "Minha empresa",
+    lastSeen: serverTimestamp()
+  };
+}
+
+function touchAuthenticatedClientPresence(active = !document.hidden) {
+  if (!authenticatedClientPresenceRef) return;
+  firebaseUpdate(authenticatedClientPresenceRef, authenticatedClientPresencePayload(active)).catch(() => {});
+}
+
+function stopAuthenticatedClientPresence() {
+  if (authenticatedClientPresenceHeartbeat) clearInterval(authenticatedClientPresenceHeartbeat);
+  authenticatedClientPresenceHeartbeat = null;
+  if (authenticatedClientPresenceConnectedUnsubscribe) authenticatedClientPresenceConnectedUnsubscribe();
+  authenticatedClientPresenceConnectedUnsubscribe = null;
+  if (authenticatedClientPresenceRef) firebaseRemove(authenticatedClientPresenceRef).catch(() => {});
+  authenticatedClientPresenceDisconnect = null;
+  authenticatedClientPresenceRef = null;
+}
+
+function bindAuthenticatedClientPresenceEvents() {
+  if (authenticatedClientPresenceEventsBound) return;
+  authenticatedClientPresenceEventsBound = true;
+  document.addEventListener("visibilitychange", () => touchAuthenticatedClientPresence(true));
+  window.addEventListener("focus", () => touchAuthenticatedClientPresence(true));
+}
+
+function startAuthenticatedClientPresence() {
+  stopAuthenticatedClientPresence();
+  if (canManageClients() || !currentClientId() || !state.user) return;
+  const connectionRef = push(ref(db, `clientesOnline/${currentClientId()}`));
+  authenticatedClientPresenceRef = connectionRef;
+  bindAuthenticatedClientPresenceEvents();
+  authenticatedClientPresenceConnectedUnsubscribe = onValue(ref(db, ".info/connected"), async (snapshot) => {
+    if (snapshot.val() !== true || !authenticatedClientPresenceRef) return;
+    try {
+      authenticatedClientPresenceDisconnect = onDisconnect(authenticatedClientPresenceRef);
+      await authenticatedClientPresenceDisconnect.remove();
+      await firebaseSet(authenticatedClientPresenceRef, {
+        ...authenticatedClientPresencePayload(true),
+        timestamp: serverTimestamp()
+      });
+    } catch (error) {
+      console.warn("Nao foi possivel atualizar a presenca do cliente no painel.", error);
+    }
+  });
+  authenticatedClientPresenceHeartbeat = setInterval(() => touchAuthenticatedClientPresence(true), 30_000);
+}
+
 function onlinePresencePageInfo(rawPage = "") {
   let page = String(rawPage || "/").trim();
   try {
@@ -2735,7 +2801,7 @@ function onlinePresenceClock(timestamp) {
 }
 
 function activeOnlinePresenceSessions(now = Date.now()) {
-  return Object.entries(onlinePresenceData || {})
+  const sessions = Object.entries(onlinePresenceData || {})
     .map(([id, value]) => {
       const session = value && typeof value === "object" ? value : {};
       const lastSeen = Number(session.lastSeen || session.timestamp || 0);
@@ -2750,6 +2816,64 @@ function activeOnlinePresenceSessions(now = Date.now()) {
       && session.lastSeen > 0
       && (now - session.lastSeen) <= ONLINE_PRESENCE_RECENT_MS)
     .sort((a, b) => b.lastSeen - a.lastSeen);
+  return [...new Map(sessions.map((session) => [session.sessionId || session.id, session])).values()];
+}
+
+function activeOnlineClients(now = Date.now()) {
+  return Object.entries(onlineClientsData || {}).map(([clientId, sessionsNode]) => {
+    const connections = Object.entries(sessionsNode && typeof sessionsNode === "object" ? sessionsNode : {})
+      .map(([id, value]) => ({ id, ...(value && typeof value === "object" ? value : {}) }))
+      .filter((connection) => {
+        const lastSeen = Number(connection.lastSeen || connection.timestamp || 0);
+        return connection.active !== false && lastSeen > 0;
+      });
+    if (!connections.length) return null;
+    const client = state.clientes.find((item) => item.id === clientId) || {};
+    const latest = connections.sort((a, b) => Number(b.lastSeen || 0) - Number(a.lastSeen || 0))[0] || {};
+    const firstTimestamp = Math.min(...connections.map((item) => Number(item.timestamp || item.lastSeen || now)));
+    return {
+      clientId,
+      name: client.nome || latest.clienteNome || clientId,
+      category: client.categoria || latest.categoria || "Cliente",
+      image: client.imagem || "",
+      connections: connections.length,
+      pages: [...new Set(connections.map((item) => item.pagina).filter(Boolean))],
+      timestamp: firstTimestamp,
+      lastSeen: Number(latest.lastSeen || latest.timestamp || 0)
+    };
+  }).filter(Boolean).sort((a, b) => b.lastSeen - a.lastSeen);
+}
+
+function renderOnlineClients(now = Date.now()) {
+  const clients = activeOnlineClients(now);
+  if ($("onlineClientsTotal")) $("onlineClientsTotal").textContent = String(clients.length);
+  const list = $("onlineClientsList");
+  if (!list) return;
+  list.innerHTML = clients.length
+    ? clients.map((client) => {
+        const initial = String(client.name || "C").trim().charAt(0).toUpperCase() || "C";
+        return `
+          <article class="online-client-item">
+            <span class="online-client-avatar">
+              ${client.image ? `<img src="${escapeAttr(client.image)}" alt="${escapeAttr(client.name)}">` : escapeHtml(initial)}
+              <i></i>
+            </span>
+            <div class="online-client-copy">
+              <strong>${escapeHtml(client.name)}</strong>
+              <span>${escapeHtml(client.category)}</span>
+            </div>
+            <div class="online-client-page">
+              <small>Tela no painel</small>
+              <strong>${escapeHtml(client.pages.join(" / ") || "Minha empresa")}</strong>
+            </div>
+            <div class="online-client-meta">
+              <span><i class="fa-regular fa-clock"></i> desde ${escapeHtml(onlinePresenceClock(client.timestamp))}</span>
+              <span><i class="fa-solid fa-signal"></i> ${client.connections} sessao(oes)</span>
+            </div>
+          </article>
+        `;
+      }).join("")
+    : `<div class="online-presence-empty"><i class="fa-solid fa-user-slash"></i><strong>Nenhum cliente logado agora</strong><span>Os clientes aparecerao aqui assim que entrarem no painel.</span></div>`;
 }
 
 function onlinePresenceHistoryItems(session = {}) {
@@ -2847,6 +2971,7 @@ function renderOnlinePresence() {
   const maxPageCount = Math.max(1, ...pageGroups.map((item) => item.count));
   const siteCount = sessions.filter((session) => String(session.origem || "site").toLowerCase() !== "app").length;
   const appCount = sessions.filter((session) => String(session.origem || "").toLowerCase() === "app").length;
+  renderOnlineClients(now);
 
   if ($("onlinePresenceTotal")) $("onlinePresenceTotal").textContent = String(sessions.length);
   if ($("onlinePresencePages")) $("onlinePresencePages").textContent = String(pageGroups.length);
@@ -2903,6 +3028,8 @@ function renderOnlinePresence() {
 function stopOnlinePresenceMonitor() {
   if (onlinePresenceUnsubscribe) onlinePresenceUnsubscribe();
   onlinePresenceUnsubscribe = null;
+  if (onlineClientsUnsubscribe) onlineClientsUnsubscribe();
+  onlineClientsUnsubscribe = null;
   if (onlinePresenceTicker) clearInterval(onlinePresenceTicker);
   onlinePresenceTicker = null;
 }
@@ -2921,6 +3048,17 @@ function startOnlinePresenceMonitor() {
       }
     });
   }
+  if (!onlineClientsUnsubscribe) {
+    onlineClientsUnsubscribe = onValue(ref(db, "clientesOnline"), (snapshot) => {
+      onlineClientsData = snapshot.val() || {};
+      renderOnlinePresence();
+    }, (error) => {
+      console.error("Falha ao acompanhar clientes logados.", error);
+      if ($("onlineClientsList")) {
+        $("onlineClientsList").innerHTML = `<div class="online-presence-empty"><strong>Nao foi possivel carregar os clientes logados.</strong></div>`;
+      }
+    });
+  }
   if (!onlinePresenceTicker) onlinePresenceTicker = setInterval(renderOnlinePresence, 10_000);
 
   const refreshButton = $("onlinePresenceRefresh");
@@ -2930,8 +3068,12 @@ function startOnlinePresenceMonitor() {
       refreshButton.disabled = true;
       refreshButton.classList.add("is-loading");
       try {
-        const snapshot = await get(ref(db, "onlineUsers"));
-        onlinePresenceData = snapshot.val() || {};
+        const [visitorSnapshot, clientSnapshot] = await Promise.all([
+          get(ref(db, "onlineUsers")),
+          get(ref(db, "clientesOnline"))
+        ]);
+        onlinePresenceData = visitorSnapshot.val() || {};
+        onlineClientsData = clientSnapshot.val() || {};
         renderOnlinePresence();
       } catch (error) {
         console.error("Falha ao atualizar usuarios online.", error);
@@ -2964,6 +3106,8 @@ function switchView(name) {
     btn.classList.toggle("active", btn.dataset.view === target);
   });
   const [title, subtitle] = viewCopy[target];
+  authenticatedClientPresenceView = title;
+  touchAuthenticatedClientPresence(true);
   $("viewTitle").textContent = title;
   $("viewSubtitle").textContent = subtitle;
   collapseEntryFormsForView(target);
@@ -16281,6 +16425,7 @@ onAuthStateChanged(auth, async (user) => {
     clearAdminIdlePauseReasons();
     stopClientMetricsRealtime();
     stopOnlinePresenceMonitor();
+    stopAuthenticatedClientPresence();
     state.profile = null;
     hidePanelLoading();
     $("loginView").classList.remove("hidden");
@@ -16307,6 +16452,7 @@ onAuthStateChanged(auth, async (user) => {
     prepareInitialView(initialView);
     updateChrome();
     await loadAllData(setPanelLoadingProgress);
+    startAuthenticatedClientPresence();
     renderClientBillingAlert();
     if (!canManageClients()) renderClientOnlyEditor();
     switchView(initialView);
