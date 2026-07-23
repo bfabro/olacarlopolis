@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=346">
+  <link rel="stylesheet" href="painel.css?v=347">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -812,6 +812,11 @@
             <strong id="onlinePresenceTotal">0</strong>
             <small>Sessoes ativas</small>
           </article>
+          <article class="online-presence-stat is-accesses">
+            <span>Total de acessos</span>
+            <strong id="onlinePresenceAccesses">0</strong>
+            <small>Navegacoes nas sessoes ativas</small>
+          </article>
           <article class="online-presence-stat">
             <span>Telas acessadas</span>
             <strong id="onlinePresencePages">0</strong>
@@ -862,6 +867,25 @@
           </section>
         </div>
 
+        <section id="onlinePresenceHistoryCard" class="panel-card online-presence-history-card">
+          <div class="section-head compact">
+            <div>
+              <span class="online-presence-history-kicker"><i class="fa-solid fa-route"></i> Ultimas 20 navegacoes</span>
+              <h2 id="onlinePresenceHistoryTitle">Historico de navegacao</h2>
+              <p id="onlinePresenceHistorySubtitle">Selecione um visitante para acompanhar o caminho percorrido nesta sessao.</p>
+            </div>
+            <button id="onlinePresenceHistoryClose" type="button" class="ghost-button hidden"><i class="fa-solid fa-eraser"></i> Limpar selecao</button>
+          </div>
+          <div id="onlinePresenceHistoryFlow" class="online-presence-history-flow">
+            <div class="online-presence-history-placeholder">
+              <i class="fa-solid fa-route"></i>
+              <strong>Selecione um visitante</strong>
+              <span>Clique em "Ver historico" na lista de sessoes ativas para visualizar a navegacao em ordem.</span>
+            </div>
+          </div>
+          <div id="onlinePresenceHistoryTimeline" class="online-presence-history-timeline"></div>
+        </section>
+
         <section class="panel-card online-clients-card">
           <div class="section-head compact">
             <div>
@@ -874,18 +898,6 @@
           <div id="onlineClientsList" class="online-clients-list">
             <div class="online-presence-empty">Carregando clientes logados...</div>
           </div>
-        </section>
-
-        <section id="onlinePresenceHistoryCard" class="panel-card online-presence-history-card hidden">
-          <div class="section-head compact">
-            <div>
-              <span class="online-presence-history-kicker"><i class="fa-solid fa-route"></i> Ultimas 20 navegacoes</span>
-              <h2 id="onlinePresenceHistoryTitle">Historico do visitante</h2>
-              <p id="onlinePresenceHistorySubtitle">Sequencia anonima de telas acessadas nesta sessao.</p>
-            </div>
-            <button id="onlinePresenceHistoryClose" type="button" class="ghost-button"><i class="fa-solid fa-xmark"></i> Fechar</button>
-          </div>
-          <div id="onlinePresenceHistoryTimeline" class="online-presence-history-timeline"></div>
         </section>
       </section>
 
@@ -1771,6 +1783,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=417"></script>
+  <script type="module" src="painel.js?v=418"></script>
 </body>
 </html>

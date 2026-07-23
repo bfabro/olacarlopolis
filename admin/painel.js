@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 482,
-  label: "v489",
-  data: "2026-07-22",
-  nota: "Navegacao pelo Inicio preserva a sessao e o Master agora ve clientes autenticados online separadamente."
+  numero: 483,
+  label: "v490",
+  data: "2026-07-23",
+  nota: "Usuarios online agora exibem o total de acessos das sessoes ativas e um historico visual permanente da navegacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2919,22 +2919,58 @@ function onlinePresenceHistoryIcon(item = {}, pageInfo = {}) {
 function renderOnlinePresenceHistory(sessions = []) {
   const card = $("onlinePresenceHistoryCard");
   if (!card) return;
+  const flow = $("onlinePresenceHistoryFlow");
+  const timeline = $("onlinePresenceHistoryTimeline");
+  const closeButton = $("onlinePresenceHistoryClose");
   const sessionIndex = sessions.findIndex((session) => session.id === onlinePresenceSelectedSessionId);
   if (sessionIndex < 0) {
     onlinePresenceSelectedSessionId = "";
-    card.classList.add("hidden");
+    if ($("onlinePresenceHistoryTitle")) $("onlinePresenceHistoryTitle").textContent = "Historico de navegacao";
+    if ($("onlinePresenceHistorySubtitle")) {
+      $("onlinePresenceHistorySubtitle").textContent = "Selecione um visitante para acompanhar o caminho percorrido nesta sessao.";
+    }
+    closeButton?.classList.add("hidden");
+    if (flow) {
+      flow.innerHTML = `
+        <div class="online-presence-history-placeholder">
+          <i class="fa-solid fa-route"></i>
+          <strong>Selecione um visitante</strong>
+          <span>Clique em "Ver historico" na lista de sessoes ativas para visualizar a navegacao em ordem.</span>
+        </div>
+      `;
+    }
+    if (timeline) timeline.innerHTML = "";
     return;
   }
 
   const session = sessions[sessionIndex];
   const history = onlinePresenceHistoryItems(session);
-  card.classList.remove("hidden");
+  closeButton?.classList.remove("hidden");
   if ($("onlinePresenceHistoryTitle")) $("onlinePresenceHistoryTitle").textContent = `Historico do Visitante ${sessionIndex + 1}`;
   if ($("onlinePresenceHistorySubtitle")) {
     $("onlinePresenceHistorySubtitle").textContent = `${history.length} acesso(s) registrado(s) nesta sessao, do mais antigo ao mais recente.`;
   }
-  if ($("onlinePresenceHistoryTimeline")) {
-    $("onlinePresenceHistoryTimeline").innerHTML = history.map((item, index) => {
+  if (flow) {
+    flow.innerHTML = `
+      <div class="online-presence-history-flow-track">
+        ${history.map((item, index) => {
+          const pageInfo = onlinePresencePageInfo(item.pagina);
+          const isClick = item.tipo === "clique";
+          const itemLabel = isClick && item.rotulo ? item.rotulo : pageInfo.label;
+          return `
+            <span class="online-presence-history-flow-step ${index === history.length - 1 ? "is-current" : ""}" title="${escapeAttr(itemLabel)}">
+              <i class="fa-solid ${escapeAttr(onlinePresenceHistoryIcon(item, pageInfo))}"></i>
+              <b>${escapeHtml(itemLabel)}</b>
+              <small>${index + 1}</small>
+            </span>
+            ${index < history.length - 1 ? `<i class="fa-solid fa-chevron-right online-presence-history-flow-arrow"></i>` : ""}
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+  if (timeline) {
+    timeline.innerHTML = history.map((item, index) => {
       const pageInfo = onlinePresencePageInfo(item.pagina);
       const isCurrent = index === history.length - 1;
       const isClick = item.tipo === "clique";
@@ -2971,9 +3007,11 @@ function renderOnlinePresence() {
   const maxPageCount = Math.max(1, ...pageGroups.map((item) => item.count));
   const siteCount = sessions.filter((session) => String(session.origem || "site").toLowerCase() !== "app").length;
   const appCount = sessions.filter((session) => String(session.origem || "").toLowerCase() === "app").length;
+  const accessCount = sessions.reduce((total, session) => total + onlinePresenceHistoryItems(session).length, 0);
   renderOnlineClients(now);
 
   if ($("onlinePresenceTotal")) $("onlinePresenceTotal").textContent = String(sessions.length);
+  if ($("onlinePresenceAccesses")) $("onlinePresenceAccesses").textContent = String(accessCount);
   if ($("onlinePresencePages")) $("onlinePresencePages").textContent = String(pageGroups.length);
   if ($("onlinePresenceSite")) $("onlinePresenceSite").textContent = String(siteCount);
   if ($("onlinePresenceApp")) $("onlinePresenceApp").textContent = String(appCount);
@@ -3090,7 +3128,7 @@ function startOnlinePresenceMonitor() {
     historyClose.dataset.bound = "true";
     historyClose.addEventListener("click", () => {
       onlinePresenceSelectedSessionId = "";
-      $("onlinePresenceHistoryCard")?.classList.add("hidden");
+      renderOnlinePresence();
     });
   }
 }
