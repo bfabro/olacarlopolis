@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 485,
-  label: "v492",
+  numero: 486,
+  label: "v493",
   data: "2026-07-23",
-  nota: "Historico de navegacao agora e compacto, retratil e permite consultar sessoes encerradas recentemente."
+  nota: "Etapas do historico agora exibem descricao e horario na propria grade, sem lista vertical duplicada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3009,7 +3009,6 @@ function renderOnlinePresenceHistory(activeSessions = [], archivedSessions = [])
   const card = $("onlinePresenceHistoryCard");
   if (!card) return;
   const flow = $("onlinePresenceHistoryFlow");
-  const timeline = $("onlinePresenceHistoryTimeline");
   const closeButton = $("onlinePresenceHistoryClose");
   const activeIndex = activeSessions.findIndex((session) => String(session.sessionId || session.id) === onlinePresenceSelectedSessionId);
   const archivedIndex = archivedSessions.findIndex((session) => String(session.sessionId || session.archiveId || session.id) === onlinePresenceSelectedSessionId);
@@ -3031,7 +3030,6 @@ function renderOnlinePresenceHistory(activeSessions = [], archivedSessions = [])
         </div>
       `;
     }
-    if (timeline) timeline.innerHTML = "";
     return;
   }
 
@@ -3055,40 +3053,22 @@ function renderOnlinePresenceHistory(activeSessions = [], archivedSessions = [])
           const pageInfo = onlinePresencePageInfo(item.pagina);
           const isClick = item.tipo === "clique";
           const itemLabel = isClick && item.rotulo ? item.rotulo : pageInfo.label;
+          const detailLabel = item.tipo === "entrada"
+            ? "Entrada no site"
+            : (isClick ? `Clique em ${item.area || "conteudo"}` : "Mudanca de tela");
           return `
             <span class="online-presence-history-flow-step ${index === history.length - 1 ? (isArchived ? "is-ended" : "is-current") : ""}" title="${escapeAttr(itemLabel)}">
               <i class="fa-solid ${escapeAttr(onlinePresenceHistoryIcon(item, pageInfo))}"></i>
-              <b>${escapeHtml(itemLabel)}</b>
+              <span class="online-presence-history-flow-copy">
+                <b>${escapeHtml(itemLabel)}</b>
+                <em>${escapeHtml(detailLabel)} - ${escapeHtml(onlinePresenceClock(item.timestamp))}</em>
+              </span>
               <small>${index + 1}</small>
             </span>
           `;
         }).join("")}
       </div>
     `;
-  }
-  if (timeline) {
-    timeline.innerHTML = history.map((item, index) => {
-      const pageInfo = onlinePresencePageInfo(item.pagina);
-      const isCurrent = index === history.length - 1;
-      const isClick = item.tipo === "clique";
-      const itemLabel = isClick && item.rotulo ? item.rotulo : pageInfo.label;
-      const detailLabel = item.tipo === "entrada"
-        ? "Entrada no site"
-        : (isClick ? `Clique em ${item.area || "conteudo"}` : "Mudanca de tela");
-      return `
-        <article class="online-presence-history-item ${isCurrent ? (isArchived ? "is-ended" : "is-current") : ""} ${isClick ? "is-click" : ""}">
-          <span class="online-presence-history-index">${index + 1}</span>
-          <span class="online-presence-history-icon"><i class="fa-solid ${escapeAttr(onlinePresenceHistoryIcon(item, pageInfo))}"></i></span>
-          <div>
-            <strong>${escapeHtml(itemLabel)}</strong>
-            <small>${escapeHtml(detailLabel)} - ${escapeHtml(onlinePresenceClock(item.timestamp))}</small>
-          </div>
-          ${isCurrent
-            ? `<b class="${isArchived ? "is-ended" : ""}"><i></i> ${isArchived ? "Fim da sessao" : (isClick ? "Ultima acao" : "Tela atual")}</b>`
-            : `<i class="fa-solid fa-arrow-right online-presence-history-arrow"></i>`}
-        </article>
-      `;
-    }).join("");
   }
 }
 

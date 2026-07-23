@@ -1650,7 +1650,7 @@ button[type="submit"]:hover,
   grid-template-columns: 28px minmax(0, 1fr);
   align-items: center;
   gap: 8px;
-  min-height: 50px;
+  min-height: 76px;
   border: 1px solid #bfdbfe;
   border-radius: 14px;
   padding: 8px 30px 8px 9px;
@@ -1691,12 +1691,31 @@ button[type="submit"]:hover,
 }
 
 .online-presence-history-flow-step b {
+  display: -webkit-box;
   max-width: 100%;
   overflow: hidden;
   color: #17233c;
   font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.2;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.online-presence-history-flow-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.online-presence-history-flow-copy em {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 9px;
+  font-style: normal;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .online-presence-history-flow-step small {
@@ -1756,131 +1775,6 @@ button[type="submit"]:hover,
 .online-presence-history-placeholder span {
   color: #64748b;
   font-size: 12px;
-}
-
-.online-presence-history-timeline {
-  display: grid;
-  gap: 9px;
-  max-height: 380px;
-  margin-top: 18px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 5px;
-  scrollbar-color: #94a3b8 #eef2f7;
-  scrollbar-width: thin;
-}
-
-.online-presence-history-item {
-  position: relative;
-  display: grid;
-  grid-template-columns: 34px 44px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 12px;
-  min-height: 68px;
-  border: 1px solid #e2e8f0;
-  border-radius: 15px;
-  padding: 11px 14px;
-  background: #fbfdff;
-}
-
-.online-presence-history-item.is-current {
-  border-color: #86efac;
-  background: linear-gradient(90deg, #f0fdf4, #fbfffd);
-}
-
-.online-presence-history-item.is-ended {
-  border-color: #cbd5e1;
-  background: linear-gradient(90deg, #f1f5f9, #fff);
-}
-
-.online-presence-history-item.is-click:not(.is-current) {
-  border-color: #bfdbfe;
-  background: linear-gradient(90deg, #eff6ff, #fbfdff);
-}
-
-.online-presence-history-item.is-click .online-presence-history-icon {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.online-presence-history-index {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: #e2e8f0;
-  color: #475569;
-  font-size: 11px;
-  font-weight: 900;
-}
-
-.online-presence-history-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 13px;
-  background: #eaf2ff;
-  color: #1767d7;
-}
-
-.online-presence-history-item > div {
-  min-width: 0;
-}
-
-.online-presence-history-item strong,
-.online-presence-history-item small {
-  display: block;
-}
-
-.online-presence-history-item strong {
-  overflow: hidden;
-  color: #17233c;
-  font-size: 14px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.online-presence-history-item small {
-  margin-top: 4px;
-  color: #64748b;
-  font-size: 11px;
-}
-
-.online-presence-history-item > b {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  border-radius: 999px;
-  padding: 6px 10px;
-  background: #dcfce7;
-  color: #15803d;
-  font-size: 11px;
-  white-space: nowrap;
-}
-
-.online-presence-history-item > b i {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: #22c55e;
-}
-
-.online-presence-history-item > b.is-ended {
-  background: #e2e8f0;
-  color: #475569;
-}
-
-.online-presence-history-item > b.is-ended i {
-  background: #64748b;
-}
-
-.online-presence-history-arrow {
-  color: #94a3b8;
-  font-size: 13px;
 }
 
 .online-presence-archive {
@@ -2134,21 +2028,6 @@ button[type="submit"]:hover,
     justify-items: start;
   }
 
-  .online-presence-history-item {
-    grid-template-columns: 28px 40px minmax(0, 1fr);
-    gap: 9px;
-    padding: 10px;
-  }
-
-  .online-presence-history-icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .online-presence-history-item > b,
-  .online-presence-history-arrow {
-    display: none;
-  }
 }
 
 .report-period-card {
