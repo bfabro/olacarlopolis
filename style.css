@@ -23640,7 +23640,17 @@ body.business-art-capturing-background .home-cards-intro {
   }
 }
 
-/* ===== Arte comercial: descricoes de ate 400 caracteres ===== */
+/* ===== Arte comercial: composicao proporcional ao tamanho da descricao ===== */
+.business-art-stage .business-art-card {
+  justify-content: space-between;
+}
+
+.business-art-stage .business-art-info {
+  margin-top: 0 !important;
+}
+
+.business-art-stage.description-short .business-art-identity p,
+.business-art-stage.description-medium .business-art-identity p,
 .business-art-stage.description-long .business-art-identity p,
 .business-art-stage.description-xlong .business-art-identity p {
   display: block !important;
@@ -23650,9 +23660,27 @@ body.business-art-capturing-background .home-cards-intro {
   -webkit-line-clamp: unset;
 }
 
+.business-art-stage.is-feed.description-empty .business-art-identity {
+  padding: 14px 18px 10px;
+}
+
+.business-art-stage.is-feed.description-short .business-art-identity {
+  padding: 18px 18px 14px;
+}
+
+.business-art-stage.is-feed.description-medium .business-art-identity {
+  padding: 17px 18px 15px;
+}
+
 .business-art-stage.is-feed.description-long .business-art-identity {
   padding-top: 14px;
   padding-bottom: 14px;
+}
+
+.business-art-stage.is-feed.description-short .business-art-identity p,
+.business-art-stage.is-feed.description-medium .business-art-identity p {
+  font-size: 27px;
+  line-height: 1.34;
 }
 
 .business-art-stage.is-feed.description-long .business-art-identity p {
@@ -23669,9 +23697,27 @@ body.business-art-capturing-background .home-cards-intro {
   line-height: 1.25;
 }
 
+.business-art-stage.is-story.description-empty .business-art-identity {
+  padding: 18px 22px 12px;
+}
+
+.business-art-stage.is-story.description-short .business-art-identity {
+  padding: 24px 22px 18px;
+}
+
+.business-art-stage.is-story.description-medium .business-art-identity {
+  padding: 22px 22px 18px;
+}
+
 .business-art-stage.is-story.description-long .business-art-identity {
   padding-top: 20px;
   padding-bottom: 18px;
+}
+
+.business-art-stage.is-story.description-short .business-art-identity p,
+.business-art-stage.is-story.description-medium .business-art-identity p {
+  font-size: 27px;
+  line-height: 1.38;
 }
 
 .business-art-stage.is-story.description-long .business-art-identity p {

@@ -964,9 +964,13 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
     const descriptionLength = dados.descricao.length;
-    const descriptionClass = descriptionLength > 340
-      ? "description-xlong"
-      : (descriptionLength > 260 ? "description-long" : "");
+    const descriptionClass = descriptionLength === 0
+      ? "description-empty"
+      : (descriptionLength <= 100
+        ? "description-short"
+        : (descriptionLength <= 220
+          ? "description-medium"
+          : (descriptionLength <= 320 ? "description-long" : "description-xlong")));
     stage.className = `business-art-stage is-${formato} layout-${layoutArte} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"} ${descriptionClass}`;
     stage.style.width = "1080px";
     stage.style.height = `${height}px`;
@@ -980,18 +984,41 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const mainImage = picture?.querySelector(".business-art-main-image");
     if (picture && mainImage?.naturalWidth && mainImage?.naturalHeight) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
-      let maxHeight = layoutArte === "showcase"
-        ? (formato === "story" ? 720 : 420)
-        : (formato === "story" ? 670 : 325);
-      if (descriptionClass === "description-long") {
-        maxHeight = layoutArte === "showcase"
-          ? (formato === "story" ? 660 : 360)
-          : (formato === "story" ? 620 : 310);
-      } else if (descriptionClass === "description-xlong") {
-        maxHeight = layoutArte === "showcase"
-          ? (formato === "story" ? 620 : 310)
-          : (formato === "story" ? 560 : 270);
-      }
+      const pictureHeights = {
+        showcase: {
+          story: {
+            "description-empty": 830,
+            "description-short": 800,
+            "description-medium": 730,
+            "description-long": 660,
+            "description-xlong": 600
+          },
+          feed: {
+            "description-empty": 500,
+            "description-short": 480,
+            "description-medium": 420,
+            "description-long": 350,
+            "description-xlong": 300
+          }
+        },
+        classic: {
+          story: {
+            "description-empty": 760,
+            "description-short": 730,
+            "description-medium": 670,
+            "description-long": 600,
+            "description-xlong": 540
+          },
+          feed: {
+            "description-empty": 440,
+            "description-short": 420,
+            "description-medium": 360,
+            "description-long": 310,
+            "description-xlong": 270
+          }
+        }
+      };
+      const maxHeight = pictureHeights[layoutArte][formato][descriptionClass];
       const scale = Math.min(maxWidth / mainImage.naturalWidth, maxHeight / mainImage.naturalHeight);
       const fittedWidth = Math.max(1, Math.round(mainImage.naturalWidth * scale));
       const fittedHeight = Math.max(1, Math.round(mainImage.naturalHeight * scale));

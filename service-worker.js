@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-23-arte-descricao-400-caracteres-v526'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-23-arte-espacamento-proporcional-v527'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

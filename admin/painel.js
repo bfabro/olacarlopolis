@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 487,
-  label: "v494",
+  numero: 488,
+  label: "v495",
   data: "2026-07-23",
-  nota: "Artes para divulgacao agora acomodam descricoes completas de ate 400 caracteres no Feed e Story."
+  nota: "A composicao das artes agora redistribui os espacos conforme o tamanho da descricao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
