@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 489,
-  label: "v496",
+  numero: 490,
+  label: "v497",
   data: "2026-07-23",
-  nota: "Arte para divulgacao ganhou foto maior no Feed, controles de fonte e layout Mosaico com ate quatro imagens."
+  nota: "Imoveis agora tem lista com rolagem independente no desktop e uma tela separada para artes do Instagram."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -327,6 +327,7 @@ const views = {
   eventos: $("eventosView"),
   noticias: $("noticiasView"),
   imoveis: $("imoveisView"),
+  imoveisArtes: $("imoveisArtesView"),
   automoveis: $("automoveisView"),
   automoveisArtes: $("automoveisArtesView"),
   informacoes: $("informacoesView"),
@@ -351,6 +352,7 @@ const viewCopy = {
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
   noticias: ["Noticias", "Cadastre materias para a home e para a pagina publica de noticias."],
   imoveis: ["Imoveis", "Cadastre imoveis para venda ou aluguel no site publico."],
+  imoveisArtes: ["Artes de imoveis", "Gere imagens para Instagram a partir dos imoveis cadastrados."],
   automoveis: ["Automoveis", "Cadastre veiculos para venda no site publico."],
   automoveisArtes: ["Artes de veiculos", "Gere imagens para Instagram de um ou varios veiculos."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
@@ -541,7 +543,7 @@ function canGenerateVeiculoImages() {
 }
 
 function canAccessImoveis() {
-  return hasPermission("imoveis") || canGenerateImovelImages();
+  return hasPermission("imoveis");
 }
 
 function canAccessAutomoveis() {
@@ -621,6 +623,7 @@ function canAccessView(viewName) {
   }
   if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenInvoice(currentClientRecord());
   if (viewName === "imoveis") return canAccessImoveis();
+  if (viewName === "imoveisArtes") return canGenerateImovelImages();
   if (viewName === "automoveis") return canAccessAutomoveis();
   if (viewName === "automoveisArtes") return canGenerateVeiculoImages();
   if (viewName === "noticias") return canManageClients() || hasPermission("noticias");
@@ -2550,7 +2553,7 @@ function updateChrome() {
     el.classList.toggle("hidden", !canGenerateImovelImages());
   });
   document.querySelectorAll("[data-classified-nav='true']").forEach((el) => {
-    el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !canAccessAutomoveis());
+    el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !canGenerateImovelImages() && !canAccessAutomoveis());
   });
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
@@ -3277,6 +3280,7 @@ function switchView(name) {
   if (target === "promocoesClientes") renderStaffPromocoesView();
   if (target === "noticias") renderNewsAdminList();
   if (target === "imoveis") renderImoveisList();
+  if (target === "imoveisArtes") renderImovelArteOptions();
   if (target === "automoveis") {
     renderAutomoveisList();
   }
@@ -9820,17 +9824,10 @@ function renderImoveisList() {
       <div class="list-meta">${escapeHtml([item.corretor || item.clienteNome, item.telefone].filter(Boolean).join(" - ") || "Sem contato")}</div>
       <div class="list-meta">${escapeHtml(item.origemBase === "script.js" && item.origem !== "painel" ? "Base inicial do site" : "Firebase / Painel")}</div>
       <span class="badge ${escapeAttr(item.status || "ativo")}">${statusLabel(item.status || "ativo")}</span>
-      ${canGenerateImovelImages() ? `<button type="button" data-art-imovel="${escapeAttr(item.id)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Arte Instagram</button>` : ""}
       <button type="button" data-edit-imovel="${escapeAttr(item.id)}">Editar</button>
       <button type="button" class="danger" data-delete-imovel="${escapeAttr(item.id)}">Excluir</button>
     </article>
   `; }).join("");
-  box.querySelectorAll("[data-art-imovel]").forEach((button) => {
-    button.addEventListener("click", () => {
-      if ($("imovelArteItem")) $("imovelArteItem").value = button.dataset.artImovel || "";
-      gerarArteInstagramImovel(button.dataset.artImovel, $("imovelArteLayout")?.value || "navyGold");
-    });
-  });
   box.querySelectorAll("[data-edit-imovel]").forEach((button) => {
     button.addEventListener("click", () => {
       const item = state.imoveis.find((imovel) => imovel.id === button.dataset.editImovel && itemBelongsToCurrentClient(imovel));

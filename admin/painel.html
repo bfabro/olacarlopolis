@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=350">
+  <link rel="stylesheet" href="painel.css?v=351">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -76,6 +76,7 @@
           <span class="nav-admin-group-title"><i class="fa-solid fa-rectangle-list"></i> Classificados</span>
           <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Noticias</button>
           <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
+          <button data-view="imoveisArtes" data-permission="gerar_imagens_imoveis"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de imoveis</button>
           <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
           <button data-view="automoveisArtes" data-permission="gerar_imagens_veiculos"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de veiculos</button>
         </section>
@@ -1057,8 +1058,8 @@
       </section>
 
       <section id="imoveisView" class="panel-view hidden">
-        <div class="split-layout">
-          <section class="panel-card form-collapsed">
+        <div class="split-layout imoveis-admin-layout">
+          <section class="panel-card form-collapsed imoveis-form-card">
             <div class="section-head">
               <div>
                 <h2>Cadastrar ou editar imovel</h2>
@@ -1162,14 +1163,28 @@
             </form>
           </section>
 
-          <section class="panel-card">
+          <section class="panel-card imoveis-list-card">
             <div class="section-head">
               <div>
                 <h2>Imoveis cadastrados</h2>
                 <p>Edite, inative ou remova anuncios.</p>
               </div>
             </div>
-            <div class="imovel-art-panel" data-permission="gerar_imagens_imoveis">
+            <input id="imovelSearch" class="search-input" placeholder="Buscar imovel...">
+            <div id="imoveisList" class="entity-list"></div>
+          </section>
+        </div>
+      </section>
+
+      <section id="imoveisArtesView" class="panel-view hidden">
+        <section class="panel-card imovel-art-screen-card" data-permission="gerar_imagens_imoveis">
+          <div class="section-head">
+            <div>
+              <h2>Artes para Instagram - imoveis</h2>
+              <p>Escolha o imovel e configure o modelo da imagem sem interferir no cadastro ou na lista de anuncios.</p>
+            </div>
+          </div>
+          <div class="imovel-art-panel">
               <div>
                 <strong>Arte para Instagram</strong>
                 <span>Escolha um imovel e uma das 6 combinacoes de cores para baixar a imagem.</span>
@@ -1189,8 +1204,8 @@
                 </select>
               </label>
               <button id="generateImovelArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
-            </div>
-            <section id="imovelCsEditor" class="imovel-cs-editor hidden" data-permission="gerar_imagens_imoveis">
+          </div>
+          <section id="imovelCsEditor" class="imovel-cs-editor hidden">
               <div class="section-head compact">
                 <div>
                   <strong>Editar arte CS</strong>
@@ -1232,11 +1247,8 @@
                   Exibir logo do Ola Carlopolis
                 </label>
               </div>
-            </section>
-            <input id="imovelSearch" class="search-input" placeholder="Buscar imovel...">
-            <div id="imoveisList" class="entity-list"></div>
           </section>
-        </div>
+        </section>
       </section>
 
       <section id="automoveisView" class="panel-view hidden">
@@ -1806,6 +1818,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=424"></script>
+  <script type="module" src="painel.js?v=425"></script>
 </body>
 </html>

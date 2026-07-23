@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-23-arte-mosaico-controles-fonte-v528'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-23-imoveis-lista-scroll-artes-separadas-v529'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
