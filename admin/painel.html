@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=348">
+  <link rel="stylesheet" href="painel.css?v=349">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -874,16 +874,33 @@
               <h2 id="onlinePresenceHistoryTitle">Historico de navegacao</h2>
               <p id="onlinePresenceHistorySubtitle">Selecione um visitante para acompanhar o caminho percorrido nesta sessao.</p>
             </div>
-            <button id="onlinePresenceHistoryClose" type="button" class="ghost-button hidden"><i class="fa-solid fa-eraser"></i> Limpar selecao</button>
-          </div>
-          <div id="onlinePresenceHistoryFlow" class="online-presence-history-flow">
-            <div class="online-presence-history-placeholder">
-              <i class="fa-solid fa-route"></i>
-              <strong>Selecione um visitante</strong>
-              <span>Clique em "Ver historico" na lista de sessoes ativas para visualizar a navegacao em ordem.</span>
+            <div class="section-actions">
+              <button id="onlinePresenceHistoryClose" type="button" class="ghost-button hidden"><i class="fa-solid fa-eraser"></i> Limpar selecao</button>
+              <button id="onlinePresenceHistoryToggle" type="button" class="ghost-button" aria-expanded="true"><i class="fa-solid fa-chevron-up"></i> Retrair</button>
             </div>
           </div>
-          <div id="onlinePresenceHistoryTimeline" class="online-presence-history-timeline"></div>
+          <div id="onlinePresenceHistoryContent" class="online-presence-history-content">
+            <div id="onlinePresenceHistoryFlow" class="online-presence-history-flow">
+              <div class="online-presence-history-placeholder">
+                <i class="fa-solid fa-route"></i>
+                <strong>Selecione um visitante</strong>
+                <span>Escolha uma sessao ativa ou encerrada para visualizar a navegacao em ordem.</span>
+              </div>
+            </div>
+            <div id="onlinePresenceHistoryTimeline" class="online-presence-history-timeline"></div>
+            <section class="online-presence-archive">
+              <div class="online-presence-archive-head">
+                <div>
+                  <strong><i class="fa-solid fa-clock-rotate-left"></i> Sessoes encerradas recentemente</strong>
+                  <span>Selecione uma sessao para consultar o caminho mesmo depois que o visitante sair.</span>
+                </div>
+                <b id="onlinePresenceArchiveCount">0</b>
+              </div>
+              <div id="onlinePresenceArchiveList" class="online-presence-archive-list">
+                <div class="online-presence-empty">O historico das proximas sessoes aparecera aqui.</div>
+              </div>
+            </section>
+          </div>
         </section>
 
         <section class="panel-card online-clients-card">
@@ -1790,6 +1807,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=419"></script>
+  <script type="module" src="painel.js?v=420"></script>
 </body>
 </html>

@@ -151,6 +151,11 @@
       ".write": true
     },
 
+    "onlineUserHistory": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": true
+    },
+
     "acessos": {
       ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
       ".write": true
@@ -167,7 +172,7 @@
     },
 
     "$other": {
-      ".read": true,
+      ".read": "$other !== 'onlineUserHistory'",
       ".write": true
     }
   }

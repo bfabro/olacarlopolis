@@ -2819,6 +2819,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (location.pathname.toLowerCase().includes("/admin/")) return;
 
     const onlineUsersRef = firebase.database().ref("onlineUsers");
+    const onlineUserHistoryRef = firebase.database().ref("onlineUserHistory");
     const connectedRef = firebase.database().ref(".info/connected");
     const INACTIVE_LIMIT_MS = 20 * 60 * 1000;
     const PRESENCE_RECENT_LIMIT_MS = 2 * 60 * 1000;
@@ -2853,12 +2854,23 @@ document.addEventListener("DOMContentLoaded", function () {
       presenceSessionId = onlineUsersRef.push().key || `sessao-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
       try { sessionStorage.setItem(PRESENCE_SESSION_ID_KEY, presenceSessionId); } catch (error) { }
     }
+    const archivedPresenceRef = onlineUserHistoryRef.child(presenceSessionId);
 
     const browserPresencePage = () => location.pathname + location.hash;
     const currentPresencePage = () => logicalPresencePage || browserPresencePage();
 
     const persistPresenceHistory = () => {
       try { sessionStorage.setItem(PRESENCE_HISTORY_KEY, JSON.stringify(navigationHistory.slice(-NAVIGATION_HISTORY_LIMIT))); } catch (error) { }
+    };
+
+    const updateArchivedPresence = (payload = {}) => {
+      archivedPresenceRef.update({
+        sessionId: presenceSessionId,
+        origem: getOrigemAcesso(),
+        pagina: currentPresencePage(),
+        historico: navigationHistory,
+        ...payload
+      }).catch(() => {});
     };
 
     const appendNavigationHistory = (type = "navegacao") => {
@@ -3001,9 +3013,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const stopPresence = () => {
       clearInactiveTimer();
-      if (!myUserRef) return;
-      myUserRef.remove().catch(() => {});
-      try { myUserRef.onDisconnect().cancel(); } catch (e) {}
+      if (presenceStarted) {
+        updateArchivedPresence({
+          active: false,
+          endedAt: firebase.database.ServerValue.TIMESTAMP,
+          lastSeen: firebase.database.ServerValue.TIMESTAMP
+        });
+      }
+      if (myUserRef) {
+        myUserRef.remove().catch(() => {});
+        try { myUserRef.onDisconnect().cancel(); } catch (e) {}
+      }
       myUserRef = null;
       presenceStarted = false;
       lastPresenceWriteAt = 0;
@@ -3024,6 +3044,17 @@ document.addEventListener("DOMContentLoaded", function () {
         lastSeen: firebase.database.ServerValue.TIMESTAMP
       });
       myUserRef.onDisconnect().remove();
+      updateArchivedPresence({
+        active: true,
+        timestamp: navigationHistory[0]?.timestamp || Date.now(),
+        endedAt: null,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      });
+      archivedPresenceRef.onDisconnect().update({
+        active: false,
+        endedAt: firebase.database.ServerValue.TIMESTAMP,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      });
       lastPresenceWriteAt = Date.now();
       scheduleIdleExpiration();
     };
@@ -3035,6 +3066,11 @@ document.addEventListener("DOMContentLoaded", function () {
         inactivePending: true,
         inactiveAt: firebase.database.ServerValue.TIMESTAMP
       }).catch(() => {});
+      updateArchivedPresence({
+        active: false,
+        endedAt: firebase.database.ServerValue.TIMESTAMP,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      });
     };
 
     const scheduleIdleExpiration = () => {
@@ -3063,6 +3099,11 @@ document.addEventListener("DOMContentLoaded", function () {
       if (pagina) payload.pagina = currentPresencePage();
       if (historico) payload.historico = navigationHistory;
       myUserRef.update(payload).catch(() => {});
+      updateArchivedPresence({
+        active: true,
+        endedAt: null,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      });
     };
 
     const trackNavigation = () => {
@@ -3093,6 +3134,11 @@ document.addEventListener("DOMContentLoaded", function () {
         hiddenAt: firebase.database.ServerValue.TIMESTAMP,
         lastSeen: firebase.database.ServerValue.TIMESTAMP
       }).catch(() => {});
+      updateArchivedPresence({
+        active: false,
+        endedAt: firebase.database.ServerValue.TIMESTAMP,
+        lastSeen: firebase.database.ServerValue.TIMESTAMP
+      });
       inactiveTimer = setTimeout(stopPresence, HIDDEN_REMOVE_DELAY_MS);
     };
 
@@ -3107,6 +3153,11 @@ document.addEventListener("DOMContentLoaded", function () {
             hiddenAt: null,
             lastSeen: firebase.database.ServerValue.TIMESTAMP
           }).catch(() => {});
+          updateArchivedPresence({
+            active: true,
+            endedAt: null,
+            lastSeen: firebase.database.ServerValue.TIMESTAMP
+          });
           lastPresenceWriteAt = Date.now();
           scheduleIdleExpiration();
         } else {

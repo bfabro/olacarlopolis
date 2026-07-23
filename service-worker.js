@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-23-automoveis-origem-unico-dono-v524'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-23-historico-navegacao-persistente-v525'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
