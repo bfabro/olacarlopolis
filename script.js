@@ -2825,10 +2825,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const PRESENCE_HEARTBEAT_MS = 30 * 1000;
     const HIDDEN_REMOVE_DELAY_MS = 60 * 1000;
     const ACTIVITY_WRITE_THROTTLE_MS = 45 * 1000;
+    const NAVIGATION_HISTORY_LIMIT = 20;
     let myUserRef = null;
     let inactiveTimer = null;
     let presenceStarted = false;
     let lastPresenceWriteAt = 0;
+    let navigationHistory = [];
+    let lastNavigationPage = "";
+
+    const currentPresencePage = () => location.pathname + location.hash;
+
+    const appendNavigationHistory = (type = "navegacao") => {
+      const page = currentPresencePage();
+      if (!page || page === lastNavigationPage) return false;
+      lastNavigationPage = page;
+      navigationHistory.push({
+        pagina: page,
+        tipo: navigationHistory.length ? type : "entrada",
+        timestamp: Date.now()
+      });
+      navigationHistory = navigationHistory.slice(-NAVIGATION_HISTORY_LIMIT);
+      return true;
+    };
 
     const clearInactiveTimer = () => {
       if (inactiveTimer) clearTimeout(inactiveTimer);
@@ -2848,10 +2866,12 @@ document.addEventListener("DOMContentLoaded", function () {
     const startPresence = () => {
       if (presenceStarted || document.hidden) return;
       presenceStarted = true;
+      appendNavigationHistory("entrada");
       myUserRef = onlineUsersRef.push();
       myUserRef.set({
         origem: getOrigemAcesso(),
-        pagina: location.pathname + location.hash,
+        pagina: currentPresencePage(),
+        historico: navigationHistory,
         active: true,
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         lastSeen: firebase.database.ServerValue.TIMESTAMP
@@ -2876,7 +2896,7 @@ document.addEventListener("DOMContentLoaded", function () {
       inactiveTimer = setTimeout(markPresenceInactive, INACTIVE_LIMIT_MS);
     };
 
-    const touchPresence = ({ force = false, pagina = false } = {}) => {
+    const touchPresence = ({ force = false, pagina = false, historico = false } = {}) => {
       if (document.hidden) return;
       if (!myUserRef) {
         startPresence();
@@ -2893,8 +2913,14 @@ document.addEventListener("DOMContentLoaded", function () {
         hiddenAt: null,
         lastSeen: firebase.database.ServerValue.TIMESTAMP
       };
-      if (pagina) payload.pagina = location.pathname + location.hash;
+      if (pagina) payload.pagina = currentPresencePage();
+      if (historico) payload.historico = navigationHistory;
       myUserRef.update(payload).catch(() => {});
+    };
+
+    const trackNavigation = () => {
+      const changed = appendNavigationHistory("navegacao");
+      touchPresence({ force: true, pagina: true, historico: changed });
     };
 
     const scheduleInactiveRemoval = () => {
@@ -2943,8 +2969,8 @@ document.addEventListener("DOMContentLoaded", function () {
     ["click", "keydown", "wheel", "scroll", "touchstart", "pointerdown", "mousemove"].forEach((eventName) => {
       window.addEventListener(eventName, () => touchPresence(), { passive: true });
     });
-    window.addEventListener("hashchange", () => touchPresence({ force: true, pagina: true }));
-    window.addEventListener("popstate", () => touchPresence({ force: true, pagina: true }));
+    window.addEventListener("hashchange", trackNavigation);
+    window.addEventListener("popstate", trackNavigation);
     window.addEventListener("focus", () => touchPresence({ force: true, pagina: true }));
     setInterval(() => touchPresence({ force: true, pagina: true }), PRESENCE_HEARTBEAT_MS);
 

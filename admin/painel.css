@@ -1427,6 +1427,141 @@ button[type="submit"]:hover,
   text-align: center !important;
 }
 
+.online-presence-history-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #bfdbfe;
+  border-radius: 9px;
+  padding: 7px 10px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.online-presence-history-button:hover {
+  border-color: #60a5fa;
+  background: #dbeafe;
+}
+
+.online-presence-history-card {
+  margin-top: 18px;
+  padding: 24px;
+  scroll-margin-top: 90px;
+  background:
+    radial-gradient(circle at 95% 0, rgba(37, 99, 235, .1), transparent 30%),
+    #fff;
+}
+
+.online-presence-history-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.online-presence-history-timeline {
+  display: grid;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.online-presence-history-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 34px 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  border: 1px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 11px 14px;
+  background: #fbfdff;
+}
+
+.online-presence-history-item.is-current {
+  border-color: #86efac;
+  background: linear-gradient(90deg, #f0fdf4, #fbfffd);
+}
+
+.online-presence-history-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.online-presence-history-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: #eaf2ff;
+  color: #1767d7;
+}
+
+.online-presence-history-item > div {
+  min-width: 0;
+}
+
+.online-presence-history-item strong,
+.online-presence-history-item small {
+  display: block;
+}
+
+.online-presence-history-item strong {
+  overflow: hidden;
+  color: #17233c;
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.online-presence-history-item small {
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.online-presence-history-item > b {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: #dcfce7;
+  color: #15803d;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.online-presence-history-item > b i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.online-presence-history-arrow {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
 #onlinePresenceRefresh.is-loading i {
   animation: online-presence-spin .7s linear infinite;
 }
@@ -1456,6 +1591,26 @@ button[type="submit"]:hover,
 
   .online-presence-card {
     padding: 16px;
+  }
+
+  .online-presence-history-card {
+    padding: 18px;
+  }
+
+  .online-presence-history-item {
+    grid-template-columns: 28px 40px minmax(0, 1fr);
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .online-presence-history-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .online-presence-history-item > b,
+  .online-presence-history-arrow {
+    display: none;
   }
 }
 

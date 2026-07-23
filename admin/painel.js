@@ -41,10 +41,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 479,
-  label: "v486",
+  numero: 480,
+  label: "v487",
   data: "2026-07-22",
-  nota: "Nova tela exclusiva do Master mostra em tempo real onde os usuarios estao navegando."
+  nota: "Usuarios online agora exibem o historico anonimo das ultimas 20 telas acessadas por sessao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -59,6 +59,7 @@ const ONLINE_PRESENCE_RECENT_MS = 2 * 60 * 1000;
 let onlinePresenceUnsubscribe = null;
 let onlinePresenceTicker = null;
 let onlinePresenceData = {};
+let onlinePresenceSelectedSessionId = "";
 let automovelArtePreviewTimer = null;
 let automovelArteDragState = null;
 let automovelArteDragFrame = null;
@@ -2681,14 +2682,29 @@ function onlinePresencePageInfo(rawPage = "") {
   if (hash.startsWith("promocoes")) return { key: "promocoes", label: "Promocoes", icon: "fa-tags", route: page };
   if (hash.startsWith("comercios")) {
     const categoryRaw = hashRaw.replace(/^comercios[-_]?/i, "");
-    const categoryLabel = categoryRaw
+    const categoryKey = normalizeName(categoryRaw);
+    const categoryRecord = state.categorias.find((category) => [category.id, category.nome, category.title].some((value) => normalizeName(value) === categoryKey));
+    const categoryLabel = categoryRecord?.nome || categoryRecord?.title || (categoryRaw
       ? categoryRaw.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
-      : "Comercios e servicos";
-    return { key: `comercios-${normalizeName(categoryRaw) || "todos"}`, label: categoryLabel, icon: "fa-store", route: page };
+      : "Comercios e servicos");
+    return { key: `comercios-${categoryKey || "todos"}`, label: categoryLabel, icon: "fa-store", route: page };
+  }
+
+  const clientRecord = state.clientes.find((client) => [client.id, client.nome, client.nomeNormalizado]
+    .some((value) => normalizeName(value) === hash));
+  if (clientRecord) {
+    return {
+      key: `cliente-${normalizeName(clientRecord.id || clientRecord.nome)}`,
+      label: clientRecord.nome || "Pagina do cliente",
+      icon: "fa-store",
+      route: page
+    };
   }
 
   if (hashRaw) {
-    const label = hashRaw.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+    const label = hashRaw
+      ? hashRaw.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
+      : "Comercios e servicos";
     return { key: hash || "outra", label, icon: "fa-window-maximize", route: page };
   }
   if (pathname.includes("cnpj")) return { key: "cnpj", label: "Busca CNPJ", icon: "fa-building", route: page };
@@ -2734,6 +2750,64 @@ function activeOnlinePresenceSessions(now = Date.now()) {
     .sort((a, b) => b.lastSeen - a.lastSeen);
 }
 
+function onlinePresenceHistoryItems(session = {}) {
+  const rawHistory = Array.isArray(session.historico)
+    ? session.historico
+    : Object.values(session.historico || {});
+  const items = rawHistory
+    .filter((item) => item && typeof item === "object" && item.pagina)
+    .map((item) => ({
+      pagina: String(item.pagina || "/"),
+      tipo: item.tipo === "entrada" ? "entrada" : "navegacao",
+      timestamp: Number(item.timestamp || 0)
+    }))
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .slice(-20);
+
+  if (items.length) return items;
+  return [{
+    pagina: session.pagina || "/",
+    tipo: "entrada",
+    timestamp: Number(session.timestamp || session.lastSeen || Date.now())
+  }];
+}
+
+function renderOnlinePresenceHistory(sessions = []) {
+  const card = $("onlinePresenceHistoryCard");
+  if (!card) return;
+  const sessionIndex = sessions.findIndex((session) => session.id === onlinePresenceSelectedSessionId);
+  if (sessionIndex < 0) {
+    onlinePresenceSelectedSessionId = "";
+    card.classList.add("hidden");
+    return;
+  }
+
+  const session = sessions[sessionIndex];
+  const history = onlinePresenceHistoryItems(session);
+  card.classList.remove("hidden");
+  if ($("onlinePresenceHistoryTitle")) $("onlinePresenceHistoryTitle").textContent = `Historico do Visitante ${sessionIndex + 1}`;
+  if ($("onlinePresenceHistorySubtitle")) {
+    $("onlinePresenceHistorySubtitle").textContent = `${history.length} acesso(s) registrado(s) nesta sessao, do mais antigo ao mais recente.`;
+  }
+  if ($("onlinePresenceHistoryTimeline")) {
+    $("onlinePresenceHistoryTimeline").innerHTML = history.map((item, index) => {
+      const pageInfo = onlinePresencePageInfo(item.pagina);
+      const isCurrent = index === history.length - 1;
+      return `
+        <article class="online-presence-history-item ${isCurrent ? "is-current" : ""}">
+          <span class="online-presence-history-index">${index + 1}</span>
+          <span class="online-presence-history-icon"><i class="fa-solid ${escapeAttr(pageInfo.icon)}"></i></span>
+          <div>
+            <strong>${escapeHtml(pageInfo.label)}</strong>
+            <small>${item.tipo === "entrada" ? "Entrada no site" : "Navegacao"} - ${escapeHtml(onlinePresenceClock(item.timestamp))}</small>
+          </div>
+          ${isCurrent ? `<b><i></i> Tela atual</b>` : `<i class="fa-solid fa-arrow-right online-presence-history-arrow"></i>`}
+        </article>
+      `;
+    }).join("");
+  }
+}
+
 function renderOnlinePresence() {
   if (!isMaster() || !$("usuariosOnlineView")) return;
   const now = Date.now();
@@ -2776,17 +2850,29 @@ function renderOnlinePresence() {
   const tableBody = $("onlinePresenceTableBody");
   if (tableBody) {
     tableBody.innerHTML = sessions.length
-      ? sessions.map((session, index) => `
+      ? sessions.map((session, index) => {
+          const historyCount = onlinePresenceHistoryItems(session).length;
+          return `
           <tr title="${escapeAttr(session.pageInfo.route)}">
             <td><span class="online-presence-visitor"><i class="fa-solid fa-user"></i> Visitante ${index + 1}</span></td>
             <td><strong>${escapeHtml(session.pageInfo.label)}</strong></td>
             <td><span class="online-presence-channel">${escapeHtml(onlinePresenceOriginLabel(session.origem))}</span></td>
             <td>${escapeHtml(onlinePresenceClock(session.timestamp || session.lastSeen))}</td>
             <td><span class="online-presence-activity"><i></i> ${escapeHtml(onlinePresenceRelativeTime(session.lastSeen, now))}</span></td>
+            <td><button type="button" class="online-presence-history-button" data-online-presence-history="${escapeAttr(session.id)}"><i class="fa-solid fa-route"></i> Ver ${historyCount}</button></td>
           </tr>
-        `).join("")
-      : `<tr><td colspan="5" class="online-presence-table-empty">Nenhuma sessao ativa nos ultimos 2 minutos.</td></tr>`;
+        `;
+        }).join("")
+      : `<tr><td colspan="6" class="online-presence-table-empty">Nenhuma sessao ativa nos ultimos 2 minutos.</td></tr>`;
+    tableBody.querySelectorAll("[data-online-presence-history]").forEach((button) => {
+      button.addEventListener("click", () => {
+        onlinePresenceSelectedSessionId = button.dataset.onlinePresenceHistory || "";
+        renderOnlinePresence();
+        requestAnimationFrame(() => $("onlinePresenceHistoryCard")?.scrollIntoView({ behavior: "smooth", block: "start" }));
+      });
+    });
   }
+  renderOnlinePresenceHistory(sessions);
 }
 
 function stopOnlinePresenceMonitor() {
@@ -2829,6 +2915,15 @@ function startOnlinePresenceMonitor() {
         refreshButton.disabled = false;
         refreshButton.classList.remove("is-loading");
       }
+    });
+  }
+
+  const historyClose = $("onlinePresenceHistoryClose");
+  if (historyClose && historyClose.dataset.bound !== "true") {
+    historyClose.dataset.bound = "true";
+    historyClose.addEventListener("click", () => {
+      onlinePresenceSelectedSessionId = "";
+      $("onlinePresenceHistoryCard")?.classList.add("hidden");
     });
   }
 }

@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=343">
+  <link rel="stylesheet" href="painel.css?v=344">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -852,15 +852,27 @@
             <div class="online-presence-table-wrap">
               <table class="online-presence-table">
                 <thead>
-                  <tr><th>Visitante</th><th>Tela atual</th><th>Canal</th><th>Entrou</th><th>Ultima atividade</th></tr>
+                  <tr><th>Visitante</th><th>Tela atual</th><th>Canal</th><th>Entrou</th><th>Ultima atividade</th><th>Historico</th></tr>
                 </thead>
                 <tbody id="onlinePresenceTableBody">
-                  <tr><td colspan="5">Carregando sessoes...</td></tr>
+                  <tr><td colspan="6">Carregando sessoes...</td></tr>
                 </tbody>
               </table>
             </div>
           </section>
         </div>
+
+        <section id="onlinePresenceHistoryCard" class="panel-card online-presence-history-card hidden">
+          <div class="section-head compact">
+            <div>
+              <span class="online-presence-history-kicker"><i class="fa-solid fa-route"></i> Ultimas 20 navegacoes</span>
+              <h2 id="onlinePresenceHistoryTitle">Historico do visitante</h2>
+              <p id="onlinePresenceHistorySubtitle">Sequencia anonima de telas acessadas nesta sessao.</p>
+            </div>
+            <button id="onlinePresenceHistoryClose" type="button" class="ghost-button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+          </div>
+          <div id="onlinePresenceHistoryTimeline" class="online-presence-history-timeline"></div>
+        </section>
       </section>
 
       <section id="pagamentoSistemaView" class="panel-view hidden">
@@ -1745,6 +1757,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=414"></script>
+  <script type="module" src="painel.js?v=415"></script>
 </body>
 </html>
