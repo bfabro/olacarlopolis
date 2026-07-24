@@ -24190,3 +24190,28 @@ body.business-art-capturing-background .home-cards-intro {
 .loja-produto-modal-img.imagem-expandivel {
   cursor: zoom-in;
 }
+
+/* ===== Promocoes do menu com o mesmo card da area do cliente v181 ===== */
+.promo-menu-client-layout .promo-client-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important;
+  gap: 12px !important;
+  width: 100% !important;
+  max-width: none !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+}
+
+.promo-menu-client-layout .promo-client-grid .loja-produto-card {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 100% !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 720px) {
+  .promo-menu-client-layout .promo-client-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+}

@@ -9369,6 +9369,36 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     return ["Tamanho", "Medida", "Volume"].includes(label) ? label : "Tamanho";
   }
 
+  function promocaoComoProdutoPublico(promo = {}, estabelecimento = {}) {
+    const contatoPadrao = getPrimeiroContato(
+      estabelecimento.contact || estabelecimento.contato || estabelecimento.whatsapp || estabelecimento.telefone || ""
+    ) || "";
+    const contatoPromocao = getPrimeiroContato(
+      promo.contato || promo.contact || promo.whatsapp || promo.telefone || contatoPadrao
+    ) || "";
+    return {
+      ...promo,
+      id: promo.id,
+      titulo: promo.titulo || promo.nome || "Promocao",
+      descricao: promo.descricao || promo.obs || promo.observacoes || "",
+      preco: promo.preco,
+      precoAntigo: promo.precoAntigo || promo.precoReal || promo.valorReal || promo.precoOriginal || "",
+      imagem: promo.imagem || promo.image || promo.foto || "",
+      imagens: promo.imagens || (promo.imagem ? [promo.imagem] : []),
+      validadeFim: promo.validadeFim || "",
+      desconto: promo.desconto || "",
+      entregaRetirada: promo.entregaRetirada || "",
+      observacoes: [
+        promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "",
+        promo.desconto ? `Desconto: ${promo.desconto}` : ""
+      ].filter(Boolean).join(" | "),
+      categoria: "Promocao",
+      contato: contatoPromocao,
+      whatsapp: promo.whatsapp || promo.contato || promo.contact || contatoPadrao,
+      telefone: promo.telefone || estabelecimento.telefone || ""
+    };
+  }
+
   function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
     const isPromocao = tipo === "promocao";
     const preco = produtoPrecoPublico(item, tipo);
@@ -12701,24 +12731,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (deveMostrarAbaPromocoes) {
         abasInseridas = adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
           const promocoesUnicas = deduplicarPromocoesMesmoEstabelecimentoPublico(promocoes);
-          const contatoPromocaoPadrao = getPrimeiroContato(est.contact || est.contato || est.whatsapp || est.telefone || "") || "";
-          const itens = promocoesUnicas.map((promo) => ({
-            id: promo.id,
-            titulo: promo.titulo,
-            descricao: promo.descricao || promo.obs,
-            preco: promo.preco,
-            precoAntigo: promo.precoAntigo || promo.precoReal || promo.valorReal || promo.precoOriginal || "",
-            imagem: promo.imagem,
-            imagens: promo.imagens || (promo.imagem ? [promo.imagem] : []),
-            validadeFim: promo.validadeFim || "",
-            desconto: promo.desconto || "",
-            entregaRetirada: promo.entregaRetirada || "",
-            observacoes: [promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "", promo.desconto ? `Desconto: ${promo.desconto}` : ""].filter(Boolean).join(" | "),
-            categoria: "Promocao",
-            contato: getPrimeiroContato(promo.contato || promo.contact || promo.whatsapp || "") || contatoPromocaoPadrao,
-            whatsapp: promo.whatsapp || promo.contato || promo.contact || contatoPromocaoPadrao,
-            telefone: promo.telefone || est.telefone || ""
-          }));
+          const itens = promocoesUnicas.map((promo) => promocaoComoProdutoPublico(promo, est));
           pane.innerHTML = `<section class="loja-itens-wrap loja-promocoes-wrap promo-city-screen"><div class="loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
@@ -13259,7 +13272,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
 
     html = `
-    <div class="promo-city-screen ${window.__promoModoCompacto ? "promo-compact-mode" : ""}">
+    <div class="promo-city-screen promo-menu-client-layout ${window.__promoModoCompacto ? "promo-compact-mode" : ""}">
       <h2 class="highlighted promo-onde-title"><span><i class="fa-solid fa-fire"></i> Promo&ccedil;&otilde;es</span></h2>
       <header class="promo-city-top">
         <button type="button" class="promo-top-icon" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
@@ -13307,11 +13320,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         <span><i class="fa-solid fa-arrow-down-wide-short"></i> Ordenar por</span>
         <button type="button" data-promo-sort="recentes" class="${ordemAtual === "recentes" ? "active" : ""}"><i class="fa-solid fa-bolt"></i> Mais recentes</button>
         <button type="button" data-promo-sort="termina" class="${ordemAtual === "termina" ? "active" : ""}"><i class="fa-regular fa-clock"></i> Termina hoje</button>
-        <label class="promo-compact-switch" title="Mostrar promocoes em cards menores">
-          <input type="checkbox" id="promoCompactToggle" ${window.__promoModoCompacto ? "checked" : ""}>
-          <span class="track"><span class="thumb"></span></span>
-          <span>Cards</span>
-        </label>
         <button type="button" class="promo-clear-filters" id="promoClearFilters"><i class="fa-solid fa-rotate-left"></i> Limpar filtros</button>
       </section>
       <div class="promo-filter-menu">
@@ -13365,149 +13373,14 @@ plotarPinsImoveis(stateImoveis.filtered);
     `;
 
     // grid de cards
-    html += `<section class="promo-grid">`;
+    html += `<section class="promo-grid loja-produtos-grid loja-cards-grid promo-client-grid">`;
 
-    const promoDetalhesRenderizados = {};
     if (itensFiltrados.length === 0) {
       html += `<div class="promo-vazio">Nenhuma promoção cadastrada.</div>`;
     } else {
-      itensFiltrados.forEach((i, index) => {
-        const precoFmt = formatarMoedaPromo(i.preco);
-
-        const precoAntFmt = formatarMoedaPromo(i.precoAntigo);
-
-        const descontoTxt = String(i.desconto || "").trim();
-        const descontoPct = descontoTxt ? 0 : descontoPromocao(i);
-        const destaqueOferta = promoValorTexto(i, precoFmt);
-        const badgeClass = promoBadgeClass(i);
-        const badgeLabel = i.destaque || (badgeClass === "super" ? "Super oferta" : "");
-        const descricaoPromo = i.descricao || [i.volume, i.embalagem].filter(Boolean).join(" + ");
-        const temPreco = Boolean(precoFmt && String(precoFmt).trim());
-        const valorCard = temPreco ? destaqueOferta : "PROMO";
-        const precoAtualNum = numeroPrecoPromocao(i.preco);
-        const precoAntigoNum = numeroPrecoPromocao(i.precoAntigo);
-        const economiaFmt = (precoAtualNum && precoAntigoNum && precoAntigoNum > precoAtualNum)
-          ? (precoAntigoNum - precoAtualNum).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
-          : "";
-        const promoKey = `${i.estabelecimentoId || "todos"}::${i.id || index}`;
-        const whatsappPromo = produtoWhatsappLink(i, "promocao");
-        promoDetalhesRenderizados[promoKey] = i;
-
-        // validade
-        let validadeTxt = "";
-        if (i.validadeInicio && i.validadeFim) {
-          validadeTxt = `Ofertas válidas de ${i.validadeInicio} a ${i.validadeFim}`;
-        } else if (i.validadeFim) {
-          validadeTxt = `Válidade: ${i.validadeFim}`;
-        } else if (i.validadeInicio) {
-          validadeTxt = `Válido a partir de ${i.validadeInicio}`;
-        }
-
-
-
-
-        if (window.__promoModoCompacto) {
-          const dataCompacta = i.validadeFim ? formatarDataBR(i.validadeFim) : (i.validadeInicio ? formatarDataBR(i.validadeInicio) : "");
-          const detalheCompacto = dataCompacta ? `V&aacute;lido at&eacute;: ${dataCompacta}` : "";
-          html += `
-    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-event-style-card card-divulgacao-pequeno" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" data-promo-detail-key="${escapePromoHtml(promoKey)}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
-      <div class="card-divulgacao-img-wrap">
-        ${i.imagem
-              ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
-              : `<div class="card-divulgacao-img-placeholder"><i class="fa-solid fa-tag"></i></div>`}
-        <span class="promo-event-price">${valorCard}</span>
-      </div>
-      <div class="card-divulgacao-info">
-        <div class="promo-event-meta-row">
-          <span class="card-divulgacao-categoria">Promo&ccedil;&atilde;o</span>
-          <span class="promo-event-actions">
-          ${whatsappPromo
-              ? `<a href="${escapePromoHtml(whatsappPromo)}" class="card-divulgacao-wa-btn" data-promo-action="whatsapp" aria-label="Tenho interesse pelo WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i><span>Tenho interesse</span></a>`
-              : ""}
-          ${i.instagram
-              ? `<a href="${fixUrl(i.instagram)}" class="card-divulgacao-ig-btn" data-promo-action="instagram" aria-label="Abrir Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>`
-              : ""}
-          </span>
-        </div>
-        <div class="card-divulgacao-linha">
-          <h4><button type="button" class="promo-nome-btn promo-event-title-btn" data-promo-detail-key="${escapePromoHtml(promoKey)}">${i.titulo}</button></h4>
-        </div>
-        <a class="promo-event-store" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">${i.estabelecimento}</a>
-        ${detalheCompacto ? `<small>${detalheCompacto}</small>` : ""}
-      </div>
-    </article>
-    `;
-          return;
-        }
-
-        html += `
-    <article id="${novidadeDomId("promocao", `${i.id || "promo"}-${i.estabelecimentoId || "todos"}`)}" class="promo-card promo-card-new" data-promo-id="${i.id || ""}" data-promo-title="${i.titulo || ""}" data-promo-category="${i.categoria || ""}" data-promo-est="${i.estabelecimentoId}" data-promo-detail-key="${escapePromoHtml(promoKey)}" ${i.validadeFim ? `data-validade-fim="${i.validadeFim}"` : ""}>
-    <div class="promo-card-body">
-      <div class="promo-produto">
-        <div class="promo-image-wrap">
-          ${i.imagem
-            ? `<img class="promo-img-zoom" src="${i.imagem}" alt="${i.titulo}" loading="lazy">`
-            : `<div class="promo-sem-imagem">Imagem da promo&ccedil;&atilde;o</div>`}
-          ${(descontoTxt || descontoPct) ? `<span class="promo-discount-badge">${descontoTxt || `${descontoPct}%`}<small>off</small></span>` : ""}
-          ${(i.validadeInicio && i.validadeFim)
-            ? `<div class="promo-validade-media"><i class="fa-regular fa-circle-check"></i> Ate ${formatarDataBR(i.validadeFim)}</div>`
-            : (i.validadeFim ? `<div class="promo-validade-media"><i class="fa-regular fa-circle-check"></i> Ate ${formatarDataBR(i.validadeFim)}</div>`
-              : (i.validadeInicio ? `<div class="promo-validade-media"><i class="fa-regular fa-circle-check"></i> A partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
-        </div>
-        
-        <div class="promo-info">
-          <button type="button" class="promo-nome promo-nome-btn" data-promo-detail-key="${escapePromoHtml(promoKey)}">${i.titulo}</button>
-          ${i.obs ? `<div class="promo-obs">${i.obs}</div>` : (!i.volume && !i.embalagem && descricaoPromo ? `<div class="promo-obs">${descricaoPromo}</div>` : "")}
-          <div class="promo-store-strip">
-            <a class="promo-estab promo-estab-link" href="#${i.estabelecimentoId}" data-promo-est-link="${i.estabelecimentoId}">
-              <span class="promo-store-logo">${i.logo ? `<img src="${i.logo}" alt="${i.estabelecimento}" loading="lazy">` : `<i class="fa-solid fa-store"></i>`}</span>
-              <span class="promo-store-copy"><strong>${i.estabelecimento}</strong><small>${i.instagramMensagem || "Siga no Instagram e fique por dentro das novidades!"}</small></span>
-            </a>
-            ${i.instagram ? `<a href="${fixUrl(i.instagram)}" target="_blank" class="promo-store-instagram" data-promo-action="instagram" aria-label="Abrir Instagram"><i class="fab fa-instagram"></i></a>` : ""}
-          </div>
-          ${(i.volume || i.embalagem)
-            ? `<div class="promo-det">${[i.volume, i.embalagem].filter(Boolean).join(" · ")}</div>` : ""}
-          ${textoDiasPromocao(i) ? `<div class="promo-days">${textoDiasPromocao(i)}</div>` : ""}
-        </div>
-      </div>
-
-     <div class="promo-preco promo-price-badge promo-price-${temPreco ? badgeClass : "promo"}">
-      ${badgeLabel ? `<div class="promo-preco-label"><i class="fa-solid fa-fire"></i> ${badgeLabel}</div>` : ""}
-      <div class="promo-preco-atual">${valorCard}</div>
-      ${precoAntFmt ? `<div class="promo-preco-antigo">${precoAntFmt}</div>` : ""}
-      ${economiaFmt ? `<div class="promo-preco-economia"><i class="fa-solid fa-tag"></i> Economize ${economiaFmt}</div>` : ""}
-      ${i.unidade && !descontoTxt ? `<div class="promo-unidade">${i.unidade}</div>` : ""}
-      ${(i.validadeInicio && i.validadeFim)
-            ? `<div class="promo-validade">Ofertas válidas de ${formatarDataBR(i.validadeInicio)} a ${formatarDataBR(i.validadeFim)}</div>`
-            : (i.validadeFim ? `<div class="promo-validade">Até ${formatarDataBR(i.validadeFim)}</div>`
-              : (i.validadeInicio ? `<div class="promo-validade">Válido a partir de ${formatarDataBR(i.validadeInicio)}</div>` : ""))}
-    </div>
-
-
-     
-    </div>
-
-    <div class="promo-rodape">
-    ${whatsappPromo
-            ? `<a href="${escapePromoHtml(whatsappPromo)}"
-          target="_blank" 
-          class="icon-link promo-whats-link" data-promo-action="whatsapp">
-          <i class="fab fa-whatsapp"></i><span>Tenho interesse</span>
-        </a>`
-            : ""}
-
-    <button type="button" class="icon-link promo-share-card" data-promo-share="page" aria-label="Compartilhar promocao">
-      <i class="fa-solid fa-share-nodes"></i><span>Compartilhar</span>
-    </button>
-
-    
-    </div>
-
-      </article>
-    `;
-
-
-      });
+      html += itensFiltrados
+        .map((item) => renderProdutoCardEstabelecimento(promocaoComoProdutoPublico(item), "promocao"))
+        .join("");
     }
 
 
@@ -13518,7 +13391,6 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const areaPromocoes = definirTelaContentArea(null);
     areaPromocoes.innerHTML = html;
-    window.__promocoesPublicasDetalhes = promoDetalhesRenderizados;
 
     // Converte "2025-09-15" em "15-09-2025"
     function formatarDataBR(dataISO) {
