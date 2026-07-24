@@ -1194,6 +1194,16 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           </div>
           <small>Selecione o quadrado 2, 3 ou 4 e depois escolha uma imagem.</small>
         </div>
+        <div class="business-art-description-controls">
+          <span>
+            <strong>Descrição da arte</strong>
+            <button type="button" class="active" data-business-description-bold aria-pressed="true">
+              <i class="fa-solid fa-bold"></i> Negrito
+            </button>
+          </span>
+          <textarea maxlength="400" rows="3" data-business-description aria-label="Editar descrição da arte">${escaparArteComercial(dados.descricao)}</textarea>
+          <small><output data-business-description-count>${dados.descricao.length}</output>/400 caracteres</small>
+        </div>
         <div class="business-art-font-controls" aria-label="Tamanho das fontes da arte">
           <label>
             <span>Descrição <output data-business-font-output="description">26</output></span>
@@ -1235,6 +1245,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let imagemMosaicoSelecionada = 0;
   let slotMosaicoEscolha = Math.min(1, Math.max(0, imagensMosaicoOriginais.length - 1));
   const fontesSelecionadasMosaico = imagensMosaicoOriginais.map((imagem) => fontesMosaicoOriginais.indexOf(imagem));
+  let descricaoNegrito = true;
+  let descricaoRenderTimer = 0;
   let fonteDescricao = dados.descricao.length > 320 ? 22 : (dados.descricao.length > 220 ? 24 : 26);
   let fonteWhatsapp = 28;
   let fonteCidade = 28;
@@ -1390,7 +1402,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         : (descriptionLength <= 220
           ? "description-medium"
           : (descriptionLength <= 320 ? "description-long" : "description-xlong")));
-    stage.className = `business-art-stage is-${formato} layout-${layoutArte} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"} ${descriptionClass}`;
+    stage.className = `business-art-stage is-${formato} layout-${layoutArte} effect-${efeitoFoto} ${cantosArredondados ? "photo-rounded" : "photo-square"} ${descricaoNegrito ? "description-bold" : ""} ${descriptionClass}`;
     stage.style.width = "1080px";
     stage.style.height = `${height}px`;
     stage.style.setProperty("--business-name-color", corNome);
@@ -1526,6 +1538,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const close = () => {
     if (dialogClosed) return;
     dialogClosed = true;
+    window.clearTimeout(descricaoRenderTimer);
     window.removeEventListener("resize", resize);
     document.removeEventListener("keydown", closeOnEscape);
     document.documentElement.style.overflow = previousOverflow;
@@ -1587,6 +1600,21 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       if (input.dataset.businessColor === "detail") corDetalhe = input.value;
       await render();
     });
+  });
+  dialog.querySelector("[data-business-description]")?.addEventListener("input", (event) => {
+    dados.descricao = String(event.currentTarget.value || "").slice(0, 400);
+    const count = dialog.querySelector("[data-business-description-count]");
+    if (count) count.value = String(dados.descricao.length);
+    window.clearTimeout(descricaoRenderTimer);
+    descricaoRenderTimer = window.setTimeout(() => {
+      render().catch((error) => console.warn("Nao foi possivel atualizar a descricao da arte.", error));
+    }, 120);
+  });
+  dialog.querySelector("[data-business-description-bold]")?.addEventListener("click", async (event) => {
+    descricaoNegrito = !descricaoNegrito;
+    event.currentTarget.classList.toggle("active", descricaoNegrito);
+    event.currentTarget.setAttribute("aria-pressed", String(descricaoNegrito));
+    await render();
   });
   dialog.querySelectorAll("[data-business-font]").forEach((input) => {
     input.addEventListener("input", () => {

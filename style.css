@@ -23798,6 +23798,78 @@ body.business-art-capturing-background .home-cards-intro {
 
 .business-art-stage .business-art-identity p {
   font-size: var(--business-description-font-size, 26px) !important;
+  white-space: pre-line;
+}
+
+.business-art-stage.description-bold .business-art-identity p {
+  font-weight: 800 !important;
+}
+
+.business-art-description-controls {
+  display: grid;
+  flex: 1 1 100%;
+  gap: 7px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: #f4f7fc;
+  color: #334a68;
+}
+
+.business-art-description-controls > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+
+.business-art-description-controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid #c9d8ec;
+  border-radius: 9px;
+  background: #fff;
+  color: #49617f;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.business-art-description-controls button.active {
+  border-color: #0b63e6;
+  background: #0b63e6;
+  color: #fff;
+}
+
+.business-art-description-controls textarea {
+  width: 100%;
+  min-height: 68px;
+  resize: vertical;
+  padding: 8px 10px;
+  border: 1px solid #c9d8ec;
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  color: #1f3654;
+  font: inherit;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.business-art-description-controls textarea:focus {
+  border-color: #0b63e6;
+  box-shadow: 0 0 0 3px rgba(11, 99, 230, .12);
+}
+
+.business-art-description-controls > small {
+  color: #64748b;
+  font-size: 9px;
+  text-align: right;
 }
 
 .business-art-stage .business-art-info-card.is-whatsapp strong {
@@ -24210,6 +24282,15 @@ body.business-art-capturing-background .home-cards-intro {
   .business-art-mosaic-picker {
     grid-column: 1 / -1;
     padding: 8px;
+  }
+
+  .business-art-description-controls {
+    grid-column: 1 / -1;
+    padding: 8px;
+  }
+
+  .business-art-description-controls textarea {
+    min-height: 58px;
   }
 
   .business-art-mosaic-slots {
