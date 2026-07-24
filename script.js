@@ -821,7 +821,7 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
           ${dados.endereco ? `<div class="business-art-info-card is-address"><i class="fa-solid fa-map-location-dot"></i><span><small>Endereço</small><strong>${escaparArteComercial(dados.endereco)}</strong></span></div>` : ""}
         </section>` : ""}
       <footer class="business-art-footer">
-        <div><i class="fa-solid fa-globe"></i><span class="business-art-footer-copy"><small>${escaparArteComercial(dados.nome)} está no Olá Carlópolis</small><strong>Acesse www.olacarlopolis.com.</strong></span></div>
+        <div><i class="fa-solid fa-globe"></i><span class="business-art-footer-copy"><small>${escaparArteComercial(dados.nome)} está no Olá Carlópolis</small><strong>Acesse www.olacarlopolis.com</strong></span></div>
         <span class="business-art-brand-logo"><img src="${escaparArteComercial(logoSiteUrl)}" alt="Ola Carlopolis" crossorigin="anonymous"></span>
       </footer>
     </article>
