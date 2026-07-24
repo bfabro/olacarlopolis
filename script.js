@@ -1276,7 +1276,16 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       picture.querySelectorAll(".business-art-mosaic-cell").forEach((cell, index) => {
         const image = cell.querySelector(".business-art-mosaic-image");
         if (image) {
-          image.style.transform = `scale(${escalasImagensMosaico[index] || 1})`;
+          const proporcaoCelula = cell.clientWidth / Math.max(1, cell.clientHeight);
+          const proporcaoImagem = image.naturalWidth / Math.max(1, image.naturalHeight);
+          if (proporcaoImagem > proporcaoCelula) {
+            image.style.width = "auto";
+            image.style.height = "100%";
+          } else {
+            image.style.width = "100%";
+            image.style.height = "auto";
+          }
+          image.style.transform = `translate(-50%, -50%) scale(${escalasImagensMosaico[index] || 1})`;
           image.style.transformOrigin = "center center";
         }
         cell.classList.toggle("is-selected-for-scale", index === imagemMosaicoSelecionada);
