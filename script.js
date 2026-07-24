@@ -24221,14 +24221,17 @@ ${produtosIniciaisLoja.length ? `
 
 
 
-  if (window.location.hash) {
-    // Garante que o menu comece fechado mas com textos prontos para exibir
+  if (window.location.hash && window.innerWidth < 768) {
+    // Em rotas compartilhadas, inicia fechado somente no mobile.
     sidebar.classList.add("close");
 
-    // Ao clicar no menu, garante que os textos sejam mostrados
+    // Ao clicar no menu, garante que os textos sejam mostrados.
     sidebarOpen.addEventListener("click", function () {
       sidebar.classList.remove("close");
-    }, { once: true }); // executa só na primeira vez
+    }, { once: true });
+  } else if (window.innerWidth >= 768) {
+    // No desktop, uma atualizacao com hash nunca deve retrair o menu.
+    sidebar.classList.remove("close", "hoverable");
   }
 
   // Mostra o loader só se veio de link compartilhado
