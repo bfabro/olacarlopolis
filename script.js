@@ -597,6 +597,178 @@ function valorPreenchidoArteComercial(value) {
   return /^(?:-|--|nao informado|não informado|nao possui|não possui|n\/a)$/i.test(text) ? "" : text;
 }
 
+function imagensConteudoArteComercial(establishment = {}) {
+  const grupos = {
+    fotos: [],
+    produtos: [],
+    veiculos: [],
+    imoveis: []
+  };
+  const adicionar = (destino, valor) => {
+    if (!valor) return;
+    if (Array.isArray(valor)) {
+      valor.forEach((item) => adicionar(destino, item));
+      return;
+    }
+    if (typeof valor === "object") {
+      [
+        valor.url,
+        valor.src,
+        valor.imagem,
+        valor.image,
+        valor.foto,
+        valor.fotoUrl,
+        valor.imagemUrl,
+        valor.imageUrl,
+        valor.imagemPrincipal,
+        valor.imagemPrincipalUrl,
+        valor.Link_Imagem,
+        valor["Imagem URL"],
+        valor.banner,
+        valor.imagens,
+        valor.images,
+        valor.fotos,
+        valor.Fotos,
+        valor.imagensExtras,
+        valor.imagensExtrasUrls
+      ].forEach((item) => adicionar(destino, item));
+      return;
+    }
+    const url = urlAbsolutaArteComercial(valor);
+    if (url && !destino.includes(url)) destino.push(url);
+  };
+  const comoLista = (valor) => {
+    if (Array.isArray(valor)) return valor;
+    if (!valor || typeof valor !== "object") return [];
+    return Object.values(valor);
+  };
+  const chavesCliente = new Set([
+    establishment.clienteId,
+    establishment.id,
+    establishment.nomeNormalizado,
+    establishment.name,
+    establishment.nome
+  ].map(normalizarArteComercial).filter(Boolean));
+  const pertenceAoCliente = (item = {}) => {
+    const candidatos = [
+      item.clienteId,
+      item.idCliente,
+      item.clienteSlug,
+      item.clienteNome,
+      item.nomeCliente,
+      item.estabelecimentoId,
+      item.estabelecimento,
+      item.nomeEstabelecimento,
+      item.vendedor,
+      item.loja,
+      item.lojaNome,
+      item.empresa,
+      item.anunciante,
+      item.corretor,
+      ...(Array.isArray(item.corretores) ? item.corretores : [])
+    ].map(normalizarArteComercial).filter(Boolean);
+    return candidatos.some((chave) => chavesCliente.has(chave));
+  };
+  const clientesRelacionados = Object.entries(window.__clientesPublicosCache || {})
+    .filter(([id, cliente]) => [
+      id,
+      cliente?.id,
+      cliente?.nomeNormalizado,
+      cliente?.name,
+      cliente?.nome
+    ].map(normalizarArteComercial).some((chave) => chave && chavesCliente.has(chave)))
+    .map(([, cliente]) => cliente || {});
+
+  [
+    establishment.novidadesImages,
+    establishment.divulgacaoImages,
+    establishment.fotos,
+    establishment.images,
+    establishment.imagens,
+    ...clientesRelacionados.flatMap((cliente) => [
+      cliente.novidadesImages,
+      cliente.divulgacaoImages,
+      cliente.fotos,
+      cliente.images,
+      cliente.imagens
+    ])
+  ].forEach((valor) => adicionar(grupos.fotos, valor));
+
+  [
+    establishment.produtos,
+    establishment.products,
+    establishment.itens,
+    establishment.items,
+    ...clientesRelacionados.flatMap((cliente) => [
+      cliente.produtos,
+      cliente.products,
+      cliente.itens,
+      cliente.items
+    ])
+  ].flatMap(comoLista).forEach((item) => {
+    if (item?.ativo === false || item?.status === "inativo") return;
+    adicionar(grupos.produtos, item);
+  });
+
+  [
+    establishment.automoveis,
+    establishment.veiculos,
+    establishment.vehicles,
+    establishment.cars,
+    ...clientesRelacionados.flatMap((cliente) => [
+      cliente.automoveis,
+      cliente.veiculos,
+      cliente.vehicles,
+      cliente.cars
+    ])
+  ].flatMap(comoLista).forEach((item) => {
+    if (item?.ativo === false || item?.status === "inativo") return;
+    adicionar(grupos.veiculos, item);
+  });
+  (window.__automoveisCache || []).forEach((item) => {
+    if (item?.ativo === false || item?.status === "inativo" || !pertenceAoCliente(item)) return;
+    adicionar(grupos.veiculos, item);
+  });
+
+  [
+    establishment.imoveis,
+    establishment.properties,
+    establishment.immobiles,
+    ...clientesRelacionados.flatMap((cliente) => [
+      cliente.imoveis,
+      cliente.properties,
+      cliente.immobiles
+    ])
+  ].flatMap(comoLista).forEach((item) => {
+    if (item?.ativo === false || item?.status === "inativo") return;
+    adicionar(grupos.imoveis, item);
+  });
+  (window.__imoveisPublicosCache || []).forEach((item) => {
+    if (item?.ativo === false || item?.status === "inativo" || !pertenceAoCliente(item)) return;
+    adicionar(grupos.imoveis, item);
+  });
+
+  const contexto = normalizarArteComercial([
+    establishment.tipoCliente,
+    establishment.tipo,
+    establishment.categoria,
+    establishment.category,
+    establishment.__categoriaPublica,
+    establishment.name,
+    establishment.nome
+  ].filter(Boolean).join(" "));
+  const ordem = /imovel|imobili|corretor/.test(contexto)
+    ? ["imoveis", "fotos", "produtos", "veiculos"]
+    : (/automovel|veiculo|revenda|carro|moto/.test(contexto)
+      ? ["veiculos", "fotos", "produtos", "imoveis"]
+      : ["produtos", "fotos", "veiculos", "imoveis"]);
+  const resultado = [];
+  ordem.forEach((grupo) => grupos[grupo].forEach((url) => {
+    if (!resultado.includes(url)) resultado.push(url);
+  }));
+  return resultado;
+}
+
 function urlAbsolutaArteComercial(value) {
   const raw = String(value || "").trim();
   if (!raw) return "";
@@ -753,6 +925,11 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     establishment.novidadesImages,
     establishment.divulgacaoImages
   ].forEach(adicionarImagem);
+  const imagensConteudo = imagensConteudoArteComercial(establishment);
+  const imagensMosaico = [...imagensConteudo];
+  imagens.forEach((url) => {
+    if (!imagensMosaico.includes(url)) imagensMosaico.push(url);
+  });
   const tipo = normalizarArteComercial(establishment.tipoCliente || establishment.tipo || "comercio");
   const tipoLabel = tipo === "servico" || tipo === "servicos"
     ? "Serviço"
@@ -778,12 +955,13 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     endereco: valorPreenchidoArteComercial(establishment.address || establishment.endereco || ""),
     imagem: imagens[0] || "",
     imagens,
+    imagensMosaico,
     imagemEnquadramento: establishment.imagemEnquadramento || establishment.imageFit || "auto"
   };
 }
 
 function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte }) {
-  const imagensMosaico = (dados.imagens || []).slice(0, 4);
+  const imagensMosaico = (dados.imagensMosaico || dados.imagens || []).slice(0, 4);
   const imageBlock = layoutArte === "mosaic" && imagensMosaico.length
     ? `<div class="business-art-mosaic business-art-mosaic-count-${imagensMosaico.length}">
         ${imagensMosaico.map((imagem, index) => `<span class="business-art-mosaic-cell" data-business-mosaic-index="${index}"><img class="business-art-mosaic-image" src="${escaparArteComercial(imagem)}" alt="Imagem ${index + 1} de ${escaparArteComercial(dados.nome)}" crossorigin="anonymous"></span>`).join("")}
@@ -927,14 +1105,18 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   mostrarToast("Preparando a previa da arte...");
   const dados = dadosArteComercial(establishment, categoriaAtual);
   const imagensOriginais = (dados.imagens || []).slice(0, 4);
-  const imagensPreparadas = await Promise.all(imagensOriginais.map(async (imagem) => {
+  const imagensMosaicoOriginais = (dados.imagensMosaico || dados.imagens || []).slice(0, 4);
+  const imagensParaPreparar = [...new Set([...imagensOriginais, ...imagensMosaicoOriginais])];
+  const imagensPreparadas = await Promise.all(imagensParaPreparar.map(async (imagem) => {
     const preparada = await prepararImagemArteComercial(imagem);
-    return preparada || imagem;
+    return [imagem, preparada || imagem];
   }));
+  const imagensPreparadasPorOrigem = new Map(imagensPreparadas);
   // A arte usa fundo escuro proprio. Capturar a pagina faria o html2canvas
   // tentar reler imagens de outros clientes e dispararia requisicoes CORS.
   const fundoUrl = "";
-  dados.imagens = imagensPreparadas.filter(Boolean);
+  dados.imagens = imagensOriginais.map((imagem) => imagensPreparadasPorOrigem.get(imagem) || imagem).filter(Boolean);
+  dados.imagensMosaico = imagensMosaicoOriginais.map((imagem) => imagensPreparadasPorOrigem.get(imagem) || imagem).filter(Boolean);
   dados.imagem = dados.imagens[0] || dados.imagem;
   const imageFit = await detectarEnquadramentoArteComercial(
     dados.imagem,
