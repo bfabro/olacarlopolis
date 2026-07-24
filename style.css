@@ -24191,6 +24191,30 @@ body.business-art-capturing-background .home-cards-intro {
   cursor: zoom-in;
 }
 
+/* ===== Imagem ampliada acima do modal de produto v182 ===== */
+.fullscreen-img-bg {
+  z-index: 10040 !important;
+}
+
+.fullscreen-img-bg .fullscreen-close {
+  position: fixed !important;
+  top: max(14px, env(safe-area-inset-top)) !important;
+  right: max(14px, env(safe-area-inset-right)) !important;
+  z-index: 2 !important;
+  display: grid !important;
+  place-items: center !important;
+  width: 46px !important;
+  height: 46px !important;
+  padding: 0 !important;
+  border: 2px solid rgba(255, 255, 255, .75) !important;
+  border-radius: 999px !important;
+  background: rgba(0, 0, 0, .82) !important;
+  color: #fff !important;
+  font-size: 34px !important;
+  line-height: 1 !important;
+  cursor: pointer !important;
+}
+
 /* ===== Promocoes do menu com o mesmo card da area do cliente v181 ===== */
 .promo-menu-client-layout .promo-client-grid {
   display: grid !important;

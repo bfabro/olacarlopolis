@@ -24959,11 +24959,24 @@ document.body.addEventListener('click', function (e) {
   const img = e.target.closest('.promo-img-zoom, .promo-carousel-img, .imagem-cardapio, .imagem-expandivel');
   if (!img) return;
 
+  e.preventDefault();
+  e.stopPropagation();
+  document.querySelector('.fullscreen-img-bg')?.remove();
+
   const src = img.src;
   const bg = document.createElement('div');
   bg.className = 'fullscreen-img-bg';
-  bg.innerHTML = `<img src="${src}" alt="Ampliada" />`;
-  bg.onclick = () => bg.remove();
+  bg.innerHTML = `
+    <button type="button" class="fullscreen-close" aria-label="Fechar imagem ampliada">&times;</button>
+    <img src="${src}" alt="Ampliada" />
+  `;
+  bg.addEventListener('click', (event) => {
+    if (event.target === bg || event.target.closest('.fullscreen-close')) {
+      event.preventDefault();
+      event.stopPropagation();
+      bg.remove();
+    }
+  });
   document.body.appendChild(bg);
 });
 
