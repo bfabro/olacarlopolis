@@ -786,7 +786,7 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
   const imagensMosaico = (dados.imagens || []).slice(0, 4);
   const imageBlock = layoutArte === "mosaic" && imagensMosaico.length
     ? `<div class="business-art-mosaic business-art-mosaic-count-${imagensMosaico.length}">
-        ${imagensMosaico.map((imagem, index) => `<img class="business-art-mosaic-image" src="${escaparArteComercial(imagem)}" alt="Imagem ${index + 1} de ${escaparArteComercial(dados.nome)}" crossorigin="anonymous">`).join("")}
+        ${imagensMosaico.map((imagem, index) => `<span class="business-art-mosaic-cell" data-business-mosaic-index="${index}"><img class="business-art-mosaic-image" src="${escaparArteComercial(imagem)}" alt="Imagem ${index + 1} de ${escaparArteComercial(dados.nome)}" crossorigin="anonymous"></span>`).join("")}
       </div>`
     : (dados.imagem
       ? `<img class="business-art-main-image" src="${escaparArteComercial(dados.imagem)}" alt="" crossorigin="anonymous" style="object-fit:${imageFit}">`
@@ -974,10 +974,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         </div>
         <div class="business-art-image-controls">
           <label>
-            <span>Tamanho da imagem <output data-business-image-scale-output>100%</output></span>
+            <span><span data-business-image-scale-label>Tamanho da imagem</span><output data-business-image-scale-output>100%</output></span>
             <input type="range" min="65" max="135" value="100" step="1" data-business-image-scale>
           </label>
-          <small><i class="fa-solid fa-hand-pointer"></i> Use dois dedos sobre a foto para aumentar ou diminuir.</small>
+          <small><i class="fa-solid fa-hand-pointer"></i> Use dois dedos sobre a foto. No Mosaico, ajuste cada imagem separadamente.</small>
         </div>
         <div class="business-art-font-controls" aria-label="Tamanho das fontes da arte">
           <label>
@@ -1015,6 +1015,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let efeitoFoto = "soft";
   let cantosArredondados = true;
   let escalaImagem = 1;
+  const escalasImagensMosaico = [1, 1, 1, 1];
+  let imagemMosaicoSelecionada = 0;
   let fonteDescricao = dados.descricao.length > 320 ? 22 : (dados.descricao.length > 220 ? 24 : 26);
   let fonteWhatsapp = 28;
   let fonteCidade = 28;
@@ -1024,25 +1026,49 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   if (descricaoOutput) descricaoOutput.value = String(fonteDescricao);
 
   const limitarEscalaImagem = (value) => Math.min(1.35, Math.max(.65, value));
+  const escalaImagemSelecionada = () => layoutArte === "mosaic"
+    ? escalasImagensMosaico[imagemMosaicoSelecionada]
+    : escalaImagem;
+  const definirEscalaImagemSelecionada = (value) => {
+    const escala = limitarEscalaImagem(value);
+    if (layoutArte === "mosaic") escalasImagensMosaico[imagemMosaicoSelecionada] = escala;
+    else escalaImagem = escala;
+  };
   const sincronizarControleEscalaImagem = () => {
     const input = dialog.querySelector("[data-business-image-scale]");
     const output = dialog.querySelector("[data-business-image-scale-output]");
-    const percentual = Math.round(escalaImagem * 100);
+    const label = dialog.querySelector("[data-business-image-scale-label]");
+    const percentual = Math.round(escalaImagemSelecionada() * 100);
     if (input) input.value = String(percentual);
     if (output) output.value = `${percentual}%`;
+    if (label) label.textContent = layoutArte === "mosaic"
+      ? `Tamanho da imagem ${imagemMosaicoSelecionada + 1}`
+      : "Tamanho da imagem";
   };
   const aplicarEscalaImagem = (picture = stage.querySelector(".business-art-picture")) => {
     if (!picture) return;
     const offsetY = efeitoFoto === "lift" ? -12 : 0;
-    picture.style.transform = `translateY(${offsetY}px) scale(${escalaImagem})`;
+    if (layoutArte === "mosaic") {
+      picture.style.transform = `translateY(${offsetY}px)`;
+      picture.querySelectorAll(".business-art-mosaic-cell").forEach((cell, index) => {
+        const image = cell.querySelector(".business-art-mosaic-image");
+        if (image) {
+          image.style.transform = `scale(${escalasImagensMosaico[index] || 1})`;
+          image.style.transformOrigin = "center center";
+        }
+        cell.classList.toggle("is-selected-for-scale", index === imagemMosaicoSelecionada);
+      });
+    } else {
+      picture.style.transform = `translateY(${offsetY}px) scale(${escalaImagem})`;
+    }
     picture.style.transformOrigin = "center center";
     sincronizarControleEscalaImagem();
   };
-  const vincularPincaImagem = (picture) => {
-    if (!picture) return;
+  const vincularPincaElementoImagem = (element, selecionar, obterEscala, definirEscala, picture) => {
+    if (!element) return;
     const pointers = new Map();
     let distanciaInicial = 0;
-    let escalaInicial = escalaImagem;
+    let escalaInicial = obterEscala();
     const distanciaEntrePontos = () => {
       const [first, second] = Array.from(pointers.values());
       return first && second ? Math.hypot(second.x - first.x, second.y - first.y) : 0;
@@ -1050,18 +1076,19 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const iniciarPinca = () => {
       if (pointers.size < 2) return;
       distanciaInicial = distanciaEntrePontos();
-      escalaInicial = escalaImagem;
+      escalaInicial = obterEscala();
     };
-    picture.addEventListener("pointerdown", (event) => {
+    element.addEventListener("pointerdown", (event) => {
+      selecionar();
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       try {
-        picture.setPointerCapture(event.pointerId);
+        element.setPointerCapture(event.pointerId);
       } catch (error) {
         // A captura pode nao estar disponivel em navegadores mais antigos.
       }
       iniciarPinca();
     });
-    picture.addEventListener("pointermove", (event) => {
+    element.addEventListener("pointermove", (event) => {
       if (!pointers.has(event.pointerId)) return;
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
       if (pointers.size < 2) return;
@@ -1069,7 +1096,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       const distanciaAtual = distanciaEntrePontos();
       if (!distanciaInicial) iniciarPinca();
       if (!distanciaInicial) return;
-      escalaImagem = limitarEscalaImagem(escalaInicial * (distanciaAtual / distanciaInicial));
+      definirEscala(limitarEscalaImagem(escalaInicial * (distanciaAtual / distanciaInicial)));
       aplicarEscalaImagem(picture);
     });
     const liberarPonteiro = (event) => {
@@ -1077,8 +1104,33 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       distanciaInicial = 0;
       if (pointers.size >= 2) iniciarPinca();
     };
-    picture.addEventListener("pointerup", liberarPonteiro);
-    picture.addEventListener("pointercancel", liberarPonteiro);
+    element.addEventListener("pointerup", liberarPonteiro);
+    element.addEventListener("pointercancel", liberarPonteiro);
+  };
+  const vincularPincaImagem = (picture) => {
+    if (!picture) return;
+    if (layoutArte === "mosaic") {
+      picture.querySelectorAll(".business-art-mosaic-cell").forEach((cell, index) => {
+        vincularPincaElementoImagem(
+          cell,
+          () => {
+            imagemMosaicoSelecionada = index;
+            aplicarEscalaImagem(picture);
+          },
+          () => escalasImagensMosaico[index] || 1,
+          (value) => { escalasImagensMosaico[index] = value; },
+          picture
+        );
+      });
+      return;
+    }
+    vincularPincaElementoImagem(
+      picture,
+      () => {},
+      () => escalaImagem,
+      (value) => { escalaImagem = value; },
+      picture
+    );
   };
 
   const render = async () => {
@@ -1272,7 +1324,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     });
   });
   dialog.querySelector("[data-business-image-scale]")?.addEventListener("input", (event) => {
-    escalaImagem = limitarEscalaImagem(Number(event.currentTarget.value) / 100);
+    definirEscalaImagemSelecionada(Number(event.currentTarget.value) / 100);
     aplicarEscalaImagem();
   });
   dialog.querySelectorAll("[data-business-effect]").forEach((button) => {
@@ -1335,6 +1387,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       });
       const exportStage = stage.cloneNode(true);
       exportStage.classList.add("is-png-export");
+      exportStage.querySelectorAll(".is-selected-for-scale").forEach((cell) => cell.classList.remove("is-selected-for-scale"));
       Object.assign(exportStage.style, {
         position: "absolute",
         inset: "0",
