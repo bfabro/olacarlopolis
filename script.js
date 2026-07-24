@@ -926,8 +926,9 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     establishment.divulgacaoImages
   ].forEach(adicionarImagem);
   const imagensConteudo = imagensConteudoArteComercial(establishment);
-  const imagensMosaico = [...imagensConteudo];
-  imagens.forEach((url) => {
+  const imagensMosaico = [];
+  [imagens[0], ...imagensConteudo, ...imagens].forEach((url) => {
+    if (!url) return;
     if (!imagensMosaico.includes(url)) imagensMosaico.push(url);
   });
   const tipo = normalizarArteComercial(establishment.tipoCliente || establishment.tipo || "comercio");
@@ -1105,7 +1106,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   mostrarToast("Preparando a previa da arte...");
   const dados = dadosArteComercial(establishment, categoriaAtual);
   const imagensOriginais = (dados.imagens || []).slice(0, 4);
-  const imagensMosaicoOriginais = (dados.imagensMosaico || dados.imagens || []).slice(0, 4);
+  const fontesMosaicoOriginais = (dados.imagensMosaico || dados.imagens || []).slice(0, 40);
+  const imagensMosaicoOriginais = fontesMosaicoOriginais.slice(0, 4);
   const imagensParaPreparar = [...new Set([...imagensOriginais, ...imagensMosaicoOriginais])];
   const imagensPreparadas = await Promise.all(imagensParaPreparar.map(async (imagem) => {
     const preparada = await prepararImagemArteComercial(imagem);
@@ -1162,6 +1164,23 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           </label>
           <small><i class="fa-solid fa-hand-pointer"></i> Use dois dedos sobre a foto. No Mosaico, ajuste cada imagem separadamente.</small>
         </div>
+        <div class="business-art-mosaic-picker is-hidden" aria-label="Escolher imagens do mosaico">
+          <strong>Imagens de cada quadrado</strong>
+          <div class="business-art-mosaic-slots" role="group" aria-label="Quadrado que sera alterado">
+            ${imagensMosaicoOriginais.map((imagem, index) => `
+              <button type="button" data-business-mosaic-slot="${index}" ${index === 0 ? "disabled" : ""} aria-label="${index === 0 ? "Imagem 1, perfil fixo" : `Escolher imagem do quadrado ${index + 1}`}">
+                <img src="${escaparArteComercial(imagem)}" alt="">
+                <span>${index === 0 ? "1 · Perfil fixo" : `Quadrado ${index + 1}`}</span>
+              </button>`).join("")}
+          </div>
+          <div class="business-art-mosaic-options" role="list" aria-label="Imagens disponiveis">
+            ${fontesMosaicoOriginais.slice(1).map((imagem, index) => `
+              <button type="button" data-business-mosaic-source="${index + 1}" role="listitem" aria-label="Usar imagem ${index + 2} no quadrado selecionado">
+                <img src="${escaparArteComercial(imagem)}" alt="" loading="lazy">
+              </button>`).join("")}
+          </div>
+          <small>Selecione o quadrado 2, 3 ou 4 e depois escolha uma imagem.</small>
+        </div>
         <div class="business-art-font-controls" aria-label="Tamanho das fontes da arte">
           <label>
             <span>Descrição <output data-business-font-output="description">26</output></span>
@@ -1201,6 +1220,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let escalaImagem = 1;
   const escalasImagensMosaico = [1, 1, 1, 1];
   let imagemMosaicoSelecionada = 0;
+  let slotMosaicoEscolha = Math.min(1, Math.max(0, imagensMosaicoOriginais.length - 1));
+  const fontesSelecionadasMosaico = imagensMosaicoOriginais.map((imagem) => fontesMosaicoOriginais.indexOf(imagem));
   let fonteDescricao = dados.descricao.length > 320 ? 22 : (dados.descricao.length > 220 ? 24 : 26);
   let fonteWhatsapp = 28;
   let fonteCidade = 28;
@@ -1228,6 +1249,24 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     if (label) label.textContent = layoutArte === "mosaic"
       ? `Tamanho da imagem ${imagemMosaicoSelecionada + 1}`
       : "Tamanho da imagem";
+  };
+  const atualizarSeletorMosaico = () => {
+    const picker = dialog.querySelector(".business-art-mosaic-picker");
+    if (!picker) return;
+    picker.classList.toggle("is-hidden", layoutArte !== "mosaic");
+    picker.querySelectorAll("[data-business-mosaic-slot]").forEach((button) => {
+      const index = Number(button.dataset.businessMosaicSlot);
+      button.classList.toggle("active", index === slotMosaicoEscolha);
+      const image = button.querySelector("img");
+      const sourceIndex = fontesSelecionadasMosaico[index];
+      if (image && fontesMosaicoOriginais[sourceIndex]) image.src = fontesMosaicoOriginais[sourceIndex];
+    });
+    picker.querySelectorAll("[data-business-mosaic-source]").forEach((button) => {
+      button.classList.toggle(
+        "active",
+        Number(button.dataset.businessMosaicSource) === fontesSelecionadasMosaico[slotMosaicoEscolha]
+      );
+    });
   };
   const aplicarEscalaImagem = (picture = stage.querySelector(".business-art-picture")) => {
     if (!picture) return;
@@ -1299,6 +1338,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           cell,
           () => {
             imagemMosaicoSelecionada = index;
+            if (index > 0) slotMosaicoEscolha = index;
+            atualizarSeletorMosaico();
             aplicarEscalaImagem(picture);
           },
           () => escalasImagensMosaico[index] || 1,
@@ -1434,6 +1475,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     }
     aplicarEscalaImagem(picture);
     vincularPincaImagem(picture);
+    atualizarSeletorMosaico();
     const disclaimer = stage.querySelector(".business-art-disclaimer");
     if (card && disclaimer) {
       disclaimer.style.top = `${Math.min(height - 58, card.offsetTop + card.offsetHeight + 24)}px`;
@@ -1480,7 +1522,41 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       layoutArte = button.dataset.businessLayout || "classic";
       dialog.querySelectorAll("[data-business-layout]").forEach((item) => item.classList.toggle("active", item === button));
       dialog.querySelector(".business-art-color-controls")?.classList.toggle("is-hidden", layoutArte === "classic");
+      atualizarSeletorMosaico();
       await render();
+    });
+  });
+  dialog.querySelectorAll("[data-business-mosaic-slot]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.businessMosaicSlot);
+      if (!Number.isInteger(index) || index <= 0 || index >= dados.imagensMosaico.length) return;
+      slotMosaicoEscolha = index;
+      imagemMosaicoSelecionada = index;
+      atualizarSeletorMosaico();
+      aplicarEscalaImagem();
+    });
+  });
+  dialog.querySelectorAll("[data-business-mosaic-source]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const sourceIndex = Number(button.dataset.businessMosaicSource);
+      const origem = fontesMosaicoOriginais[sourceIndex];
+      if (!origem || slotMosaicoEscolha <= 0 || slotMosaicoEscolha >= dados.imagensMosaico.length) return;
+      button.disabled = true;
+      try {
+        let preparada = imagensPreparadasPorOrigem.get(origem);
+        if (!preparada) {
+          mostrarToast("Preparando a imagem escolhida...");
+          preparada = await prepararImagemArteComercial(origem) || origem;
+          imagensPreparadasPorOrigem.set(origem, preparada);
+        }
+        dados.imagensMosaico[slotMosaicoEscolha] = preparada;
+        fontesSelecionadasMosaico[slotMosaicoEscolha] = sourceIndex;
+        escalasImagensMosaico[slotMosaicoEscolha] = 1;
+        await render();
+      } finally {
+        button.disabled = false;
+        atualizarSeletorMosaico();
+      }
     });
   });
   dialog.querySelectorAll("[data-business-color]").forEach((input) => {
