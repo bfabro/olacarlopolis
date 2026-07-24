@@ -604,6 +604,7 @@ function imagensConteudoArteComercial(establishment = {}) {
     veiculos: [],
     imoveis: []
   };
+  const galeriasVeiculos = [];
   const adicionar = (destino, valor) => {
     if (!valor) return;
     if (Array.isArray(valor)) {
@@ -641,6 +642,11 @@ function imagensConteudoArteComercial(establishment = {}) {
     if (Array.isArray(valor)) return valor;
     if (!valor || typeof valor !== "object") return [];
     return Object.values(valor);
+  };
+  const adicionarGaleriaVeiculo = (item) => {
+    const galeria = [];
+    adicionar(galeria, item);
+    if (galeria.length) galeriasVeiculos.push(galeria);
   };
   const chavesCliente = new Set([
     establishment.clienteId,
@@ -723,12 +729,19 @@ function imagensConteudoArteComercial(establishment = {}) {
     ])
   ].flatMap(comoLista).forEach((item) => {
     if (item?.ativo === false || item?.status === "inativo") return;
-    adicionar(grupos.veiculos, item);
+    adicionarGaleriaVeiculo(item);
   });
   (window.__automoveisCache || []).forEach((item) => {
     if (item?.ativo === false || item?.status === "inativo" || !pertenceAoCliente(item)) return;
-    adicionar(grupos.veiculos, item);
+    adicionarGaleriaVeiculo(item);
   });
+  const maiorGaleriaVeiculo = Math.max(0, ...galeriasVeiculos.map((galeria) => galeria.length));
+  for (let indiceFoto = 0; indiceFoto < maiorGaleriaVeiculo; indiceFoto += 1) {
+    galeriasVeiculos.forEach((galeria) => {
+      const url = galeria[indiceFoto];
+      if (url && !grupos.veiculos.includes(url)) grupos.veiculos.push(url);
+    });
+  }
 
   [
     establishment.imoveis,
@@ -1106,7 +1119,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   mostrarToast("Preparando a previa da arte...");
   const dados = dadosArteComercial(establishment, categoriaAtual);
   const imagensOriginais = (dados.imagens || []).slice(0, 4);
-  const fontesMosaicoOriginais = (dados.imagensMosaico || dados.imagens || []).slice(0, 40);
+  const fontesMosaicoOriginais = (dados.imagensMosaico || dados.imagens || []).slice(0, 120);
   const imagensMosaicoOriginais = fontesMosaicoOriginais.slice(0, 4);
   const imagensParaPreparar = [...new Set([...imagensOriginais, ...imagensMosaicoOriginais])];
   const imagensPreparadas = await Promise.all(imagensParaPreparar.map(async (imagem) => {
