@@ -950,6 +950,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     <div class="business-art-panel">
       <div class="business-art-toolbar">
         <div><strong>Arte para divulgacao</strong><small>Escolha o formato e confira antes de baixar.</small></div>
+        <button type="button" class="business-art-mobile-preview-toggle" aria-pressed="false"><i class="fa-solid fa-eye"></i><span>Ver imagem</span></button>
         <div class="business-art-format" role="group" aria-label="Formato da imagem">
           <button type="button" data-business-format="story">Story <small>1080 x 1920</small></button>
           <button type="button" class="active" data-business-format="feed">Feed <small>1080 x 1350</small></button>
@@ -1005,6 +1006,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const previousOverflow = document.documentElement.style.overflow;
   document.documentElement.style.overflow = "hidden";
   document.body.appendChild(dialog);
+  const panel = dialog.querySelector(".business-art-panel");
   const stage = dialog.querySelector(".business-art-stage");
   const scaleBox = dialog.querySelector(".business-art-scale");
   const preview = dialog.querySelector(".business-art-preview");
@@ -1326,6 +1328,15 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   dialog.querySelector("[data-business-image-scale]")?.addEventListener("input", (event) => {
     definirEscalaImagemSelecionada(Number(event.currentTarget.value) / 100);
     aplicarEscalaImagem();
+  });
+  dialog.querySelector(".business-art-mobile-preview-toggle")?.addEventListener("click", (event) => {
+    const button = event.currentTarget;
+    const previewMode = panel.classList.toggle("is-mobile-preview-mode");
+    button.setAttribute("aria-pressed", String(previewMode));
+    button.innerHTML = previewMode
+      ? '<i class="fa-solid fa-sliders"></i><span>Editar</span>'
+      : '<i class="fa-solid fa-eye"></i><span>Ver imagem</span>';
+    requestAnimationFrame(resize);
   });
   dialog.querySelectorAll("[data-business-effect]").forEach((button) => {
     button.addEventListener("click", async () => {

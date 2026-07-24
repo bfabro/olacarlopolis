@@ -21971,6 +21971,10 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   cursor: pointer;
 }
 
+.business-art-mobile-preview-toggle {
+  display: none;
+}
+
 .business-art-preview {
   display: grid;
   place-items: center;
@@ -23990,18 +23994,169 @@ body.business-art-capturing-background .home-cards-intro {
 }
 
 @media (max-width: 700px) {
-  .business-art-image-controls {
+  .business-art-dialog {
+    overscroll-behavior: contain;
+  }
+
+  .business-art-panel {
+    grid-template-rows: minmax(0, 42dvh) minmax(0, 1fr) auto;
+  }
+
+  .business-art-toolbar {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    align-content: start;
+    gap: 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 10px 10px 12px;
+    overscroll-behavior: contain;
+  }
+
+  .business-art-toolbar > div:first-child {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 38px;
+    padding-right: 148px;
+  }
+
+  .business-art-toolbar > div:first-child strong {
+    font-size: 16px;
+    line-height: 1.15;
+  }
+
+  .business-art-mobile-preview-toggle {
+    position: absolute;
+    top: 10px;
+    right: 56px;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 38px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 12px;
+    background: #0b63e6;
+    color: #fff;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 850;
+  }
+
+  .business-art-close {
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+  }
+
+  .business-art-format,
+  .business-art-layout,
+  .business-art-color-controls,
+  .business-art-effect {
+    grid-column: 1 / -1;
+    width: 100%;
+    gap: 4px;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .business-art-format button {
+    min-height: 44px;
+    padding: 5px 8px;
+  }
+
+  .business-art-layout button,
+  .business-art-color-controls label,
+  .business-art-effect button {
+    min-width: 0;
+    min-height: 42px;
+    padding: 5px 4px;
+  }
+
+  .business-art-photo-option {
+    grid-column: 1;
+    width: 72px !important;
+    height: 100%;
+    padding: 4px;
+  }
+
+  .business-art-photo-option button {
     width: 100%;
     min-width: 0;
+    min-height: 60px;
+    padding: 5px 3px;
+  }
+
+  .business-art-image-controls {
+    grid-column: 2;
+    width: auto;
+    min-width: 0;
+    padding: 7px 9px;
   }
 
   .business-art-font-controls {
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 8px;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    padding: 8px;
   }
 
   .business-art-font-controls label {
     min-width: 0;
+  }
+
+  .business-art-font-controls label span {
+    gap: 3px;
+    font-size: 9px;
+  }
+
+  .business-art-font-controls output {
+    min-width: 24px;
+    padding-inline: 4px;
+  }
+
+  .business-art-preview {
+    padding: 6px;
+  }
+
+  .business-art-actions {
+    position: relative;
+    z-index: 5;
+    gap: 8px;
+    padding: 9px 10px;
+  }
+
+  .business-art-resolution {
+    font-size: 10px;
+  }
+
+  .business-art-download {
+    min-height: 44px;
+    padding-inline: 14px;
+  }
+
+  .business-art-panel.is-mobile-preview-mode {
+    grid-template-rows: 58px minmax(0, 1fr) auto;
+  }
+
+  .business-art-panel.is-mobile-preview-mode .business-art-toolbar {
+    overflow: hidden;
+  }
+
+  .business-art-panel.is-mobile-preview-mode .business-art-toolbar > div:first-child {
+    visibility: hidden;
+  }
+
+  .business-art-panel.is-mobile-preview-mode .business-art-mobile-preview-toggle {
+    right: auto;
+    left: 10px;
+  }
+
+  .business-art-panel.is-mobile-preview-mode .business-art-toolbar > :not(:first-child):not(.business-art-mobile-preview-toggle):not(.business-art-close) {
+    display: none !important;
   }
 }
