@@ -24160,3 +24160,33 @@ body.business-art-capturing-background .home-cards-intro {
     display: none !important;
   }
 }
+
+/* ===== Promocoes: detalhes e interesse v180 ===== */
+.promo-city-screen:not(.promo-compact-mode) .promo-whats-link span::after {
+  content: none !important;
+  display: none !important;
+}
+
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-wa-btn {
+  display: inline-flex !important;
+  width: auto !important;
+  min-width: 0 !important;
+  height: 28px !important;
+  padding: 0 8px !important;
+  gap: 4px !important;
+  border-radius: 999px !important;
+  background: #eafaf0 !important;
+  color: #087a37 !important;
+}
+
+.promo-city-screen.promo-compact-mode .promo-event-style-card .card-divulgacao-wa-btn span {
+  display: inline !important;
+  font-size: 9px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+}
+
+.loja-produto-modal-img.imagem-expandivel {
+  cursor: zoom-in;
+}

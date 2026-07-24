@@ -8904,7 +8904,12 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         diasSemana: normalizarDiasSemanaPromocao(p.diasSemana || p.dias || p.recorrenciaDias || p.diaSemana),
         obs: p.obs || p.observacoes || "",
         instagramMensagem: p.instagramMensagem || p.mensagemInstagram || p.chamadaInstagram || contexto.instagramMensagem || "Siga no Instagram e fique por dentro das novidades!",
-        contact: contexto.contact || "",
+        contato: getPrimeiroContato(
+          p.contato || p.contact || p.whatsapp || p.telefone
+          || contexto.contato || contexto.contact || contexto.whatsapp || contexto.telefone || ""
+        ) || "",
+        whatsapp: p.whatsapp || contexto.whatsapp || "",
+        telefone: p.telefone || contexto.telefone || "",
         instagram: contexto.instagram || "",
         criadoEm: p.criadoEm || p.createdAt || ""
       });
@@ -8922,7 +8927,9 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           categoria: cat.title || "",
           logo: est.logo || est.logoUrl || est.profileImage || est.perfil || est.imagemPerfil || est.image || "",
           instagramMensagem: est.instagramMensagem,
-          contact: getPrimeiroContato(est.contact) || "",
+          contact: getPrimeiroContato(est.contact || est.contato || est.whatsapp || est.telefone || "") || "",
+          whatsapp: est.whatsapp || "",
+          telefone: est.telefone || "",
           instagram: est.instagram || ""
         }));
       });
@@ -8941,7 +8948,9 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           categoria: cliente.categoria || "",
           logo: cliente.imagem || cliente.image || "",
           instagramMensagem: cliente.instagramMensagem,
-          contact: getPrimeiroContato(cliente.contato || cliente.whatsapp || "") || "",
+          contact: getPrimeiroContato(cliente.contato || cliente.contact || cliente.whatsapp || cliente.telefone || "") || "",
+          whatsapp: cliente.whatsapp || "",
+          telefone: cliente.telefone || "",
           instagram: cliente.instagram || ""
         });
       });
@@ -9347,8 +9356,11 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   function produtoWhatsappLink(item = {}, tipo = "produto") {
     const contato = somenteDigitos(item.contato || item.whatsapp || item.telefone || "");
     if (contato.length < 10) return "";
-    const label = tipo === "promocao" ? "a promocao" : "o produto";
-    const mensagem = `Ola, vi no Ola Carlopolis ${label}: ${item.titulo || item.nome || "Produto"}. Gostaria de mais informacoes.`;
+    const titulo = item.titulo || item.nome || "Produto";
+    const estabelecimento = item.estabelecimento || item.loja || "";
+    const mensagem = tipo === "promocao"
+      ? `Ola, vi no Ola Carlopolis a promocao "${titulo}"${estabelecimento ? ` de ${estabelecimento}` : ""}. Tenho interesse e gostaria de mais informacoes.`
+      : `Ola, vi no Ola Carlopolis o produto: ${titulo}. Gostaria de mais informacoes.`;
     return `https://api.whatsapp.com/send?phone=${numeroWhatsAppBrasil(contato)}&text=${encodeURIComponent(mensagem)}`;
   }
 
@@ -9503,7 +9515,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         <div class="imovel-detalhes-media loja-produto-media">
           ${imagensProduto.length ? `
             <div class="loja-produto-modal-galeria" data-produto-galeria>
-              <img class="loja-produto-modal-img" src="${escapePromoHtml(imagensProduto[0])}" alt="${escapePromoHtml(titulo)} - imagem 1" data-produto-galeria-img loading="lazy">
+              <img class="loja-produto-modal-img imagem-expandivel" src="${escapePromoHtml(imagensProduto[0])}" alt="${escapePromoHtml(titulo)} - imagem 1" data-produto-galeria-img loading="lazy" title="Clique para ampliar">
               ${imagensProduto.length > 1 ? `
                 <button type="button" class="loja-produto-galeria-seta anterior" data-produto-galeria-prev aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
                 <button type="button" class="loja-produto-galeria-seta proxima" data-produto-galeria-next aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
@@ -13378,6 +13390,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           ? (precoAntigoNum - precoAtualNum).toLocaleString("pt-BR", { style: "currency", currency: "BRL" })
           : "";
         const promoKey = `${i.estabelecimentoId || "todos"}::${i.id || index}`;
+        const whatsappPromo = produtoWhatsappLink(i, "promocao");
         promoDetalhesRenderizados[promoKey] = i;
 
         // validade
@@ -13408,8 +13421,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         <div class="promo-event-meta-row">
           <span class="card-divulgacao-categoria">Promo&ccedil;&atilde;o</span>
           <span class="promo-event-actions">
-          ${i.contact
-              ? `<a href="https://wa.me/55${somenteDigitos(i.contact)}?text=${encodeURIComponent("Ola, vi sua promocao no Ola Carlopolis e tenho interesse.")}" class="card-divulgacao-wa-btn" data-promo-action="whatsapp" aria-label="Abrir WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i></a>`
+          ${whatsappPromo
+              ? `<a href="${escapePromoHtml(whatsappPromo)}" class="card-divulgacao-wa-btn" data-promo-action="whatsapp" aria-label="Tenho interesse pelo WhatsApp" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i><span>Tenho interesse</span></a>`
               : ""}
           ${i.instagram
               ? `<a href="${fixUrl(i.instagram)}" class="card-divulgacao-ig-btn" data-promo-action="instagram" aria-label="Abrir Instagram" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i></a>`
@@ -13475,12 +13488,11 @@ plotarPinsImoveis(stateImoveis.filtered);
     </div>
 
     <div class="promo-rodape">
-    ${i.contact
-            ? `<a href="https://wa.me/55${somenteDigitos(i.contact)}?text=${encodeURIComponent("Ola, vi sua promocao no Ola Carlopolis e tenho interesse.")
-            }" 
+    ${whatsappPromo
+            ? `<a href="${escapePromoHtml(whatsappPromo)}"
           target="_blank" 
           class="icon-link promo-whats-link" data-promo-action="whatsapp">
-          <i class="fab fa-whatsapp"></i><span>Quero essa promo&ccedil;&atilde;o</span>
+          <i class="fab fa-whatsapp"></i><span>Tenho interesse</span>
         </a>`
             : ""}
 
@@ -13534,33 +13546,6 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!window.__promoExpireTimer) {
       window.__promoExpireTimer = setInterval(removerExpiradasComAnimacao, 60000);
     }
-
-
-
-
-
-    // Ampliar imagem do produto
-    document.querySelectorAll('.promo-img-zoom').forEach(img => {
-      img.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        const overlay = document.createElement('div');
-        overlay.className = 'fullscreen-img-bg';
-        overlay.innerHTML = `
-      <button class="fullscreen-close" aria-label="Fechar">&times;</button>
-      <img src="${img.src}" alt="${img.alt}">
-    `;
-        overlay.addEventListener('click', (e) => {
-          if (e.target === overlay || e.target.classList.contains('fullscreen-close')) {
-            e.preventDefault();
-            e.stopPropagation();
-            overlay.remove();
-          }
-        });
-        document.body.appendChild(overlay);
-      });
-    });
-
 
     // listeners do filtro
 
@@ -13775,16 +13760,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         });
         abrirModalProdutoEstabelecimento(item, "Promocao");
       });
-    });
-
-    document.querySelectorAll(".promo-event-style-card").forEach((card) => {
-      card.addEventListener("click", (event) => {
-        if (event.target.closest("a, button, [data-promo-action], [data-promo-share]")) return;
-        event.preventDefault();
-        const item = window.__promocoesPublicasDetalhes?.[card.dataset.promoDetailKey || ""];
-        if (item) abrirModalProdutoEstabelecimento(item, "Promocao");
-      });
-      card.querySelectorAll("a").forEach((link) => link.addEventListener("click", (event) => event.stopPropagation()));
     });
 
     document.querySelectorAll("[data-promo-share]").forEach((button) => {
