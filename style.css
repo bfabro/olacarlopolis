@@ -23606,6 +23606,20 @@ body.business-art-capturing-background .home-cards-intro {
   box-shadow: none !important;
 }
 
+/* Na exportacao, o html2canvas pode rasterizar sombras CSS como camadas
+   retangulares cinzas. O clone do PNG remove essas sombras em todos os
+   layouts; a sombra da foto continua vindo do canvas raster dedicado. */
+.business-art-stage.is-png-export .business-art-card,
+.business-art-stage.is-png-export .business-art-kind,
+.business-art-stage.is-png-export .business-art-picture,
+.business-art-stage.is-png-export .business-art-identity h1,
+.business-art-stage.is-png-export .business-art-info-card,
+.business-art-stage.is-png-export .business-art-info-card > i,
+.business-art-stage.is-png-export .business-art-footer,
+.business-art-stage.is-png-export .business-art-layout-decoration-left {
+  box-shadow: none !important;
+}
+
 .business-art-footer,
 .business-art-stage.is-feed .business-art-footer,
 .business-art-stage.is-story .business-art-footer {

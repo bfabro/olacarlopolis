@@ -1262,6 +1262,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         zIndex: "0"
       });
       const exportStage = stage.cloneNode(true);
+      exportStage.classList.add("is-png-export");
       Object.assign(exportStage.style, {
         position: "absolute",
         inset: "0",
