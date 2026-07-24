@@ -821,7 +821,7 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
           ${dados.endereco ? `<div class="business-art-info-card is-address"><i class="fa-solid fa-map-location-dot"></i><span><small>Endereço</small><strong>${escaparArteComercial(dados.endereco)}</strong></span></div>` : ""}
         </section>` : ""}
       <footer class="business-art-footer">
-        <div><i class="fa-solid fa-globe"></i><span><small>Encontre no</small><strong>www.olacarlopolis.com</strong></span></div>
+        <div><i class="fa-solid fa-globe"></i><span class="business-art-footer-copy"><small>${escaparArteComercial(dados.nome)} está no Olá Carlópolis</small><strong>Acesse www.olacarlopolis.com.</strong></span></div>
         <span class="business-art-brand-logo"><img src="${escaparArteComercial(logoSiteUrl)}" alt="Ola Carlopolis" crossorigin="anonymous"></span>
       </footer>
     </article>
@@ -972,6 +972,13 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         <div class="business-art-photo-option" role="group" aria-label="Formato dos cantos da foto">
           <button type="button" class="active" data-business-rounded aria-pressed="true" title="Ativar ou desativar cantos arredondados"><i class="fa-solid fa-border-top-left"></i><small>Cantos</small></button>
         </div>
+        <div class="business-art-image-controls">
+          <label>
+            <span>Tamanho da imagem <output data-business-image-scale-output>100%</output></span>
+            <input type="range" min="65" max="135" value="100" step="1" data-business-image-scale>
+          </label>
+          <small><i class="fa-solid fa-hand-pointer"></i> Use dois dedos sobre a foto para aumentar ou diminuir.</small>
+        </div>
         <div class="business-art-font-controls" aria-label="Tamanho das fontes da arte">
           <label>
             <span>Descrição <output data-business-font-output="description">26</output></span>
@@ -1007,6 +1014,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let corDetalhe = "#0b63e6";
   let efeitoFoto = "soft";
   let cantosArredondados = true;
+  let escalaImagem = 1;
   let fonteDescricao = dados.descricao.length > 320 ? 22 : (dados.descricao.length > 220 ? 24 : 26);
   let fonteWhatsapp = 28;
   let fonteCidade = 28;
@@ -1014,6 +1022,64 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   if (descricaoInput) descricaoInput.value = String(fonteDescricao);
   const descricaoOutput = dialog.querySelector('[data-business-font-output="description"]');
   if (descricaoOutput) descricaoOutput.value = String(fonteDescricao);
+
+  const limitarEscalaImagem = (value) => Math.min(1.35, Math.max(.65, value));
+  const sincronizarControleEscalaImagem = () => {
+    const input = dialog.querySelector("[data-business-image-scale]");
+    const output = dialog.querySelector("[data-business-image-scale-output]");
+    const percentual = Math.round(escalaImagem * 100);
+    if (input) input.value = String(percentual);
+    if (output) output.value = `${percentual}%`;
+  };
+  const aplicarEscalaImagem = (picture = stage.querySelector(".business-art-picture")) => {
+    if (!picture) return;
+    const offsetY = efeitoFoto === "lift" ? -12 : 0;
+    picture.style.transform = `translateY(${offsetY}px) scale(${escalaImagem})`;
+    picture.style.transformOrigin = "center center";
+    sincronizarControleEscalaImagem();
+  };
+  const vincularPincaImagem = (picture) => {
+    if (!picture) return;
+    const pointers = new Map();
+    let distanciaInicial = 0;
+    let escalaInicial = escalaImagem;
+    const distanciaEntrePontos = () => {
+      const [first, second] = Array.from(pointers.values());
+      return first && second ? Math.hypot(second.x - first.x, second.y - first.y) : 0;
+    };
+    const iniciarPinca = () => {
+      if (pointers.size < 2) return;
+      distanciaInicial = distanciaEntrePontos();
+      escalaInicial = escalaImagem;
+    };
+    picture.addEventListener("pointerdown", (event) => {
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      try {
+        picture.setPointerCapture(event.pointerId);
+      } catch (error) {
+        // A captura pode nao estar disponivel em navegadores mais antigos.
+      }
+      iniciarPinca();
+    });
+    picture.addEventListener("pointermove", (event) => {
+      if (!pointers.has(event.pointerId)) return;
+      pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (pointers.size < 2) return;
+      event.preventDefault();
+      const distanciaAtual = distanciaEntrePontos();
+      if (!distanciaInicial) iniciarPinca();
+      if (!distanciaInicial) return;
+      escalaImagem = limitarEscalaImagem(escalaInicial * (distanciaAtual / distanciaInicial));
+      aplicarEscalaImagem(picture);
+    });
+    const liberarPonteiro = (event) => {
+      pointers.delete(event.pointerId);
+      distanciaInicial = 0;
+      if (pointers.size >= 2) iniciarPinca();
+    };
+    picture.addEventListener("pointerup", liberarPonteiro);
+    picture.addEventListener("pointercancel", liberarPonteiro);
+  };
 
   const render = async () => {
     const height = formato === "story" ? 1920 : 1350;
@@ -1130,6 +1196,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         }
       }
     }
+    aplicarEscalaImagem(picture);
+    vincularPincaImagem(picture);
     const disclaimer = stage.querySelector(".business-art-disclaimer");
     if (card && disclaimer) {
       disclaimer.style.top = `${Math.min(height - 58, card.offsetTop + card.offsetHeight + 24)}px`;
@@ -1202,6 +1270,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       }[fontType];
       if (variable) stage.style.setProperty(variable, `${value}px`);
     });
+  });
+  dialog.querySelector("[data-business-image-scale]")?.addEventListener("input", (event) => {
+    escalaImagem = limitarEscalaImagem(Number(event.currentTarget.value) / 100);
+    aplicarEscalaImagem();
   });
   dialog.querySelectorAll("[data-business-effect]").forEach((button) => {
     button.addEventListener("click", async () => {
