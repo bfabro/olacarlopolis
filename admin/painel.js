@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 491,
-  label: "v498",
+  numero: 492,
+  label: "v499",
   data: "2026-07-25",
-  nota: "Usuarios online agora registra e arquiva o historico de navegacao dos administradores de clientes."
+  nota: "Historico administrativo agora registra tambem Produtos e todos os menus internos de Minha empresa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -14292,16 +14292,22 @@ function renderClientOnlyEditor() {
     stopClientMetricsRealtime();
   }
   const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
-  const activateClientModule = (targetId) => {
+  const activateClientModule = (targetId, registrarAcesso = false) => {
     const target = mount.querySelector(`#${targetId}`) || mount.querySelector(`[data-client-module-group="${targetId}"]`);
     if (!target) return;
     mount.querySelectorAll(".client-module-panel").forEach((panel) => {
       panel.classList.toggle("active", panel.id === targetId || panel.dataset.clientModuleGroup === targetId);
     });
     moduleNavButtons.forEach((item) => item.classList.toggle("active", item.dataset.clientModuleTarget === targetId));
+    const moduleInfo = clientModules.find((item) => item.id === targetId);
+    if (moduleInfo?.label) {
+      authenticatedClientPresenceView = moduleInfo.label;
+      if (registrarAcesso) touchAuthenticatedClientPresence(true, true);
+      else touchAuthenticatedClientPresence(true);
+    }
   };
   if (initialClientModule) {
-    activateClientModule(initialClientModule);
+    activateClientModule(initialClientModule, Boolean(requestedClientModule));
     state.pendingClientModuleTarget = "";
   }
   moduleNavButtons.forEach((button) => {
@@ -14311,7 +14317,7 @@ function renderClientOnlyEditor() {
       if (views.minhaEmpresa?.classList.contains("hidden")) {
         switchView("minhaEmpresa");
       } else {
-        activateClientModule(targetModule);
+        activateClientModule(targetModule, true);
         state.pendingClientModuleTarget = "";
       }
       closeAdminMenuOnMobile();
