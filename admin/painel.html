@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=351">
+  <link rel="stylesheet" href="painel.css?v=352">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -907,14 +907,42 @@
           <div class="section-head compact">
             <div>
               <span class="online-clients-kicker"><i class="fa-solid fa-user-shield"></i> Area administrativa</span>
-              <h2>Clientes logados agora</h2>
-              <p>Clientes autenticados no painel, separados dos visitantes do site publico.</p>
+              <h2>Administradores de clientes logados agora</h2>
+              <p>Cada sessao mostra o admin identificado, a tela atual e o historico das areas acessadas.</p>
             </div>
-            <span class="online-clients-total"><strong id="onlineClientsTotal">0</strong> online</span>
+            <span class="online-clients-total"><strong id="onlineClientsTotal">0</strong> admin(s) online</span>
           </div>
           <div id="onlineClientsList" class="online-clients-list">
             <div class="online-presence-empty">Carregando clientes logados...</div>
           </div>
+          <section class="online-client-history">
+            <div class="online-presence-archive-head">
+              <div>
+                <strong id="onlineClientHistoryTitle"><i class="fa-solid fa-route"></i> Historico dos clientes logados</strong>
+                <span id="onlineClientHistorySubtitle">Selecione um cliente online ou uma sessao encerrada para consultar as areas acessadas.</span>
+              </div>
+              <button id="onlineClientHistoryClose" type="button" class="ghost-button hidden"><i class="fa-solid fa-eraser"></i> Limpar selecao</button>
+            </div>
+            <div id="onlineClientHistoryFlow" class="online-presence-history-flow">
+              <div class="online-presence-history-placeholder">
+                <i class="fa-solid fa-user-shield"></i>
+                <strong>Selecione um cliente logado</strong>
+                <span>O caminho percorrido no painel aparecera aqui em ordem.</span>
+              </div>
+            </div>
+            <section class="online-presence-archive">
+              <div class="online-presence-archive-head">
+                <div>
+                  <strong><i class="fa-solid fa-clock-rotate-left"></i> Sessoes administrativas encerradas recentemente</strong>
+                  <span>Consulte por onde cada admin do cliente navegou mesmo depois que ele sair.</span>
+                </div>
+                <b id="onlineClientArchiveCount">0</b>
+              </div>
+              <div id="onlineClientArchiveList" class="online-presence-archive-list">
+                <div class="online-presence-empty">O historico das proximas sessoes administrativas aparecera aqui.</div>
+              </div>
+            </section>
+          </section>
         </section>
       </section>
 
@@ -1818,6 +1846,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=425"></script>
+  <script type="module" src="painel.js?v=426"></script>
 </body>
 </html>

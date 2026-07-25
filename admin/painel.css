@@ -1504,7 +1504,7 @@ button[type="submit"]:hover,
 
 .online-client-item {
   display: grid;
-  grid-template-columns: 52px minmax(170px, .8fr) minmax(180px, 1fr) auto;
+  grid-template-columns: 52px minmax(170px, .8fr) minmax(180px, 1fr) auto auto;
   align-items: center;
   gap: 14px;
   border: 1px solid #dbe7e3;
@@ -1593,6 +1593,26 @@ button[type="submit"]:hover,
   width: 15px;
   color: #10b981;
   text-align: center;
+}
+
+.online-client-history {
+  margin-top: 22px;
+  border-top: 1px solid #dbe7e3;
+  padding-top: 20px;
+}
+
+.online-client-history > .online-presence-archive-head > div {
+  min-width: 0;
+}
+
+.online-client-history > .online-presence-history-flow {
+  border-color: #bbf7d0;
+  background: linear-gradient(135deg, #f8fffb, #ecfdf5);
+}
+
+.online-client-history > .online-presence-history-flow .online-presence-history-placeholder > i {
+  background: #d1fae5;
+  color: #047857;
 }
 
 .online-presence-history-card {
@@ -2020,7 +2040,8 @@ button[type="submit"]:hover,
   }
 
   .online-client-page,
-  .online-client-meta {
+  .online-client-meta,
+  .online-client-item > [data-online-client-history] {
     grid-column: 2;
   }
 

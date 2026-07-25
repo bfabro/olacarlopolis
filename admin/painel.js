@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 490,
-  label: "v497",
-  data: "2026-07-23",
-  nota: "Imoveis agora tem lista com rolagem independente no desktop e uma tela separada para artes do Instagram."
+  numero: 491,
+  label: "v498",
+  data: "2026-07-25",
+  nota: "Usuarios online agora registra e arquiva o historico de navegacao dos administradores de clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -67,11 +67,19 @@ let onlinePresenceSelectedSessionId = "";
 let onlinePresenceHistoryCollapsed = false;
 let onlineClientsUnsubscribe = null;
 let onlineClientsData = {};
+let onlineClientHistoryUnsubscribe = null;
+let onlineClientHistoryData = {};
+let onlineClientSelectedSessionId = "";
 let authenticatedClientPresenceRef = null;
+let authenticatedClientPresenceArchiveRef = null;
 let authenticatedClientPresenceDisconnect = null;
+let authenticatedClientPresenceArchiveDisconnect = null;
 let authenticatedClientPresenceConnectedUnsubscribe = null;
 let authenticatedClientPresenceHeartbeat = null;
 let authenticatedClientPresenceView = "Minha empresa";
+let authenticatedClientPresenceSessionId = "";
+let authenticatedClientPresenceLastHistoryView = "";
+let authenticatedClientPresenceStartedAt = 0;
 let authenticatedClientPresenceEventsBound = false;
 let automovelArtePreviewTimer = null;
 let automovelArteDragState = null;
@@ -2661,15 +2669,44 @@ function authenticatedClientPresencePayload(active = !document.hidden) {
     clienteId: currentClientId(),
     clienteNome: client.nome || "",
     categoria: client.categoria || "",
+    adminNome: state.profile?.nome || state.profile?.name || state.user?.displayName || state.user?.email || "Admin do cliente",
+    adminEmail: state.user?.email || "",
+    sessionId: authenticatedClientPresenceSessionId,
     active: Boolean(active),
     pagina: authenticatedClientPresenceView || "Minha empresa",
     lastSeen: serverTimestamp()
   };
 }
 
-function touchAuthenticatedClientPresence(active = !document.hidden) {
+function touchAuthenticatedClientPresence(active = !document.hidden, registrarNavegacao = false) {
   if (!authenticatedClientPresenceRef) return;
-  firebaseUpdate(authenticatedClientPresenceRef, authenticatedClientPresencePayload(active)).catch(() => {});
+  const payload = authenticatedClientPresencePayload(active);
+  const updates = [firebaseUpdate(authenticatedClientPresenceRef, payload)];
+  if (authenticatedClientPresenceArchiveRef) {
+    updates.push(firebaseUpdate(authenticatedClientPresenceArchiveRef, payload));
+  }
+  const pagina = String(payload.pagina || "Minha empresa");
+  if (registrarNavegacao && pagina !== authenticatedClientPresenceLastHistoryView) {
+    const isFirstNavigation = !authenticatedClientPresenceLastHistoryView;
+    authenticatedClientPresenceLastHistoryView = pagina;
+    const historyKey = push(ref(db, `clientesOnlineHistorico/${authenticatedClientPresenceSessionId}/historico`)).key;
+    const historyItem = {
+      pagina,
+      tipo: isFirstNavigation ? "entrada" : "navegacao",
+      timestamp: serverTimestamp()
+    };
+    if (historyKey && authenticatedClientPresenceRef.key) {
+      updates.push(firebaseSet(
+        ref(db, `clientesOnline/${currentClientId()}/${authenticatedClientPresenceRef.key}/historico/${historyKey}`),
+        historyItem
+      ));
+      updates.push(firebaseSet(
+        ref(db, `clientesOnlineHistorico/${authenticatedClientPresenceSessionId}/historico/${historyKey}`),
+        historyItem
+      ));
+    }
+  }
+  Promise.all(updates).catch(() => {});
 }
 
 function stopAuthenticatedClientPresence() {
@@ -2677,9 +2714,23 @@ function stopAuthenticatedClientPresence() {
   authenticatedClientPresenceHeartbeat = null;
   if (authenticatedClientPresenceConnectedUnsubscribe) authenticatedClientPresenceConnectedUnsubscribe();
   authenticatedClientPresenceConnectedUnsubscribe = null;
+  authenticatedClientPresenceDisconnect?.cancel?.().catch(() => {});
+  authenticatedClientPresenceArchiveDisconnect?.cancel?.().catch(() => {});
+  if (authenticatedClientPresenceArchiveRef) {
+    firebaseUpdate(authenticatedClientPresenceArchiveRef, {
+      active: false,
+      endedAt: serverTimestamp(),
+      lastSeen: serverTimestamp()
+    }).catch(() => {});
+  }
   if (authenticatedClientPresenceRef) firebaseRemove(authenticatedClientPresenceRef).catch(() => {});
   authenticatedClientPresenceDisconnect = null;
+  authenticatedClientPresenceArchiveDisconnect = null;
   authenticatedClientPresenceRef = null;
+  authenticatedClientPresenceArchiveRef = null;
+  authenticatedClientPresenceSessionId = "";
+  authenticatedClientPresenceLastHistoryView = "";
+  authenticatedClientPresenceStartedAt = 0;
 }
 
 function bindAuthenticatedClientPresenceEvents() {
@@ -2692,18 +2743,34 @@ function bindAuthenticatedClientPresenceEvents() {
 function startAuthenticatedClientPresence() {
   stopAuthenticatedClientPresence();
   if (canManageClients() || !currentClientId() || !state.user) return;
-  const connectionRef = push(ref(db, `clientesOnline/${currentClientId()}`));
+  const clientId = currentClientId();
+  const connectionRef = push(ref(db, `clientesOnline/${clientId}`));
   authenticatedClientPresenceRef = connectionRef;
+  authenticatedClientPresenceSessionId = connectionRef.key || `${clientId}-${Date.now()}`;
+  authenticatedClientPresenceArchiveRef = ref(db, `clientesOnlineHistorico/${authenticatedClientPresenceSessionId}`);
+  authenticatedClientPresenceLastHistoryView = "";
+  authenticatedClientPresenceStartedAt = Date.now();
   bindAuthenticatedClientPresenceEvents();
   authenticatedClientPresenceConnectedUnsubscribe = onValue(ref(db, ".info/connected"), async (snapshot) => {
-    if (snapshot.val() !== true || !authenticatedClientPresenceRef) return;
+    if (snapshot.val() !== true || !authenticatedClientPresenceRef || !authenticatedClientPresenceArchiveRef) return;
     try {
       authenticatedClientPresenceDisconnect = onDisconnect(authenticatedClientPresenceRef);
       await authenticatedClientPresenceDisconnect.remove();
-      await firebaseSet(authenticatedClientPresenceRef, {
-        ...authenticatedClientPresencePayload(true),
-        timestamp: serverTimestamp()
+      authenticatedClientPresenceArchiveDisconnect = onDisconnect(authenticatedClientPresenceArchiveRef);
+      await authenticatedClientPresenceArchiveDisconnect.update({
+        active: false,
+        endedAt: serverTimestamp(),
+        lastSeen: serverTimestamp()
       });
+      const initialPayload = {
+        ...authenticatedClientPresencePayload(true),
+        timestamp: authenticatedClientPresenceStartedAt
+      };
+      await Promise.all([
+        firebaseUpdate(authenticatedClientPresenceRef, initialPayload),
+        firebaseUpdate(authenticatedClientPresenceArchiveRef, initialPayload)
+      ]);
+      touchAuthenticatedClientPresence(true, true);
     } catch (error) {
       console.warn("Nao foi possivel atualizar a presenca do cliente no painel.", error);
     }
@@ -2861,33 +2928,167 @@ function onlinePresenceDateTime(timestamp) {
   });
 }
 
-function activeOnlineClients(now = Date.now()) {
-  return Object.entries(onlineClientsData || {}).map(([clientId, sessionsNode]) => {
-    const connections = Object.entries(sessionsNode && typeof sessionsNode === "object" ? sessionsNode : {})
-      .map(([id, value]) => ({ id, ...(value && typeof value === "object" ? value : {}) }))
-      .filter((connection) => {
-        const lastSeen = Number(connection.lastSeen || connection.timestamp || 0);
-        return connection.active !== false && lastSeen > 0;
-      });
-    if (!connections.length) return null;
+function activeOnlineClientSessions(now = Date.now()) {
+  return Object.entries(onlineClientsData || {}).flatMap(([clientId, sessionsNode]) => (
+    Object.entries(sessionsNode && typeof sessionsNode === "object" ? sessionsNode : {}).map(([id, value]) => {
+      const session = value && typeof value === "object" ? value : {};
+      const client = state.clientes.find((item) => item.id === clientId) || {};
+      const lastSeen = Number(session.lastSeen || session.timestamp || 0);
+      return {
+        id,
+        ...session,
+        clientId,
+        sessionId: String(session.sessionId || id),
+        name: client.nome || session.clienteNome || clientId,
+        category: client.categoria || session.categoria || "Cliente",
+        image: client.imagem || "",
+        lastSeen
+      };
+    })
+  )).filter((session) => (
+    session.active !== false
+    && session.lastSeen > 0
+    && (now - session.lastSeen) <= ONLINE_PRESENCE_RECENT_MS
+  )).sort((a, b) => b.lastSeen - a.lastSeen);
+}
+
+function archivedOnlineClientSessions(activeSessions = [], now = Date.now()) {
+  const activeSessionIds = new Set(activeSessions.map((session) => String(session.sessionId || session.id || "")));
+  return Object.entries(onlineClientHistoryData || {}).map(([archiveId, value]) => {
+    const session = value && typeof value === "object" ? value : {};
+    const clientId = String(session.clienteId || "");
     const client = state.clientes.find((item) => item.id === clientId) || {};
-    const latest = connections.sort((a, b) => Number(b.lastSeen || 0) - Number(a.lastSeen || 0))[0] || {};
-    const firstTimestamp = Math.min(...connections.map((item) => Number(item.timestamp || item.lastSeen || now)));
+    const sessionId = String(session.sessionId || archiveId);
+    const lastSeen = Number(session.endedAt || session.lastSeen || session.timestamp || 0);
     return {
+      id: `client-archive:${archiveId}`,
+      archiveId,
+      ...session,
       clientId,
-      name: client.nome || latest.clienteNome || clientId,
-      category: client.categoria || latest.categoria || "Cliente",
+      sessionId,
+      name: client.nome || session.clienteNome || clientId || "Cliente",
+      category: client.categoria || session.categoria || "Cliente",
       image: client.imagem || "",
-      connections: connections.length,
-      pages: [...new Set(connections.map((item) => item.pagina).filter(Boolean))],
-      timestamp: firstTimestamp,
-      lastSeen: Number(latest.lastSeen || latest.timestamp || 0)
+      lastSeen,
+      isArchived: true
     };
-  }).filter(Boolean).sort((a, b) => b.lastSeen - a.lastSeen);
+  }).filter((session) => {
+    if (!session.lastSeen || activeSessionIds.has(session.sessionId)) return false;
+    return session.active === false || (now - session.lastSeen) > ONLINE_PRESENCE_RECENT_MS;
+  }).sort((a, b) => b.lastSeen - a.lastSeen).slice(0, 20);
+}
+
+function onlineClientHistoryItems(session = {}) {
+  const rawHistory = Array.isArray(session.historico)
+    ? session.historico
+    : Object.values(session.historico || {});
+  const items = rawHistory.filter((item) => item && typeof item === "object" && item.pagina)
+    .map((item) => ({
+      pagina: String(item.pagina || "Minha empresa"),
+      tipo: item.tipo === "entrada" ? "entrada" : "navegacao",
+      timestamp: Number(item.timestamp || 0)
+    }))
+    .sort((a, b) => a.timestamp - b.timestamp)
+    .slice(-20);
+  if (items.length) return items;
+  return [{
+    pagina: session.pagina || "Minha empresa",
+    tipo: "entrada",
+    timestamp: Number(session.timestamp || session.lastSeen || Date.now())
+  }];
+}
+
+function onlineClientViewIcon(page = "") {
+  const value = normalizeName(page);
+  if (value.includes("fatura") || value.includes("finance")) return "fa-file-invoice-dollar";
+  if (value.includes("produto")) return "fa-box-open";
+  if (value.includes("promoc")) return "fa-tags";
+  if (value.includes("veiculo") || value.includes("automovel")) return "fa-car";
+  if (value.includes("imovel")) return "fa-house";
+  if (value.includes("foto") || value.includes("arte")) return "fa-images";
+  if (value.includes("empresa") || value.includes("cliente")) return "fa-store";
+  return "fa-window-maximize";
+}
+
+function renderOnlineClientHistory(activeSessions = [], archivedSessions = []) {
+  const flow = $("onlineClientHistoryFlow");
+  const closeButton = $("onlineClientHistoryClose");
+  const activeIndex = activeSessions.findIndex((session) => session.sessionId === onlineClientSelectedSessionId);
+  const archivedIndex = archivedSessions.findIndex((session) => session.sessionId === onlineClientSelectedSessionId);
+  const isArchived = activeIndex < 0 && archivedIndex >= 0;
+  const session = activeIndex >= 0 ? activeSessions[activeIndex] : archivedSessions[archivedIndex];
+  if (!session) {
+    onlineClientSelectedSessionId = "";
+    if ($("onlineClientHistoryTitle")) $("onlineClientHistoryTitle").innerHTML = `<i class="fa-solid fa-route"></i> Historico dos clientes logados`;
+    if ($("onlineClientHistorySubtitle")) $("onlineClientHistorySubtitle").textContent = "Selecione um cliente online ou uma sessao encerrada para consultar as areas acessadas.";
+    closeButton?.classList.add("hidden");
+    if (flow) {
+      flow.innerHTML = `<div class="online-presence-history-placeholder"><i class="fa-solid fa-user-shield"></i><strong>Selecione um cliente logado</strong><span>O caminho percorrido no painel aparecera aqui em ordem.</span></div>`;
+    }
+    return;
+  }
+  const history = onlineClientHistoryItems(session);
+  const adminLabel = session.adminNome || session.adminEmail || "Admin do cliente";
+  closeButton?.classList.remove("hidden");
+  if ($("onlineClientHistoryTitle")) {
+    $("onlineClientHistoryTitle").innerHTML = `<i class="fa-solid fa-route"></i> ${escapeHtml(session.name)}`;
+  }
+  if ($("onlineClientHistorySubtitle")) {
+    $("onlineClientHistorySubtitle").textContent = isArchived
+      ? `${adminLabel} - ${history.length} area(s) acessada(s). Sessao encerrada em ${onlinePresenceDateTime(session.endedAt || session.lastSeen)}.`
+      : `${adminLabel} - acompanhando ${history.length} acesso(s) nesta sessao ativa.`;
+  }
+  if (flow) {
+    flow.innerHTML = `<div class="online-presence-history-flow-track">${history.map((item, index) => `
+      <span class="online-presence-history-flow-step ${index === history.length - 1 ? (isArchived ? "is-ended" : "is-current") : ""}">
+        <i class="fa-solid ${escapeAttr(onlineClientViewIcon(item.pagina))}"></i>
+        <span class="online-presence-history-flow-copy">
+          <b>${escapeHtml(item.pagina)}</b>
+          <em>${item.tipo === "entrada" ? "Entrada no painel" : "Mudanca de area"} - ${escapeHtml(onlinePresenceClock(item.timestamp))}</em>
+        </span>
+        <small>${index + 1}</small>
+      </span>
+    `).join("")}</div>`;
+  }
+}
+
+function renderOnlineClientArchiveList(sessions = []) {
+  const list = $("onlineClientArchiveList");
+  if ($("onlineClientArchiveCount")) $("onlineClientArchiveCount").textContent = String(sessions.length);
+  if (!list) return;
+  list.innerHTML = sessions.length ? sessions.map((session) => {
+    const history = onlineClientHistoryItems(session);
+    const path = history.map((item) => item.pagina).filter((page, index, pages) => index === 0 || page !== pages[index - 1]).slice(-4);
+    return `<article class="online-presence-archive-item">
+      <span class="online-presence-archive-icon"><i class="fa-solid fa-user-shield"></i></span>
+      <div>
+        <strong>${escapeHtml(session.name)} - ${escapeHtml(session.adminNome || session.adminEmail || "Admin")}</strong>
+        <small>${escapeHtml(onlinePresenceDateTime(session.timestamp || session.lastSeen))} ate ${escapeHtml(onlinePresenceDateTime(session.endedAt || session.lastSeen))}</small>
+        <span>${escapeHtml(path.join(" > ") || session.pagina || "Minha empresa")}</span>
+      </div>
+      <b>${history.length} acesso(s)</b>
+      <button type="button" data-online-client-archive="${escapeAttr(session.sessionId)}"><i class="fa-solid fa-route"></i> Visualizar</button>
+    </article>`;
+  }).join("") : `<div class="online-presence-empty"><i class="fa-solid fa-clock-rotate-left"></i><strong>Nenhuma sessao administrativa encerrada</strong><span>As proximas sessoes dos clientes ficarao disponiveis aqui.</span></div>`;
+  list.querySelectorAll("[data-online-client-archive]").forEach((button) => {
+    button.addEventListener("click", () => {
+      onlineClientSelectedSessionId = button.dataset.onlineClientArchive || "";
+      renderOnlinePresence();
+      requestAnimationFrame(() => $("onlineClientHistoryFlow")?.scrollIntoView({ behavior: "smooth", block: "center" }));
+    });
+  });
 }
 
 function renderOnlineClients(now = Date.now()) {
-  const clients = activeOnlineClients(now);
+  const sessions = activeOnlineClientSessions(now);
+  const archivedSessions = archivedOnlineClientSessions(sessions, now);
+  const clients = sessions.map((session) => ({
+    ...session,
+    connections: 1,
+    pages: [session.pagina].filter(Boolean),
+    timestamp: Number(session.timestamp || session.lastSeen || now),
+    historyCount: onlineClientHistoryItems(session).length
+  }));
   if ($("onlineClientsTotal")) $("onlineClientsTotal").textContent = String(clients.length);
   const list = $("onlineClientsList");
   if (!list) return;
@@ -2902,7 +3103,7 @@ function renderOnlineClients(now = Date.now()) {
             </span>
             <div class="online-client-copy">
               <strong>${escapeHtml(client.name)}</strong>
-              <span>${escapeHtml(client.category)}</span>
+              <span>${escapeHtml(client.adminNome || client.adminEmail || client.category)}</span>
             </div>
             <div class="online-client-page">
               <small>Tela no painel</small>
@@ -2912,10 +3113,20 @@ function renderOnlineClients(now = Date.now()) {
               <span><i class="fa-regular fa-clock"></i> desde ${escapeHtml(onlinePresenceClock(client.timestamp))}</span>
               <span><i class="fa-solid fa-signal"></i> ${client.connections} sessao(oes)</span>
             </div>
+            <button type="button" class="online-presence-history-button" data-online-client-history="${escapeAttr(client.sessionId)}"><i class="fa-solid fa-route"></i> Ver ${client.historyCount}</button>
           </article>
         `;
       }).join("")
     : `<div class="online-presence-empty"><i class="fa-solid fa-user-slash"></i><strong>Nenhum cliente logado agora</strong><span>Os clientes aparecerao aqui assim que entrarem no painel.</span></div>`;
+  list.querySelectorAll("[data-online-client-history]").forEach((button) => {
+    button.addEventListener("click", () => {
+      onlineClientSelectedSessionId = button.dataset.onlineClientHistory || "";
+      renderOnlinePresence();
+      requestAnimationFrame(() => $("onlineClientHistoryFlow")?.scrollIntoView({ behavior: "smooth", block: "center" }));
+    });
+  });
+  renderOnlineClientArchiveList(archivedSessions);
+  renderOnlineClientHistory(sessions, archivedSessions);
 }
 
 function onlinePresenceHistoryItems(session = {}) {
@@ -3156,6 +3367,8 @@ function stopOnlinePresenceMonitor() {
   onlinePresenceHistoryUnsubscribe = null;
   if (onlineClientsUnsubscribe) onlineClientsUnsubscribe();
   onlineClientsUnsubscribe = null;
+  if (onlineClientHistoryUnsubscribe) onlineClientHistoryUnsubscribe();
+  onlineClientHistoryUnsubscribe = null;
   if (onlinePresenceTicker) clearInterval(onlinePresenceTicker);
   onlinePresenceTicker = null;
 }
@@ -3200,6 +3413,21 @@ function startOnlinePresenceMonitor() {
       }
     });
   }
+  if (!onlineClientHistoryUnsubscribe) {
+    onlineClientHistoryUnsubscribe = onValue(
+      query(ref(db, "clientesOnlineHistorico"), limitToLast(60)),
+      (snapshot) => {
+        onlineClientHistoryData = snapshot.val() || {};
+        renderOnlinePresence();
+      },
+      (error) => {
+        console.error("Falha ao carregar historico dos clientes logados.", error);
+        if ($("onlineClientArchiveList")) {
+          $("onlineClientArchiveList").innerHTML = `<div class="online-presence-empty"><strong>Nao foi possivel carregar as sessoes administrativas encerradas.</strong></div>`;
+        }
+      }
+    );
+  }
   if (!onlinePresenceTicker) onlinePresenceTicker = setInterval(renderOnlinePresence, 10_000);
 
   const refreshButton = $("onlinePresenceRefresh");
@@ -3209,14 +3437,16 @@ function startOnlinePresenceMonitor() {
       refreshButton.disabled = true;
       refreshButton.classList.add("is-loading");
       try {
-        const [visitorSnapshot, clientSnapshot, historySnapshot] = await Promise.all([
+        const [visitorSnapshot, clientSnapshot, historySnapshot, clientHistorySnapshot] = await Promise.all([
           get(ref(db, "onlineUsers")),
           get(ref(db, "clientesOnline")),
-          get(query(ref(db, "onlineUserHistory"), limitToLast(60)))
+          get(query(ref(db, "onlineUserHistory"), limitToLast(60))),
+          get(query(ref(db, "clientesOnlineHistorico"), limitToLast(60)))
         ]);
         onlinePresenceData = visitorSnapshot.val() || {};
         onlineClientsData = clientSnapshot.val() || {};
         onlinePresenceHistoryData = historySnapshot.val() || {};
+        onlineClientHistoryData = clientHistorySnapshot.val() || {};
         renderOnlinePresence();
       } catch (error) {
         console.error("Falha ao atualizar usuarios online.", error);
@@ -3244,6 +3474,14 @@ function startOnlinePresenceMonitor() {
       setOnlinePresenceHistoryCollapsed(!onlinePresenceHistoryCollapsed);
     });
   }
+  const clientHistoryClose = $("onlineClientHistoryClose");
+  if (clientHistoryClose && clientHistoryClose.dataset.bound !== "true") {
+    clientHistoryClose.dataset.bound = "true";
+    clientHistoryClose.addEventListener("click", () => {
+      onlineClientSelectedSessionId = "";
+      renderOnlinePresence();
+    });
+  }
   setOnlinePresenceHistoryCollapsed(onlinePresenceHistoryCollapsed);
 }
 
@@ -3259,7 +3497,7 @@ function switchView(name) {
   });
   const [title, subtitle] = viewCopy[target];
   authenticatedClientPresenceView = title;
-  touchAuthenticatedClientPresence(true);
+  touchAuthenticatedClientPresence(true, true);
   $("viewTitle").textContent = title;
   $("viewSubtitle").textContent = subtitle;
   collapseEntryFormsForView(target);

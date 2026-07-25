@@ -156,6 +156,16 @@
       ".write": true
     },
 
+    "clientesOnline": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null"
+    },
+
+    "clientesOnlineHistorico": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null"
+    },
+
     "acessos": {
       ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
       ".write": true
