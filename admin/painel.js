@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 493,
-  label: "v500",
+  numero: 494,
+  label: "v501",
   data: "2026-07-26",
-  nota: "Relatorios do Admin Master separados em Acessos e Financeiro."
+  nota: "Relatorio de acessos agora consolida Site, PWA, links e demais origens sem duplicar os canais."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -11155,17 +11155,53 @@ function origemLabel(value) {
   return raw;
 }
 
-function aggregateOrigemAcessos(acessos = {}, origemAcessos = {}) {
-  const map = new Map();
+function consolidateAccessMetrics(acessos = {}, origemAcessos = {}, usoPWAData = {}) {
+  const detalhadosPorCanal = new Map();
+  const origensExternas = new Map();
+  let totalDetalhado = 0;
+  let totalGeralGravado = 0;
+
   Object.values(acessos || {}).forEach((dia) => {
+    totalGeralGravado += Number(dia?.total || 0);
     Object.values(dia?.detalhados || {}).forEach((item) => {
-      incrementMetric(map, origemLabel(item?.origem || item?.canal || item?.referrer), 1);
+      const canal = origemLabel(item?.origem || item?.canal || item?.referrer);
+      incrementMetric(detalhadosPorCanal, canal, 1);
+      totalDetalhado += 1;
     });
   });
   Object.values(origemAcessos || {}).forEach((dia) => {
-    Object.entries(dia || {}).forEach(([origem, count]) => incrementMetric(map, origemLabel(origem), count));
+    Object.entries(dia || {}).forEach(([origem, count]) => {
+      incrementMetric(origensExternas, origemLabel(origem), count);
+    });
   });
-  return map;
+
+  const canais = new Map(detalhadosPorCanal);
+  origensExternas.forEach((count, canal) => {
+    canais.set(canal, Math.max(Number(canais.get(canal) || 0), Number(count || 0)));
+  });
+
+  const usoPWA = aggregateUsoPWA(usoPWAData);
+  const pwaAtual = [...canais.entries()]
+    .filter(([canal]) => /app|pwa/i.test(canal))
+    .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  if (usoPWA > pwaAtual) {
+    canais.set("App / PWA", Number(canais.get("App / PWA") || 0) + (usoPWA - pwaAtual));
+  }
+
+  let somaCanais = [...canais.values()].reduce((sum, count) => sum + Number(count || 0), 0);
+  const basePrimaria = totalDetalhado || totalGeralGravado;
+  const total = Math.max(basePrimaria, somaCanais);
+  if (total > somaCanais) {
+    incrementMetric(canais, "Site / outros acessos", total - somaCanais);
+    somaCanais = total;
+  }
+
+  return {
+    canais,
+    total: somaCanais,
+    pwa: usoPWA,
+    siteOutros: Math.max(0, somaCanais - usoPWA)
+  };
 }
 
 function aggregatePWAInstalls(data = {}) {
@@ -12062,10 +12098,15 @@ function renderReports(reportType = "") {
   const cliquesOndeComerFotos = aggregateSimpleDaily(filteredMetrics.ondeComerFotos);
   const cliquesPromocoes = aggregateSimpleDaily(filteredMetrics.promocoes);
   const cidadesAcesso = aggregateCidadesAcesso(filteredMetrics.acessos);
-  const origensAcesso = aggregateOrigemAcessos(filteredMetrics.acessos, filteredMetrics.origemAcessos);
+  const acessosConsolidados = consolidateAccessMetrics(
+    filteredMetrics.acessos,
+    filteredMetrics.origemAcessos,
+    filteredMetrics.usoPWA
+  );
+  const origensAcesso = acessosConsolidados.canais;
   const instalacoesPWA = aggregatePWAInstalls(filteredMetrics.instalacoesPWA);
-  const usoPWA = aggregateUsoPWA(filteredMetrics.usoPWA);
-  const totalAcessos = Object.values(filteredMetrics.acessos || {}).reduce((sum, dia) => sum + Number(dia?.total || 0), 0);
+  const usoPWA = acessosConsolidados.pwa;
+  const totalAcessos = acessosConsolidados.total;
   const clickTimeline = buildClickTimeline(state.metricas, periodRange);
   const itemAccessRows = buildItemAccessRows(state.metricas, periodRange);
   const accessTimeline = buildAccessTimeline(filteredMetrics.acessos, periodRange);
@@ -12162,9 +12203,10 @@ function renderReports(reportType = "") {
         <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + destaqueValueForClient(c), 0))}</small></article>
         <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
       ` : `
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Registros do periodo</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Instalacoes PWA</span><strong>${instalacoesPWA}</strong><small>App instalado</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Uso via PWA</span><strong>${usoPWA}</strong><small>Acessos pelo app</small></article>
+        <article class="stat-card is-primary" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Total consolidado de todos os meios</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Site e outros canais</span><strong>${acessosConsolidados.siteOutros}</strong><small>Navegador, links e redes sociais</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Uso via PWA</span><strong>${usoPWA}</strong><small>Acessos pelo aplicativo</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Instalacoes PWA</span><strong>${instalacoesPWA}</strong><small>Novas instalacoes, nao acessos</small></article>
       `}
     </div>
 

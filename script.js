@@ -3848,9 +3848,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const refTotal = firebase.database().ref(`acessosPorDia/${hoje}/total`);
     const refDetalhado = firebase.database().ref(`acessosPorDia/${hoje}/detalhados`).push();
 
-    refTotal.transaction((acessos) => (acessos || 0) + 1);
-
-    refTotal.transaction((acessos) => (acessos || 0) + 1);
+    refTotal.transaction((acessos) => (acessos || 0) + 1)
+      .catch((error) => console.warn("Nao foi possivel atualizar o total diario de acessos.", error));
 
     function salvarDados(info) {
       salvarOrigemCliqueLocal({
