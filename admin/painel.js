@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 494,
-  label: "v501",
+  numero: 495,
+  label: "v502",
   data: "2026-07-26",
-  nota: "Relatorio de acessos agora consolida Site, PWA, links e demais origens sem duplicar os canais."
+  nota: "Atualizacoes de logo e informacoes publicas do cliente agora aparecem em Novidades."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -173,6 +173,8 @@ const NOVIDADES_TOPICS = {
   produto: ["Produtos", "Novo produto ou atualizacao de item."],
   novoCliente: ["Novo cliente", "Cadastro de um novo comércio, serviço ou instituição."],
   nomeCliente: ["Nome do cliente", "Alteração do nome comercial."],
+  dadosCliente: ["Informações do cliente", "Alteração de informações públicas do cadastro."],
+  logoCliente: ["Logo do cliente", "Troca ou atualização da imagem de perfil."],
   endereco: ["Endereço", "Alteração do endereço do cliente."],
   telefone: ["Telefone / WhatsApp", "Alteração dos contatos do cliente."],
   horario: ["Horário de atendimento", "Alteração de horários ou atendimento 24 horas."],
@@ -3946,8 +3948,10 @@ async function registrarNovidadeAdmin(payload = {}) {
       link: payload.link || payload.url || "",
       novidadeTema,
       dataCriacao: serverTimestamp(),
-      criadoPor: state.user?.uid || "",
-      origem: "painel"
+      criadoPor: payload.criadoPor || state.user?.uid || "",
+      clienteId: payload.clienteId || "",
+      atribuidaAoCliente: Boolean(payload.atribuidaAoCliente),
+      origem: payload.origem || "painel"
     });
   } catch (error) {
     console.warn("Nao foi possivel registrar novidade.", error);
@@ -3975,7 +3979,11 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     imagens: noveltyImages,
     categoria: effective.categoria || "",
     destinoTipo: "estabelecimento",
-    destinoId: effective.nomeNormalizado || normalizeName(effective.nome || clientId)
+    destinoId: effective.nomeNormalizado || normalizeName(effective.nome || clientId),
+    clienteId: clientId,
+    criadoPor: clientId,
+    atribuidaAoCliente: true,
+    origem: "cliente"
   };
   if (!original) {
     await registrarNovidadeAdmin({ ...base, tipo: "estabelecimento", novidadeTema: "novoCliente", itemId: "novoCliente", titulo: "Cadastro novo", acao: "Cadastro novo", descricao: "Cadastro novo" });
@@ -3987,6 +3995,17 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   const add = (tema, tipo, acao) => updates.push({ ...base, tipo, destinoTipo: tipo, novidadeTema: tema, itemId: tema, titulo: acao, acao, descricao: acao });
   const remove = (tipo, tema) => removals.push(removerNovidadesPorDestino(tipo, base.destinoId, tema));
   if (String(original.nome || "") !== String(effective.nome || "")) add("nomeCliente", "cliente-nome", "Nome do cliente atualizado");
+  const originalProfileImage = String(
+    original.imagem
+    || original.profileImage
+    || original.imagemPerfil
+    || original.perfil
+    || original.logo
+    || ""
+  ).trim();
+  if (originalProfileImage !== profileImage) {
+    add("logoCliente", "cliente-logo", "Logo do cliente atualizada");
+  }
   if (String(original.endereco || "") !== String(effective.endereco || "")) {
     if (String(effective.endereco || "").trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
     else remove("cliente-endereco", "endereco");
@@ -4035,6 +4054,41 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   if (Boolean(original.destaqueSemanal) !== Boolean(effective.destaqueSemanal) || String(original.destaqueFim || "") !== String(effective.destaqueFim || "")) {
     if (effective.destaqueSemanal) add("destaque", "cliente-destaque", "Destaque comercial atualizado");
     else remove("cliente-destaque", "destaque");
+  }
+  const publicInfoFingerprint = (client = {}) => JSON.stringify({
+    nome: String(client.nome || "").trim(),
+    endereco: String(client.endereco || "").trim(),
+    contatos: contactFingerprint(client),
+    horarios: scheduleFingerprint(client),
+    imagem: String(client.imagem || client.profileImage || client.imagemPerfil || client.perfil || client.logo || "").trim(),
+    imagens: normalizeImageItems(client.imagens).map((item) => ({
+      url: String(item.url || "").trim(),
+      texto: String(item.texto || "").trim()
+    })),
+    categoria: String(client.categoria || "").trim(),
+    redesSociais: JSON.stringify([client.instagram, client.facebook, client.tiktok, client.site]),
+    cardapio: JSON.stringify([client.cardapioAtivo, client.cardapioLink, normalizeUrlList(client.menuImages)]),
+    destaque: JSON.stringify([Boolean(client.destaqueSemanal), client.destaqueFim || ""]),
+    descricaoCurta: String(client.descricaoCurta || client.descricao || "").trim(),
+    cidade: String(client.cidade || "").trim(),
+    creci: String(client.creci || "").trim(),
+    infoAdicional: String(client.infoAdicional || "").trim(),
+    tipo: String(client.tipo || client.tipoCliente || "").trim(),
+    status: String(client.status || "").trim(),
+    imagemEnquadramento: String(client.imagemEnquadramento || "").trim(),
+    vagaAtiva: Boolean(client.vagaAtiva),
+    vagaTitulo: String(client.vagaTitulo || client.vagaCargo || "").trim(),
+    vagaDescricao: String(client.vagaDescricao || client.infoVagaTrabalho || "").trim(),
+    vagaRequisitos: String(client.vagaRequisitos || client.vagaPreRequisito || "").trim(),
+    vagaSalario: String(client.vagaSalario || "").trim(),
+    vagaJornada: String(client.vagaJornada || "").trim(),
+    vagaLocal: String(client.vagaLocal || "").trim(),
+    vagaContato: String(client.vagaContato || "").trim(),
+    vagaComoCandidatar: String(client.vagaComoCandidatar || "").trim(),
+    vagaValidade: String(client.vagaValidade || "").trim()
+  });
+  if (!updates.length && publicInfoFingerprint(original) !== publicInfoFingerprint(effective)) {
+    add("dadosCliente", "cliente-dados", "Informações do cliente atualizadas");
   }
   await Promise.all([...removals, ...updates.map(registrarNovidadeAdmin)]);
 }
@@ -4783,6 +4837,7 @@ async function saveClientMenuForCanonicalClient(sourceClient, targetId) {
     updates[`clientesFinanceiro/${oldId}`] = null;
   }
   await update(ref(db), updates);
+  await registrarAtualizacoesClienteNovidade(targetId, payload, sourceClient);
   if (oldId && oldId !== targetId) {
     state.clientes = state.clientes.filter((item) => item.id !== oldId);
     if (state.clientesFinanceiro[oldId]) {
@@ -4853,6 +4908,7 @@ async function saveProfileImageForCanonicalClient(client, targetId, url) {
     updates[`usuariosByUid/${state.user.uid}/clienteId`] = targetId;
   }
   await update(ref(db), updates);
+  await registrarAtualizacoesClienteNovidade(targetId, payload, client);
   state.clientes = state.clientes.filter((item) => item.id !== oldId || oldId === targetId);
   if (oldId && oldId !== targetId && state.clientesFinanceiro[oldId]) {
     state.clientesFinanceiro[targetId] = state.clientesFinanceiro[oldId];
@@ -14460,25 +14516,14 @@ function renderClientOnlyEditor() {
     showToast("Enviando imagens...");
     const urls = await uploadImagesForClient(client.id, selected);
     imagens.push(...urls.map((url) => ({ url, texto: "" })));
-    await update(ref(db, `clientes/${client.id}`), {
+    const imageUpdate = {
       imagens,
       imagem: $("coImage").value || imageUrl(imagens[0]) || "",
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
-    });
-    await registrarNovidadeAdmin({
-      tipo: "estabelecimento",
-      titulo: "Novas fotos adicionadas",
-      acao: "Novas fotos adicionadas",
-      descricao: "Novas fotos adicionadas",
-      tituloConteudo: client.nome || client.id,
-      estabelecimento: client.nome || client.id,
-      imagem: urls[0] || imagemPrincipalNovidade(client),
-      imagens: urls,
-      categoria: client.categoria || "",
-      destinoTipo: "estabelecimento",
-      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id)
-    });
+    };
+    await update(ref(db, `clientes/${client.id}`), imageUpdate);
+    await registrarAtualizacoesClienteNovidade(client.id, { ...client, ...imageUpdate }, client);
     showToast("Imagens enviadas.");
     await loadAllData();
     renderClientOnlyEditor();
@@ -14491,7 +14536,7 @@ function renderClientOnlyEditor() {
     const result = await uploadMenuFilesForClient(client.id, selected);
     if (result.pdf) $("coMenuLink").value = result.pdf;
     menuImages.push(...result.images);
-    await update(ref(db, `clientes/${client.id}`), {
+    const menuUpdate = {
       menuImages,
       cardapioLink: $("coMenuLink").value.trim(),
       cardapioAtivo: true,
@@ -14499,7 +14544,9 @@ function renderClientOnlyEditor() {
       editadoNoPainel: true,
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
-    });
+    };
+    await update(ref(db, `clientes/${client.id}`), menuUpdate);
+    await registrarAtualizacoesClienteNovidade(client.id, { ...client, ...menuUpdate }, client);
     showToast("Cardapio enviado.");
     await loadAllData();
     renderClientOnlyEditor();
@@ -14517,25 +14564,14 @@ function renderClientOnlyEditor() {
       return;
     }
     imagens.push({ url, texto });
-    await update(ref(db, `clientes/${client.id}`), {
+    const imageUpdate = {
       imagens,
       imagem: $("coImage").value || url,
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
-    });
-    await registrarNovidadeAdmin({
-      tipo: "estabelecimento",
-      titulo: "Novas fotos adicionadas",
-      acao: "Novas fotos adicionadas",
-      descricao: "Novas fotos adicionadas",
-      tituloConteudo: client.nome || client.id,
-      estabelecimento: client.nome || client.id,
-      imagem: url,
-      imagens: [url],
-      categoria: client.categoria || "",
-      destinoTipo: "estabelecimento",
-      destinoId: client.nomeNormalizado || normalizeName(client.nome || client.id)
-    });
+    };
+    await update(ref(db, `clientes/${client.id}`), imageUpdate);
+    await registrarAtualizacoesClienteNovidade(client.id, { ...client, ...imageUpdate }, client);
     showToast("Imagem com texto adicionada.");
     await loadAllData();
     renderClientOnlyEditor();

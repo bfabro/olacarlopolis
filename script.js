@@ -4436,7 +4436,7 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     const tipo = normalizeName(item.destinoTipo || item.tipo || "");
     const isClientUpdate = tipo.includes("cliente")
-      || ["nomeCliente", "endereco", "telefone", "horario", "imagens", "cardapio", "redesSociais", "destaque", "categoria"]
+      || ["nomeCliente", "dadosCliente", "logoCliente", "endereco", "telefone", "horario", "imagens", "cardapio", "redesSociais", "destaque", "categoria"]
         .includes(item.novidadeTema || item.raw?.novidadeTema || "");
     if (isClientUpdate) {
       const cadastro = encontrarCadastroDonoNovidade(item, item.estabelecimento || item.raw?.estabelecimento || "");
@@ -4554,8 +4554,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function novidadeEhAtualizacaoCliente(item = {}) {
     const tipo = normalizeName(item.destinoTipo || item.tipo || "");
-    return tipo.includes("cliente") || [
+    if (tipo.includes("cliente")) return true;
+    if ([
       "nomeCliente",
+      "dadosCliente",
+      "logoCliente",
       "endereco",
       "telefone",
       "horario",
@@ -4564,7 +4567,8 @@ document.addEventListener("DOMContentLoaded", function () {
       "redesSociais",
       "destaque",
       "categoria"
-    ].includes(item.raw?.novidadeTema || item.novidadeTema || "");
+    ].includes(item.raw?.novidadeTema || item.novidadeTema || "")) return true;
+    return tipo.includes("estabelecimento") && normalizeName(novidadeTextoAcao(item)).includes("atualiz");
   }
 
   function novidadeResumoAlteracao(item = {}) {
@@ -4919,11 +4923,10 @@ document.addEventListener("DOMContentLoaded", function () {
       const novidadeDestinoExiste = (item) => {
         const tipo = normalizeName(item.destinoTipo || item.tipo || "");
         const textoNovidade = normalizeName(`${item.tipo || ""} ${item.titulo || ""} ${item.descricao || ""}`);
-        if (/(informacoesatualizadas|financeiro|pagamento|mensalidade|fatura|inadimplente|clienteativo|clienteinativo|ativado|desativad|removid|excluid|retirad|ocultad|cancelad|encerrad|apagado)/.test(textoNovidade)) return false;
+        if (/(financeiro|pagamento|mensalidade|fatura|inadimplente|clienteativo|clienteinativo|ativado|desativad|removid|excluid|retirad|ocultad|cancelad|encerrad|apagado)/.test(textoNovidade)) return false;
         if (!clienteEstaPublico(item.destinoId, item.estabelecimento, item.raw?.clienteId, item.raw?.clienteNome)) return false;
         if (tipo.includes("estabelecimento")) {
-          const titulo = normalizeName(`${item.titulo || ""} ${item.acao || ""}`);
-          return titulo.includes("novoestabelecimentocadastrado") || titulo.includes("cadastronovo") || titulo.includes("novasfotosadicionadas");
+          return true;
         }
         if (tipo.includes("promoc")) {
           const cardId = item.destinoCardId || "";
