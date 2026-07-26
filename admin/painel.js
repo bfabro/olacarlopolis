@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 492,
-  label: "v499",
-  data: "2026-07-25",
-  nota: "Historico administrativo agora registra tambem Produtos e todos os menus internos de Minha empresa."
+  numero: 493,
+  label: "v500",
+  data: "2026-07-26",
+  nota: "Relatorios do Admin Master separados em Acessos e Financeiro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -340,7 +340,8 @@ const views = {
   automoveisArtes: $("automoveisArtesView"),
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
-  relatorios: $("relatoriosView"),
+  relatorioAcessos: $("relatorioAcessosView"),
+  relatorioFinanceiro: $("relatorioFinanceiroView"),
   usuariosOnline: $("usuariosOnlineView"),
   pagamentoSistema: $("pagamentoSistemaView"),
   paginaInicialSite: $("paginaInicialSiteView"),
@@ -365,7 +366,8 @@ const viewCopy = {
   automoveisArtes: ["Artes de veiculos", "Gere imagens para Instagram de um ou varios veiculos."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
-  relatorios: ["Relatorios", "Indicadores e pontos de atencao do painel."],
+  relatorioAcessos: ["Relatorio Acessos", "Acessos, cliques, origens e acoes realizadas pelos usuarios."],
+  relatorioFinanceiro: ["Relatorio Financeiro", "Receitas, valores em aberto, planos e comprovantes dos clientes."],
   usuariosOnline: ["Usuarios online", "Acompanhe em tempo real quais telas do site publico estao sendo acessadas."],
   pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
@@ -2399,7 +2401,9 @@ async function loadAllData(onProgress = null) {
     renderReports();
   } catch (error) {
     console.error("Falha ao renderizar os relatorios.", error);
-    if ($("reportsMount")) $("reportsMount").innerHTML = `<section class="panel-card"><p>Nao foi possivel montar os relatorios. Use Atualizar para tentar novamente.</p></section>`;
+    ["reportsAccessMount", "reportsFinanceMount"].forEach((id) => {
+      if ($(id)) $(id).innerHTML = `<section class="panel-card"><p>Nao foi possivel montar este relatorio. Use Atualizar para tentar novamente.</p></section>`;
+    });
   }
   renderPaymentSettings();
   renderHomePageSettings();
@@ -2409,7 +2413,7 @@ async function loadAllData(onProgress = null) {
   renderClientBillingAlert();
   progress(96, "Finalizando a navegação...");
   loadAuditLogs().then(() => {
-    const reportsVisible = !$("relatoriosView")?.classList.contains("hidden");
+    const reportsVisible = !$("relatorioAcessosView")?.classList.contains("hidden");
     if (reportsVisible && state.reportSection === "actions") renderReports();
   });
 
@@ -3512,7 +3516,7 @@ function switchView(name) {
   if (target === "novidadesConfig") renderNovidadesConfig();
   if (target === "xadrezConfig") renderXadrezConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
-  if (target === "relatorios") renderReports();
+  if (target === "relatorioAcessos" || target === "relatorioFinanceiro") renderReports();
   if (target === "usuariosOnline") startOnlinePresenceMonitor();
   else stopOnlinePresenceMonitor();
   if (target === "promocoesClientes") renderStaffPromocoesView();
@@ -11857,13 +11861,13 @@ function renderReportSectionTabs() {
     <section class="panel-card report-section-card">
       <div class="section-head compact">
         <div>
-          <h2>Relatorios do painel</h2>
-          <p>Separe os indicadores de acesso da auditoria das atividades administrativas.</p>
+          <h2>Relatorio de acessos</h2>
+          <p>Consulte os indicadores de navegacao ou a auditoria das atividades administrativas.</p>
         </div>
       </div>
       <div class="report-section-tabs">
         <button type="button" data-report-section="analytics" class="${state.reportSection === "analytics" ? "active" : ""}">
-          <i class="fa-solid fa-chart-line"></i> Relatorio analitico de acessos
+          <i class="fa-solid fa-chart-line"></i> Indicadores de acessos
         </button>
         <button type="button" data-report-section="actions" class="${state.reportSection === "actions" ? "active" : ""}">
           <i class="fa-solid fa-list-check"></i> Acoes dos usuarios
@@ -11981,12 +11985,18 @@ function bindReportControls(mount) {
   mount.querySelector("#auditLogCategory")?.addEventListener("change", renderReports);
 }
 
-function renderReports() {
-  const mount = $("reportsMount");
+function renderReports(reportType = "") {
+  if (!reportType) {
+    const financeVisible = !$("relatorioFinanceiroView")?.classList.contains("hidden");
+    renderReports(financeVisible ? "finance" : "access");
+    return;
+  }
+  const isFinanceReport = reportType === "finance";
+  const mount = $(isFinanceReport ? "reportsFinanceMount" : "reportsAccessMount");
   if (!mount) return;
   if (!isMaster()) state.reportSection = "analytics";
   const periodRange = getReportDateRange();
-  if (isMaster() && state.reportSection === "actions") {
+  if (!isFinanceReport && isMaster() && state.reportSection === "actions") {
     renderUserActionReport(mount, periodRange);
     bindReportControls(mount);
     return;
@@ -12105,12 +12115,14 @@ function renderReports() {
     .map((event) => ({ title: event.titulo || event.nome || event.id, meta: `${event.data || "Sem data"} - ${event.local || "Sem local"}` }));
 
   mount.innerHTML = `
-    ${renderReportSectionTabs()}
+    ${isFinanceReport ? "" : renderReportSectionTabs()}
     <section class="panel-card report-title-card">
       <div class="section-head compact">
         <div>
-          <h2>Relatorio analitico de informacoes de acessos</h2>
-          <p>Indicadores do site, cliques, origem dos acessos, clientes e resultados financeiros.</p>
+          <h2>${isFinanceReport ? "Relatorio Financeiro" : "Relatorio analitico de acessos"}</h2>
+          <p>${isFinanceReport
+            ? "Receitas, valores em aberto, planos, destaques e comprovantes dos clientes."
+            : "Indicadores do site, cliques, origem dos acessos e comportamento dos usuarios."}</p>
         </div>
       </div>
     </section>
@@ -12118,7 +12130,9 @@ function renderReports() {
       <div class="section-head compact">
         <div>
           <h2>Periodo dos relatorios</h2>
-          <p>Filtra acessos, cliques, menu lateral, Onde Comer e Promocoes. Base financeira usa os clientes atuais.</p>
+          <p>${isFinanceReport
+            ? "A base financeira considera os clientes, planos e faturas atuais."
+            : "Filtra acessos, cliques, menu lateral, Onde Comer, Promocoes e acoes dos usuarios."}</p>
         </div>
         <span class="badge ativo">${escapeHtml(periodRange.label)}</span>
       </div>
@@ -12130,29 +12144,32 @@ function renderReports() {
         <button type="button" data-report-period="personalizado" class="period-custom ${state.reportPeriod.type === "personalizado" ? "active" : ""}"><i class="fa-solid fa-sliders"></i> Personalizado</button>
       </div>
       <div class="report-custom-range ${state.reportPeriod.type === "personalizado" ? "" : "hidden"}">
-        <label>Inicio<input id="reportStartDate" type="date" value="${escapeAttr(state.reportPeriod.start || periodRange.start)}"></label>
-        <label>Fim<input id="reportEndDate" type="date" value="${escapeAttr(state.reportPeriod.end || periodRange.end)}"></label>
-        <button id="applyReportRangeButton" type="button" class="ghost-button"><i class="fa-solid fa-check"></i> Aplicar</button>
+        <label>Inicio<input data-report-start-date type="date" value="${escapeAttr(state.reportPeriod.start || periodRange.start)}"></label>
+        <label>Fim<input data-report-end-date type="date" value="${escapeAttr(state.reportPeriod.end || periodRange.end)}"></label>
+        <button data-apply-report-range type="button" class="ghost-button"><i class="fa-solid fa-check"></i> Aplicar</button>
       </div>
     </section>
 
     <div class="stats-grid">
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita prevista</span><strong>${moneyBR(valorReceber)}</strong><small>Clientes nao isentos</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Projecao por planos</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita semestral</span><strong>${moneyBR(receitas.semestral)}</strong><small>Projecao por planos</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Projecao por planos</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + destaqueValueForClient(c), 0))}</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Registros do periodo</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Instalacoes PWA</span><strong>${instalacoesPWA}</strong><small>App instalado</small></article>
-      <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Uso via PWA</span><strong>${usoPWA}</strong><small>Acessos pelo app</small></article>
+      ${isFinanceReport ? `
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita prevista</span><strong>${moneyBR(valorReceber)}</strong><small>Clientes nao isentos</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Projecao por planos</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita semestral</span><strong>${moneyBR(receitas.semestral)}</strong><small>Projecao por planos</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Projecao por planos</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + destaqueValueForClient(c), 0))}</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
+      ` : `
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Registros do periodo</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Instalacoes PWA</span><strong>${instalacoesPWA}</strong><small>App instalado</small></article>
+        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Uso via PWA</span><strong>${usoPWA}</strong><small>Acessos pelo app</small></article>
+      `}
     </div>
 
     <div class="reports-grid">
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
         ${renderReportCardHeader("Resumo operacional", periodRange)}
         <div class="report-kpis">
           <span>Ativos: <strong>${ativos.length}</strong></span>
@@ -12167,43 +12184,43 @@ function renderReports() {
         </div>
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Mais acessados por comercio", periodRange)}
         ${renderReportList(topFromMap(cliquesBotoes.porCliente, 12), "Ainda nao ha cliques de comercio registrados.")}
       </section>
 
-      <section class="panel-card report-card report-wide">
+      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Cliques por estabelecimento/servico", periodRange)}
         ${renderClickReportTable(generalClickReport.rows, generalClickReport.types, "Ainda nao ha cliques por estabelecimento ou servico.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Cliques por botao", periodRange)}
         ${renderReportList(topFromMap(cliquesBotoes.porTipo, 12), "Ainda nao ha cliques por botao registrados.")}
       </section>
 
-      <section class="panel-card report-card report-wide">
+      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Cliques nas noticias da cidade", periodRange)}
         <p class="list-meta">Mostra visualizacoes, compartilhamentos, WhatsApp e acessos para a materia oficial de cada noticia.</p>
         ${renderNewsClickReportTable(newsClickRows, "Ainda nao ha cliques em noticias registrados neste periodo.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Cidades dos acessos", periodRange)}
         ${renderReportList(topFromMap(cidadesAcesso, 12, "acesso", "acessos"), "Ainda nao ha dados de cidade nos acessos.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Meios de acesso", periodRange)}
         ${renderReportList(topFromMap(origensAcesso, 12, "acesso", "acessos"), "Ainda nao ha origem de acesso registrada.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Menu lateral", periodRange)}
         ${renderReportList(topFromMap(cliquesMenu, 12), "Ainda nao ha cliques de menu registrados.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Onde Comer", periodRange)}
         <div class="report-kpis">
           <span>Cardapios: <strong>${[...cliquesOndeComerCardapios.values()].reduce((s, v) => s + v, 0)}</strong></span>
@@ -12213,48 +12230,48 @@ function renderReports() {
         ${renderReportList(topFromMap(cliquesOndeComerWhats, 8), "Ainda nao ha cliques no Onde Comer.")}
       </section>
 
-      <section class="panel-card report-card report-wide">
+      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Cliques por estabelecimento - Onde Comer", periodRange)}
         ${renderClickReportTable(ondeComerClickRows, ["whatsapp", "cardapio", "fotos"], "Ainda nao ha cliques no Onde Comer.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Promocoes", periodRange)}
         ${renderReportList(topFromMap(cliquesPromocoes, 12), "Ainda nao ha cliques em promocoes registrados.")}
       </section>
 
-      <section class="panel-card report-card report-wide">
+      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Horarios dos cliques dos cards", periodRange)}
         ${renderTimelineTable(clickTimeline, "Ainda nao ha horarios detalhados de cliques neste periodo.")}
       </section>
 
-      <section class="panel-card report-card report-wide">
+      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Acessos por imovel e veiculo", periodRange)}
         <p class="list-meta">Visualizacoes, WhatsApp e fotos separados pelo codigo de referencia do anuncio.</p>
         ${renderItemAccessTable(itemAccessRows, "Ainda nao ha acessos em imoveis ou veiculos neste periodo.")}
       </section>
 
-      <section class="panel-card report-card report-wide">
+      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Horarios e origem dos acessos", periodRange)}
         ${renderTimelineTable(accessTimeline, "Ainda nao ha acessos detalhados neste periodo.", "access")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
         ${renderReportCardHeader("Clientes que precisam de atencao", periodRange)}
         ${renderReportList(clientesAtencao, "Nenhuma pendencia importante encontrada.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
         ${renderReportCardHeader("Top categorias", periodRange)}
         ${renderReportList(topCategorias, "Nenhuma categoria com cliente.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
         ${renderReportCardHeader("Comprovantes recentes", periodRange)}
         ${renderReportList(faturasComComprovante, "Nenhum comprovante anexado ainda.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
         ${renderReportCardHeader("Usuarios", periodRange)}
         <div class="report-kpis">
           <span>Master: <strong>${roles.master || 0}</strong></span>
@@ -12265,7 +12282,7 @@ function renderReports() {
         ${renderReportList(usuariosSemCliente.slice(0, 6), "Todos os usuarios cliente estao vinculados.")}
       </section>
 
-      <section class="panel-card report-card">
+      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
         ${renderReportCardHeader("Proximos eventos", periodRange)}
         ${renderReportList(proximosEventos, "Nenhum evento ativo futuro encontrado.")}
       </section>
@@ -12273,10 +12290,10 @@ function renderReports() {
   `;
 
   bindReportControls(mount);
-  mount.querySelector("#applyReportRangeButton")?.addEventListener("click", () => {
+  mount.querySelector("[data-apply-report-range]")?.addEventListener("click", () => {
     state.reportPeriod.type = "personalizado";
-    state.reportPeriod.start = $("reportStartDate")?.value || "";
-    state.reportPeriod.end = $("reportEndDate")?.value || state.reportPeriod.start;
+    state.reportPeriod.start = mount.querySelector("[data-report-start-date]")?.value || "";
+    state.reportPeriod.end = mount.querySelector("[data-report-end-date]")?.value || state.reportPeriod.start;
     renderReports();
   });
 }
@@ -16389,7 +16406,7 @@ function bindEvents() {
   }
   document.querySelectorAll(".nav-admin button").forEach((button) => {
     button.addEventListener("click", () => {
-      if (button.dataset.view === "relatorios") {
+      if (button.dataset.view === "relatorioAcessos" || button.dataset.view === "relatorioFinanceiro") {
         const finish = beginAdminActionLoading("Montando relatórios...", button);
         showAdminActionLoading("Montando relatórios...", button);
         return new Promise((resolve) => {

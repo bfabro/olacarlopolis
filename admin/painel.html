@@ -83,7 +83,8 @@
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestao</span>
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
-          <button data-view="relatorios" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorios</button>
+          <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatorio Acessos</button>
+          <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorio Financeiro</button>
           <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuarios online</button>
         </section>
         <section class="nav-admin-group" data-master="true">
@@ -793,8 +794,12 @@
         </section>
       </section>
 
-      <section id="relatoriosView" class="panel-view hidden">
-        <div id="reportsMount" class="reports-layout"></div>
+      <section id="relatorioAcessosView" class="panel-view hidden">
+        <div id="reportsAccessMount" class="reports-layout"></div>
+      </section>
+
+      <section id="relatorioFinanceiroView" class="panel-view hidden">
+        <div id="reportsFinanceMount" class="reports-layout"></div>
       </section>
 
       <section id="usuariosOnlineView" class="panel-view hidden">
@@ -1846,6 +1851,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=427"></script>
+  <script type="module" src="painel.js?v=428"></script>
 </body>
 </html>
