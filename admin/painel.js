@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 495,
-  label: "v502",
+  numero: 496,
+  label: "v503",
   data: "2026-07-26",
-  nota: "Atualizacoes de logo e informacoes publicas do cliente agora aparecem em Novidades."
+  nota: "Comparacao de atualizacoes corrigida para nao gerar falso aviso de cardapio."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4039,14 +4039,25 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   }
   if (normalizeImageItems(effective.imagens).length > normalizeImageItems(original.imagens).length) add("imagens", "cliente-imagens", "Novas fotos adicionadas");
   if (String(original.categoria || "") !== String(effective.categoria || "")) add("categoria", "cliente-categoria", "Categoria atualizada");
-  const oldSocial = JSON.stringify([original.instagram, original.facebook, original.tiktok, original.site]);
-  const newSocial = JSON.stringify([effective.instagram, effective.facebook, effective.tiktok, effective.site]);
+  const socialFingerprint = (client = {}) => JSON.stringify([
+    String(client.instagram || "").trim(),
+    String(client.facebook || "").trim(),
+    String(client.tiktok || "").trim(),
+    String(client.site || "").trim()
+  ]);
+  const oldSocial = socialFingerprint(original);
+  const newSocial = socialFingerprint(effective);
   if (oldSocial !== newSocial) {
     if ([effective.instagram, effective.facebook, effective.tiktok, effective.site].some((value) => String(value || "").trim())) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
     else remove("cliente-redes", "redesSociais");
   }
-  const oldMenu = JSON.stringify([original.cardapioAtivo, original.cardapioLink, original.menuImages]);
-  const newMenu = JSON.stringify([effective.cardapioAtivo, effective.cardapioLink, effective.menuImages]);
+  const menuFingerprint = (client = {}) => JSON.stringify({
+    ativo: Boolean(client.cardapioAtivo),
+    link: String(client.cardapioLink || "").trim(),
+    imagens: normalizeUrlList(client.menuImages)
+  });
+  const oldMenu = menuFingerprint(original);
+  const newMenu = menuFingerprint(effective);
   if (oldMenu !== newMenu) {
     if (effective.cardapioAtivo || String(effective.cardapioLink || "").trim() || normalizeUrlList(effective.menuImages).length) add("cardapio", "cliente-cardapio", "Cardápio atualizado");
     else remove("cliente-cardapio", "cardapio");
@@ -4066,8 +4077,8 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
       texto: String(item.texto || "").trim()
     })),
     categoria: String(client.categoria || "").trim(),
-    redesSociais: JSON.stringify([client.instagram, client.facebook, client.tiktok, client.site]),
-    cardapio: JSON.stringify([client.cardapioAtivo, client.cardapioLink, normalizeUrlList(client.menuImages)]),
+    redesSociais: socialFingerprint(client),
+    cardapio: menuFingerprint(client),
     destaque: JSON.stringify([Boolean(client.destaqueSemanal), client.destaqueFim || ""]),
     descricaoCurta: String(client.descricaoCurta || client.descricao || "").trim(),
     cidade: String(client.cidade || "").trim(),
@@ -4087,7 +4098,30 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     vagaComoCandidatar: String(client.vagaComoCandidatar || "").trim(),
     vagaValidade: String(client.vagaValidade || "").trim()
   });
-  if (!updates.length && publicInfoFingerprint(original) !== publicInfoFingerprint(effective)) {
+  const generalInfoFingerprint = (client = {}) => JSON.stringify({
+    descricaoCurta: String(client.descricaoCurta || client.descricao || "").trim(),
+    cidade: String(client.cidade || "").trim(),
+    creci: String(client.creci || "").trim(),
+    infoAdicional: String(client.infoAdicional || "").trim(),
+    tipo: String(client.tipo || client.tipoCliente || "").trim(),
+    status: String(client.status || "").trim(),
+    imagemEnquadramento: String(client.imagemEnquadramento || "").trim(),
+    vagaAtiva: Boolean(client.vagaAtiva),
+    vagaTitulo: String(client.vagaTitulo || client.vagaCargo || "").trim(),
+    vagaDescricao: String(client.vagaDescricao || client.infoVagaTrabalho || "").trim(),
+    vagaRequisitos: String(client.vagaRequisitos || client.vagaPreRequisito || "").trim(),
+    vagaSalario: String(client.vagaSalario || "").trim(),
+    vagaJornada: String(client.vagaJornada || "").trim(),
+    vagaLocal: String(client.vagaLocal || "").trim(),
+    vagaContato: String(client.vagaContato || "").trim(),
+    vagaComoCandidatar: String(client.vagaComoCandidatar || "").trim(),
+    vagaValidade: String(client.vagaValidade || "").trim()
+  });
+  const generalInfoChanged = generalInfoFingerprint(original) !== generalInfoFingerprint(effective);
+  if (generalInfoChanged) {
+    updates.splice(0, updates.length);
+    add("dadosCliente", "cliente-dados", "Dados do cliente atualizados");
+  } else if (!updates.length && publicInfoFingerprint(original) !== publicInfoFingerprint(effective)) {
     add("dadosCliente", "cliente-dados", "Informações do cliente atualizadas");
   }
   await Promise.all([...removals, ...updates.map(registrarNovidadeAdmin)]);
