@@ -9761,6 +9761,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
 
   function renderFotoCardEstabelecimento(est = {}, img = "", index = 0) {
     const nome = est.name || est.nome || "Cliente";
+    const titulo = est.novidadesTitles?.[index] || est.titulosFotos?.[index] || nome;
     const descricao = est.novidadesDescriptions?.[index] || est.descricoesFotos?.[index] || "";
     const slug = normalizeName(nome);
     const cacheKey = `${slug}:${index}`;
@@ -9770,9 +9771,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       window.__lojaFotosGrupos[slug] = {
         nome,
         imagens: Array.isArray(est.novidadesImages) ? est.novidadesImages : [],
+        titulos: Array.isArray(est.novidadesTitles) ? est.novidadesTitles : [],
         descricoes: Array.isArray(est.novidadesDescriptions) ? est.novidadesDescriptions : []
       };
-      window.__lojaFotosDetalhes[cacheKey] = { slug, index, img, descricao };
+      window.__lojaFotosDetalhes[cacheKey] = { slug, index, img, titulo, descricao };
     }
     return `
       <article class="loja-foto-card loja-card-foto" data-loja-foto="${escapePromoHtml(cacheKey)}">
@@ -9780,7 +9782,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           <img src="${escapePromoHtml(img)}" alt="Foto ${index + 1} de ${escapePromoHtml(nome)}" loading="lazy" decoding="async">
         </div>
         <div class="loja-foto-info">
-          <strong>Foto ${index + 1}</strong>
+          <strong>${escapePromoHtml(titulo)}</strong>
           ${descricao ? `<p>${escapePromoHtml(descricao)}</p>` : `<p>${escapePromoHtml(nome)}</p>`}
         </div>
       </article>
@@ -9791,6 +9793,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const imagens = Array.isArray(grupo.imagens) ? grupo.imagens.filter(Boolean) : [];
     if (!imagens.length) return;
     document.querySelectorAll(".modal-fotos-overlay").forEach((el) => el.remove());
+    const titulos = Array.isArray(grupo.titulos) ? grupo.titulos : [];
     const descricoes = Array.isArray(grupo.descricoes) ? grupo.descricoes : [];
     const ordenadas = imagens.map((img, index) => ({ img, index }))
       .sort((a, b) => (a.index === initialIndex ? -1 : b.index === initialIndex ? 1 : a.index - b.index));
@@ -9801,9 +9804,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           <h2>Fotos de ${escapePromoHtml(grupo.nome || "cliente")}</h2>
           <div class="modal-fotos-imgs">
             ${ordenadas.map(({ img, index }) => `
-              <div>
+              <div class="foto-com-descricao">
                 <img src="${escapePromoHtml(img)}" alt="Foto ${index + 1}" loading="lazy">
-                ${descricoes[index] ? `<div>${escapePromoHtml(descricoes[index])}</div>` : ""}
+                <strong>${escapePromoHtml(titulos[index] || grupo.nome || "Imagem")}</strong>
+                ${descricoes[index] ? `<p>${escapePromoHtml(descricoes[index])}</p>` : ""}
               </div>
             `).join("")}
           </div>
@@ -21869,7 +21873,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   function montarImagensAdminComLogoAtual(cliente = {}) {
     const imagensGaleria = Array.isArray(cliente.imagens)
       ? cliente.imagens
-          .map((item) => typeof item === "string" ? { url: item, texto: "" } : { ...item })
+          .map((item) => typeof item === "string" ? { url: item, titulo: "", texto: "" } : { ...item })
           .filter((item) => item && String(item.url || "").trim())
       : [];
     const logoAtual = String(cliente.imagem || cliente.image || "").trim();
@@ -21906,7 +21910,8 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     if (imagensAdmin.length) {
       est.novidadesImages = imagensAdmin.map((item) => item.url).slice(0, 10);
-      est.novidadesDescriptions = imagensAdmin.map((item) => item.texto || "").slice(0, 10);
+      est.novidadesTitles = imagensAdmin.map((item) => item.titulo || item.title || "").slice(0, 10);
+      est.novidadesDescriptions = imagensAdmin.map((item) => item.texto || item.descricao || item.description || "").slice(0, 10);
     }
 
     if (campoExiste(cliente, "contatosDetalhados") || campoExiste(cliente, "contatos") || campoExiste(cliente, "contato") || campoExiste(cliente, "whatsapp")) {
@@ -22047,7 +22052,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       vagaValidade: cliente.vagaValidade || "",
       infoAdicional: cliente.infoAdicional || "",
       novidadesImages: imagensAdmin.map((item) => item.url).slice(0, 10),
-      novidadesDescriptions: imagensAdmin.map((item) => item.texto || "").slice(0, 10),
+      novidadesTitles: imagensAdmin.map((item) => item.titulo || item.title || "").slice(0, 10),
+      novidadesDescriptions: imagensAdmin.map((item) => item.texto || item.descricao || item.description || "").slice(0, 10),
       origemAdmin: true
     };
   }

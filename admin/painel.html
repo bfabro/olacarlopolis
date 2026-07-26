@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=352">
+  <link rel="stylesheet" href="painel.css?v=353">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -384,10 +384,13 @@
                   <label>URL da imagem
                     <input id="clientImageUrl" placeholder="https://... ou images/...">
                   </label>
-                  <label>Texto desta imagem
-                    <textarea id="clientImageText" rows="3" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+                  <label>Título da imagem
+                    <input id="clientImageTitle" maxlength="80" placeholder="Ex.: Ambiente interno">
                   </label>
-                  <button id="addClientImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem com texto</button>
+                  <label>Breve descrição
+                    <textarea id="clientImageText" rows="3" maxlength="300" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+                  </label>
+                  <button id="addClientImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem</button>
                 </div>
                 <div id="clientImagesPreview" class="image-grid"></div>
               </section>
@@ -1851,6 +1854,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=432"></script>
+  <script type="module" src="painel.js?v=433"></script>
 </body>
 </html>

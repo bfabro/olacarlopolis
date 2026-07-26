@@ -3556,7 +3556,7 @@ button[type="submit"]:hover,
 
 .manual-image-form {
   display: grid;
-  grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.2fr) auto;
+  grid-template-columns: minmax(180px, 1fr) minmax(170px, .8fr) minmax(220px, 1.2fr) auto;
   gap: 10px;
   align-items: end;
   margin-top: 12px;
@@ -3918,6 +3918,7 @@ body.admin-auto-image-dragging {
   background: #f8fafc;
 }
 
+.image-caption-label input,
 .image-caption-label textarea {
   margin-top: 6px;
   background: #fff;

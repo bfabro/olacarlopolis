@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 497,
-  label: "v504",
+  numero: 498,
+  label: "v505",
   data: "2026-07-26",
-  nota: "Atualizacoes de logo e dados do cliente agora geram itens separados em Novidades."
+  nota: "Fotos dos clientes agora possuem titulo e breve descricao no cadastro e no site publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -787,8 +787,12 @@ function gerarPixCopiaCola({ chave, nome, cidade, valor, txid }) {
 function normalizeImageItems(images) {
   return (Array.isArray(images) ? images : [])
     .map((item) => {
-      if (typeof item === "string") return { url: item, texto: "" };
-      return { url: item?.url || "", texto: item?.texto || "" };
+      if (typeof item === "string") return { url: item, titulo: "", texto: "" };
+      return {
+        url: item?.url || "",
+        titulo: item?.titulo || item?.title || "",
+        texto: item?.texto || item?.descricao || item?.description || ""
+      };
     })
     .filter((item) => item.url)
     .slice(0, 10);
@@ -4074,6 +4078,7 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     imagem: String(client.imagem || client.profileImage || client.imagemPerfil || client.perfil || client.logo || "").trim(),
     imagens: normalizeImageItems(client.imagens).map((item) => ({
       url: String(item.url || "").trim(),
+      titulo: String(item.titulo || "").trim(),
       texto: String(item.texto || "").trim()
     })),
     categoria: String(client.categoria || "").trim(),
@@ -4277,8 +4282,11 @@ function renderClientImagesPreview() {
   box.innerHTML = state.clientImages.map((item, index) => `
     <article class="image-tile">
       <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
-      <label class="image-caption-label">Texto desta imagem
-        <textarea data-image-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
+      <label class="image-caption-label">Título da imagem
+        <input data-image-title="${index}" maxlength="80" placeholder="Ex.: Ambiente interno" value="${escapeAttr(item.titulo || "")}">
+      </label>
+      <label class="image-caption-label">Breve descrição
+        <textarea data-image-text="${index}" rows="3" maxlength="300" placeholder="Texto opcional que aparece junto da imagem no site">${escapeHtml(item.texto || "")}</textarea>
       </label>
       <div>
         <button type="button" data-main-image="${index}">Usar como foto de perfil</button>
@@ -4300,6 +4308,13 @@ function renderClientImagesPreview() {
     field.addEventListener("input", () => {
       const index = Number(field.dataset.imageText);
       if (state.clientImages[index]) state.clientImages[index].texto = field.value;
+    });
+  });
+
+  box.querySelectorAll("[data-image-title]").forEach((field) => {
+    field.addEventListener("input", () => {
+      const index = Number(field.dataset.imageTitle);
+      if (state.clientImages[index]) state.clientImages[index].titulo = field.value;
     });
   });
 
@@ -4822,7 +4837,7 @@ async function uploadClientImages(files) {
 
   showToast("Enviando imagens...");
   const urls = await uploadImagesForClient(currentId, selected);
-  state.clientImages.push(...urls.map((url) => ({ url, texto: "" })));
+  state.clientImages.push(...urls.map((url) => ({ url, titulo: "", texto: "" })));
 
   if (!$("clientImage").value && state.clientImages[0]) $("clientImage").value = imageUrl(state.clientImages[0]);
   renderClientImagesPreview();
@@ -4982,6 +4997,7 @@ async function uploadClientProfileImage(file) {
 
 function addClientImageFromUrl() {
   const url = $("clientImageUrl").value.trim();
+  const titulo = $("clientImageTitle").value.trim();
   const texto = $("clientImageText").value.trim();
 
   if (!url) {
@@ -4993,12 +5009,13 @@ function addClientImageFromUrl() {
     return;
   }
 
-  state.clientImages.push({ url, texto });
+  state.clientImages.push({ url, titulo, texto });
   if (!$("clientImage").value) $("clientImage").value = url;
   $("clientImageUrl").value = "";
+  $("clientImageTitle").value = "";
   $("clientImageText").value = "";
   renderClientImagesPreview();
-  showToast("Imagem com texto adicionada. Clique em salvar cliente para gravar.");
+  showToast("Imagem adicionada. Clique em salvar cliente para gravar.");
 }
 
 async function uploadImagesForClient(clientId, files) {
@@ -5223,6 +5240,7 @@ async function uploadUrlToClientStorage(clientId, imageItem, index) {
 
   return {
     url: storageUrl,
+    titulo: imageItem?.titulo || "",
     texto: imageItem?.texto || ""
   };
 }
@@ -14165,10 +14183,13 @@ function renderClientOnlyEditor() {
             <label>URL da imagem
               <input id="coImageUrl" placeholder="https://... ou images/...">
             </label>
-            <label>Texto desta imagem
-              <textarea id="coImageText" rows="3" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+            <label>Título da imagem
+              <input id="coImageTitle" maxlength="80" placeholder="Ex.: Ambiente interno">
             </label>
-            <button id="coAddImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem com texto</button>
+            <label>Breve descrição
+              <textarea id="coImageText" rows="3" maxlength="300" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+            </label>
+            <button id="coAddImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem</button>
           </div>
           <div id="coImagesPreview" class="image-grid">
             ${renderImagesMarkup(imagens, "co")}
@@ -14548,7 +14569,7 @@ function renderClientOnlyEditor() {
     }
     showToast("Enviando imagens...");
     const urls = await uploadImagesForClient(client.id, selected);
-    imagens.push(...urls.map((url) => ({ url, texto: "" })));
+    imagens.push(...urls.map((url) => ({ url, titulo: "", texto: "" })));
     const imageUpdate = {
       imagens,
       imagem: $("coImage").value || imageUrl(imagens[0]) || "",
@@ -14587,6 +14608,7 @@ function renderClientOnlyEditor() {
 
   mount.querySelector("#coAddImageUrlButton")?.addEventListener("click", async () => {
     const url = mount.querySelector("#coImageUrl").value.trim();
+    const titulo = mount.querySelector("#coImageTitle").value.trim();
     const texto = mount.querySelector("#coImageText").value.trim();
     if (!url) {
       showToast("Informe a URL da imagem.");
@@ -14596,7 +14618,7 @@ function renderClientOnlyEditor() {
       showToast("Limite de 10 imagens atingido.");
       return;
     }
-    imagens.push({ url, texto });
+    imagens.push({ url, titulo, texto });
     const imageUpdate = {
       imagens,
       imagem: $("coImage").value || url,
@@ -14605,7 +14627,7 @@ function renderClientOnlyEditor() {
     };
     await update(ref(db, `clientes/${client.id}`), imageUpdate);
     await registrarAtualizacoesClienteNovidade(client.id, { ...client, ...imageUpdate }, client);
-    showToast("Imagem com texto adicionada.");
+    showToast("Imagem adicionada.");
     await loadAllData();
     renderClientOnlyEditor();
   });
@@ -14919,6 +14941,13 @@ function renderClientOnlyEditor() {
     });
   });
 
+  mount.querySelectorAll("[data-co-title]").forEach((field) => {
+    field.addEventListener("input", () => {
+      const index = Number(field.dataset.coTitle);
+      if (imagens[index]) imagens[index].titulo = field.value;
+    });
+  });
+
   const coShortDescription = mount.querySelector("#coShortDescription");
   const updateCoShortDescriptionCount = () => {
     const count = mount.querySelector("#coShortDescriptionCount");
@@ -15189,8 +15218,11 @@ function renderImagesMarkup(images, prefix) {
   return images.map((item, index) => `
     <article class="image-tile">
       <img src="${escapeAttr(displayImageUrl(imageUrl(item)))}" alt="Imagem ${index + 1}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
-      <label class="image-caption-label">Texto desta imagem
-        <textarea data-${prefix}-text="${index}" rows="3" placeholder="Ex.: Promoção, descrição ou legenda opcional">${escapeHtml(item.texto || "")}</textarea>
+      <label class="image-caption-label">Título da imagem
+        <input data-${prefix}-title="${index}" maxlength="80" placeholder="Ex.: Ambiente interno" value="${escapeAttr(item.titulo || "")}">
+      </label>
+      <label class="image-caption-label">Breve descrição
+        <textarea data-${prefix}-text="${index}" rows="3" maxlength="300" placeholder="Texto opcional que aparece junto da imagem no site">${escapeHtml(item.texto || "")}</textarea>
       </label>
       <div>
         <button type="button" data-${prefix}-main="${index}">Usar como foto de perfil</button>

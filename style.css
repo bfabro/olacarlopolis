@@ -4254,10 +4254,18 @@ a:focus {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
+.foto-com-descricao strong {
+  display: block;
+  margin-top: 10px;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
 .foto-com-descricao p {
-  margin-top: 8px;
+  margin: 5px 0 0;
+  color: #64748b;
   font-size: 14px;
-  color: #444;
+  line-height: 1.4;
 }
 
 
