@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 496,
-  label: "v503",
+  numero: 497,
+  label: "v504",
   data: "2026-07-26",
-  nota: "Comparacao de atualizacoes corrigida para nao gerar falso aviso de cardapio."
+  nota: "Atualizacoes de logo e dados do cliente agora geram itens separados em Novidades."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4119,7 +4119,6 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   });
   const generalInfoChanged = generalInfoFingerprint(original) !== generalInfoFingerprint(effective);
   if (generalInfoChanged) {
-    updates.splice(0, updates.length);
     add("dadosCliente", "cliente-dados", "Dados do cliente atualizados");
   } else if (!updates.length && publicInfoFingerprint(original) !== publicInfoFingerprint(effective)) {
     add("dadosCliente", "cliente-dados", "Informações do cliente atualizadas");
