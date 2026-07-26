@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 498,
-  label: "v505",
+  numero: 499,
+  label: "v506",
   data: "2026-07-26",
-  nota: "Fotos dos clientes agora possuem titulo e breve descricao no cadastro e no site publico."
+  nota: "Novidades de informacoes agora permanecem separadas por cliente e usam o texto Informacoes Atualizadas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4124,9 +4124,9 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   });
   const generalInfoChanged = generalInfoFingerprint(original) !== generalInfoFingerprint(effective);
   if (generalInfoChanged) {
-    add("dadosCliente", "cliente-dados", "Dados do cliente atualizados");
+    add("dadosCliente", "cliente-dados", "Informações Atualizadas");
   } else if (!updates.length && publicInfoFingerprint(original) !== publicInfoFingerprint(effective)) {
-    add("dadosCliente", "cliente-dados", "Informações do cliente atualizadas");
+    add("dadosCliente", "cliente-dados", "Informações Atualizadas");
   }
   await Promise.all([...removals, ...updates.map(registrarNovidadeAdmin)]);
 }
@@ -4154,7 +4154,8 @@ async function removerNovidadesPorDestino(tipo, destinoId, itemId = "") {
         (novidadeCardId && item.includes(novidadeCardId)) ||
         (novidadeId && novidadeId.includes(item))
       );
-      if (mesmoTipo && (mesmoItem || (!item && mesmoDestino))) updates[`novidades/${child.key}`] = null;
+      const mesmoAlvo = destino ? mesmoDestino : true;
+      if (mesmoTipo && mesmoAlvo && (mesmoItem || (!item && mesmoDestino))) updates[`novidades/${child.key}`] = null;
       return false;
     });
     if (Object.keys(updates).length) await update(ref(db), updates);
