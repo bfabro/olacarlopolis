@@ -23959,8 +23959,12 @@ body.business-art-capturing-background .home-cards-intro {
   min-height: 0;
   overflow: hidden;
   background: #eaf2ff;
-  cursor: zoom-in;
+  cursor: grab;
   touch-action: none;
+}
+
+.business-art-stage.layout-mosaic .business-art-mosaic-cell.is-dragging {
+  cursor: grabbing;
 }
 
 .business-art-stage.layout-mosaic .business-art-mosaic-cell.is-selected-for-scale::after {

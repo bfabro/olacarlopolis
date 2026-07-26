@@ -975,7 +975,8 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
 }
 
 function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte }) {
-  const imagensMosaico = (dados.imagensMosaico || dados.imagens || []).slice(0, 4);
+  const limiteMosaico = formato === "feed" ? 2 : 4;
+  const imagensMosaico = (dados.imagensMosaico || dados.imagens || []).slice(0, limiteMosaico);
   const imageBlock = layoutArte === "mosaic" && imagensMosaico.length
     ? `<div class="business-art-mosaic business-art-mosaic-count-${imagensMosaico.length}">
         ${imagensMosaico.map((imagem, index) => `<span class="business-art-mosaic-cell" data-business-mosaic-index="${index}"><img class="business-art-mosaic-image" src="${escaparArteComercial(imagem)}" alt="Imagem ${index + 1} de ${escaparArteComercial(dados.nome)}" crossorigin="anonymous"></span>`).join("")}
@@ -1155,7 +1156,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         <div class="business-art-layout" role="group" aria-label="Layout da arte">
           <button type="button" class="active" data-business-layout="classic"><i class="fa-regular fa-rectangle-list"></i><small>Atual</small></button>
           <button type="button" data-business-layout="showcase"><i class="fa-solid fa-wand-magic-sparkles"></i><small>Destaque</small></button>
-          <button type="button" data-business-layout="mosaic" title="Usar ate quatro imagens cadastradas"><i class="fa-solid fa-table-cells-large"></i><small>Mosaico</small></button>
+          <button type="button" data-business-layout="mosaic" title="Usar quatro imagens no Story ou duas no Feed"><i class="fa-solid fa-table-cells-large"></i><small>Mosaico</small></button>
         </div>
         <div class="business-art-color-controls is-hidden" aria-label="Cores do layout selecionado">
           <label title="Cor da faixa com o nome"><input type="color" data-business-color="name" value="#075fd5"><small>Nome</small></label>
@@ -1175,7 +1176,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             <span><span data-business-image-scale-label>Tamanho da imagem</span><output data-business-image-scale-output>100%</output></span>
             <input type="range" min="65" max="135" value="100" step="1" data-business-image-scale>
           </label>
-          <small><i class="fa-solid fa-hand-pointer"></i> Use dois dedos sobre a foto. No Mosaico, ajuste cada imagem separadamente.</small>
+          <small><i class="fa-solid fa-hand-pointer"></i> No Mosaico, arraste com um dedo e use dois dedos para ajustar o tamanho de cada imagem.</small>
         </div>
         <div class="business-art-mosaic-picker is-hidden" aria-label="Escolher imagens do mosaico">
           <strong>Imagens de cada quadrado</strong>
@@ -1192,7 +1193,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
                 <img src="${escaparArteComercial(imagem)}" alt="" loading="lazy">
               </button>`).join("")}
           </div>
-          <small>Selecione o quadrado 2, 3 ou 4 e depois escolha uma imagem.</small>
+          <small data-business-mosaic-help>Selecione o quadrado 2, 3 ou 4 e depois escolha uma imagem.</small>
         </div>
         <div class="business-art-description-controls">
           <span>
@@ -1242,6 +1243,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let cantosArredondados = true;
   let escalaImagem = 1;
   const escalasImagensMosaico = [1, 1, 1, 1];
+  const deslocamentosImagensMosaico = Array.from({ length: 4 }, () => ({ x: 0, y: 0 }));
   let imagemMosaicoSelecionada = 0;
   let slotMosaicoEscolha = Math.min(1, Math.max(0, imagensMosaicoOriginais.length - 1));
   const fontesSelecionadasMosaico = imagensMosaicoOriginais.map((imagem) => fontesMosaicoOriginais.indexOf(imagem));
@@ -1278,9 +1280,11 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const atualizarSeletorMosaico = () => {
     const picker = dialog.querySelector(".business-art-mosaic-picker");
     if (!picker) return;
+    const limiteMosaico = formato === "feed" ? 2 : 4;
     picker.classList.toggle("is-hidden", layoutArte !== "mosaic");
     picker.querySelectorAll("[data-business-mosaic-slot]").forEach((button) => {
       const index = Number(button.dataset.businessMosaicSlot);
+      button.hidden = index >= limiteMosaico;
       button.classList.toggle("active", index === slotMosaicoEscolha);
       const image = button.querySelector("img");
       const sourceIndex = fontesSelecionadasMosaico[index];
@@ -1292,6 +1296,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         Number(button.dataset.businessMosaicSource) === fontesSelecionadasMosaico[slotMosaicoEscolha]
       );
     });
+    const help = picker.querySelector("[data-business-mosaic-help]");
+    if (help) {
+      help.textContent = formato === "feed"
+        ? "No Feed, selecione o quadrado 2 e escolha a segunda imagem."
+        : "No Story, selecione o quadrado 2, 3 ou 4 e escolha uma imagem.";
+    }
   };
   const aplicarEscalaImagem = (picture = stage.querySelector(".business-art-picture")) => {
     if (!picture) return;
@@ -1310,7 +1320,13 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             image.style.width = "100%";
             image.style.height = "auto";
           }
-          image.style.transform = `translate(-50%, -50%) scale(${escalasImagensMosaico[index] || 1})`;
+          const escala = escalasImagensMosaico[index] || 1;
+          const deslocamento = deslocamentosImagensMosaico[index] || { x: 0, y: 0 };
+          const limiteX = Math.max(0, ((image.offsetWidth * escala) - cell.clientWidth) / 2);
+          const limiteY = Math.max(0, ((image.offsetHeight * escala) - cell.clientHeight) / 2);
+          deslocamento.x = Math.max(-limiteX, Math.min(limiteX, Number(deslocamento.x || 0)));
+          deslocamento.y = Math.max(-limiteY, Math.min(limiteY, Number(deslocamento.y || 0)));
+          image.style.transform = `translate(calc(-50% + ${deslocamento.x}px), calc(-50% + ${deslocamento.y}px)) scale(${escala})`;
           image.style.transformOrigin = "center center";
         }
         cell.classList.toggle("is-selected-for-scale", index === imagemMosaicoSelecionada);
@@ -1321,11 +1337,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     picture.style.transformOrigin = "center center";
     sincronizarControleEscalaImagem();
   };
-  const vincularPincaElementoImagem = (element, selecionar, obterEscala, definirEscala, picture) => {
+  const vincularPincaElementoImagem = (element, selecionar, obterEscala, definirEscala, picture, options = {}) => {
     if (!element) return;
     const pointers = new Map();
     let distanciaInicial = 0;
     let escalaInicial = obterEscala();
+    let arrasteInicial = null;
     const distanciaEntrePontos = () => {
       const [first, second] = Array.from(pointers.values());
       return first && second ? Math.hypot(second.x - first.x, second.y - first.y) : 0;
@@ -1338,6 +1355,17 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     element.addEventListener("pointerdown", (event) => {
       selecionar();
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (pointers.size === 1 && options.obterDeslocamento) {
+        const deslocamento = options.obterDeslocamento();
+        arrasteInicial = {
+          pointerId: event.pointerId,
+          clientX: event.clientX,
+          clientY: event.clientY,
+          x: Number(deslocamento?.x || 0),
+          y: Number(deslocamento?.y || 0)
+        };
+        element.classList.add("is-dragging");
+      }
       try {
         element.setPointerCapture(event.pointerId);
       } catch (error) {
@@ -1348,6 +1376,22 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     element.addEventListener("pointermove", (event) => {
       if (!pointers.has(event.pointerId)) return;
       pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+      if (
+        pointers.size === 1
+        && arrasteInicial?.pointerId === event.pointerId
+        && options.definirDeslocamento
+      ) {
+        event.preventDefault();
+        const rect = element.getBoundingClientRect();
+        const fatorX = element.clientWidth / Math.max(1, rect.width);
+        const fatorY = element.clientHeight / Math.max(1, rect.height);
+        options.definirDeslocamento({
+          x: arrasteInicial.x + ((event.clientX - arrasteInicial.clientX) * fatorX),
+          y: arrasteInicial.y + ((event.clientY - arrasteInicial.clientY) * fatorY)
+        });
+        aplicarEscalaImagem(picture);
+        return;
+      }
       if (pointers.size < 2) return;
       event.preventDefault();
       const distanciaAtual = distanciaEntrePontos();
@@ -1359,6 +1403,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     const liberarPonteiro = (event) => {
       pointers.delete(event.pointerId);
       distanciaInicial = 0;
+      if (arrasteInicial?.pointerId === event.pointerId) arrasteInicial = null;
+      if (!pointers.size) element.classList.remove("is-dragging");
       if (pointers.size >= 2) iniciarPinca();
     };
     element.addEventListener("pointerup", liberarPonteiro);
@@ -1378,7 +1424,16 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           },
           () => escalasImagensMosaico[index] || 1,
           (value) => { escalasImagensMosaico[index] = value; },
-          picture
+          picture,
+          {
+            obterDeslocamento: () => deslocamentosImagensMosaico[index] || { x: 0, y: 0 },
+            definirDeslocamento: (value) => {
+              deslocamentosImagensMosaico[index] = {
+                x: Number(value?.x || 0),
+                y: Number(value?.y || 0)
+              };
+            }
+          }
         );
       });
       return;
@@ -1548,7 +1603,12 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   dialog.querySelectorAll("[data-business-format]").forEach((button) => {
     button.addEventListener("click", async () => {
       formato = button.dataset.businessFormat;
+      if (formato === "feed") {
+        imagemMosaicoSelecionada = Math.min(1, imagemMosaicoSelecionada);
+        slotMosaicoEscolha = Math.min(1, slotMosaicoEscolha);
+      }
       dialog.querySelectorAll("[data-business-format]").forEach((item) => item.classList.toggle("active", item === button));
+      atualizarSeletorMosaico();
       await render();
     });
   });
@@ -1587,6 +1647,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         dados.imagensMosaico[slotMosaicoEscolha] = preparada;
         fontesSelecionadasMosaico[slotMosaicoEscolha] = sourceIndex;
         escalasImagensMosaico[slotMosaicoEscolha] = 1;
+        deslocamentosImagensMosaico[slotMosaicoEscolha] = { x: 0, y: 0 };
         await render();
       } finally {
         button.disabled = false;
