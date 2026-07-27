@@ -4504,14 +4504,18 @@ document.addEventListener("DOMContentLoaded", function () {
       if (texto) valores.push(texto);
     };
     const tipo = normalizeName(item.destinoTipo || item.tipo || "");
+    const novidadeTema = item.novidadeTema || item.raw?.novidadeTema || "";
+    const isLogoUpdate = novidadeTema === "logoCliente" || tipo.includes("clientelogo");
     const isClientUpdate = tipo.includes("cliente")
       || ["nomeCliente", "dadosCliente", "logoCliente", "endereco", "telefone", "horario", "imagens", "cardapio", "redesSociais", "destaque", "categoria"]
-        .includes(item.novidadeTema || item.raw?.novidadeTema || "");
+        .includes(novidadeTema);
     if (isClientUpdate) {
-      const cadastro = encontrarCadastroDonoNovidade(item, item.estabelecimento || item.raw?.estabelecimento || "");
       adicionar(novidadeImagem(item));
       adicionar(item.imagens || item.images || item.fotos || item.Fotos);
-      adicionar(cadastro?.novidadesImages || cadastro?.divulgacaoImages || cadastro?.imagens || cadastro?.images);
+      if (!isLogoUpdate) {
+        const cadastro = encontrarCadastroDonoNovidade(item, item.estabelecimento || item.raw?.estabelecimento || "");
+        adicionar(cadastro?.novidadesImages || cadastro?.divulgacaoImages || cadastro?.imagens || cadastro?.images);
+      }
     } else {
       adicionar(item.imagens || item.images || item.fotos || item.Fotos);
       if (!temListaImagens) adicionar(novidadeImagem(item));

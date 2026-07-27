@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 500,
-  label: "v507",
-  data: "2026-07-26",
-  nota: "Breve descricao das fotos ampliada para 600 caracteres."
+  numero: 501,
+  label: "v508",
+  data: "2026-07-27",
+  nota: "Novidades de logo agora exibem exclusivamente a logo atualizada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4009,6 +4009,9 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
   ).trim();
   if (originalProfileImage !== profileImage) {
     add("logoCliente", "cliente-logo", "Logo do cliente atualizada");
+    const logoUpdate = updates[updates.length - 1];
+    logoUpdate.imagem = profileImage;
+    logoUpdate.imagens = profileImage ? [profileImage] : [];
   }
   if (String(original.endereco || "") !== String(effective.endereco || "")) {
     if (String(effective.endereco || "").trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
@@ -4322,8 +4325,10 @@ function renderClientImagesPreview() {
   box.querySelectorAll("[data-remove-image]").forEach((button) => {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.removeImage);
+      const removedImage = imageUrl(state.clientImages[index]);
+      const currentProfileImage = $("clientImage").value;
       state.clientImages.splice(index, 1);
-      if (!state.clientImages.some((item) => imageUrl(item) === $("clientImage").value)) {
+      if (removedImage && removedImage === currentProfileImage) {
         $("clientImage").value = imageUrl(state.clientImages[0]);
       }
       renderClientImagesPreview();
@@ -14964,10 +14969,15 @@ function renderClientOnlyEditor() {
   mount.querySelectorAll("[data-co-remove]").forEach((button) => {
     button.addEventListener("click", async () => {
       const index = Number(button.dataset.coRemove);
+      const removedImage = imageUrl(imagens[index]);
+      const currentProfileImage = $("coImage")?.value || "";
       imagens.splice(index, 1);
+      const nextProfileImage = removedImage && removedImage === currentProfileImage
+        ? imageUrl(imagens[0])
+        : currentProfileImage;
       await update(ref(db, `clientes/${client.id}`), {
         imagens,
-        imagem: imagens.some((item) => imageUrl(item) === $("coImage")?.value) ? $("coImage").value : imageUrl(imagens[0]),
+        imagem: nextProfileImage,
         updatedAt: serverTimestamp(),
         updatedBy: state.user.uid
       });
