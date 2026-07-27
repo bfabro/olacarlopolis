@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=353">
+  <link rel="stylesheet" href="painel.css?v=354">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1710,24 +1710,44 @@
           <div class="section-head story-generator-head">
             <div>
               <span class="story-kicker">Estudio de criacao</span>
-              <h2>Stories comerciais premium</h2>
-              <p>Crie uma arte vertical para divulgar um cliente e mostrar a força de anunciar no Ola Carlopolis.</p>
+              <h2>Artes comerciais premium</h2>
+              <p>Monte Stories e posts para o Feed com fotos reais dos clientes e mensagens que valorizam quem participa do Ola Carlopolis.</p>
             </div>
-            <span class="story-size-badge"><i class="fa-brands fa-instagram"></i> 1080 x 1920</span>
+            <span id="storySizeBadge" class="story-size-badge"><i class="fa-brands fa-instagram"></i> Story 1080 x 1920</span>
           </div>
 
           <div class="story-generator-layout">
             <div class="story-controls">
               <section class="story-control-card">
-                <div class="story-step"><span>1</span><div><strong>Escolha o cliente</strong><small>Dados e imagens do cadastro serao carregados.</small></div></div>
+                <div class="story-step"><span>1</span><div><strong>Formato e cliente</strong><small>Escolha onde publicar e carregue o acervo do cliente.</small></div></div>
+                <div class="story-segmented" aria-label="Formato da arte">
+                  <button type="button" class="active" data-story-format="story"><i class="fa-regular fa-rectangle-list"></i><strong>Story</strong><small>1080 x 1920</small></button>
+                  <button type="button" data-story-format="feed"><i class="fa-regular fa-square"></i><strong>Feed</strong><small>1080 x 1350</small></button>
+                </div>
                 <label>Cliente<select id="storyClient"></select></label>
-                <label>Imagem do cadastro<select id="storyClientImage"></select></label>
-                <label class="story-upload-button"><i class="fa-solid fa-cloud-arrow-up"></i> Usar outra imagem nesta arte<input id="storyCustomImage" type="file" accept="image/*"></label>
+              </section>
+
+              <section class="story-control-card">
+                <div class="story-step"><span>2</span><div><strong>Composicao e imagens</strong><small>No mosaico, escolha e enquadre cada foto separadamente.</small></div></div>
+                <div class="story-segmented story-composition-options" aria-label="Composicao da arte">
+                  <button type="button" data-story-composition="spotlight"><i class="fa-regular fa-image"></i><strong>Destaque</strong><small>Uma foto principal</small></button>
+                  <button type="button" class="active" data-story-composition="mosaic"><i class="fa-solid fa-table-cells-large"></i><strong>Mosaico</strong><small>Quatro fotos</small></button>
+                </div>
+                <div id="storyImageSlots" class="story-image-slots"></div>
+                <div class="story-image-adjust">
+                  <div class="story-adjust-head">
+                    <strong id="storySelectedSlotLabel">Enquadramento da imagem 1</strong>
+                    <button id="storyResetImagePosition" type="button" class="ghost-button">Centralizar</button>
+                  </div>
+                  <label>Zoom <span id="storyImageScaleValue">100%</span><input id="storyImageScale" type="range" min="100" max="240" step="1" value="100"></label>
+                  <p><i class="fa-solid fa-hand-pointer"></i> Arraste a foto diretamente na previa para reposicionar.</p>
+                </div>
+                <label class="story-upload-button"><i class="fa-solid fa-cloud-arrow-up"></i> Usar outra imagem na area selecionada<input id="storyCustomImage" type="file" accept="image/*"></label>
                 <span id="storyCustomImageName" class="story-file-name">Nenhuma imagem personalizada.</span>
               </section>
 
               <section class="story-control-card">
-                <div class="story-step"><span>2</span><div><strong>Escolha um modelo premium</strong><small>Sete composicoes criadas para transmitir sentimentos diferentes.</small></div></div>
+                <div class="story-step"><span>3</span><div><strong>Escolha o visual</strong><small>Sete estilos para transmitir sentimentos diferentes.</small></div></div>
                 <div id="storyTemplateGrid" class="story-template-grid">
                   <button type="button" class="story-template-option active" data-story-template="vitrine"><span class="story-template-thumb template-vitrine"></span><strong>Vitrine</strong><small>Vibrante</small></button>
                   <button type="button" class="story-template-option" data-story-template="humor"><span class="story-template-thumb template-humor"></span><strong>Humor</strong><small>Leve e divertido</small></button>
@@ -1740,7 +1760,17 @@
               </section>
 
               <section class="story-control-card">
-                <div class="story-step"><span>3</span><div><strong>Ajuste a mensagem</strong><small>Personalize o texto antes de baixar.</small></div></div>
+                <div class="story-step"><span>4</span><div><strong>Mensagem que inspira</strong><small>Use uma frase pronta ou escreva livremente.</small></div></div>
+                <label>Frase de efeito
+                  <select id="storyPhrasePreset">
+                    <option value="">Preenchimento manual</option>
+                    <option value="descubra">Descubra o comercio local</option>
+                    <option value="fortalece">Quem compra aqui fortalece a cidade</option>
+                    <option value="presenca">Sua empresa tambem pode estar aqui</option>
+                    <option value="perto">Boas escolhas estao mais perto</option>
+                    <option value="participar">Faca parte do Ola Carlopolis</option>
+                  </select>
+                </label>
                 <label>Chamada principal<textarea id="storyHeadline" rows="3" maxlength="90">Sua marca merece ser vista por toda Carlópolis.</textarea></label>
                 <label>Mensagem de apoio<textarea id="storyMessage" rows="3" maxlength="150">Comercio local forte e aquele que esta perto das pessoas, todos os dias.</textarea></label>
                 <div class="story-inline-fields">
@@ -1753,16 +1783,16 @@
 
               <div class="story-actions">
                 <button id="storyRefreshPreview" type="button" class="ghost-button"><i class="fa-solid fa-rotate"></i> Atualizar previa</button>
-                <button id="storyDownload" type="button"><i class="fa-solid fa-download"></i> Baixar story em PNG</button>
+                <button id="storyDownload" type="button"><i class="fa-solid fa-download"></i> Baixar Story em PNG</button>
               </div>
             </div>
 
             <aside class="story-preview-panel">
               <div class="story-preview-toolbar">
-                <div><strong>Previa do story</strong><span id="storyPreviewModel">Modelo Vitrine</span></div>
+                <div><strong id="storyPreviewTitle">Previa do Story</strong><span id="storyPreviewModel">Mosaico • Modelo Vitrine</span></div>
                 <span class="story-live-dot">PREVIA</span>
               </div>
-              <div class="story-phone-frame"><canvas id="storyCanvas" width="1080" height="1920" aria-label="Previa do story comercial"></canvas></div>
+              <div id="storyCanvasFrame" class="story-phone-frame"><canvas id="storyCanvas" width="1080" height="1920" aria-label="Previa da arte comercial"></canvas></div>
               <p class="story-preview-note"><i class="fa-solid fa-circle-info"></i> A imagem final e exportada em alta resolucao, pronta para publicar.</p>
             </aside>
           </div>
@@ -1854,6 +1884,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=436"></script>
+  <script type="module" src="painel.js?v=437"></script>
 </body>
 </html>

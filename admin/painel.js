@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 501,
-  label: "v508",
+  numero: 502,
+  label: "v509",
   data: "2026-07-27",
-  nota: "Novidades de logo agora exibem exclusivamente a logo atualizada."
+  nota: "Stories comerciais agora geram Story e Feed com mosaicos editaveis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -157,6 +157,12 @@ let state = {
   selectedAutomovelArtIds: new Set(),
   selectedAutomovelArtLayout: "showroom",
   selectedStoryTemplate: "vitrine",
+  selectedStoryFormat: "story",
+  selectedStoryComposition: "mosaic",
+  selectedStoryImageSlot: 0,
+  storyImageSlots: [],
+  storyImageTransforms: [],
+  storyCanvasSlots: [],
   storyCustomImage: "",
   pendingClientModuleTarget: "",
   selectedPromoClientId: "",
@@ -12553,6 +12559,8 @@ const STORY_TEMPLATE_NAMES = {
 
 let storyPreviewRequest = 0;
 let storyPreviewTimer = null;
+let storyCanvasDragState = null;
+let storyCanvasDragFrame = null;
 
 function scheduleStoryPreview() {
   window.clearTimeout(storyPreviewTimer);
@@ -12563,26 +12571,177 @@ function storyCurrentClient() {
   return state.clientes.find((client) => client.id === $("storyClient")?.value) || state.clientes[0] || null;
 }
 
+function storyItemBelongsToClient(item = {}, client = {}) {
+  const owners = [
+    item.clienteId,
+    item.clientId,
+    item.estabelecimentoId,
+    item.clienteNome,
+    item.vendedor,
+    item.loja,
+    item.corretor,
+    item.proprietario
+  ].map((value) => normalizeName(value || "")).filter(Boolean);
+  const clientKeys = [client.id, client.nome, client.name, client.nomeNormalizado]
+    .map((value) => normalizeName(value || ""))
+    .filter(Boolean);
+  return clientKeys.some((key) => owners.some((owner) => owner === key || owner.includes(key) || key.includes(owner)));
+}
+
 function storyClientImages(client = {}) {
-  const items = normalizeImageItems(client.imagens);
+  const gallery = normalizeImageItems(client.imagens).map((item) => item.url);
+  const products = normalizeProdutos(client.produtos).flatMap((item) => item.imagens || []);
+  const promotions = normalizePromocoes(client.promocoes).map((item) => item.imagem);
+  const relatedVehicles = state.automoveis
+    .filter((item) => storyItemBelongsToClient(item, client))
+    .flatMap((item) => automovelImagensCandidatasAdmin(item));
+  const relatedProperties = state.imoveis
+    .filter((item) => storyItemBelongsToClient(item, client))
+    .flatMap((item) => imovelImagensCandidatasAdmin(item));
   const urls = [
-    ...items.map((item) => item.url),
     client.imagem,
     client.logo,
-    client.logoUrl
+    client.logoUrl,
+    ...gallery,
+    ...products,
+    ...promotions,
+    ...(Array.isArray(client.menuImages) ? client.menuImages : []),
+    ...relatedVehicles,
+    ...relatedProperties
   ].map(normalizarImagemArteAdmin).filter(Boolean);
   return [...new Set(urls)];
 }
 
+function storySlotCount() {
+  return state.selectedStoryComposition === "mosaic" ? 4 : 1;
+}
+
+function storyDefaultImageTransform() {
+  return { scale: 1, x: 0, y: 0 };
+}
+
 function fillStoryClientImages(client, preserveValue = true) {
-  const select = $("storyClientImage");
-  if (!select) return;
-  const previous = preserveValue ? select.value : "";
   const images = storyClientImages(client);
-  select.innerHTML = images.length
-    ? images.map((url, index) => `<option value="${escapeAttr(url)}">Imagem ${index + 1}${index === 0 ? " - principal" : ""}</option>`).join("")
-    : `<option value="">Usar logo do Ola Carlopolis</option>`;
-  if (previous && images.includes(previous)) select.value = previous;
+  const count = storySlotCount();
+  const previous = preserveValue ? [...state.storyImageSlots] : [];
+  state.storyImageSlots = Array.from({ length: count }, (_, index) => {
+    const current = previous[index];
+    if (current && (images.includes(current) || /^(data:|blob:)/i.test(current))) return current;
+    return images[index % Math.max(1, images.length)] || "";
+  });
+  state.storyImageTransforms = Array.from({ length: count }, (_, index) => (
+    preserveValue && state.storyImageTransforms[index]
+      ? { ...storyDefaultImageTransform(), ...state.storyImageTransforms[index] }
+      : storyDefaultImageTransform()
+  ));
+  state.selectedStoryImageSlot = Math.min(state.selectedStoryImageSlot || 0, count - 1);
+  renderStoryImageSlots(client);
+}
+
+function renderStoryImageSlots(client = storyCurrentClient()) {
+  const mount = $("storyImageSlots");
+  if (!mount) return;
+  const images = storyClientImages(client || {});
+  mount.innerHTML = state.storyImageSlots.map((selected, index) => {
+    const customOption = selected && !images.includes(selected)
+      ? `<option value="${escapeAttr(selected)}" selected>Imagem personalizada</option>`
+      : "";
+    return `
+      <article class="story-image-slot ${index === state.selectedStoryImageSlot ? "active" : ""}" data-story-slot-card="${index}">
+        <button type="button" data-story-select-slot="${index}" aria-label="Selecionar imagem ${index + 1}">
+          <span>${index + 1}</span>
+          <img src="${escapeAttr(displayImageUrl(selected) || "../images/img_padrao_site/logo_1.png")}" alt="Imagem ${index + 1}">
+        </button>
+        <label>Area ${index + 1}
+          <select data-story-slot="${index}">
+            ${customOption}
+            ${images.length
+              ? images.map((url, imageIndex) => `<option value="${escapeAttr(url)}" ${url === selected ? "selected" : ""}>${imageIndex === 0 ? "Logo / perfil" : `Imagem ${imageIndex + 1}`}</option>`).join("")
+              : `<option value="">Sem imagens cadastradas</option>`}
+          </select>
+        </label>
+      </article>
+    `;
+  }).join("");
+
+  mount.querySelectorAll("[data-story-select-slot]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedStoryImageSlot = Number(button.dataset.storySelectSlot) || 0;
+      renderStoryImageSlots(client);
+      syncStoryImageAdjustmentControls();
+      atualizarPreviaStory();
+    });
+  });
+  mount.querySelectorAll("[data-story-slot]").forEach((select) => {
+    select.addEventListener("change", () => {
+      const index = Number(select.dataset.storySlot) || 0;
+      state.storyImageSlots[index] = select.value;
+      state.storyImageTransforms[index] = storyDefaultImageTransform();
+      state.selectedStoryImageSlot = index;
+      renderStoryImageSlots(client);
+      syncStoryImageAdjustmentControls();
+      atualizarPreviaStory();
+    });
+  });
+  syncStoryImageAdjustmentControls();
+}
+
+function syncStoryImageAdjustmentControls() {
+  const index = Math.min(state.selectedStoryImageSlot || 0, Math.max(0, storySlotCount() - 1));
+  const transform = state.storyImageTransforms[index] || storyDefaultImageTransform();
+  if ($("storySelectedSlotLabel")) $("storySelectedSlotLabel").textContent = `Enquadramento da imagem ${index + 1}`;
+  if ($("storyImageScale")) $("storyImageScale").value = String(Math.round((transform.scale || 1) * 100));
+  if ($("storyImageScaleValue")) $("storyImageScaleValue").textContent = `${Math.round((transform.scale || 1) * 100)}%`;
+}
+
+function storyCanvasPointerPoint(event) {
+  const canvas = $("storyCanvas");
+  if (!canvas) return { x: 0, y: 0 };
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * canvas.width / Math.max(1, rect.width),
+    y: (event.clientY - rect.top) * canvas.height / Math.max(1, rect.height)
+  };
+}
+
+function startStoryCanvasDrag(event) {
+  const point = storyCanvasPointerPoint(event);
+  const index = state.storyCanvasSlots.findIndex((rect) => (
+    point.x >= rect.x && point.x <= rect.x + rect.w && point.y >= rect.y && point.y <= rect.y + rect.h
+  ));
+  if (index < 0) return;
+  event.preventDefault();
+  state.selectedStoryImageSlot = index;
+  storyCanvasDragState = { pointerId: event.pointerId, point };
+  $("storyCanvas")?.setPointerCapture?.(event.pointerId);
+  renderStoryImageSlots();
+  syncStoryImageAdjustmentControls();
+  atualizarPreviaStory();
+}
+
+function moveStoryCanvasDrag(event) {
+  if (!storyCanvasDragState || event.pointerId !== storyCanvasDragState.pointerId) return;
+  event.preventDefault();
+  const point = storyCanvasPointerPoint(event);
+  const index = state.selectedStoryImageSlot;
+  const transform = state.storyImageTransforms[index] || storyDefaultImageTransform();
+  transform.x = (Number(transform.x) || 0) + point.x - storyCanvasDragState.point.x;
+  transform.y = (Number(transform.y) || 0) + point.y - storyCanvasDragState.point.y;
+  state.storyImageTransforms[index] = transform;
+  storyCanvasDragState.point = point;
+  if (!storyCanvasDragFrame) {
+    storyCanvasDragFrame = window.requestAnimationFrame(() => {
+      storyCanvasDragFrame = null;
+      atualizarPreviaStory();
+    });
+  }
+}
+
+function endStoryCanvasDrag(event) {
+  if (!storyCanvasDragState || (event?.pointerId !== undefined && event.pointerId !== storyCanvasDragState.pointerId)) return;
+  $("storyCanvas")?.releasePointerCapture?.(storyCanvasDragState.pointerId);
+  storyCanvasDragState = null;
+  atualizarPreviaStory();
 }
 
 function renderStoriesComerciaisView() {
@@ -12594,6 +12753,7 @@ function renderStoriesComerciaisView() {
     : `<option value="">Nenhum cliente cadastrado</option>`;
   if (previous && clients.some((client) => client.id === previous)) $("storyClient").value = previous;
   fillStoryClientImages(storyCurrentClient());
+  updateStoryEditorFormat();
   atualizarPreviaStory();
 }
 
@@ -12867,20 +13027,189 @@ function desenharStoryExclusivo(ctx, data) {
   storyDrawProspectFooter(ctx, showProspect, true);
 }
 
-async function atualizarPreviaStory() {
+const STORY_TEMPLATE_PALETTES = {
+  vitrine: { bg: "#5b21b6", panel: "#ffffff", ink: "#22103f", soft: "#6b5b7d", accent: "#ffca28", photo: "#f8f4ff" },
+  humor: { bg: "#24d4c4", panel: "#ffffff", ink: "#123047", soft: "#375f72", accent: "#ffe04b", photo: "#ecfeff" },
+  seriedade: { bg: "#081b33", panel: "#d7e2ef", ink: "#081b33", soft: "#3d536b", accent: "#3b82a0", photo: "#d7e2ef" },
+  alegria: { bg: "#ef4e7b", panel: "#fff6dc", ink: "#6c2745", soft: "#8e536d", accent: "#ffcf4a", photo: "#fff4c7" },
+  marketing: { bg: "#101828", panel: "#eaf0ff", ink: "#101828", soft: "#3b4a67", accent: "#64e572", photo: "#dce6ff" },
+  acolhimento: { bg: "#9b4f3f", panel: "#f4eadc", ink: "#5a3028", soft: "#795b50", accent: "#f4b942", photo: "#f8efe4" },
+  exclusivo: { bg: "#090909", panel: "#252018", ink: "#f4ead2", soft: "#c3b89f", accent: "#c9a24f", photo: "#18140e" }
+};
+
+const STORY_PHRASE_PRESETS = {
+  descubra: {
+    headline: "Descubra o que Carlópolis tem de melhor.",
+    message: "Conheça empresas locais, encontre boas escolhas e valorize quem faz parte da nossa cidade.",
+    cta: "Conheça este cliente"
+  },
+  fortalece: {
+    headline: "Quem compra aqui fortalece toda a cidade.",
+    message: "Apoiar o comércio local gera oportunidades e mantém Carlópolis em movimento.",
+    cta: "Valorize o comércio local"
+  },
+  presenca: {
+    headline: "Sua empresa também pode aparecer aqui.",
+    message: "Ganhe presença, seja encontrada e faça parte da vitrine digital de Carlópolis.",
+    cta: "Quero participar"
+  },
+  perto: {
+    headline: "Boas escolhas estão mais perto do que você imagina.",
+    message: "Encontre produtos, serviços e oportunidades de quem trabalha por Carlópolis.",
+    cta: "Descubra agora"
+  },
+  participar: {
+    headline: "Faça parte do Olá Carlópolis.",
+    message: "Mostre sua empresa para quem vive, compra e procura soluções na nossa cidade.",
+    cta: "Minha empresa no site"
+  }
+};
+
+function storyCanvasDimensions() {
+  return state.selectedStoryFormat === "feed"
+    ? { width: 1080, height: 1350, label: "Feed", dimensions: "1080 x 1350" }
+    : { width: 1080, height: 1920, label: "Story", dimensions: "1080 x 1920" };
+}
+
+function updateStoryEditorFormat() {
+  const canvas = $("storyCanvas");
+  const format = storyCanvasDimensions();
+  if (canvas && (canvas.width !== format.width || canvas.height !== format.height)) {
+    canvas.width = format.width;
+    canvas.height = format.height;
+  }
+  $("storyCanvasFrame")?.classList.toggle("is-feed", state.selectedStoryFormat === "feed");
+  document.querySelectorAll("[data-story-format]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.storyFormat === state.selectedStoryFormat);
+  });
+  document.querySelectorAll("[data-story-composition]").forEach((button) => {
+    button.classList.toggle("active", button.dataset.storyComposition === state.selectedStoryComposition);
+  });
+  if ($("storySizeBadge")) {
+    $("storySizeBadge").innerHTML = `<i class="fa-brands fa-instagram"></i> ${format.label} ${format.dimensions}`;
+  }
+  if ($("storyPreviewTitle")) $("storyPreviewTitle").textContent = `Previa do ${format.label}`;
+  if ($("storyDownload")) $("storyDownload").innerHTML = `<i class="fa-solid fa-download"></i> Baixar ${format.label} em PNG`;
+}
+
+function storyMosaicRects(width, height) {
+  const isFeed = height < 1600;
+  const gap = 18;
+  const side = 48;
+  const top = isFeed ? 205 : 245;
+  const mediaHeight = isFeed ? 690 : 955;
+  const cellW = (width - side * 2 - gap) / 2;
+  const cellH = (mediaHeight - gap) / 2;
+  return [
+    { x: side, y: top, w: cellW, h: cellH },
+    { x: side + cellW + gap, y: top, w: cellW, h: cellH },
+    { x: side, y: top + cellH + gap, w: cellW, h: cellH },
+    { x: side + cellW + gap, y: top + cellH + gap, w: cellW, h: cellH }
+  ];
+}
+
+function storySpotlightRect(width, height) {
+  return height < 1600
+    ? { x: 48, y: 205, w: width - 96, h: 690 }
+    : { x: 48, y: 245, w: width - 96, h: 955 };
+}
+
+function storyDrawPositionedImage(ctx, img, rect, transform = {}, fill = "#e2e8f0", radius = 28) {
+  const { x, y, w, h } = rect;
+  preencherRoundRect(ctx, x, y, w, h, radius, fill);
+  if (!img) {
+    ctx.fillStyle = "#64748b";
+    ctx.textAlign = "center";
+    ctx.font = "800 24px Arial";
+    ctx.fillText("Selecione uma imagem", x + w / 2, y + h / 2);
+    return;
+  }
+  const zoom = Math.max(1, Number(transform.scale) || 1);
+  const scale = Math.max(w / img.width, h / img.height) * zoom;
+  const drawW = img.width * scale;
+  const drawH = img.height * scale;
+  const limitX = Math.max(0, (drawW - w) / 2);
+  const limitY = Math.max(0, (drawH - h) / 2);
+  const offsetX = clampNumero(transform.x || 0, -limitX, limitX);
+  const offsetY = clampNumero(transform.y || 0, -limitY, limitY);
+  ctx.save();
+  canvasRoundRect(ctx, x, y, w, h, radius);
+  ctx.clip();
+  ctx.drawImage(img, x + (w - drawW) / 2 + offsetX, y + (h - drawH) / 2 + offsetY, drawW, drawH);
+  ctx.restore();
+}
+
+function storyDrawCommercialArt(ctx, data, showSelection = true) {
+  const { client, logo, photos, headline, message, cta, accent, showContact, showProspect } = data;
+  const { width, height } = ctx.canvas;
+  const isFeed = height < 1600;
+  const template = state.selectedStoryTemplate || "vitrine";
+  const palette = STORY_TEMPLATE_PALETTES[template] || STORY_TEMPLATE_PALETTES.vitrine;
+  const highlight = accent || palette.accent;
+  const background = ctx.createLinearGradient(0, 0, width, height);
+  background.addColorStop(0, palette.bg);
+  background.addColorStop(1, template === "exclusivo" ? "#252018" : "#172033");
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.fillStyle = highlight;
+  ctx.fillRect(0, 0, width, 16);
+  storyDrawLogo(ctx, logo, client, 50, 48, isFeed ? 105 : 125, "#ffffff");
+  storyDrawText(ctx, client.nome || "Cliente", isFeed ? 185 : 205, isFeed ? 83 : 92, 700, 2, "#ffffff", isFeed ? 34 : 39);
+  ctx.fillStyle = highlight;
+  ctx.textAlign = "right";
+  ctx.font = `900 ${isFeed ? 18 : 21}px Arial`;
+  ctx.fillText("CLIENTE EM DESTAQUE", width - 50, isFeed ? 101 : 112);
+
+  const rects = state.selectedStoryComposition === "mosaic"
+    ? storyMosaicRects(width, height)
+    : [storySpotlightRect(width, height)];
+  state.storyCanvasSlots = rects.map((rect) => ({ ...rect }));
+  rects.forEach((rect, index) => {
+    storyDrawPositionedImage(ctx, photos[index], rect, state.storyImageTransforms[index], palette.photo, state.selectedStoryComposition === "mosaic" ? 24 : 34);
+    desenharBordaRoundRect(ctx, rect.x, rect.y, rect.w, rect.h, state.selectedStoryComposition === "mosaic" ? 24 : 34, "rgba(255,255,255,.8)", 4);
+    if (showSelection && index === state.selectedStoryImageSlot) {
+      desenharBordaRoundRect(ctx, rect.x + 5, rect.y + 5, rect.w - 10, rect.h - 10, 20, highlight, 8);
+      preencherRoundRect(ctx, rect.x + 17, rect.y + 17, 52, 52, 18, highlight);
+      ctx.fillStyle = "#111827";
+      ctx.textAlign = "center";
+      ctx.font = "900 24px Arial";
+      ctx.fillText(String(index + 1), rect.x + 43, rect.y + 51);
+    }
+  });
+
+  const panelY = isFeed ? 925 : 1240;
+  const panelH = height - panelY - 48;
+  preencherRoundRect(ctx, 48, panelY, width - 96, panelH, 36, palette.panel);
+  const ink = palette.ink;
+  storyDrawText(ctx, headline, 92, panelY + (isFeed ? 65 : 80), width - 184, isFeed ? 2 : 3, ink, isFeed ? 44 : 60);
+  storyDrawText(ctx, message, 92, panelY + (isFeed ? 170 : 275), width - 184, isFeed ? 2 : 3, palette.soft, isFeed ? 23 : 29, "left", 700);
+  preencherRoundRect(ctx, 92, panelY + panelH - (isFeed ? 104 : 142), isFeed ? 390 : 430, isFeed ? 66 : 78, 36, highlight);
+  storyDrawText(ctx, cta, 92 + (isFeed ? 195 : 215), panelY + panelH - (isFeed ? 82 : 116), isFeed ? 350 : 390, 1, "#111827", isFeed ? 22 : 25, "center");
+  storyDrawContact(ctx, client, showContact, width - 92, panelY + panelH - (isFeed ? 62 : 84), 430, ink, "right");
+
+  if (showProspect) {
+    ctx.fillStyle = ink;
+    ctx.textAlign = "right";
+    ctx.font = `900 ${isFeed ? 16 : 19}px Arial`;
+    ctx.fillText("Sua empresa também pode estar aqui • olacarlopolis.com", width - 92, panelY + panelH - 24);
+  }
+}
+
+async function atualizarPreviaStory(showSelection = true) {
   const canvas = $("storyCanvas");
   const client = storyCurrentClient();
   if (!canvas || !client) return;
   const requestId = ++storyPreviewRequest;
   const ctx = canvas.getContext("2d");
-  const selectedImage = state.storyCustomImage || $("storyClientImage")?.value || storyClientImages(client)[0] || "";
-  const [photo, logo] = await Promise.all([
-    carregarImagemCanvas(selectedImage),
+  const selectedUrls = state.storyImageSlots.slice(0, storySlotCount());
+  const [photos, logo] = await Promise.all([
+    Promise.all(selectedUrls.map((url) => carregarImagemCanvas(url))),
     carregarImagemCanvas(logoClienteImovelAdmin(client))
   ]);
   if (requestId !== storyPreviewRequest) return;
   const data = {
-    photo,
+    photos,
     logo,
     client,
     headline: $("storyHeadline")?.value.trim() || "Sua marca merece ser vista.",
@@ -12890,19 +13219,11 @@ async function atualizarPreviaStory() {
     showContact: $("storyShowContact")?.checked !== false,
     showProspect: $("storyShowProspect")?.checked !== false
   };
-  const template = state.selectedStoryTemplate || "vitrine";
-  const drawers = {
-    vitrine: desenharStoryVitrine,
-    humor: desenharStoryHumor,
-    seriedade: desenharStorySeriedade,
-    alegria: desenharStoryAlegria,
-    marketing: desenharStoryMarketing,
-    acolhimento: desenharStoryAcolhimento,
-    exclusivo: desenharStoryExclusivo
-  };
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  (drawers[template] || drawers.vitrine)(ctx, data);
-  if ($("storyPreviewModel")) $("storyPreviewModel").textContent = `Modelo ${STORY_TEMPLATE_NAMES[template] || "Vitrine"}`;
+  storyDrawCommercialArt(ctx, data, showSelection);
+  const composition = state.selectedStoryComposition === "mosaic" ? "Mosaico" : "Destaque";
+  const template = state.selectedStoryTemplate || "vitrine";
+  if ($("storyPreviewModel")) $("storyPreviewModel").textContent = `${composition} • Modelo ${STORY_TEMPLATE_NAMES[template] || "Vitrine"}`;
 }
 
 async function baixarStoryComercial() {
@@ -12911,13 +13232,20 @@ async function baixarStoryComercial() {
   const button = $("storyDownload");
   if (button) button.disabled = true;
   try {
-    await atualizarPreviaStory();
+    window.clearTimeout(storyPreviewTimer);
+    if (storyCanvasDragFrame) {
+      window.cancelAnimationFrame(storyCanvasDragFrame);
+      storyCanvasDragFrame = null;
+    }
+    await atualizarPreviaStory(false);
     const blob = await canvasParaBlob($("storyCanvas"));
-    baixarBlobCanvas(blob, `story-${slugify(client.nome || client.id)}-${state.selectedStoryTemplate}.png`);
-    showToast("Story comercial gerado em alta resolucao.");
+    const format = state.selectedStoryFormat === "feed" ? "feed" : "story";
+    baixarBlobCanvas(blob, `${format}-${slugify(client.nome || client.id)}-${state.selectedStoryComposition}-${state.selectedStoryTemplate}.png`);
+    showToast(`${format === "feed" ? "Post para Feed" : "Story"} gerado em alta resolucao.`);
+    atualizarPreviaStory(true);
   } catch (error) {
-    console.error("Falha ao gerar story comercial.", error);
-    showToast("Nao foi possivel gerar o story.");
+    console.error("Falha ao gerar arte comercial.", error);
+    showToast("Nao foi possivel gerar a arte.");
   } finally {
     if (button) button.disabled = false;
   }
@@ -16494,16 +16822,30 @@ function bindEvents() {
   });
   $("storyClient")?.addEventListener("change", () => {
     state.storyCustomImage = "";
+    state.storyImageSlots = [];
+    state.storyImageTransforms = [];
+    state.selectedStoryImageSlot = 0;
     if ($("storyCustomImage")) $("storyCustomImage").value = "";
     if ($("storyCustomImageName")) $("storyCustomImageName").textContent = "Nenhuma imagem personalizada.";
     fillStoryClientImages(storyCurrentClient(), false);
     atualizarPreviaStory();
   });
-  $("storyClientImage")?.addEventListener("change", () => {
-    state.storyCustomImage = "";
-    if ($("storyCustomImage")) $("storyCustomImage").value = "";
-    if ($("storyCustomImageName")) $("storyCustomImageName").textContent = "Nenhuma imagem personalizada.";
-    atualizarPreviaStory();
+  document.querySelectorAll("[data-story-format]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedStoryFormat = button.dataset.storyFormat === "feed" ? "feed" : "story";
+      updateStoryEditorFormat();
+      fillStoryClientImages(storyCurrentClient(), true);
+      atualizarPreviaStory();
+    });
+  });
+  document.querySelectorAll("[data-story-composition]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedStoryComposition = button.dataset.storyComposition === "spotlight" ? "spotlight" : "mosaic";
+      state.selectedStoryImageSlot = 0;
+      updateStoryEditorFormat();
+      fillStoryClientImages(storyCurrentClient(), true);
+      atualizarPreviaStory();
+    });
   });
   $("storyCustomImage")?.addEventListener("change", (event) => {
     const file = event.target.files?.[0];
@@ -16511,7 +16853,11 @@ function bindEvents() {
     const reader = new FileReader();
     reader.onload = () => {
       state.storyCustomImage = String(reader.result || "");
+      const index = state.selectedStoryImageSlot || 0;
+      state.storyImageSlots[index] = state.storyCustomImage;
+      state.storyImageTransforms[index] = storyDefaultImageTransform();
       if ($("storyCustomImageName")) $("storyCustomImageName").textContent = file.name;
+      renderStoryImageSlots();
       atualizarPreviaStory();
     };
     reader.readAsDataURL(file);
@@ -16523,6 +16869,31 @@ function bindEvents() {
       atualizarPreviaStory();
     });
   });
+  $("storyPhrasePreset")?.addEventListener("change", () => {
+    const preset = STORY_PHRASE_PRESETS[$("storyPhrasePreset")?.value];
+    if (!preset) return;
+    if ($("storyHeadline")) $("storyHeadline").value = preset.headline;
+    if ($("storyMessage")) $("storyMessage").value = preset.message;
+    if ($("storyCta")) $("storyCta").value = preset.cta;
+    atualizarPreviaStory();
+  });
+  $("storyImageScale")?.addEventListener("input", () => {
+    const index = state.selectedStoryImageSlot || 0;
+    const transform = state.storyImageTransforms[index] || storyDefaultImageTransform();
+    transform.scale = clampNumero(Number($("storyImageScale").value) / 100, 1, 2.4);
+    state.storyImageTransforms[index] = transform;
+    syncStoryImageAdjustmentControls();
+    scheduleStoryPreview();
+  });
+  $("storyResetImagePosition")?.addEventListener("click", () => {
+    state.storyImageTransforms[state.selectedStoryImageSlot || 0] = storyDefaultImageTransform();
+    syncStoryImageAdjustmentControls();
+    atualizarPreviaStory();
+  });
+  $("storyCanvas")?.addEventListener("pointerdown", startStoryCanvasDrag);
+  $("storyCanvas")?.addEventListener("pointermove", moveStoryCanvasDrag);
+  $("storyCanvas")?.addEventListener("pointerup", endStoryCanvasDrag);
+  $("storyCanvas")?.addEventListener("pointercancel", endStoryCanvasDrag);
   ["storyHeadline", "storyMessage", "storyCta", "storyAccent", "storyShowContact", "storyShowProspect"].forEach((id) => {
     $(id)?.addEventListener("input", scheduleStoryPreview);
     $(id)?.addEventListener("change", scheduleStoryPreview);
