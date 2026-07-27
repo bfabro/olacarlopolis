@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 499,
-  label: "v506",
+  numero: 500,
+  label: "v507",
   data: "2026-07-26",
-  nota: "Novidades de informacoes agora permanecem separadas por cliente e usam o texto Informacoes Atualizadas."
+  nota: "Breve descricao das fotos ampliada para 600 caracteres."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4287,7 +4287,7 @@ function renderClientImagesPreview() {
         <input data-image-title="${index}" maxlength="80" placeholder="Ex.: Ambiente interno" value="${escapeAttr(item.titulo || "")}">
       </label>
       <label class="image-caption-label">Breve descrição
-        <textarea data-image-text="${index}" rows="3" maxlength="300" placeholder="Texto opcional que aparece junto da imagem no site">${escapeHtml(item.texto || "")}</textarea>
+        <textarea data-image-text="${index}" rows="4" maxlength="600" placeholder="Texto opcional que aparece junto da imagem no site">${escapeHtml(item.texto || "")}</textarea>
       </label>
       <div>
         <button type="button" data-main-image="${index}">Usar como foto de perfil</button>
@@ -14188,7 +14188,7 @@ function renderClientOnlyEditor() {
               <input id="coImageTitle" maxlength="80" placeholder="Ex.: Ambiente interno">
             </label>
             <label>Breve descrição
-              <textarea id="coImageText" rows="3" maxlength="300" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
+              <textarea id="coImageText" rows="4" maxlength="600" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
             </label>
             <button id="coAddImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem</button>
           </div>
@@ -15223,7 +15223,7 @@ function renderImagesMarkup(images, prefix) {
         <input data-${prefix}-title="${index}" maxlength="80" placeholder="Ex.: Ambiente interno" value="${escapeAttr(item.titulo || "")}">
       </label>
       <label class="image-caption-label">Breve descrição
-        <textarea data-${prefix}-text="${index}" rows="3" maxlength="300" placeholder="Texto opcional que aparece junto da imagem no site">${escapeHtml(item.texto || "")}</textarea>
+        <textarea data-${prefix}-text="${index}" rows="4" maxlength="600" placeholder="Texto opcional que aparece junto da imagem no site">${escapeHtml(item.texto || "")}</textarea>
       </label>
       <div>
         <button type="button" data-${prefix}-main="${index}">Usar como foto de perfil</button>

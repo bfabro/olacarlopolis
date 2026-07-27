@@ -21406,7 +21406,7 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   color: #64748b;
   font-size: .78rem;
   line-height: 1.25;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 
