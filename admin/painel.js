@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 502,
-  label: "v509",
+  numero: 503,
+  label: "v510",
   data: "2026-07-27",
-  nota: "Stories comerciais agora geram Story e Feed com mosaicos editaveis."
+  nota: "Relatorio de acessos consolida menu, Onde Comer e Promocoes em tempo atualizado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3528,7 +3528,10 @@ function switchView(name) {
   if (target === "novidadesConfig") renderNovidadesConfig();
   if (target === "xadrezConfig") renderXadrezConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
-  if (target === "relatorioAcessos" || target === "relatorioFinanceiro") renderReports();
+  if (target === "relatorioAcessos" || target === "relatorioFinanceiro") {
+    renderReports();
+    if (target === "relatorioAcessos") refreshMasterAccessMetrics();
+  }
   if (target === "usuariosOnline") startOnlinePresenceMonitor();
   else stopOnlinePresenceMonitor();
   if (target === "promocoesClientes") renderStaffPromocoesView();
@@ -11072,6 +11075,95 @@ function aggregateSimpleDaily(data = {}) {
   return map;
 }
 
+function menuMetricIdentity(value = "") {
+  return normalizeName(value).replace(/^menu/, "") || "menu";
+}
+
+function menuMetricLabel(value = "") {
+  const identity = menuMetricIdentity(value);
+  const labels = {
+    inicio: "Inicio",
+    ondecomer: "Onde Comer",
+    promocoes: "Promocoes",
+    imoveis: "Imoveis",
+    automoveis: "Automoveis",
+    vagasdetrabalho: "Vagas de Trabalho",
+    noticiascidade: "Noticias da Cidade",
+    gruposwhats: "Grupos de WhatsApp",
+    eventos: "Eventos",
+    jogos: "Jogos"
+  };
+  if (labels[identity]) return labels[identity];
+  const text = String(value || "Menu")
+    .replace(/^menu/i, "")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[_-]+/g, " ")
+    .trim();
+  return text || "Menu";
+}
+
+function aggregateMenuDaily(primary = {}, detailed = {}) {
+  const totals = new Map();
+  const dates = new Set([...Object.keys(primary || {}), ...Object.keys(detailed || {})]);
+  dates.forEach((date) => {
+    const byIdentity = new Map();
+    Object.entries(primary?.[date] || {}).forEach(([key, count]) => {
+      const identity = menuMetricIdentity(key);
+      byIdentity.set(identity, {
+        label: menuMetricLabel(key),
+        primary: Number(count || 0),
+        detailed: 0
+      });
+    });
+    Object.entries(detailed?.[date] || {}).forEach(([key, value]) => {
+      const firstDetail = Object.values(value?.detalhes || {})[0] || {};
+      const labelSource = firstDetail.texto || key;
+      const identity = menuMetricIdentity(labelSource);
+      const current = byIdentity.get(identity) || {
+        label: menuMetricLabel(labelSource),
+        primary: 0,
+        detailed: 0
+      };
+      current.detailed += Number(value?.total || Object.keys(value?.detalhes || {}).length || 0);
+      byIdentity.set(identity, current);
+    });
+    byIdentity.forEach((entry) => incrementMetric(totals, entry.label, Math.max(entry.primary, entry.detailed)));
+  });
+  return totals;
+}
+
+function aggregateDailyWithDetails(primary = {}, detailed = {}, predicate = () => true) {
+  const totals = new Map();
+  const dates = new Set([...Object.keys(primary || {}), ...Object.keys(detailed || {})]);
+  dates.forEach((date) => {
+    const primaryDay = new Map();
+    const detailDay = new Map();
+    Object.entries(primary?.[date] || {}).forEach(([key, count]) => {
+      primaryDay.set(key, Number(count || 0));
+    });
+    Object.entries(detailed?.[date] || {}).forEach(([key, logs]) => {
+      const count = Object.values(logs || {}).filter(predicate).length;
+      if (count) detailDay.set(key, count);
+    });
+    new Set([...primaryDay.keys(), ...detailDay.keys()]).forEach((key) => {
+      incrementMetric(totals, key, Math.max(primaryDay.get(key) || 0, detailDay.get(key) || 0));
+    });
+  });
+  return totals;
+}
+
+function totalMetricMap(map = new Map()) {
+  return [...map.values()].reduce((sum, value) => sum + Number(value || 0), 0);
+}
+
+function menuMetricTotal(map = new Map(), identity = "") {
+  let total = 0;
+  map.forEach((count, label) => {
+    if (menuMetricIdentity(label) === menuMetricIdentity(identity)) total += Number(count || 0);
+  });
+  return total;
+}
+
 function clientLabelFromMetricKey(key) {
   const normalized = normalizeName(key);
   if (normalized === "noticiasdacidade") return "Notícias da Cidade";
@@ -12123,6 +12215,50 @@ function renderUserActionReport(mount, periodRange) {
   `;
 }
 
+let accessMetricsRefreshPromise = null;
+
+async function refreshMasterAccessMetrics({ notify = false } = {}) {
+  if (!isMaster()) return;
+  if (accessMetricsRefreshPromise) return accessMetricsRefreshPromise;
+  const paths = {
+    cliquesBotoes: "cliquesPorBotao",
+    cliquesMenu: "cliquesMenuLateral",
+    acessos: "acessosPorDia",
+    ondeComerCardapios: "cliquesCardapiosOndeComer",
+    ondeComerWhats: "cliquesWhatsOndeComer",
+    ondeComerFotos: "cliquesFotosOndeComer",
+    promocoes: "cliquesPromocoesPorComercio",
+    cliquesBotoesDetalhado: "cliquesPorBotaoDetalhado",
+    cliquesOndeComerDetalhado: "cliquesOndeComerDetalhado",
+    cliquesPromocoesDetalhado: "cliquesPromocoesDetalhado",
+    cliquesPorMenuDetalhado: "cliquesPorMenu",
+    origemAcessos: "origemAcessos",
+    instalacoesPWA: "instalacoesPWA",
+    usoPWA: "usoPWA"
+  };
+  accessMetricsRefreshPromise = (async () => {
+    const results = await Promise.allSettled(Object.entries(paths).map(async ([key, path]) => {
+      const snapshot = await get(ref(db, path));
+      return [key, snapshot.exists() ? snapshot.val() : {}];
+    }));
+    let updated = 0;
+    results.forEach((result) => {
+      if (result.status !== "fulfilled") {
+        console.warn("Nao foi possivel atualizar uma metrica do relatorio.", result.reason);
+        return;
+      }
+      const [key, value] = result.value;
+      state.metricas[key] = value;
+      updated += 1;
+    });
+    if (!$("relatorioAcessosView")?.classList.contains("hidden")) renderReports("access");
+    if (notify) showToast(updated ? "Relatorio de acessos atualizado." : "Nao foi possivel atualizar o relatorio.");
+  })().finally(() => {
+    accessMetricsRefreshPromise = null;
+  });
+  return accessMetricsRefreshPromise;
+}
+
 function bindReportControls(mount) {
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
     button.addEventListener("click", () => {
@@ -12138,6 +12274,9 @@ function bindReportControls(mount) {
   });
   mount.querySelector("#auditLogSearch")?.addEventListener("change", renderReports);
   mount.querySelector("#auditLogCategory")?.addEventListener("change", renderReports);
+  mount.querySelector("[data-refresh-access-metrics]")?.addEventListener("click", () => {
+    refreshMasterAccessMetrics({ notify: true });
+  });
 }
 
 function renderReports(reportType = "") {
@@ -12164,6 +12303,9 @@ function renderReports(reportType = "") {
     ondeComerWhats: filterDailyMetrics(state.metricas.ondeComerWhats, periodRange),
     ondeComerFotos: filterDailyMetrics(state.metricas.ondeComerFotos, periodRange),
     promocoes: filterDailyMetrics(state.metricas.promocoes, periodRange),
+    cliquesOndeComerDetalhado: filterDailyMetrics(state.metricas.cliquesOndeComerDetalhado, periodRange),
+    cliquesPromocoesDetalhado: filterDailyMetrics(state.metricas.cliquesPromocoesDetalhado, periodRange),
+    cliquesPorMenuDetalhado: filterDailyMetrics(state.metricas.cliquesPorMenuDetalhado, periodRange),
     origemAcessos: filterDailyMetrics(state.metricas.origemAcessos, periodRange),
     instalacoesPWA: filterDailyMetrics(state.metricas.instalacoesPWA, periodRange),
     usoPWA: filterDailyMetrics(state.metricas.usoPWA, periodRange)
@@ -12211,11 +12353,28 @@ function renderReports(reportType = "") {
     .map(([title, count]) => ({ title, meta: `${count} cliente${count === 1 ? "" : "s"}` }));
 
   const cliquesBotoes = aggregateCliquesPorBotao(filteredMetrics.cliquesBotoes);
-  const cliquesMenu = aggregateSimpleDaily(filteredMetrics.cliquesMenu);
-  const cliquesOndeComerCardapios = aggregateSimpleDaily(filteredMetrics.ondeComerCardapios);
-  const cliquesOndeComerWhats = aggregateSimpleDaily(filteredMetrics.ondeComerWhats);
-  const cliquesOndeComerFotos = aggregateSimpleDaily(filteredMetrics.ondeComerFotos);
-  const cliquesPromocoes = aggregateSimpleDaily(filteredMetrics.promocoes);
+  const cliquesMenu = aggregateMenuDaily(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
+  const cliquesOndeComerCardapios = aggregateDailyWithDetails(
+    filteredMetrics.ondeComerCardapios,
+    filteredMetrics.cliquesOndeComerDetalhado,
+    (item) => item?.tipo === "cardapio"
+  );
+  const cliquesOndeComerWhats = aggregateDailyWithDetails(
+    filteredMetrics.ondeComerWhats,
+    filteredMetrics.cliquesOndeComerDetalhado,
+    (item) => item?.tipo === "whatsapp"
+  );
+  const cliquesOndeComerFotos = aggregateDailyWithDetails(
+    filteredMetrics.ondeComerFotos,
+    filteredMetrics.cliquesOndeComerDetalhado,
+    (item) => item?.tipo === "fotos"
+  );
+  const cliquesPromocoes = aggregateDailyWithDetails(
+    filteredMetrics.promocoes,
+    filteredMetrics.cliquesPromocoesDetalhado
+  );
+  const aberturasOndeComer = menuMetricTotal(cliquesMenu, "ondecomer");
+  const aberturasPromocoes = menuMetricTotal(cliquesMenu, "promocoes");
   const cidadesAcesso = aggregateCidadesAcesso(filteredMetrics.acessos);
   const acessosConsolidados = consolidateAccessMetrics(
     filteredMetrics.acessos,
@@ -12284,6 +12443,7 @@ function renderReports(reportType = "") {
             ? "Receitas, valores em aberto, planos, destaques e comprovantes dos clientes."
             : "Indicadores do site, cliques, origem dos acessos e comportamento dos usuarios."}</p>
         </div>
+        ${isFinanceReport ? "" : `<button type="button" class="ghost-button" data-refresh-access-metrics><i class="fa-solid fa-rotate"></i> Atualizar dados</button>`}
       </div>
     </section>
     <section class="panel-card report-period-card">
@@ -12378,17 +12538,21 @@ function renderReports(reportType = "") {
 
       <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Menu lateral", periodRange)}
+        <div class="report-kpis">
+          <span>Total de cliques: <strong>${totalMetricMap(cliquesMenu)}</strong></span>
+        </div>
         ${renderReportList(topFromMap(cliquesMenu, 12), "Ainda nao ha cliques de menu registrados.")}
       </section>
 
       <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Onde Comer", periodRange)}
         <div class="report-kpis">
-          <span>Cardapios: <strong>${[...cliquesOndeComerCardapios.values()].reduce((s, v) => s + v, 0)}</strong></span>
-          <span>WhatsApp: <strong>${[...cliquesOndeComerWhats.values()].reduce((s, v) => s + v, 0)}</strong></span>
-          <span>Fotos: <strong>${[...cliquesOndeComerFotos.values()].reduce((s, v) => s + v, 0)}</strong></span>
+          <span>Aberturas da tela: <strong>${aberturasOndeComer}</strong></span>
+          <span>Cardapios: <strong>${totalMetricMap(cliquesOndeComerCardapios)}</strong></span>
+          <span>WhatsApp: <strong>${totalMetricMap(cliquesOndeComerWhats)}</strong></span>
+          <span>Fotos: <strong>${totalMetricMap(cliquesOndeComerFotos)}</strong></span>
         </div>
-        ${renderReportList(topFromMap(cliquesOndeComerWhats, 8), "Ainda nao ha cliques no Onde Comer.")}
+        ${renderReportList(topFromMap(cliquesOndeComerWhats, 8), aberturasOndeComer ? "Ainda nao ha interacoes com os estabelecimentos." : "Ainda nao ha cliques no Onde Comer.")}
       </section>
 
       <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
@@ -12398,7 +12562,11 @@ function renderReports(reportType = "") {
 
       <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Promocoes", periodRange)}
-        ${renderReportList(topFromMap(cliquesPromocoes, 12), "Ainda nao ha cliques em promocoes registrados.")}
+        <div class="report-kpis">
+          <span>Aberturas da tela: <strong>${aberturasPromocoes}</strong></span>
+          <span>Interacoes com ofertas: <strong>${totalMetricMap(cliquesPromocoes)}</strong></span>
+        </div>
+        ${renderReportList(topFromMap(cliquesPromocoes, 12), aberturasPromocoes ? "Ainda nao ha interacoes com as ofertas." : "Ainda nao ha cliques em promocoes registrados.")}
       </section>
 
       <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
