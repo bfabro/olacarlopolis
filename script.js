@@ -1218,6 +1218,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             <span>Cidade <output data-business-font-output="city">28</output></span>
             <input type="range" min="20" max="36" value="28" step="1" data-business-font="city">
           </label>
+          <label>
+            <span>Endereço <output data-business-font-output="address">22</output></span>
+            <input type="range" min="16" max="34" value="22" step="1" data-business-font="address">
+          </label>
         </div>
         <button type="button" class="business-art-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -1252,6 +1256,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let fonteDescricao = dados.descricao.length > 320 ? 22 : (dados.descricao.length > 220 ? 24 : 26);
   let fonteWhatsapp = 28;
   let fonteCidade = 28;
+  let fonteEndereco = 22;
   const descricaoInput = dialog.querySelector('[data-business-font="description"]');
   if (descricaoInput) descricaoInput.value = String(fonteDescricao);
   const descricaoOutput = dialog.querySelector('[data-business-font-output="description"]');
@@ -1465,6 +1470,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     stage.style.setProperty("--business-description-font-size", `${fonteDescricao}px`);
     stage.style.setProperty("--business-whatsapp-font-size", `${fonteWhatsapp}px`);
     stage.style.setProperty("--business-city-font-size", `${fonteCidade}px`);
+    stage.style.setProperty("--business-address-font-size", `${fonteEndereco}px`);
     stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte });
     dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
     await aguardarImagensArteComercial(stage);
@@ -1684,12 +1690,14 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       if (fontType === "description") fonteDescricao = value;
       if (fontType === "whatsapp") fonteWhatsapp = value;
       if (fontType === "city") fonteCidade = value;
+      if (fontType === "address") fonteEndereco = value;
       const output = dialog.querySelector(`[data-business-font-output="${fontType}"]`);
       if (output) output.value = String(value);
       const variable = {
         description: "--business-description-font-size",
         whatsapp: "--business-whatsapp-font-size",
-        city: "--business-city-font-size"
+        city: "--business-city-font-size",
+        address: "--business-address-font-size"
       }[fontType];
       if (variable) stage.style.setProperty(variable, `${value}px`);
     });

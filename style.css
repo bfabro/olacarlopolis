@@ -23888,6 +23888,10 @@ body.business-art-capturing-background .home-cards-intro {
   font-size: var(--business-city-font-size, 28px) !important;
 }
 
+.business-art-stage .business-art-info-card.is-address strong {
+  font-size: var(--business-address-font-size, 22px) !important;
+}
+
 /* A foto do Feed cresce para ocupar a composicao e o nome fica mais proximo. */
 .business-art-stage.is-feed .business-art-picture {
   margin-bottom: 40px;
@@ -24330,7 +24334,7 @@ body.business-art-capturing-background .home-cards-intro {
   .business-art-font-controls {
     display: grid;
     grid-column: 1 / -1;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 6px;
     padding: 8px;
   }
