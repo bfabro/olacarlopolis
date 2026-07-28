@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 519,
-  label: "v526",
+  numero: 520,
+  label: "v527",
   data: "2026-07-28",
-  nota: "Relatorio financeiro filtrado por periodo, compacto, retratil e com acoes de atencao via WhatsApp."
+  nota: "Valores pagos separados entre planos mensais, semestrais e anuais no relatorio financeiro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -13233,6 +13233,7 @@ function financeInvoiceRowsForRange(clients = [], periodRange = getReportDateRan
         client,
         month,
         invoice: { mes: month, ...(invoice || {}) },
+        planType: invoice?.tipoPlano || invoice?.planoTipo || client.tipoPlano || "mensal",
         status: invoice?.status || financePaymentStatusForMonth(client, month),
         value: Number(invoice?.valorTotal || financeInvoiceValueForMonth(client, month) || 0),
         synthetic: false
@@ -13250,6 +13251,7 @@ function financeInvoiceRowsForRange(clients = [], periodRange = getReportDateRan
         client,
         month: currentMonth,
         invoice: { mes: currentMonth },
+        planType: client.tipoPlano || "mensal",
         status: financePaymentStatusForMonth(client, currentMonth),
         value: financeInvoiceValueForMonth(client, currentMonth),
         synthetic: true
@@ -14719,13 +14721,21 @@ function renderReports(reportType = "") {
   const isentos = reportClients.filter((c) => effectivePaymentStatus(c) === "isento");
   const financeInvoiceRows = financeInvoiceRowsForRange(reportClients, periodRange);
   const financePaidRows = financeInvoiceRows.filter((item) => item.status === "pago");
+  const financeMonthlyPaidRows = financePaidRows.filter((item) => item.planType === "mensal");
+  const financeSemiannualPaidRows = financePaidRows.filter((item) => item.planType === "semestral");
+  const financeAnnualPaidRows = financePaidRows.filter((item) => item.planType === "anual");
   const financeOpenRows = financeInvoiceRows.filter((item) => !item.status || item.status === "em_aberto");
   const financeReviewRows = financeInvoiceRows.filter((item) => item.status === "em_analise");
   const financeReceiptRows = financeInvoiceRows.filter((item) => invoiceHasReceipt(item.invoice));
   const financeBaseClients = reportClients.filter((client) => client.status !== "inativo" && isBillableClientType(client));
   const financeClientCount = new Set(financeInvoiceRows.map((item) => item.client.id)).size;
   const financeBilledValue = financeInvoiceRows.reduce((sum, item) => sum + item.value, 0);
-  const financePaidValue = financePaidRows.reduce((sum, item) => sum + item.value, 0);
+  const financeMonthlyPaidValue = financeMonthlyPaidRows.reduce((sum, item) => sum + item.value, 0);
+  const financeSemiannualPaidValue = financeSemiannualPaidRows.reduce((sum, item) => sum + item.value, 0);
+  const financeAnnualPaidValue = financeAnnualPaidRows.reduce((sum, item) => sum + item.value, 0);
+  const financeMonthlyPaidClients = new Set(financeMonthlyPaidRows.map((item) => item.client.id)).size;
+  const financeSemiannualPaidClients = new Set(financeSemiannualPaidRows.map((item) => item.client.id)).size;
+  const financeAnnualPaidClients = new Set(financeAnnualPaidRows.map((item) => item.client.id)).size;
   const financeOpenValue = financeOpenRows.reduce((sum, item) => sum + item.value, 0);
   const financeReviewValue = financeReviewRows.reduce((sum, item) => sum + item.value, 0);
   const receitas = reportClients
@@ -14843,8 +14853,10 @@ function renderReports(reportType = "") {
 
     <div class="stats-grid">
       ${isFinanceReport ? `
-        ${renderFinanceStatCard("Total faturado", moneyBR(financeBilledValue), `${financeInvoiceRows.length} fatura${financeInvoiceRows.length === 1 ? "" : "s"} consideradas`, periodRange.label, "primary")}
-        ${renderFinanceStatCard("Total pago", moneyBR(financePaidValue), `${financePaidRows.length} fatura${financePaidRows.length === 1 ? "" : "s"} paga${financePaidRows.length === 1 ? "" : "s"}`, periodRange.label, "success")}
+        ${renderFinanceStatCard("Total faturado geral", moneyBR(financeBilledValue), `${financeInvoiceRows.length} fatura${financeInvoiceRows.length === 1 ? "" : "s"} de todos os planos`, periodRange.label, "primary")}
+        ${renderFinanceStatCard("Mensal já pago", moneyBR(financeMonthlyPaidValue), `${financeMonthlyPaidClients} ${financeMonthlyPaidClients === 1 ? "cliente mensal marcado" : "clientes mensais marcados"} como pago`, periodRange.label, "success")}
+        ${renderFinanceStatCard("Semestral já pago", moneyBR(financeSemiannualPaidValue), `${financeSemiannualPaidClients} ${financeSemiannualPaidClients === 1 ? "cliente semestral marcado" : "clientes semestrais marcados"} como pago`, periodRange.label, "success")}
+        ${renderFinanceStatCard("Anual já pago", moneyBR(financeAnnualPaidValue), `${financeAnnualPaidClients} ${financeAnnualPaidClients === 1 ? "cliente anual marcado" : "clientes anuais marcados"} como pago`, periodRange.label, "annual")}
         ${renderFinanceStatCard("Total em aberto", moneyBR(financeOpenValue), `${financeOpenRows.length} fatura${financeOpenRows.length === 1 ? "" : "s"} pendente${financeOpenRows.length === 1 ? "" : "s"}`, periodRange.label, "warning")}
         ${renderFinanceStatCard("Em análise", moneyBR(financeReviewValue), `${financeReviewRows.length} comprovante${financeReviewRows.length === 1 ? "" : "s"} aguardando`, periodRange.label, "review")}
         ${renderFinanceStatCard("Com comprovante", String(financeReceiptRows.length), "Faturas com arquivo anexado", periodRange.label)}
@@ -14861,7 +14873,7 @@ function renderReports(reportType = "") {
       ${isFinanceReport ? renderFinanceReportSection("resumo-operacional", "Resumo operacional", periodRange, `
         <div class="finance-operational-summary">
           <article><span>Base de clientes</span><strong>${totalClientes}</strong><small>${ativos.length} ativos, ${pendentes.length} pendentes e ${inativos.length} inativos.</small></article>
-          <article><span>Situação financeira</span><strong>${financePaidRows.length + financeOpenRows.length + financeReviewRows.length}</strong><small>${financePaidRows.length} pagas, ${financeOpenRows.length} em aberto e ${financeReviewRows.length} em análise no filtro.</small></article>
+          <article><span>Situação financeira</span><strong>${financePaidRows.length + financeOpenRows.length + financeReviewRows.length}</strong><small>${financePaidRows.length} pagas (${financeMonthlyPaidRows.length} mensais, ${financeSemiannualPaidRows.length} semestrais e ${financeAnnualPaidRows.length} anuais), ${financeOpenRows.length} em aberto e ${financeReviewRows.length} em análise.</small></article>
           <article><span>Clientes isentos</span><strong>${isentos.length}</strong><small>Não entram nos valores de faturamento.</small></article>
           <article><span>Planos cadastrados</span><strong>${(porPlano.mensal || 0) + (porPlano.semestral || 0) + (porPlano.anual || 0)}</strong><small>${porPlano.mensal || 0} mensais, ${porPlano.semestral || 0} semestrais e ${porPlano.anual || 0} anuais.</small></article>
           <article><span>Projeção mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Equivalência mensal dos planos ativos e não isentos.</small></article>

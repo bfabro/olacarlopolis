@@ -2250,6 +2250,10 @@ button[type="submit"]:hover,
   border-left-color: #7c3aed;
 }
 
+.finance-report-stat.is-annual {
+  border-left-color: #0f766e;
+}
+
 .finance-report-collapsible {
   display: block;
   padding: 0;
