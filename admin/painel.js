@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 516,
-  label: "v523",
+  numero: 517,
+  label: "v524",
   data: "2026-07-28",
-  nota: "Galeria de beneficios com texto e link por imagem e contratacao centralizada pelo Ola Carlopolis."
+  nota: "Correcao de CORS nas logos e imagens externas exibidas na modal de beneficios."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4748,8 +4748,19 @@ function renderBenefitsView() {
 function autoCropBenefitLogos(root = document) {
   root.querySelectorAll("img[data-benefit-logo-auto]:not([data-benefit-logo-processed])").forEach((target) => {
     target.dataset.benefitLogoProcessed = "true";
+    const sourceUrl = target.currentSrc || target.src;
+    try {
+      const parsedUrl = new URL(sourceUrl, window.location.href);
+      const canProcessLocally = parsedUrl.origin === window.location.origin || ["data:", "blob:"].includes(parsedUrl.protocol);
+      if (!canProcessLocally) {
+        target.classList.add("is-auto-crop-skipped");
+        return;
+      }
+    } catch {
+      target.classList.add("is-auto-crop-skipped");
+      return;
+    }
     const source = new Image();
-    source.crossOrigin = "anonymous";
     source.onload = () => {
       try {
         const maxSide = 600;
@@ -4807,7 +4818,7 @@ function autoCropBenefitLogos(root = document) {
         console.warn("Não foi possível ajustar automaticamente a logo do parceiro.", error);
       }
     };
-    source.src = target.currentSrc || target.src;
+    source.src = sourceUrl;
   });
 }
 
