@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 514,
-  label: "v521",
+  numero: 515,
+  label: "v522",
   data: "2026-07-28",
-  nota: "Formulario de beneficios retraido e persistencia reforcada para fotos e planos."
+  nota: "Modal de beneficios fecha somente no X e permite navegar por todas as imagens do parceiro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4507,12 +4507,12 @@ function renderBenefitDetail(benefit = {}) {
   const planRequired = benefit.modalidadeContratacao === "obrigatorio";
   const canCancel = activeUse && ["aguardando_analise", "solicitado"].includes(activeUse.status);
   return `
-    <div class="benefit-detail-backdrop" data-benefit-close>
+    <div class="benefit-detail-backdrop">
       <article class="benefit-detail-modal ${gallery.length ? "" : "no-gallery"}" role="dialog" aria-modal="true" aria-labelledby="benefitDetailTitle">
-        <button type="button" class="benefit-detail-close" data-benefit-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" class="benefit-detail-close" data-benefit-detail-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
         ${gallery.length ? `<div class="benefit-detail-gallery">
           <div class="benefit-detail-main ${gallery[0] === primaryImage ? "is-logo" : ""}"><img data-benefit-main-image src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "")}"></div>
-          ${gallery.length > 1 ? `<div class="benefit-detail-thumbs">${gallery.map((url, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(url)}" data-benefit-gallery-logo="${url === primaryImage ? "true" : "false"}" class="${index === 0 ? "active" : ""}"><img src="${escapeAttr(url)}" alt="Imagem ${index + 1}"></button>`).join("")}</div>` : ""}
+          ${gallery.length > 1 ? `<div class="benefit-detail-thumbs" aria-label="Imagens do parceiro">${gallery.map((url, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(url)}" data-benefit-gallery-logo="${url === primaryImage ? "true" : "false"}" class="${index === 0 ? "active" : ""}" aria-label="Ver imagem ${index + 1}"><img src="${escapeAttr(url)}" alt="Imagem ${index + 1} de ${escapeAttr(benefit.parceiro || "parceiro")}"></button>`).join("")}</div>` : ""}
         </div>` : ""}
         <div class="benefit-detail-content">
           <span class="feature-kicker">Parceiro Olá Carlópolis</span>
@@ -5141,8 +5141,8 @@ function bindBenefitsView() {
       renderBenefitsView();
       return;
     }
-    const close = event.target.closest("[data-benefit-close]");
-    if (close && (event.target === close || close.hasAttribute("data-benefit-close"))) {
+    const close = event.target.closest("[data-benefit-detail-close]");
+    if (close) {
       state.selectedBenefitDetailId = "";
       renderBenefitsView();
       return;
@@ -5181,12 +5181,13 @@ function bindBenefitsView() {
     }
     const galleryButton = event.target.closest("[data-benefit-gallery-image]");
     if (galleryButton) {
-      const main = mount.querySelector("[data-benefit-main-image]");
+      const detailModal = galleryButton.closest(".benefit-detail-modal");
+      const main = detailModal?.querySelector("[data-benefit-main-image]");
       if (main) {
         main.src = galleryButton.dataset.benefitGalleryImage;
         main.parentElement?.classList.toggle("is-logo", galleryButton.dataset.benefitGalleryLogo === "true");
       }
-      mount.querySelectorAll("[data-benefit-gallery-image]").forEach((button) => button.classList.toggle("active", button === galleryButton));
+      detailModal?.querySelectorAll("[data-benefit-gallery-image]").forEach((button) => button.classList.toggle("active", button === galleryButton));
       return;
     }
     const requestButton = event.target.closest("[data-benefit-request]");
