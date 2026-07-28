@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 505,
-  label: "v512",
+  numero: 506,
+  label: "v513",
   data: "2026-07-28",
-  nota: "Novo clube de beneficios com parceiros, solicitacoes e relatorio de utilizacao."
+  nota: "Correcao do upload de imagens dos beneficios e descricao ampliada para 1.100 caracteres."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3649,7 +3649,7 @@ function renderBenefitMasterForm() {
         <label>Tipo de benefício<select id="benefitType"><option value="percentual" ${current.tipoBeneficio === "percentual" ? "selected" : ""}>Desconto em percentual</option><option value="valor" ${current.tipoBeneficio === "valor" ? "selected" : ""}>Desconto em valor</option><option value="beneficio" ${!current.tipoBeneficio || current.tipoBeneficio === "beneficio" ? "selected" : ""}>Outro benefício</option></select></label>
         <label>Valor do desconto<input id="benefitValue" type="number" min="0" step="0.01" value="${escapeAttr(current.valorBeneficio ?? "")}" placeholder="Ex.: 15 ou 100"></label>
         <label class="wide">Chamada do benefício<input id="benefitCallout" maxlength="100" value="${escapeAttr(current.chamadaBeneficio || "")}" placeholder="Ex.: Diagnóstico gratuito da presença digital"></label>
-        <label class="wide">Descrição<textarea id="benefitDescription" required maxlength="800" rows="4">${escapeHtml(current.descricao || "")}</textarea></label>
+        <label class="wide">Descrição <span class="field-counter" id="benefitDescriptionCount">${String(current.descricao || "").length}/1100</span><textarea id="benefitDescription" required maxlength="1100" rows="6">${escapeHtml(current.descricao || "")}</textarea></label>
         <label class="wide">Regras e como utilizar<textarea id="benefitRules" maxlength="800" rows="3">${escapeHtml(current.regras || "")}</textarea></label>
         <label>Contato do parceiro<input id="benefitContact" maxlength="100" value="${escapeAttr(current.contato || "")}" placeholder="Telefone, WhatsApp ou e-mail"></label>
         <label>Site ou rede social<input id="benefitSite" type="url" value="${escapeAttr(current.site || "")}" placeholder="https://..."></label>
@@ -3734,7 +3734,7 @@ async function saveBenefitFromForm(form) {
       tipoBeneficio: $("benefitType").value,
       valorBeneficio: Number($("benefitValue").value || 0),
       chamadaBeneficio: $("benefitCallout").value.trim(),
-      descricao: $("benefitDescription").value.trim(),
+      descricao: $("benefitDescription").value.trim().slice(0, 1100),
       regras: $("benefitRules").value.trim(),
       contato: $("benefitContact").value.trim(),
       site: $("benefitSite").value.trim(),
@@ -3793,6 +3793,13 @@ async function requestBenefitUse(benefitId) {
 function bindBenefitsView() {
   const mount = $("benefitsMount");
   if (!mount) return;
+  const description = mount.querySelector("#benefitDescription");
+  const descriptionCount = mount.querySelector("#benefitDescriptionCount");
+  const updateDescriptionCount = () => {
+    if (description && descriptionCount) descriptionCount.textContent = `${description.value.length}/1100`;
+  };
+  description?.addEventListener("input", updateDescriptionCount);
+  updateDescriptionCount();
   mount.querySelector("#benefitForm")?.addEventListener("submit", (event) => {
     event.preventDefault();
     saveBenefitFromForm(event.currentTarget);
