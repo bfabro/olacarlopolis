@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 508,
-  label: "v515",
+  numero: 509,
+  label: "v516",
   data: "2026-07-28",
-  nota: "Cards compactos de parceiros, logo com recorte automatico e galeria destacada."
+  nota: "Correcao definitiva do salvamento de planos e imagens dos parceiros."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3754,11 +3754,6 @@ async function saveBenefitFromFormLegacy(form) {
   const button = form.querySelector('button[type="submit"]');
   setBusy(button, true, "Salvando...");
   try {
-    const plans = collectBenefitPlans(form);
-    const contractMode = $("benefitContractMode").value;
-    if (contractMode !== "gratuito" && !Object.values(plans).some((plan) => plan.status === "ativo")) {
-      throw new Error("Adicione pelo menos um plano ativo para esta forma de contratação.");
-    }
     let image = $("benefitImage")?.value.trim() || "";
     const file = $("benefitImageUpload")?.files?.[0];
     if (file) {
@@ -4070,18 +4065,19 @@ function benefitPartnerDescription(benefit = {}) {
 
 function renderBenefitPlan(plan = {}, inputName = "") {
   const value = Number(plan.valor || 0);
+  const paymentMode = plan.modalidadePagamento || plan.periodicidade || "";
   const periodicity = {
     mensal: "por mês",
     semestral: "por semestre",
     anual: "por ano",
     unico: "pagamento único"
-  }[plan.periodicidade] || plan.periodicidade || "pagamento único";
+  }[paymentMode] || paymentMode;
   return `
     <label class="benefit-plan-card">
       ${inputName ? `<input type="radio" name="${escapeAttr(inputName)}" value="${escapeAttr(plan.id || "")}">` : ""}
       <span>
         <strong>${escapeHtml(plan.nome || "Plano")}</strong>
-        <b>${moneyBR(value)} <small>${escapeHtml(periodicity)}</small></b>
+        <b>${moneyBR(value)} ${periodicity ? `<small>${escapeHtml(periodicity)}</small>` : ""}</b>
         ${plan.descricao ? `<em>${escapeHtml(plan.descricao)}</em>` : ""}
         ${plan.incluidos ? `<small><i class="fa-solid fa-circle-check"></i>${escapeHtml(plan.incluidos)}</small>` : ""}
       </span>
@@ -4200,9 +4196,9 @@ function renderBenefitPlanEditor(plan = {}, index = 0) {
   return `
     <article class="benefit-plan-editor" data-benefit-plan-row>
       <input type="hidden" data-plan-id value="${escapeAttr(plan.id || `plano-${Date.now()}-${index}`)}">
-      <label>Nome<input data-plan-name required maxlength="80" value="${escapeAttr(plan.nome || "")}" placeholder="Ex.: Plano Completo"></label>
+      <label>Nome<input data-plan-name maxlength="80" value="${escapeAttr(plan.nome || "")}" placeholder="Ex.: Plano Completo"></label>
       <label>Valor em reais<input data-plan-value type="number" min="0" step="0.01" value="${escapeAttr(plan.valor ?? "")}"></label>
-      <label>Periodicidade<select data-plan-period><option value="mensal" ${plan.periodicidade === "mensal" ? "selected" : ""}>Mensal</option><option value="semestral" ${plan.periodicidade === "semestral" ? "selected" : ""}>Semestral</option><option value="anual" ${plan.periodicidade === "anual" ? "selected" : ""}>Anual</option><option value="unico" ${plan.periodicidade === "unico" ? "selected" : ""}>Pagamento único</option></select></label>
+      <label>Modalidade de pagamento<select data-plan-period><option value="" ${!(plan.modalidadePagamento || plan.periodicidade) ? "selected" : ""}>Sem modalidade definida</option><option value="mensal" ${(plan.modalidadePagamento || plan.periodicidade) === "mensal" ? "selected" : ""}>Mensal</option><option value="semestral" ${(plan.modalidadePagamento || plan.periodicidade) === "semestral" ? "selected" : ""}>Semestral</option><option value="anual" ${(plan.modalidadePagamento || plan.periodicidade) === "anual" ? "selected" : ""}>Anual</option><option value="unico" ${(plan.modalidadePagamento || plan.periodicidade) === "unico" ? "selected" : ""}>Pagamento único</option></select></label>
       <label>Status<select data-plan-status><option value="ativo" ${plan.status !== "inativo" ? "selected" : ""}>Ativo</option><option value="inativo" ${plan.status === "inativo" ? "selected" : ""}>Inativo</option></select></label>
       <label class="wide">Descrição<textarea data-plan-description maxlength="500" rows="2">${escapeHtml(plan.descricao || "")}</textarea></label>
       <label class="wide">Benefícios incluídos<textarea data-plan-included maxlength="700" rows="2">${escapeHtml(plan.incluidos || "")}</textarea></label>
@@ -4226,8 +4222,8 @@ function renderBenefitMasterForm() {
         <input type="hidden" id="benefitId" value="${escapeAttr(current.id || "")}">
         <label>Nome do parceiro<input id="benefitPartner" required maxlength="100" value="${escapeAttr(current.parceiro || "")}"></label>
         <label>Título do benefício<input id="benefitTitle" required maxlength="120" value="${escapeAttr(current.titulo || "")}"></label>
-        <label class="wide">Breve descrição do que faz o parceiro<input id="benefitPartnerSummary" required maxlength="240" value="${escapeAttr(current.resumoParceiro || "")}" placeholder="Ex.: Agência de marketing especializada em posicionamento, conteúdo e redes sociais."></label>
-        <label class="wide">Descrição completa do parceiro<textarea id="benefitPartnerDescription" required maxlength="1100" rows="5">${escapeHtml(current.descricaoParceiro || "")}</textarea></label>
+        <label class="wide">Breve descrição do que faz o parceiro<input id="benefitPartnerSummary" maxlength="240" value="${escapeAttr(current.resumoParceiro || "")}" placeholder="Ex.: Agência de marketing especializada em posicionamento, conteúdo e redes sociais."><small>Opcional. Quando vazio, o sistema utiliza o início da descrição cadastrada.</small></label>
+        <label class="wide">Descrição completa do parceiro<textarea id="benefitPartnerDescription" maxlength="1100" rows="5">${escapeHtml(current.descricaoParceiro || "")}</textarea></label>
         <label class="wide">Descrição do benefício <span class="field-counter" id="benefitDescriptionCount">${String(current.descricao || "").length}/1100</span><textarea id="benefitDescription" required maxlength="1100" rows="6">${escapeHtml(current.descricao || "")}</textarea></label>
         <label>Tipo de benefício<select id="benefitType"><option value="percentual" ${current.tipoBeneficio === "percentual" ? "selected" : ""}>Desconto em percentual</option><option value="valor" ${current.tipoBeneficio === "valor" ? "selected" : ""}>Desconto em valor</option><option value="beneficio" ${!current.tipoBeneficio || current.tipoBeneficio === "beneficio" ? "selected" : ""}>Outro benefício</option></select></label>
         <label>Valor do desconto<input id="benefitValue" type="number" min="0" step="0.01" value="${escapeAttr(current.valorBeneficio ?? "")}"></label>
@@ -4245,7 +4241,7 @@ function renderBenefitMasterForm() {
         <label>Logo por URL<input id="benefitImage" value="${escapeAttr(current.imagem || "")}" placeholder="https://..."></label>
         <label>Enviar logo<input id="benefitImageUpload" type="file" accept="image/*"></label>
         <label class="wide">URLs adicionais, uma por linha<textarea id="benefitGalleryUrls" rows="4" placeholder="https://...">${escapeHtml(gallery.join("\n"))}</textarea></label>
-        <label class="wide">Enviar várias imagens<input id="benefitGalleryUpload" type="file" accept="image/*" multiple></label>
+        <label class="wide">Enviar várias imagens<input id="benefitGalleryUpload" type="file" accept="image/*" multiple><small id="benefitGallerySelection">Nenhuma nova imagem selecionada.</small></label>
         <div class="form-section-title wide"><i class="fa-solid fa-layer-group"></i><div><strong>Planos</strong><span>Use planos apenas quando fizerem parte deste benefício.</span></div></div>
         <div id="benefitPlansEditor" class="benefit-plans-editor wide">${plans.map(renderBenefitPlanEditor).join("")}</div>
         <div class="wide"><button type="button" class="ghost-button" data-benefit-plan-add><i class="fa-solid fa-plus"></i> Adicionar plano</button></div>
@@ -4396,16 +4392,22 @@ function autoCropBenefitLogos(root = document) {
 function collectBenefitPlans(form) {
   const plans = {};
   form.querySelectorAll("[data-benefit-plan-row]").forEach((row, index) => {
-    const name = row.querySelector("[data-plan-name]")?.value.trim() || "";
-    if (!name) return;
+    const rawName = row.querySelector("[data-plan-name]")?.value.trim() || "";
+    const description = row.querySelector("[data-plan-description]")?.value.trim() || "";
+    const included = row.querySelector("[data-plan-included]")?.value.trim() || "";
+    const rawValue = row.querySelector("[data-plan-value]")?.value.trim() || "";
+    if (!rawName && !description && !included && !rawValue) return;
+    const name = rawName || `Plano ${index + 1}`;
     const id = slugify(row.querySelector("[data-plan-id]")?.value || name) || `plano-${index + 1}`;
+    const paymentMode = row.querySelector("[data-plan-period]")?.value || "";
     plans[id] = {
       id,
       nome: name,
-      descricao: row.querySelector("[data-plan-description]")?.value.trim() || "",
-      valor: Number(row.querySelector("[data-plan-value]")?.value || 0),
-      periodicidade: row.querySelector("[data-plan-period]")?.value || "mensal",
-      incluidos: row.querySelector("[data-plan-included]")?.value.trim() || "",
+      descricao: description,
+      valor: Number(rawValue || 0),
+      periodicidade: paymentMode,
+      modalidadePagamento: paymentMode,
+      incluidos: included,
       status: row.querySelector("[data-plan-status]")?.value || "ativo",
       ordem: index
     };
@@ -4420,6 +4422,11 @@ async function saveBenefitFromForm(form) {
   const button = form.querySelector('button[type="submit"]');
   setBusy(button, true, "Salvando...");
   try {
+    const plans = collectBenefitPlans(form);
+    const contractMode = $("benefitContractMode").value;
+    if (contractMode !== "gratuito" && !Object.values(plans).some((plan) => plan.status === "ativo")) {
+      throw new Error("Adicione pelo menos um plano ativo para esta forma de contratação.");
+    }
     let image = $("benefitImage")?.value.trim() || "";
     const logoFile = $("benefitImageUpload")?.files?.[0];
     if (logoFile) {
@@ -4434,7 +4441,7 @@ async function saveBenefitFromForm(form) {
       gallery.push(await uploadFileWithProgress(fileRef, file, `Enviando imagem ${index + 1} de ${galleryFiles.length}`, file.name || "imagem"));
     }
     const current = state.beneficios.find((item) => item.id === id) || {};
-    await set(ref(db, `beneficiosParceiros/${id}`), {
+    const benefitPayload = {
       parceiro: $("benefitPartner").value.trim(),
       resumoParceiro: $("benefitPartnerSummary").value.trim().slice(0, 240),
       descricaoParceiro: $("benefitPartnerDescription").value.trim().slice(0, 1100),
@@ -4459,9 +4466,18 @@ async function saveBenefitFromForm(form) {
       createdBy: current.createdBy || state.user?.uid || "",
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
-    });
+    };
+    const benefitRef = ref(db, `beneficiosParceiros/${id}`);
+    await set(benefitRef, benefitPayload);
+    const savedSnapshot = await get(benefitRef);
+    const savedBenefit = savedSnapshot.val() || {};
+    const savedPlans = benefitListFromValue(savedBenefit.planos);
+    const savedGallery = benefitPartnerImages(savedBenefit);
+    if (savedPlans.length !== Object.keys(plans).length || savedGallery.length !== gallery.length) {
+      throw new Error("O cadastro foi salvo, mas a conferência dos planos ou imagens não corresponde ao formulário. Tente novamente.");
+    }
     state.selectedBenefitId = "";
-    showToast("Parceiro e benefício salvos.");
+    showToast(`Parceiro salvo com ${savedPlans.length} plano${savedPlans.length === 1 ? "" : "s"} e ${savedGallery.length} imagem${savedGallery.length === 1 ? "" : "ns"} na galeria.`);
   } catch (error) {
     console.error(error);
     showToast(error.message || "Não foi possível salvar o parceiro.");
@@ -4678,6 +4694,12 @@ function bindBenefitsView() {
   const updateCount = () => { if (description && count) count.textContent = `${description.value.length}/1100`; };
   description?.addEventListener("input", updateCount);
   updateCount();
+  const galleryUpload = mount.querySelector("#benefitGalleryUpload");
+  galleryUpload?.addEventListener("change", () => {
+    const selected = [...(galleryUpload.files || [])].slice(0, 12);
+    const label = mount.querySelector("#benefitGallerySelection");
+    if (label) label.textContent = selected.length ? `${selected.length} nova${selected.length === 1 ? " imagem selecionada" : "s imagens selecionadas"} para salvar.` : "Nenhuma nova imagem selecionada.";
+  });
   mount.querySelector("#benefitForm")?.addEventListener("submit", (event) => { event.preventDefault(); saveBenefitFromForm(event.currentTarget); });
   mount.querySelector("[data-benefit-plan-add]")?.addEventListener("click", () => {
     mount.querySelector("#benefitPlansEditor")?.insertAdjacentHTML("beforeend", renderBenefitPlanEditor({}, mount.querySelectorAll("[data-benefit-plan-row]").length));
