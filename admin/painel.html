@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=354">
+  <link rel="stylesheet" href="painel.css?v=355">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -95,6 +95,7 @@
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         </section>
+        <button data-view="beneficios"><i class="fa-solid fa-gift"></i> Benefícios</button>
         <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
         <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
         <button data-view="faturas" data-role="cliente" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
@@ -803,6 +804,10 @@
 
       <section id="relatorioFinanceiroView" class="panel-view hidden">
         <div id="reportsFinanceMount" class="reports-layout"></div>
+      </section>
+
+      <section id="beneficiosView" class="panel-view hidden">
+        <div id="benefitsMount" class="benefits-admin-view"></div>
       </section>
 
       <section id="usuariosOnlineView" class="panel-view hidden">
@@ -1884,6 +1889,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=439"></script>
+  <script type="module" src="painel.js?v=440"></script>
 </body>
 </html>

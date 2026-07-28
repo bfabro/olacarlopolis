@@ -166,6 +166,21 @@
       ".write": "auth != null"
     },
 
+    "beneficiosParceiros": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+    },
+
+    "beneficiosUtilizacoes": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$clientId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId)",
+        "$usageId": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (!data.exists() && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId && newData.child('clientId').val() === $clientId && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'solicitado'))"
+        }
+      }
+    },
+
     "acessos": {
       ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
       ".write": true
