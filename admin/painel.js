@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 515,
-  label: "v522",
+  numero: 516,
+  label: "v523",
   data: "2026-07-28",
-  nota: "Modal de beneficios fecha somente no X e permite navegar por todas as imagens do parceiro."
+  nota: "Galeria de beneficios com texto e link por imagem e contratacao centralizada pelo Ola Carlopolis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -4240,11 +4240,25 @@ function benefitPrimaryImage(benefit = {}) {
   return String(benefit.imagem || benefit.image || benefit.logo || benefit.logoUrl || benefit.imagemLogo || "").trim();
 }
 
-function benefitGalleryImages(benefit = {}) {
+function benefitGalleryItems(benefit = {}) {
   const sources = [benefit.galeria, benefit.imagens, benefit.fotos];
-  return [...new Set(sources.flatMap((source) => benefitListFromValue(source))
-    .map((item) => String(item.url || item.imagem || item.image || item.foto || item.value || "").trim())
-    .filter(Boolean))];
+  const itemsByUrl = new Map();
+  sources.flatMap((source) => benefitListFromValue(source)).forEach((item, index) => {
+    const url = String(item.url || item.imagem || item.image || item.foto || item.value || "").trim();
+    if (!url || itemsByUrl.has(url)) return;
+    itemsByUrl.set(url, {
+      id: item.id || `imagem-${index + 1}`,
+      url,
+      texto: String(item.texto || item.descricao || item.legenda || item.titulo || "").trim(),
+      link: String(item.link || item.urlTrabalho || item.linkTrabalho || "").trim(),
+      ordem: Number(item.ordem ?? item.order ?? index)
+    });
+  });
+  return [...itemsByUrl.values()].sort((a, b) => a.ordem - b.ordem);
+}
+
+function benefitGalleryImages(benefit = {}) {
+  return benefitGalleryItems(benefit).map((item) => item.url);
 }
 
 function benefitGallery(benefit = {}) {
@@ -4253,6 +4267,24 @@ function benefitGallery(benefit = {}) {
 
 function benefitPartnerImages(benefit = {}) {
   return benefitGallery(benefit);
+}
+
+function benefitPartnerGalleryItems(benefit = {}) {
+  const primaryImage = benefitPrimaryImage(benefit);
+  const items = benefitGalleryItems(benefit);
+  return [
+    ...(primaryImage ? [{ id: "logo", url: primaryImage, texto: "Logo do parceiro", link: "", isLogo: true, ordem: -1 }] : []),
+    ...items.filter((item) => item.url !== primaryImage)
+  ];
+}
+
+function benefitSafeExternalUrl(value = "") {
+  try {
+    const url = new URL(String(value || "").trim());
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "";
+  } catch {
+    return "";
+  }
 }
 
 function benefitContractModeLabel(mode = "gratuito") {
@@ -4498,9 +4530,12 @@ function renderBenefitCard(benefit = {}) {
 }
 
 function renderBenefitDetail(benefit = {}) {
-  const gallery = benefitPartnerImages(benefit);
+  const galleryItems = benefitPartnerGalleryItems(benefit);
+  const gallery = galleryItems.map((item) => item.url);
   const plans = benefitPlans(benefit);
   const primaryImage = benefitPrimaryImage(benefit);
+  const firstGalleryItem = galleryItems[0] || {};
+  const firstGalleryLink = benefitSafeExternalUrl(firstGalleryItem.link);
   const clientId = currentClientId();
   const activeUse = clientId ? benefitUsageForClient(benefit.id, clientId) : null;
   const canRequest = Boolean(clientId) && benefitIsAvailable(benefit) && !activeUse;
@@ -4512,7 +4547,11 @@ function renderBenefitDetail(benefit = {}) {
         <button type="button" class="benefit-detail-close" data-benefit-detail-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
         ${gallery.length ? `<div class="benefit-detail-gallery">
           <div class="benefit-detail-main ${gallery[0] === primaryImage ? "is-logo" : ""}"><img data-benefit-main-image src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "")}"></div>
-          ${gallery.length > 1 ? `<div class="benefit-detail-thumbs" aria-label="Imagens do parceiro">${gallery.map((url, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(url)}" data-benefit-gallery-logo="${url === primaryImage ? "true" : "false"}" class="${index === 0 ? "active" : ""}" aria-label="Ver imagem ${index + 1}"><img src="${escapeAttr(url)}" alt="Imagem ${index + 1} de ${escapeAttr(benefit.parceiro || "parceiro")}"></button>`).join("")}</div>` : ""}
+          <div class="benefit-detail-gallery-info ${firstGalleryItem.texto || firstGalleryLink ? "" : "hidden"}" data-benefit-gallery-info>
+            <p data-benefit-gallery-text>${escapeHtml(firstGalleryItem.texto || "")}</p>
+            <a data-benefit-gallery-link href="${escapeAttr(firstGalleryLink || "#")}" target="_blank" rel="noopener" class="${firstGalleryLink ? "" : "hidden"}"><i class="fa-solid fa-arrow-up-right-from-square"></i> Ver este trabalho</a>
+          </div>
+          ${gallery.length > 1 ? `<div class="benefit-detail-thumbs" aria-label="Imagens do parceiro">${galleryItems.map((item, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(item.url)}" data-benefit-gallery-logo="${item.isLogo ? "true" : "false"}" data-benefit-gallery-text="${escapeAttr(item.texto || "")}" data-benefit-gallery-link="${escapeAttr(benefitSafeExternalUrl(item.link))}" class="${index === 0 ? "active" : ""}" aria-label="Ver imagem ${index + 1}"><img src="${escapeAttr(item.url)}" alt="Imagem ${index + 1} de ${escapeAttr(benefit.parceiro || "parceiro")}"></button>`).join("")}</div>` : ""}
         </div>` : ""}
         <div class="benefit-detail-content">
           <span class="feature-kicker">Parceiro Olá Carlópolis</span>
@@ -4524,18 +4563,14 @@ function renderBenefitDetail(benefit = {}) {
           <section><h3>${escapeHtml(benefit.titulo || "Benefício oferecido")}</h3><p>${escapeHtml(benefit.descricao || "")}</p></section>
           ${plans.length ? `<section><h3>Planos disponíveis</h3><div class="benefit-plans">${benefit.modalidadeContratacao === "opcional" && clientId ? `<label class="benefit-plan-card is-free"><input type="radio" name="benefitSelectedPlan" value="" checked><span><strong>Quero somente o benefício</strong><b>Sem contratação de plano</b></span></label>` : ""}${plans.map((plan) => renderBenefitPlan(plan, clientId ? "benefitSelectedPlan" : "")).join("")}</div></section>` : ""}
           ${benefit.regras ? `<section class="benefit-detail-rules"><h3>Regras, condições e limitações</h3><p>${escapeHtml(benefit.regras)}</p></section>` : ""}
-          <div class="benefit-detail-contact">
-            ${benefit.contato ? `<span><i class="fa-solid fa-phone"></i>${escapeHtml(benefit.contato)}</span>` : ""}
-            ${benefit.email ? `<a href="mailto:${escapeAttr(benefit.email)}"><i class="fa-solid fa-envelope"></i>${escapeHtml(benefit.email)}</a>` : ""}
-            ${benefit.site ? `<a href="${escapeAttr(benefit.site)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Site ou rede social</a>` : ""}
-          </div>
-          ${activeUse ? `<section class="benefit-current-request"><h3>Sua solicitação</h3><span class="benefit-request-status status-${escapeAttr(activeUse.status)}">${escapeHtml(benefitStatusLabel(activeUse.status))}</span>${activeUse.planName ? `<p><strong>Plano:</strong> ${escapeHtml(activeUse.planName)} · ${moneyBR(activeUse.planValue)} ${escapeHtml(activeUse.planPeriodicityLabel || "")}</p>` : ""}${renderBenefitHistory(activeUse.historico)}${canCancel ? `<button type="button" class="danger-button" data-benefit-cancel-request="${escapeAttr(activeUse.id)}"><i class="fa-solid fa-ban"></i> Cancelar solicitação</button>` : `<small>Para alterações após a aprovação, entre em contato diretamente com o parceiro.</small>`}</section>` : ""}
+          ${isMaster() ? `<div class="benefit-detail-contact"><strong>Contato interno do parceiro</strong>${benefit.contato ? `<span><i class="fa-solid fa-phone"></i>${escapeHtml(benefit.contato)}</span>` : ""}${benefit.email ? `<a href="mailto:${escapeAttr(benefit.email)}"><i class="fa-solid fa-envelope"></i>${escapeHtml(benefit.email)}</a>` : ""}${benefit.site ? `<a href="${escapeAttr(benefit.site)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Site ou rede social</a>` : ""}</div>` : ""}
+          ${activeUse ? `<section class="benefit-current-request"><h3>Sua solicitação</h3><span class="benefit-request-status status-${escapeAttr(activeUse.status)}">${escapeHtml(benefitStatusLabel(activeUse.status))}</span>${activeUse.planName ? `<p><strong>Plano:</strong> ${escapeHtml(activeUse.planName)} · ${moneyBR(activeUse.planValue)} ${escapeHtml(activeUse.planPeriodicityLabel || "")}</p>` : ""}${renderBenefitHistory(activeUse.historico)}${canCancel ? `<button type="button" class="danger-button" data-benefit-cancel-request="${escapeAttr(activeUse.id)}"><i class="fa-solid fa-ban"></i> Cancelar solicitação</button>` : `<small>Para qualquer ajuste, fale com a equipe do Olá Carlópolis pelo acompanhamento desta solicitação.</small>`}</section>` : ""}
           ${clientId ? `
             <div class="benefit-detail-actions">
-              <button type="button" data-benefit-request="${escapeAttr(benefit.id)}" ${canRequest ? "" : "disabled"}><i class="fa-solid fa-gift"></i>${activeUse ? "Solicitação em andamento" : "Solicitar benefício"}</button>
+              <button type="button" data-benefit-request="${escapeAttr(benefit.id)}" ${canRequest ? "" : "disabled"}><i class="fa-solid fa-gift"></i>${activeUse ? "Solicitação em andamento" : "Solicitar pelo Olá Carlópolis"}</button>
             </div>
             <section class="benefit-question-box">
-              <h3>Envie uma dúvida ao parceiro</h3>
+              <h3>Envie sua dúvida pelo Olá Carlópolis</h3>
               <form data-benefit-question-form="${escapeAttr(benefit.id)}" class="grid-form">
                 <label>Assunto<input name="subject" required maxlength="120"></label>
                 <label>Telefone ou WhatsApp<input name="returnPhone" required maxlength="30"></label>
@@ -4565,11 +4600,31 @@ function renderBenefitPlanEditor(plan = {}, index = 0) {
   `;
 }
 
+function renderBenefitGalleryEditorItem(item = {}, index = 0, options = {}) {
+  const previewUrl = options.previewUrl || item.url || "";
+  const fileIndex = Number.isInteger(options.fileIndex) ? options.fileIndex : "";
+  const fileName = options.fileName || "";
+  return `
+    <article class="benefit-gallery-editor-item" data-benefit-gallery-row ${fileIndex !== "" ? `data-benefit-gallery-new data-benefit-gallery-file-index="${fileIndex}"` : ""}>
+      <div class="benefit-gallery-editor-preview">
+        ${previewUrl ? `<img src="${escapeAttr(previewUrl)}" alt="Prévia da imagem ${index + 1}">` : `<i class="fa-solid fa-image"></i>`}
+        <span>${escapeHtml(fileName || `Imagem ${index + 1}`)}</span>
+      </div>
+      <div class="benefit-gallery-editor-fields">
+        <label>URL da imagem<input type="url" data-benefit-gallery-url value="${escapeAttr(item.url || "")}" ${fileIndex !== "" ? "readonly" : ""} placeholder="https://..."></label>
+        <label>Texto referente à imagem<textarea data-benefit-gallery-description maxlength="300" rows="2" placeholder="Explique o trabalho apresentado nesta imagem.">${escapeHtml(item.texto || "")}</textarea></label>
+        <label>Link referente ao trabalho<input type="url" data-benefit-gallery-work-link value="${escapeAttr(item.link || "")}" placeholder="https://..."></label>
+      </div>
+      <button type="button" class="danger-button benefit-gallery-remove" data-benefit-gallery-remove><i class="fa-solid fa-trash"></i> Remover</button>
+    </article>
+  `;
+}
+
 function renderBenefitMasterForm() {
   if (!isMaster()) return "";
   const current = state.beneficios.find((item) => item.id === state.selectedBenefitId) || {};
   const plans = benefitAllPlans(current);
-  const gallery = benefitGalleryImages(current);
+  const galleryItems = benefitGalleryItems(current);
   const primaryImage = benefitPrimaryImage(current);
   return `
     <section class="panel-card benefit-master-form-card">
@@ -4599,9 +4654,10 @@ function renderBenefitMasterForm() {
         <div class="form-section-title wide"><i class="fa-solid fa-images"></i><div><strong>Logo e galeria</strong><span>Envie a logo principal e várias imagens do parceiro.</span></div></div>
         <label>Logo por URL<input id="benefitImage" value="${escapeAttr(primaryImage)}" placeholder="https://..."></label>
         <label>Enviar logo<input id="benefitImageUpload" type="file" accept="image/*"></label>
-        <label class="wide">URLs adicionais, uma por linha<textarea id="benefitGalleryUrls" rows="4" placeholder="https://...">${escapeHtml(gallery.join("\n"))}</textarea></label>
         <label class="wide">Enviar várias imagens<input id="benefitGalleryUpload" type="file" accept="image/*" multiple><small id="benefitGallerySelection">Nenhuma nova imagem selecionada.</small></label>
-        ${(primaryImage || gallery.length) ? `<div class="benefit-form-media-preview wide">${primaryImage ? `<figure><img src="${escapeAttr(primaryImage)}" alt="Logo atual"><figcaption>Logo atual</figcaption></figure>` : ""}${gallery.map((url, index) => `<figure><img src="${escapeAttr(url)}" alt="Imagem atual ${index + 1}"><figcaption>Imagem ${index + 1}</figcaption></figure>`).join("")}</div>` : ""}
+        ${primaryImage ? `<div class="benefit-form-media-preview wide"><figure><img src="${escapeAttr(primaryImage)}" alt="Logo atual"><figcaption>Logo atual</figcaption></figure></div>` : ""}
+        <div id="benefitGalleryEditor" class="benefit-gallery-editor wide">${galleryItems.map((item, index) => renderBenefitGalleryEditorItem(item, index)).join("")}</div>
+        <div class="wide"><button type="button" class="ghost-button" data-benefit-gallery-add><i class="fa-solid fa-link"></i> Adicionar imagem por URL</button></div>
         <div class="form-section-title wide"><i class="fa-solid fa-layer-group"></i><div><strong>Planos</strong><span>Use planos apenas quando fizerem parte deste benefício.</span></div></div>
         <div id="benefitPlansEditor" class="benefit-plans-editor wide">${plans.map(renderBenefitPlanEditor).join("")}</div>
         <div class="wide"><button type="button" class="ghost-button" data-benefit-plan-add><i class="fa-solid fa-plus"></i> Adicionar plano</button></div>
@@ -4781,6 +4837,18 @@ function collectBenefitPlans(form) {
   return plans;
 }
 
+function collectBenefitGalleryEntries(form) {
+  return [...form.querySelectorAll("[data-benefit-gallery-row]")].map((row, index) => ({
+    url: row.querySelector("[data-benefit-gallery-url]")?.value.trim() || "",
+    texto: row.querySelector("[data-benefit-gallery-description]")?.value.trim().slice(0, 300) || "",
+    link: row.querySelector("[data-benefit-gallery-work-link]")?.value.trim() || "",
+    fileIndex: row.hasAttribute("data-benefit-gallery-new")
+      ? Number(row.dataset.benefitGalleryFileIndex)
+      : -1,
+    ordem: index
+  })).filter((item) => item.url || Number.isInteger(item.fileIndex) && item.fileIndex >= 0);
+}
+
 async function saveBenefitFromForm(form) {
   if (!isMaster()) return;
   const existingId = $("benefitId")?.value || "";
@@ -4791,6 +4859,7 @@ async function saveBenefitFromForm(form) {
   setBusy(button, true, "Salvando...");
   try {
     const plans = collectBenefitPlans(form);
+    const galleryEntries = collectBenefitGalleryEntries(form);
     const field = (selector) => form.querySelector(selector);
     const draft = {
       parceiro: field("#benefitPartner")?.value.trim() || "",
@@ -4808,7 +4877,7 @@ async function saveBenefitFromForm(form) {
       email: field("#benefitEmail")?.value.trim() || "",
       site: field("#benefitSite")?.value.trim() || "",
       imageUrl: field("#benefitImage")?.value.trim() || "",
-      galleryUrls: [...new Set(String(field("#benefitGalleryUrls")?.value || "").split(/\r?\n/).map((url) => url.trim()).filter(Boolean))],
+      galleryEntries,
       validadeFim: field("#benefitValidUntil")?.value || "",
       status: field("#benefitStatus")?.value || "ativo",
       ordem: Number(field("#benefitOrder")?.value || 0),
@@ -4824,24 +4893,30 @@ async function saveBenefitFromForm(form) {
       const fileRef = storageRef(storage, `clientes/portal-olacarlopolis/imagens/beneficios/${id}/logo_${Date.now()}_${slugify(draft.logoFile.name || "imagem")}`);
       image = await uploadFileWithProgress(fileRef, draft.logoFile, "Enviando logo do parceiro", draft.logoFile.name || "logo");
     }
-    const gallery = [...draft.galleryUrls];
-    for (let index = 0; index < draft.galleryFiles.length; index += 1) {
-      const file = draft.galleryFiles[index];
-      const fileRef = storageRef(storage, `clientes/portal-olacarlopolis/imagens/beneficios/${id}/galeria/${Date.now()}_${index}_${slugify(file.name || "imagem")}`);
-      gallery.push(await uploadFileWithProgress(fileRef, file, `Enviando imagem ${index + 1} de ${draft.galleryFiles.length}`, file.name || "imagem"));
+    const gallery = [];
+    for (const entry of draft.galleryEntries) {
+      let url = entry.url;
+      if (entry.fileIndex >= 0) {
+        const file = draft.galleryFiles[entry.fileIndex];
+        if (!file) continue;
+        const fileRef = storageRef(storage, `clientes/portal-olacarlopolis/imagens/beneficios/${id}/galeria/${Date.now()}_${entry.ordem}_${slugify(file.name || "imagem")}`);
+        url = await uploadFileWithProgress(fileRef, file, `Enviando imagem ${entry.ordem + 1} de ${draft.galleryEntries.length}`, file.name || "imagem");
+      }
+      if (url) gallery.push({ url, texto: entry.texto, link: entry.link, ordem: gallery.length });
     }
     const current = state.beneficios.find((item) => item.id === id) || {};
     const savedPlansPayload = Object.fromEntries(Object.values(plans).map((plan, index) => [
       plan.id,
       { ...plan, ordem: index }
     ]));
-    const uniqueGallery = [...new Set(gallery)];
-    const savedGalleryPayload = Object.fromEntries(uniqueGallery.map((url, index) => [
+    const uniqueGalleryEntries = [...new Map(gallery.map((item) => [item.url, item])).values()];
+    const uniqueGallery = uniqueGalleryEntries.map((item) => item.url);
+    const savedGalleryPayload = Object.fromEntries(uniqueGalleryEntries.map((item, index) => [
       `imagem-${String(index + 1).padStart(2, "0")}`,
-      { url, ordem: index }
+      { url: item.url, texto: item.texto, link: item.link, ordem: index }
     ]));
     const benefitPayload = cleanForFirebase({
-      schemaVersion: 2,
+      schemaVersion: 3,
       parceiro: draft.parceiro,
       resumoParceiro: draft.resumoParceiro,
       descricaoParceiro: draft.descricaoParceiro,
@@ -4877,14 +4952,19 @@ async function saveBenefitFromForm(form) {
     const savedSnapshot = await get(benefitRef);
     const savedBenefit = savedSnapshot.val() || {};
     const savedPlans = benefitAllPlans(savedBenefit);
+    const savedGalleryItems = benefitGalleryItems(savedBenefit);
     const savedGallery = benefitGalleryImages(savedBenefit);
     const expectedPlanIds = Object.keys(savedPlansPayload);
     const plansConfirmed = savedPlans.length === expectedPlanIds.length
       && expectedPlanIds.every((planId) => savedPlans.some((plan) => String(plan.id) === String(planId)));
     const galleryConfirmed = savedGallery.length === uniqueGallery.length
       && uniqueGallery.every((url) => savedGallery.includes(url));
+    const galleryMetadataConfirmed = uniqueGalleryEntries.every((expected) => {
+      const saved = savedGalleryItems.find((item) => item.url === expected.url);
+      return saved && saved.texto === expected.texto && saved.link === expected.link;
+    });
     const logoConfirmed = !image || benefitPrimaryImage(savedBenefit) === image;
-    if (!plansConfirmed || !galleryConfirmed || !logoConfirmed) {
+    if (!plansConfirmed || !galleryConfirmed || !galleryMetadataConfirmed || !logoConfirmed) {
       throw new Error("O cadastro foi salvo, mas a conferência dos planos ou imagens não corresponde ao formulário. Tente novamente.");
     }
     savedBenefitRecord = { id, ...savedBenefit };
@@ -4935,10 +5015,10 @@ function showBenefitRequestConfirmation(benefit, plan = null) {
     <div class="benefit-confirm-backdrop" data-benefit-confirm-close>
       <section class="benefit-confirm-modal" role="dialog" aria-modal="true">
         <i class="fa-solid fa-circle-question"></i>
-        <h2>Deseja realmente solicitar este benefício?</h2>
+        <h2>Solicitar este benefício pelo Olá Carlópolis?</h2>
         <dl><div><dt>Parceiro</dt><dd>${escapeHtml(benefit.parceiro || "")}</dd></div><div><dt>Benefício</dt><dd>${escapeHtml(benefit.titulo || "")}</dd></div>${plan ? `<div><dt>Plano escolhido</dt><dd>${escapeHtml(plan.nome)} · ${moneyBR(plan.valor)} ${escapeHtml(benefitPlanPeriodicityLabel(plan.periodicidade))}</dd></div>` : `<div><dt>Plano</dt><dd>Sem plano contratado</dd></div>`}</dl>
         ${benefit.observacoesImportantes ? `<p><strong>Observações importantes</strong>${escapeHtml(benefit.observacoesImportantes)}</p>` : ""}
-        <label>Mensagem ou observação para o parceiro<textarea id="benefitRequestMessage" maxlength="700" rows="3" placeholder="Opcional"></textarea></label>
+        <label>Mensagem ou observação para a solicitação<textarea id="benefitRequestMessage" maxlength="700" rows="3" placeholder="Opcional"></textarea></label>
         <div><button type="button" class="ghost-button" data-benefit-confirm-close>Voltar</button><button type="button" data-benefit-confirm-request="${escapeAttr(benefit.id)}" data-benefit-confirm-plan="${escapeAttr(plan?.id || "")}"><i class="fa-solid fa-check"></i> Confirmar solicitação</button></div>
       </section>
     </div>
@@ -5128,6 +5208,15 @@ function bindBenefitsView() {
     const selected = [...(galleryUpload.files || [])].slice(0, 12);
     const label = mount.querySelector("#benefitGallerySelection");
     if (label) label.textContent = selected.length ? `${selected.length} nova${selected.length === 1 ? " imagem selecionada" : "s imagens selecionadas"} para salvar.` : "Nenhuma nova imagem selecionada.";
+    mount.querySelectorAll("[data-benefit-gallery-new]").forEach((row) => row.remove());
+    const editor = mount.querySelector("#benefitGalleryEditor");
+    selected.forEach((file, index) => {
+      editor?.insertAdjacentHTML("beforeend", renderBenefitGalleryEditorItem({}, editor.querySelectorAll("[data-benefit-gallery-row]").length, {
+        fileIndex: index,
+        fileName: file.name || `Nova imagem ${index + 1}`,
+        previewUrl: URL.createObjectURL(file)
+      }));
+    });
   });
   benefitForm?.addEventListener("submit", (event) => { event.preventDefault(); saveBenefitFromForm(event.currentTarget); });
   mount.querySelector("[data-benefit-plan-add]")?.addEventListener("click", () => {
@@ -5165,6 +5254,19 @@ function bindBenefitsView() {
       $("benefitForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
+    if (event.target.closest("[data-benefit-gallery-add]")) {
+      benefitFormDirty = true;
+      const editor = mount.querySelector("#benefitGalleryEditor");
+      editor?.insertAdjacentHTML("beforeend", renderBenefitGalleryEditorItem({}, editor.querySelectorAll("[data-benefit-gallery-row]").length));
+      editor?.lastElementChild?.querySelector("[data-benefit-gallery-url]")?.focus();
+      return;
+    }
+    const removeGalleryItem = event.target.closest("[data-benefit-gallery-remove]");
+    if (removeGalleryItem) {
+      benefitFormDirty = true;
+      removeGalleryItem.closest("[data-benefit-gallery-row]")?.remove();
+      return;
+    }
     if (event.target.closest("[data-benefit-form-close]")) {
       if (benefitFormDirty && !window.confirm("Fechar o cadastro sem salvar as alterações?")) return;
       benefitFormDirty = false;
@@ -5187,6 +5289,17 @@ function bindBenefitsView() {
         main.src = galleryButton.dataset.benefitGalleryImage;
         main.parentElement?.classList.toggle("is-logo", galleryButton.dataset.benefitGalleryLogo === "true");
       }
+      const galleryInfo = detailModal?.querySelector("[data-benefit-gallery-info]");
+      const galleryText = galleryInfo?.querySelector("[data-benefit-gallery-text]");
+      const galleryLink = galleryInfo?.querySelector("[data-benefit-gallery-link]");
+      const text = galleryButton.dataset.benefitGalleryText || "";
+      const link = benefitSafeExternalUrl(galleryButton.dataset.benefitGalleryLink || "");
+      if (galleryText) galleryText.textContent = text;
+      if (galleryLink) {
+        galleryLink.href = link || "#";
+        galleryLink.classList.toggle("hidden", !link);
+      }
+      galleryInfo?.classList.toggle("hidden", !text && !link);
       detailModal?.querySelectorAll("[data-benefit-gallery-image]").forEach((button) => button.classList.toggle("active", button === galleryButton));
       return;
     }

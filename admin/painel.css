@@ -6575,6 +6575,83 @@ button.admin-button-loading::after {
   text-align: center;
 }
 
+.benefit-gallery-editor {
+  display: grid;
+  gap: 14px;
+}
+
+.benefit-gallery-editor-item {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr) auto;
+  gap: 15px;
+  padding: 14px;
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.benefit-gallery-editor-preview {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 7px;
+  min-height: 130px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #fff;
+  color: #64748b;
+  text-align: center;
+}
+
+.benefit-gallery-editor-preview img {
+  width: 100%;
+  height: 105px;
+  object-fit: contain;
+}
+
+.benefit-gallery-editor-preview i {
+  font-size: 34px;
+}
+
+.benefit-gallery-editor-preview span {
+  max-width: 135px;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.benefit-gallery-editor-fields {
+  display: grid;
+  gap: 10px;
+}
+
+.benefit-gallery-remove {
+  align-self: start;
+}
+
+.benefit-detail-gallery-info {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 13px 15px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, .3);
+  color: #fff;
+}
+
+.benefit-detail-gallery-info p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.benefit-detail-gallery-info a {
+  color: #fbbf24;
+  font-weight: 850;
+}
+
 .benefit-detail-modal.no-gallery {
   grid-template-columns: minmax(0, 760px);
 }
@@ -6637,6 +6714,14 @@ button.admin-button-loading::after {
 }
 
 @media (max-width: 700px) {
+  .benefit-gallery-editor-item {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit-gallery-remove {
+    width: 100%;
+  }
+
   .benefits-grid {
     grid-template-columns: 1fr;
   }
