@@ -982,6 +982,9 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
   const descricao = primeiraDescricaoPreenchida || "";
   const nome = textoLimpoArteComercial(establishment.name || establishment.nome || establishment.title || "Estabelecimento");
   if (imagens[0] && !titulosPorImagem.has(imagens[0])) titulosPorImagem.set(imagens[0], nome);
+  const temItens = (valor) => Array.isArray(valor)
+    ? valor.length > 0
+    : Boolean(valor && typeof valor === "object" && Object.keys(valor).length);
   return {
     nome,
     descricao: textoLimpoArteComercial(descricao).slice(0, 400),
@@ -996,11 +999,112 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     tituloImagem: titulosPorImagem.get(imagens[0]) || "",
     titulosImagensMosaico: imagensMosaico.map((imagem) => titulosPorImagem.get(imagem) || ""),
     titulosPorImagem,
+    temFotosProdutos: imagensMosaico.length > 1 || [establishment.produtos, establishment.products, establishment.itens].some(temItens),
+    temPromocoes: [establishment.promocoes, establishment.promotions, establishment.ofertas].some(temItens),
     imagemEnquadramento: establishment.imagemEnquadramento || establishment.imageFit || "auto"
   };
 }
 
+function montarConteudoVitrineArteComercial({ dados, formato, logoSiteUrl, cidadeFundoUrl, imageFit, mostrarTitulosImagens = false }) {
+  const imagens = (dados.imagensMosaico || dados.imagens || []).slice(0, 4);
+  const imagemPrincipal = imagens[0] || dados.imagem || "";
+  const imagensMenores = imagens.slice(1, 4);
+  const titulosPadrao = ["Novidades", "Promoções", "Mais procurados"];
+  const itensInformativos = [
+    dados.temFotosProdutos || imagens.length > 1 ? {
+      classe: "is-gallery",
+      icone: "fa-solid fa-images",
+      titulo: "Fotos e produtos",
+      descricao: "Encontre o que temos de melhor"
+    } : null,
+    dados.temPromocoes ? {
+      classe: "is-promotion",
+      icone: "fa-solid fa-star",
+      titulo: "Promoções em destaque",
+      descricao: "Ofertas e novidades para você"
+    } : null,
+    dados.endereco || dados.cidade ? {
+      classe: "is-information",
+      icone: "fa-solid fa-info",
+      titulo: "Informações do comércio",
+      descricao: "Endereço, horário e mais detalhes"
+    } : null,
+    dados.whatsapp ? {
+      classe: "is-whatsapp",
+      icone: "fa-brands fa-whatsapp",
+      titulo: "Contato rápido no WhatsApp",
+      descricao: "Facilidade para você"
+    } : null
+  ].filter(Boolean);
+  const miniaturas = imagensMenores.map((imagem, index) => {
+    const tituloRecebido = dados.titulosImagensMosaico?.[index + 1] || "";
+    const titulo = textoLimpoArteComercial(tituloRecebido || titulosPadrao[index]).slice(0, 38);
+    return `
+      <div class="business-art-vitrine-thumb ${mostrarTitulosImagens ? "has-title" : ""} ${index === 1 ? "is-orange" : "is-blue"}">
+        ${mostrarTitulosImagens ? `<strong>${escaparArteComercial(titulo)}</strong>` : ""}
+        <img src="${escaparArteComercial(imagem)}" alt="${escaparArteComercial(titulo)}" crossorigin="anonymous">
+      </div>
+    `;
+  }).join("");
+  const nomeClass = dados.nome.length > 34 ? "name-xlong" : (dados.nome.length > 22 ? "name-long" : "");
+  return `
+    <div class="business-art-vitrine-bg"></div>
+    <header class="business-art-vitrine-header" style="--vitrine-city-bg:url('${escaparArteComercial(cidadeFundoUrl)}')">
+      <span class="business-art-vitrine-corner is-left" aria-hidden="true"></span>
+      <span class="business-art-vitrine-corner is-right" aria-hidden="true"></span>
+      <img src="${escaparArteComercial(logoSiteUrl)}" alt="Olá Carlópolis" crossorigin="anonymous">
+      <strong>O portal da nossa cidade</strong>
+    </header>
+    <article class="business-art-vitrine-card ${nomeClass}">
+      <section class="business-art-vitrine-client">
+        <h1>${escaparArteComercial(dados.nome)}</h1>
+        ${dados.categoria ? `<strong>${escaparArteComercial(dados.categoria)}</strong>` : ""}
+        ${dados.descricao ? `<p>${escaparArteComercial(dados.descricao)}</p>` : ""}
+      </section>
+      <div class="business-art-vitrine-content ${itensInformativos.length ? "has-info" : "no-info"}">
+        <section class="business-art-vitrine-visual ${miniaturas ? "has-thumbs" : "no-thumbs"}">
+          <div class="business-art-picture business-art-vitrine-main is-${escaparArteComercial(imageFit || "cover")}">
+            ${imagemPrincipal
+              ? `<img class="business-art-main-image" src="${escaparArteComercial(imagemPrincipal)}" alt="${escaparArteComercial(dados.nome)}" crossorigin="anonymous">${mostrarTitulosImagens && dados.tituloImagem ? `<strong class="business-art-image-title">${escaparArteComercial(dados.tituloImagem)}</strong>` : ""}`
+              : `<div class="business-art-placeholder"><i class="fa-solid fa-store"></i><span>${escaparArteComercial(dados.categoria || dados.tipoLabel)}</span></div>`}
+          </div>
+          ${miniaturas ? `<div class="business-art-vitrine-thumbs count-${imagensMenores.length}">${miniaturas}</div>` : ""}
+        </section>
+        ${itensInformativos.length ? `
+          <aside class="business-art-vitrine-info">
+            <h2>Fique por dentro:</h2>
+            <div>
+              ${itensInformativos.map((item) => `
+                <section class="${item.classe}">
+                  <i class="${item.icone}"></i>
+                  <span><strong>${item.titulo}</strong><small>${item.descricao}</small></span>
+                </section>
+              `).join("")}
+            </div>
+          </aside>
+        ` : ""}
+      </div>
+    </article>
+    <footer class="business-art-vitrine-footer">
+      <i class="fa-solid fa-globe"></i>
+      <span><small>Acesse:</small><strong>www.olacarlopolis.com</strong></span>
+      <b><i class="fa-solid fa-arrow-pointer"></i></b>
+      <em>Encontre o que você precisa!</em>
+    </footer>
+  `;
+}
+
 function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte, mostrarTitulosImagens = false }) {
+  if (layoutArte === "vitrine") {
+    return montarConteudoVitrineArteComercial({
+      dados,
+      formato,
+      logoSiteUrl,
+      cidadeFundoUrl: dados.cidadeFundoUrl || urlAbsolutaArteComercial("images/img_padrao_site/postal_1.png"),
+      imageFit,
+      mostrarTitulosImagens
+    });
+  }
   const limiteMosaico = formato === "feed" ? 2 : 4;
   const imagensMosaico = (dados.imagensMosaico || dados.imagens || []).slice(0, limiteMosaico);
   const imageBlock = layoutArte === "mosaic" && imagensMosaico.length
@@ -1155,9 +1259,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const imagensOriginais = (dados.imagens || []).slice(0, 4);
   const fontesMosaicoOriginais = (dados.imagensMosaico || dados.imagens || []).slice(0, 120);
   const imagensMosaicoOriginais = fontesMosaicoOriginais.slice(0, 4);
+  const cidadeFundoOriginal = urlAbsolutaArteComercial("images/img_padrao_site/postal_1.png");
   const titulosFontesMosaico = fontesMosaicoOriginais.map((imagem) => dados.titulosPorImagem?.get(imagem) || "");
   const tituloImagemOriginal = dados.tituloImagem || dados.nome;
-  const imagensParaPreparar = [...new Set([...imagensOriginais, ...imagensMosaicoOriginais])];
+  const imagensParaPreparar = [...new Set([...imagensOriginais, ...imagensMosaicoOriginais, cidadeFundoOriginal])];
   const imagensPreparadas = await Promise.all(imagensParaPreparar.map(async (imagem) => {
     const preparada = await prepararImagemArteComercial(imagem);
     return [imagem, preparada || imagem];
@@ -1169,6 +1274,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   dados.imagens = imagensOriginais.map((imagem) => imagensPreparadasPorOrigem.get(imagem) || imagem).filter(Boolean);
   dados.imagensMosaico = imagensMosaicoOriginais.map((imagem) => imagensPreparadasPorOrigem.get(imagem) || imagem).filter(Boolean);
   dados.imagem = dados.imagens[0] || dados.imagem;
+  dados.cidadeFundoUrl = imagensPreparadasPorOrigem.get(cidadeFundoOriginal) || cidadeFundoOriginal;
   dados.tituloImagem = tituloImagemOriginal;
   dados.titulosImagensMosaico = imagensMosaicoOriginais.map((imagem) => dados.titulosPorImagem?.get(imagem) || "");
   const imageFit = await detectarEnquadramentoArteComercial(
@@ -1188,7 +1294,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         <button type="button" class="business-art-mobile-preview-toggle" aria-pressed="false"><i class="fa-solid fa-eye"></i><span>Ver imagem</span></button>
         <div class="business-art-format" role="group" aria-label="Formato da imagem">
           <button type="button" data-business-format="story">Story <small>1080 x 1920</small></button>
-          <button type="button" class="active" data-business-format="feed">Feed <small>1080 x 1350</small></button>
+          <button type="button" class="active" data-business-format="feed">Feed <small>1080 x 1080</small></button>
         </div>
         <div class="business-art-layout" role="group" aria-label="Layout da arte">
           <button type="button" class="active" data-business-layout="vitrine"><i class="fa-solid fa-store"></i><small>Vitrine</small></button>
@@ -1206,7 +1312,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         </div>
         <div class="business-art-photo-option" role="group" aria-label="Formato dos cantos da foto">
           <button type="button" class="active" data-business-rounded aria-pressed="true" title="Ativar ou desativar cantos arredondados"><i class="fa-solid fa-border-top-left"></i><small>Cantos</small></button>
-          <button type="button" data-business-image-titles aria-pressed="false" title="Mostrar ou ocultar os titulos sobre as fotos"><i class="fa-solid fa-tag"></i><small>Títulos</small></button>
+          <button type="button" class="active" data-business-image-titles aria-pressed="true" title="Mostrar ou ocultar os titulos sobre as fotos"><i class="fa-solid fa-tag"></i><small>Títulos</small></button>
         </div>
         <div class="business-art-image-controls">
           <label>
@@ -1264,7 +1370,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       </div>
       <div class="business-art-preview"><div class="business-art-scale"><div class="business-art-stage is-feed"></div></div></div>
       <div class="business-art-actions">
-        <span class="business-art-resolution">PNG 1080 x 1350</span>
+        <span class="business-art-resolution">PNG 1080 x 1080</span>
         <button type="button" class="business-art-download"><i class="fa-solid fa-download"></i> Baixar imagem</button>
       </div>
     </div>`;
@@ -1282,7 +1388,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let corDetalhe = "#0b63e6";
   let efeitoFoto = "soft";
   let cantosArredondados = true;
-  let mostrarTitulosImagens = false;
+  let mostrarTitulosImagens = true;
   let escalaImagem = 1;
   const escalasImagensMosaico = [1, 1, 1, 1];
   const deslocamentosImagensMosaico = Array.from({ length: 4 }, () => ({ x: 0, y: 0 }));
@@ -1299,6 +1405,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   if (descricaoInput) descricaoInput.value = String(fonteDescricao);
   const descricaoOutput = dialog.querySelector('[data-business-font-output="description"]');
   if (descricaoOutput) descricaoOutput.value = String(fonteDescricao);
+  const alturaArteAtual = () => formato === "story" ? 1920 : (layoutArte === "vitrine" ? 1080 : 1350);
 
   const limitarEscalaImagem = (value) => Math.min(1.35, Math.max(.65, value));
   const escalaImagemSelecionada = () => layoutArte === "mosaic"
@@ -1491,7 +1598,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   };
 
   const render = async () => {
-    const height = formato === "story" ? 1920 : 1350;
+    const height = alturaArteAtual();
     const descriptionLength = dados.descricao.length;
     const descriptionClass = descriptionLength === 0
       ? "description-empty"
@@ -1519,12 +1626,14 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       mostrarTitulosImagens
     });
     dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
+    const feedFormatLabel = dialog.querySelector('[data-business-format="feed"] small');
+    if (feedFormatLabel) feedFormatLabel.textContent = layoutArte === "vitrine" ? "1080 x 1080" : "1080 x 1350";
     await aguardarImagensArteComercial(stage);
     const card = stage.querySelector(".business-art-card");
     const picture = stage.querySelector(".business-art-picture");
     const mainImage = picture?.querySelector(".business-art-main-image");
     const mosaic = picture?.querySelector(".business-art-mosaic");
-    if (picture && (mosaic || (mainImage?.naturalWidth && mainImage?.naturalHeight))) {
+    if (layoutArte !== "vitrine" && picture && (mosaic || (mainImage?.naturalWidth && mainImage?.naturalHeight))) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
       const pictureHeights = {
         vitrine: {
@@ -1610,7 +1719,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   };
 
   const resize = () => {
-    const height = formato === "story" ? 1920 : 1350;
+    const height = alturaArteAtual();
     const availableWidth = Math.max(240, preview.clientWidth - 24);
     const availableHeight = Math.max(320, Math.min(window.innerHeight * 0.7, preview.clientHeight || window.innerHeight * 0.7) - 24);
     const scale = Math.min(availableWidth / 1080, availableHeight / height);
@@ -1789,7 +1898,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       await render();
       await aguardarImagensArteComercial(stage);
       if (document.fonts?.ready) await document.fonts.ready;
-      const height = formato === "story" ? 1920 : 1350;
+      const height = alturaArteAtual();
 
       // O preview fica dentro de um contêiner reduzido e com overflow. Renderizar
       // o próprio elemento ali faz o html2canvas herdar esse recorte. A cópia
