@@ -39,6 +39,13 @@
       }
     },
 
+    "auditoriaExclusoes": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$logId": {
+        ".write": "auth != null && !data.exists() && newData.child('uid').val() === auth.uid && newData.child('email').val() === auth.token.email"
+      }
+    },
+
     "configuracoes": {
       "paginaInicial": {
         ".read": true,

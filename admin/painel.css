@@ -6611,3 +6611,175 @@ button.admin-button-loading::after {
     height: 76px;
   }
 }
+/* Relatorio de exclusoes */
+.deletion-report-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #fff 0%, #fff7f7 100%);
+  border: 1px solid #fecaca;
+}
+
+.deletion-report-hero h2 {
+  margin: 8px 0 6px;
+}
+
+.deletion-report-hero p {
+  max-width: 780px;
+  margin: 0;
+  color: #64748b;
+}
+
+.deletion-report-icon {
+  display: grid;
+  width: 78px;
+  height: 78px;
+  flex: 0 0 78px;
+  place-items: center;
+  border-radius: 24px;
+  color: #fff;
+  font-size: 30px;
+  background: linear-gradient(145deg, #ef4444, #b91c1c);
+  box-shadow: 0 16px 35px rgba(185, 28, 28, .24);
+}
+
+.deletion-report-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.deletion-report-stats article {
+  padding: 18px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+}
+
+.deletion-report-stats span {
+  display: block;
+  margin-bottom: 6px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.deletion-report-stats strong {
+  color: #0f172a;
+  font-size: 28px;
+}
+
+.deletion-report-filters {
+  display: grid;
+  grid-template-columns: minmax(240px, 1.5fr) repeat(3, minmax(160px, 1fr));
+  gap: 14px;
+}
+
+.deletion-report-filters label {
+  display: grid;
+  gap: 7px;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.deletion-report-filters input,
+.deletion-report-filters select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 11px;
+  background: #fff;
+  color: #0f172a;
+}
+
+.deletion-report-table-card .section-head {
+  margin-bottom: 16px;
+}
+
+.deletion-report-table td {
+  vertical-align: top;
+}
+
+.deletion-report-table td strong,
+.deletion-report-table td small {
+  display: block;
+}
+
+.deletion-report-table td small {
+  margin-top: 4px;
+  color: #64748b;
+}
+
+.deletion-type-badge {
+  display: inline-flex;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #991b1b;
+  background: #fee2e2;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.deletion-details summary {
+  cursor: pointer;
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.deletion-details p {
+  min-width: 220px;
+  max-width: 360px;
+  margin: 9px 0 5px;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.deletion-empty {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 34px 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+.deletion-empty i {
+  color: #94a3b8;
+  font-size: 28px;
+}
+
+@media (max-width: 900px) {
+  .deletion-report-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .deletion-report-filters {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .deletion-report-hero {
+    align-items: flex-start;
+  }
+
+  .deletion-report-icon {
+    width: 56px;
+    height: 56px;
+    flex-basis: 56px;
+    border-radius: 17px;
+    font-size: 22px;
+  }
+
+  .deletion-report-stats,
+  .deletion-report-filters {
+    grid-template-columns: 1fr;
+  }
+}

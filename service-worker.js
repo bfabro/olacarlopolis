@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-28-novidades-institucionais-v563'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-28-relatorio-exclusoes-v564'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

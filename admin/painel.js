@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 510,
-  label: "v517",
+  numero: 511,
+  label: "v518",
   data: "2026-07-28",
-  nota: "Identificacao de clientes institucionais nas novidades."
+  nota: "Relatorio completo de itens excluidos por administradores."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -134,6 +134,13 @@ let state = {
   beneficiosUtilizacoesLegacy: [],
   beneficiosDuvidas: [],
   beneficiosNotificacoes: [],
+  exclusoes: [],
+  deletionReportFilters: {
+    search: "",
+    type: "todos",
+    actor: "todos",
+    period: "30"
+  },
   selectedBenefitId: "",
   selectedBenefitDetailId: "",
   metricas: {},
@@ -181,7 +188,7 @@ let state = {
   lastVisibleClientCount: 0
 };
 
-const AUDIT_IGNORED_ROOTS = new Set(["auditLogs", "novidades"]);
+const AUDIT_IGNORED_ROOTS = new Set(["auditLogs", "auditoriaExclusoes", "novidades"]);
 const NOVIDADES_TOPICS = {
   produto: ["Produtos", "Novo produto ou atualizacao de item."],
   novoCliente: ["Novo cliente", "Cadastro de um novo comércio, serviço ou instituição."],
@@ -291,8 +298,300 @@ async function registrarLogAuditoria(action, category, details = "", target = ""
   }
 }
 
+const DELETION_ITEM_PATHS = [
+  { pattern: /^clientes\/([^/]+)$/, type: "Cliente" },
+  { pattern: /^categorias\/([^/]+)$/, type: "Categoria" },
+  { pattern: /^eventos\/([^/]+)$/, type: "Evento" },
+  { pattern: /^noticias\/([^/]+)$/, type: "Noticia" },
+  { pattern: /^beneficiosParceiros\/([^/]+)$/, type: "Beneficio" },
+  { pattern: /^usuariosByUid\/([^/]+)$/, type: "Usuario" },
+  { pattern: /^conteudosInformativos\/imoveis\/([^/]+)$/, type: "Imovel" },
+  { pattern: /^conteudosInformativos\/automoveis\/([^/]+)$/, type: "Automovel" },
+  { pattern: /^conteudosInformativos\/notaFalecimento\/([^/]+)$/, type: "Nota de falecimento" },
+  { pattern: /^conteudosInformativos\/gruposWhatsapp\/([^/]+)$/, type: "Grupo WhatsApp" }
+];
+
+const DELETION_CHILD_COLLECTIONS = {
+  clientes: {
+    promocoes: "Promocao",
+    produtos: "Produto",
+    vagasTrabalho: "Vaga",
+    imagens: "Foto do cliente",
+    menuImages: "Imagem de cardapio"
+  },
+  beneficiosParceiros: {
+    planos: "Plano de beneficio",
+    galeria: "Imagem do parceiro"
+  }
+};
+
+const DELETION_CHILD_SCALARS = {
+  clientes: {
+    imagem: "Logo do cliente",
+    logo: "Logo do cliente",
+    profileImage: "Logo do cliente"
+  },
+  beneficiosParceiros: {
+    imagem: "Logo do parceiro",
+    logoUrl: "Logo do parceiro",
+    imagemCapa: "Imagem de capa do parceiro"
+  }
+};
+
+function deletionPathInfo(path = "") {
+  const normalizedPath = String(path || "").replace(/^\/+|\/+$/g, "");
+  for (const config of DELETION_ITEM_PATHS) {
+    const match = normalizedPath.match(config.pattern);
+    if (match) return { path: normalizedPath, itemId: match[1] || "", type: config.type };
+  }
+  return null;
+}
+
+function deletionCollectionInfo(path = "") {
+  const parts = String(path || "").split("/").filter(Boolean);
+  if (parts.length !== 2) return null;
+  const fields = DELETION_CHILD_COLLECTIONS[parts[0]];
+  return fields ? { root: parts[0], itemId: parts[1], fields } : null;
+}
+
+function deletionScalarInfo(path = "") {
+  const parts = String(path || "").split("/").filter(Boolean);
+  if (parts.length !== 2) return null;
+  const fields = DELETION_CHILD_SCALARS[parts[0]];
+  return fields ? { root: parts[0], itemId: parts[1], fields } : null;
+}
+
+function deletionItemReference(item, fallback = "", type = "") {
+  const value = item && typeof item === "object" ? item : {};
+  if (type === "Automovel") {
+    const vehicle = [value.marca, value.modelo, value.ano].filter(Boolean).join(" ").trim();
+    if (vehicle) return vehicle;
+  }
+  return String(
+    value.titulo
+    || value.nome
+    || value.name
+    || value.nomeFalecido
+    || value.razaoSocial
+    || value.email
+    || value.codRef
+    || value.codigo
+    || value.referencia
+    || value.descricaoCurta
+    || fallback
+    || "Item sem nome"
+  ).trim().slice(0, 300);
+}
+
+function deletionItemDetails(item = {}) {
+  if (!item || typeof item !== "object") return "";
+  const candidates = [
+    ["codigo", item.codRef || item.codigo || item.referencia],
+    ["categoria", item.categoria || item.segmento],
+    ["valor", item.preco || item.valor || item.desconto || item.valorTexto],
+    ["status", item.status],
+    ["endereco", item.endereco || item.local],
+    ["contato", item.contato || item.telefone || item.whatsapp],
+    ["validade", item.validade || item.data || item.dataEvento],
+    ["descricao", item.descricaoCurta || item.breveDescricao || item.subtitulo]
+  ];
+  return candidates
+    .filter(([, value]) => value !== undefined && value !== null && String(value).trim())
+    .slice(0, 5)
+    .map(([label, value]) => `${label}: ${String(value).trim().slice(0, 180)}`)
+    .join(" | ")
+    .slice(0, 900);
+}
+
+function deletionClientInfo(item = {}, fallbackClientId = "") {
+  const clientId = String(item.clienteId || item.clientId || fallbackClientId || state.profile?.clienteId || "").trim();
+  const client = state.clientes.find((entry) => entry.id === clientId);
+  return {
+    clientId,
+    clientName: String(
+      item.clienteNome
+      || item.estabelecimento
+      || item.loja
+      || item.corretor
+      || client?.nome
+      || ""
+    ).trim().slice(0, 250)
+  };
+}
+
+function deletionComparableKey(item, index = 0) {
+  if (item === undefined || item === null) return `item-${index}`;
+  if (typeof item !== "object") return `valor:${String(item)}`;
+  const direct = item.id || item.codRef || item.codigo || item.referencia || item.url || item.imagem || item.link;
+  if (direct) return `id:${String(direct)}`;
+  return `ref:${normalizeName(deletionItemReference(item, `item-${index}`))}`;
+}
+
+function deletionItemsEquivalent(first, second) {
+  if (first === second) return true;
+  if (typeof first !== "object" || first === null || typeof second !== "object" || second === null) {
+    return String(first ?? "") === String(second ?? "");
+  }
+  const firstId = first.id || first.codRef || first.codigo || first.referencia;
+  const secondId = second.id || second.codRef || second.codigo || second.referencia;
+  if (firstId && secondId && String(firstId) === String(secondId)) return true;
+  const firstMedia = first.url || first.imagem || first.image || first.link;
+  const secondMedia = second.url || second.imagem || second.image || second.link;
+  if (firstMedia && secondMedia && String(firstMedia) === String(secondMedia)) return true;
+  const firstReference = normalizeName(deletionItemReference(first));
+  const secondReference = normalizeName(deletionItemReference(second));
+  return Boolean(firstReference && secondReference && firstReference === secondReference);
+}
+
+function removedCollectionItems(beforeValue, afterValue) {
+  const before = Array.isArray(beforeValue) ? beforeValue : Object.values(beforeValue || {});
+  const after = Array.isArray(afterValue) ? afterValue : Object.values(afterValue || {});
+  const removalCount = Math.max(0, before.length - after.length);
+  if (!removalCount) return [];
+  const remaining = [...after];
+  const unmatched = [];
+  before.forEach((item) => {
+    const matchIndex = remaining.findIndex((candidate) => deletionItemsEquivalent(item, candidate));
+    if (matchIndex >= 0) remaining.splice(matchIndex, 1);
+    else unmatched.push(item);
+  });
+  return unmatched.slice(0, removalCount);
+}
+
+function makeDeletionRecord(type, item, itemId, path, fallbackClientId = "", referenceOverride = "") {
+  const source = item && typeof item === "object" ? item : {};
+  const clientInfo = deletionClientInfo(source, fallbackClientId);
+  return {
+    tipo: type || "Item",
+    referencia: String(referenceOverride || deletionItemReference(source, itemId, type)).slice(0, 300),
+    itemId: String(itemId || source.id || "").slice(0, 220),
+    caminho: String(path || "").slice(0, 500),
+    clienteId: clientInfo.clientId,
+    clienteNome: clientInfo.clientName,
+    detalhes: deletionItemDetails(source)
+  };
+}
+
+async function registrarExclusaoMonitoramento(record = {}) {
+  const user = auth.currentUser || state.user;
+  if (!user || !state.profile || !record.tipo) return;
+  const id = `${Date.now()}-${user.uid}-${Math.random().toString(36).slice(2, 9)}`;
+  const payload = {
+    ...record,
+    uid: user.uid,
+    email: String(user.email || state.profile.email || "").trim(),
+    role: currentRole() || state.profile.role || "",
+    origemTela: String(authenticatedClientPresenceView || "").slice(0, 160),
+    createdAt: serverTimestamp()
+  };
+  try {
+    await firebaseSet(ref(db, `auditoriaExclusoes/${id}`), payload);
+    if (isMaster()) {
+      state.exclusoes.unshift({ id, ...payload, createdAt: Date.now() });
+      if (!$("relatorioExclusoesView")?.classList.contains("hidden")) renderDeletionReport();
+    }
+  } catch (error) {
+    console.warn("Nao foi possivel registrar a exclusao para monitoramento.", error);
+  }
+}
+
+async function snapshotValueForDeletion(path = "") {
+  try {
+    const snapshot = await get(ref(db, path));
+    return snapshot.exists() ? snapshot.val() : null;
+  } catch (error) {
+    console.warn("Nao foi possivel preparar os dados da exclusao.", error);
+    return null;
+  }
+}
+
+async function prepareDeletionRecordsForUpdate(reference, value) {
+  const basePath = databaseReferencePath(reference);
+  const entries = [];
+  if (basePath) {
+    entries.push({ path: basePath, value });
+  } else if (value && typeof value === "object") {
+    Object.entries(value).forEach(([path, entryValue]) => entries.push({ path, value: entryValue }));
+  }
+  const objectWrites = new Set(entries
+    .filter((entry) => entry.value && typeof entry.value === "object")
+    .map((entry) => String(entry.path).split("/").slice(0, -1).join("/")));
+  const records = [];
+
+  for (const entry of entries) {
+    const path = String(entry.path || "").replace(/^\/+|\/+$/g, "");
+    const pathInfo = deletionPathInfo(path);
+    const parentPath = path.split("/").slice(0, -1).join("/");
+    const likelyRename = entry.value === null && objectWrites.has(parentPath);
+    if (pathInfo && entry.value === null && !likelyRename) {
+      const previous = await snapshotValueForDeletion(path);
+      if (previous !== null) records.push(makeDeletionRecord(pathInfo.type, previous, pathInfo.itemId, path));
+      continue;
+    }
+
+    if (pathInfo && entry.value && typeof entry.value === "object") {
+      const isSoftDeletion = (
+        pathInfo.type === "Evento" && normalizeName(entry.value.status || "") === "excluido"
+      ) || (
+        pathInfo.type === "Imovel" && entry.value.ocultarBaseInicial === true
+      );
+      if (isSoftDeletion) {
+        const previous = await snapshotValueForDeletion(path);
+        if (previous && normalizeName(previous.status || "") !== "excluido" && previous.ocultarBaseInicial !== true) {
+          records.push(makeDeletionRecord(pathInfo.type, previous, pathInfo.itemId, path));
+        }
+      }
+    }
+
+    const collectionInfo = deletionCollectionInfo(path);
+    const scalarInfo = deletionScalarInfo(path);
+    if ((!collectionInfo && !scalarInfo) || !entry.value || typeof entry.value !== "object") continue;
+    const collectionFields = collectionInfo
+      ? Object.keys(collectionInfo.fields).filter((field) => Object.prototype.hasOwnProperty.call(entry.value, field))
+      : [];
+    const scalarFields = scalarInfo
+      ? Object.keys(scalarInfo.fields).filter((field) => Object.prototype.hasOwnProperty.call(entry.value, field))
+      : [];
+    if (!collectionFields.length && !scalarFields.length) continue;
+    const previous = await snapshotValueForDeletion(path);
+    if (!previous || typeof previous !== "object") continue;
+    for (const field of collectionFields) {
+      const removed = removedCollectionItems(previous[field], entry.value[field]);
+      removed.forEach((item, index) => {
+        const type = collectionInfo.fields[field];
+        const fallback = `${type} ${index + 1}`;
+        const isMediaItem = type.includes("Imagem") || type.includes("Foto");
+        records.push(makeDeletionRecord(
+          type,
+          item && typeof item === "object" ? item : {},
+          isMediaItem ? `${field}-${index + 1}` : deletionComparableKey(item, index).slice(0, 220),
+          `${path}/${field}`,
+          collectionInfo.root === "clientes" ? collectionInfo.itemId : "",
+          isMediaItem ? fallback : ""
+        ));
+      });
+    }
+    for (const field of scalarFields) {
+      if (previous[field] && !entry.value[field]) {
+        const type = scalarInfo.fields[field];
+        records.push(makeDeletionRecord(
+          type,
+          {},
+          field,
+          `${path}/${field}`,
+          scalarInfo.root === "clientes" ? scalarInfo.itemId : "",
+          type
+        ));
+      }
+    }
+  }
+  return records;
+}
+
 async function update(reference, value) {
+  const deletionRecords = await prepareDeletionRecordsForUpdate(reference, value);
   await firebaseUpdate(reference, value);
+  for (const record of deletionRecords) await registrarExclusaoMonitoramento(record);
   const audit = auditTargetFromWrite(reference, value);
   if (audit) {
     const hasRemoval = Object.values(value || {}).some((item) => item === null);
@@ -302,14 +601,22 @@ async function update(reference, value) {
 }
 
 async function set(reference, value) {
+  const deletionRecords = await prepareDeletionRecordsForUpdate(reference, value);
   await firebaseSet(reference, value);
+  for (const record of deletionRecords) await registrarExclusaoMonitoramento(record);
   const audit = auditTargetFromWrite(reference, value);
   if (audit) await registrarLogAuditoria("Gravacao", audit.category, "Registro salvo", audit.target);
 }
 
 async function remove(reference) {
   const audit = auditTargetFromWrite(reference);
+  const path = databaseReferencePath(reference);
+  const pathInfo = deletionPathInfo(path);
+  const previous = pathInfo ? await snapshotValueForDeletion(path) : null;
   await firebaseRemove(reference);
+  if (pathInfo && previous !== null) {
+    await registrarExclusaoMonitoramento(makeDeletionRecord(pathInfo.type, previous, pathInfo.itemId, path));
+  }
   if (audit) await registrarLogAuditoria("Exclusao", audit.category, "Registro removido", audit.target);
 }
 
@@ -359,6 +666,7 @@ const views = {
   financeiro: $("financeiroView"),
   relatorioAcessos: $("relatorioAcessosView"),
   relatorioFinanceiro: $("relatorioFinanceiroView"),
+  relatorioExclusoes: $("relatorioExclusoesView"),
   beneficios: $("beneficiosView"),
   areaParceiro: $("areaParceiroView"),
   usuariosOnline: $("usuariosOnlineView"),
@@ -387,6 +695,7 @@ const viewCopy = {
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   relatorioAcessos: ["Relatorio Acessos", "Acessos, cliques, origens e acoes realizadas pelos usuarios."],
   relatorioFinanceiro: ["Relatorio Financeiro", "Receitas, valores em aberto, planos e comprovantes dos clientes."],
+  relatorioExclusoes: ["Relatorio Exclusoes", "Historico dos itens removidos pelos administradores e clientes."],
   beneficios: ["Benefícios", "Vantagens exclusivas oferecidas aos clientes Olá Carlópolis."],
   areaParceiro: ["Área do Parceiro", "Solicitações, dúvidas e clientes vinculados aos seus benefícios."],
   usuariosOnline: ["Usuarios online", "Acompanhe em tempo real quais telas do site publico estao sendo acessadas."],
@@ -655,6 +964,7 @@ function canAccessView(viewName) {
   if (isBenefitPartner()) return viewName === "areaParceiro";
   if (viewName === "areaParceiro") return isBenefitPartner() || isMaster();
   if (viewName === "beneficios") return !isBenefitPartner();
+  if (viewName === "relatorioExclusoes") return isMaster();
   if (viewName === "dashboard") return canManageClients();
   if (canManageClients()) {
     if (viewName === "usuariosOnline") return isMaster();
@@ -2220,6 +2530,7 @@ async function loadAllData(onProgress = null) {
     paginaInicialSnap,
     novidadesConfigSnap,
     xadrezConfigSnap,
+    exclusoesSnap,
     cliquesBotoesSnap,
     cliquesMenuSnap,
     acessosSnap,
@@ -2248,6 +2559,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("configuracoes/paginaInicial"),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("jogos/xadrez/config"),
+    getPanelSnapshot("auditoriaExclusoes", { enabled: isMaster() }),
     getPanelSnapshot("cliquesPorBotao", { enabled: canManage }),
     getPanelSnapshot("cliquesMenuLateral", { enabled: canManage }),
     getPanelSnapshot("acessosPorDia", { enabled: canManage }),
@@ -2330,6 +2642,14 @@ async function loadAllData(onProgress = null) {
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
+  state.exclusoes = [];
+  if (exclusoesSnap.exists()) {
+    exclusoesSnap.forEach((child) => {
+      state.exclusoes.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  state.exclusoes.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
   progress(72, "Preparando informações do painel...");
   state.metricas = scopedClientMetrics || {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
@@ -2452,6 +2772,7 @@ async function loadAllData(onProgress = null) {
   renderNovidadesConfig();
   renderStoriesComerciaisView();
   renderBenefitsView();
+  if (isMaster()) renderDeletionReport();
   startBenefitsRealtime();
   renderClientInvoices();
   renderClientBillingAlert();
@@ -4890,6 +5211,168 @@ function bindPartnerBenefitsArea() {
   mount.querySelectorAll("[data-benefit-notification-read]").forEach((button) => button.addEventListener("click", () => markBenefitNotificationRead(button.dataset.benefitNotificationRead)));
 }
 
+function deletionReportFilteredItems() {
+  const filters = state.deletionReportFilters || {};
+  const search = normalizeName(filters.search || "");
+  const type = String(filters.type || "todos");
+  const actor = String(filters.actor || "todos");
+  const days = Number(filters.period || 0);
+  const cutoff = days > 0 ? Date.now() - (days * 86400000) : 0;
+  return (state.exclusoes || []).filter((item) => {
+    if (type !== "todos" && item.tipo !== type) return false;
+    if (actor !== "todos" && item.email !== actor) return false;
+    if (cutoff && Number(item.createdAt || 0) < cutoff) return false;
+    if (!search) return true;
+    const haystack = normalizeName([
+      item.referencia,
+      item.tipo,
+      item.clienteNome,
+      item.clienteId,
+      item.email,
+      item.itemId,
+      item.detalhes
+    ].filter(Boolean).join(" "));
+    return haystack.includes(search);
+  });
+}
+
+function renderDeletionReportRows() {
+  const rows = deletionReportFilteredItems();
+  const tbody = $("deletionReportRows");
+  if (!tbody) return;
+  const todayKey = new Date().toLocaleDateString("pt-BR");
+  const todayTotal = rows.filter((item) => new Date(Number(item.createdAt || 0)).toLocaleDateString("pt-BR") === todayKey).length;
+  const clientAdminTotal = rows.filter((item) => item.role === "cliente").length;
+  const uniqueActors = new Set(rows.map((item) => item.email).filter(Boolean)).size;
+  if ($("deletionReportTotal")) $("deletionReportTotal").textContent = String(rows.length);
+  if ($("deletionReportToday")) $("deletionReportToday").textContent = String(todayTotal);
+  if ($("deletionReportClients")) $("deletionReportClients").textContent = String(clientAdminTotal);
+  if ($("deletionReportActors")) $("deletionReportActors").textContent = String(uniqueActors);
+  if ($("deletionReportResultCount")) {
+    $("deletionReportResultCount").textContent = `${rows.length} exclusao${rows.length === 1 ? "" : "oes"} encontrada${rows.length === 1 ? "" : "s"}`;
+  }
+  tbody.innerHTML = rows.length ? rows.map((item) => {
+    const createdAt = Number(item.createdAt || 0);
+    const roleLabel = item.role === "cliente" ? "Admin cliente" : (item.role === "master" ? "Admin master" : (item.role || "Administrador"));
+    const clientLabel = item.clienteNome || item.clienteId || "Item geral";
+    return `
+      <tr>
+        <td><strong>${escapeHtml(createdAt ? new Date(createdAt).toLocaleDateString("pt-BR") : "-")}</strong><small>${escapeHtml(createdAt ? new Date(createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "")}</small></td>
+        <td><span class="deletion-type-badge">${escapeHtml(item.tipo || "Item")}</span></td>
+        <td><strong>${escapeHtml(item.referencia || "Item sem referencia")}</strong><small>ID: ${escapeHtml(item.itemId || "-")}</small></td>
+        <td><strong>${escapeHtml(clientLabel)}</strong><small>${escapeHtml(item.clienteId && item.clienteNome ? item.clienteId : "")}</small></td>
+        <td><strong>${escapeHtml(item.email || "-")}</strong><small>${escapeHtml(roleLabel)}</small></td>
+        <td>
+          <details class="deletion-details">
+            <summary>Ver dados</summary>
+            <p>${escapeHtml(item.detalhes || "Nenhum detalhe adicional disponivel.")}</p>
+            <small>Tela: ${escapeHtml(item.origemTela || "-")}</small>
+          </details>
+        </td>
+      </tr>
+    `;
+  }).join("") : `<tr><td colspan="6"><div class="deletion-empty"><i class="fa-solid fa-shield-halved"></i><strong>Nenhuma exclusao encontrada</strong><span>Ajuste os filtros ou aguarde novos registros.</span></div></td></tr>`;
+}
+
+function renderDeletionReport() {
+  const mount = $("deletionReportMount");
+  if (!mount || !isMaster()) return;
+  const types = [...new Set((state.exclusoes || []).map((item) => item.tipo).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const actors = [...new Set((state.exclusoes || []).map((item) => item.email).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const filters = state.deletionReportFilters || {};
+  mount.innerHTML = `
+    <section class="panel-card deletion-report-hero">
+      <div>
+        <span class="feature-kicker"><i class="fa-solid fa-shield-halved"></i> Auditoria de exclusoes</span>
+        <h2>Itens removidos do sistema</h2>
+        <p>Monitore o que foi excluido, por qual usuario e a qual cliente o item pertencia. Imagens nao sao armazenadas neste historico.</p>
+      </div>
+      <div class="deletion-report-icon"><i class="fa-solid fa-trash-can-arrow-up"></i></div>
+    </section>
+    <section class="deletion-report-stats">
+      <article><span>Resultado atual</span><strong id="deletionReportTotal">0</strong></article>
+      <article><span>Excluidos hoje</span><strong id="deletionReportToday">0</strong></article>
+      <article><span>Por admins clientes</span><strong id="deletionReportClients">0</strong></article>
+      <article><span>Usuarios envolvidos</span><strong id="deletionReportActors">0</strong></article>
+    </section>
+    <section class="panel-card deletion-report-filters">
+      <label>Buscar
+        <input id="deletionReportSearch" type="search" value="${escapeAttr(filters.search || "")}" placeholder="Nome, referencia, cliente ou usuario">
+      </label>
+      <label>Tipo de item
+        <select id="deletionReportType">
+          <option value="todos">Todos os itens</option>
+          ${types.map((type) => `<option value="${escapeAttr(type)}" ${filters.type === type ? "selected" : ""}>${escapeHtml(type)}</option>`).join("")}
+        </select>
+      </label>
+      <label>Quem excluiu
+        <select id="deletionReportActor">
+          <option value="todos">Todos os usuarios</option>
+          ${actors.map((email) => `<option value="${escapeAttr(email)}" ${filters.actor === email ? "selected" : ""}>${escapeHtml(email)}</option>`).join("")}
+        </select>
+      </label>
+      <label>Periodo
+        <select id="deletionReportPeriod">
+          <option value="7" ${filters.period === "7" ? "selected" : ""}>Ultimos 7 dias</option>
+          <option value="30" ${filters.period === "30" ? "selected" : ""}>Ultimos 30 dias</option>
+          <option value="90" ${filters.period === "90" ? "selected" : ""}>Ultimos 90 dias</option>
+          <option value="0" ${filters.period === "0" ? "selected" : ""}>Todo o historico</option>
+        </select>
+      </label>
+    </section>
+    <section class="panel-card deletion-report-table-card">
+      <div class="section-head">
+        <div><h2>Historico detalhado</h2><p id="deletionReportResultCount">0 exclusoes encontradas</p></div>
+        <button id="refreshDeletionReportButton" type="button"><i class="fa-solid fa-rotate"></i> Atualizar</button>
+      </div>
+      <div class="report-table-wrap">
+        <table class="report-table deletion-report-table">
+          <thead><tr><th>Data</th><th>Tipo</th><th>Item / referencia</th><th>Cliente</th><th>Excluido por</th><th>Detalhes</th></tr></thead>
+          <tbody id="deletionReportRows"></tbody>
+        </table>
+      </div>
+    </section>
+  `;
+  $("deletionReportSearch")?.addEventListener("input", (event) => {
+    state.deletionReportFilters.search = event.target.value;
+    renderDeletionReportRows();
+  });
+  $("deletionReportType")?.addEventListener("change", (event) => {
+    state.deletionReportFilters.type = event.target.value;
+    renderDeletionReportRows();
+  });
+  $("deletionReportActor")?.addEventListener("change", (event) => {
+    state.deletionReportFilters.actor = event.target.value;
+    renderDeletionReportRows();
+  });
+  $("deletionReportPeriod")?.addEventListener("change", (event) => {
+    state.deletionReportFilters.period = event.target.value;
+    renderDeletionReportRows();
+  });
+  $("refreshDeletionReportButton")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    setBusy(button, true, "Atualizando...");
+    try {
+      const snapshot = await get(ref(db, "auditoriaExclusoes"));
+      state.exclusoes = [];
+      if (snapshot.exists()) {
+        snapshot.forEach((child) => {
+          state.exclusoes.push({ id: child.key, ...child.val() });
+          return false;
+        });
+      }
+      state.exclusoes.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+      renderDeletionReport();
+      showToast("Relatorio de exclusoes atualizado.");
+    } catch (error) {
+      showToast("Nao foi possivel atualizar o relatorio.");
+    } finally {
+      setBusy(button, false);
+    }
+  });
+  renderDeletionReportRows();
+}
+
 function switchView(name) {
   const target = views[name] ? name : "dashboard";
   if (!canAccessView(target)) {
@@ -4919,6 +5402,7 @@ function switchView(name) {
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "beneficios") renderBenefitsView();
   if (target === "areaParceiro") renderPartnerBenefitsArea();
+  if (target === "relatorioExclusoes") renderDeletionReport();
   if (target === "relatorioAcessos" || target === "relatorioFinanceiro") {
     renderReports();
     if (target === "relatorioAcessos") refreshMasterAccessMetrics();
@@ -17995,7 +18479,7 @@ function bindEvents() {
     if (!id) return;
     const item = state.noticias.find((news) => news.id === id);
     if (!(await confirmarExclusao(item?.titulo || id, "noticia"))) return;
-    await firebaseRemove(ref(db, `noticias/${id}`));
+    await remove(ref(db, `noticias/${id}`));
     resetNewsForm();
     await loadAllData();
   });
@@ -18522,7 +19006,7 @@ function bindEvents() {
   }
   document.querySelectorAll(".nav-admin button").forEach((button) => {
     button.addEventListener("click", () => {
-      if (button.dataset.view === "relatorioAcessos" || button.dataset.view === "relatorioFinanceiro") {
+      if (button.dataset.view === "relatorioAcessos" || button.dataset.view === "relatorioFinanceiro" || button.dataset.view === "relatorioExclusoes") {
         const finish = beginAdminActionLoading("Montando relatórios...", button);
         showAdminActionLoading("Montando relatórios...", button);
         return new Promise((resolve) => {

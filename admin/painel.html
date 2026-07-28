@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=359">
+  <link rel="stylesheet" href="painel.css?v=360">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -85,6 +85,7 @@
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
           <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatorio Acessos</button>
           <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorio Financeiro</button>
+          <button data-view="relatorioExclusoes" data-master="true"><i class="fa-solid fa-trash-can-arrow-up"></i> Relatorio Exclusoes</button>
           <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuarios online</button>
         </section>
         <section class="nav-admin-group" data-master="true">
@@ -805,6 +806,10 @@
 
       <section id="relatorioFinanceiroView" class="panel-view hidden">
         <div id="reportsFinanceMount" class="reports-layout"></div>
+      </section>
+
+      <section id="relatorioExclusoesView" class="panel-view hidden">
+        <div id="deletionReportMount" class="reports-layout"></div>
       </section>
 
       <section id="beneficiosView" class="panel-view hidden">
@@ -1899,6 +1904,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=445"></script>
+  <script type="module" src="painel.js?v=446"></script>
 </body>
 </html>
