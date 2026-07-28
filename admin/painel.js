@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 518,
-  label: "v525",
+  numero: 519,
+  label: "v526",
   data: "2026-07-28",
-  nota: "Admin cliente pode acessar somente a area do parceiro vinculada quando a permissao estiver ativa."
+  nota: "Relatorio financeiro filtrado por periodo, compacto, retratil e com acoes de atencao via WhatsApp."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -13217,6 +13217,96 @@ function renderReportCardHeader(title, periodRange) {
   `;
 }
 
+function financeInvoiceRowsForRange(clients = [], periodRange = getReportDateRange()) {
+  const startMonth = String(periodRange.start || "").slice(0, 7);
+  const endMonth = String(periodRange.end || "").slice(0, 7);
+  const currentMonth = currentMonthKey();
+  const rows = [];
+  clients.forEach((client) => {
+    if (!isBillableClientType(client)) return;
+    const savedMonths = new Set();
+    Object.entries(client.faturas || {}).forEach(([month, invoice]) => {
+      if (!/^\d{4}-\d{2}$/.test(month) || month < startMonth || month > endMonth) return;
+      if (invoice?.status === "isento") return;
+      savedMonths.add(month);
+      rows.push({
+        client,
+        month,
+        invoice: { mes: month, ...(invoice || {}) },
+        status: invoice?.status || financePaymentStatusForMonth(client, month),
+        value: Number(invoice?.valorTotal || financeInvoiceValueForMonth(client, month) || 0),
+        synthetic: false
+      });
+    });
+    if (
+      currentMonth >= startMonth
+      && currentMonth <= endMonth
+      && !savedMonths.has(currentMonth)
+      && client.status !== "inativo"
+      && isBillableClientType(client)
+      && effectivePaymentStatus(client) !== "isento"
+    ) {
+      rows.push({
+        client,
+        month: currentMonth,
+        invoice: { mes: currentMonth },
+        status: financePaymentStatusForMonth(client, currentMonth),
+        value: financeInvoiceValueForMonth(client, currentMonth),
+        synthetic: true
+      });
+    }
+  });
+  return rows.sort((a, b) => b.month.localeCompare(a.month) || String(a.client.nome || "").localeCompare(String(b.client.nome || ""), "pt-BR"));
+}
+
+function renderFinanceStatCard(title, value, meta, periodLabel, tone = "") {
+  return `
+    <article class="stat-card finance-report-stat ${tone ? `is-${escapeAttr(tone)}` : ""}">
+      <div class="finance-stat-filter"><span>Filtro aplicado</span><strong>${escapeHtml(periodLabel)}</strong></div>
+      <div class="finance-stat-content"><span>${escapeHtml(title)}</span><strong>${escapeHtml(value)}</strong><small>${escapeHtml(meta || "")}</small></div>
+    </article>
+  `;
+}
+
+function renderFinanceReportSection(id, title, periodRange, content, wide = false) {
+  return `
+    <section class="panel-card report-card finance-report-collapsible ${wide ? "report-wide" : ""}" data-finance-report-section="${escapeAttr(id)}">
+      <button type="button" class="finance-report-section-toggle" data-finance-report-toggle aria-expanded="false">
+        <span><i class="fa-solid fa-chevron-right"></i><strong>${escapeHtml(title)}</strong></span>
+        <small><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(periodRange.label)}</small>
+      </button>
+      <div class="finance-report-section-content hidden" data-finance-report-content>${content}</div>
+    </section>
+  `;
+}
+
+function financialAttentionMessage(client = {}, issues = []) {
+  const clientName = client.nome || client.name || "cliente";
+  const issueText = issues.length > 1
+    ? `${issues.slice(0, -1).join(", ")} e ${issues.at(-1)}`
+    : (issues[0] || "uma informação pendente");
+  return `Olá, ${clientName}! Tudo bem? Identificamos no Olá Carlópolis que seu cadastro precisa de atenção: ${issueText}. Poderia, por favor, verificar essa pendência e nos retornar? Ficamos à disposição para ajudar.`;
+}
+
+function renderFinancialAttentionList(items = []) {
+  if (!items.length) return `<div class="list-meta">Nenhuma pendência financeira encontrada neste período.</div>`;
+  return `<div class="finance-attention-list">${items.map(({ client, issues }) => {
+    const phone = String(client.whatsapp || client.telefoneWhatsapp || client.contatoWhatsapp || client.contato || client.telefone || "").replace(/\D/g, "");
+    const whatsappPhone = phone ? (phone.startsWith("55") ? phone : `55${phone}`) : "";
+    const message = financialAttentionMessage(client, issues);
+    return `
+      <article class="finance-attention-item">
+        <div><strong>${escapeHtml(client.nome || client.id)}</strong><span>${escapeHtml(issues.join(" · "))}</span></div>
+        <div class="finance-attention-actions">
+          ${whatsappPhone ? `<a class="finance-attention-whatsapp" href="https://wa.me/${escapeAttr(whatsappPhone)}?text=${encodeURIComponent(message)}" target="_blank" rel="noopener" aria-label="Enviar mensagem no WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` : `<button type="button" class="finance-attention-whatsapp is-disabled" disabled title="Cliente sem WhatsApp cadastrado"><i class="fa-brands fa-whatsapp"></i></button>`}
+          <button type="button" class="ghost-button" data-generate-finance-attention-message data-message="${escapeAttr(message)}"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar mensagem</button>
+        </div>
+        <textarea class="finance-attention-message hidden" readonly></textarea>
+      </article>
+    `;
+  }).join("")}</div>`;
+}
+
 const REPORT_BLOCKED_CATEGORY_SLUGS = new Set([
   "eventosemcarlopolis",
   "agendamento",
@@ -14477,6 +14567,19 @@ function renderUserActionReport(mount, periodRange) {
   `;
 }
 
+async function applyFinanceReportFilter(sourceButton, updatePeriod) {
+  const finish = beginAdminActionLoading("Carregando informações do período...", sourceButton);
+  showAdminActionLoading("Carregando informações do período...", sourceButton);
+  try {
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+    updatePeriod();
+    renderReports("finance");
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  } finally {
+    finish();
+  }
+}
+
 let accessMetricsRefreshPromise = null;
 
 async function refreshMasterAccessMetrics({ notify = false } = {}) {
@@ -14522,6 +14625,7 @@ async function refreshMasterAccessMetrics({ notify = false } = {}) {
 }
 
 function bindReportControls(mount) {
+  const isFinanceReport = mount.id === "reportsFinanceMount";
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
     button.addEventListener("click", () => {
       state.reportSection = button.dataset.reportSection;
@@ -14529,9 +14633,43 @@ function bindReportControls(mount) {
     });
   });
   mount.querySelectorAll("[data-report-period]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
+      if (isFinanceReport) {
+        await applyFinanceReportFilter(button, () => {
+          state.reportPeriod.type = button.dataset.reportPeriod;
+        });
+        return;
+      }
       state.reportPeriod.type = button.dataset.reportPeriod;
       renderReports();
+    });
+  });
+  mount.querySelectorAll("[data-finance-report-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const section = button.closest("[data-finance-report-section]");
+      const content = section?.querySelector("[data-finance-report-content]");
+      const expanded = button.getAttribute("aria-expanded") === "true";
+      button.setAttribute("aria-expanded", String(!expanded));
+      content?.classList.toggle("hidden", expanded);
+      section?.classList.toggle("is-expanded", !expanded);
+    });
+  });
+  mount.querySelectorAll("[data-generate-finance-attention-message]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const message = button.dataset.message || "";
+      const textarea = button.closest(".finance-attention-item")?.querySelector(".finance-attention-message");
+      if (textarea) {
+        textarea.value = message;
+        textarea.classList.remove("hidden");
+        textarea.focus();
+        textarea.select();
+      }
+      try {
+        await navigator.clipboard?.writeText(message);
+        showToast("Mensagem gerada e copiada.");
+      } catch {
+        showToast("Mensagem gerada. Use o campo para copiar.");
+      }
     });
   });
   mount.querySelector("#auditLogSearch")?.addEventListener("change", renderReports);
@@ -14578,17 +14716,18 @@ function renderReports(reportType = "") {
   const ativos = reportClients.filter((c) => c.status === "ativo");
   const inativos = reportClients.filter((c) => c.status === "inativo");
   const pendentes = reportClients.filter((c) => c.status === "pendente");
-  const pagos = reportClients.filter((c) => effectivePaymentStatus(c) === "pago");
-  const abertos = reportClients.filter((c) => effectivePaymentStatus(c) === "em_aberto");
   const isentos = reportClients.filter((c) => effectivePaymentStatus(c) === "isento");
-  const destaques = reportClients.filter((c) => destaqueIsActive(c));
-  const comImagem = reportClients.filter((c) => c.imagem || normalizeImageItems(c.imagens).length);
-  const comHorarios = reportClients.filter((c) => scheduleHasAnyOpen(c.horarios || {}));
-  const valorReceber = reportClients
-    .filter((c) => c.status !== "inativo" && isBillableClientType(c) && effectivePaymentStatus(c) !== "isento")
-    .reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
-  const valorPago = pagos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
-  const valorAberto = abertos.reduce((sum, c) => sum + valorTotalFaturaCliente(c), 0);
+  const financeInvoiceRows = financeInvoiceRowsForRange(reportClients, periodRange);
+  const financePaidRows = financeInvoiceRows.filter((item) => item.status === "pago");
+  const financeOpenRows = financeInvoiceRows.filter((item) => !item.status || item.status === "em_aberto");
+  const financeReviewRows = financeInvoiceRows.filter((item) => item.status === "em_analise");
+  const financeReceiptRows = financeInvoiceRows.filter((item) => invoiceHasReceipt(item.invoice));
+  const financeBaseClients = reportClients.filter((client) => client.status !== "inativo" && isBillableClientType(client));
+  const financeClientCount = new Set(financeInvoiceRows.map((item) => item.client.id)).size;
+  const financeBilledValue = financeInvoiceRows.reduce((sum, item) => sum + item.value, 0);
+  const financePaidValue = financePaidRows.reduce((sum, item) => sum + item.value, 0);
+  const financeOpenValue = financeOpenRows.reduce((sum, item) => sum + item.value, 0);
+  const financeReviewValue = financeReviewRows.reduce((sum, item) => sum + item.value, 0);
   const receitas = reportClients
     .filter((c) => c.status !== "inativo" && isBillableClientType(c) && effectivePaymentStatus(c) !== "isento")
     .reduce((acc, client) => {
@@ -14603,16 +14742,6 @@ function renderReports(reportType = "") {
     acc[plano] = (acc[plano] || 0) + 1;
     return acc;
   }, {});
-
-  const categoriasMap = new Map();
-  reportClients.forEach((client) => {
-    const key = client.categoria || "Sem categoria";
-    categoriasMap.set(key, (categoriasMap.get(key) || 0) + 1);
-  });
-  const topCategorias = [...categoriasMap.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 8)
-    .map(([title, count]) => ({ title, meta: `${count} cliente${count === 1 ? "" : "s"}` }));
 
   const cliquesBotoes = aggregateCliquesPorBotao(filteredMetrics.cliquesBotoes);
   const cliquesMenu = aggregateMenuDaily(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
@@ -14655,45 +14784,25 @@ function renderReports(reportType = "") {
   const newsClickRows = buildNewsClickRows(state.metricas, periodRange);
 
   const clientesAtencao = reportClients
-    .filter((client) => client.status !== "inativo")
+    .filter((client) => client.status !== "inativo" && isBillableClientType(client))
     .map((client) => {
-      const faltas = [];
-      if (!client.imagem && !normalizeImageItems(client.imagens).length) faltas.push("sem foto");
-      if (!client.contato && !client.whatsapp) faltas.push("sem telefone");
-      if (!client.categoria) faltas.push("sem categoria");
-      if (!scheduleHasAnyOpen(client.horarios || {})) faltas.push("sem horarios");
-      if (effectivePaymentStatus(client) === "em_aberto") faltas.push("financeiro em aberto");
-      return { client, faltas };
+      const issues = [];
+      const clientRows = financeInvoiceRows.filter((item) => item.client.id === client.id);
+      const openRows = clientRows.filter((item) => !item.status || item.status === "em_aberto");
+      const reviewRows = clientRows.filter((item) => item.status === "em_analise");
+      if (openRows.length) issues.push(`${openRows.length} fatura${openRows.length === 1 ? "" : "s"} em aberto (${moneyBR(openRows.reduce((sum, item) => sum + item.value, 0))})`);
+      if (reviewRows.length) issues.push(`${reviewRows.length} comprovante${reviewRows.length === 1 ? "" : "s"} aguardando análise`);
+      if (valorTotalFaturaCliente(client) <= 0 && effectivePaymentStatus(client) !== "isento") issues.push("valor do plano não definido");
+      if (["semestral", "anual"].includes(client.tipoPlano) && !financePlanDueDate(client)) issues.push("vencimento do plano não definido");
+      return { client, issues };
     })
-    .filter((item) => item.faltas.length)
-    .slice(0, 10)
-    .map((item) => ({ title: item.client.nome || item.client.id, meta: item.faltas.join(", ") }));
+    .filter((item) => item.issues.length);
 
-  const faturasComComprovante = reportClients
-    .map((client) => ({ client, invoice: latestClientInvoice(client) }))
-    .filter(({ invoice }) => invoiceHasReceipt(invoice))
-    .slice(0, 10)
-    .map(({ client, invoice }) => ({
+  const faturasComComprovante = financeReceiptRows
+    .map(({ client, invoice, month, value }) => ({
       title: client.nome || client.id,
-      meta: `${invoice.mes || "Fatura"} - ${paymentLabel(invoice.status || "em_analise")} - ${moneyBR(invoice.valorTotal || valorTotalFaturaCliente(client))}`
+      meta: `${monthLabel(month)} - ${paymentLabel(invoice.status || "em_analise")} - ${moneyBR(value)}`
     }));
-
-  const roles = state.usuarios.reduce((acc, user) => {
-    const role = user.role || "cliente";
-    acc[role] = (acc[role] || 0) + 1;
-    return acc;
-  }, {});
-  const usuariosSemCliente = state.usuarios
-    .filter((user) => user.role === "cliente" && !user.clienteId)
-    .map((user) => ({ title: user.email || user.uid, meta: "Usuario cliente sem cliente vinculado" }));
-
-  const hoje = dateKeyFromDate(new Date());
-  const eventosAtivos = state.eventos.filter((event) => (event.status || "ativo") === "ativo");
-  const proximosEventos = eventosAtivos
-    .filter((event) => !event.data || event.data >= hoje)
-    .sort((a, b) => String(a.data || "").localeCompare(String(b.data || "")))
-    .slice(0, 6)
-    .map((event) => ({ title: event.titulo || event.nome || event.id, meta: `${event.data || "Sem data"} - ${event.local || "Sem local"}` }));
 
   mount.innerHTML = `
     ${isFinanceReport ? "" : renderReportSectionTabs()}
@@ -14702,7 +14811,7 @@ function renderReports(reportType = "") {
         <div>
           <h2>${isFinanceReport ? "Relatorio Financeiro" : "Relatorio analitico de acessos"}</h2>
           <p>${isFinanceReport
-            ? "Receitas, valores em aberto, planos, destaques e comprovantes dos clientes."
+            ? "Faturamento, pagamentos, pendências, planos e comprovantes dos clientes."
             : "Indicadores do site, cliques, origem dos acessos e comportamento dos usuarios."}</p>
         </div>
         ${isFinanceReport ? "" : `<button type="button" class="ghost-button" data-refresh-access-metrics><i class="fa-solid fa-rotate"></i> Atualizar dados</button>`}
@@ -14713,7 +14822,7 @@ function renderReports(reportType = "") {
         <div>
           <h2>Periodo dos relatorios</h2>
           <p>${isFinanceReport
-            ? "A base financeira considera os clientes, planos e faturas atuais."
+            ? "Os valores usam as faturas registradas nas competências abrangidas pelo filtro. A competência atual é complementada pela situação financeira vigente quando necessário."
             : "Filtra acessos, cliques, menu lateral, Onde Comer, Promocoes e acoes dos usuarios."}</p>
         </div>
         <span class="badge ativo">${escapeHtml(periodRange.label)}</span>
@@ -14734,15 +14843,12 @@ function renderReports(reportType = "") {
 
     <div class="stats-grid">
       ${isFinanceReport ? `
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Clientes ativos</span><strong>${ativos.length}</strong><small>${reportPercent(ativos.length, totalClientes)} da base</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Financeiro em aberto</span><strong>${abertos.length}</strong><small>${moneyBR(valorAberto)}</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita prevista</span><strong>${moneyBR(valorReceber)}</strong><small>Clientes nao isentos</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Projecao por planos</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita semestral</span><strong>${moneyBR(receitas.semestral)}</strong><small>Projecao por planos</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Projecao por planos</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Receita paga</span><strong>${moneyBR(valorPago)}</strong><small>${pagos.length} cliente${pagos.length === 1 ? "" : "s"}</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Destaques semanais</span><strong>${destaques.length}</strong><small>${moneyBR(destaques.reduce((sum, c) => sum + destaqueValueForClient(c), 0))}</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Com foto</span><strong>${comImagem.length}</strong><small>${reportPercent(comImagem.length, totalClientes)} dos clientes</small></article>
+        ${renderFinanceStatCard("Total faturado", moneyBR(financeBilledValue), `${financeInvoiceRows.length} fatura${financeInvoiceRows.length === 1 ? "" : "s"} consideradas`, periodRange.label, "primary")}
+        ${renderFinanceStatCard("Total pago", moneyBR(financePaidValue), `${financePaidRows.length} fatura${financePaidRows.length === 1 ? "" : "s"} paga${financePaidRows.length === 1 ? "" : "s"}`, periodRange.label, "success")}
+        ${renderFinanceStatCard("Total em aberto", moneyBR(financeOpenValue), `${financeOpenRows.length} fatura${financeOpenRows.length === 1 ? "" : "s"} pendente${financeOpenRows.length === 1 ? "" : "s"}`, periodRange.label, "warning")}
+        ${renderFinanceStatCard("Em análise", moneyBR(financeReviewValue), `${financeReviewRows.length} comprovante${financeReviewRows.length === 1 ? "" : "s"} aguardando`, periodRange.label, "review")}
+        ${renderFinanceStatCard("Com comprovante", String(financeReceiptRows.length), "Faturas com arquivo anexado", periodRange.label)}
+        ${renderFinanceStatCard("Clientes faturados", String(financeClientCount), `${reportPercent(financeClientCount, financeBaseClients.length)} da base financeira`, periodRange.label)}
       ` : `
         <article class="stat-card is-primary" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Total consolidado de todos os meios</small></article>
         <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Site e outros canais</span><strong>${acessosConsolidados.siteOutros}</strong><small>Navegador, links e redes sociais</small></article>
@@ -14752,20 +14858,16 @@ function renderReports(reportType = "") {
     </div>
 
     <div class="reports-grid">
-      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
-        ${renderReportCardHeader("Resumo operacional", periodRange)}
-        <div class="report-kpis">
-          <span>Ativos: <strong>${ativos.length}</strong></span>
-          <span>Pendentes: <strong>${pendentes.length}</strong></span>
-          <span>Inativos: <strong>${inativos.length}</strong></span>
-          <span>Isentos: <strong>${isentos.length}</strong></span>
-          <span>Com horarios: <strong>${comHorarios.length}</strong></span>
-          <span>Categorias usadas: <strong>${categoriasMap.size}</strong></span>
-          <span>Plano mensal: <strong>${porPlano.mensal || 0}</strong></span>
-          <span>Plano semestral: <strong>${porPlano.semestral || 0}</strong></span>
-          <span>Plano anual: <strong>${porPlano.anual || 0}</strong></span>
+      ${isFinanceReport ? renderFinanceReportSection("resumo-operacional", "Resumo operacional", periodRange, `
+        <div class="finance-operational-summary">
+          <article><span>Base de clientes</span><strong>${totalClientes}</strong><small>${ativos.length} ativos, ${pendentes.length} pendentes e ${inativos.length} inativos.</small></article>
+          <article><span>Situação financeira</span><strong>${financePaidRows.length + financeOpenRows.length + financeReviewRows.length}</strong><small>${financePaidRows.length} pagas, ${financeOpenRows.length} em aberto e ${financeReviewRows.length} em análise no filtro.</small></article>
+          <article><span>Clientes isentos</span><strong>${isentos.length}</strong><small>Não entram nos valores de faturamento.</small></article>
+          <article><span>Planos cadastrados</span><strong>${(porPlano.mensal || 0) + (porPlano.semestral || 0) + (porPlano.anual || 0)}</strong><small>${porPlano.mensal || 0} mensais, ${porPlano.semestral || 0} semestrais e ${porPlano.anual || 0} anuais.</small></article>
+          <article><span>Projeção mensal</span><strong>${moneyBR(receitas.mensal)}</strong><small>Equivalência mensal dos planos ativos e não isentos.</small></article>
+          <article><span>Projeção anual</span><strong>${moneyBR(receitas.anual)}</strong><small>Equivalência anual dos planos ativos e não isentos.</small></article>
         </div>
-      </section>
+      `, true) : ""}
 
       <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
         ${renderReportCardHeader("Mais acessados por comercio", periodRange)}
@@ -14847,45 +14949,37 @@ function renderReports(reportType = "") {
         ${renderTimelineTable(accessTimeline, "Ainda nao ha acessos detalhados neste periodo.", "access")}
       </section>
 
-      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
-        ${renderReportCardHeader("Clientes que precisam de atencao", periodRange)}
-        ${renderReportList(clientesAtencao, "Nenhuma pendencia importante encontrada.")}
-      </section>
+      ${isFinanceReport ? renderFinanceReportSection(
+        "clientes-atencao",
+        "Clientes que precisam de atenção",
+        periodRange,
+        renderFinancialAttentionList(clientesAtencao),
+        true
+      ) : ""}
 
-      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
-        ${renderReportCardHeader("Top categorias", periodRange)}
-        ${renderReportList(topCategorias, "Nenhuma categoria com cliente.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
-        ${renderReportCardHeader("Comprovantes recentes", periodRange)}
-        ${renderReportList(faturasComComprovante, "Nenhum comprovante anexado ainda.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
-        ${renderReportCardHeader("Usuarios", periodRange)}
-        <div class="report-kpis">
-          <span>Master: <strong>${roles.master || 0}</strong></span>
-          <span>Admin: <strong>${roles.admin || 0}</strong></span>
-          <span>Clientes: <strong>${roles.cliente || 0}</strong></span>
-          <span>Sem vinculo: <strong>${usuariosSemCliente.length}</strong></span>
-        </div>
-        ${renderReportList(usuariosSemCliente.slice(0, 6), "Todos os usuarios cliente estao vinculados.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "" : "hidden"}">
-        ${renderReportCardHeader("Proximos eventos", periodRange)}
-        ${renderReportList(proximosEventos, "Nenhum evento ativo futuro encontrado.")}
-      </section>
+      ${isFinanceReport ? renderFinanceReportSection(
+        "comprovantes",
+        "Comprovantes do período",
+        periodRange,
+        renderReportList(faturasComComprovante, "Nenhum comprovante anexado neste período."),
+        true
+      ) : ""}
     </div>
   `;
 
   bindReportControls(mount);
-  mount.querySelector("[data-apply-report-range]")?.addEventListener("click", () => {
-    state.reportPeriod.type = "personalizado";
-    state.reportPeriod.start = mount.querySelector("[data-report-start-date]")?.value || "";
-    state.reportPeriod.end = mount.querySelector("[data-report-end-date]")?.value || state.reportPeriod.start;
-    renderReports();
+  mount.querySelector("[data-apply-report-range]")?.addEventListener("click", async (event) => {
+    const applyRange = () => {
+      state.reportPeriod.type = "personalizado";
+      state.reportPeriod.start = mount.querySelector("[data-report-start-date]")?.value || "";
+      state.reportPeriod.end = mount.querySelector("[data-report-end-date]")?.value || state.reportPeriod.start;
+    };
+    if (isFinanceReport) {
+      await applyFinanceReportFilter(event.currentTarget, applyRange);
+      return;
+    }
+    applyRange();
+    renderReports("access");
   });
 }
 
