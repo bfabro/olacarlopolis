@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=356">
+  <link rel="stylesheet" href="painel.css?v=357">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -95,7 +95,8 @@
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
         </section>
-        <button data-view="beneficios"><i class="fa-solid fa-gift"></i> Benefícios</button>
+        <button data-view="beneficios" data-benefits-client-nav="true"><i class="fa-solid fa-gift"></i> Benefícios</button>
+        <button data-view="areaParceiro" data-role="parceiro"><i class="fa-solid fa-handshake"></i> Área do Parceiro</button>
         <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
         <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
         <button data-view="faturas" data-role="cliente" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
@@ -808,6 +809,10 @@
 
       <section id="beneficiosView" class="panel-view hidden">
         <div id="benefitsMount" class="benefits-admin-view"></div>
+      </section>
+
+      <section id="areaParceiroView" class="panel-view hidden">
+        <div id="partnerBenefitsMount" class="benefits-admin-view"></div>
       </section>
 
       <section id="usuariosOnlineView" class="panel-view hidden">
@@ -1625,9 +1630,10 @@
               <input id="editUserUid" type="hidden">
               <label>E-mail<input id="newUserEmail" type="email" required><small>Master pode alterar. Ao trocar, sera criado um novo acesso para este e-mail.</small></label>
               <label>Senha provisoria<input id="newUserPassword" type="text" minlength="6" placeholder="Obrigatoria para novo usuario ou troca de e-mail"></label>
-              <label>Perfil
+              <label>Tipo de usuário
                 <select id="newUserRole">
                   <option value="cliente">Admin do cliente</option>
+                  <option value="parceiro">Parceiro de Benefícios</option>
                   <option value="admin">Admin geral</option>
                   <option value="master">Master</option>
                 </select>
@@ -1635,6 +1641,10 @@
               <label>Cliente vinculado
                 <input id="newUserClientSearch" type="search" placeholder="Pesquisar cliente pelo nome..." autocomplete="off">
                 <select id="newUserClient"></select>
+              </label>
+              <label id="newUserPartnerField" class="hidden">Parceiro vinculado
+                <select id="newUserPartner"></select>
+                <small>O usuário visualizará somente solicitações e dúvidas deste parceiro.</small>
               </label>
               <label>Status
                 <select id="editUserStatus">
@@ -1889,6 +1899,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=441"></script>
+  <script type="module" src="painel.js?v=442"></script>
 </body>
 </html>

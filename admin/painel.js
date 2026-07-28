@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 506,
-  label: "v513",
+  numero: 507,
+  label: "v514",
   data: "2026-07-28",
-  nota: "Correcao do upload de imagens dos beneficios e descricao ampliada para 1.100 caracteres."
+  nota: "Nova area de parceiros com planos, solicitacoes, duvidas, historico e acesso exclusivo."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -131,7 +131,11 @@ let state = {
   xadrezConfig: {},
   beneficios: [],
   beneficiosUtilizacoes: [],
+  beneficiosUtilizacoesLegacy: [],
+  beneficiosDuvidas: [],
+  beneficiosNotificacoes: [],
   selectedBenefitId: "",
+  selectedBenefitDetailId: "",
   metricas: {},
   auditLogs: [],
   reportSection: "analytics",
@@ -356,6 +360,7 @@ const views = {
   relatorioAcessos: $("relatorioAcessosView"),
   relatorioFinanceiro: $("relatorioFinanceiroView"),
   beneficios: $("beneficiosView"),
+  areaParceiro: $("areaParceiroView"),
   usuariosOnline: $("usuariosOnlineView"),
   pagamentoSistema: $("pagamentoSistemaView"),
   paginaInicialSite: $("paginaInicialSiteView"),
@@ -383,6 +388,7 @@ const viewCopy = {
   relatorioAcessos: ["Relatorio Acessos", "Acessos, cliques, origens e acoes realizadas pelos usuarios."],
   relatorioFinanceiro: ["Relatorio Financeiro", "Receitas, valores em aberto, planos e comprovantes dos clientes."],
   beneficios: ["Benefícios", "Vantagens exclusivas oferecidas aos clientes Olá Carlópolis."],
+  areaParceiro: ["Área do Parceiro", "Solicitações, dúvidas e clientes vinculados aos seus benefícios."],
   usuariosOnline: ["Usuarios online", "Acompanhe em tempo real quais telas do site publico estao sendo acessadas."],
   pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
@@ -520,6 +526,14 @@ function canManageClients() {
   return isMasterEmail() || ["master", "admin"].includes(currentRole());
 }
 
+function isBenefitPartner() {
+  return currentRole() === "parceiro";
+}
+
+function currentBenefitPartnerId() {
+  return String(state.profile?.parceiroId || "").trim();
+}
+
 function clienteAssociadoImoveis(client = {}, includeCurrentPermission = false) {
   const category = normalizeName(client?.categoria || client?.category || client?.categoriaId || "");
   const categoryMatches = category.includes("imove") || category.includes("imobili");
@@ -638,7 +652,9 @@ function canManageInformacoes() {
 }
 
 function canAccessView(viewName) {
-  if (viewName === "beneficios") return true;
+  if (isBenefitPartner()) return viewName === "areaParceiro";
+  if (viewName === "areaParceiro") return isBenefitPartner() || isMaster();
+  if (viewName === "beneficios") return !isBenefitPartner();
   if (viewName === "dashboard") return canManageClients();
   if (canManageClients()) {
     if (viewName === "usuariosOnline") return isMaster();
@@ -661,6 +677,7 @@ function canAccessView(viewName) {
 }
 
 function initialViewForProfile() {
+  if (isBenefitPartner()) return "areaParceiro";
   return canManageClients() ? "dashboard" : "minhaEmpresa";
 }
 
@@ -2126,6 +2143,7 @@ async function saveUserProfile(profile) {
     email: String(profile.email || "").toLowerCase(),
     role: masterEmail ? "master" : (profile.role || "cliente"),
     clienteId: masterEmail ? "" : (profile.clienteId || ""),
+    parceiroId: masterEmail ? "" : (profile.parceiroId || ""),
     status: masterEmail ? "ativo" : (profile.status || "ativo"),
     permissoes: masterEmail ? { ...masterPermissions, ...(profile.permissoes || {}) } : (profile.permissoes || {}),
     updatedAt: serverTimestamp()
@@ -2143,7 +2161,7 @@ async function createAuthUserWithTemporaryPassword(email, password) {
   return cred.user;
 }
 
-async function migratePanelUserEmail({ currentUser, email, password, role, clienteId, status, permissoes }) {
+async function migratePanelUserEmail({ currentUser, email, password, role, clienteId, parceiroId, status, permissoes }) {
   if (!isMaster()) {
     showToast("Somente master pode trocar o e-mail de acesso.");
     return false;
@@ -2166,6 +2184,7 @@ async function migratePanelUserEmail({ currentUser, email, password, role, clien
     email,
     role,
     clienteId: role === "cliente" ? clienteId : "",
+    parceiroId: role === "parceiro" ? parceiroId : "",
     status,
     permissoes
   });
@@ -2186,6 +2205,7 @@ async function loadAllData(onProgress = null) {
   const canManage = canManageClients();
   const financeClientId = canManage ? "" : currentClientId();
   const financePath = financeClientId ? `clientesFinanceiro/${financeClientId}` : "clientesFinanceiro";
+  const canReadFinance = canManage || Boolean(financeClientId);
   const [
     clientesSnap,
     clientesFinanceiroSnap,
@@ -2216,7 +2236,7 @@ async function loadAllData(onProgress = null) {
     usoPWASnap
   ] = await Promise.all([
     getPanelSnapshot("clientes", { required: true }),
-    getPanelSnapshot(financePath),
+    getPanelSnapshot(financePath, { enabled: canReadFinance }),
     getPanelSnapshot("usuariosByUid", { enabled: canManage }),
     getPanelSnapshot("eventos"),
     getPanelSnapshot("conteudosInformativos/imoveis"),
@@ -2556,7 +2576,13 @@ function updateChrome() {
     el.classList.toggle("hidden", !canManageClients());
   });
   document.querySelectorAll("[data-role='cliente']").forEach((el) => {
-    el.classList.toggle("hidden", canManageClients());
+    el.classList.toggle("hidden", canManageClients() || isBenefitPartner());
+  });
+  document.querySelectorAll("[data-role='parceiro']").forEach((el) => {
+    el.classList.toggle("hidden", !isBenefitPartner() && !isMaster());
+  });
+  document.querySelectorAll("[data-benefits-client-nav='true']").forEach((el) => {
+    el.classList.toggle("hidden", isBenefitPartner());
   });
   document.querySelectorAll("[data-client-root-nav='true']").forEach((el) => {
     el.classList.add("hidden");
@@ -2591,6 +2617,12 @@ function updateChrome() {
   document.querySelectorAll("[data-classified-nav='true']").forEach((el) => {
     el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !canGenerateImovelImages() && !canAccessAutomoveis());
   });
+  if (isBenefitPartner()) {
+    document.querySelectorAll(".nav-admin button").forEach((button) => {
+      button.classList.toggle("hidden", button.dataset.view !== "areaParceiro");
+    });
+    document.querySelectorAll(".nav-admin-group").forEach((group) => group.classList.add("hidden"));
+  }
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");
   if (masterOption) masterOption.disabled = !isMaster();
@@ -2687,7 +2719,8 @@ function roleLabel(role) {
   return {
     master: "Usuario master",
     admin: "Admin geral",
-    cliente: "Admin do cliente"
+    cliente: "Admin do cliente",
+    parceiro: "Parceiro de Benefícios"
   }[key] || "Sem perfil";
 }
 
@@ -3534,7 +3567,7 @@ function benefitUsageListFromData(data = {}, scopedClientId = "") {
   return rows.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
 }
 
-function startBenefitsRealtime() {
+function startBenefitsRealtimeLegacy() {
   stopBenefitsRealtime();
   benefitsRealtimeUnsubscribers.push(onValue(
     ref(db, "beneficiosParceiros"),
@@ -3573,7 +3606,7 @@ function benefitTypeLabel(benefit = {}) {
   return benefit.chamadaBeneficio || "Benefício exclusivo";
 }
 
-function benefitStatusLabel(status = "") {
+function benefitStatusLabelLegacy(status = "") {
   return {
     solicitado: "Solicitado",
     aprovado: "Aprovado",
@@ -3583,11 +3616,11 @@ function benefitStatusLabel(status = "") {
   }[status] || "Solicitado";
 }
 
-function benefitIsAvailable(benefit = {}) {
+function benefitIsAvailableLegacy(benefit = {}) {
   return benefit.status === "ativo" && (!benefit.validadeFim || benefit.validadeFim >= dateKeyFromDate(new Date()));
 }
 
-function benefitUsageForClient(benefitId, clientId = currentClientId()) {
+function benefitUsageForClientLegacy(benefitId, clientId = currentClientId()) {
   return state.beneficiosUtilizacoes.find((item) => (
     item.benefitId === benefitId
     && item.clientId === clientId
@@ -3595,7 +3628,7 @@ function benefitUsageForClient(benefitId, clientId = currentClientId()) {
   ));
 }
 
-function renderBenefitCard(benefit = {}) {
+function renderBenefitCardLegacy(benefit = {}) {
   const clientId = currentClientId();
   const activeUse = clientId ? benefitUsageForClient(benefit.id, clientId) : null;
   const unavailable = !benefitIsAvailable(benefit);
@@ -3633,7 +3666,7 @@ function renderBenefitCard(benefit = {}) {
   `;
 }
 
-function renderBenefitMasterForm() {
+function renderBenefitMasterFormLegacy() {
   if (!isMaster()) return "";
   const current = state.beneficios.find((item) => item.id === state.selectedBenefitId) || {};
   return `
@@ -3664,7 +3697,7 @@ function renderBenefitMasterForm() {
   `;
 }
 
-function renderBenefitUsageReport() {
+function renderBenefitUsageReportLegacy() {
   if (!isMaster()) return "";
   const rows = state.beneficiosUtilizacoes;
   const active = rows.filter((item) => ["solicitado", "aprovado", "em_uso"].includes(item.status)).length;
@@ -3698,7 +3731,7 @@ function renderBenefitUsageReport() {
   `;
 }
 
-function renderBenefitsView() {
+function renderBenefitsViewLegacy() {
   const mount = $("benefitsMount");
   if (!mount) return;
   const benefits = isMaster() ? state.beneficios : state.beneficios.filter(benefitIsAvailable);
@@ -3714,13 +3747,18 @@ function renderBenefitsView() {
   bindBenefitsView();
 }
 
-async function saveBenefitFromForm(form) {
+async function saveBenefitFromFormLegacy(form) {
   if (!isMaster()) return;
   const existingId = $("benefitId")?.value || "";
   const id = existingId || push(ref(db, "beneficiosParceiros")).key;
   const button = form.querySelector('button[type="submit"]');
   setBusy(button, true, "Salvando...");
   try {
+    const plans = collectBenefitPlans(form);
+    const contractMode = $("benefitContractMode").value;
+    if (contractMode !== "gratuito" && !Object.values(plans).some((plan) => plan.status === "ativo")) {
+      throw new Error("Adicione pelo menos um plano ativo para esta forma de contratação.");
+    }
     let image = $("benefitImage")?.value.trim() || "";
     const file = $("benefitImageUpload")?.files?.[0];
     if (file) {
@@ -3757,7 +3795,7 @@ async function saveBenefitFromForm(form) {
   }
 }
 
-async function requestBenefitUse(benefitId) {
+async function requestBenefitUseLegacy(benefitId) {
   const benefit = state.beneficios.find((item) => item.id === benefitId);
   const client = currentClientRecord();
   const clientId = currentClientId();
@@ -3790,7 +3828,7 @@ async function requestBenefitUse(benefitId) {
   }
 }
 
-function bindBenefitsView() {
+function bindBenefitsViewLegacy() {
   const mount = $("benefitsMount");
   if (!mount) return;
   const description = mount.querySelector("#benefitDescription");
@@ -3843,10 +3881,912 @@ function bindBenefitsView() {
   }));
 }
 
+// ===== Parceiros e Beneficios v514 =====
+function benefitListFromValue(value) {
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (!value || typeof value !== "object") return [];
+  return Object.entries(value)
+    .map(([id, item]) => ({ id, ...(item || {}) }))
+    .sort((a, b) => Number(a.ordem ?? a.order ?? 0) - Number(b.ordem ?? b.order ?? 0));
+}
+
+function benefitPlans(benefit = {}) {
+  return benefitListFromValue(benefit.planos).filter((plan) => plan.status !== "inativo");
+}
+
+function benefitGallery(benefit = {}) {
+  return [...new Set([
+    benefit.imagem,
+    ...benefitListFromValue(benefit.galeria).map((item) => typeof item === "string" ? item : item.url)
+  ].filter(Boolean))];
+}
+
+function benefitContractModeLabel(mode = "gratuito") {
+  return {
+    gratuito: "Benefício gratuito",
+    opcional: "Planos opcionais",
+    obrigatorio: "Escolha de plano obrigatória"
+  }[mode] || "Benefício gratuito";
+}
+
+function benefitStatusLabel(status = "") {
+  return {
+    aguardando_analise: "Aguardando análise",
+    solicitado: "Aguardando análise",
+    informacoes_solicitadas: "Informações solicitadas",
+    aprovada: "Aprovada",
+    aprovado: "Aprovada",
+    recusada: "Recusada",
+    cancelada_cliente: "Cancelada pelo cliente",
+    cancelado: "Cancelada",
+    beneficiario_ativo: "Beneficiário ativo",
+    em_uso: "Beneficiário ativo",
+    beneficio_encerrado: "Benefício encerrado",
+    concluido: "Benefício encerrado"
+  }[status] || "Aguardando análise";
+}
+
+function benefitQuestionStatusLabel(status = "") {
+  return {
+    nova: "Nova",
+    em_atendimento: "Em atendimento",
+    respondida: "Respondida",
+    finalizada: "Finalizada"
+  }[status] || "Nova";
+}
+
+function benefitIsAvailable(benefit = {}) {
+  return benefit.status === "ativo" && (!benefit.validadeFim || benefit.validadeFim >= dateKeyFromDate(new Date()));
+}
+
+function benefitRequestIsOpen(request = {}) {
+  return ["aguardando_analise", "solicitado", "informacoes_solicitadas", "aprovada", "aprovado", "beneficiario_ativo", "em_uso"].includes(request.status);
+}
+
+function benefitUsageForClient(benefitId, clientId = currentClientId()) {
+  return state.beneficiosUtilizacoes.find((item) => (
+    item.benefitId === benefitId
+    && item.clientId === clientId
+    && benefitRequestIsOpen(item)
+  ));
+}
+
+function flattenPartnerRecords(data = {}) {
+  const rows = [];
+  Object.entries(data || {}).forEach(([partnerId, records]) => {
+    Object.entries(records || {}).forEach(([id, value]) => rows.push({ id, partnerId, ...(value || {}) }));
+  });
+  return rows.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+}
+
+function flatScopedRecords(data = {}, scope = {}) {
+  return Object.entries(data || {})
+    .map(([id, value]) => ({ id, ...scope, ...(value || {}) }))
+    .sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+}
+
+function renderBenefitsRealtimeTargets() {
+  if (!$("beneficiosView")?.classList.contains("hidden")) renderBenefitsView();
+  if (!$("areaParceiroView")?.classList.contains("hidden")) renderPartnerBenefitsArea();
+}
+
+function startBenefitsRealtime() {
+  stopBenefitsRealtime();
+  const listen = (path, onData, warning) => {
+    benefitsRealtimeUnsubscribers.push(onValue(
+      ref(db, path),
+      (snapshot) => {
+        onData(snapshot.val() || {});
+        renderBenefitsRealtimeTargets();
+      },
+      (error) => console.warn(warning, error)
+    ));
+  };
+
+  if (isBenefitPartner()) {
+    const linkedPartnerId = currentBenefitPartnerId();
+    if (linkedPartnerId) {
+      listen(`beneficiosParceiros/${linkedPartnerId}`, (data) => {
+        state.beneficios = data && typeof data === "object" ? [{ id: linkedPartnerId, ...data }] : [];
+      }, "Benefício vinculado ao parceiro indisponível.");
+    } else {
+      state.beneficios = [];
+    }
+  } else {
+    listen("beneficiosParceiros", (data) => {
+      state.beneficios = flatScopedRecords(data);
+      state.beneficios.sort((a, b) => Number(a.ordem || 0) - Number(b.ordem || 0) || String(a.parceiro || "").localeCompare(String(b.parceiro || ""), "pt-BR"));
+      fillUserPartnerSelect($("newUserPartner")?.value || "");
+      renderUsersList();
+    }, "Benefícios em tempo real indisponíveis.");
+  }
+
+  if (isMaster()) {
+    listen("beneficiosSolicitacoes", (data) => {
+      state.beneficiosUtilizacoes = flattenPartnerRecords(data);
+    }, "Solicitações de benefícios indisponíveis.");
+    listen("beneficiosDuvidas", (data) => {
+      state.beneficiosDuvidas = flattenPartnerRecords(data);
+    }, "Dúvidas de benefícios indisponíveis.");
+    listen("beneficiosUtilizacoes", (data) => {
+      state.beneficiosUtilizacoesLegacy = benefitUsageListFromData(data);
+    }, "Histórico anterior de benefícios indisponível.");
+    state.beneficiosNotificacoes = [];
+    return;
+  }
+
+  if (isBenefitPartner()) {
+    const partnerId = currentBenefitPartnerId();
+    if (!partnerId) {
+      state.beneficiosUtilizacoes = [];
+      state.beneficiosDuvidas = [];
+      state.beneficiosNotificacoes = [];
+      return;
+    }
+    listen(`beneficiosSolicitacoes/${partnerId}`, (data) => {
+      state.beneficiosUtilizacoes = flatScopedRecords(data, { partnerId });
+    }, "Solicitações do parceiro indisponíveis.");
+    listen(`beneficiosDuvidas/${partnerId}`, (data) => {
+      state.beneficiosDuvidas = flatScopedRecords(data, { partnerId });
+    }, "Dúvidas do parceiro indisponíveis.");
+    listen(`beneficiosNotificacoesParceiro/${partnerId}`, (data) => {
+      state.beneficiosNotificacoes = flatScopedRecords(data, { partnerId });
+    }, "Notificações do parceiro indisponíveis.");
+    return;
+  }
+
+  const clientId = currentClientId();
+  if (!clientId) {
+    state.beneficiosUtilizacoes = [];
+    state.beneficiosDuvidas = [];
+    state.beneficiosNotificacoes = [];
+    return;
+  }
+  listen(`beneficiosSolicitacoesPorCliente/${clientId}`, (data) => {
+    state.beneficiosUtilizacoes = flatScopedRecords(data, { clientId });
+  }, "Solicitações do cliente indisponíveis.");
+  listen(`beneficiosDuvidasPorCliente/${clientId}`, (data) => {
+    state.beneficiosDuvidas = flatScopedRecords(data, { clientId });
+  }, "Dúvidas do cliente indisponíveis.");
+  listen(`beneficiosNotificacoesCliente/${clientId}`, (data) => {
+    state.beneficiosNotificacoes = flatScopedRecords(data, { clientId });
+  }, "Notificações do cliente indisponíveis.");
+  listen(`beneficiosUtilizacoes/${clientId}`, (data) => {
+    state.beneficiosUtilizacoesLegacy = benefitUsageListFromData(data, clientId);
+  }, "Histórico anterior do cliente indisponível.");
+}
+
+function benefitPartnerDescription(benefit = {}) {
+  return benefit.descricaoParceiro || `${benefit.parceiro || "Este parceiro"} faz parte do clube de parceiros Olá Carlópolis.`;
+}
+
+function renderBenefitPlan(plan = {}, inputName = "") {
+  const value = Number(plan.valor || 0);
+  const periodicity = {
+    mensal: "por mês",
+    semestral: "por semestre",
+    anual: "por ano",
+    unico: "pagamento único"
+  }[plan.periodicidade] || plan.periodicidade || "pagamento único";
+  return `
+    <label class="benefit-plan-card">
+      ${inputName ? `<input type="radio" name="${escapeAttr(inputName)}" value="${escapeAttr(plan.id || "")}">` : ""}
+      <span>
+        <strong>${escapeHtml(plan.nome || "Plano")}</strong>
+        <b>${moneyBR(value)} <small>${escapeHtml(periodicity)}</small></b>
+        ${plan.descricao ? `<em>${escapeHtml(plan.descricao)}</em>` : ""}
+        ${plan.incluidos ? `<small><i class="fa-solid fa-circle-check"></i>${escapeHtml(plan.incluidos)}</small>` : ""}
+      </span>
+    </label>
+  `;
+}
+
+function renderBenefitHistory(history = {}) {
+  const rows = benefitListFromValue(history).sort((a, b) => Number(b.at || 0) - Number(a.at || 0));
+  return rows.length ? `
+    <div class="benefit-history">
+      ${rows.map((item) => `
+        <div>
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span><strong>${escapeHtml(benefitStatusLabel(item.status))}</strong><small>${escapeHtml(item.at ? new Date(item.at).toLocaleString("pt-BR") : "")}${item.userEmail ? ` · ${escapeHtml(item.userEmail)}` : ""}</small>${item.note ? `<em>${escapeHtml(item.note)}</em>` : ""}</span>
+        </div>
+      `).join("")}
+    </div>
+  ` : "";
+}
+
+function renderBenefitNotifications() {
+  const unread = state.beneficiosNotificacoes.filter((item) => !item.readAt);
+  if (!unread.length) return "";
+  return `
+    <section class="benefit-notifications">
+      <div><i class="fa-solid fa-bell"></i><strong>${unread.length} nova${unread.length === 1 ? "" : "s"} notificação${unread.length === 1 ? "" : "ões"}</strong></div>
+      ${unread.slice(0, 5).map((item) => `<button type="button" data-benefit-notification-read="${escapeAttr(item.id)}">${escapeHtml(item.message || "Nova atualização em benefícios")}<small>${item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : ""}</small></button>`).join("")}
+    </section>
+  `;
+}
+
+function renderBenefitCard(benefit = {}) {
+  const activeUse = currentClientId() ? benefitUsageForClient(benefit.id) : null;
+  const unavailable = !benefitIsAvailable(benefit);
+  const gallery = benefitGallery(benefit);
+  return `
+    <article class="benefit-card ${unavailable ? "is-inactive" : ""}">
+      <button type="button" class="benefit-card-open" data-benefit-open="${escapeAttr(benefit.id)}" aria-label="Abrir ${escapeAttr(benefit.parceiro || "parceiro")}">
+        <div class="benefit-card-media">
+          ${gallery[0] ? `<img src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "Parceiro")}" loading="lazy">` : `<span><i class="fa-solid fa-handshake"></i></span>`}
+          <strong>${escapeHtml(benefitTypeLabel(benefit))}</strong>
+        </div>
+        <div class="benefit-card-body">
+          <span class="benefit-partner">Parceiro Olá Carlópolis</span>
+          <h3>${escapeHtml(benefit.parceiro || "Parceiro")}</h3>
+          <h4>${escapeHtml(benefit.titulo || "Benefício exclusivo")}</h4>
+          <p>${escapeHtml(benefit.descricao || "")}</p>
+          <span class="benefit-contract-mode"><i class="fa-solid fa-wallet"></i>${escapeHtml(benefitContractModeLabel(benefit.modalidadeContratacao))}</span>
+          ${activeUse ? `<span class="benefit-request-status status-${escapeAttr(activeUse.status)}">${escapeHtml(benefitStatusLabel(activeUse.status))}</span>` : ""}
+          <span class="benefit-card-cta">Ver parceiro e condições <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </button>
+      ${isMaster() ? `<div class="benefit-master-card-actions"><button type="button" class="ghost-button" data-benefit-edit="${escapeAttr(benefit.id)}"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" class="danger-button" data-benefit-delete="${escapeAttr(benefit.id)}"><i class="fa-solid fa-trash"></i></button></div>` : ""}
+    </article>
+  `;
+}
+
+function renderBenefitDetail(benefit = {}) {
+  const gallery = benefitGallery(benefit);
+  const plans = benefitPlans(benefit);
+  const clientId = currentClientId();
+  const activeUse = clientId ? benefitUsageForClient(benefit.id, clientId) : null;
+  const canRequest = Boolean(clientId) && benefitIsAvailable(benefit) && !activeUse;
+  const planRequired = benefit.modalidadeContratacao === "obrigatorio";
+  const canCancel = activeUse && ["aguardando_analise", "solicitado"].includes(activeUse.status);
+  return `
+    <div class="benefit-detail-backdrop" data-benefit-close>
+      <article class="benefit-detail-modal" role="dialog" aria-modal="true" aria-labelledby="benefitDetailTitle">
+        <button type="button" class="benefit-detail-close" data-benefit-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+        <div class="benefit-detail-gallery">
+          <div class="benefit-detail-main">${gallery[0] ? `<img data-benefit-main-image src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "")}">` : `<span><i class="fa-solid fa-handshake"></i></span>`}</div>
+          ${gallery.length > 1 ? `<div class="benefit-detail-thumbs">${gallery.map((url, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(url)}" class="${index === 0 ? "active" : ""}"><img src="${escapeAttr(url)}" alt="Imagem ${index + 1}"></button>`).join("")}</div>` : ""}
+        </div>
+        <div class="benefit-detail-content">
+          <span class="feature-kicker">Parceiro Olá Carlópolis</span>
+          <h2 id="benefitDetailTitle">${escapeHtml(benefit.parceiro || "Parceiro")}</h2>
+          <p class="benefit-partner-description">${escapeHtml(benefitPartnerDescription(benefit))}</p>
+          <section><h3>${escapeHtml(benefit.titulo || "Benefício oferecido")}</h3><p>${escapeHtml(benefit.descricao || "")}</p></section>
+          ${plans.length ? `<section><h3>Planos disponíveis</h3><div class="benefit-plans">${benefit.modalidadeContratacao === "opcional" && clientId ? `<label class="benefit-plan-card is-free"><input type="radio" name="benefitSelectedPlan" value="" checked><span><strong>Quero somente o benefício</strong><b>Sem contratação de plano</b></span></label>` : ""}${plans.map((plan) => renderBenefitPlan(plan, clientId ? "benefitSelectedPlan" : "")).join("")}</div></section>` : ""}
+          ${benefit.regras ? `<section class="benefit-detail-rules"><h3>Regras, condições e limitações</h3><p>${escapeHtml(benefit.regras)}</p></section>` : ""}
+          <div class="benefit-detail-contact">
+            ${benefit.contato ? `<span><i class="fa-solid fa-phone"></i>${escapeHtml(benefit.contato)}</span>` : ""}
+            ${benefit.email ? `<a href="mailto:${escapeAttr(benefit.email)}"><i class="fa-solid fa-envelope"></i>${escapeHtml(benefit.email)}</a>` : ""}
+            ${benefit.site ? `<a href="${escapeAttr(benefit.site)}" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i>Site ou rede social</a>` : ""}
+          </div>
+          ${activeUse ? `<section class="benefit-current-request"><h3>Sua solicitação</h3><span class="benefit-request-status status-${escapeAttr(activeUse.status)}">${escapeHtml(benefitStatusLabel(activeUse.status))}</span>${activeUse.planName ? `<p><strong>Plano:</strong> ${escapeHtml(activeUse.planName)} · ${moneyBR(activeUse.planValue)} ${escapeHtml(activeUse.planPeriodicityLabel || "")}</p>` : ""}${renderBenefitHistory(activeUse.historico)}${canCancel ? `<button type="button" class="danger-button" data-benefit-cancel-request="${escapeAttr(activeUse.id)}"><i class="fa-solid fa-ban"></i> Cancelar solicitação</button>` : `<small>Para alterações após a aprovação, entre em contato diretamente com o parceiro.</small>`}</section>` : ""}
+          ${clientId ? `
+            <div class="benefit-detail-actions">
+              <button type="button" data-benefit-request="${escapeAttr(benefit.id)}" ${canRequest ? "" : "disabled"}><i class="fa-solid fa-gift"></i>${activeUse ? "Solicitação em andamento" : "Solicitar benefício"}</button>
+            </div>
+            <section class="benefit-question-box">
+              <h3>Envie uma dúvida ao parceiro</h3>
+              <form data-benefit-question-form="${escapeAttr(benefit.id)}" class="grid-form">
+                <label>Assunto<input name="subject" required maxlength="120"></label>
+                <label>Telefone ou WhatsApp<input name="returnPhone" required maxlength="30"></label>
+                <label class="wide">Mensagem<textarea name="message" required maxlength="1100" rows="4"></textarea></label>
+                <div class="form-actions wide"><button type="submit"><i class="fa-solid fa-paper-plane"></i> Enviar dúvida</button></div>
+              </form>
+            </section>
+          ` : ""}
+        </div>
+      </article>
+    </div>
+  `;
+}
+
+function renderBenefitPlanEditor(plan = {}, index = 0) {
+  return `
+    <article class="benefit-plan-editor" data-benefit-plan-row>
+      <input type="hidden" data-plan-id value="${escapeAttr(plan.id || `plano-${Date.now()}-${index}`)}">
+      <label>Nome<input data-plan-name required maxlength="80" value="${escapeAttr(plan.nome || "")}" placeholder="Ex.: Plano Completo"></label>
+      <label>Valor em reais<input data-plan-value type="number" min="0" step="0.01" value="${escapeAttr(plan.valor ?? "")}"></label>
+      <label>Periodicidade<select data-plan-period><option value="mensal" ${plan.periodicidade === "mensal" ? "selected" : ""}>Mensal</option><option value="semestral" ${plan.periodicidade === "semestral" ? "selected" : ""}>Semestral</option><option value="anual" ${plan.periodicidade === "anual" ? "selected" : ""}>Anual</option><option value="unico" ${plan.periodicidade === "unico" ? "selected" : ""}>Pagamento único</option></select></label>
+      <label>Status<select data-plan-status><option value="ativo" ${plan.status !== "inativo" ? "selected" : ""}>Ativo</option><option value="inativo" ${plan.status === "inativo" ? "selected" : ""}>Inativo</option></select></label>
+      <label class="wide">Descrição<textarea data-plan-description maxlength="500" rows="2">${escapeHtml(plan.descricao || "")}</textarea></label>
+      <label class="wide">Benefícios incluídos<textarea data-plan-included maxlength="700" rows="2">${escapeHtml(plan.incluidos || "")}</textarea></label>
+      <button type="button" class="danger-button benefit-plan-remove" data-benefit-plan-remove><i class="fa-solid fa-trash"></i> Remover plano</button>
+    </article>
+  `;
+}
+
+function renderBenefitMasterForm() {
+  if (!isMaster()) return "";
+  const current = state.beneficios.find((item) => item.id === state.selectedBenefitId) || {};
+  const plans = benefitListFromValue(current.planos);
+  const gallery = benefitGallery({ galeria: current.galeria });
+  return `
+    <section class="panel-card benefit-master-form-card">
+      <div class="section-head">
+        <div><span class="feature-kicker">Gestão de parceiros</span><h2>${current.id ? "Editar parceiro e benefício" : "Cadastrar parceiro e benefício"}</h2><p>Cadastre a apresentação completa que será exibida antes da solicitação.</p></div>
+        ${current.id ? `<button type="button" class="ghost-button" data-benefit-new><i class="fa-solid fa-plus"></i> Novo parceiro</button>` : ""}
+      </div>
+      <form id="benefitForm" class="grid-form">
+        <input type="hidden" id="benefitId" value="${escapeAttr(current.id || "")}">
+        <label>Nome do parceiro<input id="benefitPartner" required maxlength="100" value="${escapeAttr(current.parceiro || "")}"></label>
+        <label>Título do benefício<input id="benefitTitle" required maxlength="120" value="${escapeAttr(current.titulo || "")}"></label>
+        <label class="wide">Descrição do parceiro<textarea id="benefitPartnerDescription" required maxlength="1100" rows="5">${escapeHtml(current.descricaoParceiro || "")}</textarea></label>
+        <label class="wide">Descrição do benefício <span class="field-counter" id="benefitDescriptionCount">${String(current.descricao || "").length}/1100</span><textarea id="benefitDescription" required maxlength="1100" rows="6">${escapeHtml(current.descricao || "")}</textarea></label>
+        <label>Tipo de benefício<select id="benefitType"><option value="percentual" ${current.tipoBeneficio === "percentual" ? "selected" : ""}>Desconto em percentual</option><option value="valor" ${current.tipoBeneficio === "valor" ? "selected" : ""}>Desconto em valor</option><option value="beneficio" ${!current.tipoBeneficio || current.tipoBeneficio === "beneficio" ? "selected" : ""}>Outro benefício</option></select></label>
+        <label>Valor do desconto<input id="benefitValue" type="number" min="0" step="0.01" value="${escapeAttr(current.valorBeneficio ?? "")}"></label>
+        <label class="wide">Chamada do benefício<input id="benefitCallout" maxlength="100" value="${escapeAttr(current.chamadaBeneficio || "")}"></label>
+        <label>Forma de contratação<select id="benefitContractMode"><option value="gratuito" ${current.modalidadeContratacao === "gratuito" || !current.modalidadeContratacao ? "selected" : ""}>Gratuito</option><option value="opcional" ${current.modalidadeContratacao === "opcional" ? "selected" : ""}>Plano opcional</option><option value="obrigatorio" ${current.modalidadeContratacao === "obrigatorio" ? "selected" : ""}>Plano obrigatório</option></select></label>
+        <label>Status<select id="benefitStatus"><option value="ativo" ${current.status !== "inativo" ? "selected" : ""}>Ativo</option><option value="inativo" ${current.status === "inativo" ? "selected" : ""}>Inativo</option></select></label>
+        <label class="wide">Regras, condições e limitações<textarea id="benefitRules" maxlength="1100" rows="5">${escapeHtml(current.regras || "")}</textarea></label>
+        <label class="wide">Observações importantes para a confirmação<textarea id="benefitImportantNotes" maxlength="700" rows="3">${escapeHtml(current.observacoesImportantes || "")}</textarea></label>
+        <label>Telefone / WhatsApp<input id="benefitContact" maxlength="100" value="${escapeAttr(current.contato || "")}"></label>
+        <label>E-mail<input id="benefitEmail" type="email" maxlength="120" value="${escapeAttr(current.email || "")}"></label>
+        <label>Site ou rede social<input id="benefitSite" type="url" value="${escapeAttr(current.site || "")}" placeholder="https://..."></label>
+        <label>Validade final<input id="benefitValidUntil" type="date" value="${escapeAttr(current.validadeFim || "")}"></label>
+        <label>Ordem de exibição<input id="benefitOrder" type="number" min="0" step="1" value="${escapeAttr(current.ordem ?? 0)}"></label>
+        <div class="form-section-title wide"><i class="fa-solid fa-images"></i><div><strong>Logo e galeria</strong><span>Envie a logo principal e várias imagens do parceiro.</span></div></div>
+        <label>Logo por URL<input id="benefitImage" value="${escapeAttr(current.imagem || "")}" placeholder="https://..."></label>
+        <label>Enviar logo<input id="benefitImageUpload" type="file" accept="image/*"></label>
+        <label class="wide">URLs adicionais, uma por linha<textarea id="benefitGalleryUrls" rows="4" placeholder="https://...">${escapeHtml(gallery.join("\n"))}</textarea></label>
+        <label class="wide">Enviar várias imagens<input id="benefitGalleryUpload" type="file" accept="image/*" multiple></label>
+        <div class="form-section-title wide"><i class="fa-solid fa-layer-group"></i><div><strong>Planos</strong><span>Use planos apenas quando fizerem parte deste benefício.</span></div></div>
+        <div id="benefitPlansEditor" class="benefit-plans-editor wide">${plans.map(renderBenefitPlanEditor).join("")}</div>
+        <div class="wide"><button type="button" class="ghost-button" data-benefit-plan-add><i class="fa-solid fa-plus"></i> Adicionar plano</button></div>
+        <div class="form-actions wide"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar parceiro e benefício</button></div>
+      </form>
+    </section>
+  `;
+}
+
+function renderBenefitUsageReport() {
+  if (!isMaster()) return "";
+  const rows = state.beneficiosUtilizacoes;
+  const questions = state.beneficiosDuvidas;
+  const active = rows.filter((item) => item.status === "beneficiario_ativo").length;
+  const generated = rows.filter((item) => ["aprovada", "beneficiario_ativo", "beneficio_encerrado"].includes(item.status)).reduce((sum, item) => sum + Number(item.planValue || 0), 0);
+  const stalled = rows.filter((item) => ["aguardando_analise", "solicitado"].includes(item.status) && Date.now() - Number(item.createdAt || Date.now()) > 48 * 60 * 60 * 1000);
+  return `
+    <section class="panel-card benefit-report-card">
+      <div class="section-head"><div><span class="feature-kicker">Gestão completa</span><h2>Solicitações, planos e atendimento</h2><p>Acompanhe clientes ativos, valores, cancelamentos, recusas e histórico.</p></div></div>
+      ${stalled.length ? `<div class="benefit-stalled-alert"><i class="fa-solid fa-triangle-exclamation"></i><strong>${stalled.length} solicitação${stalled.length === 1 ? "" : "ões"} aguardando há mais de 48 horas.</strong></div>` : ""}
+      <div class="stats-grid benefit-report-stats">
+        <article class="stat-card"><span>Solicitações</span><strong>${rows.length}</strong><small>Total registrado</small></article>
+        <article class="stat-card"><span>Beneficiários ativos</span><strong>${active}</strong><small>Clientes ativos</small></article>
+        <article class="stat-card"><span>Valores contratados</span><strong>${moneyBR(generated)}</strong><small>Soma dos planos aprovados</small></article>
+        <article class="stat-card"><span>Dúvidas</span><strong>${questions.length}</strong><small>${questions.filter((item) => item.status === "nova").length} novas</small></article>
+      </div>
+      <div class="report-table-wrap">
+        <table class="report-click-table"><thead><tr><th>Data</th><th>Cliente</th><th>Parceiro</th><th>Benefício / plano</th><th>Valor</th><th>Situação</th><th>Histórico</th></tr></thead>
+          <tbody>${rows.length ? rows.map((item) => `<tr><td>${item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : "-"}</td><td><strong>${escapeHtml(item.clientName || item.clientId || "-")}</strong><small>${escapeHtml(item.userEmail || "")}</small></td><td>${escapeHtml(item.partnerName || "-")}</td><td>${escapeHtml(item.benefitTitle || "-")}${item.planName ? `<small>${escapeHtml(item.planName)}</small>` : ""}</td><td>${item.planName ? moneyBR(item.planValue) : "-"}</td><td><select data-benefit-request-status="${escapeAttr(item.id)}" data-benefit-request-partner="${escapeAttr(item.partnerId || item.benefitId)}" data-benefit-request-client="${escapeAttr(item.clientId)}">${benefitStatusOptions(item.status)}</select></td><td><details><summary>Ver</summary>${renderBenefitHistory(item.historico)}</details></td></tr>`).join("") : `<tr><td colspan="7">Nenhuma solicitação registrada.</td></tr>`}</tbody>
+        </table>
+      </div>
+      ${renderMasterBenefitQuestions()}
+    </section>
+  `;
+}
+
+function benefitStatusOptions(current = "") {
+  return ["aguardando_analise", "informacoes_solicitadas", "aprovada", "recusada", "cancelada_cliente", "beneficiario_ativo", "beneficio_encerrado"]
+    .map((status) => `<option value="${status}" ${status === current || (current === "solicitado" && status === "aguardando_analise") ? "selected" : ""}>${benefitStatusLabel(status)}</option>`).join("");
+}
+
+function renderMasterBenefitQuestions() {
+  const questions = state.beneficiosDuvidas;
+  return `
+    <div class="benefit-master-questions">
+      <h3>Dúvidas enviadas</h3>
+      ${questions.length ? questions.map((item) => `<article><div><strong>${escapeHtml(item.subject || "Dúvida")}</strong><span>${escapeHtml(item.clientName || item.clientId || "")} → ${escapeHtml(item.partnerName || "")}</span><p>${escapeHtml(item.message || "")}</p>${item.response ? `<em>Resposta: ${escapeHtml(item.response)}</em>` : ""}</div><span class="badge">${escapeHtml(benefitQuestionStatusLabel(item.status))}</span></article>`).join("") : `<p class="list-meta">Nenhuma dúvida enviada.</p>`}
+    </div>
+  `;
+}
+
+function renderClientBenefitQuestions() {
+  if (!currentClientId() || !state.beneficiosDuvidas.length) return "";
+  return `
+    <section class="panel-card benefit-client-questions">
+      <div class="section-head"><div><span class="feature-kicker">Atendimento</span><h2>Minhas dúvidas</h2><p>Acompanhe as mensagens enviadas e as respostas dos parceiros.</p></div></div>
+      <div class="partner-question-list">
+        ${state.beneficiosDuvidas.map((item) => `<article class="partner-question-card"><header><div><span>${item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : ""}</span><h3>${escapeHtml(item.subject || "Dúvida")}</h3><small>${escapeHtml(item.partnerName || "")}</small></div><span class="benefit-request-status">${escapeHtml(benefitQuestionStatusLabel(item.status))}</span></header><p>${escapeHtml(item.message || "")}</p>${item.response ? `<div class="partner-question-response"><strong>Resposta do parceiro</strong>${escapeHtml(item.response)}</div>` : `<small>Aguardando retorno do parceiro.</small>`}</article>`).join("")}
+      </div>
+    </section>
+  `;
+}
+
+function renderBenefitsView() {
+  const mount = $("benefitsMount");
+  if (!mount) return;
+  const benefits = isMaster() ? state.beneficios : state.beneficios.filter(benefitIsAvailable);
+  const selected = state.beneficios.find((item) => item.id === state.selectedBenefitDetailId);
+  mount.innerHTML = `
+    ${renderBenefitMasterForm()}
+    ${renderBenefitNotifications()}
+    <section class="benefit-catalog-hero"><div><span><i class="fa-solid fa-crown"></i> Clube de benefícios</span><h2>Parceiros que ajudam sua empresa a crescer</h2><p>Conheça cada parceiro, compare condições e tire suas dúvidas antes de solicitar.</p></div><strong>${benefits.length}<small>parceiro${benefits.length === 1 ? "" : "s"} disponível${benefits.length === 1 ? "" : "is"}</small></strong></section>
+    <div class="benefits-grid">${benefits.length ? benefits.map(renderBenefitCard).join("") : `<section class="panel-card"><p class="list-meta">Nenhum parceiro disponível no momento.</p></section>`}</div>
+    ${renderClientBenefitQuestions()}
+    ${renderBenefitUsageReport()}
+    ${selected ? renderBenefitDetail(selected) : ""}
+  `;
+  bindBenefitsView();
+}
+
+function collectBenefitPlans(form) {
+  const plans = {};
+  form.querySelectorAll("[data-benefit-plan-row]").forEach((row, index) => {
+    const name = row.querySelector("[data-plan-name]")?.value.trim() || "";
+    if (!name) return;
+    const id = slugify(row.querySelector("[data-plan-id]")?.value || name) || `plano-${index + 1}`;
+    plans[id] = {
+      id,
+      nome: name,
+      descricao: row.querySelector("[data-plan-description]")?.value.trim() || "",
+      valor: Number(row.querySelector("[data-plan-value]")?.value || 0),
+      periodicidade: row.querySelector("[data-plan-period]")?.value || "mensal",
+      incluidos: row.querySelector("[data-plan-included]")?.value.trim() || "",
+      status: row.querySelector("[data-plan-status]")?.value || "ativo",
+      ordem: index
+    };
+  });
+  return plans;
+}
+
+async function saveBenefitFromForm(form) {
+  if (!isMaster()) return;
+  const existingId = $("benefitId")?.value || "";
+  const id = existingId || push(ref(db, "beneficiosParceiros")).key;
+  const button = form.querySelector('button[type="submit"]');
+  setBusy(button, true, "Salvando...");
+  try {
+    let image = $("benefitImage")?.value.trim() || "";
+    const logoFile = $("benefitImageUpload")?.files?.[0];
+    if (logoFile) {
+      const fileRef = storageRef(storage, `beneficios/${id}/logo_${Date.now()}_${slugify(logoFile.name || "imagem")}`);
+      image = await uploadFileWithProgress(fileRef, logoFile, "Enviando logo do parceiro", logoFile.name || "logo");
+    }
+    const gallery = [...new Set(String($("benefitGalleryUrls")?.value || "").split(/\r?\n/).map((url) => url.trim()).filter(Boolean))];
+    const galleryFiles = [...($("benefitGalleryUpload")?.files || [])].slice(0, 12);
+    for (let index = 0; index < galleryFiles.length; index += 1) {
+      const file = galleryFiles[index];
+      const fileRef = storageRef(storage, `beneficios/${id}/galeria/${Date.now()}_${index}_${slugify(file.name || "imagem")}`);
+      gallery.push(await uploadFileWithProgress(fileRef, file, `Enviando imagem ${index + 1} de ${galleryFiles.length}`, file.name || "imagem"));
+    }
+    const current = state.beneficios.find((item) => item.id === id) || {};
+    await set(ref(db, `beneficiosParceiros/${id}`), {
+      parceiro: $("benefitPartner").value.trim(),
+      descricaoParceiro: $("benefitPartnerDescription").value.trim().slice(0, 1100),
+      titulo: $("benefitTitle").value.trim(),
+      tipoBeneficio: $("benefitType").value,
+      valorBeneficio: Number($("benefitValue").value || 0),
+      chamadaBeneficio: $("benefitCallout").value.trim(),
+      descricao: $("benefitDescription").value.trim().slice(0, 1100),
+      regras: $("benefitRules").value.trim().slice(0, 1100),
+      observacoesImportantes: $("benefitImportantNotes").value.trim(),
+      modalidadeContratacao: contractMode,
+      planos,
+      contato: $("benefitContact").value.trim(),
+      email: $("benefitEmail").value.trim(),
+      site: $("benefitSite").value.trim(),
+      imagem: image,
+      galeria: gallery,
+      validadeFim: $("benefitValidUntil").value,
+      status: $("benefitStatus").value,
+      ordem: Number($("benefitOrder").value || 0),
+      createdAt: current.createdAt || serverTimestamp(),
+      createdBy: current.createdBy || state.user?.uid || "",
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    });
+    state.selectedBenefitId = "";
+    showToast("Parceiro e benefício salvos.");
+  } catch (error) {
+    console.error(error);
+    showToast(error.message || "Não foi possível salvar o parceiro.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+function benefitClientSnapshot() {
+  const client = currentClientRecord() || {};
+  const whatsapp = client.whatsapp || client.telefoneWhatsapp || client.contatoWhatsapp || client.telefone || "";
+  const phone = client.telefone || client.contato || whatsapp;
+  return {
+    clientId: currentClientId(),
+    clientName: client.nome || client.name || currentClientId(),
+    responsibleName: client.responsavel || client.nomeResponsavel || state.profile?.nome || state.user?.email || "",
+    phone,
+    whatsapp,
+    email: client.email || state.user?.email || ""
+  };
+}
+
+function benefitPlanPeriodicityLabel(periodicity = "") {
+  return { mensal: "por mês", semestral: "por semestre", anual: "por ano", unico: "pagamento único" }[periodicity] || periodicity;
+}
+
+function showBenefitRequestConfirmation(benefit, plan = null) {
+  const mount = $("benefitsMount");
+  if (!mount) return;
+  mount.insertAdjacentHTML("beforeend", `
+    <div class="benefit-confirm-backdrop" data-benefit-confirm-close>
+      <section class="benefit-confirm-modal" role="dialog" aria-modal="true">
+        <i class="fa-solid fa-circle-question"></i>
+        <h2>Deseja realmente solicitar este benefício?</h2>
+        <dl><div><dt>Parceiro</dt><dd>${escapeHtml(benefit.parceiro || "")}</dd></div><div><dt>Benefício</dt><dd>${escapeHtml(benefit.titulo || "")}</dd></div>${plan ? `<div><dt>Plano escolhido</dt><dd>${escapeHtml(plan.nome)} · ${moneyBR(plan.valor)} ${escapeHtml(benefitPlanPeriodicityLabel(plan.periodicidade))}</dd></div>` : `<div><dt>Plano</dt><dd>Sem plano contratado</dd></div>`}</dl>
+        ${benefit.observacoesImportantes ? `<p><strong>Observações importantes</strong>${escapeHtml(benefit.observacoesImportantes)}</p>` : ""}
+        <label>Mensagem ou observação para o parceiro<textarea id="benefitRequestMessage" maxlength="700" rows="3" placeholder="Opcional"></textarea></label>
+        <div><button type="button" class="ghost-button" data-benefit-confirm-close>Voltar</button><button type="button" data-benefit-confirm-request="${escapeAttr(benefit.id)}" data-benefit-confirm-plan="${escapeAttr(plan?.id || "")}"><i class="fa-solid fa-check"></i> Confirmar solicitação</button></div>
+      </section>
+    </div>
+  `);
+  bindBenefitConfirmation();
+}
+
+function bindBenefitConfirmation() {
+  const overlay = document.querySelector(".benefit-confirm-backdrop");
+  if (!overlay) return;
+  overlay.querySelectorAll("[data-benefit-confirm-close]").forEach((button) => button.addEventListener("click", (event) => {
+    if (event.target === overlay || event.currentTarget !== overlay) overlay.remove();
+  }));
+  overlay.querySelector("[data-benefit-confirm-request]")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    setBusy(button, true, "Confirmando...");
+    try {
+      await requestBenefitUse(button.dataset.benefitConfirmRequest, button.dataset.benefitConfirmPlan || "", overlay.querySelector("#benefitRequestMessage")?.value.trim() || "");
+      overlay.remove();
+      state.selectedBenefitDetailId = "";
+    } finally {
+      if (button.isConnected) setBusy(button, false);
+    }
+  });
+}
+
+async function requestBenefitUse(benefitId, planId = "", message = "") {
+  const benefit = state.beneficios.find((item) => item.id === benefitId);
+  const client = benefitClientSnapshot();
+  if (!benefit || !client.clientId || !benefitIsAvailable(benefit)) {
+    showToast("Este benefício não está disponível para este acesso.");
+    return;
+  }
+  if (benefitUsageForClient(benefitId, client.clientId)) {
+    showToast("Já existe uma solicitação em andamento para este benefício.");
+    return;
+  }
+  const plans = benefitPlans(benefit);
+  const plan = plans.find((item) => item.id === planId) || null;
+  if (benefit.modalidadeContratacao === "obrigatorio" && !plan) {
+    showToast("Escolha um plano antes de confirmar.");
+    return;
+  }
+  const id = push(ref(db, `beneficiosSolicitacoes/${benefitId}`)).key;
+  const now = Date.now();
+  const request = {
+    id,
+    partnerId: benefitId,
+    benefitId,
+    partnerName: benefit.parceiro || "",
+    benefitTitle: benefit.titulo || "",
+    ...client,
+    userId: state.user?.uid || "",
+    userEmail: state.user?.email || "",
+    planId: plan?.id || "",
+    planName: plan?.nome || "",
+    planValue: Number(plan?.valor || 0),
+    planPeriodicity: plan?.periodicidade || "",
+    planPeriodicityLabel: benefitPlanPeriodicityLabel(plan?.periodicidade || ""),
+    status: "aguardando_analise",
+    message: String(message || "").slice(0, 700),
+    historico: {
+      [String(now)]: { status: "aguardando_analise", at: now, userId: state.user?.uid || "", userEmail: state.user?.email || "" }
+    },
+    createdAt: now,
+    updatedAt: now
+  };
+  const notificationId = push(ref(db, `beneficiosNotificacoesParceiro/${benefitId}`)).key;
+  await update(ref(db), {
+    [`beneficiosSolicitacoes/${benefitId}/${id}`]: request,
+    [`beneficiosSolicitacoesPorCliente/${client.clientId}/${id}`]: request,
+    [`beneficiosNotificacoesParceiro/${benefitId}/${notificationId}`]: {
+      type: "nova_solicitacao",
+      partnerId: benefitId,
+      clientId: client.clientId,
+      actorUid: state.user?.uid || "",
+      requestId: id,
+      message: `${client.clientName} enviou uma nova solicitação.`,
+      createdAt: now
+    }
+  });
+  showToast("Solicitação enviada com status Aguardando análise.");
+}
+
+async function cancelBenefitRequest(requestId) {
+  const request = state.beneficiosUtilizacoes.find((item) => item.id === requestId);
+  if (!request || !["aguardando_analise", "solicitado"].includes(request.status)) {
+    showToast("Esta solicitação não pode mais ser cancelada automaticamente.");
+    return;
+  }
+  if (!window.confirm("Deseja realmente cancelar esta solicitação?")) return;
+  await updateBenefitRequestStatus(request, "cancelada_cliente", "Cancelada pelo cliente.");
+  showToast("Solicitação cancelada e mantida no histórico.");
+}
+
+async function updateBenefitRequestStatus(request, status, note = "") {
+  const now = Date.now();
+  const historyId = String(now);
+  const historyEntry = { status, at: now, note, userId: state.user?.uid || "", userEmail: state.user?.email || "" };
+  const partnerId = request.partnerId || request.benefitId;
+  const clientId = request.clientId;
+  const updates = {
+    [`beneficiosSolicitacoes/${partnerId}/${request.id}/status`]: status,
+    [`beneficiosSolicitacoes/${partnerId}/${request.id}/updatedAt`]: now,
+    [`beneficiosSolicitacoes/${partnerId}/${request.id}/updatedBy`]: state.user?.uid || "",
+    [`beneficiosSolicitacoes/${partnerId}/${request.id}/historico/${historyId}`]: historyEntry,
+    [`beneficiosSolicitacoesPorCliente/${clientId}/${request.id}/status`]: status,
+    [`beneficiosSolicitacoesPorCliente/${clientId}/${request.id}/updatedAt`]: now,
+    [`beneficiosSolicitacoesPorCliente/${clientId}/${request.id}/updatedBy`]: state.user?.uid || "",
+    [`beneficiosSolicitacoesPorCliente/${clientId}/${request.id}/historico/${historyId}`]: historyEntry
+  };
+  if (status === "cancelada_cliente") {
+    const notificationId = push(ref(db, `beneficiosNotificacoesParceiro/${partnerId}`)).key;
+    updates[`beneficiosNotificacoesParceiro/${partnerId}/${notificationId}`] = {
+      type: "solicitacao_cancelada", partnerId, clientId, actorUid: state.user?.uid || "", requestId: request.id,
+      message: `${request.clientName || "Um cliente"} cancelou uma solicitação.`, createdAt: now
+    };
+  } else {
+    const notificationId = push(ref(db, `beneficiosNotificacoesCliente/${clientId}`)).key;
+    updates[`beneficiosNotificacoesCliente/${clientId}/${notificationId}`] = {
+      type: status === "informacoes_solicitadas" ? "mais_informacoes" : "status_solicitacao",
+      partnerId, clientId, actorUid: state.user?.uid || "", requestId: request.id,
+      message: `${request.partnerName || "O parceiro"} atualizou sua solicitação para ${benefitStatusLabel(status)}.`, createdAt: now
+    };
+  }
+  await update(ref(db), updates);
+}
+
+async function submitBenefitQuestion(form, benefitId) {
+  const benefit = state.beneficios.find((item) => item.id === benefitId);
+  const client = benefitClientSnapshot();
+  if (!benefit || !client.clientId) return;
+  const id = push(ref(db, `beneficiosDuvidas/${benefitId}`)).key;
+  const now = Date.now();
+  const question = {
+    id,
+    partnerId: benefitId,
+    partnerName: benefit.parceiro || "",
+    benefitId,
+    benefitTitle: benefit.titulo || "",
+    ...client,
+    userId: state.user?.uid || "",
+    userEmail: state.user?.email || "",
+    subject: form.elements.subject.value.trim(),
+    message: form.elements.message.value.trim(),
+    returnPhone: form.elements.returnPhone.value.trim(),
+    status: "nova",
+    createdAt: now,
+    updatedAt: now
+  };
+  const notificationId = push(ref(db, `beneficiosNotificacoesParceiro/${benefitId}`)).key;
+  await update(ref(db), {
+    [`beneficiosDuvidas/${benefitId}/${id}`]: question,
+    [`beneficiosDuvidasPorCliente/${client.clientId}/${id}`]: question,
+    [`beneficiosNotificacoesParceiro/${benefitId}/${notificationId}`]: {
+      type: "nova_duvida", partnerId: benefitId, clientId: client.clientId, actorUid: state.user?.uid || "", questionId: id,
+      message: `${client.clientName} enviou uma nova dúvida.`, createdAt: now
+    }
+  });
+  form.reset();
+  showToast("Dúvida enviada diretamente ao parceiro.");
+}
+
+async function markBenefitNotificationRead(id) {
+  if (isBenefitPartner()) {
+    await update(ref(db, `beneficiosNotificacoesParceiro/${currentBenefitPartnerId()}/${id}`), { readAt: Date.now(), readBy: state.user?.uid || "" });
+  } else if (currentClientId()) {
+    await update(ref(db, `beneficiosNotificacoesCliente/${currentClientId()}/${id}`), { readAt: Date.now(), readBy: state.user?.uid || "" });
+  }
+}
+
+function bindBenefitsView() {
+  const mount = $("benefitsMount");
+  if (!mount) return;
+  const description = mount.querySelector("#benefitDescription");
+  const count = mount.querySelector("#benefitDescriptionCount");
+  const updateCount = () => { if (description && count) count.textContent = `${description.value.length}/1100`; };
+  description?.addEventListener("input", updateCount);
+  updateCount();
+  mount.querySelector("#benefitForm")?.addEventListener("submit", (event) => { event.preventDefault(); saveBenefitFromForm(event.currentTarget); });
+  mount.querySelector("[data-benefit-plan-add]")?.addEventListener("click", () => {
+    mount.querySelector("#benefitPlansEditor")?.insertAdjacentHTML("beforeend", renderBenefitPlanEditor({}, mount.querySelectorAll("[data-benefit-plan-row]").length));
+  });
+  mount.addEventListener("click", async (event) => {
+    const open = event.target.closest("[data-benefit-open]");
+    if (open) {
+      state.selectedBenefitDetailId = open.dataset.benefitOpen || "";
+      renderBenefitsView();
+      return;
+    }
+    const close = event.target.closest("[data-benefit-close]");
+    if (close && (event.target === close || close.hasAttribute("data-benefit-close"))) {
+      state.selectedBenefitDetailId = "";
+      renderBenefitsView();
+      return;
+    }
+    const edit = event.target.closest("[data-benefit-edit]");
+    if (edit) {
+      state.selectedBenefitId = edit.dataset.benefitEdit || "";
+      state.selectedBenefitDetailId = "";
+      renderBenefitsView();
+      $("benefitForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (event.target.closest("[data-benefit-new]")) {
+      state.selectedBenefitId = "";
+      renderBenefitsView();
+      return;
+    }
+    const removePlan = event.target.closest("[data-benefit-plan-remove]");
+    if (removePlan) {
+      removePlan.closest("[data-benefit-plan-row]")?.remove();
+      return;
+    }
+    const galleryButton = event.target.closest("[data-benefit-gallery-image]");
+    if (galleryButton) {
+      const main = mount.querySelector("[data-benefit-main-image]");
+      if (main) main.src = galleryButton.dataset.benefitGalleryImage;
+      mount.querySelectorAll("[data-benefit-gallery-image]").forEach((button) => button.classList.toggle("active", button === galleryButton));
+      return;
+    }
+    const requestButton = event.target.closest("[data-benefit-request]");
+    if (requestButton) {
+      const benefit = state.beneficios.find((item) => item.id === requestButton.dataset.benefitRequest);
+      if (!benefit) return;
+      const selectedPlanId = mount.querySelector('input[name="benefitSelectedPlan"]:checked')?.value || "";
+      const plan = benefitPlans(benefit).find((item) => item.id === selectedPlanId) || null;
+      if (benefit.modalidadeContratacao === "obrigatorio" && !plan) return showToast("Escolha um plano para continuar.");
+      showBenefitRequestConfirmation(benefit, plan);
+      return;
+    }
+    const cancel = event.target.closest("[data-benefit-cancel-request]");
+    if (cancel) {
+      await cancelBenefitRequest(cancel.dataset.benefitCancelRequest);
+      return;
+    }
+    const notification = event.target.closest("[data-benefit-notification-read]");
+    if (notification) {
+      await markBenefitNotificationRead(notification.dataset.benefitNotificationRead);
+      return;
+    }
+    const removeBenefit = event.target.closest("[data-benefit-delete]");
+    if (removeBenefit && isMaster() && window.confirm("Excluir este parceiro e benefício? O histórico de solicitações será preservado.")) {
+      await remove(ref(db, `beneficiosParceiros/${removeBenefit.dataset.benefitDelete}`));
+      return;
+    }
+  });
+  mount.querySelectorAll("[data-benefit-question-form]").forEach((form) => form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = event.submitter;
+    setBusy(button, true, "Enviando...");
+    try { await submitBenefitQuestion(form, form.dataset.benefitQuestionForm); } finally { setBusy(button, false); }
+  }));
+  mount.querySelectorAll("[data-benefit-request-status]").forEach((select) => select.addEventListener("change", async () => {
+    const request = state.beneficiosUtilizacoes.find((item) => item.id === select.dataset.benefitRequestStatus);
+    if (!request) return;
+    const note = select.value === "informacoes_solicitadas" || select.value === "recusada" ? (window.prompt("Informe uma observação para o cliente:") || "") : "";
+    select.disabled = true;
+    try { await updateBenefitRequestStatus(request, select.value, note); showToast("Situação atualizada."); } finally { select.disabled = false; }
+  }));
+}
+
+function renderPartnerBenefitsArea() {
+  const mount = $("partnerBenefitsMount");
+  if (!mount) return;
+  const partnerId = isMaster() ? (state.selectedBenefitDetailId || state.beneficios[0]?.id || "") : currentBenefitPartnerId();
+  const partner = state.beneficios.find((item) => item.id === partnerId);
+  if (!partnerId || !partner) {
+    mount.innerHTML = `<section class="panel-card"><h2>Parceiro não vinculado</h2><p>Peça ao Admin Master para vincular este usuário ao parceiro correspondente.</p></section>`;
+    return;
+  }
+  const requests = state.beneficiosUtilizacoes.filter((item) => (item.partnerId || item.benefitId) === partnerId);
+  const questions = state.beneficiosDuvidas.filter((item) => (item.partnerId || item.benefitId) === partnerId);
+  const active = requests.filter((item) => item.status === "beneficiario_ativo").length;
+  mount.innerHTML = `
+    ${renderBenefitNotifications()}
+    <section class="benefit-partner-hero"><div>${partner.imagem ? `<img src="${escapeAttr(partner.imagem)}" alt="${escapeAttr(partner.parceiro || "")}">` : `<i class="fa-solid fa-handshake"></i>`}<span><small>Área exclusiva do parceiro</small><h2>${escapeHtml(partner.parceiro || "")}</h2><p>${escapeHtml(partner.titulo || "")}</p></span></div>${isMaster() ? `<select id="masterPartnerAreaSelect">${state.beneficios.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === partnerId ? "selected" : ""}>${escapeHtml(item.parceiro || item.id)}</option>`).join("")}</select>` : ""}</section>
+    <div class="stats-grid benefit-report-stats"><article class="stat-card"><span>Solicitações</span><strong>${requests.length}</strong><small>Recebidas</small></article><article class="stat-card"><span>Aguardando análise</span><strong>${requests.filter((item) => ["aguardando_analise", "solicitado"].includes(item.status)).length}</strong><small>Precisam de atendimento</small></article><article class="stat-card"><span>Beneficiários ativos</span><strong>${active}</strong><small>Clientes vinculados</small></article><article class="stat-card"><span>Dúvidas</span><strong>${questions.filter((item) => item.status !== "finalizada").length}</strong><small>Em atendimento</small></article></div>
+    <section class="panel-card"><div class="section-head"><div><span class="feature-kicker">Solicitações recebidas</span><h2>Atendimento dos clientes</h2></div></div><div class="partner-request-list">${requests.length ? requests.map(renderPartnerRequestCard).join("") : `<p class="list-meta">Nenhuma solicitação recebida.</p>`}</div></section>
+    <section class="panel-card"><div class="section-head"><div><span class="feature-kicker">Dúvidas</span><h2>Mensagens dos clientes</h2></div></div><div class="partner-question-list">${questions.length ? questions.map(renderPartnerQuestionCard).join("") : `<p class="list-meta">Nenhuma dúvida recebida.</p>`}</div></section>
+  `;
+  bindPartnerBenefitsArea();
+}
+
+function renderPartnerRequestCard(item = {}) {
+  const whatsappDigits = String(item.whatsapp || item.phone || "").replace(/\D/g, "");
+  return `
+    <article class="partner-request-card">
+      <header><div><span>${item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : ""}</span><h3>${escapeHtml(item.clientName || item.clientId || "Cliente")}</h3><p>${escapeHtml(item.responsibleName || "")}</p></div><span class="benefit-request-status status-${escapeAttr(item.status)}">${escapeHtml(benefitStatusLabel(item.status))}</span></header>
+      <div class="partner-request-details"><span><i class="fa-solid fa-gift"></i><strong>${escapeHtml(item.benefitTitle || "")}</strong></span>${item.planName ? `<span><i class="fa-solid fa-layer-group"></i><strong>${escapeHtml(item.planName)}</strong> · ${moneyBR(item.planValue)} ${escapeHtml(item.planPeriodicityLabel || "")}</span>` : ""}<span><i class="fa-solid fa-envelope"></i>${escapeHtml(item.email || item.userEmail || "")}</span><span><i class="fa-solid fa-phone"></i>${escapeHtml(item.phone || item.whatsapp || "")}</span>${item.message ? `<p>${escapeHtml(item.message)}</p>` : ""}</div>
+      <div class="partner-request-actions"><select data-partner-request-status="${escapeAttr(item.id)}">${benefitStatusOptions(item.status)}</select>${whatsappDigits ? `<a class="ghost-button" href="https://wa.me/${escapeAttr(whatsappDigits.startsWith("55") ? whatsappDigits : `55${whatsappDigits}`)}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Contatar cliente</a>` : ""}</div>
+      <details><summary>Histórico completo</summary>${renderBenefitHistory(item.historico)}</details>
+    </article>
+  `;
+}
+
+function renderPartnerQuestionCard(item = {}) {
+  return `
+    <article class="partner-question-card">
+      <header><div><span>${item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : ""}</span><h3>${escapeHtml(item.subject || "Dúvida")}</h3><small>${escapeHtml(item.clientName || item.clientId || "")} · ${escapeHtml(item.returnPhone || "")}</small></div><select data-partner-question-status="${escapeAttr(item.id)}">${["nova", "em_atendimento", "respondida", "finalizada"].map((status) => `<option value="${status}" ${status === item.status ? "selected" : ""}>${benefitQuestionStatusLabel(status)}</option>`).join("")}</select></header>
+      <p>${escapeHtml(item.message || "")}</p>
+      ${item.response ? `<div class="partner-question-response"><strong>Resposta enviada</strong>${escapeHtml(item.response)}</div>` : ""}
+      <form data-partner-question-response="${escapeAttr(item.id)}"><textarea maxlength="1100" rows="3" placeholder="Escreva uma resposta ou orientação...">${escapeHtml(item.response || "")}</textarea><button type="submit"><i class="fa-solid fa-reply"></i> Salvar resposta</button></form>
+    </article>
+  `;
+}
+
+async function updateBenefitQuestion(question, status, response = question.response || "") {
+  const now = Date.now();
+  const partnerId = question.partnerId || question.benefitId;
+  const updates = {
+    [`beneficiosDuvidas/${partnerId}/${question.id}/status`]: status,
+    [`beneficiosDuvidas/${partnerId}/${question.id}/response`]: response,
+    [`beneficiosDuvidas/${partnerId}/${question.id}/updatedAt`]: now,
+    [`beneficiosDuvidas/${partnerId}/${question.id}/updatedBy`]: state.user?.uid || "",
+    [`beneficiosDuvidasPorCliente/${question.clientId}/${question.id}/status`]: status,
+    [`beneficiosDuvidasPorCliente/${question.clientId}/${question.id}/response`]: response,
+    [`beneficiosDuvidasPorCliente/${question.clientId}/${question.id}/updatedAt`]: now,
+    [`beneficiosDuvidasPorCliente/${question.clientId}/${question.id}/updatedBy`]: state.user?.uid || ""
+  };
+  if (response || status === "respondida") {
+    const notificationId = push(ref(db, `beneficiosNotificacoesCliente/${question.clientId}`)).key;
+    updates[`beneficiosNotificacoesCliente/${question.clientId}/${notificationId}`] = {
+      type: "resposta_duvida", partnerId, clientId: question.clientId, actorUid: state.user?.uid || "", questionId: question.id,
+      message: `${question.partnerName || "O parceiro"} respondeu sua dúvida.`, createdAt: now
+    };
+  }
+  await update(ref(db), updates);
+}
+
+function bindPartnerBenefitsArea() {
+  const mount = $("partnerBenefitsMount");
+  if (!mount) return;
+  mount.querySelector("#masterPartnerAreaSelect")?.addEventListener("change", (event) => {
+    state.selectedBenefitDetailId = event.target.value;
+    renderPartnerBenefitsArea();
+  });
+  mount.querySelectorAll("[data-partner-request-status]").forEach((select) => select.addEventListener("change", async () => {
+    const request = state.beneficiosUtilizacoes.find((item) => item.id === select.dataset.partnerRequestStatus);
+    if (!request) return;
+    const needsNote = ["informacoes_solicitadas", "recusada"].includes(select.value);
+    const note = needsNote ? (window.prompt("Informe a orientação ou motivo que será enviado ao cliente:") || "") : "";
+    if (needsNote && !note) {
+      select.value = request.status;
+      return;
+    }
+    select.disabled = true;
+    try { await updateBenefitRequestStatus(request, select.value, note); showToast("Solicitação atualizada e cliente notificado."); } finally { select.disabled = false; }
+  }));
+  mount.querySelectorAll("[data-partner-question-status]").forEach((select) => select.addEventListener("change", async () => {
+    const question = state.beneficiosDuvidas.find((item) => item.id === select.dataset.partnerQuestionStatus);
+    if (!question) return;
+    await updateBenefitQuestion(question, select.value);
+    showToast("Situação da dúvida atualizada.");
+  }));
+  mount.querySelectorAll("[data-partner-question-response]").forEach((form) => form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const question = state.beneficiosDuvidas.find((item) => item.id === form.dataset.partnerQuestionResponse);
+    if (!question) return;
+    const response = form.querySelector("textarea")?.value.trim() || "";
+    if (!response) return showToast("Escreva uma resposta.");
+    const button = event.submitter;
+    setBusy(button, true, "Salvando...");
+    try { await updateBenefitQuestion(question, "respondida", response); showToast("Resposta salva e cliente notificado."); } finally { setBusy(button, false); }
+  }));
+  mount.querySelectorAll("[data-benefit-notification-read]").forEach((button) => button.addEventListener("click", () => markBenefitNotificationRead(button.dataset.benefitNotificationRead)));
+}
+
 function switchView(name) {
   const target = views[name] ? name : "dashboard";
   if (!canAccessView(target)) {
-    switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
+    switchView(initialViewForProfile());
     return;
   }
   Object.entries(views).forEach(([key, el]) => el.classList.toggle("hidden", key !== target));
@@ -3871,6 +4811,7 @@ function switchView(name) {
   if (target === "xadrezConfig") renderXadrezConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "beneficios") renderBenefitsView();
+  if (target === "areaParceiro") renderPartnerBenefitsArea();
   if (target === "relatorioAcessos" || target === "relatorioFinanceiro") {
     renderReports();
     if (target === "relatorioAcessos") refreshMasterAccessMetrics();
@@ -6370,10 +7311,11 @@ function renderUsersList() {
 
   box.innerHTML = users.map((user) => {
     const client = state.clientes.find((item) => item.id === user.clienteId);
+    const partner = state.beneficios.find((item) => item.id === user.parceiroId);
     return `
       <article class="list-card">
         <div class="list-title">${escapeHtml(user.email || user.uid)}</div>
-        <div class="list-meta">${roleLabel(user.role)}${client ? ` - ${escapeHtml(client.nome)}` : ""}</div>
+        <div class="list-meta">${roleLabel(user.role)}${client ? ` - ${escapeHtml(client.nome)}` : ""}${partner ? ` - ${escapeHtml(partner.parceiro || partner.titulo)}` : ""}</div>
         <div class="list-meta">Permissoes: ${Object.entries(user.permissoes || {}).filter(([, value]) => value).map(([key]) => escapeHtml(key)).join(", ") || "nenhuma"}</div>
         <span class="badge ${escapeAttr(user.status || "ativo")}">${statusLabel(user.status)}</span>
         <button type="button" data-edit-user="${escapeAttr(user.uid)}">Editar</button>
@@ -6388,6 +7330,22 @@ function renderUsersList() {
   });
 }
 
+function fillUserPartnerSelect(selectedId = "") {
+  const select = $("newUserPartner");
+  if (!select) return;
+  select.innerHTML = `<option value="">Selecione o parceiro...</option>${state.beneficios.map((benefit) => `<option value="${escapeAttr(benefit.id)}" ${benefit.id === selectedId ? "selected" : ""}>${escapeHtml(benefit.parceiro || benefit.titulo || benefit.id)}</option>`).join("")}`;
+}
+
+function syncUserLinkFields() {
+  const role = $("newUserRole")?.value || "cliente";
+  const partnerField = $("newUserPartnerField");
+  const clientSelect = $("newUserClient")?.closest("label");
+  partnerField?.classList.toggle("hidden", role !== "parceiro");
+  clientSelect?.classList.toggle("hidden", role === "parceiro");
+  if ($("newUserPartner")) $("newUserPartner").required = role === "parceiro";
+  if ($("newUserClient")) $("newUserClient").required = role === "cliente";
+}
+
 function resetUserForm() {
   $("userForm")?.reset();
   delete $("userForm").dataset.originalEmail;
@@ -6397,6 +7355,8 @@ function resetUserForm() {
   $("newUserPassword").placeholder = "Obrigatoria para novo usuario ou troca de e-mail";
   if ($("newUserClientSearch")) $("newUserClientSearch").value = "";
   fillUserClientSelect();
+  fillUserPartnerSelect();
+  syncUserLinkFields();
   $("editUserStatus").value = "ativo";
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
   $("deleteUserButton")?.classList.add("hidden");
@@ -6418,6 +7378,8 @@ function fillUserForm(user) {
   const linkedClient = state.clientes.find((client) => client.id === user.clienteId);
   if ($("newUserClientSearch")) $("newUserClientSearch").value = linkedClient?.nome || "";
   fillUserClientSelect(user.clienteId || "");
+  fillUserPartnerSelect(user.parceiroId || "");
+  syncUserLinkFields();
   $("editUserStatus").value = user.status || "ativo";
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     input.checked = Boolean(user.permissoes?.[input.value]);
@@ -16685,6 +17647,11 @@ async function createPanelUser(event) {
   const email = $("newUserEmail").value.trim().toLowerCase();
   const password = $("newUserPassword").value.trim();
   const clienteId = $("newUserClient").value;
+  const parceiroId = $("newUserPartner")?.value || "";
+  if (role === "parceiro" && !parceiroId) {
+    showToast("Selecione o parceiro que ficará vinculado a este usuário.");
+    return;
+  }
   const permissoes = {};
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     permissoes[input.value] = input.checked;
@@ -16703,6 +17670,7 @@ async function createPanelUser(event) {
           password,
           role,
           clienteId,
+          parceiroId,
           status: $("editUserStatus").value || "ativo",
           permissoes
         });
@@ -16718,6 +17686,7 @@ async function createPanelUser(event) {
         email,
         role,
         clienteId: role === "cliente" ? clienteId : "",
+        parceiroId: role === "parceiro" ? parceiroId : "",
         status: $("editUserStatus").value || "ativo",
         permissoes
       });
@@ -16739,6 +17708,7 @@ async function createPanelUser(event) {
       email,
       role,
       clienteId: role === "cliente" ? clienteId : "",
+      parceiroId: role === "parceiro" ? parceiroId : "",
       status: "ativo",
       permissoes
     });
@@ -17419,6 +18389,7 @@ function bindEvents() {
   $("userForm").addEventListener("submit", createPanelUser);
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
   $("userSearch")?.addEventListener("input", renderUsersList);
+  $("newUserRole")?.addEventListener("change", syncUserLinkFields);
   $("newUserClientSearch")?.addEventListener("input", () => fillUserClientSelect());
   $("newUserClient")?.addEventListener("change", () => {
     const client = state.clientes.find((item) => item.id === $("newUserClient").value);

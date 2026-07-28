@@ -167,8 +167,11 @@
     },
 
     "beneficiosParceiros": {
-      ".read": "auth != null",
-      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+      ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente')",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$partnerId": {
+        ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === $partnerId"
+      }
     },
 
     "beneficiosUtilizacoes": {
@@ -177,6 +180,64 @@
         ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId)",
         "$usageId": {
           ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (!data.exists() && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId && newData.child('clientId').val() === $clientId && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'solicitado'))"
+        }
+      }
+    },
+
+    "beneficiosSolicitacoes": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$partnerId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === $partnerId))",
+        "$requestId": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === $partnerId) || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && newData.child('clientId').val() === root.child('usuariosByUid').child(auth.uid).child('clienteId').val() && newData.child('partnerId').val() === $partnerId && ((!data.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'aguardando_analise') || (data.exists() && data.child('clientId').val() === newData.child('clientId').val() && data.child('partnerId').val() === newData.child('partnerId').val() && (data.child('status').val() === 'aguardando_analise' || data.child('status').val() === 'solicitado') && newData.child('status').val() === 'cancelada_cliente'))))"
+        }
+      }
+    },
+
+    "beneficiosSolicitacoesPorCliente": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$clientId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId))",
+        "$requestId": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === newData.child('partnerId').val()) || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId && newData.child('clientId').val() === $clientId && ((!data.exists() && newData.child('userId').val() === auth.uid && newData.child('status').val() === 'aguardando_analise') || (data.exists() && data.child('partnerId').val() === newData.child('partnerId').val() && (data.child('status').val() === 'aguardando_analise' || data.child('status').val() === 'solicitado') && newData.child('status').val() === 'cancelada_cliente'))))"
+        }
+      }
+    },
+
+    "beneficiosDuvidas": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$partnerId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === $partnerId))",
+        "$questionId": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === $partnerId) || (!data.exists() && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && newData.child('clientId').val() === root.child('usuariosByUid').child(auth.uid).child('clienteId').val() && newData.child('partnerId').val() === $partnerId && newData.child('userId').val() === auth.uid))"
+        }
+      }
+    },
+
+    "beneficiosDuvidasPorCliente": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$clientId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId))",
+        "$questionId": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === newData.child('partnerId').val()) || (!data.exists() && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && newData.child('clientId').val() === $clientId && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId && newData.child('userId').val() === auth.uid))"
+        }
+      }
+    },
+
+    "beneficiosNotificacoesParceiro": {
+      "$partnerId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === $partnerId))",
+        "$notificationId": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === $partnerId) || (!data.exists() && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && newData.child('actorUid').val() === auth.uid && newData.child('partnerId').val() === $partnerId && newData.child('clientId').val() === root.child('usuariosByUid').child(auth.uid).child('clienteId').val()))"
+        }
+      }
+    },
+
+    "beneficiosNotificacoesCliente": {
+      "$clientId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId))",
+        "$notificationId": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (data.exists() && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('clienteId').val() === $clientId && data.child('clientId').val() === $clientId) || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'parceiro' && root.child('usuariosByUid').child(auth.uid).child('parceiroId').val() === newData.child('partnerId').val() && ((newData.child('requestId').exists() && root.child('beneficiosSolicitacoes').child(newData.child('partnerId').val()).child(newData.child('requestId').val()).child('clientId').val() === $clientId) || (newData.child('questionId').exists() && root.child('beneficiosDuvidas').child(newData.child('partnerId').val()).child(newData.child('questionId').val()).child('clientId').val() === $clientId))))"
         }
       }
     },
@@ -197,8 +258,8 @@
     },
 
     "$other": {
-      ".read": "$other !== 'onlineUserHistory'",
-      ".write": true
+      ".read": "$other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
+      ".write": "$other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
     }
   }
 }
