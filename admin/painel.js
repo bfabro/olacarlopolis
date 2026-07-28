@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 509,
-  label: "v516",
+  numero: 510,
+  label: "v517",
   data: "2026-07-28",
-  nota: "Correcao definitiva do salvamento de planos e imagens dos parceiros."
+  nota: "Identificacao de clientes institucionais nas novidades."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5345,6 +5345,7 @@ async function registrarNovidadeAdmin(payload = {}) {
       imagens: Array.isArray(payload.imagens) ? payload.imagens.filter(Boolean) : (payload.imagem ? [payload.imagem] : []),
       valor: payload.valor || "",
       categoria: payload.categoria || "",
+      tipoCliente: payload.tipoCliente || payload.clientType || "",
       destinoTipo: payload.destinoTipo || tipo,
       destinoId,
       itemId,
@@ -5382,6 +5383,7 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     imagem: profileImage,
     imagens: noveltyImages,
     categoria: effective.categoria || "",
+    tipoCliente: effective.tipoCliente || effective.tipo || "",
     destinoTipo: "estabelecimento",
     destinoId: effective.nomeNormalizado || normalizeName(effective.nome || clientId),
     clienteId: clientId,

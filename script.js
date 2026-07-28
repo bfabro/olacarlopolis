@@ -4725,8 +4725,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  function novidadeTipoCliente(item = {}) {
+    const tipoDireto = normalizeName(
+      item.tipoCliente
+      || item.clientType
+      || item.raw?.tipoCliente
+      || item.raw?.clientType
+      || ""
+    );
+    if (tipoDireto) return tipoDireto;
+    const cadastro = encontrarCadastroDonoNovidade(item, item.estabelecimento || item.raw?.estabelecimento || "");
+    return normalizeName(cadastro?.tipoCliente || cadastro?.tipo || cadastro?.clientType || "");
+  }
+
   function novidadeCategoriaInfo(item) {
     const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
+    const clienteInstitucional = novidadeTipoCliente(item).includes("institucional");
     const texto = normalizeName(`${item?.titulo || ""} ${item?.acao || ""} ${item?.descricao || ""}`);
     if (tipo.includes("imovel")) return { key: "imoveis", label: "Imóvel", icon: "fa-house" };
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
@@ -4735,8 +4749,16 @@ document.addEventListener("DOMContentLoaded", function () {
     if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
     if (tipo.includes("grupo") || tipo.includes("whatsapp")) return { key: "grupo-whatsapp", label: "Grupo WhatsApp", icon: "fa-user-group" };
     if (texto.includes("destaque")) return { key: "comercios", label: "Destaque", icon: "fa-star" };
-    if (tipo.includes("cliente") || tipo.includes("endereco") || tipo.includes("telefone") || tipo.includes("horario") || tipo.includes("cardapio") || tipo.includes("rede")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
-    if (tipo.includes("estabelecimento")) return { key: "comercios", label: "Comércio", icon: "fa-store" };
+    if (tipo.includes("cliente") || tipo.includes("endereco") || tipo.includes("telefone") || tipo.includes("horario") || tipo.includes("cardapio") || tipo.includes("rede")) {
+      return clienteInstitucional
+        ? { key: "comercios", label: "Institucional", icon: "fa-building-columns" }
+        : { key: "comercios", label: "Comércio", icon: "fa-store" };
+    }
+    if (tipo.includes("estabelecimento")) {
+      return clienteInstitucional
+        ? { key: "comercios", label: "Institucional", icon: "fa-building-columns" }
+        : { key: "comercios", label: "Comércio", icon: "fa-store" };
+    }
     return { key: "servicos", label: "Serviço", icon: "fa-bell" };
   }
 
@@ -4856,6 +4878,7 @@ document.addEventListener("DOMContentLoaded", function () {
       itemId: base.itemId || base.promoOriginalId || "",
       destinoCardId: base.destinoCardId || "",
       categoria: base.categoria || "",
+      tipoCliente: base.tipoCliente || base.clientType || "",
       valor: base.valor || base.preco || base.valorTexto || "",
       codRef: base.codRef || base.codigoReferencia || base.codigo || base.referencia || "",
       link: base.link || base.url || "",
@@ -5390,7 +5413,12 @@ document.addEventListener("DOMContentLoaded", function () {
       add("fa-location-dot", novidadeValorCampo(item, ["local", "endereco"]) || item.estabelecimento, "Local");
       add("fa-ticket", novidadeValorCampo(item, ["entrada", "valor", "valorEntrada"]) || "Confira detalhes", "Entrada");
     } else {
-      add("fa-store", item.estabelecimento || novidadeTituloDestino(item), "Responsável");
+      const clienteInstitucional = novidadeTipoCliente(item).includes("institucional");
+      add(
+        clienteInstitucional ? "fa-building-columns" : "fa-store",
+        item.estabelecimento || novidadeTituloDestino(item),
+        clienteInstitucional ? "Institucional" : "Responsável"
+      );
       add("fa-location-dot", novidadeValorCampo(item, ["endereco", "cidade"]) || "Carlópolis - PR", "Local");
       add("fa-bell", item.categoria || item.descricao || "Novidade recente", "Informação");
     }
