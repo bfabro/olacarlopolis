@@ -1031,11 +1031,12 @@ function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, im
     <div class="business-art-layout-decoration business-art-layout-decoration-dots" aria-hidden="true"></div>
     <article class="business-art-card">
       <header class="business-art-header">
-        <span class="business-art-kind"><i class="fa-solid fa-store"></i>${escaparArteComercial(dados.tipoLabel)}</span>
+        <span class="business-art-kind"><i class="fa-solid fa-store"></i>${layoutArte === "vitrine" ? "Vitrine local" : escaparArteComercial(dados.tipoLabel)}</span>
         ${dados.categoria ? `<strong>${escaparArteComercial(dados.categoria)}</strong>` : ""}
       </header>
       <div class="business-art-picture ${layoutArte === "mosaic" ? "is-mosaic" : `is-${imageFit}`}">${imageBlock}</div>
       <section class="business-art-identity">
+        ${layoutArte === "vitrine" ? `<span class="business-art-vitrine-label"><i class="fa-solid fa-location-dot"></i> Conheça em Carlópolis</span>` : ""}
         <h1>${escaparArteComercial(dados.nome)}</h1>
         <span class="business-art-name-line"></span>
         ${dados.descricao ? `<p>${escaparArteComercial(dados.descricao)}</p>` : ""}
@@ -1190,11 +1191,10 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           <button type="button" class="active" data-business-format="feed">Feed <small>1080 x 1350</small></button>
         </div>
         <div class="business-art-layout" role="group" aria-label="Layout da arte">
-          <button type="button" class="active" data-business-layout="classic"><i class="fa-regular fa-rectangle-list"></i><small>Atual</small></button>
-          <button type="button" data-business-layout="showcase"><i class="fa-solid fa-wand-magic-sparkles"></i><small>Destaque</small></button>
+          <button type="button" class="active" data-business-layout="vitrine"><i class="fa-solid fa-store"></i><small>Vitrine</small></button>
           <button type="button" data-business-layout="mosaic" title="Usar quatro imagens no Story ou duas no Feed"><i class="fa-solid fa-table-cells-large"></i><small>Mosaico</small></button>
         </div>
-        <div class="business-art-color-controls is-hidden" aria-label="Cores do layout selecionado">
+        <div class="business-art-color-controls" aria-label="Cores do layout selecionado">
           <label title="Cor da faixa com o nome"><input type="color" data-business-color="name" value="#075fd5"><small>Nome</small></label>
           <label title="Cor do detalhe decorativo esquerdo"><input type="color" data-business-color="detail" value="#0b63e6"><small>Detalhe</small></label>
         </div>
@@ -1277,7 +1277,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const scaleBox = dialog.querySelector(".business-art-scale");
   const preview = dialog.querySelector(".business-art-preview");
   let formato = "feed";
-  let layoutArte = "classic";
+  let layoutArte = "vitrine";
   let corNome = "#075fd5";
   let corDetalhe = "#0b63e6";
   let efeitoFoto = "soft";
@@ -1527,20 +1527,20 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     if (picture && (mosaic || (mainImage?.naturalWidth && mainImage?.naturalHeight))) {
       const maxWidth = picture.clientWidth || card?.clientWidth || 900;
       const pictureHeights = {
-        showcase: {
+        vitrine: {
           story: {
-            "description-empty": 830,
-            "description-short": 800,
-            "description-medium": 730,
-            "description-long": 660,
-            "description-xlong": 600
+            "description-empty": 790,
+            "description-short": 760,
+            "description-medium": 690,
+            "description-long": 620,
+            "description-xlong": 560
           },
           feed: {
-            "description-empty": 540,
-            "description-short": 520,
-            "description-medium": 470,
-            "description-long": 410,
-            "description-xlong": 350
+            "description-empty": 510,
+            "description-short": 490,
+            "description-medium": 440,
+            "description-long": 380,
+            "description-xlong": 320
           }
         },
         mosaic: {
@@ -1556,22 +1556,6 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
             "description-short": 510,
             "description-medium": 460,
             "description-long": 400,
-            "description-xlong": 340
-          }
-        },
-        classic: {
-          story: {
-            "description-empty": 760,
-            "description-short": 730,
-            "description-medium": 670,
-            "description-long": 600,
-            "description-xlong": 540
-          },
-          feed: {
-            "description-empty": 520,
-            "description-short": 500,
-            "description-medium": 450,
-            "description-long": 390,
             "description-xlong": 340
           }
         }
@@ -1666,9 +1650,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   });
   dialog.querySelectorAll("[data-business-layout]").forEach((button) => {
     button.addEventListener("click", async () => {
-      layoutArte = button.dataset.businessLayout || "classic";
+      layoutArte = button.dataset.businessLayout || "vitrine";
       dialog.querySelectorAll("[data-business-layout]").forEach((item) => item.classList.toggle("active", item === button));
-      dialog.querySelector(".business-art-color-controls")?.classList.toggle("is-hidden", layoutArte === "classic");
       atualizarSeletorMosaico();
       await render();
     });
@@ -1823,7 +1806,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         padding: "0",
         overflow: "hidden",
         boxSizing: "border-box",
-        background: layoutArte === "showcase" ? "#f7faff" : "#071120",
+        background: layoutArte === "vitrine" ? "#f7faff" : "#071120",
         pointerEvents: "none",
         zIndex: "0"
       });
@@ -1866,7 +1849,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         scale: 1,
         useCORS: true,
         allowTaint: false,
-        backgroundColor: layoutArte === "showcase" ? "#f7faff" : "#071120",
+        backgroundColor: layoutArte === "vitrine" ? "#f7faff" : "#071120",
         logging: false,
         scrollX: 0,
         scrollY: 0,
@@ -1878,7 +1861,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
       canvas.height = height;
       const canvasContext = canvas.getContext("2d");
       if (!canvasContext) throw new Error("Canvas de exportacao indisponivel.");
-      canvasContext.fillStyle = layoutArte === "showcase" ? "#f7faff" : "#071120";
+      canvasContext.fillStyle = layoutArte === "vitrine" ? "#f7faff" : "#071120";
       canvasContext.fillRect(0, 0, canvas.width, canvas.height);
       canvasContext.drawImage(capturedCanvas, 0, 0, 1080, height, 0, 0, 1080, height);
       const link = document.createElement("a");

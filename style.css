@@ -23420,7 +23420,7 @@ body.business-art-capturing-background .home-cards-intro {
   font-size: 22px;
 }
 
-/* ===== Arte comercial: layout alternativo Destaque ===== */
+/* ===== Arte comercial: modelo Vitrine ===== */
 .business-art-layout,
 .business-art-color-controls {
   display: flex;
@@ -23480,26 +23480,26 @@ body.business-art-capturing-background .home-cards-intro {
   display: none;
 }
 
-.business-art-stage.layout-showcase {
-  background: linear-gradient(145deg, #fff 0%, #f5f8fe 58%, #eaf2ff 100%);
+.business-art-stage.layout-vitrine {
+  background: linear-gradient(145deg, #f8fbff 0%, #edf5ff 55%, #dcecff 100%);
 }
 
-.business-art-stage.layout-showcase .business-art-background {
-  background: linear-gradient(145deg, #fff 0%, #f5f8fe 58%, #eaf2ff 100%) !important;
+.business-art-stage.layout-vitrine .business-art-background {
+  background: linear-gradient(145deg, #f8fbff 0%, #edf5ff 55%, #dcecff 100%) !important;
 }
 
-.business-art-stage.layout-showcase .business-art-shade {
+.business-art-stage.layout-vitrine .business-art-shade {
   display: none;
 }
 
-.business-art-stage.layout-showcase .business-art-layout-decoration {
+.business-art-stage.layout-vitrine .business-art-layout-decoration {
   position: absolute;
   z-index: 1;
   display: block;
   pointer-events: none;
 }
 
-.business-art-stage.layout-showcase .business-art-layout-decoration-left {
+.business-art-stage.layout-vitrine .business-art-layout-decoration-left {
   top: 260px;
   left: -105px;
   width: 270px;
@@ -23510,7 +23510,7 @@ body.business-art-capturing-background .home-cards-intro {
   transform: rotate(-8deg);
 }
 
-.business-art-stage.layout-showcase .business-art-layout-decoration-dots {
+.business-art-stage.layout-vitrine .business-art-layout-decoration-dots {
   top: 500px;
   right: 28px;
   width: 92px;
@@ -23520,25 +23520,26 @@ body.business-art-capturing-background .home-cards-intro {
   background-size: 26px 26px;
 }
 
-.business-art-stage.layout-showcase .business-art-card {
+.business-art-stage.layout-vitrine .business-art-card {
   z-index: 2;
   overflow: visible;
-  border: 1px solid #e0e8f5;
-  background: rgba(255, 255, 255, .9);
+  border: 2px solid rgba(255, 255, 255, .94);
+  border-top: 12px solid var(--business-name-color);
+  background: rgba(255, 255, 255, .94);
   box-shadow: none;
 }
 
-.business-art-stage.layout-showcase .business-art-header,
-.business-art-stage.layout-showcase .business-art-identity,
-.business-art-stage.layout-showcase .business-art-info {
+.business-art-stage.layout-vitrine .business-art-header,
+.business-art-stage.layout-vitrine .business-art-identity,
+.business-art-stage.layout-vitrine .business-art-info {
   background: transparent;
 }
 
-.business-art-stage.layout-showcase .business-art-header > strong {
+.business-art-stage.layout-vitrine .business-art-header > strong {
   color: var(--business-name-color);
 }
 
-.business-art-stage.layout-showcase .business-art-header > strong::after {
+.business-art-stage.layout-vitrine .business-art-header > strong::after {
   display: block;
   width: 72px;
   height: 5px;
@@ -23548,23 +23549,38 @@ body.business-art-capturing-background .home-cards-intro {
   content: "";
 }
 
-.business-art-stage.layout-showcase .business-art-kind {
+.business-art-stage.layout-vitrine .business-art-kind {
   border: 2px solid #d9e3f1;
   background: rgba(255,255,255,.94);
   color: var(--business-name-color);
   box-shadow: none;
 }
 
-.business-art-stage.layout-showcase .business-art-picture {
-  padding: 0;
-  border: 0 !important;
+.business-art-stage.layout-vitrine .business-art-picture {
+  padding: 8px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border: 2px solid #d8e5f5 !important;
   background: #f1f6ff !important;
   box-shadow: none;
 }
 
-.business-art-stage.layout-showcase .business-art-identity h1,
-.business-art-stage.layout-showcase.is-feed .business-art-identity h1,
-.business-art-stage.layout-showcase.is-story .business-art-identity h1 {
+.business-art-vitrine-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  color: var(--business-name-color);
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.business-art-stage.layout-vitrine .business-art-identity h1,
+.business-art-stage.layout-vitrine.is-feed .business-art-identity h1,
+.business-art-stage.layout-vitrine.is-story .business-art-identity h1 {
   width: min(860px, 100%);
   box-sizing: border-box;
   border: 0;
@@ -23573,16 +23589,16 @@ body.business-art-capturing-background .home-cards-intro {
   box-shadow: none;
 }
 
-.business-art-stage.layout-showcase .business-art-name-line {
+.business-art-stage.layout-vitrine .business-art-name-line {
   background: var(--business-name-color);
 }
 
-.business-art-stage.layout-showcase .business-art-info-card {
+.business-art-stage.layout-vitrine .business-art-info-card {
   background: rgba(255,255,255,.94);
   box-shadow: none;
 }
 
-.business-art-stage.layout-showcase.is-story .business-art-card {
+.business-art-stage.layout-vitrine.is-story .business-art-card {
   top: 24px;
   width: 1030px;
   height: 1872px;
@@ -23590,23 +23606,23 @@ body.business-art-capturing-background .home-cards-intro {
   border-radius: 72px;
 }
 
-.business-art-stage.layout-showcase.is-story .business-art-picture {
+.business-art-stage.layout-vitrine.is-story .business-art-picture {
   max-width: 850px;
   margin-top: 16px;
   margin-bottom: 62px;
 }
 
-.business-art-stage.layout-showcase.is-story .business-art-identity {
+.business-art-stage.layout-vitrine.is-story .business-art-identity {
   padding-top: 8px;
 }
 
-.business-art-stage.layout-showcase.is-story .business-art-identity h1 {
+.business-art-stage.layout-vitrine.is-story .business-art-identity h1 {
   padding: 20px 34px 22px;
   border-radius: 28px;
   font-size: 58px;
 }
 
-.business-art-stage.layout-showcase.is-feed .business-art-card {
+.business-art-stage.layout-vitrine.is-feed .business-art-card {
   top: 24px;
   width: 1030px;
   height: 1302px;
@@ -23614,35 +23630,23 @@ body.business-art-capturing-background .home-cards-intro {
   border-radius: 58px;
 }
 
-.business-art-stage.layout-showcase.is-feed .business-art-picture {
+.business-art-stage.layout-vitrine.is-feed .business-art-picture {
   max-width: 900px;
   margin-bottom: 48px;
 }
 
-.business-art-stage.layout-showcase.is-feed .business-art-identity {
+.business-art-stage.layout-vitrine.is-feed .business-art-identity {
   padding-top: 4px;
 }
 
-.business-art-stage.layout-showcase.is-feed .business-art-identity h1 {
+.business-art-stage.layout-vitrine.is-feed .business-art-identity h1 {
   padding: 15px 30px 17px;
   border-radius: 24px;
   font-size: 48px;
 }
 
-.business-art-stage.layout-showcase .business-art-footer {
-  background: linear-gradient(110deg, #063aa8 0%, var(--business-name-color) 58%, #1592ff 100%);
-}
-
-/* O html2canvas transforma algumas sombras CSS do layout Atual em blocos
-   retangulares. A sombra editavel da foto continua sendo desenhada pelo
-   canvas proprio e nao e afetada por estas regras. */
-.business-art-stage.layout-classic .business-art-card,
-.business-art-stage.layout-classic .business-art-kind,
-.business-art-stage.layout-classic .business-art-picture,
-.business-art-stage.layout-classic .business-art-identity h1,
-.business-art-stage.layout-classic .business-art-info-card,
-.business-art-stage.layout-classic .business-art-footer {
-  box-shadow: none !important;
+.business-art-stage.layout-vitrine .business-art-footer {
+  background: linear-gradient(110deg, #063aa8 0%, var(--business-name-color) 58%, #1592ff 100%) !important;
 }
 
 /* Na exportacao, o html2canvas pode rasterizar sombras CSS como camadas
