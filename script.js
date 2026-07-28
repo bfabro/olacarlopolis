@@ -558,14 +558,16 @@ function resolverChaveMetricaCliente(idEstabelecimento) {
   if (mapped) return mapped;
 
   const metricClientIds = window.__metricClientIds || {};
-  const fuzzyMatch = Object.entries(metricClientIds)
-    .filter(([key]) => {
+  const fuzzyMatches = Object.entries(metricClientIds)
+    .filter(([key, clientId]) => {
+      if (!clientId) return false;
       const normalizedKey = normalizarChaveMetricaCliente(key);
       return normalizedKey.length > 3 && normalized.length > 3
         && (normalized.includes(normalizedKey) || normalizedKey.includes(normalized));
     })
-    .sort((a, b) => String(b[0]).length - String(a[0]).length)[0];
-  return fuzzyMatch?.[1] || normalized;
+    .sort((a, b) => String(b[0]).length - String(a[0]).length);
+  const clientIds = [...new Set(fuzzyMatches.map(([, clientId]) => clientId).filter(Boolean))];
+  return clientIds.length === 1 ? clientIds[0] : normalized;
 }
 
 function escaparArteComercial(value) {
@@ -21894,11 +21896,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (estId === alvoId) melhor = Math.max(melhor, 95);
       if (categoriaSlug && alvoId === categoriaMaisEst) melhor = Math.max(melhor, 92);
       if (categoriaSlug && alvoId.startsWith(categoriaSlug) && alvoId.slice(categoriaSlug.length) === estId) melhor = Math.max(melhor, 90);
-      if (alvoId.endsWith(estId)) melhor = Math.max(melhor, 45);
       aliasesClienteAdmin(cliente).forEach((alias) => {
         if (alias === estId) melhor = Math.max(melhor, 130);
         if (categoriaSlug && alias === categoriaMaisEst) melhor = Math.max(melhor, 128);
-        if (alias.endsWith(estId)) melhor = Math.max(melhor, 75);
       });
     });
     return melhor;
@@ -22203,8 +22203,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const keys = [
       normalizeName(clienteId),
       normalizeName(cliente.nome || ""),
-      normalizeName(cliente.nomeNormalizado || ""),
-      ...aliasesClienteAdmin(cliente)
+      normalizeName(cliente.nomeNormalizado || "")
     ].filter(Boolean);
     const setStatus = (value) => keys.forEach((key) => { statusEstabelecimentos[key] = value; });
 
@@ -22219,119 +22218,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     return ![statusCliente, financeiroStatus, pagamentoStatus].some((status) => ["inativo", "inativa", "inactive"].includes(status));
   }
 
-  function pontuarFonteClienteAdmin(cliente) {
-    if (cliente?.editadoNoPainel || cliente?.origem === "painel") return 2;
-    if (cliente?.origem === "script.js") return 0;
-    return 1;
-  }
-
-  function chavesFortesClienteAdmin(clienteId, cliente) {
-    const keys = new Set();
-    const categoriaKeysBase = [
-      cliente?.categoria,
-      cliente?.categoriaId,
-      tituloCanonicoCategoriaAdmin(cliente?.categoria || cliente?.categoriaId || ""),
-      chaveMenuCategoriaAdmin(cliente?.categoria || cliente?.categoriaId || "")
-    ].map((value) => normalizeName(value)).filter(Boolean);
-    const categoriaKeys = new Set([
-      ...categoriaKeysBase,
-      ...categoriaKeysBase.map((value) => value.replace(/[^a-z0-9]/g, ""))
-    ].filter(Boolean));
-    const chavesGenericas = new Set([
-      "automovel",
-      "automoveis",
-      "auto",
-      "autos",
-      "carro",
-      "carros",
-      "carveiculos",
-      "comercio",
-      "comercios",
-      "deautomovel",
-      "deautomoveis",
-      "decarro",
-      "decarros",
-      "deveiculo",
-      "deveiculos",
-      "loja",
-      "lojas",
-      "outro",
-      "outros",
-      "produto",
-      "produtos",
-      "revenda",
-      "revendade",
-      "revendadeautomovel",
-      "revendadeautomoveis",
-      "revendadecarro",
-      "revendadecarros",
-      "revendadeveiculo",
-      "revendadeveiculos",
-      "revendaveiculo",
-      "servico",
-      "servicos",
-      "veiculo",
-      "veiculos"
-    ]);
-    const chaveGenerica = (value) => {
-      const key = normalizeName(value);
-      const compacta = key.replace(/[^a-z0-9]/g, "");
-      if (!key) return true;
-      if (/^(de|do|da|dos|das).+/.test(compacta) && categoriaKeys.has(compacta.replace(/^(de|do|da|dos|das)/, ""))) return true;
-      if (/^(outro|outros)cliente$/.test(compacta)) return true;
-      // Aliases antigos podem conter apenas a categoria repetida (por exemplo,
-      // "eletricista-eletricista"). Eles nao identificam uma empresa e faziam
-      // clientes distintos da mesma categoria serem consolidados em um so.
-      if ([...categoriaKeys].some((categoriaKey) => {
-        const categoriaCompacta = normalizeName(categoriaKey).replace(/[^a-z0-9]/g, "");
-        if (!categoriaCompacta || compacta.length < categoriaCompacta.length) return false;
-        return compacta.length % categoriaCompacta.length === 0
-          && compacta === categoriaCompacta.repeat(compacta.length / categoriaCompacta.length);
-      })) return true;
-      return categoriaKeys.has(key) || categoriaKeys.has(compacta) || chavesGenericas.has(key) || chavesGenericas.has(compacta);
-    };
-    const add = (value, options = {}) => {
-      const normalized = normalizeName(value);
-      const slug = normalizeName(adminSlug(value));
-      if (normalized && (options.permitirGenerica || !chaveGenerica(normalized))) keys.add(normalized);
-      if (slug && (options.permitirGenerica || !chaveGenerica(slug))) keys.add(slug);
-    };
-    add(clienteId, { permitirGenerica: true });
-    add(cliente?.id, { permitirGenerica: true });
-    add(cliente?.uid, { permitirGenerica: true });
-    add(cliente?.nome);
-    add(cliente?.name);
-    add(cliente?.nomeNormalizado);
-    add(adminClientCanonicalId(cliente?.categoria || cliente?.categoriaId || "outros", cliente?.nome || clienteId), { permitirGenerica: true });
-    aliasesClienteAdmin(cliente).forEach(add);
-    add(`${cliente?.categoria || cliente?.categoriaId || "outros"}-${cliente?.nome || clienteId}`, { permitirGenerica: true });
-    return Array.from(keys);
-  }
-
-  function melhorClienteAdmin(atual, candidato) {
-    if (!atual) return candidato;
-    const fonte = pontuarFonteClienteAdmin(candidato.cliente) - pontuarFonteClienteAdmin(atual.cliente);
-    if (fonte) return fonte > 0 ? candidato : atual;
-    const atualizado = valorAtualizacaoClienteAdmin(candidato.cliente) - valorAtualizacaoClienteAdmin(atual.cliente);
-    if (atualizado) return atualizado > 0 ? candidato : atual;
-    return candidato;
-  }
-
   function consolidarClientesAdmin(clientes) {
-    const grupos = [];
-    Object.entries(clientes || {}).forEach(([clienteId, cliente]) => {
-      const clienteCompleto = enriquecerClienteComBaseAdmin(clienteId, cliente);
-      const keys = chavesFortesClienteAdmin(clienteId, clienteCompleto);
-      const grupo = grupos.find((item) => keys.some((key) => item.keys.has(key)));
-      const item = { clienteId, cliente: clienteCompleto };
-      if (grupo) {
-        keys.forEach((key) => grupo.keys.add(key));
-        grupo.item = melhorClienteAdmin(grupo.item, item);
-      } else {
-        grupos.push({ keys: new Set(keys), item });
-      }
-    });
-    return grupos.map((grupo) => grupo.item);
+    // Cada registro da base representa um cliente independente. Aliases servem
+    // apenas para localizar rotas antigas e nunca para eliminar outro cliente.
+    return Object.entries(clientes || {}).map(([clienteId, cliente]) => ({
+      clienteId,
+      cliente: enriquecerClienteComBaseAdmin(clienteId, cliente)
+    }));
   }
 
   function categoriaAdminAtiva(meta) {
@@ -22819,6 +22712,15 @@ plotarPinsImoveis(stateImoveis.filtered);
         aplicarConfiguracaoPaginaInicial(paginaInicialAdmin);
         const clientesConsolidados = consolidarClientesAdmin(clientes);
         window.__metricClientIds = {};
+        const registrarIdentidadeMetrica = (key, clienteId) => {
+          if (!key) return;
+          const atual = window.__metricClientIds[key];
+          if (atual && atual !== clienteId) {
+            window.__metricClientIds[key] = null;
+            return;
+          }
+          if (atual === undefined) window.__metricClientIds[key] = clienteId;
+        };
         clientesConsolidados.forEach(({ clienteId, cliente }) => {
           const aliases = [
             clienteId,
@@ -22831,8 +22733,8 @@ plotarPinsImoveis(stateImoveis.filtered);
             variantesChaveMetricaCliente(alias).forEach((variant) => {
               const key = normalizeName(variant || "");
               const metricKey = normalizarChaveMetricaCliente(variant || "");
-              if (key) window.__metricClientIds[key] = clienteId;
-              if (metricKey) window.__metricClientIds[metricKey] = clienteId;
+              registrarIdentidadeMetrica(key, clienteId);
+              registrarIdentidadeMetrica(metricKey, clienteId);
             });
           });
         });

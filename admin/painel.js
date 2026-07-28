@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 503,
-  label: "v510",
+  numero: 504,
+  label: "v511",
   data: "2026-07-27",
-  nota: "Relatorio de acessos consolida menu, Onde Comer e Promocoes em tempo atualizado."
+  nota: "Aliases de clientes agora usam apenas identidades completas e sem colisoes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -460,12 +460,14 @@ function aliasKeyVariants(value) {
 }
 
 function addAliasVariants(target, value) {
-  aliasKeyVariants(value).forEach((variant) => addAliasKey(target, variant));
+  const raw = String(value || "").trim();
+  if (!raw) return;
+  [raw, slugify(raw), normalizeName(raw)].forEach((variant) => addAliasKey(target, variant));
 }
 
 function buildClientPublicAliases(clientId, payload, sourceClient = null, useFormContext = true) {
   const form = useFormContext ? $("clientForm") : null;
-  const aliases = { ...(sourceClient?.aliases || {}) };
+  const aliases = {};
   const add = (value) => addAliasVariants(aliases, value);
   const names = [
     clientId,
