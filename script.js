@@ -599,7 +599,7 @@ function valorPreenchidoArteComercial(value) {
   return /^(?:-|--|nao informado|não informado|nao possui|não possui|n\/a)$/i.test(text) ? "" : text;
 }
 
-function imagensConteudoArteComercial(establishment = {}) {
+function imagensConteudoArteComercial(establishment = {}, titulosPorImagem = new Map()) {
   const grupos = {
     fotos: [],
     produtos: [],
@@ -607,13 +607,24 @@ function imagensConteudoArteComercial(establishment = {}) {
     imoveis: []
   };
   const galeriasVeiculos = [];
-  const adicionar = (destino, valor) => {
+  const tituloDoItem = (item = {}, fallback = "") => valorPreenchidoArteComercial(
+    item.titulo
+    || item.title
+    || item.nome
+    || item.name
+    || item.produto
+    || [item.marca, item.modelo, item.ano].filter(Boolean).join(" ")
+    || item.descricaoCurta
+    || fallback
+  );
+  const adicionar = (destino, valor, tituloHerdado = "") => {
     if (!valor) return;
     if (Array.isArray(valor)) {
-      valor.forEach((item) => adicionar(destino, item));
+      valor.forEach((item) => adicionar(destino, item, tituloHerdado));
       return;
     }
     if (typeof valor === "object") {
+      const tituloItem = tituloDoItem(valor, tituloHerdado);
       [
         valor.url,
         valor.src,
@@ -634,11 +645,14 @@ function imagensConteudoArteComercial(establishment = {}) {
         valor.Fotos,
         valor.imagensExtras,
         valor.imagensExtrasUrls
-      ].forEach((item) => adicionar(destino, item));
+      ].forEach((item) => adicionar(destino, item, tituloItem));
       return;
     }
     const url = urlAbsolutaArteComercial(valor);
     if (url && !destino.includes(url)) destino.push(url);
+    if (url && tituloHerdado && !titulosPorImagem.has(url)) {
+      titulosPorImagem.set(url, textoLimpoArteComercial(tituloHerdado).slice(0, 80));
+    }
   };
   const comoLista = (valor) => {
     if (Array.isArray(valor)) return valor;
@@ -687,20 +701,24 @@ function imagensConteudoArteComercial(establishment = {}) {
     ].map(normalizarArteComercial).some((chave) => chave && chavesCliente.has(chave)))
     .map(([, cliente]) => cliente || {});
 
-  [
-    establishment.novidadesImages,
-    establishment.divulgacaoImages,
-    establishment.fotos,
-    establishment.images,
-    establishment.imagens,
-    ...clientesRelacionados.flatMap((cliente) => [
-      cliente.novidadesImages,
-      cliente.divulgacaoImages,
-      cliente.fotos,
-      cliente.images,
-      cliente.imagens
-    ])
-  ].forEach((valor) => adicionar(grupos.fotos, valor));
+  const adicionarFotosComTitulos = (cliente = {}) => {
+    const fontes = [
+      [cliente.novidadesImages, cliente.novidadesTitles || cliente.titulosFotos],
+      [cliente.divulgacaoImages, cliente.divulgacaoTitles || cliente.titulosDivulgacao],
+      [cliente.fotos, cliente.titulosFotos || cliente.novidadesTitles],
+      [cliente.images, cliente.imageTitles || cliente.titulosFotos],
+      [cliente.imagens, cliente.titulosImagens || cliente.titulosFotos]
+    ];
+    fontes.forEach(([valor, titulos]) => {
+      if (Array.isArray(valor)) {
+        valor.forEach((item, index) => adicionar(grupos.fotos, item, Array.isArray(titulos) ? titulos[index] : ""));
+      } else {
+        adicionar(grupos.fotos, valor);
+      }
+    });
+  };
+  adicionarFotosComTitulos(establishment);
+  clientesRelacionados.forEach(adicionarFotosComTitulos);
 
   [
     establishment.produtos,
@@ -913,6 +931,7 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     || establishment.contato
     || "";
   const imagens = [];
+  const titulosPorImagem = new Map();
   const adicionarImagem = (valor) => {
     if (!valor) return;
     if (Array.isArray(valor)) {
@@ -940,7 +959,7 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     establishment.novidadesImages,
     establishment.divulgacaoImages
   ].forEach(adicionarImagem);
-  const imagensConteudo = imagensConteudoArteComercial(establishment);
+  const imagensConteudo = imagensConteudoArteComercial(establishment, titulosPorImagem);
   const imagensMosaico = [];
   [imagens[0], ...imagensConteudo, ...imagens].forEach((url) => {
     if (!url) return;
@@ -961,8 +980,10 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     ...(Array.isArray(establishment.divulgacaoDescriptions) ? establishment.divulgacaoDescriptions : [])
   ].find((texto) => textoLimpoArteComercial(texto || ""));
   const descricao = primeiraDescricaoPreenchida || "";
+  const nome = textoLimpoArteComercial(establishment.name || establishment.nome || establishment.title || "Estabelecimento");
+  if (imagens[0] && !titulosPorImagem.has(imagens[0])) titulosPorImagem.set(imagens[0], nome);
   return {
-    nome: textoLimpoArteComercial(establishment.name || establishment.nome || establishment.title || "Estabelecimento"),
+    nome,
     descricao: textoLimpoArteComercial(descricao).slice(0, 400),
     categoria: textoLimpoArteComercial(categoriaAtual || establishment.categoria || establishment.category || ""),
     tipoLabel,
@@ -972,19 +993,28 @@ function dadosArteComercial(establishment = {}, categoriaAtual = "") {
     imagem: imagens[0] || "",
     imagens,
     imagensMosaico,
+    tituloImagem: titulosPorImagem.get(imagens[0]) || "",
+    titulosImagensMosaico: imagensMosaico.map((imagem) => titulosPorImagem.get(imagem) || ""),
+    titulosPorImagem,
     imagemEnquadramento: establishment.imagemEnquadramento || establishment.imageFit || "auto"
   };
 }
 
-function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte }) {
+function montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte, mostrarTitulosImagens = false }) {
   const limiteMosaico = formato === "feed" ? 2 : 4;
   const imagensMosaico = (dados.imagensMosaico || dados.imagens || []).slice(0, limiteMosaico);
   const imageBlock = layoutArte === "mosaic" && imagensMosaico.length
     ? `<div class="business-art-mosaic business-art-mosaic-count-${imagensMosaico.length}">
-        ${imagensMosaico.map((imagem, index) => `<span class="business-art-mosaic-cell" data-business-mosaic-index="${index}"><img class="business-art-mosaic-image" src="${escaparArteComercial(imagem)}" alt="Imagem ${index + 1} de ${escaparArteComercial(dados.nome)}" crossorigin="anonymous"></span>`).join("")}
+        ${imagensMosaico.map((imagem, index) => {
+          const titulo = dados.titulosImagensMosaico?.[index] || "";
+          return `<span class="business-art-mosaic-cell" data-business-mosaic-index="${index}">
+            <img class="business-art-mosaic-image" src="${escaparArteComercial(imagem)}" alt="Imagem ${index + 1} de ${escaparArteComercial(dados.nome)}" crossorigin="anonymous">
+            ${mostrarTitulosImagens && titulo ? `<strong class="business-art-image-title">${escaparArteComercial(titulo)}</strong>` : ""}
+          </span>`;
+        }).join("")}
       </div>`
     : (dados.imagem
-      ? `<img class="business-art-main-image" src="${escaparArteComercial(dados.imagem)}" alt="" crossorigin="anonymous" style="object-fit:${imageFit}">`
+      ? `<img class="business-art-main-image" src="${escaparArteComercial(dados.imagem)}" alt="" crossorigin="anonymous" style="object-fit:${imageFit}">${mostrarTitulosImagens && dados.tituloImagem ? `<strong class="business-art-image-title">${escaparArteComercial(dados.tituloImagem)}</strong>` : ""}`
       : `<div class="business-art-placeholder"><i class="fa-solid fa-store"></i><span>${escaparArteComercial(dados.categoria || dados.tipoLabel)}</span></div>`);
   const contactCards = [
     dados.whatsapp ? `<div class="business-art-info-card is-whatsapp"><i class="fa-brands fa-whatsapp"></i><span><small>WhatsApp</small><strong>${escaparArteComercial(dados.whatsapp)}</strong></span></div>` : "",
@@ -1124,6 +1154,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   const imagensOriginais = (dados.imagens || []).slice(0, 4);
   const fontesMosaicoOriginais = (dados.imagensMosaico || dados.imagens || []).slice(0, 120);
   const imagensMosaicoOriginais = fontesMosaicoOriginais.slice(0, 4);
+  const titulosFontesMosaico = fontesMosaicoOriginais.map((imagem) => dados.titulosPorImagem?.get(imagem) || "");
+  const tituloImagemOriginal = dados.tituloImagem || dados.nome;
   const imagensParaPreparar = [...new Set([...imagensOriginais, ...imagensMosaicoOriginais])];
   const imagensPreparadas = await Promise.all(imagensParaPreparar.map(async (imagem) => {
     const preparada = await prepararImagemArteComercial(imagem);
@@ -1136,6 +1168,8 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   dados.imagens = imagensOriginais.map((imagem) => imagensPreparadasPorOrigem.get(imagem) || imagem).filter(Boolean);
   dados.imagensMosaico = imagensMosaicoOriginais.map((imagem) => imagensPreparadasPorOrigem.get(imagem) || imagem).filter(Boolean);
   dados.imagem = dados.imagens[0] || dados.imagem;
+  dados.tituloImagem = tituloImagemOriginal;
+  dados.titulosImagensMosaico = imagensMosaicoOriginais.map((imagem) => dados.titulosPorImagem?.get(imagem) || "");
   const imageFit = await detectarEnquadramentoArteComercial(
     dados.imagem,
     establishment.imagemEnquadramento || establishment.imageFit || "auto"
@@ -1172,6 +1206,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
         </div>
         <div class="business-art-photo-option" role="group" aria-label="Formato dos cantos da foto">
           <button type="button" class="active" data-business-rounded aria-pressed="true" title="Ativar ou desativar cantos arredondados"><i class="fa-solid fa-border-top-left"></i><small>Cantos</small></button>
+          <button type="button" data-business-image-titles aria-pressed="false" title="Mostrar ou ocultar os titulos sobre as fotos"><i class="fa-solid fa-tag"></i><small>Títulos</small></button>
         </div>
         <div class="business-art-image-controls">
           <label>
@@ -1247,6 +1282,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
   let corDetalhe = "#0b63e6";
   let efeitoFoto = "soft";
   let cantosArredondados = true;
+  let mostrarTitulosImagens = false;
   let escalaImagem = 1;
   const escalasImagensMosaico = [1, 1, 1, 1];
   const deslocamentosImagensMosaico = Array.from({ length: 4 }, () => ({ x: 0, y: 0 }));
@@ -1473,7 +1509,15 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     stage.style.setProperty("--business-whatsapp-font-size", `${fonteWhatsapp}px`);
     stage.style.setProperty("--business-city-font-size", `${fonteCidade}px`);
     stage.style.setProperty("--business-address-font-size", `${fonteEndereco}px`);
-    stage.innerHTML = montarConteudoArteComercial({ dados, formato, fundoUrl, logoSiteUrl, imageFit, layoutArte });
+    stage.innerHTML = montarConteudoArteComercial({
+      dados,
+      formato,
+      fundoUrl,
+      logoSiteUrl,
+      imageFit,
+      layoutArte,
+      mostrarTitulosImagens
+    });
     dialog.querySelector(".business-art-resolution").textContent = `PNG 1080 x ${height}`;
     await aguardarImagensArteComercial(stage);
     const card = stage.querySelector(".business-art-card");
@@ -1653,6 +1697,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
           imagensPreparadasPorOrigem.set(origem, preparada);
         }
         dados.imagensMosaico[slotMosaicoEscolha] = preparada;
+        dados.titulosImagensMosaico[slotMosaicoEscolha] = titulosFontesMosaico[sourceIndex] || "";
         fontesSelecionadasMosaico[slotMosaicoEscolha] = sourceIndex;
         escalasImagensMosaico[slotMosaicoEscolha] = 1;
         deslocamentosImagensMosaico[slotMosaicoEscolha] = { x: 0, y: 0 };
@@ -1729,6 +1774,13 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     cantosArredondados = !cantosArredondados;
     button.classList.toggle("active", cantosArredondados);
     button.setAttribute("aria-pressed", String(cantosArredondados));
+    await render();
+  });
+  dialog.querySelector("[data-business-image-titles]")?.addEventListener("click", async (event) => {
+    const button = event.currentTarget;
+    mostrarTitulosImagens = !mostrarTitulosImagens;
+    button.classList.toggle("active", mostrarTitulosImagens);
+    button.setAttribute("aria-pressed", String(mostrarTitulosImagens));
     await render();
   });
   const closeButton = dialog.querySelector(".business-art-close");

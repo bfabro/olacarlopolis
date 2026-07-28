@@ -23393,6 +23393,33 @@ body.business-art-capturing-background .home-cards-intro {
   box-shadow: 0 5px 14px rgba(11, 99, 230, .25);
 }
 
+.business-art-image-title {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: -webkit-box;
+  overflow: hidden;
+  padding: 16px 22px 14px;
+  background: linear-gradient(180deg, rgba(3, 12, 28, 0), rgba(3, 12, 28, .9) 48%);
+  color: #fff;
+  font-size: 27px;
+  font-weight: 850;
+  line-height: 1.18;
+  text-align: center;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .72);
+  overflow-wrap: anywhere;
+  pointer-events: none;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.business-art-stage.layout-mosaic .business-art-image-title {
+  padding: 30px 14px 12px;
+  font-size: 22px;
+}
+
 /* ===== Arte comercial: layout alternativo Destaque ===== */
 .business-art-layout,
 .business-art-color-controls {
@@ -24275,6 +24302,7 @@ body.business-art-capturing-background .home-cards-intro {
   }
 
   .business-art-photo-option {
+    flex-direction: column;
     grid-column: 1;
     width: 72px !important;
     height: 100%;
@@ -24284,7 +24312,7 @@ body.business-art-capturing-background .home-cards-intro {
   .business-art-photo-option button {
     width: 100%;
     min-width: 0;
-    min-height: 60px;
+    min-height: 46px;
     padding: 5px 3px;
   }
 
