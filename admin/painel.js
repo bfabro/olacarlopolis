@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 517,
-  label: "v524",
+  numero: 518,
+  label: "v525",
   data: "2026-07-28",
-  nota: "Correcao de CORS nas logos e imagens externas exibidas na modal de beneficios."
+  nota: "Admin cliente pode acessar somente a area do parceiro vinculada quando a permissao estiver ativa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -134,6 +134,9 @@ let state = {
   beneficiosUtilizacoesLegacy: [],
   beneficiosDuvidas: [],
   beneficiosNotificacoes: [],
+  beneficiosParceiroSolicitacoes: [],
+  beneficiosParceiroDuvidas: [],
+  beneficiosParceiroNotificacoes: [],
   exclusoes: [],
   deletionReportFilters: {
     search: "",
@@ -841,6 +844,12 @@ function isBenefitPartner() {
   return currentRole() === "parceiro";
 }
 
+function hasBenefitPartnerAreaAccess() {
+  return isMaster()
+    || isBenefitPartner()
+    || (currentRole() === "cliente" && Boolean(state.profile?.permissoes?.parceiro) && Boolean(currentBenefitPartnerId()));
+}
+
 function currentBenefitPartnerId() {
   return String(state.profile?.parceiroId || "").trim();
 }
@@ -964,7 +973,7 @@ function canManageInformacoes() {
 
 function canAccessView(viewName) {
   if (isBenefitPartner()) return viewName === "areaParceiro";
-  if (viewName === "areaParceiro") return isBenefitPartner() || isMaster();
+  if (viewName === "areaParceiro") return hasBenefitPartnerAreaAccess();
   if (viewName === "beneficios") return !isBenefitPartner();
   if (viewName === "relatorioExclusoes") return isMaster();
   if (viewName === "dashboard") return canManageClients();
@@ -2496,7 +2505,7 @@ async function migratePanelUserEmail({ currentUser, email, password, role, clien
     email,
     role,
     clienteId: role === "cliente" ? clienteId : "",
-    parceiroId: role === "parceiro" ? parceiroId : "",
+    parceiroId: role === "parceiro" || (role === "cliente" && permissoes?.parceiro) ? parceiroId : "",
     status,
     permissoes
   });
@@ -2902,7 +2911,7 @@ function updateChrome() {
     el.classList.toggle("hidden", canManageClients() || isBenefitPartner());
   });
   document.querySelectorAll("[data-role='parceiro']").forEach((el) => {
-    el.classList.toggle("hidden", !isBenefitPartner() && !isMaster());
+    el.classList.toggle("hidden", !hasBenefitPartnerAreaAccess());
   });
   document.querySelectorAll("[data-benefits-client-nav='true']").forEach((el) => {
     el.classList.toggle("hidden", isBenefitPartner());
@@ -4404,24 +4413,28 @@ function startBenefitsRealtime() {
     return;
   }
 
-  if (isBenefitPartner()) {
+  if (hasBenefitPartnerAreaAccess() && !isMaster()) {
     const partnerId = currentBenefitPartnerId();
     if (!partnerId) {
-      state.beneficiosUtilizacoes = [];
-      state.beneficiosDuvidas = [];
-      state.beneficiosNotificacoes = [];
+      state.beneficiosParceiroSolicitacoes = [];
+      state.beneficiosParceiroDuvidas = [];
+      state.beneficiosParceiroNotificacoes = [];
       return;
     }
     listen(`beneficiosSolicitacoes/${partnerId}`, (data) => {
-      state.beneficiosUtilizacoes = flatScopedRecords(data, { partnerId });
+      state.beneficiosParceiroSolicitacoes = flatScopedRecords(data, { partnerId });
     }, "Solicitações do parceiro indisponíveis.");
     listen(`beneficiosDuvidas/${partnerId}`, (data) => {
-      state.beneficiosDuvidas = flatScopedRecords(data, { partnerId });
+      state.beneficiosParceiroDuvidas = flatScopedRecords(data, { partnerId });
     }, "Dúvidas do parceiro indisponíveis.");
     listen(`beneficiosNotificacoesParceiro/${partnerId}`, (data) => {
-      state.beneficiosNotificacoes = flatScopedRecords(data, { partnerId });
+      state.beneficiosParceiroNotificacoes = flatScopedRecords(data, { partnerId });
     }, "Notificações do parceiro indisponíveis.");
-    return;
+    if (isBenefitPartner()) return;
+  } else {
+    state.beneficiosParceiroSolicitacoes = [];
+    state.beneficiosParceiroDuvidas = [];
+    state.beneficiosParceiroNotificacoes = [];
   }
 
   const clientId = currentClientId();
@@ -4485,13 +4498,13 @@ function renderBenefitHistory(history = {}) {
   ` : "";
 }
 
-function renderBenefitNotifications() {
-  const unread = state.beneficiosNotificacoes.filter((item) => !item.readAt);
+function renderBenefitNotifications(notifications = state.beneficiosNotificacoes, scope = "client") {
+  const unread = notifications.filter((item) => !item.readAt);
   if (!unread.length) return "";
   return `
     <section class="benefit-notifications">
       <div><i class="fa-solid fa-bell"></i><strong>${unread.length} nova${unread.length === 1 ? "" : "s"} notificação${unread.length === 1 ? "" : "ões"}</strong></div>
-      ${unread.slice(0, 5).map((item) => `<button type="button" data-benefit-notification-read="${escapeAttr(item.id)}">${escapeHtml(item.message || "Nova atualização em benefícios")}<small>${item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : ""}</small></button>`).join("")}
+      ${unread.slice(0, 5).map((item) => `<button type="button" data-benefit-notification-read="${escapeAttr(item.id)}" data-benefit-notification-scope="${escapeAttr(scope)}">${escapeHtml(item.message || "Nova atualização em benefícios")}<small>${item.createdAt ? new Date(item.createdAt).toLocaleString("pt-BR") : ""}</small></button>`).join("")}
     </section>
   `;
 }
@@ -5193,8 +5206,8 @@ async function submitBenefitQuestion(form, benefitId) {
   showToast("Dúvida enviada diretamente ao parceiro.");
 }
 
-async function markBenefitNotificationRead(id) {
-  if (isBenefitPartner()) {
+async function markBenefitNotificationRead(id, scope = "client") {
+  if (scope === "partner" || isBenefitPartner()) {
     await update(ref(db, `beneficiosNotificacoesParceiro/${currentBenefitPartnerId()}/${id}`), { readAt: Date.now(), readBy: state.user?.uid || "" });
   } else if (currentClientId()) {
     await update(ref(db, `beneficiosNotificacoesCliente/${currentClientId()}/${id}`), { readAt: Date.now(), readBy: state.user?.uid || "" });
@@ -5331,7 +5344,7 @@ function bindBenefitsView() {
     }
     const notification = event.target.closest("[data-benefit-notification-read]");
     if (notification) {
-      await markBenefitNotificationRead(notification.dataset.benefitNotificationRead);
+      await markBenefitNotificationRead(notification.dataset.benefitNotificationRead, notification.dataset.benefitNotificationScope || "client");
       return;
     }
     const removeBenefit = event.target.closest("[data-benefit-delete]");
@@ -5364,11 +5377,14 @@ function renderPartnerBenefitsArea() {
     mount.innerHTML = `<section class="panel-card"><h2>Parceiro não vinculado</h2><p>Peça ao Admin Master para vincular este usuário ao parceiro correspondente.</p></section>`;
     return;
   }
-  const requests = state.beneficiosUtilizacoes.filter((item) => (item.partnerId || item.benefitId) === partnerId);
-  const questions = state.beneficiosDuvidas.filter((item) => (item.partnerId || item.benefitId) === partnerId);
+  const partnerRequests = isMaster() ? state.beneficiosUtilizacoes : state.beneficiosParceiroSolicitacoes;
+  const partnerQuestions = isMaster() ? state.beneficiosDuvidas : state.beneficiosParceiroDuvidas;
+  const partnerNotifications = isMaster() ? state.beneficiosNotificacoes : state.beneficiosParceiroNotificacoes;
+  const requests = partnerRequests.filter((item) => (item.partnerId || item.benefitId) === partnerId);
+  const questions = partnerQuestions.filter((item) => (item.partnerId || item.benefitId) === partnerId);
   const active = requests.filter((item) => item.status === "beneficiario_ativo").length;
   mount.innerHTML = `
-    ${renderBenefitNotifications()}
+    ${renderBenefitNotifications(partnerNotifications, "partner")}
     <section class="benefit-partner-hero"><div>${benefitPrimaryImage(partner) ? `<img data-benefit-logo-auto src="${escapeAttr(benefitPrimaryImage(partner))}" alt="${escapeAttr(partner.parceiro || "")}">` : `<i class="fa-solid fa-handshake"></i>`}<span><small>Área exclusiva do parceiro</small><h2>${escapeHtml(partner.parceiro || "")}</h2><p>${escapeHtml(partner.titulo || "")}</p></span></div>${isMaster() ? `<select id="masterPartnerAreaSelect">${state.beneficios.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === partnerId ? "selected" : ""}>${escapeHtml(item.parceiro || item.id)}</option>`).join("")}</select>` : ""}</section>
     <div class="stats-grid benefit-report-stats"><article class="stat-card"><span>Solicitações</span><strong>${requests.length}</strong><small>Recebidas</small></article><article class="stat-card"><span>Aguardando análise</span><strong>${requests.filter((item) => ["aguardando_analise", "solicitado"].includes(item.status)).length}</strong><small>Precisam de atendimento</small></article><article class="stat-card"><span>Beneficiários ativos</span><strong>${active}</strong><small>Clientes vinculados</small></article><article class="stat-card"><span>Dúvidas</span><strong>${questions.filter((item) => item.status !== "finalizada").length}</strong><small>Em atendimento</small></article></div>
     <section class="panel-card"><div class="section-head"><div><span class="feature-kicker">Solicitações recebidas</span><h2>Atendimento dos clientes</h2></div></div><div class="partner-request-list">${requests.length ? requests.map(renderPartnerRequestCard).join("") : `<p class="list-meta">Nenhuma solicitação recebida.</p>`}</div></section>
@@ -5427,12 +5443,14 @@ async function updateBenefitQuestion(question, status, response = question.respo
 function bindPartnerBenefitsArea() {
   const mount = $("partnerBenefitsMount");
   if (!mount) return;
+  const partnerRequests = isMaster() ? state.beneficiosUtilizacoes : state.beneficiosParceiroSolicitacoes;
+  const partnerQuestions = isMaster() ? state.beneficiosDuvidas : state.beneficiosParceiroDuvidas;
   mount.querySelector("#masterPartnerAreaSelect")?.addEventListener("change", (event) => {
     state.selectedBenefitDetailId = event.target.value;
     renderPartnerBenefitsArea();
   });
   mount.querySelectorAll("[data-partner-request-status]").forEach((select) => select.addEventListener("change", async () => {
-    const request = state.beneficiosUtilizacoes.find((item) => item.id === select.dataset.partnerRequestStatus);
+    const request = partnerRequests.find((item) => item.id === select.dataset.partnerRequestStatus);
     if (!request) return;
     const needsNote = ["informacoes_solicitadas", "recusada"].includes(select.value);
     const note = needsNote ? (window.prompt("Informe a orientação ou motivo que será enviado ao cliente:") || "") : "";
@@ -5444,14 +5462,14 @@ function bindPartnerBenefitsArea() {
     try { await updateBenefitRequestStatus(request, select.value, note); showToast("Solicitação atualizada e cliente notificado."); } finally { select.disabled = false; }
   }));
   mount.querySelectorAll("[data-partner-question-status]").forEach((select) => select.addEventListener("change", async () => {
-    const question = state.beneficiosDuvidas.find((item) => item.id === select.dataset.partnerQuestionStatus);
+    const question = partnerQuestions.find((item) => item.id === select.dataset.partnerQuestionStatus);
     if (!question) return;
     await updateBenefitQuestion(question, select.value);
     showToast("Situação da dúvida atualizada.");
   }));
   mount.querySelectorAll("[data-partner-question-response]").forEach((form) => form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const question = state.beneficiosDuvidas.find((item) => item.id === form.dataset.partnerQuestionResponse);
+    const question = partnerQuestions.find((item) => item.id === form.dataset.partnerQuestionResponse);
     if (!question) return;
     const response = form.querySelector("textarea")?.value.trim() || "";
     if (!response) return showToast("Escreva uma resposta.");
@@ -5459,7 +5477,7 @@ function bindPartnerBenefitsArea() {
     setBusy(button, true, "Salvando...");
     try { await updateBenefitQuestion(question, "respondida", response); showToast("Resposta salva e cliente notificado."); } finally { setBusy(button, false); }
   }));
-  mount.querySelectorAll("[data-benefit-notification-read]").forEach((button) => button.addEventListener("click", () => markBenefitNotificationRead(button.dataset.benefitNotificationRead)));
+  mount.querySelectorAll("[data-benefit-notification-read]").forEach((button) => button.addEventListener("click", () => markBenefitNotificationRead(button.dataset.benefitNotificationRead, "partner")));
 }
 
 function deletionReportFilteredItems() {
@@ -8275,11 +8293,13 @@ function fillUserPartnerSelect(selectedId = "") {
 
 function syncUserLinkFields() {
   const role = $("newUserRole")?.value || "cliente";
+  const partnerPermission = Boolean($("newUserPartnerPermission")?.checked);
+  const hasPartnerLink = role === "parceiro" || (role === "cliente" && partnerPermission);
   const partnerField = $("newUserPartnerField");
   const clientSelect = $("newUserClient")?.closest("label");
-  partnerField?.classList.toggle("hidden", role !== "parceiro");
+  partnerField?.classList.toggle("hidden", !hasPartnerLink);
   clientSelect?.classList.toggle("hidden", role === "parceiro");
-  if ($("newUserPartner")) $("newUserPartner").required = role === "parceiro";
+  if ($("newUserPartner")) $("newUserPartner").required = hasPartnerLink;
   if ($("newUserClient")) $("newUserClient").required = role === "cliente";
 }
 
@@ -8316,11 +8336,11 @@ function fillUserForm(user) {
   if ($("newUserClientSearch")) $("newUserClientSearch").value = linkedClient?.nome || "";
   fillUserClientSelect(user.clienteId || "");
   fillUserPartnerSelect(user.parceiroId || "");
-  syncUserLinkFields();
   $("editUserStatus").value = user.status || "ativo";
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     input.checked = Boolean(user.permissoes?.[input.value]);
   });
+  syncUserLinkFields();
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar usuario`;
   $("deleteUserButton")?.classList.remove("hidden");
   openFormForEdit("userForm");
@@ -18575,7 +18595,8 @@ async function createPanelUser(event) {
   const password = $("newUserPassword").value.trim();
   const clienteId = $("newUserClient").value;
   const parceiroId = $("newUserPartner")?.value || "";
-  if (role === "parceiro" && !parceiroId) {
+  const partnerAccessEnabled = role === "parceiro" || (role === "cliente" && Boolean($("newUserPartnerPermission")?.checked));
+  if (partnerAccessEnabled && !parceiroId) {
     showToast("Selecione o parceiro que ficará vinculado a este usuário.");
     return;
   }
@@ -18613,7 +18634,7 @@ async function createPanelUser(event) {
         email,
         role,
         clienteId: role === "cliente" ? clienteId : "",
-        parceiroId: role === "parceiro" ? parceiroId : "",
+        parceiroId: partnerAccessEnabled ? parceiroId : "",
         status: $("editUserStatus").value || "ativo",
         permissoes
       });
@@ -18635,7 +18656,7 @@ async function createPanelUser(event) {
       email,
       role,
       clienteId: role === "cliente" ? clienteId : "",
-      parceiroId: role === "parceiro" ? parceiroId : "",
+      parceiroId: partnerAccessEnabled ? parceiroId : "",
       status: "ativo",
       permissoes
     });
@@ -19317,6 +19338,7 @@ function bindEvents() {
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
   $("userSearch")?.addEventListener("input", renderUsersList);
   $("newUserRole")?.addEventListener("change", syncUserLinkFields);
+  $("newUserPartnerPermission")?.addEventListener("change", syncUserLinkFields);
   $("newUserClientSearch")?.addEventListener("input", () => fillUserClientSelect());
   $("newUserClient")?.addEventListener("change", () => {
     const client = state.clientes.find((item) => item.id === $("newUserClient").value);
