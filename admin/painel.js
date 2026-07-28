@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 512,
-  label: "v519",
+  numero: 513,
+  label: "v520",
   data: "2026-07-28",
-  nota: "Persistencia e exibicao confiavel de planos e imagens dos beneficios."
+  nota: "Exclusao individual de vagas no Admin Master e no admin cliente."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -163,6 +163,7 @@ let state = {
   clientMenuImages: [],
   clientPromocoes: [],
   clientProdutos: [],
+  clientVagas: [],
   clientPromoEditIndex: null,
   clientProductEditIndex: null,
   staffPromoEditIndex: null,
@@ -5661,6 +5662,7 @@ function resetClientForm() {
   state.clientMenuImages = [];
   state.clientPromocoes = [];
   state.clientProdutos = [];
+  state.clientVagas = [];
   state.clientPromoEditIndex = null;
   state.clientProductEditIndex = null;
   $("clientForm").reset();
@@ -5695,6 +5697,7 @@ function resetClientForm() {
   renderClientMenuPreview();
   renderClientPromocoesPreview();
   renderClientProdutosPreview();
+  renderMasterClientJobsPreview();
   setAllClientSectionsExpanded(false);
   setClientFocusMode(false);
 }
@@ -6191,6 +6194,7 @@ function fillClientForm(client) {
   state.clientMenuImages = normalizeUrlList(client.menuImages);
   state.clientPromocoes = normalizePromocoes(client.promocoes);
   state.clientProdutos = normalizeProdutos(client.produtos);
+  state.clientVagas = normalizeVagasTrabalho(client.vagasTrabalho, client);
   state.clientPromoEditIndex = null;
   state.clientProductEditIndex = null;
   if ($("clientJobActive")) $("clientJobActive").checked = client.vagaAtiva !== false && Boolean(client.infoVagaTrabalho || client.vagaTitulo || client.vagaCargo || client.vagaDescricao);
@@ -6210,6 +6214,7 @@ function fillClientForm(client) {
   renderClientMenuPreview();
   renderClientPromocoesPreview();
   renderClientProdutosPreview();
+  renderMasterClientJobsPreview();
   setClientFocusMode(true);
 }
 
@@ -6576,11 +6581,95 @@ function renderVagasTrabalhoMarkup(vagas, removeAttr = "job-remove", editAttr = 
         ${vaga.ativo === false ? `<small>Inativa no site publico</small>` : ""}
       </div>
       <div class="promo-admin-actions">
-        <button type="button" data-${editAttr}="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button>
+        ${editAttr ? `<button type="button" data-${editAttr}="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button>` : ""}
         <button type="button" data-${removeAttr}="${index}" class="danger-mini"><i class="fa-solid fa-trash"></i> Remover</button>
       </div>
     </article>
   `).join("");
+}
+
+function clientJobsUpdatePayload(vagas, updatedBy = "") {
+  const normalizedJobs = normalizeVagasTrabalho(vagas);
+  const mainJob = normalizedJobs.find((item) => item.ativo !== false) || normalizedJobs[0] || {};
+  return {
+    normalizedJobs,
+    mainJob,
+    payload: {
+      vagasTrabalho: normalizedJobs,
+      vagaAtiva: Boolean(mainJob.titulo || mainJob.descricao || mainJob.requisitos),
+      vagaTitulo: mainJob.titulo || "",
+      vagaCargo: mainJob.titulo || "",
+      infoVagaTrabalho: mainJob.descricao || "",
+      vagaDescricao: mainJob.descricao || "",
+      vagaPreRequisito: mainJob.requisitos || "",
+      vagaRequisitos: mainJob.requisitos || "",
+      vagaSalario: mainJob.salario || "",
+      vagaJornada: mainJob.jornada || "",
+      vagaLocal: mainJob.local || "",
+      vagaContato: mainJob.contato || "",
+      vagaComoCandidatar: mainJob.comoCandidatar || "",
+      vagaValidade: mainJob.validade || "",
+      origem: "painel",
+      editadoNoPainel: true,
+      updatedAt: serverTimestamp(),
+      updatedBy: updatedBy || state.user?.uid || ""
+    }
+  };
+}
+
+function fillMasterClientJobFields(vaga = {}) {
+  if ($("clientJobActive")) $("clientJobActive").checked = vaga.ativo !== false && Boolean(vaga.titulo || vaga.descricao || vaga.requisitos);
+  const values = {
+    clientJobTitle: vaga.titulo || "",
+    clientJobDescription: vaga.descricao || "",
+    clientJobRequirements: vaga.requisitos || "",
+    clientJobSalary: vaga.salario || "",
+    clientJobSchedule: vaga.jornada || "",
+    clientJobPlace: vaga.local || "",
+    clientJobContact: vaga.contato || "",
+    clientJobApply: vaga.comoCandidatar || "",
+    clientJobValidUntil: vaga.validade || ""
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    if ($(id)) $(id).value = value;
+  });
+}
+
+function renderMasterClientJobsPreview() {
+  const box = $("clientJobsPreview");
+  const count = $("clientJobsCount");
+  if (!box || !count) return;
+  state.clientVagas = normalizeVagasTrabalho(state.clientVagas);
+  count.textContent = `${state.clientVagas.length} vaga${state.clientVagas.length === 1 ? "" : "s"}`;
+  box.innerHTML = renderVagasTrabalhoMarkup(state.clientVagas, "client-job-remove", "");
+  box.querySelectorAll("[data-client-job-remove]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const clientId = state.selectedClientId;
+      const client = state.clientes.find((item) => item.id === clientId);
+      const index = Number(button.dataset.clientJobRemove);
+      const removedJob = state.clientVagas[index];
+      if (!clientId || !client || !removedJob) return;
+      if (!(await confirmarExclusao(removedJob.titulo || "Vaga de trabalho", "vaga de trabalho"))) return;
+      const nextJobs = state.clientVagas.filter((_, jobIndex) => jobIndex !== index);
+      const { normalizedJobs, mainJob, payload } = clientJobsUpdatePayload(nextJobs);
+      await update(ref(db, `clientes/${clientId}`), payload);
+      if (!Array.isArray(client.vagasTrabalho) || !client.vagasTrabalho.length) {
+        await registrarExclusaoMonitoramento(makeDeletionRecord(
+          "Vaga",
+          removedJob,
+          removedJob.id || "vaga-principal",
+          `clientes/${clientId}/vagasTrabalho`,
+          clientId
+        ));
+      }
+      await removerNovidadesPorDestino("vaga", client.nomeNormalizado || normalizeName(client.nome || client.id), removedJob.id || "");
+      Object.assign(client, payload);
+      state.clientVagas = normalizedJobs;
+      fillMasterClientJobFields(mainJob);
+      renderMasterClientJobsPreview();
+      showToast("Vaga excluida.");
+    });
+  });
 }
 
 function renderClientPromocoesPreview() {
@@ -17560,29 +17649,19 @@ function renderClientOnlyEditor() {
     button.addEventListener("click", async () => {
       const index = Number(button.dataset.jobRemove);
       const vagaRemovida = vagasTrabalho[index];
+      if (!vagaRemovida || !(await confirmarExclusao(vagaRemovida.titulo || "Vaga de trabalho", "vaga de trabalho"))) return;
       vagasTrabalho.splice(index, 1);
-      const normalizedJobs = normalizeVagasTrabalho(vagasTrabalho);
-      const mainJob = normalizedJobs.find((item) => item.ativo !== false) || normalizedJobs[0] || {};
-      await update(ref(db, `clientes/${client.id}`), {
-        vagasTrabalho: normalizedJobs,
-        vagaAtiva: Boolean(mainJob.titulo || mainJob.descricao || mainJob.requisitos),
-        vagaTitulo: mainJob.titulo || "",
-        vagaCargo: mainJob.titulo || "",
-        infoVagaTrabalho: mainJob.descricao || "",
-        vagaDescricao: mainJob.descricao || "",
-        vagaPreRequisito: mainJob.requisitos || "",
-        vagaRequisitos: mainJob.requisitos || "",
-        vagaSalario: mainJob.salario || "",
-        vagaJornada: mainJob.jornada || "",
-        vagaLocal: mainJob.local || "",
-        vagaContato: mainJob.contato || "",
-        vagaComoCandidatar: mainJob.comoCandidatar || "",
-        vagaValidade: mainJob.validade || "",
-        origem: "painel",
-        editadoNoPainel: true,
-        updatedAt: serverTimestamp(),
-        updatedBy: state.user.uid
-      });
+      const { payload } = clientJobsUpdatePayload(vagasTrabalho, state.user.uid);
+      await update(ref(db, `clientes/${client.id}`), payload);
+      if (!Array.isArray(client.vagasTrabalho) || !client.vagasTrabalho.length) {
+        await registrarExclusaoMonitoramento(makeDeletionRecord(
+          "Vaga",
+          vagaRemovida,
+          vagaRemovida.id || "vaga-principal",
+          `clientes/${client.id}/vagasTrabalho`,
+          client.id
+        ));
+      }
       await removerNovidadesPorDestino("vaga", client.nomeNormalizado || normalizeName(client.nome || client.id), vagaRemovida?.id || "");
       showToast("Vaga removida.");
       await loadAllData();
