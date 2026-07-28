@@ -6146,6 +6146,30 @@ button.admin-button-loading::after {
   border-top: 5px solid #7c3aed;
 }
 
+.benefit-master-launcher {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 22px 26px;
+  border-left: 5px solid #7c3aed;
+}
+
+.benefit-master-launcher h2,
+.benefit-master-launcher p {
+  margin: 0;
+}
+
+.benefit-master-launcher p {
+  margin-top: 5px;
+  color: #64748b;
+}
+
+.benefit-master-launcher > button {
+  flex: 0 0 auto;
+  min-width: 118px;
+}
+
 .benefit-catalog-hero {
   display: flex;
   align-items: center;
@@ -6806,6 +6830,15 @@ button.admin-button-loading::after {
 }
 
 @media (max-width: 560px) {
+  .benefit-master-launcher {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .benefit-master-launcher > button {
+    width: 100%;
+  }
+
   .deletion-report-hero {
     align-items: flex-start;
   }

@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 513,
-  label: "v520",
+  numero: 514,
+  label: "v521",
   data: "2026-07-28",
-  nota: "Exclusao individual de vagas no Admin Master e no admin cliente."
+  nota: "Formulario de beneficios retraido e persistencia reforcada para fotos e planos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -142,6 +142,7 @@ let state = {
     period: "30"
   },
   selectedBenefitId: "",
+  benefitFormOpen: false,
   selectedBenefitDetailId: "",
   metricas: {},
   auditLogs: [],
@@ -4221,8 +4222,18 @@ function benefitListFromValue(value) {
     .sort((a, b) => Number(a.ordem ?? a.order ?? 0) - Number(b.ordem ?? b.order ?? 0));
 }
 
+function benefitAllPlans(benefit = {}) {
+  const sources = [benefit.planos, benefit.planosLista, benefit.plans];
+  const plansById = new Map();
+  sources.flatMap((source) => benefitListFromValue(source)).forEach((plan, index) => {
+    const id = String(plan.id || `plano-${index + 1}`);
+    if (!plansById.has(id)) plansById.set(id, { ...plan, id });
+  });
+  return [...plansById.values()].sort((a, b) => Number(a.ordem ?? 0) - Number(b.ordem ?? 0));
+}
+
 function benefitPlans(benefit = {}) {
-  return benefitListFromValue(benefit.planos).filter((plan) => plan.status !== "inativo");
+  return benefitAllPlans(benefit).filter((plan) => plan.status !== "inativo");
 }
 
 function benefitPrimaryImage(benefit = {}) {
@@ -4557,14 +4568,14 @@ function renderBenefitPlanEditor(plan = {}, index = 0) {
 function renderBenefitMasterForm() {
   if (!isMaster()) return "";
   const current = state.beneficios.find((item) => item.id === state.selectedBenefitId) || {};
-  const plans = benefitListFromValue(current.planos);
+  const plans = benefitAllPlans(current);
   const gallery = benefitGalleryImages(current);
   const primaryImage = benefitPrimaryImage(current);
   return `
     <section class="panel-card benefit-master-form-card">
       <div class="section-head">
         <div><span class="feature-kicker">Gestão de parceiros</span><h2>${current.id ? "Editar parceiro e benefício" : "Cadastrar parceiro e benefício"}</h2><p>Cadastre a apresentação completa que será exibida antes da solicitação.</p></div>
-        ${current.id ? `<button type="button" class="ghost-button" data-benefit-new><i class="fa-solid fa-plus"></i> Novo parceiro</button>` : ""}
+        <button type="button" class="ghost-button" data-benefit-form-close><i class="fa-solid fa-xmark"></i> Fechar</button>
       </div>
       <form id="benefitForm" class="grid-form">
         <input type="hidden" id="benefitId" value="${escapeAttr(current.id || "")}">
@@ -4660,7 +4671,13 @@ function renderBenefitsView() {
   const benefits = isMaster() ? state.beneficios : state.beneficios.filter(benefitIsAvailable);
   const selected = state.beneficios.find((item) => item.id === state.selectedBenefitDetailId);
   mount.innerHTML = `
-    ${renderBenefitMasterForm()}
+    ${isMaster() ? `
+      <section class="panel-card benefit-master-launcher">
+        <div><span class="feature-kicker">Gestão de parceiros</span><h2>Parceiros e benefícios</h2><p>O formulário de cadastro fica retraído para manter esta tela mais organizada.</p></div>
+        <button type="button" data-benefit-new><i class="fa-solid fa-plus"></i> Novo</button>
+      </section>
+      ${state.benefitFormOpen ? renderBenefitMasterForm() : ""}
+    ` : ""}
     ${renderBenefitNotifications()}
     <section class="benefit-catalog-hero"><div><span><i class="fa-solid fa-crown"></i> Clube de benefícios</span><h2>Parceiros que ajudam sua empresa a crescer</h2><p>Conheça cada parceiro, compare condições e tire suas dúvidas antes de solicitar.</p></div><strong>${benefits.length}<small>parceiro${benefits.length === 1 ? "" : "s"} disponível${benefits.length === 1 ? "" : "is"}</small></strong></section>
     <div class="benefits-grid">${benefits.length ? benefits.map(renderBenefitCard).join("") : `<section class="panel-card"><p class="list-meta">Nenhum parceiro disponível no momento.</p></section>`}</div>
@@ -4804,17 +4821,27 @@ async function saveBenefitFromForm(form) {
     }
     let image = draft.imageUrl;
     if (draft.logoFile) {
-      const fileRef = storageRef(storage, `beneficios/${id}/logo_${Date.now()}_${slugify(draft.logoFile.name || "imagem")}`);
+      const fileRef = storageRef(storage, `clientes/portal-olacarlopolis/imagens/beneficios/${id}/logo_${Date.now()}_${slugify(draft.logoFile.name || "imagem")}`);
       image = await uploadFileWithProgress(fileRef, draft.logoFile, "Enviando logo do parceiro", draft.logoFile.name || "logo");
     }
     const gallery = [...draft.galleryUrls];
     for (let index = 0; index < draft.galleryFiles.length; index += 1) {
       const file = draft.galleryFiles[index];
-      const fileRef = storageRef(storage, `beneficios/${id}/galeria/${Date.now()}_${index}_${slugify(file.name || "imagem")}`);
+      const fileRef = storageRef(storage, `clientes/portal-olacarlopolis/imagens/beneficios/${id}/galeria/${Date.now()}_${index}_${slugify(file.name || "imagem")}`);
       gallery.push(await uploadFileWithProgress(fileRef, file, `Enviando imagem ${index + 1} de ${draft.galleryFiles.length}`, file.name || "imagem"));
     }
     const current = state.beneficios.find((item) => item.id === id) || {};
-    const benefitPayload = {
+    const savedPlansPayload = Object.fromEntries(Object.values(plans).map((plan, index) => [
+      plan.id,
+      { ...plan, ordem: index }
+    ]));
+    const uniqueGallery = [...new Set(gallery)];
+    const savedGalleryPayload = Object.fromEntries(uniqueGallery.map((url, index) => [
+      `imagem-${String(index + 1).padStart(2, "0")}`,
+      { url, ordem: index }
+    ]));
+    const benefitPayload = cleanForFirebase({
+      schemaVersion: 2,
       parceiro: draft.parceiro,
       resumoParceiro: draft.resumoParceiro,
       descricaoParceiro: draft.descricaoParceiro,
@@ -4826,12 +4853,17 @@ async function saveBenefitFromForm(form) {
       regras: draft.regras,
       observacoesImportantes: draft.observacoesImportantes,
       modalidadeContratacao: contractMode,
-      planos,
+      planos: savedPlansPayload,
+      planosLista: Object.values(savedPlansPayload),
       contato: draft.contato,
       email: draft.email,
       site: draft.site,
       imagem: image,
-      galeria: [...new Set(gallery)],
+      logo: image,
+      logoUrl: image,
+      galeria: savedGalleryPayload,
+      imagens: uniqueGallery,
+      fotos: uniqueGallery,
       validadeFim: draft.validadeFim,
       status: draft.status,
       ordem: draft.ordem,
@@ -4839,17 +4871,16 @@ async function saveBenefitFromForm(form) {
       createdBy: current.createdBy || state.user?.uid || "",
       updatedAt: serverTimestamp(),
       updatedBy: state.user?.uid || ""
-    };
+    });
     const benefitRef = ref(db, `beneficiosParceiros/${id}`);
     await set(benefitRef, benefitPayload);
     const savedSnapshot = await get(benefitRef);
     const savedBenefit = savedSnapshot.val() || {};
-    const savedPlans = benefitListFromValue(savedBenefit.planos);
+    const savedPlans = benefitAllPlans(savedBenefit);
     const savedGallery = benefitGalleryImages(savedBenefit);
-    const expectedPlanIds = Object.keys(plans);
+    const expectedPlanIds = Object.keys(savedPlansPayload);
     const plansConfirmed = savedPlans.length === expectedPlanIds.length
       && expectedPlanIds.every((planId) => savedPlans.some((plan) => String(plan.id) === String(planId)));
-    const uniqueGallery = [...new Set(gallery)];
     const galleryConfirmed = savedGallery.length === uniqueGallery.length
       && uniqueGallery.every((url) => savedGallery.includes(url));
     const logoConfirmed = !image || benefitPrimaryImage(savedBenefit) === image;
@@ -4862,6 +4893,7 @@ async function saveBenefitFromForm(form) {
     else state.beneficios.push(savedBenefitRecord);
     state.beneficios.sort((a, b) => Number(a.ordem || 0) - Number(b.ordem || 0) || String(a.parceiro || "").localeCompare(String(b.parceiro || ""), "pt-BR"));
     state.selectedBenefitId = "";
+    state.benefitFormOpen = false;
     benefitFormDirty = false;
     const savedImageCount = benefitPartnerImages(savedBenefit).length;
     showToast(`Parceiro salvo com ${savedPlans.length} plano${savedPlans.length === 1 ? "" : "s"} e ${savedImageCount} imagem${savedImageCount === 1 ? "" : "ns"}.`);
@@ -5119,6 +5151,7 @@ function bindBenefitsView() {
     if (edit) {
       benefitFormDirty = false;
       state.selectedBenefitId = edit.dataset.benefitEdit || "";
+      state.benefitFormOpen = true;
       state.selectedBenefitDetailId = "";
       renderBenefitsView();
       $("benefitForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -5127,6 +5160,16 @@ function bindBenefitsView() {
     if (event.target.closest("[data-benefit-new]")) {
       benefitFormDirty = false;
       state.selectedBenefitId = "";
+      state.benefitFormOpen = true;
+      renderBenefitsView();
+      $("benefitForm")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+    if (event.target.closest("[data-benefit-form-close]")) {
+      if (benefitFormDirty && !window.confirm("Fechar o cadastro sem salvar as alterações?")) return;
+      benefitFormDirty = false;
+      state.selectedBenefitId = "";
+      state.benefitFormOpen = false;
       renderBenefitsView();
       return;
     }
@@ -5521,6 +5564,11 @@ function prepareInitialView(name) {
 }
 
 function collapseEntryFormsForView(target) {
+  if (target === "beneficios" && !benefitSaveInProgress) {
+    benefitFormDirty = false;
+    state.selectedBenefitId = "";
+    state.benefitFormOpen = false;
+  }
   const formsByView = {
     clientes: ["clientForm"],
     categorias: ["categoryForm"],
