@@ -6377,3 +6377,237 @@ button.admin-button-loading::after {
     height: 170px;
   }
 }
+
+/* ===== Cards compactos de parceiros v515 ===== */
+.benefits-grid {
+  grid-template-columns: repeat(auto-fill, minmax(380px, 620px));
+  justify-content: start;
+}
+
+.benefit-card-compact {
+  overflow: hidden;
+}
+
+.benefit-card-compact .benefit-card-open {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  min-height: 230px;
+}
+
+.benefit-card-compact-logo {
+  display: grid;
+  min-height: 100%;
+  place-items: center;
+  padding: 18px;
+  border-right: 1px solid #e2e8f0;
+  background:
+    radial-gradient(circle at 20% 15%, rgba(124, 58, 237, .1), transparent 42%),
+    #f8fafc;
+}
+
+.benefit-card-compact-logo img {
+  display: block;
+  width: 100%;
+  max-width: 118px;
+  height: 118px;
+  border-radius: 18px;
+  background: #fff;
+  object-fit: contain;
+  filter: none;
+}
+
+.benefit-card-compact-logo span {
+  display: grid;
+  width: 90px;
+  height: 90px;
+  place-items: center;
+  border-radius: 22px;
+  background: #ede9fe;
+  color: #6d28d9;
+  font-size: 38px;
+}
+
+.benefit-card-compact .benefit-card-compact-body {
+  align-content: center;
+  gap: 7px;
+  min-width: 0;
+  padding: 18px 20px;
+}
+
+.benefit-card-compact .benefit-card-compact-body h3 {
+  overflow: hidden;
+  margin: 0;
+  color: #172554;
+  font-size: 20px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.benefit-card-compact .benefit-card-compact-body h4 {
+  overflow: hidden;
+  margin: 0;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.benefit-card-compact .benefit-card-partner-summary {
+  display: -webkit-box;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 12px;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.benefit-card-compact-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+}
+
+.benefit-card-compact-meta > strong {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #ede9fe;
+  color: #6d28d9;
+  font-size: 11px;
+}
+
+.benefit-card-compact .benefit-contract-mode,
+.benefit-card-compact .benefit-request-status {
+  font-size: 10px;
+}
+
+.benefit-card-gallery-preview {
+  display: flex;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.benefit-card-gallery-preview span {
+  width: 48px;
+  height: 38px;
+  overflow: hidden;
+  border: 2px solid #fff;
+  border-radius: 9px;
+  background: #e2e8f0;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .12);
+}
+
+.benefit-card-gallery-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.benefit-card-compact .benefit-card-cta {
+  margin-top: 1px;
+  font-size: 11px;
+}
+
+.benefit-card-compact > .benefit-master-card-actions {
+  border-top: 1px solid #eef2f7;
+}
+
+.benefit-detail-modal.no-gallery {
+  grid-template-columns: minmax(0, 760px);
+}
+
+.benefit-detail-modal.no-gallery .benefit-detail-content {
+  max-height: calc(100vh - 64px);
+}
+
+.benefit-detail-identity {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.benefit-detail-identity > div {
+  display: grid;
+  flex: 0 0 94px;
+  width: 94px;
+  height: 94px;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #fff;
+}
+
+.benefit-detail-identity img {
+  width: 100%;
+  height: 100%;
+  padding: 7px;
+  object-fit: contain;
+}
+
+.benefit-detail-identity i {
+  color: #6d28d9;
+  font-size: 38px;
+}
+
+.benefit-detail-identity > span {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.benefit-detail-identity small {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.benefit-detail-main img {
+  background: #e2e8f0;
+  object-fit: cover;
+}
+
+@media (max-width: 700px) {
+  .benefits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .benefit-card-compact .benefit-card-open {
+    grid-template-columns: 104px minmax(0, 1fr);
+    min-height: 204px;
+  }
+
+  .benefit-card-compact-logo {
+    padding: 10px;
+  }
+
+  .benefit-card-compact-logo img {
+    width: 84px;
+    height: 84px;
+    border-radius: 14px;
+  }
+
+  .benefit-card-compact .benefit-card-compact-body {
+    padding: 15px 14px;
+  }
+
+  .benefit-card-gallery-preview span {
+    width: 39px;
+    height: 32px;
+  }
+
+  .benefit-detail-identity {
+    align-items: flex-start;
+  }
+
+  .benefit-detail-identity > div {
+    flex-basis: 76px;
+    width: 76px;
+    height: 76px;
+  }
+}

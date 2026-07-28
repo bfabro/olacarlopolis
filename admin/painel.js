@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 507,
-  label: "v514",
+  numero: 508,
+  label: "v515",
   data: "2026-07-28",
-  nota: "Nova area de parceiros com planos, solicitacoes, duvidas, historico e acesso exclusivo."
+  nota: "Cards compactos de parceiros, logo com recorte automatico e galeria destacada."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3901,6 +3901,14 @@ function benefitGallery(benefit = {}) {
   ].filter(Boolean))];
 }
 
+function benefitPartnerImages(benefit = {}) {
+  return [...new Set(
+    benefitListFromValue(benefit.galeria)
+      .map((item) => typeof item === "string" ? item : item.url)
+      .filter(Boolean)
+  )];
+}
+
 function benefitContractModeLabel(mode = "gratuito") {
   return {
     gratuito: "Benefício gratuito",
@@ -4057,7 +4065,7 @@ function startBenefitsRealtime() {
 }
 
 function benefitPartnerDescription(benefit = {}) {
-  return benefit.descricaoParceiro || `${benefit.parceiro || "Este parceiro"} faz parte do clube de parceiros Olá Carlópolis.`;
+  return benefit.descricaoParceiro || benefit.resumoParceiro || benefit.descricao || `${benefit.parceiro || "Este parceiro"} faz parte do clube de parceiros Olá Carlópolis.`;
 }
 
 function renderBenefitPlan(plan = {}, inputName = "") {
@@ -4109,22 +4117,26 @@ function renderBenefitNotifications() {
 function renderBenefitCard(benefit = {}) {
   const activeUse = currentClientId() ? benefitUsageForClient(benefit.id) : null;
   const unavailable = !benefitIsAvailable(benefit);
-  const gallery = benefitGallery(benefit);
+  const gallery = benefitPartnerImages(benefit);
+  const partnerSummary = benefit.resumoParceiro || benefitPartnerDescription(benefit);
   return `
-    <article class="benefit-card ${unavailable ? "is-inactive" : ""}">
+    <article class="benefit-card benefit-card-compact ${unavailable ? "is-inactive" : ""}">
       <button type="button" class="benefit-card-open" data-benefit-open="${escapeAttr(benefit.id)}" aria-label="Abrir ${escapeAttr(benefit.parceiro || "parceiro")}">
-        <div class="benefit-card-media">
-          ${gallery[0] ? `<img src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "Parceiro")}" loading="lazy">` : `<span><i class="fa-solid fa-handshake"></i></span>`}
-          <strong>${escapeHtml(benefitTypeLabel(benefit))}</strong>
+        <div class="benefit-card-compact-logo">
+          ${benefit.imagem ? `<img data-benefit-logo-auto src="${escapeAttr(benefit.imagem)}" alt="Logo de ${escapeAttr(benefit.parceiro || "Parceiro")}" loading="lazy">` : `<span><i class="fa-solid fa-handshake"></i></span>`}
         </div>
-        <div class="benefit-card-body">
+        <div class="benefit-card-body benefit-card-compact-body">
           <span class="benefit-partner">Parceiro Olá Carlópolis</span>
           <h3>${escapeHtml(benefit.parceiro || "Parceiro")}</h3>
+          <p class="benefit-card-partner-summary">${escapeHtml(partnerSummary)}</p>
           <h4>${escapeHtml(benefit.titulo || "Benefício exclusivo")}</h4>
-          <p>${escapeHtml(benefit.descricao || "")}</p>
-          <span class="benefit-contract-mode"><i class="fa-solid fa-wallet"></i>${escapeHtml(benefitContractModeLabel(benefit.modalidadeContratacao))}</span>
-          ${activeUse ? `<span class="benefit-request-status status-${escapeAttr(activeUse.status)}">${escapeHtml(benefitStatusLabel(activeUse.status))}</span>` : ""}
-          <span class="benefit-card-cta">Ver parceiro e condições <i class="fa-solid fa-arrow-right"></i></span>
+          <div class="benefit-card-compact-meta">
+            <strong>${escapeHtml(benefitTypeLabel(benefit))}</strong>
+            <span class="benefit-contract-mode"><i class="fa-solid fa-wallet"></i>${escapeHtml(benefitContractModeLabel(benefit.modalidadeContratacao))}</span>
+            ${activeUse ? `<span class="benefit-request-status status-${escapeAttr(activeUse.status)}">${escapeHtml(benefitStatusLabel(activeUse.status))}</span>` : ""}
+          </div>
+          ${gallery.length ? `<div class="benefit-card-gallery-preview">${gallery.slice(0, 4).map((url, index) => `<span><img src="${escapeAttr(url)}" alt="Imagem ${index + 1} de ${escapeAttr(benefit.parceiro || "parceiro")}" loading="lazy"></span>`).join("")}</div>` : ""}
+          <span class="benefit-card-cta">Conhecer parceiro e benefício <i class="fa-solid fa-arrow-right"></i></span>
         </div>
       </button>
       ${isMaster() ? `<div class="benefit-master-card-actions"><button type="button" class="ghost-button" data-benefit-edit="${escapeAttr(benefit.id)}"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" class="danger-button" data-benefit-delete="${escapeAttr(benefit.id)}"><i class="fa-solid fa-trash"></i></button></div>` : ""}
@@ -4133,7 +4145,7 @@ function renderBenefitCard(benefit = {}) {
 }
 
 function renderBenefitDetail(benefit = {}) {
-  const gallery = benefitGallery(benefit);
+  const gallery = benefitPartnerImages(benefit);
   const plans = benefitPlans(benefit);
   const clientId = currentClientId();
   const activeUse = clientId ? benefitUsageForClient(benefit.id, clientId) : null;
@@ -4142,15 +4154,18 @@ function renderBenefitDetail(benefit = {}) {
   const canCancel = activeUse && ["aguardando_analise", "solicitado"].includes(activeUse.status);
   return `
     <div class="benefit-detail-backdrop" data-benefit-close>
-      <article class="benefit-detail-modal" role="dialog" aria-modal="true" aria-labelledby="benefitDetailTitle">
+      <article class="benefit-detail-modal ${gallery.length ? "" : "no-gallery"}" role="dialog" aria-modal="true" aria-labelledby="benefitDetailTitle">
         <button type="button" class="benefit-detail-close" data-benefit-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-        <div class="benefit-detail-gallery">
-          <div class="benefit-detail-main">${gallery[0] ? `<img data-benefit-main-image src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "")}">` : `<span><i class="fa-solid fa-handshake"></i></span>`}</div>
+        ${gallery.length ? `<div class="benefit-detail-gallery">
+          <div class="benefit-detail-main"><img data-benefit-main-image src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "")}"></div>
           ${gallery.length > 1 ? `<div class="benefit-detail-thumbs">${gallery.map((url, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(url)}" class="${index === 0 ? "active" : ""}"><img src="${escapeAttr(url)}" alt="Imagem ${index + 1}"></button>`).join("")}</div>` : ""}
-        </div>
+        </div>` : ""}
         <div class="benefit-detail-content">
           <span class="feature-kicker">Parceiro Olá Carlópolis</span>
-          <h2 id="benefitDetailTitle">${escapeHtml(benefit.parceiro || "Parceiro")}</h2>
+          <div class="benefit-detail-identity">
+            <div>${benefit.imagem ? `<img data-benefit-logo-auto src="${escapeAttr(benefit.imagem)}" alt="Logo de ${escapeAttr(benefit.parceiro || "Parceiro")}">` : `<i class="fa-solid fa-handshake"></i>`}</div>
+            <span><h2 id="benefitDetailTitle">${escapeHtml(benefit.parceiro || "Parceiro")}</h2>${benefit.resumoParceiro ? `<small>${escapeHtml(benefit.resumoParceiro)}</small>` : ""}</span>
+          </div>
           <p class="benefit-partner-description">${escapeHtml(benefitPartnerDescription(benefit))}</p>
           <section><h3>${escapeHtml(benefit.titulo || "Benefício oferecido")}</h3><p>${escapeHtml(benefit.descricao || "")}</p></section>
           ${plans.length ? `<section><h3>Planos disponíveis</h3><div class="benefit-plans">${benefit.modalidadeContratacao === "opcional" && clientId ? `<label class="benefit-plan-card is-free"><input type="radio" name="benefitSelectedPlan" value="" checked><span><strong>Quero somente o benefício</strong><b>Sem contratação de plano</b></span></label>` : ""}${plans.map((plan) => renderBenefitPlan(plan, clientId ? "benefitSelectedPlan" : "")).join("")}</div></section>` : ""}
@@ -4211,7 +4226,8 @@ function renderBenefitMasterForm() {
         <input type="hidden" id="benefitId" value="${escapeAttr(current.id || "")}">
         <label>Nome do parceiro<input id="benefitPartner" required maxlength="100" value="${escapeAttr(current.parceiro || "")}"></label>
         <label>Título do benefício<input id="benefitTitle" required maxlength="120" value="${escapeAttr(current.titulo || "")}"></label>
-        <label class="wide">Descrição do parceiro<textarea id="benefitPartnerDescription" required maxlength="1100" rows="5">${escapeHtml(current.descricaoParceiro || "")}</textarea></label>
+        <label class="wide">Breve descrição do que faz o parceiro<input id="benefitPartnerSummary" required maxlength="240" value="${escapeAttr(current.resumoParceiro || "")}" placeholder="Ex.: Agência de marketing especializada em posicionamento, conteúdo e redes sociais."></label>
+        <label class="wide">Descrição completa do parceiro<textarea id="benefitPartnerDescription" required maxlength="1100" rows="5">${escapeHtml(current.descricaoParceiro || "")}</textarea></label>
         <label class="wide">Descrição do benefício <span class="field-counter" id="benefitDescriptionCount">${String(current.descricao || "").length}/1100</span><textarea id="benefitDescription" required maxlength="1100" rows="6">${escapeHtml(current.descricao || "")}</textarea></label>
         <label>Tipo de benefício<select id="benefitType"><option value="percentual" ${current.tipoBeneficio === "percentual" ? "selected" : ""}>Desconto em percentual</option><option value="valor" ${current.tipoBeneficio === "valor" ? "selected" : ""}>Desconto em valor</option><option value="beneficio" ${!current.tipoBeneficio || current.tipoBeneficio === "beneficio" ? "selected" : ""}>Outro benefício</option></select></label>
         <label>Valor do desconto<input id="benefitValue" type="number" min="0" step="0.01" value="${escapeAttr(current.valorBeneficio ?? "")}"></label>
@@ -4308,6 +4324,73 @@ function renderBenefitsView() {
     ${selected ? renderBenefitDetail(selected) : ""}
   `;
   bindBenefitsView();
+  autoCropBenefitLogos(mount);
+}
+
+function autoCropBenefitLogos(root = document) {
+  root.querySelectorAll("img[data-benefit-logo-auto]:not([data-benefit-logo-processed])").forEach((target) => {
+    target.dataset.benefitLogoProcessed = "true";
+    const source = new Image();
+    source.crossOrigin = "anonymous";
+    source.onload = () => {
+      try {
+        const maxSide = 600;
+        const scale = Math.min(1, maxSide / Math.max(source.naturalWidth, source.naturalHeight));
+        const width = Math.max(1, Math.round(source.naturalWidth * scale));
+        const height = Math.max(1, Math.round(source.naturalHeight * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d", { willReadFrequently: true });
+        ctx.drawImage(source, 0, 0, width, height);
+        const pixels = ctx.getImageData(0, 0, width, height).data;
+        const cornerIndexes = [0, (width - 1) * 4, (height - 1) * width * 4, ((height * width) - 1) * 4];
+        const background = cornerIndexes.reduce((sum, index) => ({
+          r: sum.r + pixels[index],
+          g: sum.g + pixels[index + 1],
+          b: sum.b + pixels[index + 2]
+        }), { r: 0, g: 0, b: 0 });
+        background.r /= 4;
+        background.g /= 4;
+        background.b /= 4;
+        let minX = width;
+        let minY = height;
+        let maxX = -1;
+        let maxY = -1;
+        for (let y = 0; y < height; y += 1) {
+          for (let x = 0; x < width; x += 1) {
+            const index = (y * width + x) * 4;
+            const alpha = pixels[index + 3];
+            const distance = Math.abs(pixels[index] - background.r) + Math.abs(pixels[index + 1] - background.g) + Math.abs(pixels[index + 2] - background.b);
+            if (alpha > 20 && distance > 70) {
+              minX = Math.min(minX, x);
+              minY = Math.min(minY, y);
+              maxX = Math.max(maxX, x);
+              maxY = Math.max(maxY, y);
+            }
+          }
+        }
+        if (maxX < minX || maxY < minY) return;
+        const detectedWidth = maxX - minX + 1;
+        const detectedHeight = maxY - minY + 1;
+        if (detectedWidth > width * .88 && detectedHeight > height * .88) return;
+        const padding = Math.max(6, Math.round(Math.max(detectedWidth, detectedHeight) * .12));
+        const cropX = Math.max(0, minX - padding);
+        const cropY = Math.max(0, minY - padding);
+        const cropWidth = Math.min(width - cropX, detectedWidth + padding * 2);
+        const cropHeight = Math.min(height - cropY, detectedHeight + padding * 2);
+        const cropped = document.createElement("canvas");
+        cropped.width = cropWidth;
+        cropped.height = cropHeight;
+        cropped.getContext("2d").drawImage(canvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+        target.src = cropped.toDataURL("image/png");
+        target.classList.add("is-auto-cropped");
+      } catch (error) {
+        console.warn("Não foi possível ajustar automaticamente a logo do parceiro.", error);
+      }
+    };
+    source.src = target.currentSrc || target.src;
+  });
 }
 
 function collectBenefitPlans(form) {
@@ -4353,6 +4436,7 @@ async function saveBenefitFromForm(form) {
     const current = state.beneficios.find((item) => item.id === id) || {};
     await set(ref(db, `beneficiosParceiros/${id}`), {
       parceiro: $("benefitPartner").value.trim(),
+      resumoParceiro: $("benefitPartnerSummary").value.trim().slice(0, 240),
       descricaoParceiro: $("benefitPartnerDescription").value.trim().slice(0, 1100),
       titulo: $("benefitTitle").value.trim(),
       tipoBeneficio: $("benefitType").value,
@@ -4691,12 +4775,13 @@ function renderPartnerBenefitsArea() {
   const active = requests.filter((item) => item.status === "beneficiario_ativo").length;
   mount.innerHTML = `
     ${renderBenefitNotifications()}
-    <section class="benefit-partner-hero"><div>${partner.imagem ? `<img src="${escapeAttr(partner.imagem)}" alt="${escapeAttr(partner.parceiro || "")}">` : `<i class="fa-solid fa-handshake"></i>`}<span><small>Área exclusiva do parceiro</small><h2>${escapeHtml(partner.parceiro || "")}</h2><p>${escapeHtml(partner.titulo || "")}</p></span></div>${isMaster() ? `<select id="masterPartnerAreaSelect">${state.beneficios.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === partnerId ? "selected" : ""}>${escapeHtml(item.parceiro || item.id)}</option>`).join("")}</select>` : ""}</section>
+    <section class="benefit-partner-hero"><div>${partner.imagem ? `<img data-benefit-logo-auto src="${escapeAttr(partner.imagem)}" alt="${escapeAttr(partner.parceiro || "")}">` : `<i class="fa-solid fa-handshake"></i>`}<span><small>Área exclusiva do parceiro</small><h2>${escapeHtml(partner.parceiro || "")}</h2><p>${escapeHtml(partner.titulo || "")}</p></span></div>${isMaster() ? `<select id="masterPartnerAreaSelect">${state.beneficios.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === partnerId ? "selected" : ""}>${escapeHtml(item.parceiro || item.id)}</option>`).join("")}</select>` : ""}</section>
     <div class="stats-grid benefit-report-stats"><article class="stat-card"><span>Solicitações</span><strong>${requests.length}</strong><small>Recebidas</small></article><article class="stat-card"><span>Aguardando análise</span><strong>${requests.filter((item) => ["aguardando_analise", "solicitado"].includes(item.status)).length}</strong><small>Precisam de atendimento</small></article><article class="stat-card"><span>Beneficiários ativos</span><strong>${active}</strong><small>Clientes vinculados</small></article><article class="stat-card"><span>Dúvidas</span><strong>${questions.filter((item) => item.status !== "finalizada").length}</strong><small>Em atendimento</small></article></div>
     <section class="panel-card"><div class="section-head"><div><span class="feature-kicker">Solicitações recebidas</span><h2>Atendimento dos clientes</h2></div></div><div class="partner-request-list">${requests.length ? requests.map(renderPartnerRequestCard).join("") : `<p class="list-meta">Nenhuma solicitação recebida.</p>`}</div></section>
     <section class="panel-card"><div class="section-head"><div><span class="feature-kicker">Dúvidas</span><h2>Mensagens dos clientes</h2></div></div><div class="partner-question-list">${questions.length ? questions.map(renderPartnerQuestionCard).join("") : `<p class="list-meta">Nenhuma dúvida recebida.</p>`}</div></section>
   `;
   bindPartnerBenefitsArea();
+  autoCropBenefitLogos(mount);
 }
 
 function renderPartnerRequestCard(item = {}) {
