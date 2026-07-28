@@ -6517,6 +6517,40 @@ button.admin-button-loading::after {
   border-top: 1px solid #eef2f7;
 }
 
+.benefit-form-media-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #dbe4f0;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.benefit-form-media-preview figure {
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #dbe4f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.benefit-form-media-preview img {
+  display: block;
+  width: 100%;
+  height: 92px;
+  object-fit: contain;
+  background: #fff;
+}
+
+.benefit-form-media-preview figcaption {
+  padding: 7px 8px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: center;
+}
+
 .benefit-detail-modal.no-gallery {
   grid-template-columns: minmax(0, 760px);
 }
@@ -6570,6 +6604,12 @@ button.admin-button-loading::after {
 .benefit-detail-main img {
   background: #e2e8f0;
   object-fit: cover;
+}
+
+.benefit-detail-main.is-logo img {
+  padding: 24px;
+  background: #fff;
+  object-fit: contain;
 }
 
 @media (max-width: 700px) {

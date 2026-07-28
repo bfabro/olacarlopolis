@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 511,
-  label: "v518",
+  numero: 512,
+  label: "v519",
   data: "2026-07-28",
-  nota: "Relatorio completo de itens excluidos por administradores."
+  nota: "Persistencia e exibicao confiavel de planos e imagens dos beneficios."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -3868,6 +3868,9 @@ function startOnlinePresenceMonitor() {
 }
 
 let benefitsRealtimeUnsubscribers = [];
+let benefitFormDirty = false;
+let benefitSaveInProgress = false;
+let benefitRealtimeRenderPending = false;
 
 function stopBenefitsRealtime() {
   benefitsRealtimeUnsubscribers.forEach((unsubscribe) => {
@@ -4199,10 +4202,21 @@ function bindBenefitsViewLegacy() {
 
 // ===== Parceiros e Beneficios v514 =====
 function benefitListFromValue(value) {
-  if (Array.isArray(value)) return value.filter(Boolean);
+  if (Array.isArray(value)) {
+    return value.filter((item) => item !== undefined && item !== null && item !== "").map((item, index) => (
+      item && typeof item === "object"
+        ? { ...item, id: item.id || String(index) }
+        : { id: String(index), value: item, url: typeof item === "string" ? item : "" }
+    ));
+  }
   if (!value || typeof value !== "object") return [];
   return Object.entries(value)
-    .map(([id, item]) => ({ id, ...(item || {}) }))
+    .filter(([, item]) => item !== undefined && item !== null && item !== "")
+    .map(([id, item]) => (
+      item && typeof item === "object"
+        ? { ...item, id: item.id || id }
+        : { id, value: item, url: typeof item === "string" ? item : "" }
+    ))
     .sort((a, b) => Number(a.ordem ?? a.order ?? 0) - Number(b.ordem ?? b.order ?? 0));
 }
 
@@ -4210,19 +4224,23 @@ function benefitPlans(benefit = {}) {
   return benefitListFromValue(benefit.planos).filter((plan) => plan.status !== "inativo");
 }
 
+function benefitPrimaryImage(benefit = {}) {
+  return String(benefit.imagem || benefit.image || benefit.logo || benefit.logoUrl || benefit.imagemLogo || "").trim();
+}
+
+function benefitGalleryImages(benefit = {}) {
+  const sources = [benefit.galeria, benefit.imagens, benefit.fotos];
+  return [...new Set(sources.flatMap((source) => benefitListFromValue(source))
+    .map((item) => String(item.url || item.imagem || item.image || item.foto || item.value || "").trim())
+    .filter(Boolean))];
+}
+
 function benefitGallery(benefit = {}) {
-  return [...new Set([
-    benefit.imagem,
-    ...benefitListFromValue(benefit.galeria).map((item) => typeof item === "string" ? item : item.url)
-  ].filter(Boolean))];
+  return [...new Set([benefitPrimaryImage(benefit), ...benefitGalleryImages(benefit)].filter(Boolean))];
 }
 
 function benefitPartnerImages(benefit = {}) {
-  return [...new Set(
-    benefitListFromValue(benefit.galeria)
-      .map((item) => typeof item === "string" ? item : item.url)
-      .filter(Boolean)
-  )];
+  return benefitGallery(benefit);
 }
 
 function benefitContractModeLabel(mode = "gratuito") {
@@ -4290,7 +4308,10 @@ function flatScopedRecords(data = {}, scope = {}) {
 }
 
 function renderBenefitsRealtimeTargets() {
-  if (!$("beneficiosView")?.classList.contains("hidden")) renderBenefitsView();
+  if (!$("beneficiosView")?.classList.contains("hidden")) {
+    if (isMaster() && (benefitFormDirty || benefitSaveInProgress)) benefitRealtimeRenderPending = true;
+    else renderBenefitsView();
+  }
   if (!$("areaParceiroView")?.classList.contains("hidden")) renderPartnerBenefitsArea();
 }
 
@@ -4435,12 +4456,14 @@ function renderBenefitCard(benefit = {}) {
   const activeUse = currentClientId() ? benefitUsageForClient(benefit.id) : null;
   const unavailable = !benefitIsAvailable(benefit);
   const gallery = benefitPartnerImages(benefit);
+  const primaryImage = benefitPrimaryImage(benefit);
+  const plans = benefitPlans(benefit);
   const partnerSummary = benefit.resumoParceiro || benefitPartnerDescription(benefit);
   return `
     <article class="benefit-card benefit-card-compact ${unavailable ? "is-inactive" : ""}">
       <button type="button" class="benefit-card-open" data-benefit-open="${escapeAttr(benefit.id)}" aria-label="Abrir ${escapeAttr(benefit.parceiro || "parceiro")}">
         <div class="benefit-card-compact-logo">
-          ${benefit.imagem ? `<img data-benefit-logo-auto src="${escapeAttr(benefit.imagem)}" alt="Logo de ${escapeAttr(benefit.parceiro || "Parceiro")}" loading="lazy">` : `<span><i class="fa-solid fa-handshake"></i></span>`}
+          ${primaryImage ? `<img data-benefit-logo-auto src="${escapeAttr(primaryImage)}" alt="Logo de ${escapeAttr(benefit.parceiro || "Parceiro")}" loading="lazy">` : `<span><i class="fa-solid fa-handshake"></i></span>`}
         </div>
         <div class="benefit-card-body benefit-card-compact-body">
           <span class="benefit-partner">Parceiro Olá Carlópolis</span>
@@ -4450,6 +4473,7 @@ function renderBenefitCard(benefit = {}) {
           <div class="benefit-card-compact-meta">
             <strong>${escapeHtml(benefitTypeLabel(benefit))}</strong>
             <span class="benefit-contract-mode"><i class="fa-solid fa-wallet"></i>${escapeHtml(benefitContractModeLabel(benefit.modalidadeContratacao))}</span>
+            ${plans.length ? `<span class="benefit-contract-mode"><i class="fa-solid fa-layer-group"></i>${plans.length} plano${plans.length === 1 ? "" : "s"}</span>` : ""}
             ${activeUse ? `<span class="benefit-request-status status-${escapeAttr(activeUse.status)}">${escapeHtml(benefitStatusLabel(activeUse.status))}</span>` : ""}
           </div>
           ${gallery.length ? `<div class="benefit-card-gallery-preview">${gallery.slice(0, 4).map((url, index) => `<span><img src="${escapeAttr(url)}" alt="Imagem ${index + 1} de ${escapeAttr(benefit.parceiro || "parceiro")}" loading="lazy"></span>`).join("")}</div>` : ""}
@@ -4464,6 +4488,7 @@ function renderBenefitCard(benefit = {}) {
 function renderBenefitDetail(benefit = {}) {
   const gallery = benefitPartnerImages(benefit);
   const plans = benefitPlans(benefit);
+  const primaryImage = benefitPrimaryImage(benefit);
   const clientId = currentClientId();
   const activeUse = clientId ? benefitUsageForClient(benefit.id, clientId) : null;
   const canRequest = Boolean(clientId) && benefitIsAvailable(benefit) && !activeUse;
@@ -4474,13 +4499,13 @@ function renderBenefitDetail(benefit = {}) {
       <article class="benefit-detail-modal ${gallery.length ? "" : "no-gallery"}" role="dialog" aria-modal="true" aria-labelledby="benefitDetailTitle">
         <button type="button" class="benefit-detail-close" data-benefit-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
         ${gallery.length ? `<div class="benefit-detail-gallery">
-          <div class="benefit-detail-main"><img data-benefit-main-image src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "")}"></div>
-          ${gallery.length > 1 ? `<div class="benefit-detail-thumbs">${gallery.map((url, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(url)}" class="${index === 0 ? "active" : ""}"><img src="${escapeAttr(url)}" alt="Imagem ${index + 1}"></button>`).join("")}</div>` : ""}
+          <div class="benefit-detail-main ${gallery[0] === primaryImage ? "is-logo" : ""}"><img data-benefit-main-image src="${escapeAttr(gallery[0])}" alt="${escapeAttr(benefit.parceiro || "")}"></div>
+          ${gallery.length > 1 ? `<div class="benefit-detail-thumbs">${gallery.map((url, index) => `<button type="button" data-benefit-gallery-image="${escapeAttr(url)}" data-benefit-gallery-logo="${url === primaryImage ? "true" : "false"}" class="${index === 0 ? "active" : ""}"><img src="${escapeAttr(url)}" alt="Imagem ${index + 1}"></button>`).join("")}</div>` : ""}
         </div>` : ""}
         <div class="benefit-detail-content">
           <span class="feature-kicker">Parceiro Olá Carlópolis</span>
           <div class="benefit-detail-identity">
-            <div>${benefit.imagem ? `<img data-benefit-logo-auto src="${escapeAttr(benefit.imagem)}" alt="Logo de ${escapeAttr(benefit.parceiro || "Parceiro")}">` : `<i class="fa-solid fa-handshake"></i>`}</div>
+            <div>${primaryImage ? `<img data-benefit-logo-auto src="${escapeAttr(primaryImage)}" alt="Logo de ${escapeAttr(benefit.parceiro || "Parceiro")}">` : `<i class="fa-solid fa-handshake"></i>`}</div>
             <span><h2 id="benefitDetailTitle">${escapeHtml(benefit.parceiro || "Parceiro")}</h2>${benefit.resumoParceiro ? `<small>${escapeHtml(benefit.resumoParceiro)}</small>` : ""}</span>
           </div>
           <p class="benefit-partner-description">${escapeHtml(benefitPartnerDescription(benefit))}</p>
@@ -4532,7 +4557,8 @@ function renderBenefitMasterForm() {
   if (!isMaster()) return "";
   const current = state.beneficios.find((item) => item.id === state.selectedBenefitId) || {};
   const plans = benefitListFromValue(current.planos);
-  const gallery = benefitGallery({ galeria: current.galeria });
+  const gallery = benefitGalleryImages(current);
+  const primaryImage = benefitPrimaryImage(current);
   return `
     <section class="panel-card benefit-master-form-card">
       <div class="section-head">
@@ -4559,10 +4585,11 @@ function renderBenefitMasterForm() {
         <label>Validade final<input id="benefitValidUntil" type="date" value="${escapeAttr(current.validadeFim || "")}"></label>
         <label>Ordem de exibição<input id="benefitOrder" type="number" min="0" step="1" value="${escapeAttr(current.ordem ?? 0)}"></label>
         <div class="form-section-title wide"><i class="fa-solid fa-images"></i><div><strong>Logo e galeria</strong><span>Envie a logo principal e várias imagens do parceiro.</span></div></div>
-        <label>Logo por URL<input id="benefitImage" value="${escapeAttr(current.imagem || "")}" placeholder="https://..."></label>
+        <label>Logo por URL<input id="benefitImage" value="${escapeAttr(primaryImage)}" placeholder="https://..."></label>
         <label>Enviar logo<input id="benefitImageUpload" type="file" accept="image/*"></label>
         <label class="wide">URLs adicionais, uma por linha<textarea id="benefitGalleryUrls" rows="4" placeholder="https://...">${escapeHtml(gallery.join("\n"))}</textarea></label>
         <label class="wide">Enviar várias imagens<input id="benefitGalleryUpload" type="file" accept="image/*" multiple><small id="benefitGallerySelection">Nenhuma nova imagem selecionada.</small></label>
+        ${(primaryImage || gallery.length) ? `<div class="benefit-form-media-preview wide">${primaryImage ? `<figure><img src="${escapeAttr(primaryImage)}" alt="Logo atual"><figcaption>Logo atual</figcaption></figure>` : ""}${gallery.map((url, index) => `<figure><img src="${escapeAttr(url)}" alt="Imagem atual ${index + 1}"><figcaption>Imagem ${index + 1}</figcaption></figure>`).join("")}</div>` : ""}
         <div class="form-section-title wide"><i class="fa-solid fa-layer-group"></i><div><strong>Planos</strong><span>Use planos apenas quando fizerem parte deste benefício.</span></div></div>
         <div id="benefitPlansEditor" class="benefit-plans-editor wide">${plans.map(renderBenefitPlanEditor).join("")}</div>
         <div class="wide"><button type="button" class="ghost-button" data-benefit-plan-add><i class="fa-solid fa-plus"></i> Adicionar plano</button></div>
@@ -4741,48 +4768,72 @@ async function saveBenefitFromForm(form) {
   const existingId = $("benefitId")?.value || "";
   const id = existingId || push(ref(db, "beneficiosParceiros")).key;
   const button = form.querySelector('button[type="submit"]');
+  let savedBenefitRecord = null;
+  benefitSaveInProgress = true;
   setBusy(button, true, "Salvando...");
   try {
     const plans = collectBenefitPlans(form);
-    const contractMode = $("benefitContractMode").value;
+    const field = (selector) => form.querySelector(selector);
+    const draft = {
+      parceiro: field("#benefitPartner")?.value.trim() || "",
+      resumoParceiro: field("#benefitPartnerSummary")?.value.trim().slice(0, 240) || "",
+      descricaoParceiro: field("#benefitPartnerDescription")?.value.trim().slice(0, 1100) || "",
+      titulo: field("#benefitTitle")?.value.trim() || "",
+      tipoBeneficio: field("#benefitType")?.value || "beneficio",
+      valorBeneficio: Number(field("#benefitValue")?.value || 0),
+      chamadaBeneficio: field("#benefitCallout")?.value.trim() || "",
+      descricao: field("#benefitDescription")?.value.trim().slice(0, 1100) || "",
+      regras: field("#benefitRules")?.value.trim().slice(0, 1100) || "",
+      observacoesImportantes: field("#benefitImportantNotes")?.value.trim() || "",
+      contractMode: field("#benefitContractMode")?.value || "gratuito",
+      contato: field("#benefitContact")?.value.trim() || "",
+      email: field("#benefitEmail")?.value.trim() || "",
+      site: field("#benefitSite")?.value.trim() || "",
+      imageUrl: field("#benefitImage")?.value.trim() || "",
+      galleryUrls: [...new Set(String(field("#benefitGalleryUrls")?.value || "").split(/\r?\n/).map((url) => url.trim()).filter(Boolean))],
+      validadeFim: field("#benefitValidUntil")?.value || "",
+      status: field("#benefitStatus")?.value || "ativo",
+      ordem: Number(field("#benefitOrder")?.value || 0),
+      logoFile: field("#benefitImageUpload")?.files?.[0] || null,
+      galleryFiles: [...(field("#benefitGalleryUpload")?.files || [])].slice(0, 12)
+    };
+    const contractMode = draft.contractMode;
     if (contractMode !== "gratuito" && !Object.values(plans).some((plan) => plan.status === "ativo")) {
       throw new Error("Adicione pelo menos um plano ativo para esta forma de contratação.");
     }
-    let image = $("benefitImage")?.value.trim() || "";
-    const logoFile = $("benefitImageUpload")?.files?.[0];
-    if (logoFile) {
-      const fileRef = storageRef(storage, `beneficios/${id}/logo_${Date.now()}_${slugify(logoFile.name || "imagem")}`);
-      image = await uploadFileWithProgress(fileRef, logoFile, "Enviando logo do parceiro", logoFile.name || "logo");
+    let image = draft.imageUrl;
+    if (draft.logoFile) {
+      const fileRef = storageRef(storage, `beneficios/${id}/logo_${Date.now()}_${slugify(draft.logoFile.name || "imagem")}`);
+      image = await uploadFileWithProgress(fileRef, draft.logoFile, "Enviando logo do parceiro", draft.logoFile.name || "logo");
     }
-    const gallery = [...new Set(String($("benefitGalleryUrls")?.value || "").split(/\r?\n/).map((url) => url.trim()).filter(Boolean))];
-    const galleryFiles = [...($("benefitGalleryUpload")?.files || [])].slice(0, 12);
-    for (let index = 0; index < galleryFiles.length; index += 1) {
-      const file = galleryFiles[index];
+    const gallery = [...draft.galleryUrls];
+    for (let index = 0; index < draft.galleryFiles.length; index += 1) {
+      const file = draft.galleryFiles[index];
       const fileRef = storageRef(storage, `beneficios/${id}/galeria/${Date.now()}_${index}_${slugify(file.name || "imagem")}`);
-      gallery.push(await uploadFileWithProgress(fileRef, file, `Enviando imagem ${index + 1} de ${galleryFiles.length}`, file.name || "imagem"));
+      gallery.push(await uploadFileWithProgress(fileRef, file, `Enviando imagem ${index + 1} de ${draft.galleryFiles.length}`, file.name || "imagem"));
     }
     const current = state.beneficios.find((item) => item.id === id) || {};
     const benefitPayload = {
-      parceiro: $("benefitPartner").value.trim(),
-      resumoParceiro: $("benefitPartnerSummary").value.trim().slice(0, 240),
-      descricaoParceiro: $("benefitPartnerDescription").value.trim().slice(0, 1100),
-      titulo: $("benefitTitle").value.trim(),
-      tipoBeneficio: $("benefitType").value,
-      valorBeneficio: Number($("benefitValue").value || 0),
-      chamadaBeneficio: $("benefitCallout").value.trim(),
-      descricao: $("benefitDescription").value.trim().slice(0, 1100),
-      regras: $("benefitRules").value.trim().slice(0, 1100),
-      observacoesImportantes: $("benefitImportantNotes").value.trim(),
+      parceiro: draft.parceiro,
+      resumoParceiro: draft.resumoParceiro,
+      descricaoParceiro: draft.descricaoParceiro,
+      titulo: draft.titulo,
+      tipoBeneficio: draft.tipoBeneficio,
+      valorBeneficio: draft.valorBeneficio,
+      chamadaBeneficio: draft.chamadaBeneficio,
+      descricao: draft.descricao,
+      regras: draft.regras,
+      observacoesImportantes: draft.observacoesImportantes,
       modalidadeContratacao: contractMode,
       planos,
-      contato: $("benefitContact").value.trim(),
-      email: $("benefitEmail").value.trim(),
-      site: $("benefitSite").value.trim(),
+      contato: draft.contato,
+      email: draft.email,
+      site: draft.site,
       imagem: image,
-      galeria: gallery,
-      validadeFim: $("benefitValidUntil").value,
-      status: $("benefitStatus").value,
-      ordem: Number($("benefitOrder").value || 0),
+      galeria: [...new Set(gallery)],
+      validadeFim: draft.validadeFim,
+      status: draft.status,
+      ordem: draft.ordem,
       createdAt: current.createdAt || serverTimestamp(),
       createdBy: current.createdBy || state.user?.uid || "",
       updatedAt: serverTimestamp(),
@@ -4793,17 +4844,36 @@ async function saveBenefitFromForm(form) {
     const savedSnapshot = await get(benefitRef);
     const savedBenefit = savedSnapshot.val() || {};
     const savedPlans = benefitListFromValue(savedBenefit.planos);
-    const savedGallery = benefitPartnerImages(savedBenefit);
-    if (savedPlans.length !== Object.keys(plans).length || savedGallery.length !== gallery.length) {
+    const savedGallery = benefitGalleryImages(savedBenefit);
+    const expectedPlanIds = Object.keys(plans);
+    const plansConfirmed = savedPlans.length === expectedPlanIds.length
+      && expectedPlanIds.every((planId) => savedPlans.some((plan) => String(plan.id) === String(planId)));
+    const uniqueGallery = [...new Set(gallery)];
+    const galleryConfirmed = savedGallery.length === uniqueGallery.length
+      && uniqueGallery.every((url) => savedGallery.includes(url));
+    const logoConfirmed = !image || benefitPrimaryImage(savedBenefit) === image;
+    if (!plansConfirmed || !galleryConfirmed || !logoConfirmed) {
       throw new Error("O cadastro foi salvo, mas a conferência dos planos ou imagens não corresponde ao formulário. Tente novamente.");
     }
+    savedBenefitRecord = { id, ...savedBenefit };
+    const existingIndex = state.beneficios.findIndex((item) => item.id === id);
+    if (existingIndex >= 0) state.beneficios[existingIndex] = savedBenefitRecord;
+    else state.beneficios.push(savedBenefitRecord);
+    state.beneficios.sort((a, b) => Number(a.ordem || 0) - Number(b.ordem || 0) || String(a.parceiro || "").localeCompare(String(b.parceiro || ""), "pt-BR"));
     state.selectedBenefitId = "";
-    showToast(`Parceiro salvo com ${savedPlans.length} plano${savedPlans.length === 1 ? "" : "s"} e ${savedGallery.length} imagem${savedGallery.length === 1 ? "" : "ns"} na galeria.`);
+    benefitFormDirty = false;
+    const savedImageCount = benefitPartnerImages(savedBenefit).length;
+    showToast(`Parceiro salvo com ${savedPlans.length} plano${savedPlans.length === 1 ? "" : "s"} e ${savedImageCount} imagem${savedImageCount === 1 ? "" : "ns"}.`);
   } catch (error) {
     console.error(error);
     showToast(error.message || "Não foi possível salvar o parceiro.");
   } finally {
+    benefitSaveInProgress = false;
     setBusy(button, false);
+    if (savedBenefitRecord) {
+      benefitRealtimeRenderPending = false;
+      renderBenefitsView();
+    }
   }
 }
 
@@ -5010,6 +5080,10 @@ async function markBenefitNotificationRead(id) {
 function bindBenefitsView() {
   const mount = $("benefitsMount");
   if (!mount) return;
+  const benefitForm = mount.querySelector("#benefitForm");
+  const markBenefitFormDirty = () => { benefitFormDirty = true; };
+  benefitForm?.addEventListener("input", markBenefitFormDirty);
+  benefitForm?.addEventListener("change", markBenefitFormDirty);
   const description = mount.querySelector("#benefitDescription");
   const count = mount.querySelector("#benefitDescriptionCount");
   const updateCount = () => { if (description && count) count.textContent = `${description.value.length}/1100`; };
@@ -5017,12 +5091,14 @@ function bindBenefitsView() {
   updateCount();
   const galleryUpload = mount.querySelector("#benefitGalleryUpload");
   galleryUpload?.addEventListener("change", () => {
+    benefitFormDirty = true;
     const selected = [...(galleryUpload.files || [])].slice(0, 12);
     const label = mount.querySelector("#benefitGallerySelection");
     if (label) label.textContent = selected.length ? `${selected.length} nova${selected.length === 1 ? " imagem selecionada" : "s imagens selecionadas"} para salvar.` : "Nenhuma nova imagem selecionada.";
   });
-  mount.querySelector("#benefitForm")?.addEventListener("submit", (event) => { event.preventDefault(); saveBenefitFromForm(event.currentTarget); });
+  benefitForm?.addEventListener("submit", (event) => { event.preventDefault(); saveBenefitFromForm(event.currentTarget); });
   mount.querySelector("[data-benefit-plan-add]")?.addEventListener("click", () => {
+    benefitFormDirty = true;
     mount.querySelector("#benefitPlansEditor")?.insertAdjacentHTML("beforeend", renderBenefitPlanEditor({}, mount.querySelectorAll("[data-benefit-plan-row]").length));
   });
   mount.addEventListener("click", async (event) => {
@@ -5040,6 +5116,7 @@ function bindBenefitsView() {
     }
     const edit = event.target.closest("[data-benefit-edit]");
     if (edit) {
+      benefitFormDirty = false;
       state.selectedBenefitId = edit.dataset.benefitEdit || "";
       state.selectedBenefitDetailId = "";
       renderBenefitsView();
@@ -5047,19 +5124,24 @@ function bindBenefitsView() {
       return;
     }
     if (event.target.closest("[data-benefit-new]")) {
+      benefitFormDirty = false;
       state.selectedBenefitId = "";
       renderBenefitsView();
       return;
     }
     const removePlan = event.target.closest("[data-benefit-plan-remove]");
     if (removePlan) {
+      benefitFormDirty = true;
       removePlan.closest("[data-benefit-plan-row]")?.remove();
       return;
     }
     const galleryButton = event.target.closest("[data-benefit-gallery-image]");
     if (galleryButton) {
       const main = mount.querySelector("[data-benefit-main-image]");
-      if (main) main.src = galleryButton.dataset.benefitGalleryImage;
+      if (main) {
+        main.src = galleryButton.dataset.benefitGalleryImage;
+        main.parentElement?.classList.toggle("is-logo", galleryButton.dataset.benefitGalleryLogo === "true");
+      }
       mount.querySelectorAll("[data-benefit-gallery-image]").forEach((button) => button.classList.toggle("active", button === galleryButton));
       return;
     }
@@ -5118,7 +5200,7 @@ function renderPartnerBenefitsArea() {
   const active = requests.filter((item) => item.status === "beneficiario_ativo").length;
   mount.innerHTML = `
     ${renderBenefitNotifications()}
-    <section class="benefit-partner-hero"><div>${partner.imagem ? `<img data-benefit-logo-auto src="${escapeAttr(partner.imagem)}" alt="${escapeAttr(partner.parceiro || "")}">` : `<i class="fa-solid fa-handshake"></i>`}<span><small>Área exclusiva do parceiro</small><h2>${escapeHtml(partner.parceiro || "")}</h2><p>${escapeHtml(partner.titulo || "")}</p></span></div>${isMaster() ? `<select id="masterPartnerAreaSelect">${state.beneficios.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === partnerId ? "selected" : ""}>${escapeHtml(item.parceiro || item.id)}</option>`).join("")}</select>` : ""}</section>
+    <section class="benefit-partner-hero"><div>${benefitPrimaryImage(partner) ? `<img data-benefit-logo-auto src="${escapeAttr(benefitPrimaryImage(partner))}" alt="${escapeAttr(partner.parceiro || "")}">` : `<i class="fa-solid fa-handshake"></i>`}<span><small>Área exclusiva do parceiro</small><h2>${escapeHtml(partner.parceiro || "")}</h2><p>${escapeHtml(partner.titulo || "")}</p></span></div>${isMaster() ? `<select id="masterPartnerAreaSelect">${state.beneficios.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === partnerId ? "selected" : ""}>${escapeHtml(item.parceiro || item.id)}</option>`).join("")}</select>` : ""}</section>
     <div class="stats-grid benefit-report-stats"><article class="stat-card"><span>Solicitações</span><strong>${requests.length}</strong><small>Recebidas</small></article><article class="stat-card"><span>Aguardando análise</span><strong>${requests.filter((item) => ["aguardando_analise", "solicitado"].includes(item.status)).length}</strong><small>Precisam de atendimento</small></article><article class="stat-card"><span>Beneficiários ativos</span><strong>${active}</strong><small>Clientes vinculados</small></article><article class="stat-card"><span>Dúvidas</span><strong>${questions.filter((item) => item.status !== "finalizada").length}</strong><small>Em atendimento</small></article></div>
     <section class="panel-card"><div class="section-head"><div><span class="feature-kicker">Solicitações recebidas</span><h2>Atendimento dos clientes</h2></div></div><div class="partner-request-list">${requests.length ? requests.map(renderPartnerRequestCard).join("") : `<p class="list-meta">Nenhuma solicitação recebida.</p>`}</div></section>
     <section class="panel-card"><div class="section-head"><div><span class="feature-kicker">Dúvidas</span><h2>Mensagens dos clientes</h2></div></div><div class="partner-question-list">${questions.length ? questions.map(renderPartnerQuestionCard).join("") : `<p class="list-meta">Nenhuma dúvida recebida.</p>`}</div></section>
