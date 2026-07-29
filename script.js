@@ -4438,6 +4438,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const nome = ev.name || "Evento";
       const data = dataEventoPublicoFormatada(ev);
       const endereco = ev.address || "";
+      const instagramEvento = ev.instagram || ev.linkEvento || ev.link || ev.url || "";
 
       card.innerHTML = `
       <div class="card-divulgacao-img-wrap">
@@ -4450,8 +4451,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <span class="card-divulgacao-categoria">Evento</span>
         <div class="card-divulgacao-linha">
           <h4>${nome}</h4>
-          ${ev.instagram
-          ? `<a href="${fixInstagramUrl(ev.instagram)}" class="card-divulgacao-ig-btn"
+          ${instagramEvento
+          ? `<a href="${escapePromoHtml(fixInstagramUrl(instagramEvento))}" class="card-divulgacao-ig-btn"
                          aria-label="Abrir Instagram do evento"
                          target="_blank" rel="noopener noreferrer">
                    <i class="fa-brands fa-instagram"></i>
@@ -4478,7 +4479,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Clique no ícone do Instagram → abre o Insta sem disparar o clique do card
       const igBtn = card.querySelector(".card-divulgacao-ig-btn");
-      if (igBtn && ev.instagram) {
+      if (igBtn && instagramEvento) {
         igBtn.addEventListener("click", (e) => {
           e.stopPropagation();
 
@@ -5716,13 +5717,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function normalizarEventoFirebasePublico(evento, id) {
     const data = dataEventoPublico(evento);
+    const linkRedeSocial = evento.instagram || evento.linkEvento || evento.link || evento.url || "";
     return {
       id,
       image: evento.imagem || evento.image || "",
       name: evento.titulo || evento.nome || evento.name || "Evento",
       date: data,
       address: evento.local || evento.address || "",
-      instagram: evento.instagram || "",
+      instagram: linkRedeSocial,
       linkEvento: evento.linkEvento || evento.link || evento.url || "",
       contatosDetalhados: Array.isArray(evento.contatosDetalhados) ? evento.contatosDetalhados.slice(0, 3) : [],
       contatos: Array.isArray(evento.contatos) ? evento.contatos.slice(0, 3) : [],
@@ -23891,27 +23893,6 @@ ${!establishment.descricaoFalecido ? `
           </div>
         ` : ""
         }
-
-        ${establishment.linkEvento ? `
-          <div class="info-box">
-            <i class="fas fa-arrow-up-right-from-square info-icon evento-link-icon"></i>
-            <div>
-              <div class="info-label">Link do evento</div>
-              <div class="info-value">
-                <a class="evento-link-publico"
-                   href="${escapePromoHtml(fixUrl(establishment.linkEvento))}"
-                   target="_blank"
-                   rel="noopener noreferrer">
-                  <i class="fa-solid fa-link"></i>
-                  Acessar página do evento
-                </a>
-              </div>
-            </div>
-          </div>` : ""
-        }
-
-
-
 
         ${getContatosDetalhadosEstabelecimento(establishment).length ? (() => {
           const contatos = getContatosDetalhadosEstabelecimento(establishment);

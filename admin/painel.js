@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 527,
-  label: "v534",
+  numero: 528,
+  label: "v535",
   data: "2026-07-29",
-  nota: "Filtro publico de tipos de automoveis unificado com as opcoes do cadastro administrativo."
+  nota: "Link cadastrado nos eventos integrado ao Instagram dos detalhes e dos cards publicos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8985,7 +8985,7 @@ function fillEventForm(evento) {
   $("eventPlace").value = evento.local || "";
   $("eventStatus").value = evento.status || "ativo";
   $("eventImage").value = evento.imagem || "";
-  $("eventLink").value = evento.linkEvento || evento.link || evento.url || "";
+  $("eventLink").value = evento.instagram || evento.linkEvento || evento.link || evento.url || "";
   const contatos = normalizeClientContactDetails(evento);
   [1, 2, 3].forEach((position) => {
     const contato = contatos[position - 1] || {};
@@ -9020,6 +9020,7 @@ function getEventFormData() {
     whatsapp: Boolean($(`eventContact${position}IsWhatsapp`).checked)
   })).filter((item) => item.numero);
   const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
+  const linkInstagram = normalizeEventExternalUrl($("eventLink").value);
   return {
     id: $("eventId").value || `${slugify(title)}-${Date.now()}`,
     titulo: title,
@@ -9030,7 +9031,8 @@ function getEventFormData() {
     local: $("eventPlace").value.trim(),
     status: $("eventStatus").value,
     imagem: $("eventImage").value.trim(),
-    linkEvento: normalizeEventExternalUrl($("eventLink").value),
+    instagram: linkInstagram,
+    linkEvento: linkInstagram,
     contatosDetalhados,
     contatos: contatosDetalhados.map((item) => item.numero),
     contato: contatosDetalhados[0]?.numero || "",
@@ -9062,7 +9064,7 @@ function renderEventsList() {
   box.innerHTML = list.map((evento) => {
     const realizado = eventAlreadyDone(evento);
     const contatos = normalizeClientContactDetails(evento);
-    const linkEvento = normalizeEventExternalUrl(evento.linkEvento || evento.link || evento.url || "");
+    const linkEvento = normalizeEventExternalUrl(evento.instagram || evento.linkEvento || evento.link || evento.url || "");
     return `
     <article class="list-card event-card${realizado ? " event-card-done" : ""}">
       ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
@@ -9072,7 +9074,7 @@ function renderEventsList() {
       <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.origem === "script.js" ? "Base inicial" : "Firebase")}</div>
       <div class="list-meta">${escapeHtml(evento.local || "Sem local")}</div>
       ${contatos.length ? `<div class="list-meta"><i class="fa-solid fa-phone"></i> ${contatos.map((contato) => `${escapeHtml(contato.referencia || "Contato")}: ${escapeHtml(contato.numero)}${contato.whatsapp ? " (WhatsApp)" : ""}`).join(" · ")}</div>` : ""}
-      ${linkEvento ? `<a class="ghost-button" href="${escapeAttr(linkEvento)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir link do evento</a>` : ""}
+      ${linkEvento ? `<a class="ghost-button" href="${escapeAttr(linkEvento)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-instagram"></i> Abrir Instagram</a>` : ""}
       <span class="badge ${escapeAttr(evento.status || "ativo")}">${eventStatusLabel(evento.status)}</span>
       <button type="button" data-edit-event="${escapeAttr(evento.id)}">Editar</button>
     </article>
