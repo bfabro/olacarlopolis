@@ -43,10 +43,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 520,
-  label: "v527",
+  numero: 521,
+  label: "v528",
   data: "2026-07-28",
-  nota: "Valores pagos separados entre planos mensais, semestrais e anuais no relatorio financeiro."
+  nota: "Relatorio de acessos repaginado, com filtros atualizados, cards por periodo e secoes retrateis."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -14569,13 +14569,19 @@ function renderUserActionReport(mount, periodRange) {
   `;
 }
 
-async function applyFinanceReportFilter(sourceButton, updatePeriod) {
-  const finish = beginAdminActionLoading("Carregando informações do período...", sourceButton);
-  showAdminActionLoading("Carregando informações do período...", sourceButton);
+async function applyReportFilterWithLoading(sourceButton, reportType, updatePeriod) {
+  const message = reportType === "access"
+    ? "Atualizando acessos do período..."
+    : "Carregando informações do período...";
+  const finish = beginAdminActionLoading(message, sourceButton);
+  showAdminActionLoading(message, sourceButton);
   try {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     updatePeriod();
-    renderReports("finance");
+    if (reportType === "access" && isMaster()) {
+      await refreshMasterAccessMetrics({ render: false });
+    }
+    renderReports(reportType);
     await new Promise((resolve) => requestAnimationFrame(resolve));
   } finally {
     finish();
@@ -14584,7 +14590,7 @@ async function applyFinanceReportFilter(sourceButton, updatePeriod) {
 
 let accessMetricsRefreshPromise = null;
 
-async function refreshMasterAccessMetrics({ notify = false } = {}) {
+async function refreshMasterAccessMetrics({ notify = false, render = true } = {}) {
   if (!isMaster()) return;
   if (accessMetricsRefreshPromise) return accessMetricsRefreshPromise;
   const paths = {
@@ -14618,7 +14624,7 @@ async function refreshMasterAccessMetrics({ notify = false } = {}) {
       state.metricas[key] = value;
       updated += 1;
     });
-    if (!$("relatorioAcessosView")?.classList.contains("hidden")) renderReports("access");
+    if (render && !$("relatorioAcessosView")?.classList.contains("hidden")) renderReports("access");
     if (notify) showToast(updated ? "Relatorio de acessos atualizado." : "Nao foi possivel atualizar o relatorio.");
   })().finally(() => {
     accessMetricsRefreshPromise = null;
@@ -14636,14 +14642,9 @@ function bindReportControls(mount) {
   });
   mount.querySelectorAll("[data-report-period]").forEach((button) => {
     button.addEventListener("click", async () => {
-      if (isFinanceReport) {
-        await applyFinanceReportFilter(button, () => {
-          state.reportPeriod.type = button.dataset.reportPeriod;
-        });
-        return;
-      }
-      state.reportPeriod.type = button.dataset.reportPeriod;
-      renderReports();
+      await applyReportFilterWithLoading(button, isFinanceReport ? "finance" : "access", () => {
+        state.reportPeriod.type = button.dataset.reportPeriod;
+      });
     });
   });
   mount.querySelectorAll("[data-finance-report-toggle]").forEach((button) => {
@@ -14792,6 +14793,12 @@ function renderReports(reportType = "") {
   const generalClickReport = buildGeneralClickRows(cliquesBotoes.detalhes);
   const ondeComerClickRows = buildOndeComerClickRows(cliquesOndeComerCardapios, cliquesOndeComerWhats, cliquesOndeComerFotos);
   const newsClickRows = buildNewsClickRows(state.metricas, periodRange);
+  const totalMenuClicks = totalMetricMap(cliquesMenu);
+  const totalButtonClicks = totalMetricMap(cliquesBotoes.porTipo);
+  const totalOndeComerInteractions = totalMetricMap(cliquesOndeComerCardapios)
+    + totalMetricMap(cliquesOndeComerWhats)
+    + totalMetricMap(cliquesOndeComerFotos);
+  const totalPromotionInteractions = totalMetricMap(cliquesPromocoes);
 
   const clientesAtencao = reportClients
     .filter((client) => client.status !== "inativo" && isBillableClientType(client))
@@ -14862,10 +14869,12 @@ function renderReports(reportType = "") {
         ${renderFinanceStatCard("Com comprovante", String(financeReceiptRows.length), "Faturas com arquivo anexado", periodRange.label)}
         ${renderFinanceStatCard("Clientes faturados", String(financeClientCount), `${reportPercent(financeClientCount, financeBaseClients.length)} da base financeira`, periodRange.label)}
       ` : `
-        <article class="stat-card is-primary" data-report-period="${escapeAttr(periodRange.label)}"><span>Acessos no site</span><strong>${totalAcessos}</strong><small>Total consolidado de todos os meios</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Site e outros canais</span><strong>${acessosConsolidados.siteOutros}</strong><small>Navegador, links e redes sociais</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Uso via PWA</span><strong>${usoPWA}</strong><small>Acessos pelo aplicativo</small></article>
-        <article class="stat-card" data-report-period="${escapeAttr(periodRange.label)}"><span>Instalacoes PWA</span><strong>${instalacoesPWA}</strong><small>Novas instalacoes, nao acessos</small></article>
+        ${renderFinanceStatCard("Acessos no site (consolidado)", String(totalAcessos), "Todos os meios de acesso somados sem duplicidade", periodRange.label, "primary")}
+        ${renderFinanceStatCard("Site e outros canais", String(acessosConsolidados.siteOutros), "Navegador, links e redes sociais", periodRange.label)}
+        ${renderFinanceStatCard("Uso via PWA", String(usoPWA), "Acessos realizados pelo aplicativo instalado", periodRange.label, "success")}
+        ${renderFinanceStatCard("Instalações PWA", String(instalacoesPWA), "Novas instalações; não entram no total de acessos", periodRange.label, "annual")}
+        ${renderFinanceStatCard("Cliques no menu lateral", String(totalMenuClicks), "Navegação entre as áreas públicas", periodRange.label, "review")}
+        ${renderFinanceStatCard("Interações nos clientes", String(totalButtonClicks), "Cliques em botões de estabelecimentos e serviços", periodRange.label, "warning")}
       `}
     </div>
 
@@ -14881,85 +14890,88 @@ function renderReports(reportType = "") {
         </div>
       `, true) : ""}
 
-      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Mais acessados por comercio", periodRange)}
-        ${renderReportList(topFromMap(cliquesBotoes.porCliente, 12), "Ainda nao ha cliques de comercio registrados.")}
-      </section>
-
-      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Cliques por estabelecimento/servico", periodRange)}
-        ${renderClickReportTable(generalClickReport.rows, generalClickReport.types, "Ainda nao ha cliques por estabelecimento ou servico.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Cliques por botao", periodRange)}
-        ${renderReportList(topFromMap(cliquesBotoes.porTipo, 12), "Ainda nao ha cliques por botao registrados.")}
-      </section>
-
-      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Cliques nas noticias da cidade", periodRange)}
-        <p class="list-meta">Mostra visualizacoes, compartilhamentos, WhatsApp e acessos para a materia oficial de cada noticia.</p>
-        ${renderNewsClickReportTable(newsClickRows, "Ainda nao ha cliques em noticias registrados neste periodo.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Cidades dos acessos", periodRange)}
-        ${renderReportList(topFromMap(cidadesAcesso, 12, "acesso", "acessos"), "Ainda nao ha dados de cidade nos acessos.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Meios de acesso", periodRange)}
-        ${renderReportList(topFromMap(origensAcesso, 12, "acesso", "acessos"), "Ainda nao ha origem de acesso registrada.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Menu lateral", periodRange)}
-        <div class="report-kpis">
-          <span>Total de cliques: <strong>${totalMetricMap(cliquesMenu)}</strong></span>
+      ${isFinanceReport ? "" : renderFinanceReportSection("origem-localizacao", "Origem e localização dos acessos", periodRange, `
+        <div class="access-report-columns">
+          <section class="access-report-subsection">
+            <h3><i class="fa-solid fa-share-nodes"></i> Meios de acesso</h3>
+            <p>Identifica por qual canal as pessoas chegaram ao portal.</p>
+            ${renderReportList(topFromMap(origensAcesso, 12, "acesso", "acessos"), "Ainda não há origem de acesso registrada.")}
+          </section>
+          <section class="access-report-subsection">
+            <h3><i class="fa-solid fa-location-dot"></i> Cidades dos acessos</h3>
+            <p>Localização informada nos registros de acesso disponíveis.</p>
+            ${renderReportList(topFromMap(cidadesAcesso, 12, "acesso", "acessos"), "Ainda não há dados de cidade nos acessos.")}
+          </section>
         </div>
-        ${renderReportList(topFromMap(cliquesMenu, 12), "Ainda nao ha cliques de menu registrados.")}
-      </section>
+      `, true)}
 
-      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Onde Comer", periodRange)}
-        <div class="report-kpis">
-          <span>Aberturas da tela: <strong>${aberturasOndeComer}</strong></span>
-          <span>Cardapios: <strong>${totalMetricMap(cliquesOndeComerCardapios)}</strong></span>
-          <span>WhatsApp: <strong>${totalMetricMap(cliquesOndeComerWhats)}</strong></span>
-          <span>Fotos: <strong>${totalMetricMap(cliquesOndeComerFotos)}</strong></span>
+      ${isFinanceReport ? "" : renderFinanceReportSection("menu-lateral", "Navegação pelo menu lateral", periodRange, `
+        <div class="access-report-kpi-strip">
+          <article><span>Total de cliques</span><strong>${totalMenuClicks}</strong><small>Soma das opções acessadas no menu</small></article>
+          <article><span>Onde Comer</span><strong>${aberturasOndeComer}</strong><small>Aberturas registradas pelo menu</small></article>
+          <article><span>Promoções</span><strong>${aberturasPromocoes}</strong><small>Aberturas registradas pelo menu</small></article>
         </div>
-        ${renderReportList(topFromMap(cliquesOndeComerWhats, 8), aberturasOndeComer ? "Ainda nao ha interacoes com os estabelecimentos." : "Ainda nao ha cliques no Onde Comer.")}
-      </section>
+        ${renderReportList(topFromMap(cliquesMenu, 16), "Ainda não há cliques de menu registrados.")}
+      `, true)}
 
-      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Cliques por estabelecimento - Onde Comer", periodRange)}
-        ${renderClickReportTable(ondeComerClickRows, ["whatsapp", "cardapio", "fotos"], "Ainda nao ha cliques no Onde Comer.")}
-      </section>
-
-      <section class="panel-card report-card ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Promocoes", periodRange)}
-        <div class="report-kpis">
-          <span>Aberturas da tela: <strong>${aberturasPromocoes}</strong></span>
-          <span>Interacoes com ofertas: <strong>${totalMetricMap(cliquesPromocoes)}</strong></span>
+      ${isFinanceReport ? "" : renderFinanceReportSection("estabelecimentos-servicos", "Estabelecimentos e serviços", periodRange, `
+        <div class="access-report-columns">
+          <section class="access-report-subsection">
+            <h3><i class="fa-solid fa-ranking-star"></i> Mais acessados</h3>
+            <p>Clientes com maior número de interações no período.</p>
+            ${renderReportList(topFromMap(cliquesBotoes.porCliente, 12), "Ainda não há cliques de estabelecimentos registrados.")}
+          </section>
+          <section class="access-report-subsection">
+            <h3><i class="fa-solid fa-arrow-pointer"></i> Botões mais usados</h3>
+            <p>Distribuição das interações por tipo de botão.</p>
+            ${renderReportList(topFromMap(cliquesBotoes.porTipo, 12), "Ainda não há cliques por botão registrados.")}
+          </section>
         </div>
-        ${renderReportList(topFromMap(cliquesPromocoes, 12), aberturasPromocoes ? "Ainda nao ha interacoes com as ofertas." : "Ainda nao ha cliques em promocoes registrados.")}
-      </section>
+        <div class="access-report-detail-block">
+          <h3>Detalhamento por estabelecimento ou serviço</h3>
+          ${renderClickReportTable(generalClickReport.rows, generalClickReport.types, "Ainda não há cliques por estabelecimento ou serviço.")}
+        </div>
+      `, true)}
 
-      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Horarios dos cliques dos cards", periodRange)}
-        ${renderTimelineTable(clickTimeline, "Ainda nao ha horarios detalhados de cliques neste periodo.")}
-      </section>
+      ${isFinanceReport ? "" : renderFinanceReportSection("onde-comer", "Onde Comer", periodRange, `
+        <div class="access-report-kpi-strip">
+          <article><span>Aberturas da tela</span><strong>${aberturasOndeComer}</strong><small>Entradas pelo menu lateral</small></article>
+          <article><span>Cardápios</span><strong>${totalMetricMap(cliquesOndeComerCardapios)}</strong><small>Visualizações de cardápio</small></article>
+          <article><span>WhatsApp</span><strong>${totalMetricMap(cliquesOndeComerWhats)}</strong><small>Intenções de contato</small></article>
+          <article><span>Fotos</span><strong>${totalMetricMap(cliquesOndeComerFotos)}</strong><small>Visualizações de fotos</small></article>
+          <article><span>Total de interações</span><strong>${totalOndeComerInteractions}</strong><small>Cardápios, WhatsApp e fotos</small></article>
+        </div>
+        ${renderClickReportTable(ondeComerClickRows, ["whatsapp", "cardapio", "fotos"], "Ainda não há cliques no Onde Comer.")}
+      `, true)}
 
-      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Acessos por imovel e veiculo", periodRange)}
-        <p class="list-meta">Visualizacoes, WhatsApp e fotos separados pelo codigo de referencia do anuncio.</p>
-        ${renderItemAccessTable(itemAccessRows, "Ainda nao ha acessos em imoveis ou veiculos neste periodo.")}
-      </section>
+      ${isFinanceReport ? "" : renderFinanceReportSection("promocoes", "Promoções", periodRange, `
+        <div class="access-report-kpi-strip">
+          <article><span>Aberturas da tela</span><strong>${aberturasPromocoes}</strong><small>Entradas pelo menu lateral</small></article>
+          <article><span>Interações com ofertas</span><strong>${totalPromotionInteractions}</strong><small>Cliques atribuídos às promoções</small></article>
+        </div>
+        ${renderReportList(topFromMap(cliquesPromocoes, 16), aberturasPromocoes ? "Ainda não há interações com as ofertas." : "Ainda não há cliques em promoções registrados.")}
+      `, true)}
 
-      <section class="panel-card report-card report-wide ${isFinanceReport ? "hidden" : ""}">
-        ${renderReportCardHeader("Horarios e origem dos acessos", periodRange)}
-        ${renderTimelineTable(accessTimeline, "Ainda nao ha acessos detalhados neste periodo.", "access")}
-      </section>
+      ${isFinanceReport ? "" : renderFinanceReportSection("noticias", "Notícias da cidade", periodRange, `
+        <p class="list-meta">Visualizações, compartilhamentos, WhatsApp e acessos à matéria oficial de cada notícia.</p>
+        ${renderNewsClickReportTable(newsClickRows, "Ainda não há cliques em notícias registrados neste período.")}
+      `, true)}
+
+      ${isFinanceReport ? "" : renderFinanceReportSection("imoveis-veiculos", "Imóveis e veículos", periodRange, `
+        <p class="list-meta">Visualizações, WhatsApp e fotos separados pelo código de referência de cada anúncio.</p>
+        ${renderItemAccessTable(itemAccessRows, "Ainda não há acessos em imóveis ou veículos neste período.")}
+      `, true)}
+
+      ${isFinanceReport ? "" : renderFinanceReportSection("linha-tempo", "Horários e linha do tempo", periodRange, `
+        <div class="access-report-detail-block">
+          <h3>Horários dos cliques nos cards</h3>
+          ${renderTimelineTable(clickTimeline, "Ainda não há horários detalhados de cliques neste período.")}
+        </div>
+        <div class="access-report-detail-block">
+          <h3>Horários e origem dos acessos</h3>
+          ${renderTimelineTable(accessTimeline, "Ainda não há acessos detalhados neste período.", "access")}
+        </div>
+      `, true)}
 
       ${isFinanceReport ? renderFinanceReportSection(
         "clientes-atencao",
@@ -14986,12 +14998,7 @@ function renderReports(reportType = "") {
       state.reportPeriod.start = mount.querySelector("[data-report-start-date]")?.value || "";
       state.reportPeriod.end = mount.querySelector("[data-report-end-date]")?.value || state.reportPeriod.start;
     };
-    if (isFinanceReport) {
-      await applyFinanceReportFilter(event.currentTarget, applyRange);
-      return;
-    }
-    applyRange();
-    renderReports("access");
+    await applyReportFilterWithLoading(event.currentTarget, isFinanceReport ? "finance" : "access", applyRange);
   });
 }
 
