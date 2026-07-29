@@ -12414,6 +12414,57 @@ plotarPinsImoveis(stateImoveis.filtered);
     "Outro"
   ];
 
+  const MARCAS_AUTOMOVEIS_PUBLICOS = {
+    carros: `ABARTH|ACURA|AGRALE|ALFA ROMEO|AM GEN|ASIA MOTORS|ASTON MARTIN|AUDI|BABY|BMW|BRM|BUGRE|BYD|CAB MOTORS|CADILLAC|CAOA CHERY|CBT JIPE|CHANA|CHANGAN|CHRYSLER|CITROËN|CROSS LANDER|DAEWOO|DAIHATSU|DODGE|EFFA|ENGESA|ENVEMO|FERRARI|FIAT|FIBRAVAN|FORD|FOTON|FYBER|GEELY|GM - CHEVROLET|GURGEL|GWM|HAFEI|HONDA|HYUNDAI|ISUZU|IVECO|JAC|JAGUAR|JEEP|JINBEI|JPX|KIA MOTORS|LADA|LAMBORGHINI|LAND ROVER|LEXUS|LIFAN|LOBINI|LOTUS|MAHINDRA|MASERATI|MATRA|MAZDA|MCLAREN|MERCEDES-BENZ|MERCURY|MG|MINI|MITSUBISHI|MIURA|NISSAN|PEUGEOT|PLYMOUTH|PONTIAC|PORSCHE|RAM|RELY|RENAULT|ROLLS-ROYCE|ROVER|SAAB|SATURN|SEAT|SHINERAY|SMART|SSANGYONG|SUBARU|SUZUKI|TAC|TOYOTA|TROLLER|VOLVO|VW - VOLKSWAGEN|WAKE|WALK`.split("|"),
+    motos: `ADLY|AGRALE|AMAZONAS|APRILIA|ATALA|AVELLOZ|BAJAJ|BEE|BETA|BIMOTA|BMW|BRANDY|BRAVA|BRP|BUELL|BUENO|BULL|BENELLI|CAGIVA|CALOI|CFMOTO|DAELIM|DAFRA|DAYANG|DAYUN|DERBI|DUCATI|EMME|FEVER|FOX|FUSCO MOTOSEGURA|FYM|GARINNI|GAS GAS|GREEN|HAOBAO|HAOJUE|HARLEY-DAVIDSON|HARTFORD|HERO|HONDA|HUSABERG|HUSQVARNA|HISUN|INDIAN|IROS|JIAPENG VOLCANO|JOHNNYPAG|JONNY|KAHENA|KASINSKI|KAWASAKI|KTM|KYMCO|L'AQUILA|LANDUM|LAVRALE|LERIVO|LEVA|LIFAN|LON-V|MAGRÃO TRICICLOS|MIZA|MOTO GUZZI|MOTOCAR|MOTOMORINI|MOTORINO|MRX|MV AGUSTA|MVK|MALAGUTI|MOBÍLLI|NIU|ORCA|PEGASSI|PEUGEOT|PIAGGIO|POLARIS|REGAL RAPTOR|RIGUETE|ROYAL ENFIELD|SANYANG|SBM|SHINERAY|SIAMOTO|SUNDOWN|SUPER SOCO|SUZUKI|SWM|TARGOS|TIGER|TRAXX|TRIUMPH|VENTO|VESPA|VOLTZ|VENTANE MOTORS|WATTS|WUYANG|YAMAHA|ZONTES|BYCRISTO`.split("|"),
+    pesados: `AGRALE|ARROW|BEPOBUS|CHEVROLET|CICCOBUS|DAF|EFFA-JMC|FIAT|FORD|FOTON|GMC|HYUNDAI|IVECO|JAC|MAN|MARCOPOLO|MASCARELLO|MAXIBUS|MERCEDES-BENZ|NAVISTAR|NEOBUS|PUMA-ALFA|SAAB-SCANIA|SCANIA|SHACMAN|SINOTRUK|VOLKSWAGEN|VOLVO|WALKBUS`.split("|")
+  };
+
+  function categoriaMarcaAutomovelPublico(tipo = "") {
+    const normalizado = normalizarTextoAutomoveis(tipo);
+    if (/(moto|scooter|triciclo|quadriciclo)/.test(normalizado)) return "motos";
+    if (/(caminhao|onibus|micro.?onibus)/.test(normalizado)) return "pesados";
+    if (normalizado === "outro") return "";
+    return normalizado ? "carros" : "";
+  }
+
+  function chaveMarcaAutomovelPublico(valor = "") {
+    return normalizarTextoAutomoveis(valor).replace(/[^a-z0-9]+/g, "");
+  }
+
+  function marcasOficiaisAutomovelPublico(tipo = "") {
+    const categoria = categoriaMarcaAutomovelPublico(tipo);
+    if (categoria) return MARCAS_AUTOMOVEIS_PUBLICOS[categoria] || [];
+    if (normalizarTextoAutomoveis(tipo) === "outro") return [];
+    return [...new Set(Object.values(MARCAS_AUTOMOVEIS_PUBLICOS).flat())]
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+  }
+
+  function marcaOficialAutomovelPublico(marca = "", tipo = "") {
+    const chave = chaveMarcaAutomovelPublico(marca);
+    if (!chave) return "";
+    const marcas = marcasOficiaisAutomovelPublico(tipo);
+    const encontrada = marcas.find((opcao) => chaveMarcaAutomovelPublico(opcao) === chave);
+    if (encontrada) return encontrada;
+    const categoria = categoriaMarcaAutomovelPublico(tipo);
+    const aliases = {
+      carros: {
+        chevrolet: "GM - CHEVROLET",
+        gm: "GM - CHEVROLET",
+        volkswagen: "VW - VOLKSWAGEN",
+        vw: "VW - VOLKSWAGEN",
+        chery: "CAOA CHERY",
+        kia: "KIA MOTORS"
+      }
+    };
+    return aliases[categoria]?.[chave] || "";
+  }
+
+  function normalizarMarcaAutomovelPublico(marca = "", tipo = "") {
+    const original = String(marca || "").trim();
+    return marcaOficialAutomovelPublico(original, tipo) || original;
+  }
+
   function normalizarTipoAutomovelPublico(valor) {
     const tipoOriginal = String(valor || "").trim();
     if (!tipoOriginal) return "";
@@ -12433,10 +12484,12 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function automovelDeRegistro(item, key) {
+    const tipo = normalizarTipoAutomovelPublico(item.Tipo || item.tipo || item.categoria || "");
+    const marca = normalizarMarcaAutomovelPublico(item.Marca || item.marca || "", tipo);
     return {
       id: key || item.id || "",
-      tipo: normalizarTipoAutomovelPublico(item.Tipo || item.tipo || item.categoria || ""),
-      marca: item.Marca || item.marca || "",
+      tipo,
+      marca,
       modelo: item.Modelo || item.modelo || item.titulo || item.Titulo || "",
       ano: item.Ano || item.ano || "",
       createdAt: item.createdAt || item.criadoEm || item.dataCriacao || "",
@@ -13094,6 +13147,18 @@ plotarPinsImoveis(stateImoveis.filtered);
       el.innerHTML = primeiraOpcao + opcoesAutomoveis(lista, campo);
     };
 
+    const preencherFiltroMarca = (preservarAtual = true) => {
+      const filtroMarca = document.getElementById("autoFiltroMarca");
+      if (!filtroMarca) return;
+      const marcaAtual = preservarAtual ? filtroMarca.value : "";
+      const tipoAtual = document.getElementById("autoFiltroTipo")?.value || "";
+      const marcas = marcasOficiaisAutomovelPublico(tipoAtual);
+      filtroMarca.innerHTML = `<option value="">Todas</option>` + marcas
+        .map((marca) => `<option value="${textoSeguroAutomoveis(marca)}">${textoSeguroAutomoveis(marca)}</option>`)
+        .join("") + `<option value="Outra marca">Outra marca</option>`;
+      filtroMarca.value = [...filtroMarca.options].some((option) => option.value === marcaAtual) ? marcaAtual : "";
+    };
+
     const preencherFiltros = () => {
       const filtroTipo = document.getElementById("autoFiltroTipo");
       if (filtroTipo) {
@@ -13102,7 +13167,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           .map((tipo) => `<option value="${textoSeguroAutomoveis(tipo)}">${textoSeguroAutomoveis(tipo)}</option>`)
           .join("");
       }
-      preencherSelect("autoFiltroMarca", "marca");
+      preencherFiltroMarca();
       preencherSelect("autoFiltroModelo", "modelo");
       preencherSelect("autoFiltroCondicao", "condicao");
       preencherSelect("autoFiltroCombustivel", "combustivel");
@@ -13152,7 +13217,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       const filtrados = lista.filter((item) => {
         const hay = normalizarTextoAutomoveis(`${item.tipo} ${item.marca} ${item.modelo} ${item.ano} ${item.preco} ${item.vendedor || item.loja} ${item.condicao} ${item.km} ${item.combustivel} ${item.cambio} ${item.cor} ${item.cidade} ${item.opcionais} ${item.descricao}`);
         if (filtros.tipo && item.tipo !== filtros.tipo) return false;
-        if (filtros.marca && item.marca !== filtros.marca) return false;
+        if (filtros.marca) {
+          const marcaOficial = marcaOficialAutomovelPublico(item.marca, item.tipo);
+          if (filtros.marca === "Outra marca" ? Boolean(marcaOficial) : marcaOficial !== filtros.marca) return false;
+        }
         if (filtros.modelo && item.modelo !== filtros.modelo) return false;
         if (filtros.ano && !normalizarTextoAutomoveis(item.ano).includes(filtros.ano)) return false;
         if (filtros.valor && numeroAutomoveis(item.preco) > filtros.valor) return false;
@@ -13172,6 +13240,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       const expanded = filtroBox?.classList.toggle("auto-filter-collapsed") === false;
       toggleFiltros.setAttribute("aria-expanded", expanded ? "true" : "false");
     });
+    document.getElementById("autoFiltroTipo")?.addEventListener("change", () => preencherFiltroMarca(false));
     document.getElementById("autoModoCards")?.addEventListener("change", aplicarModoCards);
     document.querySelectorAll("#filtrosAutomoveis input:not(#autoModoCards), #filtrosAutomoveis select").forEach((el) => {
       el.addEventListener("input", aplicar);

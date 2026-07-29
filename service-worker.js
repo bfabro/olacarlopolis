@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-07-29-eventos-instagram-v581'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-07-29-filtro-marcas-automoveis-v582'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
