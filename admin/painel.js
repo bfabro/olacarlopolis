@@ -12,6 +12,9 @@ import {
   ref,
   get,
   query,
+  orderByKey,
+  startAt,
+  endAt,
   limitToLast,
   onValue,
   push,
@@ -43,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 521,
-  label: "v528",
+  numero: 522,
+  label: "v529",
   data: "2026-07-28",
-  nota: "Relatorio de acessos repaginado, com filtros atualizados, cards por periodo e secoes retrateis."
+  nota: "Relatorios otimizados com consultas por periodo, cache temporario e detalhes carregados sob demanda."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2571,20 +2574,20 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("jogos/xadrez/config"),
     getPanelSnapshot("auditoriaExclusoes", { enabled: isMaster() }),
-    getPanelSnapshot("cliquesPorBotao", { enabled: canManage }),
-    getPanelSnapshot("cliquesMenuLateral", { enabled: canManage }),
-    getPanelSnapshot("acessosPorDia", { enabled: canManage }),
-    getPanelSnapshot("cliquesCardapiosOndeComer", { enabled: canManage }),
-    getPanelSnapshot("cliquesWhatsOndeComer", { enabled: canManage }),
-    getPanelSnapshot("cliquesFotosOndeComer", { enabled: canManage }),
-    getPanelSnapshot("cliquesPromocoesPorComercio", { enabled: canManage }),
-    getPanelSnapshot("cliquesPorBotaoDetalhado", { enabled: canManage }),
-    getPanelSnapshot("cliquesOndeComerDetalhado", { enabled: canManage }),
-    getPanelSnapshot("cliquesPromocoesDetalhado", { enabled: canManage }),
-    getPanelSnapshot("cliquesPorMenu", { enabled: canManage }),
-    getPanelSnapshot("origemAcessos", { enabled: canManage }),
-    getPanelSnapshot("instalacoesPWA", { enabled: canManage }),
-    getPanelSnapshot("usoPWA", { enabled: canManage })
+    getPanelSnapshot("cliquesPorBotao", { enabled: false }),
+    getPanelSnapshot("cliquesMenuLateral", { enabled: false }),
+    getPanelSnapshot("acessosPorDia", { enabled: false }),
+    getPanelSnapshot("cliquesCardapiosOndeComer", { enabled: false }),
+    getPanelSnapshot("cliquesWhatsOndeComer", { enabled: false }),
+    getPanelSnapshot("cliquesFotosOndeComer", { enabled: false }),
+    getPanelSnapshot("cliquesPromocoesPorComercio", { enabled: false }),
+    getPanelSnapshot("cliquesPorBotaoDetalhado", { enabled: false }),
+    getPanelSnapshot("cliquesOndeComerDetalhado", { enabled: false }),
+    getPanelSnapshot("cliquesPromocoesDetalhado", { enabled: false }),
+    getPanelSnapshot("cliquesPorMenu", { enabled: false }),
+    getPanelSnapshot("origemAcessos", { enabled: false }),
+    getPanelSnapshot("instalacoesPWA", { enabled: false }),
+    getPanelSnapshot("usoPWA", { enabled: false })
   ]);
   const noticiasSnap = await getPanelSnapshot("noticias");
 
@@ -2771,7 +2774,14 @@ async function loadAllData(onProgress = null) {
     if ($("financeList")) $("financeList").innerHTML = `<div class="list-meta">Nao foi possivel montar o financeiro. Use Atualizar para tentar novamente.</div>`;
   }
   try {
-    renderReports();
+    const accessReportVisible = !$("relatorioAcessosView")?.classList.contains("hidden");
+    const financeReportVisible = !$("relatorioFinanceiroView")?.classList.contains("hidden");
+    if (accessReportVisible || financeReportVisible) {
+      if (accessReportVisible && isMaster() && state.reportSection !== "actions") {
+        await refreshMasterAccessMetrics({ render: false });
+      }
+      renderReports(accessReportVisible ? "access" : "finance");
+    }
   } catch (error) {
     console.error("Falha ao renderizar os relatorios.", error);
     ["reportsAccessMount", "reportsFinanceMount"].forEach((id) => {
@@ -5672,9 +5682,23 @@ function switchView(name) {
   if (target === "beneficios") renderBenefitsView();
   if (target === "areaParceiro") renderPartnerBenefitsArea();
   if (target === "relatorioExclusoes") renderDeletionReport();
-  if (target === "relatorioAcessos" || target === "relatorioFinanceiro") {
-    renderReports();
-    if (target === "relatorioAcessos") refreshMasterAccessMetrics();
+  if (target === "relatorioFinanceiro") renderReports("finance");
+  if (target === "relatorioAcessos") {
+    if (isMaster() && state.reportSection === "actions") {
+      renderReports("access");
+    } else {
+      const finish = beginAdminActionLoading("Carregando acessos do período...");
+      Promise.resolve(refreshMasterAccessMetrics())
+        .then(() => {
+          if (!isMaster()) renderReports("access");
+        })
+        .catch((error) => {
+          console.error("Falha ao carregar o relatorio de acessos.", error);
+          showToast("Nao foi possivel atualizar o relatorio de acessos.");
+          renderReports("access");
+        })
+        .finally(finish);
+    }
   }
   if (target === "usuariosOnline") startOnlinePresenceMonitor();
   else stopOnlinePresenceMonitor();
@@ -13270,14 +13294,19 @@ function renderFinanceStatCard(title, value, meta, periodLabel, tone = "") {
   `;
 }
 
+const deferredReportSectionContent = new Map();
+let deferredReportSectionSequence = 0;
+
 function renderFinanceReportSection(id, title, periodRange, content, wide = false) {
+  const deferredKey = typeof content === "function" ? `report-section-${++deferredReportSectionSequence}` : "";
+  if (deferredKey) deferredReportSectionContent.set(deferredKey, content);
   return `
     <section class="panel-card report-card finance-report-collapsible ${wide ? "report-wide" : ""}" data-finance-report-section="${escapeAttr(id)}">
       <button type="button" class="finance-report-section-toggle" data-finance-report-toggle aria-expanded="false">
         <span><i class="fa-solid fa-chevron-right"></i><strong>${escapeHtml(title)}</strong></span>
         <small><i class="fa-solid fa-calendar-days"></i> ${escapeHtml(periodRange.label)}</small>
       </button>
-      <div class="finance-report-section-content hidden" data-finance-report-content>${content}</div>
+      <div class="finance-report-section-content hidden" data-finance-report-content${deferredKey ? ` data-deferred-report-key="${escapeAttr(deferredKey)}"` : ""}>${deferredKey ? "" : content}</div>
     </section>
   `;
 }
@@ -13393,8 +13422,10 @@ function getReportDateRange() {
     return { start: `${today.getFullYear()}-01-01`, end: dateKeyFromDate(today), label: String(today.getFullYear()) };
   }
   if (type === "personalizado") {
-    const start = state.reportPeriod.start || dateKeyFromDate(today);
-    const end = state.reportPeriod.end || start;
+    const selectedStart = state.reportPeriod.start || dateKeyFromDate(today);
+    const selectedEnd = state.reportPeriod.end || selectedStart;
+    const start = selectedStart <= selectedEnd ? selectedStart : selectedEnd;
+    const end = selectedStart <= selectedEnd ? selectedEnd : selectedStart;
     return { start, end, label: `${start} ate ${end}` };
   }
   return { start: `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-01`, end: dateKeyFromDate(today), label: "Mes atual" };
@@ -14588,55 +14619,111 @@ async function applyReportFilterWithLoading(sourceButton, reportType, updatePeri
   }
 }
 
-let accessMetricsRefreshPromise = null;
+const ACCESS_METRIC_PATHS = {
+  cliquesBotoes: "cliquesPorBotao",
+  cliquesMenu: "cliquesMenuLateral",
+  acessos: "acessosPorDia",
+  ondeComerCardapios: "cliquesCardapiosOndeComer",
+  ondeComerWhats: "cliquesWhatsOndeComer",
+  ondeComerFotos: "cliquesFotosOndeComer",
+  promocoes: "cliquesPromocoesPorComercio",
+  cliquesBotoesDetalhado: "cliquesPorBotaoDetalhado",
+  cliquesOndeComerDetalhado: "cliquesOndeComerDetalhado",
+  cliquesPromocoesDetalhado: "cliquesPromocoesDetalhado",
+  cliquesPorMenuDetalhado: "cliquesPorMenu",
+  origemAcessos: "origemAcessos",
+  instalacoesPWA: "instalacoesPWA",
+  usoPWA: "usoPWA"
+};
+const ACCESS_METRICS_CACHE_TTL_MS = 2 * 60 * 1000;
+const ACCESS_METRICS_CACHE_MAX_PERIODS = 4;
+const accessMetricsRangeCache = new Map();
+const accessMetricsRefreshPromises = new Map();
 
-async function refreshMasterAccessMetrics({ notify = false, render = true } = {}) {
+function accessMetricsRangeKey(range = getReportDateRange()) {
+  return `${range.start}|${range.end}`;
+}
+
+function applyAccessMetrics(metrics = {}) {
+  Object.keys(ACCESS_METRIC_PATHS).forEach((key) => {
+    state.metricas[key] = metrics[key] || {};
+  });
+}
+
+async function refreshMasterAccessMetrics({
+  notify = false,
+  render = true,
+  force = false,
+  range = getReportDateRange()
+} = {}) {
   if (!isMaster()) return;
-  if (accessMetricsRefreshPromise) return accessMetricsRefreshPromise;
-  const paths = {
-    cliquesBotoes: "cliquesPorBotao",
-    cliquesMenu: "cliquesMenuLateral",
-    acessos: "acessosPorDia",
-    ondeComerCardapios: "cliquesCardapiosOndeComer",
-    ondeComerWhats: "cliquesWhatsOndeComer",
-    ondeComerFotos: "cliquesFotosOndeComer",
-    promocoes: "cliquesPromocoesPorComercio",
-    cliquesBotoesDetalhado: "cliquesPorBotaoDetalhado",
-    cliquesOndeComerDetalhado: "cliquesOndeComerDetalhado",
-    cliquesPromocoesDetalhado: "cliquesPromocoesDetalhado",
-    cliquesPorMenuDetalhado: "cliquesPorMenu",
-    origemAcessos: "origemAcessos",
-    instalacoesPWA: "instalacoesPWA",
-    usoPWA: "usoPWA"
-  };
-  accessMetricsRefreshPromise = (async () => {
-    const results = await Promise.allSettled(Object.entries(paths).map(async ([key, path]) => {
-      const snapshot = await get(ref(db, path));
+  const now = Date.now();
+  accessMetricsRangeCache.forEach((entry, key) => {
+    if (now - entry.loadedAt >= ACCESS_METRICS_CACHE_TTL_MS) accessMetricsRangeCache.delete(key);
+  });
+  const cacheKey = accessMetricsRangeKey(range);
+  const cached = accessMetricsRangeCache.get(cacheKey);
+  if (!force && cached) {
+    applyAccessMetrics(cached.metrics);
+    if (render && !$("relatorioAcessosView")?.classList.contains("hidden")) renderReports("access");
+    if (notify) showToast("Relatorio atualizado com os dados recentes deste periodo.");
+    return { cached: true, updated: Object.keys(cached.metrics).length };
+  }
+  if (accessMetricsRefreshPromises.has(cacheKey)) {
+    const result = await accessMetricsRefreshPromises.get(cacheKey);
+    applyAccessMetrics(result.metrics);
+    if (render && !$("relatorioAcessosView")?.classList.contains("hidden")) renderReports("access");
+    return result;
+  }
+  const refreshPromise = (async () => {
+    const results = await Promise.allSettled(Object.entries(ACCESS_METRIC_PATHS).map(async ([key, path]) => {
+      const periodQuery = query(ref(db, path), orderByKey(), startAt(range.start), endAt(range.end));
+      const snapshot = await get(periodQuery);
       return [key, snapshot.exists() ? snapshot.val() : {}];
     }));
     let updated = 0;
+    const metrics = {};
     results.forEach((result) => {
       if (result.status !== "fulfilled") {
         console.warn("Nao foi possivel atualizar uma metrica do relatorio.", result.reason);
         return;
       }
       const [key, value] = result.value;
-      state.metricas[key] = value;
+      metrics[key] = value;
       updated += 1;
     });
+    Object.keys(ACCESS_METRIC_PATHS).forEach((key) => {
+      if (!(key in metrics)) metrics[key] = cached?.metrics?.[key] || {};
+    });
+    if (updated) {
+      accessMetricsRangeCache.set(cacheKey, { loadedAt: Date.now(), metrics });
+      while (accessMetricsRangeCache.size > ACCESS_METRICS_CACHE_MAX_PERIODS) {
+        accessMetricsRangeCache.delete(accessMetricsRangeCache.keys().next().value);
+      }
+    }
+    return { cached: false, metrics, updated };
+  })();
+  accessMetricsRefreshPromises.set(cacheKey, refreshPromise);
+  try {
+    const result = await refreshPromise;
+    applyAccessMetrics(result.metrics);
     if (render && !$("relatorioAcessosView")?.classList.contains("hidden")) renderReports("access");
-    if (notify) showToast(updated ? "Relatorio de acessos atualizado." : "Nao foi possivel atualizar o relatorio.");
-  })().finally(() => {
-    accessMetricsRefreshPromise = null;
-  });
-  return accessMetricsRefreshPromise;
+    if (notify) showToast(result.updated ? "Relatorio de acessos atualizado." : "Nao foi possivel atualizar o relatorio.");
+    return result;
+  } finally {
+    accessMetricsRefreshPromises.delete(cacheKey);
+  }
 }
 
 function bindReportControls(mount) {
   const isFinanceReport = mount.id === "reportsFinanceMount";
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       state.reportSection = button.dataset.reportSection;
+      if (!isFinanceReport && isMaster() && state.reportSection === "analytics") {
+        await applyReportFilterWithLoading(button, "access", () => {});
+        return;
+      }
       renderReports();
     });
   });
@@ -14652,6 +14739,18 @@ function bindReportControls(mount) {
       const section = button.closest("[data-finance-report-section]");
       const content = section?.querySelector("[data-finance-report-content]");
       const expanded = button.getAttribute("aria-expanded") === "true";
+      if (!expanded && content?.dataset.deferredReportKey && content.dataset.loaded !== "true") {
+        const deferredKey = content.dataset.deferredReportKey;
+        const contentFactory = deferredReportSectionContent.get(deferredKey);
+        content.dataset.loaded = "loading";
+        content.innerHTML = `<div class="list-meta"><i class="fa-solid fa-spinner fa-spin"></i> Preparando detalhes...</div>`;
+        requestAnimationFrame(() => {
+          if (!content.isConnected) return;
+          content.innerHTML = typeof contentFactory === "function" ? contentFactory() : "";
+          content.dataset.loaded = "true";
+          deferredReportSectionContent.delete(deferredKey);
+        });
+      }
       button.setAttribute("aria-expanded", String(!expanded));
       content?.classList.toggle("hidden", expanded);
       section?.classList.toggle("is-expanded", !expanded);
@@ -14677,8 +14776,14 @@ function bindReportControls(mount) {
   });
   mount.querySelector("#auditLogSearch")?.addEventListener("change", renderReports);
   mount.querySelector("#auditLogCategory")?.addEventListener("change", renderReports);
-  mount.querySelector("[data-refresh-access-metrics]")?.addEventListener("click", () => {
-    refreshMasterAccessMetrics({ notify: true });
+  mount.querySelector("[data-refresh-access-metrics]")?.addEventListener("click", async (event) => {
+    const finish = beginAdminActionLoading("Atualizando acessos do período...", event.currentTarget);
+    showAdminActionLoading("Atualizando acessos do período...", event.currentTarget);
+    try {
+      await refreshMasterAccessMetrics({ notify: true, force: true });
+    } finally {
+      finish();
+    }
   });
 }
 
@@ -14691,6 +14796,7 @@ function renderReports(reportType = "") {
   const isFinanceReport = reportType === "finance";
   const mount = $(isFinanceReport ? "reportsFinanceMount" : "reportsAccessMount");
   if (!mount) return;
+  deferredReportSectionContent.clear();
   if (!isMaster()) state.reportSection = "analytics";
   const periodRange = getReportDateRange();
   if (!isFinanceReport && isMaster() && state.reportSection === "actions") {
@@ -14787,12 +14893,22 @@ function renderReports(reportType = "") {
   const instalacoesPWA = aggregatePWAInstalls(filteredMetrics.instalacoesPWA);
   const usoPWA = acessosConsolidados.pwa;
   const totalAcessos = acessosConsolidados.total;
-  const clickTimeline = buildClickTimeline(state.metricas, periodRange);
-  const itemAccessRows = buildItemAccessRows(state.metricas, periodRange);
-  const accessTimeline = buildAccessTimeline(filteredMetrics.acessos, periodRange);
-  const generalClickReport = buildGeneralClickRows(cliquesBotoes.detalhes);
-  const ondeComerClickRows = buildOndeComerClickRows(cliquesOndeComerCardapios, cliquesOndeComerWhats, cliquesOndeComerFotos);
-  const newsClickRows = buildNewsClickRows(state.metricas, periodRange);
+  let clickTimeline;
+  let itemAccessRows;
+  let accessTimeline;
+  let generalClickReport;
+  let ondeComerClickRows;
+  let newsClickRows;
+  const getClickTimeline = () => clickTimeline ??= buildClickTimeline(state.metricas, periodRange);
+  const getItemAccessRows = () => itemAccessRows ??= buildItemAccessRows(state.metricas, periodRange);
+  const getAccessTimeline = () => accessTimeline ??= buildAccessTimeline(filteredMetrics.acessos, periodRange);
+  const getGeneralClickReport = () => generalClickReport ??= buildGeneralClickRows(cliquesBotoes.detalhes);
+  const getOndeComerClickRows = () => ondeComerClickRows ??= buildOndeComerClickRows(
+    cliquesOndeComerCardapios,
+    cliquesOndeComerWhats,
+    cliquesOndeComerFotos
+  );
+  const getNewsClickRows = () => newsClickRows ??= buildNewsClickRows(state.metricas, periodRange);
   const totalMenuClicks = totalMetricMap(cliquesMenu);
   const totalButtonClicks = totalMetricMap(cliquesBotoes.porTipo);
   const totalOndeComerInteractions = totalMetricMap(cliquesOndeComerCardapios)
@@ -14890,7 +15006,7 @@ function renderReports(reportType = "") {
         </div>
       `, true) : ""}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("origem-localizacao", "Origem e localização dos acessos", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("origem-localizacao", "Origem e localização dos acessos", periodRange, () => `
         <div class="access-report-columns">
           <section class="access-report-subsection">
             <h3><i class="fa-solid fa-share-nodes"></i> Meios de acesso</h3>
@@ -14905,7 +15021,7 @@ function renderReports(reportType = "") {
         </div>
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("menu-lateral", "Navegação pelo menu lateral", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("menu-lateral", "Navegação pelo menu lateral", periodRange, () => `
         <div class="access-report-kpi-strip">
           <article><span>Total de cliques</span><strong>${totalMenuClicks}</strong><small>Soma das opções acessadas no menu</small></article>
           <article><span>Onde Comer</span><strong>${aberturasOndeComer}</strong><small>Aberturas registradas pelo menu</small></article>
@@ -14914,7 +15030,7 @@ function renderReports(reportType = "") {
         ${renderReportList(topFromMap(cliquesMenu, 16), "Ainda não há cliques de menu registrados.")}
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("estabelecimentos-servicos", "Estabelecimentos e serviços", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("estabelecimentos-servicos", "Estabelecimentos e serviços", periodRange, () => `
         <div class="access-report-columns">
           <section class="access-report-subsection">
             <h3><i class="fa-solid fa-ranking-star"></i> Mais acessados</h3>
@@ -14929,11 +15045,11 @@ function renderReports(reportType = "") {
         </div>
         <div class="access-report-detail-block">
           <h3>Detalhamento por estabelecimento ou serviço</h3>
-          ${renderClickReportTable(generalClickReport.rows, generalClickReport.types, "Ainda não há cliques por estabelecimento ou serviço.")}
+          ${renderClickReportTable(getGeneralClickReport().rows, getGeneralClickReport().types, "Ainda não há cliques por estabelecimento ou serviço.")}
         </div>
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("onde-comer", "Onde Comer", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("onde-comer", "Onde Comer", periodRange, () => `
         <div class="access-report-kpi-strip">
           <article><span>Aberturas da tela</span><strong>${aberturasOndeComer}</strong><small>Entradas pelo menu lateral</small></article>
           <article><span>Cardápios</span><strong>${totalMetricMap(cliquesOndeComerCardapios)}</strong><small>Visualizações de cardápio</small></article>
@@ -14941,10 +15057,10 @@ function renderReports(reportType = "") {
           <article><span>Fotos</span><strong>${totalMetricMap(cliquesOndeComerFotos)}</strong><small>Visualizações de fotos</small></article>
           <article><span>Total de interações</span><strong>${totalOndeComerInteractions}</strong><small>Cardápios, WhatsApp e fotos</small></article>
         </div>
-        ${renderClickReportTable(ondeComerClickRows, ["whatsapp", "cardapio", "fotos"], "Ainda não há cliques no Onde Comer.")}
+        ${renderClickReportTable(getOndeComerClickRows(), ["whatsapp", "cardapio", "fotos"], "Ainda não há cliques no Onde Comer.")}
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("promocoes", "Promoções", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("promocoes", "Promoções", periodRange, () => `
         <div class="access-report-kpi-strip">
           <article><span>Aberturas da tela</span><strong>${aberturasPromocoes}</strong><small>Entradas pelo menu lateral</small></article>
           <article><span>Interações com ofertas</span><strong>${totalPromotionInteractions}</strong><small>Cliques atribuídos às promoções</small></article>
@@ -14952,24 +15068,24 @@ function renderReports(reportType = "") {
         ${renderReportList(topFromMap(cliquesPromocoes, 16), aberturasPromocoes ? "Ainda não há interações com as ofertas." : "Ainda não há cliques em promoções registrados.")}
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("noticias", "Notícias da cidade", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("noticias", "Notícias da cidade", periodRange, () => `
         <p class="list-meta">Visualizações, compartilhamentos, WhatsApp e acessos à matéria oficial de cada notícia.</p>
-        ${renderNewsClickReportTable(newsClickRows, "Ainda não há cliques em notícias registrados neste período.")}
+        ${renderNewsClickReportTable(getNewsClickRows(), "Ainda não há cliques em notícias registrados neste período.")}
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("imoveis-veiculos", "Imóveis e veículos", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("imoveis-veiculos", "Imóveis e veículos", periodRange, () => `
         <p class="list-meta">Visualizações, WhatsApp e fotos separados pelo código de referência de cada anúncio.</p>
-        ${renderItemAccessTable(itemAccessRows, "Ainda não há acessos em imóveis ou veículos neste período.")}
+        ${renderItemAccessTable(getItemAccessRows(), "Ainda não há acessos em imóveis ou veículos neste período.")}
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("linha-tempo", "Horários e linha do tempo", periodRange, `
+      ${isFinanceReport ? "" : renderFinanceReportSection("linha-tempo", "Horários e linha do tempo", periodRange, () => `
         <div class="access-report-detail-block">
           <h3>Horários dos cliques nos cards</h3>
-          ${renderTimelineTable(clickTimeline, "Ainda não há horários detalhados de cliques neste período.")}
+          ${renderTimelineTable(getClickTimeline(), "Ainda não há horários detalhados de cliques neste período.")}
         </div>
         <div class="access-report-detail-block">
           <h3>Horários e origem dos acessos</h3>
-          ${renderTimelineTable(accessTimeline, "Ainda não há acessos detalhados neste período.", "access")}
+          ${renderTimelineTable(getAccessTimeline(), "Ainda não há acessos detalhados neste período.", "access")}
         </div>
       `, true)}
 
