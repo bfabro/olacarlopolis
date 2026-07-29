@@ -9395,7 +9395,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       : `<span class='status-tag aberto'>HORARIO</span>`);
     const status = statusBase.match(/<span class=['"]status-tag[^>]*>.*?<\/span>/i)?.[0] || statusBase;
     const proximo = statusBase.match(/<span class=['"]proximo-horario['"]>(.*?)<\/span>/i)?.[1] || "";
-    const resumo = proximo || (statusBase.includes("FECHADO") ? "Consulte os horarios" : "Ver todos os horarios");
+    const resumo = proximo || (statusBase.includes("FECHADO") ? "Consulte os horários" : "Horários de atendimento");
     if (temHorarios) {
       return `
         <details class="cliente-funcionamento-card">
@@ -9403,12 +9403,33 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
             <span class="cliente-funcionamento-status">${status}</span>
             <span class="cliente-funcionamento-resumo">
               <strong>${resumo}</strong>
-              <small>Ver todos os horarios</small>
+              <small>Ver grade completa</small>
             </span>
             <i class="fa-solid fa-chevron-right cliente-funcionamento-seta"></i>
           </summary>
           <div class="cliente-funcionamento-detalhes">
             ${renderHorariosFuncionamento(establishment.horarios)}
+          </div>
+        </details>
+      `;
+    }
+    const linhasHorario = String(establishment.hours || "")
+      .split(/<br\s*\/?>|\r?\n/gi)
+      .map((linha) => linha.trim())
+      .filter(Boolean);
+    if (temTexto && (linhasHorario.length > 1 || String(establishment.hours).length > 70)) {
+      return `
+        <details class="cliente-funcionamento-card">
+          <summary>
+            <span class="cliente-funcionamento-status">${status}</span>
+            <span class="cliente-funcionamento-resumo">
+              <strong>Horários informados</strong>
+              <small>Ver todos os horários</small>
+            </span>
+            <i class="fa-solid fa-chevron-right cliente-funcionamento-seta"></i>
+          </summary>
+          <div class="cliente-funcionamento-detalhes horario-publico-legado">
+            ${linhasHorario.map((linha) => `<span>${escapePromoHtml(linha)}</span>`).join("")}
           </div>
         </details>
       `;
@@ -22951,6 +22972,21 @@ plotarPinsImoveis(stateImoveis.filtered);
               return;
             }
             if (categoriaAdminEhSetorPublico(cliente.categoria || cliente.categoriaId || "")) {
+              const estabelecimentoBase = encontrarEstabelecimentoBaseAdmin(
+                clienteId,
+                cliente,
+                cliente.categoria || cliente.categoriaId || ""
+              );
+              if (estabelecimentoBase) {
+                aplicarClienteAdminNoEstabelecimento(estabelecimentoBase, cliente, clienteId);
+              } else {
+                const categoriaInstitucional = garantirCategoriaAdmin(
+                  cliente.categoria || cliente.categoriaId || "Institucional",
+                  { menuGroup: "setorpublico" }
+                );
+                categoriaInstitucional.establishments = categoriaInstitucional.establishments || [];
+                categoriaInstitucional.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
+              }
               definirStatusClienteAdmin(cliente, clienteId);
               return;
             }
