@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 524,
-  label: "v531",
+  numero: 525,
+  label: "v532",
   data: "2026-07-29",
-  nota: "Carregamento do relatorio de acessos encerrado corretamente ao trocar de menu."
+  nota: "Menu lateral isolado do carregamento dos relatorios e sempre liberado para navegacao."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5689,6 +5689,9 @@ function switchView(name) {
     return;
   }
   if (target !== "relatorioAcessos") cancelAccessReportViewLoading();
+  document.querySelectorAll(".nav-admin button.admin-button-loading").forEach((button) => {
+    button.classList.remove("admin-button-loading");
+  });
   Object.entries(views).forEach(([key, el]) => el.classList.toggle("hidden", key !== target));
   document.querySelectorAll(".nav-admin button").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === target);
@@ -19664,6 +19667,7 @@ function bindEvents() {
     desktopMenuQuery.addListener(handleDesktopMenuChange);
   }
   document.querySelectorAll(".nav-admin button").forEach((button) => {
+    button.dataset.noLoading = "";
     button.addEventListener("click", () => {
       switchView(button.dataset.view);
       closeAdminMenuOnMobile();
