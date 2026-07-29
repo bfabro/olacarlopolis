@@ -5723,6 +5723,11 @@ document.addEventListener("DOMContentLoaded", function () {
       date: data,
       address: evento.local || evento.address || "",
       instagram: evento.instagram || "",
+      linkEvento: evento.linkEvento || evento.link || evento.url || "",
+      contatosDetalhados: Array.isArray(evento.contatosDetalhados) ? evento.contatosDetalhados.slice(0, 3) : [],
+      contatos: Array.isArray(evento.contatos) ? evento.contatos.slice(0, 3) : [],
+      contato: evento.contato || evento.telefone || "",
+      whatsapp: evento.whatsapp || "",
       infoAdicional: evento.descricao || evento.infoAdicional || evento.description || "",
       status: evento.status || "ativo",
       origem: "firebase"
@@ -23818,6 +23823,24 @@ ${!establishment.descricaoFalecido ? `
             </div>
           </div>
         ` : ""
+        }
+
+        ${establishment.linkEvento ? `
+          <div class="info-box">
+            <i class="fas fa-arrow-up-right-from-square info-icon evento-link-icon"></i>
+            <div>
+              <div class="info-label">Link do evento</div>
+              <div class="info-value">
+                <a class="evento-link-publico"
+                   href="${escapePromoHtml(fixUrl(establishment.linkEvento))}"
+                   target="_blank"
+                   rel="noopener noreferrer">
+                  <i class="fa-solid fa-link"></i>
+                  Acessar página do evento
+                </a>
+              </div>
+            </div>
+          </div>` : ""
         }
 
 

@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 522,
-  label: "v529",
+  numero: 523,
+  label: "v530",
   data: "2026-07-28",
-  nota: "Relatorios otimizados com consultas por periodo, cache temporario e detalhes carregados sob demanda."
+  nota: "Eventos com tres contatos de responsaveis, identificacao de WhatsApp e link publico."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8950,15 +8950,41 @@ function fillEventForm(evento) {
   $("eventPlace").value = evento.local || "";
   $("eventStatus").value = evento.status || "ativo";
   $("eventImage").value = evento.imagem || "";
+  $("eventLink").value = evento.linkEvento || evento.link || evento.url || "";
+  const contatos = normalizeClientContactDetails(evento);
+  [1, 2, 3].forEach((position) => {
+    const contato = contatos[position - 1] || {};
+    $(`eventContact${position}`).value = contato.numero || "";
+    $(`eventContact${position}Reference`).value = contato.referencia || "";
+    $(`eventContact${position}IsWhatsapp`).checked = Boolean(contato.whatsapp);
+  });
   $("eventDescription").value = evento.descricao || "";
   $("deleteEventButton").classList.remove("hidden");
   openFormForEdit("eventForm");
+}
+
+function normalizeEventExternalUrl(value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw.replace(/^\/+/, "")}`;
+  try {
+    const parsed = new URL(candidate);
+    return ["http:", "https:"].includes(parsed.protocol) ? parsed.href : "";
+  } catch {
+    return "";
+  }
 }
 
 function getEventFormData() {
   const title = $("eventTitle").value.trim();
   const clienteId = $("eventClient").value;
   const client = state.clientes.find((item) => item.id === clienteId);
+  const contatosDetalhados = [1, 2, 3].map((position) => ({
+    numero: $(`eventContact${position}`).value.trim(),
+    referencia: $(`eventContact${position}Reference`).value.trim(),
+    whatsapp: Boolean($(`eventContact${position}IsWhatsapp`).checked)
+  })).filter((item) => item.numero);
+  const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
   return {
     id: $("eventId").value || `${slugify(title)}-${Date.now()}`,
     titulo: title,
@@ -8969,6 +8995,11 @@ function getEventFormData() {
     local: $("eventPlace").value.trim(),
     status: $("eventStatus").value,
     imagem: $("eventImage").value.trim(),
+    linkEvento: normalizeEventExternalUrl($("eventLink").value),
+    contatosDetalhados,
+    contatos: contatosDetalhados.map((item) => item.numero),
+    contato: contatosDetalhados[0]?.numero || "",
+    whatsapp: whatsappPrincipal,
     descricao: $("eventDescription").value.trim(),
     updatedAt: serverTimestamp(),
     updatedBy: state.user?.uid || ""
@@ -8981,7 +9012,10 @@ function renderEventsList() {
 
   const q = String($("eventSearch")?.value || "").toLowerCase().trim();
   const list = state.eventos.filter(eventVisible).filter((evento) => {
-    const hay = `${evento.titulo || ""} ${evento.clienteNome || ""} ${evento.local || ""} ${displayEventDate(eventRawDate(evento))}`.toLowerCase();
+    const contatosBusca = normalizeClientContactDetails(evento)
+      .map((contato) => `${contato.referencia} ${contato.numero}`)
+      .join(" ");
+    const hay = `${evento.titulo || ""} ${evento.clienteNome || ""} ${evento.local || ""} ${displayEventDate(eventRawDate(evento))} ${contatosBusca}`.toLowerCase();
     return !q || hay.includes(q);
   });
 
@@ -8992,6 +9026,8 @@ function renderEventsList() {
 
   box.innerHTML = list.map((evento) => {
     const realizado = eventAlreadyDone(evento);
+    const contatos = normalizeClientContactDetails(evento);
+    const linkEvento = normalizeEventExternalUrl(evento.linkEvento || evento.link || evento.url || "");
     return `
     <article class="list-card event-card${realizado ? " event-card-done" : ""}">
       ${evento.imagem ? `<img src="${escapeAttr(displayImageUrl(evento.imagem))}" alt="${escapeAttr(evento.titulo || "Evento")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : ""}
@@ -9000,6 +9036,8 @@ function renderEventsList() {
       ${realizado ? `<div class="event-done-note"><i class="fa-solid fa-circle-check"></i> Evento ja realizado</div>` : ""}
       <div class="list-meta">${escapeHtml(evento.clienteNome || "Sem cliente")} - ${escapeHtml(evento.origem === "script.js" ? "Base inicial" : "Firebase")}</div>
       <div class="list-meta">${escapeHtml(evento.local || "Sem local")}</div>
+      ${contatos.length ? `<div class="list-meta"><i class="fa-solid fa-phone"></i> ${contatos.map((contato) => `${escapeHtml(contato.referencia || "Contato")}: ${escapeHtml(contato.numero)}${contato.whatsapp ? " (WhatsApp)" : ""}`).join(" · ")}</div>` : ""}
+      ${linkEvento ? `<a class="ghost-button" href="${escapeAttr(linkEvento)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir link do evento</a>` : ""}
       <span class="badge ${escapeAttr(evento.status || "ativo")}">${eventStatusLabel(evento.status)}</span>
       <button type="button" data-edit-event="${escapeAttr(evento.id)}">Editar</button>
     </article>
@@ -19030,6 +19068,9 @@ function bindEvents() {
   bindPhoneMask("clientWhatsapp");
   bindPhoneMask("clientContact3");
   bindPhoneMask("clientContact4");
+  bindPhoneMask("eventContact1");
+  bindPhoneMask("eventContact2");
+  bindPhoneMask("eventContact3");
   bindPhoneMask("paymentBillingWhatsapp");
   bindPhoneMask("newsWhatsapp");
   resetNewsForm();

@@ -2278,6 +2278,30 @@ screen and (width: 820px) {
   color: #2563eb;
 }
 
+.evento-link-icon {
+  color: #f97316;
+}
+
+.info-value .evento-link-publico {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  margin: 4px 0 0;
+  padding: 9px 13px;
+  border-radius: 10px;
+  background: #0f3b82;
+  color: #fff;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.info-value .evento-link-publico:hover,
+.info-value .evento-link-publico:focus {
+  background: #1d4ed8;
+  color: #fff;
+  text-decoration: none;
+}
+
 .info-label {
   font-weight: 600;
   font-size: 16px;
