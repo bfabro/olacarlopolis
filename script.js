@@ -12405,10 +12405,35 @@ plotarPinsImoveis(stateImoveis.filtered);
       .replace(/"/g, "&quot;");
   }
 
+  const TIPOS_AUTOMOVEIS_PUBLICOS = [
+    "Carros e utilitários",
+    "Motos, scooters, triciclos e quadriciclos",
+    "Caminhões, ônibus e micro-ônibus",
+    "Outro"
+  ];
+
+  function normalizarTipoAutomovelPublico(valor) {
+    const tipoOriginal = String(valor || "").trim();
+    if (!tipoOriginal) return "";
+    const tipo = normalizarTextoAutomoveis(tipoOriginal);
+    const tipoOficial = TIPOS_AUTOMOVEIS_PUBLICOS.find((opcao) => normalizarTextoAutomoveis(opcao) === tipo);
+    if (tipoOficial) return tipoOficial;
+    if (/(moto|scooter|triciclo|quadriciclo)/.test(tipo)) {
+      return "Motos, scooters, triciclos e quadriciclos";
+    }
+    if (/(caminhao|onibus|micro.?onibus)/.test(tipo)) {
+      return "Caminhões, ônibus e micro-ônibus";
+    }
+    if (/(carro|automovel|utilitario|suv|pickup|picape|van)/.test(tipo)) {
+      return "Carros e utilitários";
+    }
+    return "Outro";
+  }
+
   function automovelDeRegistro(item, key) {
     return {
       id: key || item.id || "",
-      tipo: item.Tipo || item.tipo || item.categoria || "",
+      tipo: normalizarTipoAutomovelPublico(item.Tipo || item.tipo || item.categoria || ""),
       marca: item.Marca || item.marca || "",
       modelo: item.Modelo || item.modelo || item.titulo || item.Titulo || "",
       ano: item.Ano || item.ano || "",
@@ -13068,7 +13093,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     };
 
     const preencherFiltros = () => {
-      preencherSelect("autoFiltroTipo", "tipo");
+      const filtroTipo = document.getElementById("autoFiltroTipo");
+      if (filtroTipo) {
+        const primeiraOpcao = filtroTipo.querySelector("option")?.outerHTML || `<option value="">Todos</option>`;
+        filtroTipo.innerHTML = primeiraOpcao + TIPOS_AUTOMOVEIS_PUBLICOS
+          .map((tipo) => `<option value="${textoSeguroAutomoveis(tipo)}">${textoSeguroAutomoveis(tipo)}</option>`)
+          .join("");
+      }
       preencherSelect("autoFiltroMarca", "marca");
       preencherSelect("autoFiltroModelo", "modelo");
       preencherSelect("autoFiltroCondicao", "condicao");
