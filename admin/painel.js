@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 523,
-  label: "v530",
-  data: "2026-07-28",
-  nota: "Eventos com tres contatos de responsaveis, identificacao de WhatsApp e link publico."
+  numero: 524,
+  label: "v531",
+  data: "2026-07-29",
+  nota: "Carregamento do relatorio de acessos encerrado corretamente ao trocar de menu."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -2159,6 +2159,7 @@ const ADMIN_ACTION_LOADING_DELAY = 280;
 const ADMIN_ACTION_LOADING_MIN_VISIBLE = 450;
 let adminActionLoadingCount = 0;
 let adminActionLoadingTimer = null;
+let adminActionLoadingHideTimer = null;
 let adminActionLoadingVisibleAt = 0;
 
 function adminActionLoadingLabel(target) {
@@ -2182,6 +2183,10 @@ function showAdminActionLoading(message = "Carregando...", sourceButton = null) 
 }
 
 function beginAdminActionLoading(message = "Carregando...", sourceButton = null) {
+  if (adminActionLoadingHideTimer) {
+    clearTimeout(adminActionLoadingHideTimer);
+    adminActionLoadingHideTimer = null;
+  }
   adminActionLoadingCount += 1;
   if (!adminActionLoadingTimer && $("adminActionLoading")?.classList.contains("hidden")) {
     adminActionLoadingTimer = setTimeout(() => {
@@ -2204,10 +2209,35 @@ function beginAdminActionLoading(message = "Carregando...", sourceButton = null)
       adminActionLoadingTimer = null;
       return;
     }
-    const hide = () => $("adminActionLoading")?.classList.add("hidden");
+    const hide = () => {
+      adminActionLoadingHideTimer = null;
+      if (adminActionLoadingCount === 0) $("adminActionLoading")?.classList.add("hidden");
+    };
     const elapsed = Date.now() - adminActionLoadingVisibleAt;
-    setTimeout(hide, Math.max(0, ADMIN_ACTION_LOADING_MIN_VISIBLE - elapsed));
+    adminActionLoadingHideTimer = setTimeout(hide, Math.max(0, ADMIN_ACTION_LOADING_MIN_VISIBLE - elapsed));
   };
+}
+
+let accessReportViewLoadingFinish = null;
+
+function cancelAccessReportViewLoading() {
+  accessReportViewLoadingFinish?.();
+  accessReportViewLoadingFinish = null;
+}
+
+function beginAccessReportViewLoading(message = "Carregando acessos do período...", sourceButton = null, immediate = false) {
+  cancelAccessReportViewLoading();
+  const finishLoading = beginAdminActionLoading(message, sourceButton);
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    finishLoading();
+    if (accessReportViewLoadingFinish === finish) accessReportViewLoadingFinish = null;
+  };
+  accessReportViewLoadingFinish = finish;
+  if (immediate) showAdminActionLoading(message, sourceButton);
+  return finish;
 }
 
 window.beginAdminActionLoading = beginAdminActionLoading;
@@ -5658,6 +5688,7 @@ function switchView(name) {
     switchView(initialViewForProfile());
     return;
   }
+  if (target !== "relatorioAcessos") cancelAccessReportViewLoading();
   Object.entries(views).forEach(([key, el]) => el.classList.toggle("hidden", key !== target));
   document.querySelectorAll(".nav-admin button").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.view === target);
@@ -5685,9 +5716,10 @@ function switchView(name) {
   if (target === "relatorioFinanceiro") renderReports("finance");
   if (target === "relatorioAcessos") {
     if (isMaster() && state.reportSection === "actions") {
+      cancelAccessReportViewLoading();
       renderReports("access");
     } else {
-      const finish = beginAdminActionLoading("Carregando acessos do período...");
+      const finish = beginAccessReportViewLoading();
       Promise.resolve(refreshMasterAccessMetrics())
         .then(() => {
           if (!isMaster()) renderReports("access");
@@ -14536,10 +14568,10 @@ function renderReportSectionTabs() {
         </div>
       </div>
       <div class="report-section-tabs">
-        <button type="button" data-report-section="analytics" class="${state.reportSection === "analytics" ? "active" : ""}">
+        <button type="button" data-no-loading data-report-section="analytics" class="${state.reportSection === "analytics" ? "active" : ""}">
           <i class="fa-solid fa-chart-line"></i> Indicadores de acessos
         </button>
-        <button type="button" data-report-section="actions" class="${state.reportSection === "actions" ? "active" : ""}">
+        <button type="button" data-no-loading data-report-section="actions" class="${state.reportSection === "actions" ? "active" : ""}">
           <i class="fa-solid fa-list-check"></i> Acoes dos usuarios
         </button>
       </div>
@@ -14587,10 +14619,10 @@ function renderUserActionReport(mount, periodRange) {
         <span class="badge ativo">${escapeHtml(periodRange.label)}</span>
       </div>
       <div class="report-period-tabs">
-        <button type="button" data-report-period="dia" class="period-day ${state.reportPeriod.type === "dia" ? "active" : ""}">Dia</button>
-        <button type="button" data-report-period="semanal" class="period-week ${state.reportPeriod.type === "semanal" ? "active" : ""}">Semanal</button>
-        <button type="button" data-report-period="mensal" class="period-month ${state.reportPeriod.type === "mensal" ? "active" : ""}">Mensal</button>
-        <button type="button" data-report-period="anual" class="period-year ${state.reportPeriod.type === "anual" ? "active" : ""}">Anual</button>
+        <button type="button" data-no-loading data-report-period="dia" class="period-day ${state.reportPeriod.type === "dia" ? "active" : ""}">Dia</button>
+        <button type="button" data-no-loading data-report-period="semanal" class="period-week ${state.reportPeriod.type === "semanal" ? "active" : ""}">Semanal</button>
+        <button type="button" data-no-loading data-report-period="mensal" class="period-month ${state.reportPeriod.type === "mensal" ? "active" : ""}">Mensal</button>
+        <button type="button" data-no-loading data-report-period="anual" class="period-year ${state.reportPeriod.type === "anual" ? "active" : ""}">Anual</button>
       </div>
       <div class="audit-log-filters">
         <label>Pesquisar
@@ -14642,8 +14674,10 @@ async function applyReportFilterWithLoading(sourceButton, reportType, updatePeri
   const message = reportType === "access"
     ? "Atualizando acessos do período..."
     : "Carregando informações do período...";
-  const finish = beginAdminActionLoading(message, sourceButton);
-  showAdminActionLoading(message, sourceButton);
+  const finish = reportType === "access"
+    ? beginAccessReportViewLoading(message, sourceButton, true)
+    : beginAdminActionLoading(message, sourceButton);
+  if (reportType !== "access") showAdminActionLoading(message, sourceButton);
   try {
     await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
     updatePeriod();
@@ -14815,8 +14849,7 @@ function bindReportControls(mount) {
   mount.querySelector("#auditLogSearch")?.addEventListener("change", renderReports);
   mount.querySelector("#auditLogCategory")?.addEventListener("change", renderReports);
   mount.querySelector("[data-refresh-access-metrics]")?.addEventListener("click", async (event) => {
-    const finish = beginAdminActionLoading("Atualizando acessos do período...", event.currentTarget);
-    showAdminActionLoading("Atualizando acessos do período...", event.currentTarget);
+    const finish = beginAccessReportViewLoading("Atualizando acessos do período...", event.currentTarget, true);
     try {
       await refreshMasterAccessMetrics({ notify: true, force: true });
     } finally {
@@ -14985,7 +15018,7 @@ function renderReports(reportType = "") {
             ? "Faturamento, pagamentos, pendências, planos e comprovantes dos clientes."
             : "Indicadores do site, cliques, origem dos acessos e comportamento dos usuarios."}</p>
         </div>
-        ${isFinanceReport ? "" : `<button type="button" class="ghost-button" data-refresh-access-metrics><i class="fa-solid fa-rotate"></i> Atualizar dados</button>`}
+        ${isFinanceReport ? "" : `<button type="button" class="ghost-button" data-no-loading data-refresh-access-metrics><i class="fa-solid fa-rotate"></i> Atualizar dados</button>`}
       </div>
     </section>
     <section class="panel-card report-period-card">
@@ -14999,16 +15032,16 @@ function renderReports(reportType = "") {
         <span class="badge ativo">${escapeHtml(periodRange.label)}</span>
       </div>
       <div class="report-period-tabs">
-        <button type="button" data-report-period="dia" class="period-day ${state.reportPeriod.type === "dia" ? "active" : ""}"><i class="fa-solid fa-sun"></i> Dia</button>
-        <button type="button" data-report-period="semanal" class="period-week ${state.reportPeriod.type === "semanal" ? "active" : ""}"><i class="fa-solid fa-calendar-week"></i> Semanal</button>
-        <button type="button" data-report-period="mensal" class="period-month ${state.reportPeriod.type === "mensal" ? "active" : ""}"><i class="fa-solid fa-calendar-days"></i> Mensal</button>
-        <button type="button" data-report-period="anual" class="period-year ${state.reportPeriod.type === "anual" ? "active" : ""}"><i class="fa-solid fa-chart-line"></i> Anual</button>
-        <button type="button" data-report-period="personalizado" class="period-custom ${state.reportPeriod.type === "personalizado" ? "active" : ""}"><i class="fa-solid fa-sliders"></i> Personalizado</button>
+        <button type="button" data-no-loading data-report-period="dia" class="period-day ${state.reportPeriod.type === "dia" ? "active" : ""}"><i class="fa-solid fa-sun"></i> Dia</button>
+        <button type="button" data-no-loading data-report-period="semanal" class="period-week ${state.reportPeriod.type === "semanal" ? "active" : ""}"><i class="fa-solid fa-calendar-week"></i> Semanal</button>
+        <button type="button" data-no-loading data-report-period="mensal" class="period-month ${state.reportPeriod.type === "mensal" ? "active" : ""}"><i class="fa-solid fa-calendar-days"></i> Mensal</button>
+        <button type="button" data-no-loading data-report-period="anual" class="period-year ${state.reportPeriod.type === "anual" ? "active" : ""}"><i class="fa-solid fa-chart-line"></i> Anual</button>
+        <button type="button" data-no-loading data-report-period="personalizado" class="period-custom ${state.reportPeriod.type === "personalizado" ? "active" : ""}"><i class="fa-solid fa-sliders"></i> Personalizado</button>
       </div>
       <div class="report-custom-range ${state.reportPeriod.type === "personalizado" ? "" : "hidden"}">
         <label>Inicio<input data-report-start-date type="date" value="${escapeAttr(state.reportPeriod.start || periodRange.start)}"></label>
         <label>Fim<input data-report-end-date type="date" value="${escapeAttr(state.reportPeriod.end || periodRange.end)}"></label>
-        <button data-apply-report-range type="button" class="ghost-button"><i class="fa-solid fa-check"></i> Aplicar</button>
+        <button data-no-loading data-apply-report-range type="button" class="ghost-button"><i class="fa-solid fa-check"></i> Aplicar</button>
       </div>
     </section>
 
@@ -19632,23 +19665,6 @@ function bindEvents() {
   }
   document.querySelectorAll(".nav-admin button").forEach((button) => {
     button.addEventListener("click", () => {
-      if (button.dataset.view === "relatorioAcessos" || button.dataset.view === "relatorioFinanceiro" || button.dataset.view === "relatorioExclusoes") {
-        const finish = beginAdminActionLoading("Montando relatórios...", button);
-        showAdminActionLoading("Montando relatórios...", button);
-        return new Promise((resolve) => {
-          requestAnimationFrame(() => {
-            setTimeout(() => {
-              try {
-                switchView(button.dataset.view);
-                closeAdminMenuOnMobile();
-              } finally {
-                finish();
-                resolve();
-              }
-            }, 0);
-          });
-        });
-      }
       switchView(button.dataset.view);
       closeAdminMenuOnMobile();
     });
