@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 532,
-  label: "v539",
+  numero: 533,
+  label: "v540",
   data: "2026-07-30",
-  nota: "Boletos sequenciais e documento de cobranca Pix com referencia, valor e alertas revisados."
+  nota: "Tela de clientes reorganizada e lista de divulgacao com filtros e exportacao do resultado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8010,14 +8010,53 @@ function updateClientFilterCounts() {
 function clientDisclosureRows() {
   return [...state.clientes]
     .map((client) => ({
-      client,
       name: String(client.nome || client.name || client.id || "Cliente").trim(),
       category: String(client.categoria || client.category || "Sem categoria").trim(),
       status: String(client.status || "pendente").trim(),
+      type: String(client.tipoCliente || client.tipo || "comercio").trim().toLowerCase(),
+      payment: effectivePaymentStatus(client),
       description: String(client.descricaoCurta || client.shortDescription || "").trim(),
       image: String(client.imagem || client.profileImage || client.imagemPerfil || client.perfil || client.logo || "").trim()
     }))
     .sort((a, b) => a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" }));
+}
+
+function clientDisclosureFilteredRows(rows = clientDisclosureRows()) {
+  const type = $("clientDisclosureTypeFilter")?.value || "todos";
+  const category = $("clientDisclosureCategoryFilter")?.value || "todos";
+  const payment = $("clientDisclosurePaymentFilter")?.value || "todos";
+  const description = $("clientDisclosureDescriptionFilter")?.value || "todos";
+  return rows.filter((row) => {
+    if (type !== "todos" && row.type !== type) return false;
+    if (category !== "todos" && row.category !== category) return false;
+    if (payment === "pago" && row.payment !== "pago") return false;
+    if (payment === "isento" && row.payment !== "isento") return false;
+    if (payment === "nao_pago" && ["pago", "isento"].includes(row.payment)) return false;
+    if (description === "com" && !row.description) return false;
+    if (description === "sem" && row.description) return false;
+    return true;
+  });
+}
+
+function clientDisclosureTypeLabel(type = "") {
+  return {
+    comercio: "Comércio",
+    servico: "Serviço",
+    institucional: "Institucional",
+    outro: "Outro"
+  }[type] || type;
+}
+
+function fillClientDisclosureCategoryFilter(rows = clientDisclosureRows()) {
+  const select = $("clientDisclosureCategoryFilter");
+  if (!select) return;
+  const current = select.value || "todos";
+  const categories = [...new Set(rows.map((row) => row.category).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, "pt-BR", { sensitivity: "base" }));
+  select.innerHTML = `<option value="todos">Todas</option>${categories
+    .map((category) => `<option value="${escapeAttr(category)}">${escapeHtml(category)}</option>`)
+    .join("")}`;
+  select.value = categories.includes(current) ? current : "todos";
 }
 
 function renderClientDisclosureReport() {
@@ -8025,13 +8064,15 @@ function renderClientDisclosureReport() {
   const list = $("clientDisclosureReportList");
   const summary = $("clientDisclosureReportSummary");
   if (!report || !list || !summary || report.classList.contains("hidden")) return;
-  const rows = clientDisclosureRows();
+  const allRows = clientDisclosureRows();
+  fillClientDisclosureCategoryFilter(allRows);
+  const rows = clientDisclosureFilteredRows(allRows);
   const withDescription = rows.filter((row) => row.description).length;
   const withImage = rows.filter((row) => row.image).length;
   const complete = rows.filter((row) => row.description && row.image).length;
 
   summary.innerHTML = `
-    <article><span>Total de clientes</span><strong>${rows.length}</strong></article>
+    <article><span>Clientes exibidos</span><strong>${rows.length}<small> de ${allRows.length}</small></strong></article>
     <article><span>Com descrição curta</span><strong>${withDescription}</strong></article>
     <article><span>Com imagem de perfil</span><strong>${withImage}</strong></article>
     <article><span>Cadastro completo</span><strong>${complete}</strong></article>
@@ -8052,6 +8093,8 @@ function renderClientDisclosureReport() {
           <p class="${row.description ? "" : "is-missing"}">${row.description ? escapeHtml(row.description) : "Descrição curta para divulgação não preenchida."}</p>
           <div class="client-disclosure-tags">
             <span class="badge ${escapeAttr(row.status)}">${escapeHtml(statusLabel(row.status))}</span>
+            <span class="badge">${escapeHtml(clientDisclosureTypeLabel(row.type))}</span>
+            <span class="badge ${escapeAttr(row.payment)}">${escapeHtml(paymentLabel(row.payment))}</span>
             <span class="badge ${row.description ? "ativo" : "pendente"}"><i class="fa-solid ${row.description ? "fa-check" : "fa-triangle-exclamation"}"></i> ${row.description ? "Com descrição" : "Sem descrição"}</span>
             <span class="badge ${row.image ? "ativo" : "pendente"}"><i class="fa-solid ${row.image ? "fa-check" : "fa-triangle-exclamation"}"></i> ${row.image ? "Com imagem" : "Sem imagem"}</span>
           </div>
@@ -8069,13 +8112,15 @@ function clientDisclosureCsvCell(value = "") {
 
 function exportClientDisclosureCsv() {
   if (!isMaster()) return showToast("Somente o Admin Master pode exportar esta lista.");
-  const rows = clientDisclosureRows();
-  const header = ["Ordem", "Nome do cliente", "Categoria", "Status", "Descrição curta para divulgação", "Imagem de perfil", "Possui descrição", "Possui imagem"];
+  const rows = clientDisclosureFilteredRows();
+  const header = ["Ordem", "Nome do cliente", "Categoria", "Tipo de cliente", "Status", "Situação financeira", "Descrição curta para divulgação", "Imagem de perfil", "Possui descrição", "Possui imagem"];
   const lines = rows.map((row, index) => [
     index + 1,
     row.name,
     row.category,
+    clientDisclosureTypeLabel(row.type),
     statusLabel(row.status),
+    paymentLabel(row.payment),
     row.description,
     row.image,
     row.description ? "Sim" : "Não",
@@ -8091,6 +8136,13 @@ function exportClientDisclosureCsv() {
   link.remove();
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   showToast(`${rows.length} clientes exportados em ordem alfabética.`);
+}
+
+function clearClientDisclosureFilters() {
+  ["clientDisclosureTypeFilter", "clientDisclosureCategoryFilter", "clientDisclosurePaymentFilter", "clientDisclosureDescriptionFilter"].forEach((id) => {
+    if ($(id)) $(id).value = "todos";
+  });
+  renderClientDisclosureReport();
 }
 
 function setClientDisclosureReportOpen(open) {
@@ -19458,6 +19510,10 @@ function bindEvents() {
   });
   $("closeClientDisclosureReportButton")?.addEventListener("click", () => setClientDisclosureReportOpen(false));
   $("exportClientDisclosureCsvButton")?.addEventListener("click", exportClientDisclosureCsv);
+  ["clientDisclosureTypeFilter", "clientDisclosureCategoryFilter", "clientDisclosurePaymentFilter", "clientDisclosureDescriptionFilter"].forEach((id) => {
+    $(id)?.addEventListener("change", renderClientDisclosureReport);
+  });
+  $("clearClientDisclosureFiltersButton")?.addEventListener("click", clearClientDisclosureFilters);
   $("cleanupDuplicatesButton").addEventListener("click", async () => {
     const plan = state.duplicateCleanupPlan || buildDuplicateCleanupPlan();
     if (!plan.removeIds.length) {

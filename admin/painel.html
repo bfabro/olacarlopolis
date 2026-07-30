@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=369">
+  <link rel="stylesheet" href="painel.css?v=370">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -501,14 +501,21 @@
                 <h2>Visao dos clientes</h2>
                 <p>Resumo rapido com status, financeiro e quantidade de imagens.</p>
               </div>
-              <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar clientes ausentes</button>
-              <button id="migrateImagesButton" class="ghost-button" type="button"><i class="fa-solid fa-cloud-arrow-up"></i> Subir imagens</button>
-              <button id="migrateFinanceButton" class="ghost-button" type="button"><i class="fa-solid fa-file-invoice-dollar"></i> Migrar financeiro</button>
-              <button id="auditFinanceCleanupButton" class="ghost-button" type="button"><i class="fa-solid fa-shield-halved"></i> Auditar limpeza</button>
-              <button id="cleanupFinanceButton" class="danger-button" type="button"><i class="fa-solid fa-lock"></i> Limpar financeiro publico</button>
-              <button id="analyzeDuplicatesButton" class="ghost-button" type="button"><i class="fa-solid fa-copy"></i> Ver duplicados</button>
-              <button id="cleanupDuplicatesButton" class="danger-button hidden" type="button"><i class="fa-solid fa-broom"></i> Limpar duplicados seguros</button>
-              <button id="showClientDisclosureReportButton" class="ghost-button" type="button" data-master="true"><i class="fa-solid fa-list-check"></i> Lista para divulgação</button>
+              <div class="client-list-primary-actions">
+                <button id="showClientDisclosureReportButton" class="client-disclosure-open-button" type="button" data-master="true" aria-expanded="false"><i class="fa-solid fa-list-check"></i> Lista para divulgação</button>
+                <details class="client-maintenance-tools" data-master="true">
+                  <summary><i class="fa-solid fa-screwdriver-wrench"></i> Ferramentas de manutenção</summary>
+                  <div>
+                    <button id="syncClientsButton" class="ghost-button" type="button"><i class="fa-solid fa-download"></i> Importar clientes ausentes</button>
+                    <button id="migrateImagesButton" class="ghost-button" type="button"><i class="fa-solid fa-cloud-arrow-up"></i> Subir imagens</button>
+                    <button id="migrateFinanceButton" class="ghost-button" type="button"><i class="fa-solid fa-file-invoice-dollar"></i> Migrar financeiro</button>
+                    <button id="auditFinanceCleanupButton" class="ghost-button" type="button"><i class="fa-solid fa-shield-halved"></i> Auditar limpeza</button>
+                    <button id="cleanupFinanceButton" class="danger-button" type="button"><i class="fa-solid fa-lock"></i> Limpar financeiro público</button>
+                    <button id="analyzeDuplicatesButton" class="ghost-button" type="button"><i class="fa-solid fa-copy"></i> Ver duplicados</button>
+                    <button id="cleanupDuplicatesButton" class="danger-button hidden" type="button"><i class="fa-solid fa-broom"></i> Limpar duplicados seguros</button>
+                  </div>
+                </details>
+              </div>
             </div>
             <div id="importReport" class="import-report hidden"></div>
             <div id="duplicatesReport" class="duplicates-report hidden"></div>
@@ -522,6 +529,38 @@
                   <button id="exportClientDisclosureCsvButton" type="button"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
                   <button id="closeClientDisclosureReportButton" class="ghost-button" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
                 </div>
+              </div>
+              <div class="client-disclosure-filters">
+                <label>Tipo de cliente
+                  <select id="clientDisclosureTypeFilter">
+                    <option value="todos">Todos</option>
+                    <option value="comercio">Comércio</option>
+                    <option value="servico">Serviço</option>
+                    <option value="institucional">Institucional</option>
+                    <option value="outro">Outro</option>
+                  </select>
+                </label>
+                <label>Categoria
+                  <select id="clientDisclosureCategoryFilter">
+                    <option value="todos">Todas</option>
+                  </select>
+                </label>
+                <label>Situação financeira
+                  <select id="clientDisclosurePaymentFilter">
+                    <option value="todos">Todos</option>
+                    <option value="pago">Pagos</option>
+                    <option value="nao_pago">Não pagos</option>
+                    <option value="isento">Isentos</option>
+                  </select>
+                </label>
+                <label>Descrição para divulgação
+                  <select id="clientDisclosureDescriptionFilter">
+                    <option value="todos">Todas</option>
+                    <option value="com">Com descrição</option>
+                    <option value="sem">Sem descrição</option>
+                  </select>
+                </label>
+                <button id="clearClientDisclosureFiltersButton" class="ghost-button" type="button"><i class="fa-solid fa-filter-circle-xmark"></i> Limpar filtros</button>
               </div>
               <div id="clientDisclosureReportSummary" class="client-disclosure-report-summary"></div>
               <div id="clientDisclosureReportList" class="client-disclosure-report-list"></div>
@@ -1945,6 +1984,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=467"></script>
+  <script type="module" src="painel.js?v=468"></script>
 </body>
 </html>
