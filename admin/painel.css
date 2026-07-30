@@ -2402,6 +2402,124 @@ button[type="submit"]:hover,
   resize: vertical;
 }
 
+.finance-pending-payment-list {
+  display: grid;
+  gap: 12px;
+}
+
+.finance-pending-payment-item {
+  display: grid;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #fdba74;
+  border-radius: 15px;
+  background: linear-gradient(135deg, #fff7ed, #fff);
+}
+
+.finance-pending-payment-head,
+.finance-pending-payment-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.finance-pending-payment-head > div:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.finance-pending-payment-head span,
+.finance-pending-payment-total small {
+  color: #9a3412;
+  font-size: 12px;
+}
+
+.finance-pending-payment-total {
+  display: grid;
+  flex: 0 0 auto;
+  gap: 3px;
+  text-align: right;
+}
+
+.finance-pending-payment-total strong {
+  color: #c2410c;
+  font-size: 20px;
+}
+
+.finance-pending-payment-months {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.finance-pending-payment-months span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 9px;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  background: #fff;
+  color: #7c2d12;
+  font-size: 11px;
+}
+
+.finance-pending-payment-months b {
+  color: #0f172a;
+}
+
+.finance-pending-payment-actions {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.finance-pending-pix-result {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid #bfdbfe;
+  border-radius: 13px;
+  background: #eff6ff;
+}
+
+.finance-pending-pix-result > img {
+  width: 132px;
+  height: 132px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.finance-pending-pix-result > div {
+  display: grid;
+  gap: 7px;
+}
+
+.finance-pending-pix-result span {
+  color: #475569;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.finance-pending-pix-result strong {
+  color: #1d4ed8;
+  font-size: 20px;
+}
+
+.finance-pending-pix-result textarea {
+  width: 100%;
+  min-height: 74px;
+  resize: vertical;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.finance-pending-pix-result button {
+  justify-self: start;
+}
+
 .access-report-columns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2521,6 +2639,21 @@ button[type="submit"]:hover,
 
   .finance-attention-actions .ghost-button {
     flex: 1 1 190px;
+  }
+
+  .finance-pending-payment-head {
+    align-items: flex-start;
+  }
+
+  .finance-pending-pix-result {
+    grid-template-columns: 1fr;
+  }
+
+  .finance-pending-pix-result > img {
+    width: min(180px, 100%);
+    height: auto;
+    aspect-ratio: 1;
+    justify-self: center;
   }
 }
 

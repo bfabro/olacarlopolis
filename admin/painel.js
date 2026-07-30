@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 529,
-  label: "v536",
-  data: "2026-07-29",
-  nota: "Filtro publico de marcas equalizado com as listas e categorias do cadastro de automoveis."
+  numero: 530,
+  label: "v537",
+  data: "2026-07-30",
+  nota: "Relatorio financeiro com clientes pendentes e geracao individual de Pix e boletos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -13413,6 +13413,69 @@ function renderFinancialAttentionList(items = []) {
   }).join("")}</div>`;
 }
 
+function renderFinancePendingPaymentList(items = []) {
+  if (!items.length) {
+    return `<div class="list-meta">Nenhum cliente com pagamento pendente neste período.</div>`;
+  }
+  return `
+    <div class="finance-pending-payment-list">
+      ${items.map(({ client, rows }) => {
+        const months = [...new Set(rows.map((row) => row.month).filter(Boolean))].sort();
+        const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
+        const monthsValue = months.join(",");
+        return `
+          <article class="finance-pending-payment-item" data-finance-pending-client="${escapeAttr(client.id)}">
+            <div class="finance-pending-payment-head">
+              <div>
+                <strong>${escapeHtml(client.nome || client.id)}</strong>
+                <span>${escapeHtml(client.categoria || "Sem categoria")} · ${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</span>
+              </div>
+              <div class="finance-pending-payment-total">
+                <small>${rows.length} ${rows.length === 1 ? "fatura pendente" : "faturas pendentes"}</small>
+                <strong>${escapeHtml(moneyBR(total))}</strong>
+              </div>
+            </div>
+            <div class="finance-pending-payment-months">
+              ${rows.map((row) => `
+                <span>
+                  <i class="fa-regular fa-calendar"></i>
+                  ${escapeHtml(monthLabel(row.month))}
+                  <b>${escapeHtml(moneyBR(row.value))}</b>
+                </span>
+              `).join("")}
+            </div>
+            <div class="finance-pending-payment-actions">
+              <button type="button"
+                      data-generate-pending-client-pix="${escapeAttr(client.id)}"
+                      data-pending-months="${escapeAttr(monthsValue)}"
+                      data-pending-total="${escapeAttr(total)}">
+                <i class="fa-solid fa-qrcode"></i> Gerar Pix
+              </button>
+              <button type="button"
+                      class="ghost-button"
+                      data-generate-pending-client-boletos="${escapeAttr(client.id)}"
+                      data-pending-months="${escapeAttr(monthsValue)}">
+                <i class="fa-solid fa-print"></i> Gerar ${months.length === 1 ? "boleto" : "boletos"}
+              </button>
+            </div>
+            <div class="finance-pending-pix-result hidden" data-pending-pix-result>
+              <img alt="QR Code Pix de ${escapeAttr(client.nome || client.id)}" data-pending-pix-qr>
+              <div>
+                <span>Pix referente às pendências selecionadas</span>
+                <strong data-pending-pix-total>${escapeHtml(moneyBR(total))}</strong>
+                <textarea readonly aria-label="Código Pix Copia e Cola" data-pending-pix-code></textarea>
+                <button type="button" class="ghost-button" data-copy-pending-client-pix>
+                  <i class="fa-regular fa-copy"></i> Copiar Pix
+                </button>
+              </div>
+            </div>
+          </article>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
 const REPORT_BLOCKED_CATEGORY_SLUGS = new Set([
   "eventosemcarlopolis",
   "agendamento",
@@ -14851,6 +14914,56 @@ function bindReportControls(mount) {
       }
     });
   });
+  mount.querySelectorAll("[data-generate-pending-client-pix]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const client = state.clientes.find((item) => item.id === button.dataset.generatePendingClientPix);
+      const paymentConfig = state.pagamentoSistema || {};
+      if (!client) return showToast("Cliente não encontrado.");
+      if (!paymentConfig.pixChave) return showToast("Configure a chave Pix na tela de Pagamento antes de gerar o Pix.");
+      const months = String(button.dataset.pendingMonths || "").split(",").filter(Boolean);
+      const total = Number(button.dataset.pendingTotal || 0);
+      const reference = months.length === 1 ? months[0] : `${months[0] || currentMonthKey()}-${months.length}M`;
+      const invoice = buildClientInvoice(client, reference, paymentConfig, total, { ignoreSaved: true });
+      if (!invoice.pixCode || total <= 0) return showToast("Não foi possível gerar o Pix desta pendência.");
+      const item = button.closest("[data-finance-pending-client]");
+      const result = item?.querySelector("[data-pending-pix-result]");
+      const code = result?.querySelector("[data-pending-pix-code]");
+      const qr = result?.querySelector("[data-pending-pix-qr]");
+      if (code) code.value = invoice.pixCode;
+      if (qr) {
+        qr.onerror = () => {
+          qr.onerror = null;
+          qr.src = qrCodeUrl(invoice.pixCode, "quickchart");
+        };
+        qr.src = invoice.qrUrl;
+      }
+      result?.classList.remove("hidden");
+      showToast(`Pix de ${moneyBR(total)} gerado para ${client.nome || client.id}.`);
+    });
+  });
+  mount.querySelectorAll("[data-copy-pending-client-pix]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const code = button.closest("[data-pending-pix-result]")?.querySelector("[data-pending-pix-code]")?.value || "";
+      if (!code) return showToast("Gere o Pix antes de copiar.");
+      try {
+        await navigator.clipboard?.writeText(code);
+        showToast("Código Pix copiado.");
+      } catch {
+        showToast("Selecione o código Pix para copiar.");
+      }
+    });
+  });
+  mount.querySelectorAll("[data-generate-pending-client-boletos]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const client = state.clientes.find((item) => item.id === button.dataset.generatePendingClientBoletos);
+      if (!client) return showToast("Cliente não encontrado.");
+      const months = String(button.dataset.pendingMonths || "").split(",").filter(Boolean);
+      if (!months.length) return showToast("Nenhuma competência pendente para gerar boleto.");
+      const paymentConfig = state.pagamentoSistema || {};
+      const invoices = months.map((month) => buildClientInvoice(client, month, paymentConfig));
+      openPrintableBoletos(client, invoices);
+    });
+  });
   mount.querySelector("#auditLogSearch")?.addEventListener("change", renderReports);
   mount.querySelector("#auditLogCategory")?.addEventListener("change", renderReports);
   mount.querySelector("[data-refresh-access-metrics]")?.addEventListener("click", async (event) => {
@@ -14921,6 +15034,14 @@ function renderReports(reportType = "") {
   const financeAnnualPaidClients = new Set(financeAnnualPaidRows.map((item) => item.client.id)).size;
   const financeOpenValue = financeOpenRows.reduce((sum, item) => sum + item.value, 0);
   const financeReviewValue = financeReviewRows.reduce((sum, item) => sum + item.value, 0);
+  const financePendingClients = [...financeOpenRows.reduce((grouped, row) => {
+    const clientId = String(row.client?.id || "");
+    if (!clientId) return grouped;
+    if (!grouped.has(clientId)) grouped.set(clientId, { client: row.client, rows: [] });
+    grouped.get(clientId).rows.push(row);
+    return grouped;
+  }, new Map()).values()]
+    .sort((a, b) => String(a.client.nome || a.client.id || "").localeCompare(String(b.client.nome || b.client.id || ""), "pt-BR"));
   const receitas = reportClients
     .filter((c) => c.status !== "inativo" && isBillableClientType(c) && effectivePaymentStatus(c) !== "isento")
     .reduce((acc, client) => {
@@ -15164,6 +15285,14 @@ function renderReports(reportType = "") {
           ${renderTimelineTable(getAccessTimeline(), "Ainda não há acessos detalhados neste período.", "access")}
         </div>
       `, true)}
+
+      ${isFinanceReport ? renderFinanceReportSection(
+        "clientes-pendentes-pagamento",
+        `Clientes pendentes de pagamento (${financePendingClients.length})`,
+        periodRange,
+        renderFinancePendingPaymentList(financePendingClients),
+        true
+      ) : ""}
 
       ${isFinanceReport ? renderFinanceReportSection(
         "clientes-atencao",
