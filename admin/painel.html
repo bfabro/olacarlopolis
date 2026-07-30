@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=367">
+  <link rel="stylesheet" href="painel.css?v=368">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -508,9 +508,24 @@
               <button id="cleanupFinanceButton" class="danger-button" type="button"><i class="fa-solid fa-lock"></i> Limpar financeiro publico</button>
               <button id="analyzeDuplicatesButton" class="ghost-button" type="button"><i class="fa-solid fa-copy"></i> Ver duplicados</button>
               <button id="cleanupDuplicatesButton" class="danger-button hidden" type="button"><i class="fa-solid fa-broom"></i> Limpar duplicados seguros</button>
+              <button id="showClientDisclosureReportButton" class="ghost-button" type="button" data-master="true"><i class="fa-solid fa-list-check"></i> Lista para divulgação</button>
             </div>
             <div id="importReport" class="import-report hidden"></div>
             <div id="duplicatesReport" class="duplicates-report hidden"></div>
+            <section id="clientDisclosureReport" class="client-disclosure-report hidden" data-master="true">
+              <div class="client-disclosure-report-head">
+                <div>
+                  <h3><i class="fa-solid fa-address-book"></i> Clientes para divulgação</h3>
+                  <p>Lista alfabética com descrição curta e imagem de perfil.</p>
+                </div>
+                <div>
+                  <button id="exportClientDisclosureCsvButton" type="button"><i class="fa-solid fa-file-csv"></i> Exportar CSV</button>
+                  <button id="closeClientDisclosureReportButton" class="ghost-button" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                </div>
+              </div>
+              <div id="clientDisclosureReportSummary" class="client-disclosure-report-summary"></div>
+              <div id="clientDisclosureReportList" class="client-disclosure-report-list"></div>
+            </section>
             <input id="clientSearch" class="search-input" placeholder="Buscar cliente...">
             <div class="client-list-filters">
               <label>Status
@@ -1930,6 +1945,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=465"></script>
+  <script type="module" src="painel.js?v=466"></script>
 </body>
 </html>

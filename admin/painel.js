@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 530,
-  label: "v537",
+  numero: 531,
+  label: "v538",
   data: "2026-07-30",
-  nota: "Relatorio financeiro com clientes pendentes e geracao individual de Pix e boletos."
+  nota: "Lista alfabetica exportavel dos clientes com descricao curta e imagem de perfil."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8007,11 +8007,115 @@ function updateClientFilterCounts() {
   });
 }
 
+function clientDisclosureRows() {
+  return [...state.clientes]
+    .map((client) => ({
+      client,
+      name: String(client.nome || client.name || client.id || "Cliente").trim(),
+      category: String(client.categoria || client.category || "Sem categoria").trim(),
+      status: String(client.status || "pendente").trim(),
+      description: String(client.descricaoCurta || client.shortDescription || "").trim(),
+      image: String(client.imagem || client.profileImage || client.imagemPerfil || client.perfil || client.logo || "").trim()
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" }));
+}
+
+function renderClientDisclosureReport() {
+  const report = $("clientDisclosureReport");
+  const list = $("clientDisclosureReportList");
+  const summary = $("clientDisclosureReportSummary");
+  if (!report || !list || !summary || report.classList.contains("hidden")) return;
+  const rows = clientDisclosureRows();
+  const withDescription = rows.filter((row) => row.description).length;
+  const withImage = rows.filter((row) => row.image).length;
+  const complete = rows.filter((row) => row.description && row.image).length;
+
+  summary.innerHTML = `
+    <article><span>Total de clientes</span><strong>${rows.length}</strong></article>
+    <article><span>Com descrição curta</span><strong>${withDescription}</strong></article>
+    <article><span>Com imagem de perfil</span><strong>${withImage}</strong></article>
+    <article><span>Cadastro completo</span><strong>${complete}</strong></article>
+  `;
+  list.innerHTML = rows.length ? rows.map((row, index) => {
+    const publicImage = row.image ? displayImageUrl(row.image) : "";
+    return `
+      <article class="client-disclosure-item">
+        <span class="client-disclosure-order">${index + 1}</span>
+        ${publicImage
+          ? `<img src="${escapeAttr(publicImage)}" alt="Imagem de perfil de ${escapeAttr(row.name)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>`
+          : `<div class="client-disclosure-image-missing" title="Sem imagem de perfil"><i class="fa-regular fa-image"></i></div>`}
+        <div class="client-disclosure-content">
+          <div class="client-disclosure-title">
+            <strong>${escapeHtml(row.name)}</strong>
+            <span>${escapeHtml(row.category)}</span>
+          </div>
+          <p class="${row.description ? "" : "is-missing"}">${row.description ? escapeHtml(row.description) : "Descrição curta para divulgação não preenchida."}</p>
+          <div class="client-disclosure-tags">
+            <span class="badge ${escapeAttr(row.status)}">${escapeHtml(statusLabel(row.status))}</span>
+            <span class="badge ${row.description ? "ativo" : "pendente"}"><i class="fa-solid ${row.description ? "fa-check" : "fa-triangle-exclamation"}"></i> ${row.description ? "Com descrição" : "Sem descrição"}</span>
+            <span class="badge ${row.image ? "ativo" : "pendente"}"><i class="fa-solid ${row.image ? "fa-check" : "fa-triangle-exclamation"}"></i> ${row.image ? "Com imagem" : "Sem imagem"}</span>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join("") : `<div class="list-meta">Nenhum cliente cadastrado.</div>`;
+}
+
+function clientDisclosureCsvCell(value = "") {
+  let text = String(value ?? "").replace(/\r?\n/g, " ").trim();
+  if (/^[=+\-@]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
+}
+
+function exportClientDisclosureCsv() {
+  if (!isMaster()) return showToast("Somente o Admin Master pode exportar esta lista.");
+  const rows = clientDisclosureRows();
+  const header = ["Ordem", "Nome do cliente", "Categoria", "Status", "Descrição curta para divulgação", "Imagem de perfil", "Possui descrição", "Possui imagem"];
+  const lines = rows.map((row, index) => [
+    index + 1,
+    row.name,
+    row.category,
+    statusLabel(row.status),
+    row.description,
+    row.image,
+    row.description ? "Sim" : "Não",
+    row.image ? "Sim" : "Não"
+  ].map(clientDisclosureCsvCell).join(";"));
+  const csv = `\uFEFFsep=;\r\n${header.map(clientDisclosureCsvCell).join(";")}\r\n${lines.join("\r\n")}`;
+  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `clientes-divulgacao-${dateKeyFromDate(new Date())}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  showToast(`${rows.length} clientes exportados em ordem alfabética.`);
+}
+
+function setClientDisclosureReportOpen(open) {
+  if (!isMaster()) return;
+  const report = $("clientDisclosureReport");
+  const button = $("showClientDisclosureReportButton");
+  report?.classList.toggle("hidden", !open);
+  if (button) {
+    button.innerHTML = open
+      ? `<i class="fa-solid fa-eye-slash"></i> Ocultar lista`
+      : `<i class="fa-solid fa-list-check"></i> Lista para divulgação`;
+    button.setAttribute("aria-expanded", String(open));
+  }
+  if (open) {
+    renderClientDisclosureReport();
+    report?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 function renderClientsList() {
   const box = $("clientsList");
   if (!box) return;
 
   updateClientFilterCounts();
+  renderClientDisclosureReport();
 
   const q = String($("clientSearch")?.value || "").toLowerCase().trim();
   const statusFilter = $("clientStatusFilter")?.value || "todos";
@@ -19330,6 +19434,12 @@ function bindEvents() {
   $("auditFinanceCleanupButton")?.addEventListener("click", auditClientFinanceCleanup);
   $("cleanupFinanceButton")?.addEventListener("click", cleanupPublicClientFinanceFields);
   $("analyzeDuplicatesButton").addEventListener("click", renderDuplicatesReport);
+  $("showClientDisclosureReportButton")?.addEventListener("click", () => {
+    const open = $("clientDisclosureReport")?.classList.contains("hidden") !== false;
+    setClientDisclosureReportOpen(open);
+  });
+  $("closeClientDisclosureReportButton")?.addEventListener("click", () => setClientDisclosureReportOpen(false));
+  $("exportClientDisclosureCsvButton")?.addEventListener("click", exportClientDisclosureCsv);
   $("cleanupDuplicatesButton").addEventListener("click", async () => {
     const plan = state.duplicateCleanupPlan || buildDuplicateCleanupPlan();
     if (!plan.removeIds.length) {
