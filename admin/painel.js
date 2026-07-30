@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 531,
-  label: "v538",
+  numero: 532,
+  label: "v539",
   data: "2026-07-30",
-  nota: "Lista alfabetica exportavel dos clientes com descricao curta e imagem de perfil."
+  nota: "Boletos sequenciais e documento de cobranca Pix com referencia, valor e alertas revisados."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8886,9 +8886,12 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
         <img src="${escapeAttr(boletoLogoUrl(paymentConfig))}" alt="Logo">
         <div>
           <strong>Olá Carlópolis</strong>
-          <span>Boleto de pagamento via Pix</span>
+          <span>Cobrança via Pix</span>
         </div>
-        <b>${escapeHtml(moneyBR(invoice.valorTotal))}</b>
+        <div class="boleto-reference">
+          <span>Mês de referência</span>
+          <b>${escapeHtml(monthLabel(invoice.mes))}</b>
+        </div>
       </header>
       <div class="boleto-body">
         <section class="boleto-details">
@@ -8907,11 +8910,13 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
         </section>
         <section class="boleto-qr">
           <img src="${escapeAttr(qrCodeUrl(invoice.pixCode))}" alt="QR Code Pix">
-          <span>Escaneie para pagar</span>
+          <span>Escaneie o QR Code pelo aplicativo do seu banco. Antes de confirmar, confira o nome e o valor do recebedor.</span>
+          <strong>${escapeHtml(moneyBR(invoice.valorTotal))}</strong>
         </section>
       </div>
       <footer>
         ${paymentConfig.mensagemRodapeBoleto ? `<strong>${escapeHtml(paymentConfig.mensagemRodapeBoleto)}</strong>` : ""}
+        <strong class="pix-safety-message">O Olá Carlópolis não solicita pagamento para outra chave Pix. Confira sempre o beneficiário antes de concluir.</strong>
         <div><span>Documento gerado em ${escapeHtml(new Date().toLocaleDateString("pt-BR"))}</span><span>${escapeHtml(paymentConfig.pixCidade || "CARLOPOLIS")}</span></div>
       </footer>
     </article>
@@ -8972,11 +8977,11 @@ function openPrintableBoletos(client, invoices = []) {
       .boleto:not(:last-child){margin-bottom:5mm}
       .boleto:not(:last-child):after{content:"✂  CORTE AQUI";position:absolute;left:-6mm;right:-1mm;bottom:-3mm;border-bottom:1.5px dashed #64748b;color:#64748b;font-size:8px;font-weight:700;line-height:1;text-align:center}
       .boleto header{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid #cbd5e1;background:#f8fafc}
-      .boleto header img{width:64px;height:48px;object-fit:contain}.boleto header strong{display:block;font-size:18px}.boleto header span{font-size:13px;color:#64748b}.boleto header b{font-size:22px;color:#0f766e}
-      .boleto-body{display:grid;grid-template-columns:1fr 112px;gap:10px;padding:9px 12px}
+      .boleto header img{width:64px;height:48px;object-fit:contain}.boleto header strong{display:block;font-size:18px}.boleto header span{font-size:13px;color:#64748b}.boleto-reference{text-align:right}.boleto-reference span{display:block;font-size:9px!important;font-weight:700;text-transform:uppercase}.boleto-reference b{display:block;max-width:145px;color:#0f766e;font-size:15px;line-height:1.15;text-transform:capitalize}
+      .boleto-body{display:grid;grid-template-columns:1fr 145px;gap:10px;padding:9px 12px}
       .boleto-details{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;align-content:start}.boleto-details div{min-width:0}.boleto-details .wide{grid-column:1/-1}.boleto-details span{display:block;font-size:10px;text-transform:uppercase;color:#64748b;font-weight:700}.boleto-details strong{display:block;font-size:13px;line-height:1.2;overflow-wrap:anywhere}.boleto-details .note strong,.boleto-details .destaque-description strong{font-size:11px;font-weight:600}.boleto-details .destaque-value strong{color:#b45309}
-      .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px}.boleto-qr img{width:104px;height:104px}.boleto-qr span{font-size:11px;font-weight:700;margin-top:3px}
-      .boleto footer{display:grid;gap:3px;padding:6px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:10px}.boleto footer>strong{color:#334155;font-size:11px;text-align:center}.boleto footer>div{display:flex;justify-content:space-between}
+      .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px;text-align:center}.boleto-qr img{width:100px;height:100px}.boleto-qr span{max-width:136px;margin-top:4px;color:#475569;font-size:8px;font-weight:700;line-height:1.2}.boleto-qr strong{display:block;margin-top:4px;color:#0f766e;font-size:17px}
+      .boleto footer{display:grid;gap:3px;padding:5px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:9px}.boleto footer>strong{color:#334155;font-size:10px;text-align:center}.boleto footer>.pix-safety-message{color:#7c2d12;font-size:9px}.boleto footer>div{display:flex;justify-content:space-between}
       @page{size:A4 portrait;margin:0}
       @media print{body{background:#fff}.print-actions{display:none}.sheet{margin:0;box-shadow:none;width:210mm;height:297mm;min-height:297mm}}
     </style>
@@ -13555,12 +13560,24 @@ function renderFinancePendingPaymentList(items = []) {
                       data-pending-total="${escapeAttr(total)}">
                 <i class="fa-solid fa-qrcode"></i> Gerar Pix
               </button>
-              <button type="button"
-                      class="ghost-button"
-                      data-generate-pending-client-boletos="${escapeAttr(client.id)}"
-                      data-pending-months="${escapeAttr(monthsValue)}">
-                <i class="fa-solid fa-print"></i> Gerar ${months.length === 1 ? "boleto" : "boletos"}
-              </button>
+              <div class="finance-pending-boleto-controls">
+                <label>
+                  <span>Quantidade de boletos</span>
+                  <select data-pending-boleto-quantity>
+                    ${Array.from({ length: 12 }, (_, index) => {
+                      const quantity = index + 1;
+                      const defaultQuantity = Math.max(1, Math.min(12, months.length));
+                      return `<option value="${quantity}" ${quantity === defaultQuantity ? "selected" : ""}>${quantity}</option>`;
+                    }).join("")}
+                  </select>
+                </label>
+                <button type="button"
+                        class="ghost-button"
+                        data-generate-pending-client-boletos="${escapeAttr(client.id)}"
+                        data-pending-months="${escapeAttr(monthsValue)}">
+                  <i class="fa-solid fa-print"></i> Gerar boletos
+                </button>
+              </div>
             </div>
             <div class="finance-pending-pix-result hidden" data-pending-pix-result>
               <img alt="QR Code Pix de ${escapeAttr(client.nome || client.id)}" data-pending-pix-qr>
@@ -15061,10 +15078,11 @@ function bindReportControls(mount) {
     button.addEventListener("click", () => {
       const client = state.clientes.find((item) => item.id === button.dataset.generatePendingClientBoletos);
       if (!client) return showToast("Cliente não encontrado.");
-      const months = String(button.dataset.pendingMonths || "").split(",").filter(Boolean);
-      if (!months.length) return showToast("Nenhuma competência pendente para gerar boleto.");
-      const paymentConfig = state.pagamentoSistema || {};
-      const invoices = months.map((month) => buildClientInvoice(client, month, paymentConfig));
+      const months = String(button.dataset.pendingMonths || "").split(",").filter(Boolean).sort();
+      const startMonth = months[0] || currentMonthKey();
+      const item = button.closest("[data-finance-pending-client]");
+      const quantity = Number(item?.querySelector("[data-pending-boleto-quantity]")?.value || 1);
+      const invoices = buildInvoiceBatch(client, quantity, startMonth);
       openPrintableBoletos(client, invoices);
     });
   });
