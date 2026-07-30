@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 533,
-  label: "v540",
+  numero: 534,
+  label: "v541",
   data: "2026-07-30",
-  nota: "Tela de clientes reorganizada e lista de divulgacao com filtros e exportacao do resultado."
+  nota: "Documento de cobranca Pix reorganizado com valor ampliado e dados separados."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8940,30 +8940,47 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
           <strong>Olá Carlópolis</strong>
           <span>Cobrança via Pix</span>
         </div>
-        <div class="boleto-reference">
-          <span>Mês de referência</span>
-          <b>${escapeHtml(monthLabel(invoice.mes))}</b>
+        <div class="boleto-header-meta">
+          <div>
+            <span>Mês de referência</span>
+            <b>${escapeHtml(monthLabel(invoice.mes))}</b>
+          </div>
+          <div>
+            <span>Plano</span>
+            <b>${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</b>
+          </div>
         </div>
       </header>
       <div class="boleto-body">
         <section class="boleto-details">
-          <div><span>Cliente</span><strong>${escapeHtml(client.nome || client.id || "Cliente")}</strong></div>
-          <div><span>Contato</span><strong>${escapeHtml(contact)}</strong></div>
-          <div><span>Competência</span><strong>${escapeHtml(monthLabel(invoice.mes))}</strong></div>
-          <div><span>Vencimento</span><strong>${escapeHtml(formatDateBR(invoice.dueDate))}</strong></div>
-          <div><span>Plano</span><strong>${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</strong></div>
-          <div><span>Recebedor</span><strong>${escapeHtml(paymentConfig.pixNome || "Ola Carlopolis")}</strong></div>
-          <div><span>Telefone Olá Carlópolis</span><strong>${escapeHtml(olaPhone)}</strong></div>
-          <div><span>Mensalidade</span><strong>${escapeHtml(moneyBR(invoice.valorPlano))}</strong></div>
-          ${invoice.valorDestaque > 0 ? `<div class="destaque-value"><span>Adicional de destaque</span><strong>${escapeHtml(moneyBR(invoice.valorDestaque))}</strong></div>` : ""}
-          <div class="wide"><span>Chave Pix</span><strong>${escapeHtml(paymentConfig.pixChave || "Não configurada")}</strong></div>
-          ${invoice.valorDestaque > 0 ? `<div class="wide destaque-description"><span>Descrição do adicional</span><strong>Destaque comercial contratado durante ${escapeHtml(monthLabel(invoice.mes))}, somado ao valor da mensalidade.</strong></div>` : ""}
-          ${paymentConfig.observacaoFatura ? `<div class="wide note"><span>Observação</span><strong>${escapeHtml(paymentConfig.observacaoFatura)}</strong></div>` : ""}
+          <div class="boleto-parties">
+            <section class="boleto-party boleto-client">
+              <h3><i>1</i> Dados do cliente</h3>
+              <div><span>Cliente</span><strong>${escapeHtml(client.nome || client.id || "Cliente")}</strong></div>
+              <div><span>Contato</span><strong>${escapeHtml(contact)}</strong></div>
+              <div><span>Vencimento</span><strong>${escapeHtml(formatDateBR(invoice.dueDate))}</strong></div>
+            </section>
+            <section class="boleto-party boleto-receiver">
+              <h3><i>2</i> Dados do recebedor</h3>
+              <div><span>Beneficiário</span><strong>${escapeHtml(paymentConfig.pixNome || "Ola Carlopolis")}</strong></div>
+              <div><span>Telefone</span><strong>${escapeHtml(olaPhone)}</strong></div>
+              <div class="wide"><span>Chave Pix</span><strong>${escapeHtml(paymentConfig.pixChave || "Não configurada")}</strong></div>
+            </section>
+          </div>
+          <section class="boleto-charge-details">
+            <div><span>Valor do plano</span><strong>${escapeHtml(moneyBR(invoice.valorPlano))}</strong></div>
+            ${invoice.valorDestaque > 0 ? `<div class="destaque-value"><span>Adicional de destaque</span><strong>${escapeHtml(moneyBR(invoice.valorDestaque))}</strong></div>` : ""}
+            ${invoice.valorDestaque > 0 ? `<div class="wide destaque-description"><span>Descrição do adicional</span><strong>Destaque comercial contratado durante ${escapeHtml(monthLabel(invoice.mes))}, somado ao valor do plano.</strong></div>` : ""}
+            ${paymentConfig.observacaoFatura ? `<div class="wide note"><span>Observação</span><strong>${escapeHtml(paymentConfig.observacaoFatura)}</strong></div>` : ""}
+          </section>
         </section>
         <section class="boleto-qr">
           <img src="${escapeAttr(qrCodeUrl(invoice.pixCode))}" alt="QR Code Pix">
           <span>Escaneie o QR Code pelo aplicativo do seu banco. Antes de confirmar, confira o nome e o valor do recebedor.</span>
-          <strong>${escapeHtml(moneyBR(invoice.valorTotal))}</strong>
+          <div class="boleto-total">
+            <small>Valor da cobrança</small>
+            <strong>${escapeHtml(moneyBR(invoice.valorTotal))}</strong>
+          </div>
         </section>
       </div>
       <footer>
@@ -9029,10 +9046,10 @@ function openPrintableBoletos(client, invoices = []) {
       .boleto:not(:last-child){margin-bottom:5mm}
       .boleto:not(:last-child):after{content:"✂  CORTE AQUI";position:absolute;left:-6mm;right:-1mm;bottom:-3mm;border-bottom:1.5px dashed #64748b;color:#64748b;font-size:8px;font-weight:700;line-height:1;text-align:center}
       .boleto header{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;padding:9px 12px;border-bottom:1px solid #cbd5e1;background:#f8fafc}
-      .boleto header img{width:64px;height:48px;object-fit:contain}.boleto header strong{display:block;font-size:18px}.boleto header span{font-size:13px;color:#64748b}.boleto-reference{text-align:right}.boleto-reference span{display:block;font-size:9px!important;font-weight:700;text-transform:uppercase}.boleto-reference b{display:block;max-width:145px;color:#0f766e;font-size:15px;line-height:1.15;text-transform:capitalize}
-      .boleto-body{display:grid;grid-template-columns:1fr 145px;gap:10px;padding:9px 12px}
-      .boleto-details{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 10px;align-content:start}.boleto-details div{min-width:0}.boleto-details .wide{grid-column:1/-1}.boleto-details span{display:block;font-size:10px;text-transform:uppercase;color:#64748b;font-weight:700}.boleto-details strong{display:block;font-size:13px;line-height:1.2;overflow-wrap:anywhere}.boleto-details .note strong,.boleto-details .destaque-description strong{font-size:11px;font-weight:600}.boleto-details .destaque-value strong{color:#b45309}
-      .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px;text-align:center}.boleto-qr img{width:100px;height:100px}.boleto-qr span{max-width:136px;margin-top:4px;color:#475569;font-size:8px;font-weight:700;line-height:1.2}.boleto-qr strong{display:block;margin-top:4px;color:#0f766e;font-size:17px}
+      .boleto header img{width:64px;height:48px;object-fit:contain}.boleto header strong{display:block;font-size:18px}.boleto header span{font-size:13px;color:#64748b}.boleto-header-meta{display:grid;grid-template-columns:auto auto;gap:12px;text-align:right}.boleto-header-meta>div{padding-left:10px;border-left:1px solid #cbd5e1}.boleto-header-meta span{display:block;font-size:8px!important;font-weight:700;text-transform:uppercase}.boleto-header-meta b{display:block;max-width:120px;color:#0f766e;font-size:13px;line-height:1.15;text-transform:capitalize}
+      .boleto-body{display:grid;grid-template-columns:1fr 155px;gap:10px;padding:8px 12px}
+      .boleto-details{display:grid;gap:6px;align-content:start}.boleto-parties{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.boleto-party{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 8px;padding:7px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc}.boleto-party h3{grid-column:1/-1;display:flex;align-items:center;gap:5px;margin:0 0 1px;color:#334155;font-size:10px}.boleto-party h3 i{display:grid;width:15px;height:15px;place-items:center;border-radius:50%;background:#0f766e;color:#fff;font-size:8px;font-style:normal}.boleto-party div,.boleto-charge-details div{min-width:0}.boleto-party .wide,.boleto-charge-details .wide{grid-column:1/-1}.boleto-details span{display:block;font-size:8px;text-transform:uppercase;color:#64748b;font-weight:700}.boleto-details strong{display:block;font-size:10px;line-height:1.18;overflow-wrap:anywhere}.boleto-charge-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 9px;padding:6px 8px;border:1px solid #dbeafe;border-radius:6px;background:#eff6ff}.boleto-charge-details>div>strong{font-size:11px}.boleto-details .note strong,.boleto-details .destaque-description strong{font-size:9px;font-weight:600}.boleto-details .destaque-value strong{color:#b45309}
+      .boleto-qr{display:grid;justify-items:center;align-content:center;border-left:1px dashed #94a3b8;padding-left:10px;text-align:center}.boleto-qr img{width:96px;height:96px}.boleto-qr>span{max-width:146px;margin-top:4px;color:#475569;font-size:7.5px;font-weight:700;line-height:1.18}.boleto-total{width:100%;margin-top:5px;padding:6px 5px;border:2px solid #0f766e;border-radius:7px;background:#ecfdf5}.boleto-total small{display:block;color:#0f766e;font-size:8px;font-weight:800;text-transform:uppercase}.boleto-total strong{display:block;margin-top:1px;color:#065f46;font-size:25px;line-height:1.05}
       .boleto footer{display:grid;gap:3px;padding:5px 12px;border-top:1px solid #e2e8f0;color:#64748b;font-size:9px}.boleto footer>strong{color:#334155;font-size:10px;text-align:center}.boleto footer>.pix-safety-message{color:#7c2d12;font-size:9px}.boleto footer>div{display:flex;justify-content:space-between}
       @page{size:A4 portrait;margin:0}
       @media print{body{background:#fff}.print-actions{display:none}.sheet{margin:0;box-shadow:none;width:210mm;height:297mm;min-height:297mm}}
