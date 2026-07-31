@@ -25141,3 +25141,123 @@ body.business-art-capturing-background .home-cards-intro {
 .business-art-stage.layout-vitrine.is-png-export .business-art-vitrine-thumb {
   box-shadow: none !important;
 }
+
+/* ===== Modal de produto: informacoes profissionais v411 ===== */
+.loja-produto-informacoes {
+  margin: 18px 0;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-left: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .08);
+}
+
+.loja-produto-informacoes .imovel-detalhes-descricao-titulo {
+  gap: 9px;
+  padding: 13px 16px;
+  border-bottom: 1px solid #e8edf3;
+  background: linear-gradient(180deg, #fff, #fbfcfe);
+  color: #1e3a5f;
+  font-size: .78rem;
+  letter-spacing: .025em;
+}
+
+.loja-produto-informacoes .imovel-detalhes-descricao-titulo i {
+  color: #d99a22;
+  font-size: .88rem;
+}
+
+.loja-produto-detalhes-lista {
+  padding: 0 16px;
+}
+
+.loja-produto-detalhe {
+  display: grid;
+  grid-template-columns: 18px minmax(112px, .9fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: 8px;
+  min-height: 43px;
+  border-bottom: 1px solid #edf1f5;
+  color: #334155;
+}
+
+.loja-produto-detalhe:last-child {
+  border-bottom: 0;
+}
+
+.loja-produto-detalhe > i {
+  width: 18px;
+  color: #12365d;
+  font-size: .8rem;
+  text-align: center;
+}
+
+.loja-produto-detalhe > strong,
+.loja-produto-detalhe > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.loja-produto-detalhe > strong {
+  color: #314158;
+  font-size: .76rem;
+  font-weight: 750;
+}
+
+.loja-produto-detalhe > span {
+  color: #334155;
+  font-size: .77rem;
+  line-height: 1.35;
+}
+
+.loja-produto-detalhe.is-available > i,
+.loja-produto-detalhe.is-available > strong,
+.loja-produto-detalhe.is-available > span {
+  color: #16a34a;
+}
+
+.loja-produto-detalhe.is-unavailable > i,
+.loja-produto-detalhe.is-unavailable > strong,
+.loja-produto-detalhe.is-unavailable > span {
+  color: #dc2626;
+}
+
+.loja-produto-observacao {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0 16px 14px;
+  padding: 10px 11px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: .76rem;
+  line-height: 1.45;
+}
+
+.loja-produto-observacao i {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #2563eb;
+}
+
+@media (max-width: 430px) {
+  .loja-produto-informacoes .imovel-detalhes-descricao-titulo {
+    padding: 12px 13px;
+  }
+
+  .loja-produto-detalhes-lista {
+    padding: 0 13px;
+  }
+
+  .loja-produto-detalhe {
+    grid-template-columns: 17px minmax(96px, .9fr) minmax(0, 1.1fr);
+    gap: 7px;
+    min-height: 41px;
+  }
+
+  .loja-produto-observacao {
+    margin: 0 13px 13px;
+  }
+}

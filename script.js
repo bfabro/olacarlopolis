@@ -10112,19 +10112,30 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       item.foto,
       item.banner
     ].map((img) => String(img || "").trim()).filter(Boolean).filter((img, index, arr) => arr.indexOf(img) === index).slice(0, 4);
-    const detalheLinha = (label, value, icon = "fa-solid fa-circle-info") => (
-      value ? `<p class="imovel-detalhes-endereco"><i class="${icon}"></i><span><strong>${escapePromoHtml(label)}:</strong> ${escapePromoHtml(value)}</span></p>` : ""
+    const disponibilidadeNormalizada = normalizeName(item.disponibilidade || "");
+    const disponibilidadeClasse = disponibilidadeNormalizada.includes("indisponivel")
+      ? " is-unavailable"
+      : disponibilidadeNormalizada.includes("disponivel")
+        ? " is-available"
+        : "";
+    const detalheLinha = (label, value, icon = "fa-solid fa-circle-info", statusClass = "") => (
+      value ? `
+        <div class="loja-produto-detalhe${statusClass}">
+          <i class="${icon}" aria-hidden="true"></i>
+          <strong>${escapePromoHtml(label)}</strong>
+          <span>${escapePromoHtml(value)}</span>
+        </div>
+      ` : ""
     );
     const detalhesProdutoHtml = [
-      detalheLinha("Marca", item.marca, "fa-solid fa-copyright"),
-      detalheLinha("Modelo", item.modelo, "fa-solid fa-barcode"),
+      detalheLinha("Marca", item.marca, "fa-solid fa-tag"),
+      detalheLinha("Modelo", item.modelo, "fa-solid fa-cube"),
       detalheLinha(produtoMedidaLabel(item), item.tamanho, "fa-solid fa-ruler-combined"),
-      detalheLinha("Cores disponiveis", item.cores, "fa-solid fa-palette"),
-      detalheLinha("Variacoes", item.variacoes, "fa-solid fa-layer-group"),
-      detalheLinha("Condicao", item.condicao, "fa-solid fa-certificate"),
-      detalheLinha("Disponibilidade", item.disponibilidade, "fa-solid fa-circle-check"),
+      detalheLinha("Cores disponíveis", item.cores, "fa-solid fa-palette"),
+      detalheLinha("Variações", item.variacoes, "fa-solid fa-ruler"),
+      detalheLinha("Condição", item.condicao, "fa-solid fa-award"),
+      detalheLinha("Disponibilidade", item.disponibilidade, "fa-solid fa-circle-check", disponibilidadeClasse),
       detalheLinha("Entrega ou retirada", item.entregaRetirada, "fa-solid fa-truck"),
-      item.informacoesEspecificas ? `<p>${escapePromoHtml(item.informacoesEspecificas)}</p>` : ""
     ].filter(Boolean).join("");
     const modal = document.createElement("div");
     modal.className = "imovel-detalhes-modal loja-produto-modal";
@@ -10159,10 +10170,16 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ${!item.observacoes && item.obs ? `<p>${escapePromoHtml(item.obs)}</p>` : ""}
             </section>
           ` : ""}
-          ${isProduto && detalhesProdutoHtml ? `
-            <section class="imovel-detalhes-descricao">
-              <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-list-check"></i><span>Informacoes do produto</span></div>
-              ${detalhesProdutoHtml}
+          ${isProduto && (detalhesProdutoHtml || item.informacoesEspecificas) ? `
+            <section class="imovel-detalhes-descricao loja-produto-informacoes">
+              <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-list-check"></i><span>Informações do produto</span></div>
+              <div class="loja-produto-detalhes-lista">${detalhesProdutoHtml}</div>
+              ${item.informacoesEspecificas ? `
+                <div class="loja-produto-observacao">
+                  <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                  <span>${escapePromoHtml(item.informacoesEspecificas)}</span>
+                </div>
+              ` : ""}
             </section>
           ` : ""}
           ${(isProduto || isPromocao) && whatsapp ? `<a class="auto-whatsapp-button loja-produto-whatsapp" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>` : ""}
