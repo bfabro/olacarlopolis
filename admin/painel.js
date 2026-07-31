@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 535,
-  label: "v542",
+  numero: 536,
+  label: "v543",
   data: "2026-07-30",
-  nota: "Dados do cliente e recebedor empilhados e ampliados no documento de cobranca Pix."
+  nota: "Categoria atualizada para Moda e Vestuário em todo o sistema."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -1532,7 +1532,13 @@ function snapshotToClientList(snapshot) {
   const clients = [];
   if (snapshot?.exists()) {
     snapshot.forEach((child) => {
-      clients.push({ id: child.key, ...child.val() });
+      const data = child.val() || {};
+      const categoria = canonicalClientCategoryReference(data.categoria, data.categoriaId);
+      clients.push({
+        id: child.key,
+        ...data,
+        ...(categoria ? { categoria: categoria.nome, categoriaId: categoria.id } : {})
+      });
       return false;
     });
   }
@@ -1742,9 +1748,22 @@ function upsertClientInState(id, data) {
   }
 }
 
+function canonicalClientCategoryReference(name = "", id = "") {
+  const legacyKeys = new Set(["lojaderoupa", "lojaderoupas"]);
+  const normalizedName = normalizeName(name);
+  const normalizedId = normalizeName(id);
+  if (legacyKeys.has(normalizedName) || legacyKeys.has(normalizedId)) {
+    return { nome: "Moda e Vestuário", id: "moda-e-vestuario" };
+  }
+  return null;
+}
+
 function normalizeCategory(cat) {
-  const name = cat.nome || cat.title || cat.id || "Sem nome";
-  const id = cat.id || slugify(name);
+  const originalName = cat.nome || cat.title || cat.id || "Sem nome";
+  const originalId = cat.id || slugify(originalName);
+  const canonical = canonicalClientCategoryReference(originalName, originalId);
+  const name = canonical?.nome || originalName;
+  const id = canonical?.id || originalId;
   return {
     status: "ativo",
     origem: "painel",

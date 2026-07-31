@@ -6188,7 +6188,7 @@ carlopdiesel:"s",
     pescaepresente: "n",
     lojathiagoaguera: "s",
 
-    //lojaderoupas
+    // moda e vestuario
 
     "t&mcollection": "n",
 
@@ -20556,8 +20556,8 @@ plotarPinsImoveis(stateImoveis.filtered);
 
 
       {
-        link: document.querySelector("#menuLojaRoupas"),
-        title: "Loja de Roupa",
+        link: document.querySelector("#menuModaVestuario"),
+        title: "Moda e Vestuário",
         establishments: [
           {
             image: "images/comercios/lojaDeRoupa/tsmCollection/perfil.jpg",
@@ -22220,8 +22220,8 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function clienteAdminTemCategoria(cliente, categoriaSlug) {
     if (!categoriaSlug) return true;
-    const categoriaCliente = normalizeName(cliente?.categoria || cliente?.categoriaId || "");
-    return !categoriaCliente || categoriaCliente === categoriaSlug;
+    const categoriaCliente = chaveMenuCategoriaAdmin(cliente?.categoria || cliente?.categoriaId || "");
+    return !categoriaCliente || categoriaCliente === chaveMenuCategoriaAdmin(categoriaSlug);
   }
 
   function escolherClienteAdminParaEstabelecimento(candidatos, categoriaSlug) {
@@ -22436,7 +22436,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     let melhorScore = 0;
     (categories || []).forEach((cat) => {
       const catSlug = normalizeName(cat.title || "");
-      if (categoriaTitulo && catSlug !== normalizeName(categoriaTitulo)) return;
+      if (categoriaTitulo && chaveMenuCategoriaAdmin(cat.title || "") !== chaveMenuCategoriaAdmin(categoriaTitulo)) return;
       (cat.establishments || []).forEach((est) => {
         const score = pontuarClienteAdminParaEstabelecimento(clienteId, cliente, est, catSlug);
         if (score > melhorScore) {
@@ -22645,6 +22645,11 @@ plotarPinsImoveis(stateImoveis.filtered);
       acabamentoedecoracoes: "acabamento",
       acabamentodecoracao: "acabamento",
       acabamentodecoracoes: "acabamento",
+      lojaderoupa: "modavestuario",
+      lojaderoupas: "modavestuario",
+      lojaroupa: "modavestuario",
+      lojaroupas: "modavestuario",
+      modaevestuario: "modavestuario",
       hotelpousada: "hotelpousada",
       hotelpousadas: "hotelpousada",
       hotelepousada: "hotelpousada",
@@ -22672,6 +22677,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   function tituloCanonicoCategoriaAdmin(tituloCategoria = "") {
     const chave = chaveMenuCategoriaAdmin(tituloCategoria);
     if (chave === "revendaveiculo") return "Revenda de Veiculos";
+    if (chave === "modavestuario") return "Moda e Vestuário";
     return String(tituloCategoria || "Outros").trim() || "Outros";
   }
 
