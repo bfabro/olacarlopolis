@@ -25142,7 +25142,7 @@ body.business-art-capturing-background .home-cards-intro {
   box-shadow: none !important;
 }
 
-/* ===== Modal de produto: informacoes profissionais v411 ===== */
+/* ===== Modal de produto: informacoes profissionais v412 ===== */
 .loja-produto-informacoes {
   margin: 18px 0;
   overflow: hidden;
@@ -25166,6 +25166,23 @@ body.business-art-capturing-background .home-cards-intro {
 .loja-produto-informacoes .imovel-detalhes-descricao-titulo i {
   color: #d99a22;
   font-size: .88rem;
+}
+
+.loja-produto-detalhes-texto .loja-produto-textos {
+  padding: 2px 16px 4px;
+}
+
+.loja-produto-detalhes-texto .loja-produto-textos p {
+  margin: 0;
+  padding: 11px 0;
+  border-bottom: 1px solid #edf1f5;
+  color: #334155;
+  font-size: .82rem;
+  line-height: 1.55;
+}
+
+.loja-produto-detalhes-texto .loja-produto-textos p:last-child {
+  border-bottom: 0;
 }
 
 .loja-produto-detalhes-lista {
@@ -25249,6 +25266,10 @@ body.business-art-capturing-background .home-cards-intro {
 
   .loja-produto-detalhes-lista {
     padding: 0 13px;
+  }
+
+  .loja-produto-detalhes-texto .loja-produto-textos {
+    padding: 2px 13px 4px;
   }
 
   .loja-produto-detalhe {

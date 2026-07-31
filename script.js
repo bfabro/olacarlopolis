@@ -10163,11 +10163,13 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
             ${preco ? `<div class="imovel-detalhes-financeiro"><strong class="imovel-detalhes-valor">${escapePromoHtml(preco)}</strong></div>` : ""}
           </div>
           ${(item.descricao || item.observacoes || item.obs) ? `
-            <section class="imovel-detalhes-descricao">
+            <section class="imovel-detalhes-descricao loja-produto-informacoes loja-produto-detalhes-texto">
               <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-align-left"></i><span>Detalhes</span></div>
-              ${item.descricao ? `<p>${escapePromoHtml(item.descricao)}</p>` : ""}
-              ${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}
-              ${!item.observacoes && item.obs ? `<p>${escapePromoHtml(item.obs)}</p>` : ""}
+              <div class="loja-produto-textos">
+                ${item.descricao ? `<p>${escapePromoHtml(item.descricao)}</p>` : ""}
+                ${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}
+                ${!item.observacoes && item.obs ? `<p>${escapePromoHtml(item.obs)}</p>` : ""}
+              </div>
             </section>
           ` : ""}
           ${isProduto && (detalhesProdutoHtml || item.informacoesEspecificas) ? `
