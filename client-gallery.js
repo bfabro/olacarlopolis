@@ -1,4 +1,4 @@
-/* client-gallery.js - galeria publica de fotos dos clientes - v1 */
+/* client-gallery.js - galeria publica de fotos dos clientes - v2 */
 (function () {
   "use strict";
 
@@ -15,8 +15,15 @@
 
   function normalizeGallery(group = {}) {
     const seen = new Set();
+    const titles = Array.isArray(group.titulos) ? group.titulos : [];
+    const descriptions = Array.isArray(group.descricoes) ? group.descricoes : [];
     const images = (Array.isArray(group.imagens) ? group.imagens : [])
-      .map((source, originalIndex) => ({ source: String(source || "").trim(), originalIndex }))
+      .map((source, originalIndex) => ({
+        source: String(source || "").trim(),
+        originalIndex,
+        title: String(titles[originalIndex] || "").trim(),
+        description: String(descriptions[originalIndex] || "").replace(/<br\s*\/?\s*>/gi, "\n").trim()
+      }))
       .filter(({ source }) => source && !seen.has(source) && seen.add(source));
     return {
       name: String(group.nome || "cliente").trim(),
@@ -25,6 +32,7 @@
   }
 
   function closeGallery() {
+    closeLightbox();
     activeGallery?.modal?.remove();
     activeGallery = null;
     document.body.classList.remove("client-gallery-open");
@@ -82,13 +90,13 @@
   function viewerTemplate(gallery) {
     return `
       <section class="client-gallery-viewer" data-gallery-viewer hidden>
-        <button type="button" class="client-gallery-viewer-back" data-gallery-viewer-back><i class="fa-solid fa-arrow-left"></i><span>Voltar à galeria</span></button>
         <div class="client-gallery-stage" data-gallery-stage>
           <button type="button" class="client-gallery-nav prev" data-gallery-prev aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button>
           <img data-gallery-viewer-image src="" alt="">
           <button type="button" class="client-gallery-nav next" data-gallery-next aria-label="Próxima foto"><i class="fa-solid fa-chevron-right"></i></button>
           <span class="client-gallery-counter" data-gallery-counter></span>
         </div>
+        <footer class="client-gallery-caption" data-gallery-caption hidden></footer>
         <div class="client-gallery-viewer-thumbs" data-gallery-viewer-thumbs>
           ${gallery.images.map((image, index) => `<button type="button" data-gallery-thumb="${image.originalIndex}" aria-label="Ir para foto ${index + 1}"><img src="${escapeHtml(image.source)}" alt="Miniatura ${index + 1}" loading="lazy"></button>`).join("")}
         </div>
@@ -108,6 +116,14 @@
     }
     const counter = modal.querySelector("[data-gallery-counter]");
     if (counter) counter.textContent = `${activeGallery.position + 1} de ${gallery.images.length}`;
+    const caption = modal.querySelector("[data-gallery-caption]");
+    if (caption) {
+      const customTitle = current.title && current.title.toLocaleLowerCase("pt-BR") !== gallery.name.toLocaleLowerCase("pt-BR")
+        ? current.title
+        : "";
+      caption.innerHTML = `${customTitle ? `<strong>${escapeHtml(customTitle)}</strong>` : ""}${current.description ? `<p>${escapeHtml(current.description).replace(/\r?\n/g, "<br>")}</p>` : ""}`;
+      caption.hidden = !customTitle && !current.description;
+    }
     modal.querySelectorAll("[data-gallery-thumb]").forEach((thumb) => {
       const selected = Number(thumb.dataset.galleryThumb) === current.originalIndex;
       thumb.classList.toggle("is-active", selected);
@@ -141,6 +157,28 @@
     renderViewer(activeGallery.gallery.images[activeGallery.position].originalIndex);
   }
 
+  function closeLightbox() {
+    document.querySelector(".client-gallery-lightbox")?.remove();
+  }
+
+  function openLightbox() {
+    if (!activeGallery) return;
+    closeLightbox();
+    const current = activeGallery.gallery.images[activeGallery.position];
+    const lightbox = document.createElement("div");
+    lightbox.className = "client-gallery-lightbox";
+    lightbox.setAttribute("role", "dialog");
+    lightbox.setAttribute("aria-modal", "true");
+    lightbox.setAttribute("aria-label", `Foto ampliada de ${activeGallery.gallery.name}`);
+    lightbox.innerHTML = `<div class="client-gallery-lightbox-box"><button type="button" aria-label="Fechar foto ampliada">&times;</button><img src="${escapeHtml(current.source)}" alt="Foto ampliada de ${escapeHtml(activeGallery.gallery.name)}"></div>`;
+    document.body.appendChild(lightbox);
+    lightbox.querySelector("button")?.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", (event) => {
+      if (event.target === lightbox) closeLightbox();
+    });
+    lightbox.querySelector("button")?.focus();
+  }
+
   function bindGallery(modal) {
     modal.querySelector("[data-gallery-close]")?.addEventListener("click", closeGallery);
     modal.querySelectorAll("[data-gallery-image]").forEach((button) => {
@@ -150,12 +188,12 @@
       button.addEventListener("click", () => showOverview(true));
     });
     modal.querySelector("[data-gallery-back-summary]")?.addEventListener("click", () => showOverview(false));
-    modal.querySelector("[data-gallery-viewer-back]")?.addEventListener("click", () => showOverview(false));
     modal.querySelector("[data-gallery-prev]")?.addEventListener("click", () => moveViewer(-1));
     modal.querySelector("[data-gallery-next]")?.addEventListener("click", () => moveViewer(1));
     modal.querySelectorAll("[data-gallery-thumb]").forEach((button) => {
       button.addEventListener("click", () => renderViewer(Number(button.dataset.galleryThumb)));
     });
+    modal.querySelector("[data-gallery-viewer-image]")?.addEventListener("click", openLightbox);
     modal.addEventListener("click", (event) => {
       if (event.target === modal) closeGallery();
     });
@@ -191,6 +229,7 @@
     document.body.classList.add("client-gallery-open");
     activeGallery = { modal, gallery, position: 0 };
     bindGallery(modal);
+    openViewer(initialIndex);
     modal.querySelector("[data-gallery-close]")?.focus();
   }
 
@@ -208,10 +247,10 @@
   document.addEventListener("keydown", (event) => {
     if (!activeGallery) return;
     if (event.key === "Escape") {
-      if (activeGallery.modal.classList.contains("is-viewer")) showOverview(false);
+      if (document.querySelector(".client-gallery-lightbox")) closeLightbox();
       else closeGallery();
     }
-    if (!activeGallery?.modal.classList.contains("is-viewer")) return;
+    if (!activeGallery?.modal.classList.contains("is-viewer") || document.querySelector(".client-gallery-lightbox")) return;
     if (event.key === "ArrowLeft") moveViewer(-1);
     if (event.key === "ArrowRight") moveViewer(1);
   });
