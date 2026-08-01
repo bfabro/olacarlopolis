@@ -8222,6 +8222,43 @@ body > .im-modal .swiper-slide img {
   cursor: pointer;
 }
 
+.item-modal-share {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .94);
+  color: #155bd5;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 7px 20px rgba(15, 23, 42, .2);
+  transition: transform .18s ease, background .18s ease, color .18s ease;
+}
+
+.item-modal-share:hover,
+.item-modal-share:focus-visible {
+  background: #eff6ff;
+  color: #0b4ab8;
+  outline: 3px solid rgba(59, 130, 246, .24);
+  transform: translateY(-1px);
+}
+
+.item-modal-share.is-copied {
+  background: #16a34a;
+  color: #fff;
+}
+
+.item-modal-share:disabled {
+  cursor: wait;
+}
+
 .imovel-detalhes-media {
   position: relative;
   min-width: 0;
@@ -25142,7 +25179,7 @@ body.business-art-capturing-background .home-cards-intro {
   box-shadow: none !important;
 }
 
-/* ===== Modal de produto: informacoes profissionais v412 ===== */
+/* ===== Modal de produto: informacoes profissionais v413 ===== */
 .loja-produto-informacoes {
   margin: 18px 0;
   overflow: hidden;

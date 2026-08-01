@@ -9821,6 +9821,9 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         ].map((url) => String(url || "").trim()).filter(Boolean).slice(0, 4);
         return {
           id: item.id || `produto-${normalizeName(est.name || "loja")}-${index}`,
+          estabelecimento: item.estabelecimento || est.name || est.nome || cliente.nome || cliente.name || "",
+          estabelecimentoId: item.estabelecimentoId || normalizeName(est.nomeNormalizado || est.id || est.clienteId || est.name || est.nome || cliente.id || ""),
+          clienteId: item.clienteId || cliente.id || est.clienteId || "",
           titulo: item.titulo || item.nome || item.name || item.produto || "Produto",
           descricao: item.descricao || item.description || item.obs || item.observacoes || "",
           preco: item.preco || item.valor || item.price || "",
@@ -10141,6 +10144,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     modal.className = "imovel-detalhes-modal loja-produto-modal";
     modal.innerHTML = `
       <section class="imovel-detalhes-dialog loja-produto-dialog" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(titulo)}">
+        <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
         <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
         <div class="imovel-detalhes-media loja-produto-media">
           ${imagensProduto.length ? `
@@ -10224,6 +10228,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     });
     document.addEventListener("keydown", fecharComEsc);
     document.body.appendChild(modal);
+    window.ItemShare?.configureModal(modal, { type: isPromocao ? "promocao" : "produto", id: item.id || "", title: isPromocao ? "promoção" : "produto", route: isPromocao ? "#promocoes" : normalizeName(item.estabelecimentoId || item.estabelecimento || item.clienteId || "") });
   }
 
   if (typeof document !== "undefined" && typeof window !== "undefined" && !window.__lojaProdutoDelegadoBound) {
@@ -11957,6 +11962,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     modal.className = "imovel-detalhes-modal";
     modal.innerHTML = `
       <section class="imovel-detalhes-dialog" role="dialog" aria-modal="true" aria-label="Detalhes de ${escapePromoHtml(im.titulo || "imovel")}">
+        <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
         <button type="button" class="imovel-detalhes-fechar" aria-label="Fechar detalhes" title="Fechar">&times;</button>
         <div class="imovel-detalhes-media">
           <span class="imovel-detalhes-finalidade">${escapePromoHtml(String(im.tipo || "Imovel").toUpperCase())}</span>
@@ -11998,6 +12004,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       </section>
     `;
     document.body.appendChild(modal);
+    window.ItemShare?.configureModal(modal, { type: "imovel", id: im.id || im.codRef || im.codigo || "", title: "imóvel", route: "#imoveis" });
 
     const fechar = () => {
       document.removeEventListener("keydown", fecharComEsc);
@@ -12859,6 +12866,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     modal.className = "imovel-detalhes-modal auto-detalhes-modal";
     modal.innerHTML = `
       <section class="imovel-detalhes-dialog auto-detalhes-dialog" role="dialog" aria-modal="true" aria-label="Detalhes de ${textoSeguroAutomoveis(titulo)}">
+        <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
         <button type="button" class="imovel-detalhes-fechar auto-detalhes-fechar" aria-label="Fechar detalhes" title="Fechar">&times;</button>
         <div class="imovel-detalhes-media auto-detalhes-media">
           ${imagens[0] ? `
@@ -12904,6 +12912,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       </section>
     `;
     document.body.appendChild(modal);
+    window.ItemShare?.configureModal(modal, { type: "automovel", id: item.id || item.codRef || item.codigo || "", title: "automóvel", route: "#automoveis" });
 
     const fechar = () => {
       document.removeEventListener("keydown", fecharComEsc);
@@ -12986,6 +12995,21 @@ plotarPinsImoveis(stateImoveis.filtered);
   function configurarGaleriasAutomoveis(box) {
     // Mantido para compatibilidade: o card agora abre detalhes; a galeria abre dentro da modal.
   }
+
+  window.__itemShareApi = {
+    getCategories: () => categories || [],
+    loadClients: carregarModulosClientesPublicos,
+    refreshClients: aplicarDadosAdminClientes,
+    getProducts: produtosDoEstabelecimentoPublico,
+    getPromotions: coletarTodasPromocoes,
+    promoToProduct: promocaoComoProdutoPublico,
+    loadAutos: carregarAutomoveisFirebase,
+    getStoreAutos: automoveisDoEstabelecimentoPublico,
+    loadProperties: montarListaImoveisPublica,
+    openProduct: abrirModalProdutoEstabelecimento,
+    openProperty: abrirModalDetalhesImovel,
+    openAuto: abrirModalDetalhesAutomovel
+  };
 
   function lerImagensGaleriaAutomovel(media) {
     try {
