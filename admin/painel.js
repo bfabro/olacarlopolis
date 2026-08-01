@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 548,
-  label: "v555",
+  numero: 549,
+  label: "v556",
   data: "2026-08-01",
-  nota: "O menu lateral agora retrai ao abrir a tela pública de eventos."
+  nota: "Eventos segue o comportamento responsivo dos demais itens do menu lateral."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
