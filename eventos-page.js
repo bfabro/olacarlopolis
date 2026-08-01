@@ -1,4 +1,4 @@
-/* eventos-page.js - tela publica dedicada de eventos - v1 */
+/* eventos-page.js - tela publica dedicada de eventos - v2 */
 (function () {
   "use strict";
 
@@ -94,7 +94,7 @@
           <p class="eventos-public-location"><i class="fa-solid fa-location-dot"></i><span>${escapeHtml(address)}</span></p>
           <p class="eventos-public-description">${richText(description)}</p>
           <div class="eventos-public-actions">
-            <button type="button" class="eventos-details-btn" data-event-details="${index}"><i class="fa-solid fa-circle-info"></i> Ver detalhes</button>
+            <button type="button" class="eventos-details-btn" data-event-details="${index}"><i class="fa-solid fa-circle-info"></i><span>Ver detalhes</span></button>
             ${link ? `<a href="${escapeHtml(link)}" target="_blank" rel="noopener noreferrer" class="eventos-link-btn"><i class="fa-brands fa-instagram"></i><span>Publicacao</span></a>` : ""}
           </div>
         </div>
@@ -176,19 +176,18 @@
     contentArea.classList.remove("hidden");
     contentArea.removeAttribute("style");
     contentArea.innerHTML = `
-      <section class="eventos-public-page ${cards ? "eventos-cards-mode" : ""}">
-        <header class="eventos-public-hero">
-          <div class="eventos-public-hero-icon"><i class="fa-regular fa-calendar-days"></i></div>
-          <div><span>Agenda da cidade</span><h1>Eventos em Carlópolis</h1><p>Encontre os próximos eventos, datas, locais e informações em um só lugar.</p></div>
-        </header>
-        <div class="eventos-public-toolbar">
-          <div class="eventos-public-count"><strong>${events.length}</strong><span>${events.length === 1 ? "evento programado" : "eventos programados"}</span></div>
-          <label class="switch eventos-cards-switch ${cards ? "is-active" : ""}" aria-pressed="${cards}" title="Alternar entre cards e itens completos">
-            <input type="checkbox" id="eventosModoCards" ${cards ? "checked" : ""}>
-            <span class="track"><span class="thumb"></span></span>
-            <span>Cards</span>
-          </label>
-        </div>
+      <section class="imoveis-wrap eventos-public-page ${cards ? "eventos-cards-mode" : ""}">
+        <h2 class="highlighted eventos-public-title"><span><i class="fa-regular fa-calendar-days"></i> EVENTOS</span></h2>
+        <aside class="im-filtros painel-filtros eventos-public-toolbar">
+          <div class="eventos-toolbar-topbar">
+            <div class="eventos-public-count" aria-label="Total de eventos"><i class="fa-regular fa-calendar-check"></i><strong>${events.length}</strong><span>${events.length === 1 ? "evento" : "eventos"}</span></div>
+            <label class="switch eventos-cards-switch ${cards ? "is-active" : ""}" aria-pressed="${cards}" title="Mostrar eventos em cards menores">
+              <input type="checkbox" id="eventosModoCards" ${cards ? "checked" : ""}>
+              <span class="track"><span class="thumb"></span></span>
+              <span>Cards</span>
+            </label>
+          </div>
+        </aside>
         <div class="eventos-public-list">
           ${events.length ? events.map(cardTemplate).join("") : `<div class="eventos-public-empty"><i class="fa-regular fa-calendar-xmark"></i><h3>Nenhum evento programado</h3><p>Novas datas aparecerao aqui assim que forem divulgadas.</p></div>`}
         </div>
