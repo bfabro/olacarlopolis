@@ -5749,6 +5749,19 @@ document.addEventListener("DOMContentLoaded", function () {
     return Number.isNaN(livre) ? Number.MAX_SAFE_INTEGER : livre;
   }
 
+  window.__eventosPageApi = {
+    getEvents() {
+      const categoria = (categories || []).find(
+        (item) => normalizeName(item?.title || "") === "eventosemcarlopolis"
+      );
+      return (categoria?.establishments || [])
+        .filter((evento) => evento?.name && eventoPublicoAtivo(evento))
+        .slice()
+        .sort((a, b) => dataEventoPublicoValor(a) - dataEventoPublicoValor(b));
+    },
+    formatDate: dataEventoPublicoFormatada
+  };
+
   function vagaTrabalhoVisivel(establishment = {}) {
     const possuiConteudo = Boolean(
       establishment.infoVagaTrabalho ||
