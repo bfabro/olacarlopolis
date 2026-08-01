@@ -1,4 +1,4 @@
-/* eventos-page.js - tela publica dedicada de eventos - v4 */
+/* eventos-page.js - tela publica dedicada de eventos - v5 */
 (function () {
   "use strict";
 
@@ -237,11 +237,20 @@
     scheduleRefresh();
   }
 
+  function retractSidebarAfterMenuClick(trigger) {
+    if (trigger?.id !== "menuEventos") return;
+    const sidebar = trigger.closest(".sidebar") || document.querySelector(".sidebar");
+    sidebar?.classList.remove("open");
+    sidebar?.classList.add("close", "hoverable");
+    document.getElementById("overlay")?.classList.remove("active");
+  }
+
   document.addEventListener("click", (event) => {
     const trigger = event.target.closest('#menuEventos, [data-home-quick-action="eventos"], .botao-menu-topo[data-target="eventos"]');
     if (!trigger) return;
     event.preventDefault();
     event.stopImmediatePropagation();
+    retractSidebarAfterMenuClick(trigger);
     openEventsPage();
   }, true);
 
