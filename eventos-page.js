@@ -1,4 +1,4 @@
-/* eventos-page.js - tela publica dedicada de eventos - v3 */
+/* eventos-page.js - tela publica dedicada de eventos - v4 */
 (function () {
   "use strict";
 
@@ -82,7 +82,6 @@
           ${image
             ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" loading="lazy" decoding="async">`
             : `<div class="eventos-public-placeholder"><i class="fa-regular fa-calendar-days"></i></div>`}
-          <span class="eventos-public-badge"><i class="fa-solid fa-calendar-check"></i> Evento</span>
         </div>
         <div class="eventos-public-content">
           <div class="eventos-public-heading">
@@ -152,7 +151,7 @@
       <div class="eventos-detail-dialog">
         <button type="button" class="eventos-detail-close" aria-label="Fechar detalhes">&times;</button>
         <div class="eventos-detail-media">
-          ${image ? `<button type="button" class="eventos-detail-image-button" aria-label="Ampliar imagem completa de ${escapeHtml(title)}"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}"><span><i class="fa-solid fa-expand"></i> Ver imagem completa</span></button>` : `<div class="eventos-public-placeholder"><i class="fa-regular fa-calendar-days"></i></div>`}
+          ${image ? `<button type="button" class="eventos-detail-image-button" aria-label="Ampliar imagem completa de ${escapeHtml(title)}"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}"></button>` : `<div class="eventos-public-placeholder"><i class="fa-regular fa-calendar-days"></i></div>`}
         </div>
         <div class="eventos-detail-content">
           <span class="eventos-detail-kicker">Agenda de Carlópolis</span>

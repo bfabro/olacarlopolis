@@ -25839,3 +25839,27 @@ body.eventos-image-open { overflow: hidden; }
   .eventos-image-viewer-close { position: fixed; top: 16px; right: 16px; }
   .eventos-image-viewer-caption { bottom: 8px; }
 }
+
+/* ===== Eventos: ordem do cabecalho e limpeza visual - v417 ===== */
+.eventos-public-page > .eventos-public-title {
+  order: 0 !important;
+  grid-row: 1 !important;
+}
+
+.eventos-public-page > .eventos-public-toolbar {
+  position: static !important;
+  top: auto !important;
+  order: 1 !important;
+  grid-row: 2 !important;
+  align-self: stretch !important;
+}
+
+.eventos-public-page > .eventos-public-list {
+  order: 2 !important;
+  grid-row: 3 !important;
+}
+
+.eventos-public-badge,
+.eventos-detail-image-button > span {
+  display: none !important;
+}

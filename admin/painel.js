@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 543,
-  label: "v550",
+  numero: 544,
+  label: "v551",
   data: "2026-08-01",
-  nota: "A modal de Eventos permite ampliar o encarte e visualizar a imagem completa."
+  nota: "Tela de Eventos com controles abaixo do cabeçalho e imagens sem tarjas ou textos sobrepostos."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
