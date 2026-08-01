@@ -1,4 +1,4 @@
-/* eventos-page.js - tela publica dedicada de eventos - v2 */
+/* eventos-page.js - tela publica dedicada de eventos - v3 */
 (function () {
   "use strict";
 
@@ -102,8 +102,37 @@
   }
 
   function closeModal() {
+    closeExpandedImage();
     document.querySelector(".eventos-detail-modal")?.remove();
     document.body.classList.remove("eventos-modal-open");
+  }
+
+  function closeExpandedImage() {
+    document.querySelector(".eventos-image-viewer")?.remove();
+    document.body.classList.remove("eventos-image-open");
+  }
+
+  function openExpandedImage(image, title) {
+    if (!image) return;
+    closeExpandedImage();
+    const viewer = document.createElement("div");
+    viewer.className = "eventos-image-viewer";
+    viewer.setAttribute("role", "dialog");
+    viewer.setAttribute("aria-modal", "true");
+    viewer.setAttribute("aria-label", `Imagem completa de ${title}`);
+    viewer.innerHTML = `
+      <div class="eventos-image-viewer-box">
+        <button type="button" class="eventos-image-viewer-close" aria-label="Fechar imagem"><i class="fa-solid fa-xmark"></i></button>
+        <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}">
+        <span class="eventos-image-viewer-caption"><i class="fa-solid fa-magnifying-glass"></i> Encarte completo</span>
+      </div>`;
+    document.body.appendChild(viewer);
+    document.body.classList.add("eventos-image-open");
+    viewer.querySelector(".eventos-image-viewer-close")?.addEventListener("click", closeExpandedImage);
+    viewer.addEventListener("click", (clickEvent) => {
+      if (clickEvent.target === viewer) closeExpandedImage();
+    });
+    viewer.querySelector(".eventos-image-viewer-close")?.focus();
   }
 
   function openModal(event) {
@@ -123,7 +152,7 @@
       <div class="eventos-detail-dialog">
         <button type="button" class="eventos-detail-close" aria-label="Fechar detalhes">&times;</button>
         <div class="eventos-detail-media">
-          ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(title)}">` : `<div class="eventos-public-placeholder"><i class="fa-regular fa-calendar-days"></i></div>`}
+          ${image ? `<button type="button" class="eventos-detail-image-button" aria-label="Ampliar imagem completa de ${escapeHtml(title)}"><img src="${escapeHtml(image)}" alt="${escapeHtml(title)}"><span><i class="fa-solid fa-expand"></i> Ver imagem completa</span></button>` : `<div class="eventos-public-placeholder"><i class="fa-regular fa-calendar-days"></i></div>`}
         </div>
         <div class="eventos-detail-content">
           <span class="eventos-detail-kicker">Agenda de Carlópolis</span>
@@ -138,6 +167,7 @@
       </div>`;
     document.body.appendChild(modal);
     document.body.classList.add("eventos-modal-open");
+    modal.querySelector(".eventos-detail-image-button")?.addEventListener("click", () => openExpandedImage(image, title));
     modal.querySelector(".eventos-detail-close")?.focus();
   }
 
@@ -223,7 +253,9 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeModal();
+    if (event.key !== "Escape") return;
+    if (document.querySelector(".eventos-image-viewer")) closeExpandedImage();
+    else closeModal();
   });
 
   window.addEventListener("hashchange", () => {

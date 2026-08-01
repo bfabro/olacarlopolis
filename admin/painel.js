@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 542,
-  label: "v549",
+  numero: 543,
+  label: "v550",
   data: "2026-08-01",
-  nota: "Eventos seguem o padrão de Automóveis, com dois cards por linha no celular e modo sequencial."
+  nota: "A modal de Eventos permite ampliar o encarte e visualizar a imagem completa."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
