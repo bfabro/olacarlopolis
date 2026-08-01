@@ -1,4 +1,4 @@
-/* client-gallery.js - galeria publica de fotos dos clientes - v2 */
+/* client-gallery.js - galeria publica de fotos dos clientes - v3 */
 (function () {
   "use strict";
 
@@ -161,22 +161,59 @@
     document.querySelector(".client-gallery-lightbox")?.remove();
   }
 
+  function renderLightbox() {
+    if (!activeGallery) return;
+    const lightbox = document.querySelector(".client-gallery-lightbox");
+    const image = lightbox?.querySelector("img");
+    if (!image) return;
+    const current = activeGallery.gallery.images[activeGallery.position];
+    image.src = current.source;
+    image.alt = `Foto ampliada ${activeGallery.position + 1} de ${activeGallery.gallery.name}`;
+  }
+
+  function moveLightbox(step) {
+    moveViewer(step);
+    renderLightbox();
+  }
+
   function openLightbox() {
     if (!activeGallery) return;
     closeLightbox();
-    const current = activeGallery.gallery.images[activeGallery.position];
     const lightbox = document.createElement("div");
     lightbox.className = "client-gallery-lightbox";
     lightbox.setAttribute("role", "dialog");
     lightbox.setAttribute("aria-modal", "true");
     lightbox.setAttribute("aria-label", `Foto ampliada de ${activeGallery.gallery.name}`);
-    lightbox.innerHTML = `<div class="client-gallery-lightbox-box"><button type="button" aria-label="Fechar foto ampliada">&times;</button><img src="${escapeHtml(current.source)}" alt="Foto ampliada de ${escapeHtml(activeGallery.gallery.name)}"></div>`;
+    const hasNavigation = activeGallery.gallery.images.length > 1;
+    lightbox.innerHTML = `<div class="client-gallery-lightbox-box">
+      <button type="button" class="client-gallery-lightbox-close" aria-label="Fechar foto ampliada">&times;</button>
+      ${hasNavigation ? `<button type="button" class="client-gallery-lightbox-nav prev" data-lightbox-prev aria-label="Foto ampliada anterior"><i class="fa-solid fa-chevron-left"></i></button>` : ""}
+      <img src="" alt="">
+      ${hasNavigation ? `<button type="button" class="client-gallery-lightbox-nav next" data-lightbox-next aria-label="Próxima foto ampliada"><i class="fa-solid fa-chevron-right"></i></button>` : ""}
+    </div>`;
     document.body.appendChild(lightbox);
-    lightbox.querySelector("button")?.addEventListener("click", closeLightbox);
+    renderLightbox();
+    lightbox.querySelector(".client-gallery-lightbox-close")?.addEventListener("click", closeLightbox);
+    lightbox.querySelector("[data-lightbox-prev]")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      moveLightbox(-1);
+    });
+    lightbox.querySelector("[data-lightbox-next]")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      moveLightbox(1);
+    });
     lightbox.addEventListener("click", (event) => {
       if (event.target === lightbox) closeLightbox();
     });
-    lightbox.querySelector("button")?.focus();
+    let touchStartX = 0;
+    lightbox.addEventListener("touchstart", (event) => {
+      touchStartX = event.changedTouches?.[0]?.clientX || 0;
+    }, { passive: true });
+    lightbox.addEventListener("touchend", (event) => {
+      const delta = (event.changedTouches?.[0]?.clientX || 0) - touchStartX;
+      if (Math.abs(delta) > 45) moveLightbox(delta > 0 ? -1 : 1);
+    }, { passive: true });
+    lightbox.querySelector(".client-gallery-lightbox-close")?.focus();
   }
 
   function bindGallery(modal) {
@@ -246,11 +283,17 @@
 
   document.addEventListener("keydown", (event) => {
     if (!activeGallery) return;
+    const lightboxOpen = Boolean(document.querySelector(".client-gallery-lightbox"));
     if (event.key === "Escape") {
-      if (document.querySelector(".client-gallery-lightbox")) closeLightbox();
+      if (lightboxOpen) closeLightbox();
       else closeGallery();
     }
-    if (!activeGallery?.modal.classList.contains("is-viewer") || document.querySelector(".client-gallery-lightbox")) return;
+    if (lightboxOpen) {
+      if (event.key === "ArrowLeft") moveLightbox(-1);
+      if (event.key === "ArrowRight") moveLightbox(1);
+      return;
+    }
+    if (!activeGallery?.modal.classList.contains("is-viewer")) return;
     if (event.key === "ArrowLeft") moveViewer(-1);
     if (event.key === "ArrowRight") moveViewer(1);
   });
