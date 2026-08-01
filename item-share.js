@@ -170,6 +170,13 @@
     }
   }
 
+  function consumeSharedItemUrl() {
+    const url = new URL(window.location.href);
+    url.searchParams.delete("item");
+    url.searchParams.delete("id");
+    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+  }
+
   async function openSharedItem() {
     const params = new URLSearchParams(window.location.search);
     const type = String(params.get("item") || "").trim().toLowerCase();
@@ -194,6 +201,7 @@
       if (type === "imovel") api.openProperty?.(item);
       if (type === "produto") api.openProduct?.(item, "Produto");
       if (type === "promocao") api.openProduct?.(item, "Promocao");
+      consumeSharedItemUrl();
       return true;
     } finally {
       if (!item) openingKey = "";

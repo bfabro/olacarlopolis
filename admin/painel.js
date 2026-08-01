@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 539,
-  label: "v546",
+  numero: 540,
+  label: "v547",
   data: "2026-08-01",
-  nota: "Links diretos para compartilhar automóveis, imóveis, produtos e promoções no site público."
+  nota: "Links compartilhados abrem uma única vez e liberam a navegação para outros itens."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
