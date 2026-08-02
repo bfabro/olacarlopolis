@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=372">
+  <link rel="stylesheet" href="painel.css?v=373">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -62,39 +62,39 @@
         <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-database"></i> Cadastros</span>
-          <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
           <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
+          <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
           <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
         </section>
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-bullhorn"></i> Conteudo</span>
-          <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promocoes</button>
           <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
           <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
+          <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promocoes</button>
         </section>
         <section class="nav-admin-group" data-classified-nav="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-rectangle-list"></i> Classificados</span>
-          <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Noticias</button>
-          <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
           <button data-view="imoveisArtes" data-permission="gerar_imagens_imoveis"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de imoveis</button>
-          <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
           <button data-view="automoveisArtes" data-permission="gerar_imagens_veiculos"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de veiculos</button>
+          <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
+          <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
+          <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Noticias</button>
         </section>
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestao</span>
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
           <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatorio Acessos</button>
-          <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorio Financeiro</button>
           <button data-view="relatorioExclusoes" data-master="true"><i class="fa-solid fa-trash-can-arrow-up"></i> Relatorio Exclusoes</button>
+          <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorio Financeiro</button>
           <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuarios online</button>
         </section>
         <section class="nav-admin-group" data-master="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
-          <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
           <button data-view="novidadesConfig" data-master="true"><i class="fa-solid fa-bell"></i> Novidades do site</button>
-          <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
-          <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
+          <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
+          <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
+          <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
         <button data-view="beneficios" data-benefits-client-nav="true"><i class="fa-solid fa-gift"></i> Benefícios</button>
         <button data-view="areaParceiro" data-role="parceiro"><i class="fa-solid fa-handshake"></i> Área do Parceiro</button>
@@ -1985,6 +1985,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=490"></script>
+  <script type="module" src="painel.js?v=491"></script>
 </body>
 </html>

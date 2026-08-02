@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 555,
-  label: "v562",
-  data: "2026-08-01",
-  nota: "Filtro financeiro considera a competência atual e o vencimento de cada plano."
+  numero: 556,
+  label: "v563",
+  data: "2026-08-02",
+  nota: "Menu lateral destaca a tela atual e organiza os itens de cada seção em ordem alfabética."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -5701,6 +5701,15 @@ function renderDeletionReport() {
   renderDeletionReportRows();
 }
 
+function syncAdminMenuActiveState(target) {
+  document.querySelectorAll(".nav-admin button[data-view]").forEach((button) => {
+    const isActive = button.dataset.view === target;
+    button.classList.toggle("active", isActive);
+    if (isActive) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+}
+
 function switchView(name) {
   const target = views[name] ? name : "dashboard";
   if (!canAccessView(target)) {
@@ -5712,9 +5721,7 @@ function switchView(name) {
     button.classList.remove("admin-button-loading");
   });
   Object.entries(views).forEach(([key, el]) => el.classList.toggle("hidden", key !== target));
-  document.querySelectorAll(".nav-admin button").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.view === target);
-  });
+  syncAdminMenuActiveState(target);
   const [title, subtitle] = viewCopy[target];
   authenticatedClientPresenceView = title;
   touchAuthenticatedClientPresence(true, true);
@@ -5776,9 +5783,7 @@ function switchView(name) {
 function prepareInitialView(name) {
   const target = views[name] ? name : initialViewForProfile();
   Object.entries(views).forEach(([key, el]) => el?.classList.toggle("hidden", key !== target));
-  document.querySelectorAll(".nav-admin button").forEach((btn) => {
-    btn.classList.toggle("active", btn.dataset.view === target);
-  });
+  syncAdminMenuActiveState(target);
   const [title, subtitle] = viewCopy[target] || viewCopy.dashboard;
   $("viewTitle").textContent = title;
   $("viewSubtitle").textContent = subtitle;
@@ -17524,19 +17529,19 @@ function renderClientOnlyEditor() {
     {
       label: "Cadastro",
       items: [
+        { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio },
         { id: "client-module-dados", icon: "fa-solid fa-building", label: "Dados da empresa", show: canEditDados },
-        { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
-        { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio }
+        { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages }
       ]
     },
     {
       label: "Negocio",
       items: [
-        { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas },
+        { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque },
+        { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: true },
         { id: "client-module-produtos", icon: "fa-solid fa-box-open", label: "Produtos", show: canEditProdutos },
         { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes || canGeneratePromoImages },
-        { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: true },
-        { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque }
+        { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas }
       ]
     },
     {
@@ -17558,7 +17563,7 @@ function renderClientOnlyEditor() {
     <div class="client-module-sidebar-group">
       <span class="client-module-sidebar-title">${group.label}</span>
       ${group.items.map((item) => `
-        <button type="button" class="sidebar-client-module-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}">
+        <button type="button" class="sidebar-client-module-item${item.id === initialClientModule ? " active" : ""}" data-client-module-target="${item.id}"${item.id === initialClientModule ? ' aria-current="page"' : ""}>
           <i class="${item.icon}"></i><span>${item.label}</span>
         </button>
       `).join("")}
@@ -17995,7 +18000,12 @@ function renderClientOnlyEditor() {
     mount.querySelectorAll(".client-module-panel").forEach((panel) => {
       panel.classList.toggle("active", panel.id === targetId || panel.dataset.clientModuleGroup === targetId);
     });
-    moduleNavButtons.forEach((item) => item.classList.toggle("active", item.dataset.clientModuleTarget === targetId));
+    moduleNavButtons.forEach((item) => {
+      const isActive = item.dataset.clientModuleTarget === targetId;
+      item.classList.toggle("active", isActive);
+      if (isActive) item.setAttribute("aria-current", "page");
+      else item.removeAttribute("aria-current");
+    });
     const moduleInfo = clientModules.find((item) => item.id === targetId);
     if (moduleInfo?.label) {
       authenticatedClientPresenceView = moduleInfo.label;

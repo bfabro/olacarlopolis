@@ -934,11 +934,20 @@ button[type="submit"]:hover,
   width: 100%;
 }
 
-.nav-admin button.active,
 .nav-admin button:hover,
 .nav-admin a:hover,
 .sidebar-footer button:hover {
   background: rgba(255, 255, 255, .1);
+}
+
+.nav-admin button.active {
+  background: linear-gradient(135deg, #f4b942, #d99b20);
+  color: #111827;
+  box-shadow: 0 8px 18px rgba(217, 155, 32, .24), inset 4px 0 0 rgba(255, 255, 255, .78);
+}
+
+.nav-admin button.active i {
+  color: #111827;
 }
 
 .sidebar-footer {
@@ -6175,16 +6184,25 @@ button.admin-button-loading::after {
   color: #93c5fd;
 }
 
-.sidebar-client-module-item.active,
 .sidebar-client-module-item:hover {
   background: rgba(37,99,235,.22);
   color: #ffffff;
   border-color: rgba(147,197,253,.35);
 }
 
-.sidebar-client-module-item.active i,
+.sidebar-client-module-item.active {
+  background: linear-gradient(135deg, #f4b942, #d99b20);
+  color: #111827;
+  border-color: #f4b942;
+  box-shadow: 0 7px 16px rgba(217,155,32,.22), inset 4px 0 0 rgba(255,255,255,.72);
+}
+
 .sidebar-client-module-item:hover i {
   color: #ffffff;
+}
+
+.sidebar-client-module-item.active i {
+  color: #111827;
 }
 /* ===== Minha empresa um modulo por vez v184 ===== */
 .client-module-panel {
