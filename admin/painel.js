@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 556,
-  label: "v563",
+  numero: 557,
+  label: "v564",
   data: "2026-08-02",
-  nota: "Menu lateral destaca a tela atual e organiza os itens de cada seção em ordem alfabética."
+  nota: "Meses desmarcados no financeiro deixam de ser cobrados e têm suas faturas reconciliadas."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8803,8 +8803,12 @@ function financePaymentStatusForMonth(client, monthKey = currentMonthKey()) {
   const currentStatus = effectivePaymentStatus(client);
   if (currentStatus === "isento") return "isento";
   const invoiceStatus = client?.faturas?.[monthKey]?.status;
-  if (["pago", "em_aberto", "em_analise"].includes(invoiceStatus)) return invoiceStatus;
-  if (Array.isArray(client?.mesesEmAberto) && client.mesesEmAberto.includes(monthKey)) return "em_aberto";
+  if (["pago", "isento"].includes(invoiceStatus)) return invoiceStatus;
+  if (Array.isArray(client?.mesesEmAberto)) {
+    if (!client.mesesEmAberto.includes(monthKey)) return "pago";
+    return invoiceStatus === "em_analise" ? "em_analise" : "em_aberto";
+  }
+  if (["em_aberto", "em_analise"].includes(invoiceStatus)) return invoiceStatus;
   return "em_aberto";
 }
 
@@ -8893,14 +8897,44 @@ function clientHasOpenInvoice(client) {
 
 function pendingMonthsForClient(client) {
   if (!isBillableClientType(client)) return [];
-  const months = new Set(Array.isArray(client?.mesesEmAberto) ? client.mesesEmAberto : []);
-  Object.entries(client?.faturas || {}).forEach(([mes, fatura]) => {
-    if (!fatura?.status || ["em_aberto", "em_analise"].includes(fatura.status)) months.add(mes);
-  });
-  if (!months.size && (!client?.pagamentoStatus || client.pagamentoStatus === "em_aberto")) {
+  const hasExplicitOpenMonths = Array.isArray(client?.mesesEmAberto);
+  const months = new Set(hasExplicitOpenMonths ? client.mesesEmAberto : []);
+  if (hasExplicitOpenMonths) {
+    months.forEach((mes) => {
+      if (["pago", "isento"].includes(client?.faturas?.[mes]?.status)) months.delete(mes);
+    });
+  } else {
+    Object.entries(client?.faturas || {}).forEach(([mes, fatura]) => {
+      if (!fatura?.status || ["em_aberto", "em_analise"].includes(fatura.status)) months.add(mes);
+    });
+  }
+  if (!hasExplicitOpenMonths && !months.size && (!client?.pagamentoStatus || client.pagamentoStatus === "em_aberto")) {
     months.add(currentMonthKey());
   }
   return [...months].filter(Boolean).sort();
+}
+
+function financeOpenMonthsReconciliationPayload(client = {}, selectedMonths = []) {
+  const openMonths = [...new Set(selectedMonths.filter(Boolean))].sort();
+  const openMonthSet = new Set(openMonths);
+  const previouslyOpenMonths = new Set(Array.isArray(client.mesesEmAberto) ? client.mesesEmAberto : []);
+  Object.entries(client.faturas || {}).forEach(([month, invoice]) => {
+    if (!invoice?.status || ["em_aberto", "em_analise"].includes(invoice.status)) previouslyOpenMonths.add(month);
+  });
+
+  const payload = { mesesEmAberto: openMonths };
+  previouslyOpenMonths.forEach((month) => {
+    if (openMonthSet.has(month)) return;
+    const savedInvoice = client?.faturas?.[month];
+    if (savedInvoice) {
+      payload[`faturas/${month}/status`] = "pago";
+      payload[`faturas/${month}/pagoEm`] = savedInvoice.pagoEm || Date.now();
+      payload[`faturas/${month}/updatedAt`] = Date.now();
+      return;
+    }
+    Object.assign(payload, financePaidInvoicePayload(client, month));
+  });
+  return payload;
 }
 
 function monthKeyFromParts(year, monthIndex) {
@@ -13382,17 +13416,20 @@ function renderFinanceiro() {
       }
       const valorPlanoFatura = valorFinalPlano(nextClient);
       const paymentMonth = currentMonthKey();
+      const nextOpenMonths = payload.pagamentoStatus === "pago"
+        ? selectedOpenMonths.filter((month) => month !== paymentMonth)
+        : selectedOpenMonths;
+      Object.assign(payload, financeOpenMonthsReconciliationPayload(nextClient, nextOpenMonths));
       if (payload.pagamentoStatus === "pago") {
-        payload.mesesEmAberto = selectedOpenMonths.filter((month) => month !== paymentMonth);
         payload.competenciaPagamento = paymentMonth;
         payload.ultimoPagamentoMes = paymentMonth;
         Object.assign(payload, financePaidInvoicePayload(nextClient, paymentMonth));
       } else {
-        payload.mesesEmAberto = selectedOpenMonths;
-        selectedOpenMonths.forEach((mes) => {
+        nextOpenMonths.forEach((mes) => {
           const valorDestaqueFatura = destaqueIncludedInInvoiceMonth(nextClient, mes) ? destaqueValueForClient(nextClient) : 0;
           payload[`faturas/${mes}/mes`] = mes;
           payload[`faturas/${mes}/status`] = "em_aberto";
+          payload[`faturas/${mes}/pagoEm`] = null;
           payload[`faturas/${mes}/valorPlano`] = valorPlanoFatura;
           payload[`faturas/${mes}/valorDestaque`] = valorDestaqueFatura;
           payload[`faturas/${mes}/valorTotal`] = valorPlanoFatura + valorDestaqueFatura;
@@ -13474,7 +13511,7 @@ function renderFinanceiro() {
       if (!isMaster()) delete payloadBase.valorPlano;
       const payload = {
         ...payloadBase,
-        mesesEmAberto,
+        ...financeOpenMonthsReconciliationPayload(nextClient, mesesEmAberto),
         updatedAt: serverTimestamp(),
         updatedBy: state.user?.uid || "",
         origem: "painel",
