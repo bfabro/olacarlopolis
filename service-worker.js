@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-01-financeiro-competencia-mensal-v606'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-01-financeiro-vencimento-planos-v607'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

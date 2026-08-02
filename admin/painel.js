@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 553,
-  label: "v560",
+  numero: 554,
+  label: "v561",
   data: "2026-08-01",
-  nota: "Pagamentos mensais agora são contabilizados somente pela competência da fatura."
+  nota: "Planos anuais e semestrais só ficam pendentes quando o vencimento é alcançado."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -13530,6 +13530,18 @@ function financePlanRenewalStatus(dueDate = "") {
   return { warning: false, label: "Vencimento" };
 }
 
+function financePlanPaymentIsDue(client = {}, referenceDate = dateKeyFromDate(new Date())) {
+  const planType = client.tipoPlano || "mensal";
+  if (!["anual", "semestral"].includes(planType)) return true;
+  const dueDate = financePlanDueDate(client);
+  if (!dueDate) return true;
+  return dueDate <= referenceDate;
+}
+
+function financePendingInvoiceIsDue(row = {}) {
+  return financePlanPaymentIsDue(row.client || {});
+}
+
 function reportPercent(value, total) {
   if (!total) return "0%";
   return `${Math.round((value / total) * 100)}%`;
@@ -13583,6 +13595,7 @@ function financeInvoiceRowsForRange(clients = [], periodRange = getReportDateRan
       && client.status !== "inativo"
       && isBillableClientType(client)
       && effectivePaymentStatus(client) !== "isento"
+      && financePlanPaymentIsDue(client)
     ) {
       rows.push({
         client,
@@ -15319,7 +15332,10 @@ function renderReports(reportType = "") {
   const financeMonthlyPaidRows = financePaidRows.filter((item) => item.planType === "mensal");
   const financeSemiannualPaidRows = financePaidRows.filter((item) => item.planType === "semestral");
   const financeAnnualPaidRows = financePaidRows.filter((item) => item.planType === "anual");
-  const financeOpenRows = financeInvoiceRows.filter((item) => !item.status || item.status === "em_aberto");
+  const financeOpenRows = financeInvoiceRows.filter((item) => (
+    (!item.status || item.status === "em_aberto")
+    && financePendingInvoiceIsDue(item)
+  ));
   const financeReviewRows = financeInvoiceRows.filter((item) => item.status === "em_analise");
   const financeReceiptRows = financeInvoiceRows.filter((item) => invoiceHasReceipt(item.invoice));
   const financeBaseClients = reportClients.filter((client) => client.status !== "inativo" && isBillableClientType(client));
@@ -15417,7 +15433,10 @@ function renderReports(reportType = "") {
     .map((client) => {
       const issues = [];
       const clientRows = financeInvoiceRows.filter((item) => item.client.id === client.id);
-      const openRows = clientRows.filter((item) => !item.status || item.status === "em_aberto");
+      const openRows = clientRows.filter((item) => (
+        (!item.status || item.status === "em_aberto")
+        && financePendingInvoiceIsDue(item)
+      ));
       const reviewRows = clientRows.filter((item) => item.status === "em_analise");
       if (openRows.length) issues.push(`${openRows.length} fatura${openRows.length === 1 ? "" : "s"} em aberto (${moneyBR(openRows.reduce((sum, item) => sum + item.value, 0))})`);
       if (reviewRows.length) issues.push(`${reviewRows.length} comprovante${reviewRows.length === 1 ? "" : "s"} aguardando análise`);
