@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 554,
-  label: "v561",
+  numero: 555,
+  label: "v562",
   data: "2026-08-01",
-  nota: "Planos anuais e semestrais só ficam pendentes quando o vencimento é alcançado."
+  nota: "Filtro financeiro considera a competência atual e o vencimento de cada plano."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -13192,16 +13192,16 @@ function renderFinanceiro() {
 
   const filter = $("financeFilter")?.value || "todos";
   const planFilter = $("financePlanFilter")?.value || "todos";
+  const currentMonth = currentMonthKey();
   const q = String($("financeSearch")?.value || "").toLowerCase().trim();
   const list = state.clientes.filter((client) => {
-    const matchesFilter = filter === "todos" || effectivePaymentStatus(client) === filter;
+    const matchesFilter = filter === "todos" || financeClientFilterStatus(client, currentMonth) === filter;
     const matchesPlan = planFilter === "todos" || (client.tipoPlano || "mensal") === planFilter;
     const hay = `${client.nome || ""} ${client.categoria || ""} ${client.contato || ""}`.toLowerCase();
     return matchesFilter && matchesPlan && (!q || hay.includes(q));
   });
 
   const activeBillable = state.clientes.filter((client) => client.status === "ativo" && isBillableClientType(client));
-  const currentMonth = currentMonthKey();
   const monthlyClients = activeBillable.filter((client) => (client.tipoPlano || "mensal") === "mensal");
   const paid = monthlyClients.filter((client) => financePaymentStatusForMonth(client, currentMonth) === "pago");
   const open = monthlyClients.filter((client) => financePaymentStatusForMonth(client, currentMonth) === "em_aberto");
@@ -13536,6 +13536,18 @@ function financePlanPaymentIsDue(client = {}, referenceDate = dateKeyFromDate(ne
   const dueDate = financePlanDueDate(client);
   if (!dueDate) return true;
   return dueDate <= referenceDate;
+}
+
+function financeClientFilterStatus(client = {}, monthKey = currentMonthKey()) {
+  const status = effectivePaymentStatus(client);
+  if (status === "isento") return "isento";
+
+  const planType = client.tipoPlano || "mensal";
+  if (["anual", "semestral"].includes(planType) && !financePlanPaymentIsDue(client)) {
+    return "pago";
+  }
+
+  return financePaymentStatusForMonth(client, monthKey);
 }
 
 function financePendingInvoiceIsDue(row = {}) {
