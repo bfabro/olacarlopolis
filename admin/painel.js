@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 552,
-  label: "v559",
+  numero: 553,
+  label: "v560",
   data: "2026-08-01",
-  nota: "Baixa de pagamentos sincronizada com a competência atual no relatório financeiro."
+  nota: "Pagamentos mensais agora são contabilizados somente pela competência da fatura."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8796,12 +8796,11 @@ function effectivePaymentStatus(client) {
 function financePaymentStatusForMonth(client, monthKey = currentMonthKey()) {
   if (!isBillableClientType(client)) return "isento";
   const currentStatus = effectivePaymentStatus(client);
-  if (monthKey === currentMonthKey() && ["pago", "isento"].includes(currentStatus)) return currentStatus;
+  if (currentStatus === "isento") return "isento";
   const invoiceStatus = client?.faturas?.[monthKey]?.status;
-  if (invoiceStatus === "pago") return "pago";
-  if (["em_aberto", "em_analise"].includes(invoiceStatus)) return "em_aberto";
+  if (["pago", "em_aberto", "em_analise"].includes(invoiceStatus)) return invoiceStatus;
   if (Array.isArray(client?.mesesEmAberto) && client.mesesEmAberto.includes(monthKey)) return "em_aberto";
-  return currentStatus;
+  return "em_aberto";
 }
 
 function financePaidInvoicePayload(client, monthKey = currentMonthKey()) {
