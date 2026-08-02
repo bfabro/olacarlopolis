@@ -3262,10 +3262,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // 🔸 Registra clique no Firebase (opcional, já que você tem registrarCliqueBotao)
-    if (typeof registrarCliqueBotao === "function") {
-      registrarCliqueBotao("gerar-card", estId).catch(() => { });
-    }
   });
 
 
@@ -3331,10 +3327,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    // registra clique no firebase (se quiser manter a métrica)
-    if (typeof registrarCliqueBotao === "function") {
-      registrarCliqueBotao("gerar-card", estId).catch(() => { });
-    }
   });
 
   // === Botão para gerar card de IMÓVEL ===

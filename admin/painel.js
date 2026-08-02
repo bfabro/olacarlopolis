@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 549,
-  label: "v556",
+  numero: 550,
+  label: "v557",
   data: "2026-08-01",
-  nota: "Eventos segue o comportamento responsivo dos demais itens do menu lateral."
+  nota: "A geração administrativa de cards não entra mais nos relatórios dos clientes."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -14604,7 +14604,10 @@ function renderClientMetricReportContent(client = {}) {
   };
   const botoes = aggregateCliquesPorBotao(filtered.cliquesBotoes);
   const tipos = aggregateButtonTypesForClient(botoes.detalhes, keys);
-  const tiposPermitidos = new Map([...tipos.entries()].filter(([tipo]) => clientReportResourceAllowed(clientReportCategory({ tipo }))));
+  const tiposPermitidos = new Map([...tipos.entries()].filter(([tipo]) => (
+    normalizeName(tipo) !== "gerarcard"
+    && clientReportResourceAllowed(clientReportCategory({ tipo }))
+  )));
   const canShowCardapioReport = clientReportResourceAllowed("Cardapio");
   const cardapios = canShowCardapioReport
     ? sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerCardapios), keys) + Number(tiposPermitidos.get("cardapio") || 0)
@@ -14686,6 +14689,7 @@ function renderClientMetricReportContent(client = {}) {
   const total = resourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
+    .filter((row) => normalizeName(row.tipo) !== "gerarcard")
     .map((row) => ({ ...row, categoria: clientReportCategory(row) }))
     .filter((row) => clientReportResourceAllowed(row.categoria));
   const moduleTypes = {
