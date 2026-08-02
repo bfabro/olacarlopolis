@@ -2474,6 +2474,31 @@ button[type="submit"]:hover,
   flex-wrap: wrap;
 }
 
+.finance-pending-paid-button {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-color: #16a34a;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(22, 163, 74, .2);
+}
+
+.finance-pending-paid-button:hover,
+.finance-pending-paid-button:focus-visible {
+  border-color: #15803d;
+  background: linear-gradient(135deg, #15803d, #166534);
+}
+
+.finance-pending-paid-button:disabled {
+  cursor: wait;
+  opacity: .72;
+}
+
 .finance-pending-boleto-controls {
   display: flex;
   align-items: end;

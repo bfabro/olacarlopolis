@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 551,
-  label: "v558",
+  numero: 552,
+  label: "v559",
   data: "2026-08-01",
-  nota: "Tabelas de cliques recolhidas por padrão e grupo Carlópolis 24h removido."
+  nota: "Baixa de pagamentos sincronizada com a competência atual no relatório financeiro."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -8795,11 +8795,45 @@ function effectivePaymentStatus(client) {
 
 function financePaymentStatusForMonth(client, monthKey = currentMonthKey()) {
   if (!isBillableClientType(client)) return "isento";
+  const currentStatus = effectivePaymentStatus(client);
+  if (monthKey === currentMonthKey() && ["pago", "isento"].includes(currentStatus)) return currentStatus;
   const invoiceStatus = client?.faturas?.[monthKey]?.status;
   if (invoiceStatus === "pago") return "pago";
   if (["em_aberto", "em_analise"].includes(invoiceStatus)) return "em_aberto";
   if (Array.isArray(client?.mesesEmAberto) && client.mesesEmAberto.includes(monthKey)) return "em_aberto";
-  return effectivePaymentStatus(client);
+  return currentStatus;
+}
+
+function financePaidInvoicePayload(client, monthKey = currentMonthKey()) {
+  const valorPlano = valorFinalPlano(client);
+  const valorDestaque = destaqueIncludedInInvoiceMonth(client, monthKey) ? destaqueValueForClient(client) : 0;
+  return {
+    [`faturas/${monthKey}/mes`]: monthKey,
+    [`faturas/${monthKey}/tipoPlano`]: client.tipoPlano || "mensal",
+    [`faturas/${monthKey}/status`]: "pago",
+    [`faturas/${monthKey}/valorPlano`]: valorPlano,
+    [`faturas/${monthKey}/valorDestaque`]: valorDestaque,
+    [`faturas/${monthKey}/valorTotal`]: valorPlano + valorDestaque,
+    [`faturas/${monthKey}/pagoEm`]: Date.now(),
+    [`faturas/${monthKey}/updatedAt`]: Date.now()
+  };
+}
+
+async function markFinanceClientPaid(client, monthKey = currentMonthKey()) {
+  if (!client?.id) throw new Error("Cliente financeiro não identificado.");
+  const mesesEmAberto = (Array.isArray(client.mesesEmAberto) ? client.mesesEmAberto : [])
+    .filter((month) => month !== monthKey);
+  await update(ref(db, `clientesFinanceiro/${client.id}`), {
+    pagamentoStatus: "pago",
+    competenciaPagamento: monthKey,
+    ultimoPagamentoMes: monthKey,
+    mesesEmAberto,
+    ...financePaidInvoicePayload(client, monthKey),
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || "",
+    origem: "painel",
+    editadoNoPainel: true
+  });
 }
 
 function financeInvoiceValueForMonth(client, monthKey = currentMonthKey()) {
@@ -13334,7 +13368,7 @@ function renderFinanceiro() {
           ? numberFromMoney(field.value)
           : (field.dataset.financeField === "vencimentoDia" ? normalizeDueDay(field.value) : field.value.trim());
       });
-      const mesesEmAberto = [...row.querySelectorAll("[data-finance-month]:checked")].map((input) => input.value).sort();
+      const selectedOpenMonths = [...row.querySelectorAll("[data-finance-month]:checked")].map((input) => input.value).sort();
       const currentClient = state.clientes.find((client) => client.id === id) || {};
       const nextClient = { ...currentClient, ...payload };
       const publicPayload = {};
@@ -13343,16 +13377,24 @@ function renderFinanceiro() {
         delete payload.status;
       }
       const valorPlanoFatura = valorFinalPlano(nextClient);
-      payload.mesesEmAberto = mesesEmAberto;
-      mesesEmAberto.forEach((mes) => {
-        const valorDestaqueFatura = destaqueIncludedInInvoiceMonth(nextClient, mes) ? destaqueValueForClient(nextClient) : 0;
-        payload[`faturas/${mes}/mes`] = mes;
-        payload[`faturas/${mes}/status`] = "em_aberto";
-        payload[`faturas/${mes}/valorPlano`] = valorPlanoFatura;
-        payload[`faturas/${mes}/valorDestaque`] = valorDestaqueFatura;
-        payload[`faturas/${mes}/valorTotal`] = valorPlanoFatura + valorDestaqueFatura;
-        payload[`faturas/${mes}/updatedAt`] = Date.now();
-      });
+      const paymentMonth = currentMonthKey();
+      if (payload.pagamentoStatus === "pago") {
+        payload.mesesEmAberto = selectedOpenMonths.filter((month) => month !== paymentMonth);
+        payload.competenciaPagamento = paymentMonth;
+        payload.ultimoPagamentoMes = paymentMonth;
+        Object.assign(payload, financePaidInvoicePayload(nextClient, paymentMonth));
+      } else {
+        payload.mesesEmAberto = selectedOpenMonths;
+        selectedOpenMonths.forEach((mes) => {
+          const valorDestaqueFatura = destaqueIncludedInInvoiceMonth(nextClient, mes) ? destaqueValueForClient(nextClient) : 0;
+          payload[`faturas/${mes}/mes`] = mes;
+          payload[`faturas/${mes}/status`] = "em_aberto";
+          payload[`faturas/${mes}/valorPlano`] = valorPlanoFatura;
+          payload[`faturas/${mes}/valorDestaque`] = valorDestaqueFatura;
+          payload[`faturas/${mes}/valorTotal`] = valorPlanoFatura + valorDestaqueFatura;
+          payload[`faturas/${mes}/updatedAt`] = Date.now();
+        });
+      }
       if (!isMaster()) delete payload.valorPlano;
       payload.updatedAt = serverTimestamp();
       payload.updatedBy = state.user?.uid || "";
@@ -13530,7 +13572,7 @@ function financeInvoiceRowsForRange(clients = [], periodRange = getReportDateRan
         month,
         invoice: { mes: month, ...(invoice || {}) },
         planType: invoice?.tipoPlano || invoice?.planoTipo || client.tipoPlano || "mensal",
-        status: invoice?.status || financePaymentStatusForMonth(client, month),
+        status: financePaymentStatusForMonth(client, month),
         value: Number(invoice?.valorTotal || financeInvoiceValueForMonth(client, month) || 0),
         synthetic: false
       });
@@ -13642,6 +13684,13 @@ function renderFinancePendingPaymentList(items = []) {
               `).join("")}
             </div>
             <div class="finance-pending-payment-actions">
+              <button type="button"
+                      class="finance-pending-paid-button"
+                      data-no-loading
+                      data-mark-pending-client-paid="${escapeAttr(client.id)}"
+                      title="Marcar ${escapeAttr(monthLabel(currentMonthKey()))} como pago">
+                <i class="fa-solid fa-circle-check"></i> Pago
+              </button>
               <button type="button"
                       data-generate-pending-client-pix="${escapeAttr(client.id)}"
                       data-pending-months="${escapeAttr(monthsValue)}"
@@ -15137,6 +15186,30 @@ function bindReportControls(mount) {
         showToast("Mensagem gerada e copiada.");
       } catch {
         showToast("Mensagem gerada. Use o campo para copiar.");
+      }
+    });
+  });
+  mount.querySelectorAll("[data-mark-pending-client-paid]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const client = state.clientes.find((item) => item.id === button.dataset.markPendingClientPaid);
+      if (!client) return showToast("Cliente não encontrado.");
+      const monthKey = currentMonthKey();
+      const originalHtml = button.innerHTML;
+      button.disabled = true;
+      button.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Atualizando`;
+      try {
+        await markFinanceClientPaid(client, monthKey);
+        await loadAllData();
+        renderFinanceiro();
+        renderReports("finance");
+        showToast(`${client.nome || client.id} marcado como pago em ${monthLabel(monthKey)}.`);
+      } catch (error) {
+        console.error("Falha ao marcar pagamento pelo relatório financeiro.", error);
+        showToast("Não foi possível atualizar o pagamento.");
+        if (button.isConnected) {
+          button.disabled = false;
+          button.innerHTML = originalHtml;
+        }
       }
     });
   });
