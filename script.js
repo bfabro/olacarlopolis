@@ -6443,7 +6443,6 @@ carlopdiesel:"s",
     radarmeteorologico: "s",
     // FIM NOTA DE FALECIMENTO
     // GRUPO WHATS
-    carlopolis24hrs: "s",
 
     // INICIO EVENTOS 
     //calendarioeventos: "s",
@@ -6766,7 +6765,6 @@ carlopdiesel:"s",
     { id: "adegacuenca", nome: "Adega Cuenca Carlopolis", descricao: "Acesse e acompanhe nossas novidades e promoções", link: "https://chat.whatsapp.com/GeYROS9KhCOESMJ4n4jm9p", imagem: "images/informacoes/gruposWhats/7.jpg" },
     { id: "amigosdopet", nome: "Amigos do Pet", descricao: "Aqui você encontra apoio para resgates, doações, adoções responsáveis e orientações gerais sobre animais. <br>🚫 Não é um grupo de vendas.", link: "https://chat.whatsapp.com/CEun2OPjZVpAuZ626DHA7U?mode=hq2tswi", imagem: "images/informacoes/gruposWhats/5.jpg" },
     { id: "brechoAmigosPet", nome: "Brecho Amigos do Pet", descricao: "Vendas em prol de animais em risco", link: "https://chat.whatsapp.com/DW7AdwoVHIg8WfLaIqhGHa", imagem: "images/informacoes/gruposWhats/9.jpg" },
-    { id: "carlopolis24hrs", nome: "Carlópolis 24h", descricao: "Notícias e utilidades da cidade.", link: "https://chat.whatsapp.com/BjTkHcyCgsh7atBAIFpq2T?mode=gi_t", imagem: "images/informacoes/gruposWhats/2.jpg" },
     { id: "descontofacil", nome: "Farmacia Desconto Facil", descricao: "Promoções e Descontos da Desconto Facil", link: "https://chat.whatsapp.com/FuxGPdMc6qU33jLS3C4HRT", imagem: "images/comercios/farmacia/descontoFacil/descontoFacil.jpg" },
     { id: "farmaciaVila", nome: "Farmacia da Vila", descricao: "Para vocês ficarem por dentro de todas as PROMOÇÕES e NOVIDADES aqui da Farmácia da Vila ❤️", link: "https://chat.whatsapp.com/DD4Q5CZVsXLGeraeSNjyhK?mode=wwt", imagem: "images/informacoes/gruposWhats/13.jpg" },
 

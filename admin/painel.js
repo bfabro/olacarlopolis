@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 550,
-  label: "v557",
+  numero: 551,
+  label: "v558",
   data: "2026-08-01",
-  nota: "A geração administrativa de cards não entra mais nos relatórios dos clientes."
+  nota: "Tabelas de cliques recolhidas por padrão e grupo Carlópolis 24h removido."
 };
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -14559,6 +14559,21 @@ function renderClientModuleTimelineTable(rows, moduleLabel, emptyMessage) {
   `;
 }
 
+function renderClientReportDisclosure(title, content, description = "Clique para visualizar") {
+  return `
+    <details class="client-report-disclosure">
+      <summary>
+        <span class="client-report-disclosure-title">
+          <i class="fa-solid fa-table-list"></i>
+          <span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></span>
+        </span>
+        <i class="fa-solid fa-chevron-down client-report-disclosure-chevron" aria-hidden="true"></i>
+      </summary>
+      <div class="client-report-disclosure-content">${content}</div>
+    </details>
+  `;
+}
+
 function clientReportAvailability(client = {}, counts = {}) {
   const hasContacts = normalizeClientContactDetails(client).length > 0;
   const hasImages = Boolean(client.imagem || client.image || normalizeImageItems(client.imagens).length);
@@ -14757,27 +14772,25 @@ function renderClientMetricReportContent(client = {}) {
           <h3>Origem dos acessos a pagina</h3>
           <p class="list-meta">Mostra de onde vieram os acessos ao perfil do cliente. Para QR Codes, use links com <strong>?o=nome-do-qrcode</strong>, <strong>?qr=nome</strong> ou UTM.</p>
           ${renderReportList(origemPaginaResumo, "Ainda nao ha acessos com origem registrada para este cliente no periodo.")}
-          <h3>Acessos detalhados por origem</h3>
-          ${renderClientPageOriginTable(origemPaginaTimeline)}
+          ${renderClientReportDisclosure("Acessos detalhados por origem", renderClientPageOriginTable(origemPaginaTimeline))}
         </section>` : ""}
         ${availability.imoveis ? `<section class="panel-card report-card report-wide">
           <h3>Modulo especial: Imoveis</h3>
           <p class="list-meta">Acessos dos imoveis vinculados ao cliente, separados por referencia.</p>
-          ${renderItemAccessTable(imovelAccessRows, "Ainda nao ha acessos nos imoveis neste periodo.")}
-          <h3>Cliques detalhados dos imoveis por data e horario</h3>
-          ${renderClientModuleTimelineTable(imoveisTimeline, "Imoveis", "Ainda nao ha horarios de cliques nos imoveis neste periodo.")}
+          ${renderClientReportDisclosure("Acessos dos imóveis por referência", renderItemAccessTable(imovelAccessRows, "Ainda nao ha acessos nos imoveis neste periodo."))}
+          ${renderClientReportDisclosure("Cliques dos imóveis por data e horário", renderClientModuleTimelineTable(imoveisTimeline, "Imoveis", "Ainda nao ha horarios de cliques nos imoveis neste periodo."))}
         </section>` : ""}
         ${availability.veiculos ? `<section class="panel-card report-card report-wide">
           <h3>Modulo especial: Veiculos</h3>
           <p class="list-meta">Acessos dos veiculos vinculados ao cliente, separados por referencia.</p>
-          ${renderItemAccessTable(veiculoAccessRows, "Ainda nao ha acessos nos veiculos neste periodo.")}
-          <h3>Cliques detalhados dos veiculos por data e horario</h3>
-          ${renderClientModuleTimelineTable(veiculosTimeline, "Veiculos", "Ainda nao ha horarios de cliques nos veiculos neste periodo.")}
+          ${renderClientReportDisclosure("Acessos dos veículos por referência", renderItemAccessTable(veiculoAccessRows, "Ainda nao ha acessos nos veiculos neste periodo."))}
+          ${renderClientReportDisclosure("Cliques dos veículos por data e horário", renderClientModuleTimelineTable(veiculosTimeline, "Veiculos", "Ainda nao ha horarios de cliques nos veiculos neste periodo."))}
         </section>` : ""}
         <section class="panel-card report-card report-wide">
-          <h3>Cliques detalhados da pagina do cliente</h3>
-          <p class="list-meta">Use essa tabela para conferir interacoes reais em ${escapeHtml(recursosTexto)}.</p>
-          ${renderClientTimelineTable(commonTimeline, "Ainda nao ha horarios detalhados para a pagina do cliente neste periodo.")}
+          ${renderClientReportDisclosure(
+            "Cliques detalhados da página do cliente",
+            `<p class="list-meta">Use essa tabela para conferir interações reais em ${escapeHtml(recursosTexto)}.</p>${renderClientTimelineTable(commonTimeline, "Ainda nao ha horarios detalhados para a pagina do cliente neste periodo.")}`
+          )}
         </section>
       </div>
     </div>

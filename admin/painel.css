@@ -2789,6 +2789,104 @@ button[type="submit"]:hover,
   margin: 0;
 }
 
+.client-report-disclosure {
+  overflow: hidden;
+  width: 100%;
+  margin-top: 14px;
+  border: 1px solid #dbe4ee;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.client-report-disclosure > summary {
+  display: flex;
+  min-height: 62px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 13px 16px;
+  list-style: none;
+  color: var(--ink);
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color .18s ease;
+}
+
+.client-report-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.client-report-disclosure > summary:hover,
+.client-report-disclosure > summary:focus-visible {
+  background: #edf5ff;
+  outline: none;
+}
+
+.client-report-disclosure-title {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+}
+
+.client-report-disclosure-title > i {
+  display: grid;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 10px;
+  color: #2563eb;
+  background: #dbeafe;
+}
+
+.client-report-disclosure-title span {
+  display: grid;
+  gap: 3px;
+}
+
+.client-report-disclosure-title strong {
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.client-report-disclosure-title small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.client-report-disclosure-chevron {
+  color: #64748b;
+  transition: transform .2s ease;
+}
+
+.client-report-disclosure[open] .client-report-disclosure-chevron {
+  transform: rotate(180deg);
+}
+
+.client-report-disclosure-content {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-top: 1px solid #dbe4ee;
+}
+
+.client-report-disclosure-content > .list-meta {
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .client-report-disclosure > summary {
+    min-height: 56px;
+    padding: 11px 12px;
+  }
+
+  .client-report-disclosure-content {
+    padding: 10px;
+  }
+}
+
 @media (min-width: 1024px) {
   .feature-relatorios.client-module-panel.active {
     padding: 20px;
