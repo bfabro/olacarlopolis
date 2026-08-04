@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 560,
-  label: "v567",
+  numero: 561,
+  label: "v568",
   data: "2026-08-04",
-  nota: "Arte para Postagem liberada aos clientes com modelos de produtos e promoções, edição e pré-visualização."
+  nota: "Lista de setores dos produtos ampliada e sincronizada nas telas administrativas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -139,17 +139,28 @@ const canvasImageCache = new Map();
 const PRODUCT_SECTOR_OPTIONS = [
   "Acessorios",
   "Alimentos",
+  "AutoPeças",
+  "Bebidas",
+  "Bebidas Alcoolicas",
+  "Bebes e infantil",
   "Beleza e Cosmeticos",
   "Brinquedos",
   "Calcados",
   "Casa e Decoracao",
+  "Construção e Materiais",
   "Eletronicos",
   "Esporte e Lazer",
   "Ferramentas",
+  "Floricultura e Jardinagem",
   "Moveis",
+  "Oficina",
+  "Ótica e Acessórios",
+  "Óculos e Lentes",
+  "Saúde Visual",
   "Outros",
   "Papelaria",
   "Pet",
+  "Presentes",
   "Roupas",
   "Saude e Farmacia"
 ];
@@ -20071,6 +20082,7 @@ function bindAdminIdleTimer() {
 function bindEvents() {
   prepareClientFormSections();
   ensureAutomovelArteViewMounted();
+  if ($("clientProductSector")) $("clientProductSector").innerHTML = productSelectOptions(PRODUCT_SECTOR_OPTIONS);
   bindCurrencyMask($("imovelValor"));
   bindCurrencyMask($("automovelPreco"));
   bindPhoneMask("imovelTelefone");
