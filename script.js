@@ -13696,7 +13696,19 @@ plotarPinsImoveis(stateImoveis.filtered);
         conteudo.insertAdjacentHTML("beforeend", `<div class="aba loja-itens-aba" id="${targetId}" style="display:none"></div>`);
         pane = conteudo.querySelector(`#${CSS.escape(targetId)}`);
       }
-      renderizar(pane);
+      const adiarRenderizacao = pane.style.display === "none" && !pane.classList.contains("visible");
+      if (adiarRenderizacao) {
+        pane.dataset.lazyContent = "1";
+        pane.__renderLojaSobDemanda = () => {
+          if (pane.dataset.lazyContent !== "1") return;
+          pane.dataset.lazyContent = "0";
+          renderizar(pane);
+        };
+      } else {
+        pane.dataset.lazyContent = "0";
+        delete pane.__renderLojaSobDemanda;
+        renderizar(pane);
+      }
       return !jaExiste;
     };
 
@@ -23315,16 +23327,20 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
+        const lerDadoPublicoAdmin = (caminho) => dbAdmin.ref(caminho).once("value").catch((error) => {
+          console.warn(`Dado publico indisponivel em ${caminho}; seguindo com os demais.`, error);
+          return null;
+        });
         const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap, sobreNosSnap] = await Promise.all([
-          dbAdmin.ref("clientes").once("value"),
-          dbAdmin.ref("categorias").once("value"),
-          dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value"),
-          dbAdmin.ref("eventos").once("value"),
-          dbAdmin.ref("configuracoes/paginaInicial").once("value"),
-          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value"),
-          dbAdmin.ref("configuracoes/sobreNos").once("value")
+          lerDadoPublicoAdmin("clientes"),
+          lerDadoPublicoAdmin("categorias"),
+          lerDadoPublicoAdmin("conteudosInformativos/notaFalecimento"),
+          lerDadoPublicoAdmin("eventos"),
+          lerDadoPublicoAdmin("configuracoes/paginaInicial"),
+          lerDadoPublicoAdmin("conteudosInformativos/gruposWhatsapp"),
+          lerDadoPublicoAdmin("configuracoes/sobreNos")
         ]);
-        const clientes = clientesSnap.val() || {};
+        const clientes = clientesSnap?.val?.() || {};
         window.__clientesPublicosCache = clientes;
         dbAdmin.ref("usuariosByUid").once("value")
           .then((usuariosSnap) => {
@@ -23334,11 +23350,11 @@ plotarPinsImoveis(stateImoveis.filtered);
             window.__usuariosPublicosCache = window.__usuariosPublicosCache || {};
             console.warn("Permissoes publicas dos usuarios indisponiveis; seguindo com clientes.", error);
           });
-        const categoriasAdmin = categoriasSnap.val() || {};
-        const notasFalecimentoAdmin = notasFalecimentoSnap.val() || {};
-        const eventosAdmin = eventosSnap.val() || {};
-        const paginaInicialAdmin = paginaInicialSnap.val() || {};
-        const gruposWhatsappAdmin = gruposWhatsappSnap.val() || {};
+        const categoriasAdmin = categoriasSnap?.val?.() || {};
+        const notasFalecimentoAdmin = notasFalecimentoSnap?.val?.() || {};
+        const eventosAdmin = eventosSnap?.val?.() || {};
+        const paginaInicialAdmin = paginaInicialSnap?.val?.() || {};
+        const gruposWhatsappAdmin = gruposWhatsappSnap?.val?.() || {};
         Object.entries(gruposWhatsappAdmin).forEach(([grupoId, grupo]) => {
           const clienteId = grupo?.clienteId || "";
           if (!clienteId || !clientes[clienteId]) return;
@@ -23367,7 +23383,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           };
         });
         window.__paginaInicialSite = paginaInicialAdmin;
-        window.__sobreNosConfig = sobreNosSnap.val() || {};
+        window.__sobreNosConfig = sobreNosSnap?.val?.() || {};
         aplicarConfiguracaoPaginaInicial(paginaInicialAdmin);
         const clientesConsolidados = consolidarClientesAdmin(clientes);
         window.__metricClientIds = {};
@@ -23768,52 +23784,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
 
 
-  if (searchInput && clearSearch) {
-    searchInput.addEventListener("input", function () {
-      const termo = searchInput.value.toLowerCase().trim();
-      clearSearch.style.display = termo ? "flex" : "none";
-
-      // Esconde todos os separadores enquanto pesquisa
-      document.querySelectorAll(".separador-letra, .separadorr").forEach(sep => {
-        sep.style.display = termo ? "none" : "block";
-      });
-
-      // Para cada grupo/item do menu (inclui submenus e categorias principais)
-      document.querySelectorAll(".menu_items .item").forEach(item => {
-        let showItem = false;
-
-        // Procura todos os links dentro deste item
-        item.querySelectorAll(".nav_link").forEach(link => {
-          const texto = link.textContent.toLowerCase();
-          if (!termo || texto.includes(termo)) {
-            link.style.display = "flex";
-            showItem = true;
-          } else {
-            link.style.display = "none";
-          }
-        });
-
-        // Trata submenus
-        const submenu = item.querySelector(".submenu");
-        const submenuItem = item.querySelector(".submenu_item");
-
-        if (submenu) {
-          const visibleSublinks = item.querySelectorAll(".sublink");
-          const hasVisible = Array.from(visibleSublinks).some(
-            (sublink) => sublink.style.display !== "none"
-          );
-
-          submenu.style.display = hasVisible ? "block" : "none";
-          if (submenuItem) {
-            submenuItem.classList.toggle("show_submenu", hasVisible);
-          }
-          item.style.display = hasVisible ? "block" : "none";
-        } else {
-          item.style.display = showItem ? "block" : "none";
-        }
-      });
-    });
-  }
+  // A busca global e processada em um unico fluxo, sem filtrar todo o menu lateral.
 
 
 
@@ -23821,12 +23792,6 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
 
   if (searchInput && clearSearch) {
-    searchInput.addEventListener("input", function () {
-      clearSearch.style.display = searchInput.value.length > 0 ? "block" : "none";
-    });
-
-
-
     clearSearch.addEventListener("click", function () {
       searchInput.value = "";
       clearSearch.style.display = "none";
@@ -24508,41 +24473,16 @@ ${mostrarAbaVeiculosInicial ? `
 ` : ``}
 
 ${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? `
-  <div class="aba loja-itens-aba" id="fotos-${slugEstabelecimentoPublico}" style="display:none">
-    <section class="loja-itens-wrap loja-fotos-wrap">
-      <div class="loja-fotos-grid loja-cards-grid">
-        ${establishment.novidadesImages.map((img, idx) => renderFotoCardEstabelecimento(establishment, img, idx)).join('')}
-      </div>
-    </section>
-  </div>
+  <div class="aba loja-itens-aba" id="fotos-${slugEstabelecimentoPublico}" style="display:none"></div>
 ` : ``}
 
 <!-- CARDÁPIO -->
 ${(cardapioVisivel(establishment) && establishment.menuImages && establishment.menuImages.length > 0) ? `
-  <div class="aba" id="cardapio-${slugEstabelecimentoPublico}" style="display:none">
-    <div class="swiper" id="menu-${encodeURIComponent(establishment.name)}">
-      <div class="swiper-wrapper">
-        ${establishment.menuImages.map((img, idx) => `
-          <div class="swiper-slide">
-            <img src="${img}" alt="Cardápio ${idx + 1}" loading="lazy">
-            ${establishment.menuDescriptions && establishment.menuDescriptions[idx]
-                ? `<div class="descricao-foto">${establishment.menuDescriptions[idx]}</div>` : ''}
-          </div>
-        `).join('')}
-      </div>
-      <div class="swiper-pagination"></div>
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-button-next"></div>
-    </div>
-  </div>
+  <div class="aba" id="cardapio-${slugEstabelecimentoPublico}" style="display:none"></div>
 ` : ``}
 
 ${produtosIniciaisLoja.length ? `
-  <div class="aba loja-itens-aba" id="produtos-${slugEstabelecimentoPublico}" style="display:none">
-    <section class="loja-itens-wrap loja-produtos-wrap auto-cards-mode">
-      <div class="loja-produtos-grid loja-cards-grid loja-itens-grid">${produtosIniciaisLoja.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div>
-    </section>
-  </div>
+  <div class="aba loja-itens-aba" id="produtos-${slugEstabelecimentoPublico}" style="display:none"></div>
 ` : ``}
 
 </div>
@@ -24568,10 +24508,30 @@ ${produtosIniciaisLoja.length ? `
 
     paidEstablishments.forEach((establishment) => {
       establishment.__categoriaPublica = title;
+      const slug = normalizeName(establishment.name);
+      const prepararAbaSobDemanda = (pane, renderizar) => {
+        if (!pane) return;
+        pane.dataset.lazyContent = "1";
+        pane.__renderLojaSobDemanda = () => {
+          if (pane.dataset.lazyContent !== "1") return;
+          pane.dataset.lazyContent = "0";
+          renderizar(pane);
+        };
+      };
+      prepararAbaSobDemanda(contentArea.querySelector(`#${CSS.escape(`fotos-${slug}`)}`), (pane) => {
+        pane.innerHTML = `<section class="loja-itens-wrap loja-fotos-wrap"><div class="loja-fotos-grid loja-cards-grid">${(establishment.novidadesImages || []).map((img, idx) => renderFotoCardEstabelecimento(establishment, img, idx)).join("")}</div></section>`;
+      });
+      prepararAbaSobDemanda(contentArea.querySelector(`#${CSS.escape(`cardapio-${slug}`)}`), (pane) => {
+        pane.innerHTML = `<div class="swiper" id="menu-${encodeURIComponent(establishment.name)}"><div class="swiper-wrapper">${(establishment.menuImages || []).map((img, idx) => `<div class="swiper-slide"><img src="${img}" alt="Cardápio ${idx + 1}" loading="lazy">${establishment.menuDescriptions?.[idx] ? `<div class="descricao-foto">${establishment.menuDescriptions[idx]}</div>` : ""}</div>`).join("")}</div><div class="swiper-pagination"></div><div class="swiper-button-prev"></div><div class="swiper-button-next"></div></div>`;
+      });
+      const produtosIniciais = moduloClientePublicoAtivo(establishment, "produtos")
+        ? produtosDoEstabelecimentoPublico(establishment)
+        : [];
+      prepararAbaSobDemanda(contentArea.querySelector(`#${CSS.escape(`produtos-${slug}`)}`), (pane) => {
+        pane.innerHTML = `<section class="loja-itens-wrap loja-produtos-wrap auto-cards-mode"><div class="loja-produtos-grid loja-cards-grid loja-itens-grid">${produtosIniciais.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
+      });
     });
     window.__lojaItensUltimosEstabelecimentos = paidEstablishments;
-    hidratarAbasItensEstabelecimentoPublico(contentArea, paidEstablishments)
-      .catch((error) => console.warn("Nao foi possivel carregar abas de itens do estabelecimento.", error));
     agendarHidratacaoAbasItensPublicas(contentArea, 80);
 
 
@@ -24867,8 +24827,13 @@ ${produtosIniciaisLoja.length ? `
     if (!item || !item.category) return;
 
     const category = item.category;
-    location.hash = "#comercios-" + normalizeName(category.title);
-    if (category.link) category.link.click();
+    const destino = "#comercios-" + normalizeName(category.title);
+    if (location.hash !== destino) {
+      location.hash = destino;
+    } else {
+      prepararMenuParaCategoria(category);
+      loadContent(category.title, category.establishments || []);
+    }
 
     if (item.tipo === "local" && item.establishment) {
       const idEst = item.establishment.nomeNormalizado || normalizeName(item.establishment.name || "");
@@ -24958,14 +24923,17 @@ ${produtosIniciaisLoja.length ? `
     });
   }
 
+  let buscaTopoTimer = null;
   if (searchInput && clearSearch) {
     searchInput.addEventListener("input", function () {
       const valor = this.value.trim();
       clearSearch.style.display = valor ? "flex" : "none";
-      renderizarResultadosBuscaTopo(valor);
+      if (buscaTopoTimer) clearTimeout(buscaTopoTimer);
+      buscaTopoTimer = setTimeout(() => renderizarResultadosBuscaTopo(valor), 90);
     });
 
     clearSearch.addEventListener("click", function () {
+      if (buscaTopoTimer) clearTimeout(buscaTopoTimer);
       searchInput.value = "";
       clearSearch.style.display = "none";
       limparResultadosBuscaTopo();
@@ -26202,6 +26170,11 @@ document.addEventListener('click', function (e) {
   // abre a seção alvo
   const alvo = container.querySelector('#' + CSS.escape(targetId));
   if (alvo) {
+    if (typeof alvo.__renderLojaSobDemanda === "function") {
+      const renderizarSobDemanda = alvo.__renderLojaSobDemanda;
+      delete alvo.__renderLojaSobDemanda;
+      renderizarSobDemanda();
+    }
     alvo.style.display = 'block';
     alvo.classList.add('visible');
     ajustarAbaViewport(alvo); // <<< adicione esta linha
