@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 562,
-  label: "v569",
+  numero: 563,
+  label: "v570",
   data: "2026-08-04",
-  nota: "Carregamento da tela pública de eventos sincronizado com os dados atualizados."
+  nota: "Texto padrão de Sobre nós atualizado no site público e no painel."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -77,8 +77,6 @@ Promoções e novidades;
 Imóveis e automóveis;
 Eventos e vagas de emprego;
 Notícias e informações da cidade;
-Farmácia de plantão;
-Coleta de lixo;
 Nível da represa;
 Telefones, horários, localização e WhatsApp das empresas.
 

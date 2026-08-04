@@ -3219,8 +3219,6 @@ Promoções e novidades;
 Imóveis e automóveis;
 Eventos e vagas de emprego;
 Notícias e informações da cidade;
-Farmácia de plantão;
-Coleta de lixo;
 Nível da represa;
 Telefones, horários, localização e WhatsApp das empresas.
 
