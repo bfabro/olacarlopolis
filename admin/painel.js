@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 558,
-  label: "v565",
-  data: "2026-08-03",
-  nota: "Página Sobre nós editável pelo master e integrada ao site público."
+  numero: 559,
+  label: "v566",
+  data: "2026-08-04",
+  nota: "Histórico e gráfico da Represa de Chavantes aprimorados com coleta diária automática."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

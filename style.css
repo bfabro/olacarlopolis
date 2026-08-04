@@ -26465,3 +26465,391 @@ body.eventos-image-open { overflow: hidden; }
     width: 100%;
   }
 }
+
+/* ===== Painel da Represa de Chavantes v419 ===== */
+.represa-dashboard {
+  width: 100%;
+  max-width: 1080px;
+  padding: 0 6px 26px;
+}
+
+.represa-dashboard .represa-card {
+  overflow: hidden;
+  border: 1px solid #dbe7f3;
+  border-radius: 22px;
+  box-shadow: 0 18px 45px rgba(15, 52, 96, .1);
+  text-align: left;
+}
+
+.represa-dashboard-header {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  margin: 0;
+  padding: 28px 30px;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(68, 172, 255, .35), transparent 32%),
+    linear-gradient(135deg, #073c70 0%, #075aa7 54%, #0784d8 100%);
+}
+
+.represa-dashboard-header::after {
+  content: "";
+  position: absolute;
+  right: -65px;
+  bottom: -105px;
+  width: 260px;
+  height: 180px;
+  border: 22px solid rgba(255, 255, 255, .08);
+  border-radius: 50%;
+  transform: rotate(-12deg);
+}
+
+.represa-dashboard-icon {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 66px;
+  height: 66px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, .3);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .18);
+  font-size: 29px;
+}
+
+.represa-dashboard-header > div:nth-child(2) {
+  position: relative;
+  z-index: 1;
+}
+
+.represa-dashboard-header h3 {
+  margin: 5px 0 3px;
+  font-size: clamp(1.55rem, 3vw, 2.15rem);
+  line-height: 1.1;
+}
+
+.represa-dashboard-header p {
+  max-width: 620px;
+  margin: 0;
+  color: rgba(255, 255, 255, .82);
+  font-size: .92rem;
+}
+
+.represa-eyebrow,
+.represa-source,
+.represa-auto-badge,
+.represa-history-kicker {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.represa-eyebrow {
+  color: #a9ddff;
+  font-size: .73rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.represa-source {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, .76);
+  font-size: .76rem;
+}
+
+.represa-auto-badge {
+  position: relative;
+  z-index: 1;
+  align-self: start;
+  padding: 8px 11px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 999px;
+  background: rgba(5, 41, 78, .3);
+  color: #e8f6ff;
+  font-size: .72rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.represa-dashboard .represa-dados {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+  padding: 20px 24px 12px;
+}
+
+.represa-dashboard .dado-item {
+  display: flex;
+  min-width: 0;
+  gap: 11px;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #e1eaf3;
+  border-left: 1px solid #e1eaf3;
+  border-radius: 15px;
+  background: #fff;
+  box-shadow: 0 7px 18px rgba(30, 70, 110, .06);
+}
+
+.dado-icon {
+  display: grid;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 13px;
+  background: #eaf5ff;
+  color: #0876cf;
+}
+
+.dado-icon.volume { background: #e8f9f5; color: #079e7e; }
+.dado-icon.inflow { background: #eef2ff; color: #5269d8; }
+.dado-icon.outflow { background: #fff4e8; color: #d97b17; }
+
+.represa-dashboard .dado-label {
+  margin: 0 0 3px;
+  color: #66788b;
+  font-size: .73rem;
+  font-weight: 750;
+}
+
+.dado-line {
+  display: flex;
+  gap: 5px;
+  align-items: baseline;
+}
+
+.represa-dashboard .dado-valor {
+  overflow: hidden;
+  color: #102a43;
+  font-size: 1.28rem;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+}
+
+.represa-dashboard .dado-unidade {
+  margin: 0;
+  color: #7b8da0;
+  font-size: .68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.represa-dashboard .represa-info {
+  margin: 0;
+  padding: 0 24px 12px;
+}
+
+.represa-dashboard .info-box {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 12px 15px;
+  border: 1px solid #e5edf5;
+  border-radius: 14px;
+  background: #f8fbfe;
+}
+
+.represa-dashboard .info-box > span {
+  color: #27516f;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.represa-dashboard .info-box dl {
+  display: flex;
+  gap: 12px 28px;
+  justify-content: flex-end;
+  margin: 0;
+}
+
+.represa-dashboard .info-box dl div { display: flex; gap: 5px; }
+.represa-dashboard .info-box dt { color: #718499; font-size: .75rem; }
+.represa-dashboard .info-box dd { margin: 0; color: #233b53; font-size: .75rem; font-weight: 800; }
+
+.represa-dashboard .represa-note {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  margin: 0 24px 18px;
+  padding: 12px 14px;
+  border: 1px solid #d8ebfc;
+  border-left: 4px solid #1688f8;
+  border-radius: 13px;
+  background: #f1f8ff;
+}
+
+.represa-note-icon {
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  background: #dcedff;
+  color: #0874ce;
+}
+
+.represa-dashboard .represa-note p { color: #365b78; font-size: .78rem; }
+.represa-dashboard .represa-note p + p { margin-top: 2px; color: #688096; }
+
+.represa-dashboard .represa-history-panel {
+  margin: 0 24px;
+  padding: 20px;
+  border-color: #dbe7f3;
+  border-radius: 18px;
+  background: #f7fafc;
+}
+
+.represa-history-kicker {
+  margin-bottom: 5px;
+  color: #0876cf;
+  font-size: .68rem;
+  font-weight: 850;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.represa-dashboard .represa-history-head h4 { font-size: 1.15rem; }
+.represa-dashboard .represa-history-head p { max-width: 560px; }
+
+.represa-dashboard .represa-history-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 16px 0 12px;
+}
+
+.represa-dashboard .represa-history-summary div {
+  min-height: 72px;
+  padding: 12px;
+  border-radius: 13px;
+  box-shadow: 0 5px 13px rgba(33, 69, 103, .04);
+}
+
+.represa-dashboard .represa-history-summary span { font-size: .69rem; }
+.represa-dashboard .represa-history-summary strong { font-size: .93rem; }
+.represa-history-trend.up strong { color: #0b9b70; }
+.represa-history-trend.down strong { color: #e05656; }
+.represa-history-trend.stable strong { color: #60758b; }
+
+.represa-history-chart-card {
+  overflow: hidden;
+  border: 1px solid #dce6ef;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.represa-history-chart-title,
+.represa-chart-foot {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+}
+
+.represa-history-chart-title { border-bottom: 1px solid #edf2f7; }
+.represa-history-chart-title strong { display: block; color: #15324a; font-size: .9rem; }
+.represa-history-chart-title > div > span { display: block; margin-top: 2px; color: #7890a4; font-size: .67rem; }
+
+.represa-chart-legend { display: flex; gap: 13px; white-space: nowrap; }
+.represa-chart-legend span { display: inline-flex !important; gap: 6px; align-items: center; margin: 0 !important; color: #526b80 !important; font-size: .68rem !important; font-weight: 750; }
+.represa-chart-legend i { width: 17px; height: 3px; border-radius: 5px; background: #1688f8; }
+.represa-chart-legend i.volume { height: 0; border-top: 2px dashed #17a889; background: none; }
+
+.represa-history-chart-scroll { overflow-x: auto; overscroll-behavior-inline: contain; }
+.represa-dashboard .represa-history-chart { height: auto; min-width: 660px; min-height: 250px; overflow: visible; border: 0; border-radius: 0; background: linear-gradient(180deg, #fff, #f8fbff); }
+.represa-dashboard .represa-history-chart svg { min-width: 660px; aspect-ratio: 760 / 280; }
+.represa-dashboard .represa-history-chart line { stroke-width: 1; }
+.represa-chart-grid { stroke: #e5edf5 !important; stroke-dasharray: 4 5; }
+.represa-chart-y-label,
+.represa-chart-x-label,
+.represa-chart-volume-label { fill: #71879a; font-family: inherit; font-size: 11px; font-weight: 650; }
+.represa-chart-volume-label { fill: #168f78; font-size: 10px; }
+.represa-chart-area { fill: url(#represaAreaGradient); }
+.represa-dashboard .represa-history-chart .represa-chart-level { fill: none; stroke: #1688f8; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; }
+.represa-dashboard .represa-history-chart .represa-chart-volume { fill: none; stroke: #17a889; stroke-width: 2.4; stroke-dasharray: 8 7; opacity: .88; }
+.represa-chart-point { fill: #fff; stroke: #1688f8; stroke-width: 3; cursor: help; transition: r .2s, fill .2s; }
+.represa-chart-point:hover,
+.represa-chart-point:focus { r: 6; fill: #1688f8; outline: none; }
+
+.represa-chart-foot {
+  flex-wrap: wrap;
+  border-top: 1px solid #edf2f7;
+  color: #637b8f;
+  font-size: .68rem;
+}
+
+.represa-chart-foot span { display: inline-flex; gap: 6px; align-items: center; }
+.represa-chart-foot i { color: #1688f8; }
+
+.represa-dashboard .represa-history-table-wrap {
+  max-height: 340px;
+  margin-top: 14px;
+  border-radius: 14px;
+}
+
+.represa-dashboard .represa-history-table th { background: #eaf4fd; color: #24577d; }
+.represa-dashboard .represa-history-table td { color: #354d61; }
+
+.represa-dashboard .represa-actions {
+  margin: 20px 24px 24px;
+}
+
+.represa-dashboard .btn-refresh,
+.represa-dashboard .btn-external { min-height: 44px; border-radius: 12px; }
+.represa-dashboard .btn-refresh { background: linear-gradient(135deg, #0877d1, #1597eb); box-shadow: 0 8px 18px rgba(8, 119, 209, .22); }
+
+@media (max-width: 900px) {
+  .represa-dashboard .represa-dados { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .represa-dashboard .represa-history-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .represa-dashboard .info-box { grid-template-columns: 1fr; gap: 8px; }
+  .represa-dashboard .info-box dl { justify-content: flex-start; flex-wrap: wrap; }
+}
+
+@media (max-width: 600px) {
+  .represa-dashboard { padding-inline: 0; }
+  .represa-dashboard .represa-card { border-radius: 18px; }
+  .represa-dashboard-header { grid-template-columns: auto minmax(0, 1fr); padding: 22px 18px; }
+  .represa-dashboard-icon { width: 52px; height: 52px; border-radius: 16px; font-size: 23px; }
+  .represa-auto-badge { grid-column: 1 / -1; justify-self: start; }
+  .represa-dashboard .represa-dados { gap: 8px; padding: 14px 12px 10px; }
+  .represa-dashboard .dado-item { gap: 8px; padding: 11px 9px; }
+  .dado-icon { flex-basis: 34px; width: 34px; height: 34px; border-radius: 10px; font-size: .8rem; }
+  .represa-dashboard .dado-valor { font-size: 1.08rem; }
+  .represa-dashboard .represa-info { padding: 0 12px 10px; }
+  .represa-dashboard .info-box dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .represa-dashboard .info-box dl div { display: block; }
+  .represa-dashboard .represa-note { margin: 0 12px 13px; }
+  .represa-dashboard .represa-history-panel { margin: 0 12px; padding: 14px 11px; }
+  .represa-history-chart-title { align-items: flex-start; flex-direction: column; }
+  .represa-dashboard .represa-history-chart,
+  .represa-dashboard .represa-history-chart svg { min-width: 620px; }
+  .represa-dashboard .represa-history-summary strong { font-size: .86rem; }
+  .represa-chart-foot { align-items: flex-start; flex-direction: column; gap: 6px; }
+  .represa-dashboard .represa-history-table-wrap { max-height: 390px; border: 0; background: transparent; }
+  .represa-dashboard .represa-history-table,
+  .represa-dashboard .represa-history-table tbody,
+  .represa-dashboard .represa-history-table tr,
+  .represa-dashboard .represa-history-table td { display: block; width: 100%; }
+  .represa-dashboard .represa-history-table thead { display: none; }
+  .represa-dashboard .represa-history-table tr { margin-bottom: 8px; padding: 8px 10px; border: 1px solid #e1e9f0; border-radius: 12px; background: #fff; }
+  .represa-dashboard .represa-history-table td { display: flex; justify-content: space-between; padding: 4px 2px; border: 0; white-space: normal; }
+  .represa-dashboard .represa-history-table td::before { content: attr(data-label); color: #7890a4; font-size: .68rem; font-weight: 800; text-transform: uppercase; }
+  .represa-dashboard .represa-history-table small { display: inline; margin-left: 5px; }
+  .represa-dashboard .represa-actions { gap: 9px; margin: 16px 12px 18px; }
+  .represa-dashboard .btn-refresh,
+  .represa-dashboard .btn-external { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 390px) {
+  .represa-dashboard .represa-dados { grid-template-columns: 1fr; }
+  .represa-dashboard .represa-history-summary { grid-template-columns: 1fr 1fr; }
+}

@@ -2806,6 +2806,29 @@ async function filtrarHistoricoRepresa(periodo = '30') {
   return historico.filter((item) => new Date(item.dataISO) >= limite);
 }
 
+function agruparHistoricoRepresaPorDia(registros = []) {
+  const porDia = new Map();
+  registros
+    .filter((item) => Number.isFinite(item?.cota) || Number.isFinite(item?.volume))
+    .sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO))
+    .forEach((item) => {
+      const data = new Date(item.dataISO);
+      const chave = Number.isNaN(data.getTime())
+        ? String(item.dataLabel || item.id || '')
+        : new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit'
+        }).format(data);
+      porDia.set(chave, item);
+    });
+  return Array.from(porDia.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
+}
+
+function resumirPontosGraficoRepresa(registros = [], limite = 90) {
+  if (registros.length <= limite) return registros;
+  const passo = (registros.length - 1) / (limite - 1);
+  return Array.from({ length: limite }, (_, index) => registros[Math.round(index * passo)]);
+}
+
 async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
   const box = document.getElementById('represaHistoricoBox');
   if (!box) return;
@@ -2820,50 +2843,106 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
       dedupePorHorario.set(`${dia}-${hora}`, { ...item, dataLabel: dia, horario: hora });
     });
   const dados = Array.from(dedupePorHorario.values()).sort((a, b) => new Date(a.dataISO) - new Date(b.dataISO));
-  if (!dados.length) {
+  const dadosDiarios = agruparHistoricoRepresaPorDia(dados);
+  if (!dadosDiarios.length) {
     box.innerHTML = `
       <div class="represa-history-empty">
-        Ainda nao ha historico suficiente. O dado atual sera salvo e os proximos acessos vao preencher este grafico.
+        Ainda não há histórico suficiente. A coleta automática diária preencherá este gráfico assim que houver uma medição válida.
       </div>
     `;
     return;
   }
 
-  const cotaValores = dados.map((item) => item.cota).filter(Number.isFinite);
-  const volumeValores = dados.map((item) => item.volume).filter(Number.isFinite);
+  const cotaValores = dadosDiarios.map((item) => item.cota).filter(Number.isFinite);
+  const volumeValores = dadosDiarios.map((item) => item.volume).filter(Number.isFinite);
+  if (!cotaValores.length) {
+    box.innerHTML = '<div class="represa-history-empty">Os registros encontrados ainda não possuem uma cota válida para montar o gráfico.</div>';
+    return;
+  }
   const cotaMin = Math.min(...cotaValores);
   const cotaMax = Math.max(...cotaValores);
-  const span = cotaMax - cotaMin || 1;
-  const pontosBase = dados.map((item, index) => {
-    const x = dados.length === 1 ? 50 : (index / (dados.length - 1)) * 100;
-    const y = Number.isFinite(item.cota) ? 88 - (((item.cota - cotaMin) / span) * 66) : 88;
-    return `${x.toFixed(2)},${y.toFixed(2)}`;
-  });
-  const pontos = dados.length === 1 ? `8,${pontosBase[0].split(',')[1]} 92,${pontosBase[0].split(',')[1]}` : pontosBase.join(' ');
+  const cotaPadding = Math.max((cotaMax - cotaMin) * 0.16, 0.08);
+  const escalaMin = cotaMin - cotaPadding;
+  const escalaMax = cotaMax + cotaPadding;
+  const span = escalaMax - escalaMin || 1;
   const volumeMedio = volumeValores.length ? volumeValores.reduce((sum, value) => sum + value, 0) / volumeValores.length : null;
   const cotaAtual = cotaValores.length ? cotaValores[cotaValores.length - 1] : null;
-  const cotaMeio = (cotaMax + cotaMin) / 2;
+  const primeiraCota = cotaValores.length ? cotaValores[0] : null;
+  const variacao = Number.isFinite(cotaAtual) && Number.isFinite(primeiraCota) ? cotaAtual - primeiraCota : null;
+  const tendenciaClasse = variacao > 0.005 ? 'up' : variacao < -0.005 ? 'down' : 'stable';
+  const tendenciaIcone = tendenciaClasse === 'up' ? 'fa-arrow-trend-up' : tendenciaClasse === 'down' ? 'fa-arrow-trend-down' : 'fa-minus';
+  const tendenciaTexto = tendenciaClasse === 'up' ? 'Subiu no período' : tendenciaClasse === 'down' ? 'Baixou no período' : 'Estável no período';
+
+  const largura = 760;
+  const altura = 280;
+  const margem = { top: 24, right: 38, bottom: 46, left: 58 };
+  const graficoLargura = largura - margem.left - margem.right;
+  const graficoAltura = altura - margem.top - margem.bottom;
+  const pontosVisiveis = resumirPontosGraficoRepresa(dadosDiarios);
+  const xDoPonto = (index) => margem.left + (pontosVisiveis.length === 1 ? graficoLargura / 2 : (index / (pontosVisiveis.length - 1)) * graficoLargura);
+  const yDaCota = (valor) => margem.top + ((escalaMax - valor) / span) * graficoAltura;
+  const yDoVolume = (valor) => margem.top + ((100 - valor) / 100) * graficoAltura;
+  const pontosCota = pontosVisiveis
+    .map((item, index) => Number.isFinite(item.cota) ? `${xDoPonto(index).toFixed(1)},${yDaCota(item.cota).toFixed(1)}` : null)
+    .filter(Boolean);
+  const pontosVolume = pontosVisiveis
+    .map((item, index) => Number.isFinite(item.volume) ? `${xDoPonto(index).toFixed(1)},${yDoVolume(item.volume).toFixed(1)}` : null)
+    .filter(Boolean);
+  const areaCota = pontosCota.length
+    ? `M ${margem.left} ${margem.top + graficoAltura} L ${pontosCota.join(' L ')} L ${margem.left + graficoLargura} ${margem.top + graficoAltura} Z`
+    : '';
+  const linhasGrade = Array.from({ length: 5 }, (_, index) => {
+    const proporcao = index / 4;
+    const y = margem.top + proporcao * graficoAltura;
+    const valor = escalaMax - proporcao * span;
+    return `<g><line class="represa-chart-grid" x1="${margem.left}" y1="${y}" x2="${margem.left + graficoLargura}" y2="${y}"></line><text class="represa-chart-y-label" x="${margem.left - 9}" y="${y + 4}" text-anchor="end">${valor.toFixed(2)} m</text></g>`;
+  }).join('');
+  const rotulosVolume = pontosVolume.length > 1
+    ? [100, 50, 0].map((valor) => {
+      const y = margem.top + ((100 - valor) / 100) * graficoAltura;
+      return `<text class="represa-chart-volume-label" x="${margem.left + graficoLargura + 8}" y="${y + 4}">${valor}%</text>`;
+    }).join('')
+    : '';
+  const indicesDatas = [...new Set([0, Math.round((pontosVisiveis.length - 1) * .25), Math.round((pontosVisiveis.length - 1) * .5), Math.round((pontosVisiveis.length - 1) * .75), pontosVisiveis.length - 1])];
+  const rotulosDatas = indicesDatas.map((index) => {
+    const item = pontosVisiveis[index];
+    return item ? `<text class="represa-chart-x-label" x="${xDoPonto(index)}" y="${altura - 15}" text-anchor="middle">${item.dataLabel?.slice(0, 5) || ''}</text>` : '';
+  }).join('');
+  const marcadores = pontosVisiveis.map((item, index) => {
+    if (!Number.isFinite(item.cota)) return '';
+    const detalhe = `${item.dataLabel || ''}${item.horario ? ` às ${item.horario}` : ''}: ${item.cota.toFixed(2)} m${Number.isFinite(item.volume) ? `, volume ${item.volume.toFixed(2)}%` : ''}`;
+    return `<circle class="represa-chart-point" cx="${xDoPonto(index)}" cy="${yDaCota(item.cota)}" r="4" tabindex="0"><title>${detalhe}</title></circle>`;
+  }).join('');
 
   box.innerHTML = `
     <div class="represa-history-summary">
-      <div><span>Registros</span><strong>${dados.length}</strong></div>
+      <div><span>Dias monitorados</span><strong>${dadosDiarios.length}</strong></div>
       <div><span>Cota atual</span><strong>${Number.isFinite(cotaAtual) ? cotaAtual.toFixed(2) + ' m' : '-'}</strong></div>
-      <div><span>Volume medio</span><strong>${Number.isFinite(volumeMedio) ? volumeMedio.toFixed(2) + '%' : '-'}</strong></div>
+      <div><span>Mínima / máxima</span><strong>${cotaMin.toFixed(2)} / ${cotaMax.toFixed(2)} m</strong></div>
+      <div class="represa-history-trend ${tendenciaClasse}"><span>${tendenciaTexto}</span><strong><i class="fa-solid ${tendenciaIcone}"></i> ${Number.isFinite(variacao) ? `${variacao > 0 ? '+' : ''}${variacao.toFixed(2)} m` : '-'}</strong></div>
     </div>
-    <div class="represa-history-chart-shell">
-      <div class="represa-history-axis" aria-hidden="true">
-        <span>${cotaMax.toFixed(2)} m</span>
-        <span>${cotaMeio.toFixed(2)} m</span>
-        <span>${cotaMin.toFixed(2)} m</span>
+    <div class="represa-history-chart-card">
+      <div class="represa-history-chart-title">
+        <div><strong>Evolução diária</strong><span>Passe o cursor ou toque nos pontos para consultar cada medição.</span></div>
+        <div class="represa-chart-legend"><span><i class="level"></i>Nível (m)</span>${pontosVolume.length > 1 ? '<span><i class="volume"></i>Volume (%)</span>' : ''}</div>
       </div>
-      <div class="represa-history-chart" aria-label="Grafico do nivel da represa">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
-          <line x1="0" y1="22" x2="100" y2="22"></line>
-          <line x1="0" y1="55" x2="100" y2="55"></line>
-          <line x1="0" y1="88" x2="100" y2="88"></line>
-          <polyline points="${pontos}"></polyline>
+      <div class="represa-history-chart-scroll">
+        <div class="represa-history-chart" aria-label="Gráfico da evolução diária do nível da Represa de Chavantes">
+        <svg viewBox="0 0 ${largura} ${altura}" role="img">
+          <defs>
+            <linearGradient id="represaAreaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#1688f8" stop-opacity=".28"></stop><stop offset="100%" stop-color="#1688f8" stop-opacity=".02"></stop></linearGradient>
+          </defs>
+          ${linhasGrade}
+          ${rotulosVolume}
+          ${areaCota ? `<path class="represa-chart-area" d="${areaCota}"></path>` : ''}
+          ${pontosCota.length > 1 ? `<polyline class="represa-chart-level" points="${pontosCota.join(' ')}"></polyline>` : ''}
+          ${pontosVolume.length > 1 ? `<polyline class="represa-chart-volume" points="${pontosVolume.join(' ')}"></polyline>` : ''}
+          ${marcadores}
+          ${rotulosDatas}
         </svg>
+        </div>
       </div>
+      <div class="represa-chart-foot"><span><i class="fa-solid fa-gauge-high"></i> Volume médio: <strong>${Number.isFinite(volumeMedio) ? volumeMedio.toFixed(2) + '%' : 'não informado'}</strong></span><span><i class="fa-solid fa-calendar-check"></i> Coleta automática diária</span></div>
     </div>
     <div class="represa-history-table-wrap">
       <table class="represa-history-table">
@@ -2876,12 +2955,12 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
           </tr>
         </thead>
         <tbody>
-          ${dados.slice().reverse().map((item) => `
+          ${dadosDiarios.slice().reverse().map((item) => `
             <tr>
-              <td>${item.dataLabel}${item.horario ? `<small>${item.horario}</small>` : ''}</td>
-              <td>${Number.isFinite(item.cota) ? item.cota.toFixed(2) + ' m' : '-'}</td>
-              <td>${Number.isFinite(item.volume) ? item.volume.toFixed(2) + '%' : '-'}</td>
-              <td>${Number.isFinite(item.defluencia) ? item.defluencia.toFixed(2) + ' m3/s' : '-'}</td>
+              <td data-label="Data">${item.dataLabel}${item.horario ? `<small>${item.horario}</small>` : ''}</td>
+              <td data-label="Nível">${Number.isFinite(item.cota) ? item.cota.toFixed(2) + ' m' : '-'}</td>
+              <td data-label="Volume">${Number.isFinite(item.volume) ? item.volume.toFixed(2) + '%' : '-'}</td>
+              <td data-label="Defluência">${Number.isFinite(item.defluencia) ? item.defluencia.toFixed(2) + ' m³/s' : '-'}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -27514,6 +27593,7 @@ async function obterDadosHistoricos() {
 // Atualize a função carregarDadosRepresa:
 // Função para carregar dados REAIS da represa (CTG via proxy sem CORS)
 // === NOVO: URL do seu endpoint (troque pelo seu domínio do Vercel) ===
+// Represa de Chavantes v542
 const API_REPRESA = 'https://olacarlopolis.vercel.app/api/represa/chavantes';
 const REPRESA_HISTORICO_KEY = 'ola_carlopolis_represa_chavantes_historico_v1';
 const REPRESA_HISTORICO_FIREBASE_REST = 'https://contadoracessos-default-rtdb.firebaseio.com/represas/chavantes/historico';
@@ -27651,52 +27731,51 @@ function mostrarRepresaChavantes() {
          onclick="compartilharPagina('#represa-chavantes','Represa de Chavantes','Acompanhe o nível da água da Represa de Chavantes')"></i>
     </div>
 
-    <div class="represa-wrap">
+    <div class="represa-wrap represa-dashboard">
       <div class="represa-card">
-        <div class="represa-header">
-          <i class="fas fa-water" style="font-size: 3rem; color: #1e90ff; margin-bottom: 1rem;"></i>
-          <h3>Nível da Água - Tempo Real</h3>
-          <p>Monitoramento oficial da Represa de Chavantes</p>
-          <div id="fonteDados" style="font-size: 0.8rem; color: #666; margin-top: 0.5rem;"></div>
+        <div class="represa-header represa-dashboard-header">
+          <div class="represa-dashboard-icon"><i class="fas fa-water"></i></div>
+          <div>
+            <span class="represa-eyebrow"><i class="fa-solid fa-satellite-dish"></i> Monitoramento oficial</span>
+            <h3>Nível da água</h3>
+            <p>Acompanhe a situação da Represa de Chavantes e a evolução das medições.</p>
+            <div id="fonteDados" class="represa-source">Consultando fonte oficial...</div>
+          </div>
+          <span class="represa-auto-badge"><i class="fa-solid fa-rotate"></i> Atualização diária</span>
         </div>
- <!-- 
+
         <div class="represa-dados">
           <div class="dado-item">
-            <div class="dado-label">Cota atual</div>
-            <div class="dado-valor" id="cotaAtual">—</div>
-            <div class="dado-unidade">metros</div>
+            <span class="dado-icon level"><i class="fa-solid fa-ruler-vertical"></i></span>
+            <div><div class="dado-label">Cota atual</div><div class="dado-line"><strong class="dado-valor" id="cotaAtual">—</strong><span class="dado-unidade">m</span></div></div>
           </div>
           <div class="dado-item">
-            <div class="dado-label">Volume útil</div>
-            <div class="dado-valor" id="volumeUtil">—</div>
-            <div class="dado-unidade">%</div>
+            <span class="dado-icon volume"><i class="fa-solid fa-droplet"></i></span>
+            <div><div class="dado-label">Volume útil</div><div class="dado-line"><strong class="dado-valor" id="volumeUtil">—</strong><span class="dado-unidade">%</span></div></div>
           </div>
           <div class="dado-item">
-            <div class="dado-label">Vazão afluente</div>
-            <div class="dado-valor" id="vazaoAfluente">—</div>
-            <div class="dado-unidade">m³/s</div>
+            <span class="dado-icon inflow"><i class="fa-solid fa-arrow-down"></i></span>
+            <div><div class="dado-label">Vazão afluente</div><div class="dado-line"><strong class="dado-valor" id="vazaoAfluente">—</strong><span class="dado-unidade">m³/s</span></div></div>
           </div>
           <div class="dado-item">
-            <div class="dado-label">Vazão defluente</div>
-            <div class="dado-valor" id="vazaoDefluente">—</div>
-            <div class="dado-unidade">m³/s</div>
+            <span class="dado-icon outflow"><i class="fa-solid fa-arrow-up"></i></span>
+            <div><div class="dado-label">Vazão defluente</div><div class="dado-line"><strong class="dado-valor" id="vazaoDefluente">—</strong><span class="dado-unidade">m³/s</span></div></div>
           </div>
         </div>
--->
 
- <div class="represa-info">
+        <div class="represa-info">
           <div class="info-box">
-            <h4>ℹ️ Represa:</h4>
-            <p><strong>Capacidade:</strong> 9.410 hm³<br>
-               <strong>Rio:</strong> Paranapanema<br>
-               <strong>Operadora:</strong> Duke Energy</p>
+            <span><i class="fa-solid fa-circle-info"></i> Sobre a represa</span>
+            <dl><div><dt>Capacidade</dt><dd>9.410 hm³</dd></div><div><dt>Rio</dt><dd>Paranapanema</dd></div><div><dt>Operadora</dt><dd>CTG Brasil</dd></div></dl>
           </div>
         </div>
 
         
         <div class="represa-note">
-          <p><strong>Última atualização:</strong> <span id="ultimaAtualizacao">Carregando...</span></p>
+          <span class="represa-note-icon"><i class="fa-regular fa-clock"></i></span>
+          <div><p><strong>Última atualização:</strong> <span id="ultimaAtualizacao">Carregando...</span></p>
           <p id="statusDadosRepresa">Buscando dados oficiais...</p>
+          </div>
         </div>
 
        
@@ -27704,8 +27783,9 @@ function mostrarRepresaChavantes() {
         <section class="represa-history-panel">
           <div class="represa-history-head">
             <div>
-              <h4>Historico do nivel</h4>
-              <p>Grafico e tabela preparados para acompanhar a evolucao diaria.</p>
+              <span class="represa-history-kicker"><i class="fa-solid fa-chart-line"></i> Série histórica</span>
+              <h4>Histórico do nível</h4>
+              <p>Uma medição consolidada por dia para facilitar a comparação.</p>
             </div>
             <label>
               Periodo
@@ -27743,15 +27823,11 @@ function mostrarRepresaChavantes() {
     renderHistoricoRepresa(event.target.value);
   });
 
-  // e, no botão "Atualizar Dados", mantenha:
-  document.addEventListener('click', (ev) => {
-    const t = ev.target.closest('.btn-refresh');
-    if (t) carregarDadosRepresa();
-  });
+  document.querySelector('.btn-refresh')?.addEventListener('click', carregarDadosRepresa);
 
-  // Atualização automática a cada 5 minutos
+  // Mantém a tela aberta atualizada; a coleta histórica diária ocorre no servidor.
   if (window.represaInterval) clearInterval(window.represaInterval);
-  window.represaInterval = setInterval(carregarDadosRepresa, 5 * 60 * 1000);
+  window.represaInterval = setInterval(carregarDadosRepresa, 15 * 60 * 1000);
 }
 
 
