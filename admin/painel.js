@@ -46,11 +46,55 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 557,
-  label: "v564",
-  data: "2026-08-02",
-  nota: "Meses desmarcados no financeiro deixam de ser cobrados e têm suas faturas reconciliadas."
+  numero: 558,
+  label: "v565",
+  data: "2026-08-03",
+  nota: "Página Sobre nós editável pelo master e integrada ao site público."
 };
+const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
+
+O **Olá Carlópolis** é um portal criado para facilitar a vida de quem mora, trabalha ou visita Carlópolis.
+
+Em um único lugar, você encontra comércios, prestadores de serviços, restaurantes, promoções, imóveis, veículos, eventos, vagas de emprego, notícias e diversas informações úteis sobre a cidade.
+
+Nosso objetivo é aproximar a população das empresas locais, ajudando moradores e visitantes a encontrarem rapidamente o que precisam, enquanto oferecemos mais visibilidade e oportunidades para os empreendedores de Carlópolis.
+
+Cada empresa cadastrada pode apresentar seus produtos, serviços, fotos, localização, horários de atendimento, formas de contato, WhatsApp, promoções e outras informações importantes.
+
+Mais do que um catálogo de empresas, o Olá Carlópolis é uma ferramenta de conexão e valorização do comércio local.
+
+Nossa missão
+
+Conectar pessoas, empresas e serviços, tornando as informações da cidade mais acessíveis e contribuindo para o fortalecimento da economia local.
+
+O que você encontra no portal
+
+No Olá Carlópolis, você pode pesquisar:
+
+Onde comer;
+Comércios e serviços;
+Promoções e novidades;
+Imóveis e automóveis;
+Eventos e vagas de emprego;
+Notícias e informações da cidade;
+Farmácia de plantão;
+Coleta de lixo;
+Nível da represa;
+Telefones, horários, localização e WhatsApp das empresas.
+
+Para quem procura
+
+O portal ajuda moradores e visitantes a encontrarem empresas, produtos, serviços e informações de forma rápida, organizada e prática.
+
+Para quem empreende
+
+O Olá Carlópolis oferece uma presença digital local para empresas e profissionais da cidade, facilitando a divulgação, o contato com novos clientes e o acompanhamento dos resultados obtidos por meio do portal.
+
+Valorize o que é da nossa cidade
+
+Quando você compra de uma empresa local, contrata um profissional da cidade ou compartilha um comércio de Carlópolis, ajuda a movimentar a economia e fortalece toda a comunidade.
+
+**Olá Carlópolis — nossa cidade mais conectada.**`;
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase(app);
@@ -131,6 +175,7 @@ let state = {
   pagamentoSistema: {},
   paginaInicialSite: {},
   novidadesConfig: {},
+  sobreNos: {},
   xadrezConfig: {},
   beneficios: [],
   beneficiosUtilizacoes: [],
@@ -681,6 +726,7 @@ const views = {
   pagamentoSistema: $("pagamentoSistemaView"),
   paginaInicialSite: $("paginaInicialSiteView"),
   novidadesConfig: $("novidadesConfigView"),
+  sobreNos: $("sobreNosView"),
   xadrezConfig: $("xadrezConfigView"),
   storiesComerciais: $("storiesComerciaisView"),
   usuarios: $("usuariosView"),
@@ -711,6 +757,7 @@ const viewCopy = {
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
   paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
   novidadesConfig: ["Novidades do site", "Defina quais atualizações aparecem na tela principal pública."],
+  sobreNos: ["Sobre nós", "Edite o conteúdo institucional apresentado no site público."],
   xadrezConfig: ["Xadrez", "Configure campeonato e premio do jogo de xadrez."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
@@ -985,6 +1032,7 @@ function canAccessView(viewName) {
     if (viewName === "pagamentoSistema") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
     if (viewName === "novidadesConfig") return isMaster();
+    if (viewName === "sobreNos") return isMaster();
     if (viewName === "xadrezConfig") return isMaster();
     if (viewName === "storiesComerciais") return isMaster();
     return true;
@@ -2592,6 +2640,7 @@ async function loadAllData(onProgress = null) {
     pagamentoSnap,
     paginaInicialSnap,
     novidadesConfigSnap,
+    sobreNosSnap,
     xadrezConfigSnap,
     exclusoesSnap,
     cliquesBotoesSnap,
@@ -2621,6 +2670,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("configuracoes/pagamento"),
     getPanelSnapshot("configuracoes/paginaInicial"),
     getPanelSnapshot("configuracoes/novidades"),
+    getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
     getPanelSnapshot("auditoriaExclusoes", { enabled: isMaster() }),
     getPanelSnapshot("cliquesPorBotao", { enabled: false }),
@@ -2704,6 +2754,7 @@ async function loadAllData(onProgress = null) {
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
+  state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
   state.exclusoes = [];
   if (exclusoesSnap.exists()) {
@@ -5737,6 +5788,7 @@ function switchView(name) {
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "paginaInicialSite") renderHomePageSettings();
   if (target === "novidadesConfig") renderNovidadesConfig();
+  if (target === "sobreNos") renderSobreNosSettings();
   if (target === "xadrezConfig") renderXadrezConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "beneficios") renderBenefitsView();
@@ -6156,6 +6208,36 @@ function renderNovidadesConfig() {
       <span><strong>${escapeHtml(label)}</strong><small>${escapeHtml(description)}</small></span>
     </label>
   `).join("");
+}
+
+function sobreNosAdminInline(text = "") {
+  return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+}
+
+function renderSobreNosAdminPreview() {
+  const preview = $("sobreNosPreview");
+  const input = $("sobreNosContent");
+  if (!preview || !input) return;
+  const content = input.value.trim();
+  if ($("sobreNosCharacterCount")) $("sobreNosCharacterCount").textContent = String(input.value.length);
+  if (!content) {
+    preview.innerHTML = `<p class="list-meta">Digite o conteúdo para visualizar a prévia.</p>`;
+    return;
+  }
+  const blocks = content.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
+  preview.innerHTML = blocks.map((block, index) => {
+    const isHeading = index === 0 || (block.length <= 70 && !/[.!?;:]$/.test(block) && !block.includes("\n"));
+    if (index === 0) return `<h3>${sobreNosAdminInline(block.replace(/\*\*/g, ""))}</h3>`;
+    if (isHeading) return `<h4>${sobreNosAdminInline(block)}</h4>`;
+    return `<p>${sobreNosAdminInline(block).replace(/\n/g, "<br>")}</p>`;
+  }).join("");
+}
+
+function renderSobreNosSettings() {
+  const input = $("sobreNosContent");
+  if (!input) return;
+  input.value = String(state.sobreNos?.conteudo || DEFAULT_SOBRE_NOS_CONTENT);
+  renderSobreNosAdminPreview();
 }
 
 function renderXadrezConfig() {
@@ -20046,6 +20128,30 @@ function bindEvents() {
     await update(ref(db, "configuracoes/novidades"), payload);
     state.novidadesConfig = payload;
     showToast("Configuração de novidades salva.");
+  });
+  $("sobreNosContent")?.addEventListener("input", renderSobreNosAdminPreview);
+  $("restoreSobreNosDefault")?.addEventListener("click", () => {
+    if (!isMaster()) return;
+    $("sobreNosContent").value = DEFAULT_SOBRE_NOS_CONTENT;
+    renderSobreNosAdminPreview();
+    showToast("Texto inicial restaurado no editor. Clique em Salvar para publicar.");
+  });
+  $("sobreNosForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    if (!isMaster()) {
+      showToast("Somente master pode alterar a página Sobre nós.");
+      return;
+    }
+    const conteudo = $("sobreNosContent")?.value.trim().slice(0, 14000) || DEFAULT_SOBRE_NOS_CONTENT;
+    const payload = {
+      conteudo,
+      updatedAt: serverTimestamp(),
+      updatedBy: state.user?.uid || ""
+    };
+    await update(ref(db, "configuracoes/sobreNos"), payload);
+    state.sobreNos = payload;
+    renderSobreNosSettings();
+    showToast("Página Sobre nós salva e publicada.");
   });
   $("xadrezConfigForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();

@@ -3114,6 +3114,51 @@ function mostrarToast(mensagem) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
+
+O **Olá Carlópolis** é um portal criado para facilitar a vida de quem mora, trabalha ou visita Carlópolis.
+
+Em um único lugar, você encontra comércios, prestadores de serviços, restaurantes, promoções, imóveis, veículos, eventos, vagas de emprego, notícias e diversas informações úteis sobre a cidade.
+
+Nosso objetivo é aproximar a população das empresas locais, ajudando moradores e visitantes a encontrarem rapidamente o que precisam, enquanto oferecemos mais visibilidade e oportunidades para os empreendedores de Carlópolis.
+
+Cada empresa cadastrada pode apresentar seus produtos, serviços, fotos, localização, horários de atendimento, formas de contato, WhatsApp, promoções e outras informações importantes.
+
+Mais do que um catálogo de empresas, o Olá Carlópolis é uma ferramenta de conexão e valorização do comércio local.
+
+Nossa missão
+
+Conectar pessoas, empresas e serviços, tornando as informações da cidade mais acessíveis e contribuindo para o fortalecimento da economia local.
+
+O que você encontra no portal
+
+No Olá Carlópolis, você pode pesquisar:
+
+Onde comer;
+Comércios e serviços;
+Promoções e novidades;
+Imóveis e automóveis;
+Eventos e vagas de emprego;
+Notícias e informações da cidade;
+Farmácia de plantão;
+Coleta de lixo;
+Nível da represa;
+Telefones, horários, localização e WhatsApp das empresas.
+
+Para quem procura
+
+O portal ajuda moradores e visitantes a encontrarem empresas, produtos, serviços e informações de forma rápida, organizada e prática.
+
+Para quem empreende
+
+O Olá Carlópolis oferece uma presença digital local para empresas e profissionais da cidade, facilitando a divulgação, o contato com novos clientes e o acompanhamento dos resultados obtidos por meio do portal.
+
+Valorize o que é da nossa cidade
+
+Quando você compra de uma empresa local, contrata um profissional da cidade ou compartilha um comércio de Carlópolis, ajuda a movimentar a economia e fortalece toda a comunidade.
+
+**Olá Carlópolis — nossa cidade mais conectada.**`;
+
 
   // ================================
   // 🔗 CAPTURA ORIGEM DO ACESSO (?o=xxx)
@@ -13081,6 +13126,188 @@ plotarPinsImoveis(stateImoveis.filtered);
     document.body.appendChild(modal);
   }
 
+  function sobreNosEscape(value = "") {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function sobreNosInline(value = "") {
+    return sobreNosEscape(value).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+  }
+
+  function sobreNosKey(value = "") {
+    return String(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  }
+
+  function parseSobreNosContent(content = "") {
+    const blocks = String(content || DEFAULT_SOBRE_NOS_CONTENT)
+      .replace(/\r/g, "")
+      .split(/\n\s*\n/)
+      .map((block) => block.trim())
+      .filter(Boolean);
+    const title = (blocks.shift() || "Sobre o Olá Carlópolis").replace(/\*\*/g, "");
+    const sections = [{ id: "visao-geral", title: "", blocks: [] }];
+    let tagline = "";
+
+    blocks.forEach((block) => {
+      if (/^\*\*[^*]+\*\*$/.test(block)) {
+        tagline = block.replace(/\*\*/g, "");
+        return;
+      }
+      const isHeading = block.length <= 70 && !block.includes("\n") && !/[.!?;:]$/.test(block);
+      if (isHeading) {
+        sections.push({ id: sobreNosKey(block) || `secao-${sections.length}`, title: block, blocks: [] });
+        return;
+      }
+      const lines = block.split("\n").map((line) => line.trim()).filter(Boolean);
+      const isList = lines.length > 1 && lines.every((line) => /[;.]$/.test(line));
+      sections.at(-1).blocks.push({ type: isList ? "list" : "paragraph", lines });
+    });
+
+    return { title, sections: sections.filter((section) => section.blocks.length || section.title), tagline };
+  }
+
+  const SOBRE_NOS_SECTION_META = {
+    "nossa-missao": { icon: "fa-solid fa-bullseye", tone: "mission" },
+    "o-que-voce-encontra-no-portal": { icon: "fa-solid fa-compass", tone: "services" },
+    "para-quem-procura": { icon: "fa-solid fa-magnifying-glass", tone: "people" },
+    "para-quem-empreende": { icon: "fa-solid fa-store", tone: "business" },
+    "valorize-o-que-e-da-nossa-cidade": { icon: "fa-solid fa-heart", tone: "local" }
+  };
+  const SOBRE_NOS_LIST_ICONS = ["fa-utensils", "fa-store", "fa-tags", "fa-house", "fa-calendar-days", "fa-newspaper", "fa-prescription-bottle-medical", "fa-truck", "fa-water", "fa-location-dot"];
+
+  function renderSobreNosBlocks(blocks = []) {
+    return blocks.map((block) => {
+      if (block.type === "list") {
+        return `<ul class="about-public-list">${block.lines.map((line, index) => `<li><span><i class="fa-solid ${SOBRE_NOS_LIST_ICONS[index % SOBRE_NOS_LIST_ICONS.length]}"></i></span><strong>${sobreNosInline(line.replace(/[;.]$/, ""))}</strong></li>`).join("")}</ul>`;
+      }
+      return `<p>${sobreNosInline(block.lines.join("\n")).replace(/\n/g, "<br>")}</p>`;
+    }).join("");
+  }
+
+  async function carregarSobreNosConfigPublico() {
+    if (window.__sobreNosConfig?.conteudo) return window.__sobreNosConfig;
+    try {
+      const dbAdmin = await esperarFirebaseDatabase();
+      if (!dbAdmin) return {};
+      const snapshot = await dbAdmin.ref("configuracoes/sobreNos").once("value");
+      window.__sobreNosConfig = snapshot.val() || {};
+      return window.__sobreNosConfig;
+    } catch (error) {
+      console.warn("Não foi possível carregar a página Sobre nós. Usando o conteúdo inicial.", error);
+      return {};
+    }
+  }
+
+  async function mostrarSobreNos() {
+    if (location.hash !== "#sobre-nos") history.pushState(null, "", "#sobre-nos");
+    prepararNavegacaoMenuEspecial();
+    atualizarVisibilidadeHomeQuickBanner();
+    if (typeof definirTelaContentArea === "function") definirTelaContentArea(null);
+    const area = document.querySelector(".content_area");
+    if (!area) return;
+    area.dataset.currentRoute = "sobre-nos";
+    area.innerHTML = `<section class="about-public-page"><div class="about-public-loading"><i class="fa-solid fa-circle-notch fa-spin"></i><span>Carregando nossa história...</span></div></section>`;
+
+    const config = await carregarSobreNosConfigPublico();
+    if (area.dataset.currentRoute !== "sobre-nos") return;
+    const parsed = parseSobreNosContent(config.conteudo || DEFAULT_SOBRE_NOS_CONTENT);
+    const intro = parsed.sections.find((section) => section.id === "visao-geral") || { blocks: [] };
+    const sections = parsed.sections.filter((section) => section.id !== "visao-geral");
+    const heroLead = intro.blocks[0]?.lines?.join(" ") || "Informação local, empresas e serviços reunidos para você.";
+    const introRest = intro.blocks.slice(1);
+
+    area.innerHTML = `
+      <section class="about-public-page">
+        <header class="about-public-hero">
+          <div class="about-public-hero-orb about-orb-one"></div>
+          <div class="about-public-hero-orb about-orb-two"></div>
+          <div class="about-public-hero-content">
+            <span class="about-public-kicker"><i class="fa-solid fa-location-dot"></i> Feito em Carlópolis, para Carlópolis</span>
+            <h1>${sobreNosInline(parsed.title)}</h1>
+            <p>${sobreNosInline(heroLead)}</p>
+            <div class="about-public-hero-actions">
+              <button type="button" data-about-target="nossa-missao"><i class="fa-solid fa-compass"></i> Conheça nosso propósito</button>
+              <button type="button" class="about-share-button" onclick="compartilharPagina('#sobre-nos','Sobre o Olá Carlópolis','Conheça o portal que conecta Carlópolis.')"><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>
+            </div>
+          </div>
+          <div class="about-public-hero-mark" aria-hidden="true">
+            <span><i class="fa-solid fa-city"></i></span>
+            <strong>Olá</strong>
+            <small>Carlópolis</small>
+          </div>
+        </header>
+
+        <div class="about-public-impact" aria-label="O que move o Olá Carlópolis">
+          <article><i class="fa-solid fa-magnifying-glass-location"></i><div><strong>Encontre</strong><span>Informações úteis em poucos passos</span></div></article>
+          <article><i class="fa-solid fa-people-arrows"></i><div><strong>Conecte</strong><span>Pessoas, empresas e serviços locais</span></div></article>
+          <article><i class="fa-solid fa-hand-holding-heart"></i><div><strong>Valorize</strong><span>Quem movimenta nossa cidade</span></div></article>
+        </div>
+
+        <nav class="about-public-nav" aria-label="Seções da página Sobre nós">
+          <button type="button" class="active" data-about-target="visao-geral">Visão geral</button>
+          ${sections.map((section) => `<button type="button" data-about-target="${sobreNosEscape(section.id)}">${sobreNosEscape(section.title)}</button>`).join("")}
+        </nav>
+
+        <div class="about-public-content">
+          <section id="visao-geral" class="about-public-intro about-observed-section">
+            <div class="about-public-section-heading"><span><i class="fa-solid fa-circle-info"></i></span><div><small>Quem somos</small><h2>Um portal para viver melhor a cidade</h2></div></div>
+            <div class="about-public-intro-copy">${renderSobreNosBlocks(introRest.length ? introRest : intro.blocks)}</div>
+          </section>
+          ${sections.map((section) => {
+            const meta = SOBRE_NOS_SECTION_META[section.id] || { icon: "fa-solid fa-circle-check", tone: "default" };
+            return `<section id="${sobreNosEscape(section.id)}" class="about-public-section about-tone-${meta.tone} about-observed-section">
+              <div class="about-public-section-heading"><span><i class="${meta.icon}"></i></span><div><small>Olá Carlópolis</small><h2>${sobreNosInline(section.title)}</h2></div></div>
+              <div class="about-public-section-body">${renderSobreNosBlocks(section.blocks)}</div>
+            </section>`;
+          }).join("")}
+        </div>
+
+        ${parsed.tagline ? `<blockquote class="about-public-tagline"><i class="fa-solid fa-quote-left"></i><strong>${sobreNosInline(parsed.tagline)}</strong></blockquote>` : ""}
+
+        <footer class="about-public-cta">
+          <div><span>Faça parte dessa conexão</span><h2>Descubra, compartilhe e valorize Carlópolis.</h2><p>Explore o portal ou apresente sua empresa para quem vive e visita nossa cidade.</p></div>
+          <div class="about-public-cta-actions">
+            <a href="index.html"><i class="fa-solid fa-compass"></i> Explorar o portal</a>
+            <a class="about-public-whatsapp" href="https://wa.me/5543991766639?text=${encodeURIComponent("Olá! Gostaria de saber mais sobre o Olá Carlópolis.")}" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Quero participar</a>
+          </div>
+        </footer>
+      </section>
+    `;
+
+    const targetButtons = [...area.querySelectorAll("[data-about-target]")];
+    const navButtons = [...area.querySelectorAll(".about-public-nav [data-about-target]")];
+    targetButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = area.querySelector(`#${button.dataset.aboutTarget}`);
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+    window.__sobreNosObserver?.disconnect?.();
+    if ("IntersectionObserver" in window) {
+      window.__sobreNosObserver = new IntersectionObserver((entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (!visible) return;
+        navButtons.forEach((button) => button.classList.toggle("active", button.dataset.aboutTarget === visible.target.id));
+      }, { rootMargin: "-25% 0px -60%", threshold: [0.1, 0.35, 0.7] });
+      area.querySelectorAll(".about-observed-section").forEach((section) => window.__sobreNosObserver.observe(section));
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  window.mostrarSobreNos = mostrarSobreNos;
+
+  document.getElementById("menuSobreNos")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.__menuClickTracked = true;
+    registrarCliqueMenuLateral("Sobre nós");
+    mostrarSobreNos();
+  });
+
   function prepararNavegacaoMenuEspecial() {
     document.getElementById("novidades")?.classList.add("hidden");
     document.querySelector(".content_area")?.classList.remove("hidden");
@@ -23010,13 +23237,14 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (!dbAdmin) return;
 
       try {
-        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, gruposWhatsappSnap, sobreNosSnap] = await Promise.all([
           dbAdmin.ref("clientes").once("value"),
           dbAdmin.ref("categorias").once("value"),
           dbAdmin.ref("conteudosInformativos/notaFalecimento").once("value"),
           dbAdmin.ref("eventos").once("value"),
           dbAdmin.ref("configuracoes/paginaInicial").once("value"),
-          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value")
+          dbAdmin.ref("conteudosInformativos/gruposWhatsapp").once("value"),
+          dbAdmin.ref("configuracoes/sobreNos").once("value")
         ]);
         const clientes = clientesSnap.val() || {};
         window.__clientesPublicosCache = clientes;
@@ -23061,6 +23289,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           };
         });
         window.__paginaInicialSite = paginaInicialAdmin;
+        window.__sobreNosConfig = sobreNosSnap.val() || {};
         aplicarConfiguracaoPaginaInicial(paginaInicialAdmin);
         const clientesConsolidados = consolidarClientesAdmin(clientes);
         window.__metricClientIds = {};
@@ -23361,6 +23590,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     try {
       if (h === "#ondecomer") return mostrarOndeComer();
       if (h === "#promocoes" || h.startsWith("#promocoes-")) return mostrarPromocoes(getPromoFiltroFromHash());
+      if (h === "#sobre-nos") return mostrarSobreNos();
       const categoriaMatch = h.match(/^#comercios-(.+)$/);
       if (categoriaMatch) {
         const slug = categoriaMatch[1];
@@ -24774,6 +25004,7 @@ ${produtosIniciaisLoja.length ? `
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
     if (h === "#vagas" || h === "#vagas-trabalho") { return mostrarVagasTrabalhoPublicas(); }
+    if (h === "#sobre-nos") { return mostrarSobreNos(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }
 
     if (h === "#represa" || h === "#represa-chavantes") { return mostrarRepresaChavantes(); };

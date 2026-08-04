@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-02-financeiro-reconciliar-meses-v610'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-03-sobre-nos-v611'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

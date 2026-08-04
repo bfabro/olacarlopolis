@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=373">
+  <link rel="stylesheet" href="painel.css?v=374">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -93,6 +93,7 @@
           <button data-view="novidadesConfig" data-master="true"><i class="fa-solid fa-bell"></i> Novidades do site</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
           <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
+          <button data-view="sobreNos" data-master="true"><i class="fa-solid fa-circle-info"></i> Sobre nós</button>
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
@@ -1947,6 +1948,39 @@
         </section>
       </section>
 
+      <section id="sobreNosView" class="panel-view hidden">
+        <section class="panel-card about-admin-card">
+          <div class="section-head">
+            <div>
+              <h2>Sobre nós</h2>
+              <p>Edite livremente o conteúdo apresentado na página pública do Olá Carlópolis.</p>
+            </div>
+            <span class="about-admin-status"><i class="fa-solid fa-globe"></i> Página pública</span>
+          </div>
+          <form id="sobreNosForm" class="about-admin-form">
+            <div class="about-admin-guidance">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <div>
+                <strong>Organização automática</strong>
+                <span>A primeira linha vira o título. Separe parágrafos com uma linha em branco, use títulos curtos para criar seções e <code>**texto**</code> para destacar trechos.</span>
+              </div>
+            </div>
+            <label>Conteúdo da página
+              <textarea id="sobreNosContent" rows="28" maxlength="14000" spellcheck="true"></textarea>
+              <small><span id="sobreNosCharacterCount">0</span>/14000 caracteres</small>
+            </label>
+            <div class="form-actions">
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar Sobre nós</button>
+              <button id="restoreSobreNosDefault" type="button" class="ghost-button"><i class="fa-solid fa-rotate-left"></i> Restaurar texto inicial</button>
+            </div>
+          </form>
+          <section class="about-admin-preview">
+            <div class="about-admin-preview-title"><i class="fa-solid fa-eye"></i><strong>Prévia do conteúdo</strong></div>
+            <div id="sobreNosPreview"></div>
+          </section>
+        </section>
+      </section>
+
       <section id="xadrezConfigView" class="panel-view hidden">
         <section class="panel-card">
           <div class="section-head">
@@ -1985,6 +2019,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=492"></script>
+  <script type="module" src="painel.js?v=493"></script>
 </body>
 </html>

@@ -62,6 +62,10 @@
         ".read": true,
         ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
       },
+      "sobreNos": {
+        ".read": true,
+        ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+      },
       "$other": {
         ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
         ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
