@@ -1,4 +1,4 @@
-/* eventos-page.js - tela publica dedicada de eventos - v6 */
+/* eventos-page.js - tela publica dedicada de eventos - v7 */
 (function () {
   "use strict";
 

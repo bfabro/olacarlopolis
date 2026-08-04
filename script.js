@@ -23668,6 +23668,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!h) return;
 
     try {
+      if (h === "#eventos") return window.mostrarEventosPublicos?.();
       if (h === "#ondecomer") return mostrarOndeComer();
       if (h === "#promocoes" || h.startsWith("#promocoes-")) return mostrarPromocoes(getPromoFiltroFromHash());
       if (h === "#sobre-nos") return mostrarSobreNos();
