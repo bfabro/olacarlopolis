@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 563,
-  label: "v570",
+  numero: 564,
+  label: "v571",
   data: "2026-08-04",
-  nota: "Texto padrão de Sobre nós atualizado no site público e no painel."
+  nota: "Arte para Postagem condicionada à liberação individual de cada cliente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1041,7 +1041,9 @@ function canAccessView(viewName) {
   if (isBenefitPartner()) return viewName === "areaParceiro";
   if (viewName === "areaParceiro") return hasBenefitPartnerAreaAccess();
   if (viewName === "beneficios") return !isBenefitPartner();
-  if (viewName === "artesPostagem") return !isBenefitPartner();
+  if (viewName === "artesPostagem") {
+    return !isBenefitPartner() && (canManageClients() || hasPermission("gerar_imagens_promocoes"));
+  }
   if (viewName === "relatorioExclusoes") return isMaster();
   if (viewName === "dashboard") return canManageClients();
   if (canManageClients()) {
@@ -3044,7 +3046,7 @@ function updateChrome() {
     el.classList.toggle("hidden", isBenefitPartner());
   });
   document.querySelectorAll("[data-post-art-nav='true']").forEach((el) => {
-    el.classList.toggle("hidden", isBenefitPartner());
+    el.classList.toggle("hidden", !canAccessView("artesPostagem"));
   });
   document.querySelectorAll("[data-client-root-nav='true']").forEach((el) => {
     el.classList.add("hidden");
