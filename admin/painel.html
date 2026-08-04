@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=374">
+  <link rel="stylesheet" href="painel.css?v=375">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -60,6 +60,7 @@
 
       <nav class="nav-admin">
         <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
+        <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-palette"></i> Arte para Postagem</button>
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-database"></i> Cadastros</span>
           <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
@@ -418,7 +419,7 @@
                   <label>Embalagem<input id="clientPromoPack" placeholder="Opcional"></label>
                   <label>Validade inicio<input id="clientPromoStart" type="date"></label>
                   <label>Validade fim<input id="clientPromoEnd" type="date"></label>
-                  <label>Tipo de oferta<select id="clientPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option></select></label>
+                  <label>Tipo de oferta<select id="clientPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option><option value="dia-especial">Dia especial</option></select></label>
                   <label>Entrega / retirada<select id="clientPromoFulfillment"><option value="">Nao informar</option><option value="entrega">Entrega</option><option value="retirada">Retirada</option><option value="ambos">Entrega e retirada</option></select></label>
                   <label>Faixa de preco<select id="clientPromoPriceRange"><option value="">Automatico</option><option value="ate-50">Ate R$ 50</option><option value="50-100">R$ 50 a R$ 100</option><option value="100-200">R$ 100 a R$ 200</option><option value="acima-200">Acima de R$ 200</option></select></label>
                   <label>Com preco?<select id="clientPromoPriceMode"><option value="">Automatico</option><option value="com-preco">Com preco</option><option value="sem-preco">Sem preco</option></select></label>
@@ -1308,6 +1309,10 @@
         </div>
       </section>
 
+      <section id="artesPostagemView" class="panel-view hidden">
+        <div id="postArtMount"></div>
+      </section>
+
       <section id="imoveisArtesView" class="panel-view hidden">
         <section class="panel-card imovel-art-screen-card" data-permission="gerar_imagens_imoveis">
           <div class="section-head">
@@ -2019,6 +2024,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=494"></script>
+  <script type="module" src="painel.js?v=495"></script>
 </body>
 </html>

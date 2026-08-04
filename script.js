@@ -14240,6 +14240,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       .sort((a, b) => a.localeCompare(b));
     const tiposOfertaPromo = Array.from(new Set(promoAtivasDisponiveis.map(i => i.tipoOferta).filter(Boolean)))
       .sort((a, b) => a.localeCompare(b));
+    const tipoOfertaPromoLabel = (tipo) => String(tipo || "") === "dia-especial" ? "Dia especial" : String(tipo || "");
     const entregasPromo = Array.from(new Set(promoAtivasDisponiveis.map(i => i.entregaRetirada).filter(Boolean)))
       .sort((a, b) => a.localeCompare(b));
 
@@ -14379,7 +14380,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         <label>Tipo de oferta
           <select data-promo-filter-select>
             <option value="tipo::todos">Todos</option>
-            ${tiposOfertaPromo.map(tipo => `<option value="tipo::${tipo}" ${filtrosExtras.tipoOferta === tipo ? "selected" : ""}>${tipo}</option>`).join("")}
+            ${tiposOfertaPromo.map(tipo => `<option value="tipo::${tipo}" ${filtrosExtras.tipoOferta === tipo ? "selected" : ""}>${tipoOfertaPromoLabel(tipo)}</option>`).join("")}
           </select>
         </label>
         <label>Faixa de pre&ccedil;o

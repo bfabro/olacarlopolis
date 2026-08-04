@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 559,
-  label: "v566",
+  numero: 560,
+  label: "v567",
   data: "2026-08-04",
-  nota: "Histórico e gráfico da Represa de Chavantes aprimorados com coleta diária automática."
+  nota: "Arte para Postagem liberada aos clientes com modelos de produtos e promoções, edição e pré-visualização."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -220,6 +220,11 @@ let state = {
   clientProductEditIndex: null,
   staffPromoEditIndex: null,
   selectedPromoArtId: "",
+  postArtType: "produto",
+  postArtClientId: "",
+  postArtItemId: "",
+  postArtLayout: "produto-vitrine",
+  postArtCustomImage: "",
   selectedAutomovelArtId: "",
   selectedAutomovelArtIds: new Set(),
   selectedAutomovelArtLayout: "showroom",
@@ -706,6 +711,7 @@ function updateClientShortDescriptionCount() {
 
 const views = {
   dashboard: $("dashboardView"),
+  artesPostagem: $("artesPostagemView"),
   clientes: $("clientesView"),
   promocoesClientes: $("promocoesClientesView"),
   categorias: $("categoriasView"),
@@ -736,6 +742,7 @@ const views = {
 
 const viewCopy = {
   dashboard: ["Visao geral", "Resumo do ambiente administrativo."],
+  artesPostagem: ["Arte para Postagem", "Crie artes de produtos e promocoes com previa antes de baixar."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
@@ -1025,6 +1032,7 @@ function canAccessView(viewName) {
   if (isBenefitPartner()) return viewName === "areaParceiro";
   if (viewName === "areaParceiro") return hasBenefitPartnerAreaAccess();
   if (viewName === "beneficios") return !isBenefitPartner();
+  if (viewName === "artesPostagem") return !isBenefitPartner();
   if (viewName === "relatorioExclusoes") return isMaster();
   if (viewName === "dashboard") return canManageClients();
   if (canManageClients()) {
@@ -3024,6 +3032,9 @@ function updateChrome() {
     el.classList.toggle("hidden", !hasBenefitPartnerAreaAccess());
   });
   document.querySelectorAll("[data-benefits-client-nav='true']").forEach((el) => {
+    el.classList.toggle("hidden", isBenefitPartner());
+  });
+  document.querySelectorAll("[data-post-art-nav='true']").forEach((el) => {
     el.classList.toggle("hidden", isBenefitPartner());
   });
   document.querySelectorAll("[data-client-root-nav='true']").forEach((el) => {
@@ -5784,6 +5795,7 @@ function switchView(name) {
     state.pendingClientModuleTarget = "";
     renderClientOnlyEditor();
   }
+  if (target === "artesPostagem") renderPostArtView();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "paginaInicialSite") renderHomePageSettings();
@@ -17293,6 +17305,378 @@ async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classi
   }
 }
 
+const POST_ART_LAYOUTS = {
+  produto: [
+    { key: "produto-vitrine", nome: "Vitrine clara", descricao: "Imagem ampla e informacoes objetivas", variant: 0, bg: "#eef6ff", panel: "#ffffff", primary: "#1769e0", accent: "#f5b82e", ink: "#10253f" },
+    { key: "produto-editorial", nome: "Editorial escuro", descricao: "Visual sofisticado com divisao lateral", variant: 1, bg: "#101827", panel: "#182338", primary: "#5fd3ff", accent: "#f8cf5b", ink: "#ffffff" },
+    { key: "produto-catalogo", nome: "Catalogo moderno", descricao: "Produto central e detalhes organizados", variant: 2, bg: "#f6f3ed", panel: "#ffffff", primary: "#19735a", accent: "#e8aa47", ink: "#18342c" },
+    { key: "produto-social", nome: "Social vibrante", descricao: "Cores fortes para chamar atencao no feed", variant: 3, bg: "#4c1d95", panel: "#ffffff", primary: "#ff5f7e", accent: "#ffd84a", ink: "#ffffff" }
+  ],
+  promocao: [
+    { key: "promocao-impacto", nome: "Impacto vermelho", descricao: "Preco e desconto como protagonistas", variant: 0, bg: "#8f1024", panel: "#ffffff", primary: "#e7193f", accent: "#ffd43b", ink: "#ffffff" },
+    { key: "promocao-varejo", nome: "Varejo laranja", descricao: "Composicao comercial e direta", variant: 1, bg: "#ff6a00", panel: "#fff8ed", primary: "#ef4d00", accent: "#ffe057", ink: "#33150a" },
+    { key: "promocao-premium", nome: "Oferta premium", descricao: "Fundo escuro e acabamento dourado", variant: 2, bg: "#111111", panel: "#1d1d1d", primary: "#d5a940", accent: "#f6dc8b", ink: "#ffffff" },
+    { key: "promocao-festival", nome: "Festival de ofertas", descricao: "Layout dinamico para campanhas especiais", variant: 3, bg: "#3d1677", panel: "#ffffff", primary: "#8b3ffc", accent: "#ffcf3e", ink: "#ffffff" }
+  ]
+};
+
+let postArtPreviewTimer = null;
+let postArtPreviewRequest = 0;
+
+function postArtClients() {
+  if (canManageClients()) return [...state.clientes].sort((a, b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
+  const client = currentClientRecord();
+  return client ? [client] : [];
+}
+
+function postArtCurrentClient() {
+  const clients = postArtClients();
+  const requested = canManageClients() ? state.postArtClientId : currentClientId();
+  return clients.find((client) => client.id === requested) || clients[0] || null;
+}
+
+function postArtItems(client, type = state.postArtType) {
+  return type === "promocao" ? normalizePromocoes(client?.promocoes) : normalizeProdutos(client?.produtos);
+}
+
+function postArtCurrentItem(client = postArtCurrentClient()) {
+  const items = postArtItems(client);
+  return items.find((item) => item.id === state.postArtItemId) || items[0] || null;
+}
+
+function postArtLayout(type = state.postArtType, key = state.postArtLayout) {
+  const layouts = POST_ART_LAYOUTS[type] || POST_ART_LAYOUTS.produto;
+  return layouts.find((layout) => layout.key === key) || layouts[0];
+}
+
+function postArtItemImage(item = {}) {
+  return normalizarImagemArteAdmin(
+    state.postArtCustomImage
+      || $("postArtImage")?.value
+      || item.imagem
+      || item.imagens?.[0]
+      || ""
+  );
+}
+
+function postArtMoney(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "CONSULTE";
+  const numeric = numberFromMoney(raw);
+  if (numeric > 0) return numeric.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  return raw.toUpperCase();
+}
+
+function postArtDrawText(ctx, text, x, y, width, lines, size, color, options = {}) {
+  ctx.fillStyle = color;
+  return desenharTextoInteiroCanvas(ctx, String(text || ""), x, y, width, lines, {
+    peso: options.weight || 900,
+    tamanho: size,
+    minimo: options.min || 17,
+    lineHeight: options.lineHeight || Math.round(size * 1.08),
+    familia: options.family || "Arial",
+    align: options.align || "left",
+    blockHeight: options.blockHeight || 0
+  });
+}
+
+function postArtDrawPhoto(ctx, image, rect, fit = "cover", radius = 32, fill = "#edf2f7") {
+  preencherRoundRect(ctx, rect.x, rect.y, rect.w, rect.h, radius, fill);
+  if (!image) {
+    ctx.fillStyle = "#8292a5";
+    ctx.textAlign = "center";
+    ctx.font = "800 25px Arial";
+    ctx.fillText("IMAGEM DO ITEM", rect.x + rect.w / 2, rect.y + rect.h / 2);
+    return;
+  }
+  if (fit === "contain") desenharImagemContain(ctx, image, rect.x, rect.y, rect.w, rect.h, radius, fill);
+  else desenharImagemCover(ctx, image, rect.x, rect.y, rect.w, rect.h, radius);
+}
+
+function postArtDrawBrand(ctx, client, logo, siteLogo, layout, options = {}) {
+  const light = options.light !== false;
+  preencherRoundRect(ctx, 48, 42, 400, 94, 24, light ? "rgba(255,255,255,.94)" : "rgba(12,20,34,.76)");
+  if (logo) desenharImagemContain(ctx, logo, 62, 52, 74, 74, 16, "rgba(255,255,255,0)");
+  postArtDrawText(ctx, client?.nome || "SUA EMPRESA", 150, 68, 275, 2, 25, light ? "#15273a" : "#ffffff", { min: 14, lineHeight: 25 });
+  if (options.showSiteLogo !== false && siteLogo) desenharImagemContain(ctx, siteLogo, 858, 46, 174, 80, 0, "rgba(255,255,255,0)");
+}
+
+function postArtDrawFooter(ctx, client, layout, dark = true) {
+  const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte pelo WhatsApp";
+  const instagramRaw = String(client?.instagram || "").trim();
+  const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "") || "@olacarlopolis";
+  preencherRoundRect(ctx, 48, 974, 984, 68, 22, dark ? "rgba(11,21,34,.92)" : "rgba(255,255,255,.92)");
+  postArtDrawText(ctx, `WHATSAPP  ${phone}`, 78, 998, 480, 1, 20, dark ? "#ffffff" : layout.ink, { min: 14 });
+  postArtDrawText(ctx, instagram, 1000, 998, 400, 1, 20, dark ? layout.accent : layout.primary, { min: 14, align: "right" });
+}
+
+function postArtDrawPrice(ctx, data, x, y, w, layout, options = {}) {
+  const color = options.color || layout.primary;
+  preencherRoundRect(ctx, x, y, w, options.height || 145, 34, color);
+  if (data.oldPrice && data.type === "promocao") {
+    postArtDrawText(ctx, `DE ${postArtMoney(data.oldPrice)}`, x + 28, y + 22, w - 56, 1, 19, "rgba(255,255,255,.82)", { min: 13 });
+  }
+  postArtDrawText(ctx, postArtMoney(data.price), x + w / 2, y + (data.oldPrice && data.type === "promocao" ? 60 : 43), w - 44, 1, options.size || 48, "#ffffff", { min: 25, align: "center" });
+}
+
+function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout) {
+  const { width, height } = ctx.canvas;
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, layout.bg);
+  gradient.addColorStop(1, layout.variant === 3 ? layout.primary : layout.bg);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  const isPromo = data.type === "promocao";
+  const eyebrow = data.callout || (isPromo ? "PROMOÇÃO EM DESTAQUE" : "PRODUTO EM DESTAQUE");
+  const fit = data.imageFit || "cover";
+
+  if (layout.variant === 0) {
+    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 610 }, fit, 0, "#edf2f7");
+    const overlay = ctx.createLinearGradient(0, 250, 0, 620);
+    overlay.addColorStop(0, "rgba(8,20,36,0)");
+    overlay.addColorStop(1, "rgba(8,20,36,.88)");
+    ctx.fillStyle = overlay;
+    ctx.fillRect(0, 240, 1080, 380);
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { showSiteLogo: data.showSiteLogo });
+    preencherRoundRect(ctx, 54, 500, 430, 52, 26, layout.accent);
+    postArtDrawText(ctx, eyebrow, 269, 516, 390, 1, 20, "#202020", { min: 13, align: "center" });
+    preencherRoundRect(ctx, 0, 590, 1080, 490, 0, layout.panel);
+    postArtDrawText(ctx, data.title, 58, 645, 650, 2, 48, isPromo ? "#251a1d" : layout.ink, { min: 27, lineHeight: 50 });
+    postArtDrawText(ctx, data.description, 58, 770, 640, 3, 23, "#637083", { min: 15, weight: 600, lineHeight: 28 });
+    postArtDrawPrice(ctx, data, 730, 650, 300, layout, { color: layout.primary, height: 160, size: 45 });
+    if (data.validity) postArtDrawText(ctx, `Válida até ${formatDateBR(data.validity)}`, 880, 830, 290, 1, 18, "#5d6874", { align: "center", min: 13 });
+    postArtDrawFooter(ctx, client, layout, true);
+  } else if (layout.variant === 1) {
+    ctx.fillStyle = layout.panel;
+    ctx.fillRect(0, 0, 465, 1080);
+    postArtDrawPhoto(ctx, image, { x: 465, y: 0, w: 615, h: 1080 }, fit, 0, "#edf2f7");
+    const sideShade = ctx.createLinearGradient(440, 0, 760, 0);
+    sideShade.addColorStop(0, layout.panel);
+    sideShade.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = sideShade;
+    ctx.fillRect(430, 0, 360, 1080);
+    postArtDrawBrand(ctx, client, logo, null, layout, { light: false, showSiteLogo: false });
+    postArtDrawText(ctx, eyebrow, 58, 200, 350, 2, 22, layout.accent, { min: 14, lineHeight: 24 });
+    postArtDrawText(ctx, data.title, 58, 286, 355, 4, 51, layout.ink, { min: 27, lineHeight: 52 });
+    postArtDrawText(ctx, data.description, 58, 530, 340, 4, 22, layout.ink === "#ffffff" ? "#cbd5e1" : "#6b5b4d", { min: 14, weight: 600, lineHeight: 28 });
+    postArtDrawPrice(ctx, data, 58, 710, 350, layout, { color: layout.primary, height: 150, size: 43 });
+    if (data.validity) postArtDrawText(ctx, `ATÉ ${formatDateBR(data.validity)}`, 233, 884, 330, 1, 18, layout.accent, { align: "center" });
+    if (data.showSiteLogo && siteLogo) desenharImagemContain(ctx, siteLogo, 92, 940, 280, 92, 0, "rgba(255,255,255,0)");
+  } else if (layout.variant === 2) {
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { showSiteLogo: data.showSiteLogo });
+    postArtDrawText(ctx, eyebrow, 540, 160, 760, 1, 21, layout.primary, { align: "center", min: 14 });
+    postArtDrawPhoto(ctx, image, { x: 75, y: 205, w: 930, h: 540 }, fit, 38, "#ffffff");
+    desenharBordaRoundRect(ctx, 75, 205, 930, 540, 38, layout.primary, 5);
+    preencherRoundRect(ctx, 75, 775, 930, 175, 30, layout.panel);
+    postArtDrawText(ctx, data.title, 110, 808, 560, 2, 39, layout.ink, { min: 23, lineHeight: 41 });
+    postArtDrawText(ctx, data.description, 110, 897, 560, 2, 19, "#6b756f", { min: 13, weight: 600, lineHeight: 23 });
+    postArtDrawPrice(ctx, data, 700, 800, 270, layout, { color: layout.primary, height: 120, size: 38 });
+    postArtDrawFooter(ctx, client, layout, true);
+  } else {
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    ctx.beginPath(); ctx.arc(980, 100, 250, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(90, 930, 210, 0, Math.PI * 2); ctx.fill();
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { light: true, showSiteLogo: data.showSiteLogo });
+    preencherRoundRect(ctx, 58, 190, 390, 55, 27, layout.accent);
+    postArtDrawText(ctx, eyebrow, 253, 208, 350, 1, 20, "#241a06", { align: "center", min: 13 });
+    postArtDrawText(ctx, data.title, 58, 290, 420, 4, 55, "#ffffff", { min: 29, lineHeight: 56 });
+    postArtDrawText(ctx, data.description, 58, 555, 410, 4, 23, "rgba(255,255,255,.83)", { min: 15, weight: 600, lineHeight: 29 });
+    postArtDrawPhoto(ctx, image, { x: 520, y: 185, w: 505, h: 635 }, fit, 42, "#ffffff");
+    desenharBordaRoundRect(ctx, 520, 185, 505, 635, 42, "rgba(255,255,255,.9)", 8);
+    postArtDrawPrice(ctx, data, 585, 760, 375, layout, { color: layout.primary, height: 150, size: 45 });
+    if (data.validity) postArtDrawText(ctx, `VÁLIDA ATÉ ${formatDateBR(data.validity)}`, 263, 858, 400, 1, 18, layout.accent, { align: "center", min: 13 });
+    postArtDrawFooter(ctx, client, layout, true);
+  }
+}
+
+function postArtFormData() {
+  return {
+    type: state.postArtType,
+    title: $("postArtTitle")?.value.trim() || "Item em destaque",
+    description: $("postArtDescription")?.value.trim() || "Conheça esta novidade e fale com a empresa para saber mais.",
+    price: $("postArtPrice")?.value.trim() || "",
+    oldPrice: $("postArtOldPrice")?.value.trim() || "",
+    callout: $("postArtCallout")?.value.trim() || "",
+    validity: $("postArtValidity")?.value || "",
+    imageFit: $("postArtImageFit")?.value || "cover",
+    showSiteLogo: $("postArtShowSiteLogo")?.checked !== false
+  };
+}
+
+function preencherFormularioPostArt() {
+  const client = postArtCurrentClient();
+  const item = postArtCurrentItem(client);
+  if (!item) return;
+  const isPromo = state.postArtType === "promocao";
+  $("postArtTitle").value = item.titulo || item.nome || "";
+  $("postArtDescription").value = isPromo
+    ? (item.obs || item.instagramMensagem || "Oferta especial por tempo limitado.")
+    : (item.descricao || [item.marca, item.modelo, item.tamanho].filter(Boolean).join(" • ") || "Produto disponível. Consulte detalhes e disponibilidade.");
+  $("postArtPrice").value = item.preco || "";
+  $("postArtOldPrice").value = isPromo ? (item.precoAntigo || "") : "";
+  $("postArtCallout").value = isPromo ? (item.desconto || "PROMOÇÃO EM DESTAQUE") : (item.categoria || item.setor || "PRODUTO EM DESTAQUE");
+  $("postArtValidity").value = isPromo ? (item.validadeFim || "") : "";
+  $("postArtImage").value = item.imagem || item.imagens?.[0] || "";
+  state.postArtCustomImage = "";
+  $("postArtOldPriceLabel")?.classList.toggle("hidden", !isPromo);
+  $("postArtValidityLabel")?.classList.toggle("hidden", !isPromo);
+}
+
+async function atualizarPreviaPostArt() {
+  const canvas = $("postArtCanvas");
+  const client = postArtCurrentClient();
+  const item = postArtCurrentItem(client);
+  if (!canvas || !client || !item) return;
+  const requestId = ++postArtPreviewRequest;
+  const layout = postArtLayout();
+  const [image, logo, siteLogo] = await Promise.all([
+    carregarImagemCanvas(postArtItemImage(item)),
+    carregarImagemCanvas(logoClienteImovelAdmin(client)),
+    carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
+  ]);
+  if (requestId !== postArtPreviewRequest) return;
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  desenharPostArtCanvas(ctx, postArtFormData(), client, image, logo, siteLogo, layout);
+  if ($("postArtPreviewMeta")) $("postArtPreviewMeta").textContent = `${layout.nome} • 1080 × 1080 px`;
+}
+
+function agendarPreviaPostArt() {
+  window.clearTimeout(postArtPreviewTimer);
+  postArtPreviewTimer = window.setTimeout(() => atualizarPreviaPostArt(), 180);
+}
+
+async function baixarPostArt() {
+  const canvas = $("postArtCanvas");
+  const client = postArtCurrentClient();
+  const item = postArtCurrentItem(client);
+  if (!canvas || !client || !item) return showToast("Selecione um item para gerar a arte.");
+  const button = $("postArtDownload");
+  if (button) button.disabled = true;
+  try {
+    window.clearTimeout(postArtPreviewTimer);
+    await atualizarPreviaPostArt();
+    const blob = await canvasParaBlob(canvas);
+    baixarBlobCanvas(blob, `arte-${state.postArtType}-${slugify(client.nome || client.id)}-${slugify($("postArtTitle")?.value || item.titulo)}-${postArtLayout().key}.png`);
+    showToast("Arte pronta para postagem.");
+  } catch (error) {
+    console.error("Falha ao gerar arte para postagem.", error);
+    showToast("Não foi possível gerar a arte.");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function renderPostArtView() {
+  const mount = $("postArtMount");
+  if (!mount) return;
+  const clients = postArtClients();
+  if (!clients.length) {
+    mount.innerHTML = '<section class="panel-card"><div class="empty-state">Nenhuma empresa vinculada a este acesso.</div></section>';
+    return;
+  }
+  const client = postArtCurrentClient();
+  state.postArtClientId = client.id;
+  const type = state.postArtType === "promocao" ? "promocao" : "produto";
+  state.postArtType = type;
+  const items = postArtItems(client, type);
+  if (!items.some((item) => item.id === state.postArtItemId)) state.postArtItemId = items[0]?.id || "";
+  const layouts = POST_ART_LAYOUTS[type];
+  if (!layouts.some((layout) => layout.key === state.postArtLayout)) state.postArtLayout = layouts[0].key;
+
+  mount.innerHTML = `
+    <section class="panel-card post-art-intro">
+      <div class="section-head">
+        <div><span class="feature-kicker">Conteúdo para redes sociais</span><h2>Arte para Postagem</h2><p>Escolha um item cadastrado, ajuste os textos e compare os modelos antes de baixar.</p></div>
+        <span class="badge"><i class="fa-solid fa-image"></i> PNG 1080 × 1080</span>
+      </div>
+      ${canManageClients() ? `<label class="post-art-client-select">Cliente<select id="postArtClient">${clients.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === client.id ? "selected" : ""}>${escapeHtml(item.nome || item.id)}</option>`).join("")}</select></label>` : `<div class="post-art-client-identity"><img src="${escapeAttr(displayImageUrl(logoClienteImovelAdmin(client)) || "../images/img_padrao_site/logo_1.png")}" alt=""><div><span>Empresa selecionada</span><strong>${escapeHtml(client.nome || client.id)}</strong></div></div>`}
+    </section>
+    <section class="post-art-workspace">
+      <div class="post-art-editor-column">
+        <section class="panel-card post-art-step">
+          <div class="post-art-step-title"><span>1</span><div><strong>Tipo da arte</strong><small>Produto para vitrine ou promoção em destaque.</small></div></div>
+          <div class="post-art-type-toggle">
+            <button type="button" data-post-art-type="produto" class="${type === "produto" ? "active" : ""}"><i class="fa-solid fa-box-open"></i><strong>Produto</strong><span>Apresentação e detalhes</span></button>
+            <button type="button" data-post-art-type="promocao" class="${type === "promocao" ? "active" : ""}"><i class="fa-solid fa-tags"></i><strong>Promoção</strong><span>Preço e chamada em destaque</span></button>
+          </div>
+          ${items.length ? `<label>Item cadastrado<select id="postArtItem">${items.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === state.postArtItemId ? "selected" : ""}>${escapeHtml(item.titulo || item.nome)}</option>`).join("")}</select></label>` : `<div class="post-art-empty"><i class="fa-solid fa-circle-info"></i> Cadastre ao menos ${type === "produto" ? "um produto" : "uma promoção"} para criar a arte.</div>`}
+        </section>
+        ${items.length ? `
+        <section class="panel-card post-art-step">
+          <div class="post-art-step-title"><span>2</span><div><strong>Modelo visual</strong><small>Quatro composições criadas especialmente para ${type === "produto" ? "produtos" : "promoções"}.</small></div></div>
+          <div class="post-art-layout-grid">
+            ${layouts.map((layout) => `<button type="button" data-post-art-layout="${layout.key}" class="post-art-layout-card variant-${layout.variant} ${layout.key === state.postArtLayout ? "active" : ""}" style="--art-bg:${layout.bg};--art-primary:${layout.primary};--art-accent:${layout.accent};--art-panel:${layout.panel}"><span class="post-art-layout-mini"><i></i><b></b><em></em></span><strong>${escapeHtml(layout.nome)}</strong><small>${escapeHtml(layout.descricao)}</small><i class="fa-solid fa-circle-check"></i></button>`).join("")}
+          </div>
+        </section>
+        <section class="panel-card post-art-step">
+          <div class="post-art-step-title"><span>3</span><div><strong>Textos e imagem</strong><small>Os dados vieram do cadastro, mas podem ser ajustados somente para esta arte.</small></div></div>
+          <div class="post-art-fields">
+            <label class="wide">Título<input id="postArtTitle" maxlength="80"></label>
+            <label class="wide">Descrição<textarea id="postArtDescription" rows="3" maxlength="220"></textarea></label>
+            <label>Preço<input id="postArtPrice" placeholder="Ex.: 89,90"></label>
+            <label id="postArtOldPriceLabel">Preço anterior<input id="postArtOldPrice" placeholder="Ex.: 119,90"></label>
+            <label>Chamada<input id="postArtCallout" maxlength="48" placeholder="Ex.: Novidade ou 20% OFF"></label>
+            <label id="postArtValidityLabel">Validade<input id="postArtValidity" type="date"></label>
+            <label class="wide">Imagem usada<input id="postArtImage" placeholder="URL da imagem"></label>
+            <label>Nova imagem para esta arte<input id="postArtImageUpload" type="file" accept="image/*"></label>
+            <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
+            <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
+          </div>
+        </section>` : ""}
+      </div>
+      <aside class="panel-card post-art-preview-card">
+        <div class="section-head compact"><div><strong>Pré-visualização</strong><span id="postArtPreviewMeta">Confira o resultado antes de baixar</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>
+        ${items.length ? `<div class="post-art-canvas-shell"><canvas id="postArtCanvas" width="1080" height="1080"></canvas></div><button id="postArtDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar arte em PNG</button><p class="post-art-preview-note"><i class="fa-solid fa-circle-info"></i> As edições feitas aqui não alteram o cadastro do produto ou da promoção.</p>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-image"></i><span>A prévia aparecerá quando houver um item cadastrado.</span></div>`}
+      </aside>
+    </section>
+  `;
+
+  $("postArtClient")?.addEventListener("change", (event) => {
+    state.postArtClientId = event.target.value;
+    state.postArtItemId = "";
+    state.postArtCustomImage = "";
+    renderPostArtView();
+  });
+  mount.querySelectorAll("[data-post-art-type]").forEach((button) => button.addEventListener("click", () => {
+    state.postArtType = button.dataset.postArtType;
+    state.postArtLayout = POST_ART_LAYOUTS[state.postArtType][0].key;
+    state.postArtItemId = "";
+    state.postArtCustomImage = "";
+    renderPostArtView();
+  }));
+  if (!items.length) return;
+  $("postArtItem")?.addEventListener("change", (event) => {
+    state.postArtItemId = event.target.value;
+    preencherFormularioPostArt();
+    atualizarPreviaPostArt();
+  });
+  mount.querySelectorAll("[data-post-art-layout]").forEach((button) => button.addEventListener("click", () => {
+    state.postArtLayout = button.dataset.postArtLayout;
+    mount.querySelectorAll("[data-post-art-layout]").forEach((item) => item.classList.toggle("active", item === button));
+    atualizarPreviaPostArt();
+  }));
+  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtImage", "postArtImageFit", "postArtShowSiteLogo"].forEach((id) => {
+    $(id)?.addEventListener("input", agendarPreviaPostArt);
+    $(id)?.addEventListener("change", agendarPreviaPostArt);
+  });
+  $("postArtImageUpload")?.addEventListener("change", (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.postArtCustomImage = String(reader.result || "");
+      if ($("postArtImage")) $("postArtImage").value = "Imagem enviada para esta arte";
+      atualizarPreviaPostArt();
+    };
+    reader.readAsDataURL(file);
+  });
+  $("postArtDownload")?.addEventListener("click", baixarPostArt);
+  preencherFormularioPostArt();
+  atualizarPreviaPostArt();
+}
+
 function renderStaffPromocoesView() {
   const mount = $("staffPromocoesMount");
   if (!mount) return;
@@ -17417,7 +17801,7 @@ function renderStaffPromocoesView() {
         <label>Embalagem<input id="staffPromoPack" placeholder="Opcional"></label>
         <label>Validade inicio<input id="staffPromoStart" type="date"></label>
         <label>Validade fim<input id="staffPromoEnd" type="date"></label>
-        <label>Tipo de oferta<select id="staffPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option></select></label>
+        <label>Tipo de oferta<select id="staffPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option><option value="dia-especial">Dia especial</option></select></label>
         <label>Entrega / retirada<select id="staffPromoFulfillment"><option value="">Nao informar</option><option value="entrega">Entrega</option><option value="retirada">Retirada</option><option value="ambos">Entrega e retirada</option></select></label>
         <label>Faixa de preco<select id="staffPromoPriceRange"><option value="">Automatico</option><option value="ate-50">Ate R$ 50</option><option value="50-100">R$ 50 a R$ 100</option><option value="100-200">R$ 100 a R$ 200</option><option value="acima-200">Acima de R$ 200</option></select></label>
         <label>Com preco?<select id="staffPromoPriceMode"><option value="">Automatico</option><option value="com-preco">Com preco</option><option value="sem-preco">Sem preco</option></select></label>
@@ -17972,7 +18356,7 @@ function renderClientOnlyEditor() {
             <label>Embalagem<input id="coPromoPack" placeholder="Opcional"></label>
             <label>Validade inicio<input id="coPromoStart" type="date"></label>
             <label>Validade fim<input id="coPromoEnd" type="date"></label>
-            <label>Tipo de oferta<select id="coPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option></select></label>
+            <label>Tipo de oferta<select id="coPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option><option value="dia-especial">Dia especial</option></select></label>
             <label>Entrega / retirada<select id="coPromoFulfillment"><option value="">Nao informar</option><option value="entrega">Entrega</option><option value="retirada">Retirada</option><option value="ambos">Entrega e retirada</option></select></label>
             <label>Faixa de preco<select id="coPromoPriceRange"><option value="">Automatico</option><option value="ate-50">Ate R$ 50</option><option value="50-100">R$ 50 a R$ 100</option><option value="100-200">R$ 100 a R$ 200</option><option value="acima-200">Acima de R$ 200</option></select></label>
             <label>Com preco?<select id="coPromoPriceMode"><option value="">Automatico</option><option value="com-preco">Com preco</option><option value="sem-preco">Sem preco</option></select></label>
