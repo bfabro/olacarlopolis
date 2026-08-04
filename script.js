@@ -10036,7 +10036,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       .filter((item) => item.status !== "inativo" && item.ativo !== false && item.titulo);
   }
 
-  function promocoesDoEstabelecimentoPublico(est = {}) {
+  function promocoesDoEstabelecimentoPublico(est = {}, promocoesGlobais = null) {
     const chaves = new Set(chavesEstabelecimentoPublico(est));
     const cliente = clientePublicoDoEstabelecimento(est) || {};
     const promocoesCliente = normalizarPromocoesPublicas(cliente.promocoes || est.promocoes || est.promotions || [], {
@@ -10049,7 +10049,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       instagram: cliente.instagram || est.instagram || ""
     });
     const porId = new Map();
-    [...coletarTodasPromocoes(), ...promocoesCliente]
+    [...(Array.isArray(promocoesGlobais) ? promocoesGlobais : coletarTodasPromocoes()), ...promocoesCliente]
       .filter((promo) => chaves.has(normalizeName(promo.estabelecimentoId)) || chaves.has(normalizeName(promo.estabelecimento)))
       .filter((promo) => !promoExpirada(promo) && promoDisponivelHoje(promo))
       .forEach((promo) => {
@@ -13649,29 +13649,23 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     const autos = Array.isArray(options.autos) ? options.autos : (window.__automoveisCache || []);
     const imoveis = Array.isArray(options.imoveis) ? options.imoveis : (window.__imoveisPublicosCache || []);
+    const promocoesGlobais = coletarTodasPromocoes();
     await carregarModulosClientesPublicos();
     if (carregarRemoto) {
-      carregarAutomoveisFirebase({ reidratarLojas: false })
-        .then((lista) => {
-          hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, {
-            autos: lista,
-            imoveis: window.__imoveisPublicosCache || imoveis,
-            carregarRemoto: false,
-            atualizar: true
-          }).catch((error) => console.warn("Nao foi possivel atualizar aba de veiculos.", error));
-        })
-        .catch((error) => console.warn("Nao foi possivel carregar veiculos da loja.", error));
-      montarListaImoveisPublica()
-        .then((lista) => {
-          window.__imoveisPublicosCache = lista;
-          hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, {
-            autos: window.__automoveisCache || autos,
-            imoveis: lista,
-            carregarRemoto: false,
-            atualizar: true
-          }).catch((error) => console.warn("Nao foi possivel atualizar aba de imoveis.", error));
-        })
-        .catch((error) => console.warn("Nao foi possivel carregar imoveis da loja.", error));
+      Promise.allSettled([
+        carregarAutomoveisFirebase({ reidratarLojas: false }),
+        montarListaImoveisPublica()
+      ]).then(([autosResult, imoveisResult]) => {
+        const autosAtualizados = autosResult.status === "fulfilled" ? autosResult.value : autos;
+        const imoveisAtualizados = imoveisResult.status === "fulfilled" ? imoveisResult.value : imoveis;
+        window.__imoveisPublicosCache = imoveisAtualizados;
+        return hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, {
+          autos: autosAtualizados,
+          imoveis: imoveisAtualizados,
+          carregarRemoto: false,
+          atualizar: true
+        });
+      }).catch((error) => console.warn("Nao foi possivel atualizar abas remotas da loja.", error));
     }
 
     const adicionarAba = (li, slug, tipo, label, icon, renderizar, count = 0) => {
@@ -13712,16 +13706,20 @@ plotarPinsImoveis(stateImoveis.filtered);
       return !jaExiste;
     };
 
-    cards.forEach((li) => {
+    for (let cardIndex = 0; cardIndex < cards.length; cardIndex += 1) {
+      if (cardIndex > 0) {
+        await new Promise((resolve) => setTimeout(resolve, 0));
+      }
+      const li = cards[cardIndex];
       const slug = normalizeName(li.dataset.id || li.id || "");
       const est = encontrarEstabelecimentoPorSlug(slug);
-      if (!est || (li.dataset.lojaItensHidratados === "1" && !atualizar)) return;
+      if (!est || (li.dataset.lojaItensHidratados === "1" && !atualizar)) continue;
       let abasInseridas = false;
 
       const veiculos = automoveisDoEstabelecimentoPublico(est, autos || []);
       const imoveisDoEst = (imoveis || []).filter((item) => item.status !== "inativo" && item.ativo !== false && itemPertenceAoEstabelecimentoPublico(item, est));
       const produtos = produtosDoEstabelecimentoPublico(est);
-      const promocoes = promocoesDoEstabelecimentoPublico(est);
+      const promocoes = promocoesDoEstabelecimentoPublico(est, promocoesGlobais);
       const deveMostrarAbaVeiculos = veiculos.length && moduloClientePublicoAtivo(est, "veiculos");
       const deveMostrarAbaImoveis = imoveisDoEst.length && moduloClientePublicoAtivo(est, "imoveis");
       const deveMostrarAbaProdutos = produtos.length && moduloClientePublicoAtivo(est, "produtos");
@@ -13801,11 +13799,11 @@ plotarPinsImoveis(stateImoveis.filtered);
       const veiculosPendentes = deveMostrarAbaVeiculos && !veiculos.length;
       if ((abasInseridas || temAbaItens) && !veiculosPendentes) {
         li.dataset.lojaItensHidratados = "1";
-        moveTabSlider(li.querySelector(".abas-nav"));
+        requestAnimationFrame(() => moveTabSlider(li.querySelector(".abas-nav")));
       } else if (abasInseridas) {
-        moveTabSlider(li.querySelector(".abas-nav"));
+        requestAnimationFrame(() => moveTabSlider(li.querySelector(".abas-nav")));
       }
-    });
+    }
   }
 
   function estabelecimentosVisiveisParaAbasPublicas(root = document) {
@@ -13814,11 +13812,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       .map((li) => normalizeName(li.dataset.id || li.id || ""))
       .filter(Boolean));
     if (!ids.size) return [];
+    const idsVisiveis = [...ids];
     const encontrados = [];
     (categories || []).forEach((cat) => {
       (cat.establishments || []).forEach((est) => {
         const chaves = chavesEstabelecimentoPublico(est);
-        const combina = chaves.some((chave) => ids.has(chave) || [...ids].some((id) => (
+        const combina = chaves.some((chave) => ids.has(chave) || idsVisiveis.some((id) => (
           chave.length >= 4
           && id.length >= 4
           && (chave.includes(id) || id.includes(chave))
@@ -13835,15 +13834,22 @@ plotarPinsImoveis(stateImoveis.filtered);
   function agendarHidratacaoAbasItensPublicas(root = document, delay = 120) {
     if (lojaItensAutoHydrateTimer) clearTimeout(lojaItensAutoHydrateTimer);
     lojaItensAutoHydrateTimer = setTimeout(() => {
-      const area = root?.querySelector?.(".content_area") || document.querySelector(".content_area") || root || document;
-      const estabelecimentos = estabelecimentosVisiveisParaAbasPublicas(area);
-      if (!estabelecimentos.length) return;
-      const carregarRemoto = !window.__lojaItensAutoHydrateRemoteStarted;
-      window.__lojaItensAutoHydrateRemoteStarted = true;
-      window.__lojaItensUltimosEstabelecimentos = estabelecimentos;
-      hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, { carregarRemoto, atualizar: true })
-        .catch((error) => console.warn("Nao foi possivel hidratar abas de itens visiveis.", error));
-    }, delay);
+      const executarHidratacao = () => {
+        const area = root?.querySelector?.(".content_area") || document.querySelector(".content_area") || root || document;
+        const estabelecimentos = estabelecimentosVisiveisParaAbasPublicas(area);
+        if (!estabelecimentos.length) return;
+        const carregarRemoto = !window.__lojaItensAutoHydrateRemoteStarted;
+        window.__lojaItensAutoHydrateRemoteStarted = true;
+        window.__lojaItensUltimosEstabelecimentos = estabelecimentos;
+        hidratarAbasItensEstabelecimentoPublico(area, estabelecimentos, { carregarRemoto, atualizar: true })
+          .catch((error) => console.warn("Nao foi possivel hidratar abas de itens visiveis.", error));
+      };
+      if (typeof requestIdleCallback === "function") {
+        requestIdleCallback(executarHidratacao, { timeout: 1200 });
+      } else {
+        setTimeout(executarHidratacao, 0);
+      }
+    }, Math.max(Number(delay) || 0, 3000));
   }
 
   const elMenuAutomoveis = document.getElementById("menuAutomoveis");
