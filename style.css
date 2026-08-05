@@ -26936,10 +26936,10 @@ body.eventos-image-open { overflow: hidden; }
   gap: 8px;
   min-height: 40px;
   padding: 8px 12px;
-  border: 1px solid #60a5fa;
+  border: 1px solid #cbd5e1;
   border-radius: 12px;
   background: #fff;
-  color: #1d4ed8;
+  color: #334155;
   font-size: .86rem;
   font-weight: 900;
   cursor: pointer;
@@ -27015,8 +27015,8 @@ body.eventos-image-open { overflow: hidden; }
   overflow: hidden;
   min-height: 42px;
   padding-left: 16px;
-  border: 1px solid #cfe0f5;
-  background: linear-gradient(90deg, #eff6ff, #f8fafc 68%, #fff);
+  border: 1px solid #e2e8f0;
+  background: #fff;
   color: #475569;
   font-weight: 750;
 }
@@ -27026,7 +27026,7 @@ body.eventos-image-open { overflow: hidden; }
   position: absolute;
   inset: 0 auto 0 0;
   width: 4px;
-  background: linear-gradient(#2563eb, #f97316);
+  background: #94a3b8;
 }
 
 .vitrine-produtos-grid {
@@ -27039,6 +27039,9 @@ body.eventos-image-open { overflow: hidden; }
 .vitrine-produtos-grid .loja-produto-card {
   height: 100%;
   margin: 0;
+  border-color: #e2e8f0;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, .07);
 }
 
 .loja-produto-empresa {
@@ -27076,10 +27079,10 @@ body.eventos-image-open { overflow: hidden; }
   gap: 6px;
   min-height: 38px;
   padding: 7px 9px;
-  border: 0;
+  border: 1px solid #2563eb;
   border-radius: 10px;
-  background: #2563eb;
-  color: #fff;
+  background: #fff;
+  color: #2563eb;
   font-size: .82rem;
   font-weight: 900;
   cursor: pointer;

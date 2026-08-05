@@ -23720,7 +23720,6 @@ plotarPinsImoveis(stateImoveis.filtered);
       <section class="vitrine-produtos-page">
         <header class="vitrine-produtos-header">
           <h2 class="highlighted"><i class="fa-solid fa-bag-shopping"></i> Produtos</h2>
-          <p>Encontre produtos oferecidos pelas empresas de Carlópolis em uma única vitrine.</p>
         </header>
         <aside id="vitrineProdutosFiltros" class="vitrine-produtos-filtro-card vitrine-filter-collapsed" aria-label="Filtros e ordenação de produtos">
           <div class="vitrine-produtos-filtro-topbar">
@@ -23797,7 +23796,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       });
 
       const empresasAtivas = new Set(filtrados.map((item) => normalizeName(item.estabelecimento)).filter(Boolean));
-      resumo.innerHTML = `<i class="fa-solid fa-box-open"></i><strong>${filtrados.length}</strong> ${filtrados.length === 1 ? "produto cadastrado" : "produtos cadastrados"}<span>•</span><strong>${empresasAtivas.size}</strong> ${empresasAtivas.size === 1 ? "empresa participante" : "empresas participantes"}`;
+      resumo.innerHTML = `<i class="fa-solid fa-box-open"></i><strong>${filtrados.length}</strong> ${filtrados.length === 1 ? "produto" : "produtos"}<span>•</span><strong>${empresasAtivas.size}</strong> ${empresasAtivas.size === 1 ? "empresa" : "empresas"}`;
       grid.innerHTML = filtrados.length
         ? filtrados.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")
         : `<div class="vitrine-produtos-vazio"><i class="fa-solid fa-magnifying-glass"></i><strong>Nenhum produto encontrado</strong><span>Tente alterar a pesquisa ou os filtros.</span></div>`;
