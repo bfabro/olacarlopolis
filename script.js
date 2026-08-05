@@ -6632,6 +6632,7 @@ carlopdiesel:"s",
          
         "menuAutomoveis",
         "menuImoveis",
+        "menuProdutos",
         "menuPromocoes"
       ]],
        ["Lazer e gastronomia", [
@@ -10148,10 +10149,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ${isPromocao ? `<span class="loja-produto-badge loja-promocao-badge">Promoção</span>` : (item.destaque ? `<span class="loja-produto-badge">Destaque</span>` : "")}
           </div>
           <div class="loja-produto-info">
-            ${setorCategoria ? `<div class="loja-produto-categoria">${escapePromoHtml(setorCategoria)}</div>` : ""}
+            ${setorCategoria && !item.ocultarCategoriaCard ? `<div class="loja-produto-categoria">${escapePromoHtml(setorCategoria)}</div>` : ""}
             <div class="loja-produto-nome">${titulo}</div>
             ${item.exibirEmpresaNoCard && item.estabelecimento ? `<div class="loja-produto-empresa"><i class="fa-solid fa-store"></i>${escapePromoHtml(item.estabelecimento)}</div>` : ""}
-            ${descricao ? `<div class="loja-produto-descricao">${descricao}</div>` : ""}
+            ${descricao && !item.ocultarDescricaoCard ? `<div class="loja-produto-descricao">${descricao}</div>` : ""}
             ${isPromocao && infoPromocao ? `<div class="loja-produto-promocao-info">${escapePromoHtml(infoPromocao)}</div>` : ""}
           </div>
           ${mostrarPrecoCard ? `<div class="loja-produto-preco ${isPromocao ? "loja-promocao-preco" : ""}">
@@ -10162,8 +10163,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
             <div class="loja-produto-acoes vitrine-produto-acoes">
               <button type="button" class="vitrine-produto-detalhes" data-vitrine-produto-detalhes="${escapePromoHtml(cacheKey)}"><i class="fa-solid fa-circle-info"></i> Detalhes</button>
               ${whatsapp
-                ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>`
-                : `<button type="button" class="loja-produto-interesse is-disabled" disabled><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>`}
+                ? `<a class="loja-produto-interesse${item.whatsappSomenteIcone ? " is-icon-only" : ""}" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="Falar pelo WhatsApp"><i class="fa-brands fa-whatsapp"></i>${item.whatsappSomenteIcone ? "" : " WhatsApp"}</a>`
+                : `<button type="button" class="loja-produto-interesse is-disabled${item.whatsappSomenteIcone ? " is-icon-only" : ""}" disabled aria-label="WhatsApp indisponível" title="WhatsApp indisponível"><i class="fa-brands fa-whatsapp"></i>${item.whatsappSomenteIcone ? "" : " WhatsApp"}</button>`}
             </div>
           ` : ((tipo === "produto" || isPromocao) ? (whatsapp
             ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>`
@@ -14741,6 +14742,15 @@ plotarPinsImoveis(stateImoveis.filtered);
   /////
 
   // Atalho no menu
+  const linkProdutos = document.getElementById("menuProdutos");
+  if (linkProdutos) {
+    linkProdutos.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (location.hash !== "#produtos") history.pushState(null, "", `${location.pathname}${location.search}#produtos`);
+      mostrarProdutosPublicos();
+    });
+  }
+
   const linkPromo = document.getElementById("menuPromocoes");
   if (linkPromo) {
     linkPromo.dataset.promoMenuBound = "true";
@@ -23668,7 +23678,10 @@ plotarPinsImoveis(stateImoveis.filtered);
             palavrasRelacionadas: produto.palavrasRelacionadas || "",
             exibirEmpresaNoCard: true,
             exibirBotaoDetalhes: true,
-            ocultarPrecoAusente: true
+            ocultarPrecoAusente: true,
+            ocultarCategoriaCard: true,
+            ocultarDescricaoCard: true,
+            whatsappSomenteIcone: true
           });
         });
       });
@@ -23682,6 +23695,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (typeof definirTelaContentArea === "function") definirTelaContentArea(null);
     const area = document.querySelector(".content_area");
     if (!area) return;
+    document.querySelectorAll(".sidebar .nav_link").forEach((link) => link.classList.remove("active"));
+    document.getElementById("menuProdutos")?.classList.add("active");
 
     if (!ADMIN_CLIENTES_LOADED) {
       area.innerHTML = `<section class="vitrine-produtos-page"><h2 class="highlighted"><i class="fa-solid fa-bag-shopping"></i> Produtos</h2><div class="vitrine-produtos-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>Carregando produtos locais...</span></div></section>`;
@@ -23707,34 +23722,42 @@ plotarPinsImoveis(stateImoveis.filtered);
           <h2 class="highlighted"><i class="fa-solid fa-bag-shopping"></i> Produtos</h2>
           <p>Encontre produtos oferecidos pelas empresas de Carlópolis em uma única vitrine.</p>
         </header>
+        <aside id="vitrineProdutosFiltros" class="vitrine-produtos-filtro-card vitrine-filter-collapsed" aria-label="Filtros e ordenação de produtos">
+          <div class="vitrine-produtos-filtro-topbar">
+            <button id="vitrineProdutosToggleFiltros" class="vitrine-filter-toggle" type="button" aria-expanded="false">
+              <i class="fa-solid fa-sliders"></i><span>Filtro e ordenação</span><i class="fa-solid fa-chevron-down vitrine-filter-chevron"></i>
+            </button>
+          </div>
+          <div class="vitrine-produtos-filtro-grid">
+            <label><span>Categoria</span><select id="vitrineProdutosCategoria"><option value="">Todas as categorias</option>${categoriasProdutos.map((nome) => `<option value="${escapePromoHtml(nome)}">${escapePromoHtml(nome)}</option>`).join("")}</select></label>
+            <label><span>Empresa</span><select id="vitrineProdutosEmpresa"><option value="">Todas as empresas</option>${empresasProdutos.map((nome) => `<option value="${escapePromoHtml(nome)}">${escapePromoHtml(nome)}</option>`).join("")}</select></label>
+            <label><span>Ordenar por</span><select id="vitrineProdutosOrdem"><option value="recentes">Data: mais recentes</option><option value="antigos">Data: mais antigos</option><option value="preco-asc">Preço: menor para maior</option><option value="preco-desc">Preço: maior para menor</option><option value="az">Nome: A a Z</option><option value="za">Nome: Z a A</option></select></label>
+          </div>
+        </aside>
         <div class="vitrine-produtos-pesquisa">
           <i class="fa-solid fa-magnifying-glass"></i>
           <input id="vitrineProdutosBusca" type="search" placeholder="Produto, empresa, descrição, categoria ou palavra relacionada" autocomplete="off">
           <button id="vitrineProdutosLimpar" type="button" aria-label="Limpar pesquisa" title="Limpar pesquisa"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <section class="vitrine-produtos-controles" aria-label="Filtros e ordenação de produtos">
-          <div class="vitrine-produtos-filtro-card">
-            <div class="vitrine-controle-titulo"><i class="fa-solid fa-sliders"></i><span>Filtrar</span></div>
-            <label><span>Categoria</span><select id="vitrineProdutosCategoria"><option value="">Todas as categorias</option>${categoriasProdutos.map((nome) => `<option value="${escapePromoHtml(nome)}">${escapePromoHtml(nome)}</option>`).join("")}</select></label>
-            <label><span>Empresa</span><select id="vitrineProdutosEmpresa"><option value="">Todas as empresas</option>${empresasProdutos.map((nome) => `<option value="${escapePromoHtml(nome)}">${escapePromoHtml(nome)}</option>`).join("")}</select></label>
-          </div>
-          <div class="vitrine-produtos-ordem-card">
-            <div class="vitrine-controle-titulo"><i class="fa-solid fa-arrow-down-wide-short"></i><span>Ordenar</span></div>
-            <label><span>Exibição</span><select id="vitrineProdutosOrdem"><option value="recentes">Data: mais recentes</option><option value="antigos">Data: mais antigos</option><option value="preco-asc">Preço: menor para maior</option><option value="preco-desc">Preço: maior para menor</option><option value="az">Nome: A a Z</option><option value="za">Nome: Z a A</option></select></label>
-          </div>
-        </section>
-        <div class="vitrine-produtos-resumo" id="vitrineProdutosResumo" aria-live="polite"></div>
+        <div class="vitrine-produtos-resumo vitrine-produtos-resumo-destaque" id="vitrineProdutosResumo" aria-live="polite"></div>
         <div class="vitrine-produtos-grid loja-produtos-grid loja-cards-grid" id="vitrineProdutosGrid"></div>
       </section>`;
 
     const busca = area.querySelector("#vitrineProdutosBusca");
     const limpar = area.querySelector("#vitrineProdutosLimpar");
+    const filtroCard = area.querySelector("#vitrineProdutosFiltros");
+    const toggleFiltros = area.querySelector("#vitrineProdutosToggleFiltros");
     const categoria = area.querySelector("#vitrineProdutosCategoria");
     const empresa = area.querySelector("#vitrineProdutosEmpresa");
     const ordem = area.querySelector("#vitrineProdutosOrdem");
     const resumo = area.querySelector("#vitrineProdutosResumo");
     const grid = area.querySelector("#vitrineProdutosGrid");
     let timerBusca = null;
+
+    toggleFiltros.addEventListener("click", () => {
+      const recolhido = filtroCard.classList.toggle("vitrine-filter-collapsed");
+      toggleFiltros.setAttribute("aria-expanded", recolhido ? "false" : "true");
+    });
 
     const renderizar = () => {
       const termo = normalizeName(busca.value || "");
