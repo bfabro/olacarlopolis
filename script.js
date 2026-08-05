@@ -9939,12 +9939,15 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       .map((item, index) => {
         const imagens = [
           ...(Array.isArray(item.imagens) ? item.imagens : []),
+          ...(Array.isArray(item.fotos) ? item.fotos : []),
           item.imagem,
           item.image,
           item.foto,
           item.fotoUrl,
           item.imagemUrl
-        ].map((url) => String(url || "").trim()).filter(Boolean).slice(0, 4);
+        ].map((url) => String(url || "").trim())
+          .filter(Boolean)
+          .filter((url, imageIndex, allImages) => allImages.indexOf(url) === imageIndex);
         return {
           id: item.id || `produto-${normalizeName(est.name || "loja")}-${index}`,
           estabelecimento: item.estabelecimento || est.name || est.nome || cliente.nome || cliente.name || "",
@@ -10254,7 +10257,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       item.image,
       item.foto,
       item.banner
-    ].map((img) => String(img || "").trim()).filter(Boolean).filter((img, index, arr) => arr.indexOf(img) === index).slice(0, 4);
+    ].map((img) => String(img || "").trim()).filter(Boolean).filter((img, index, arr) => arr.indexOf(img) === index);
     const disponibilidadeNormalizada = normalizeName(item.disponibilidade || "");
     const disponibilidadeClasse = disponibilidadeNormalizada.includes("indisponivel")
       ? " is-unavailable"
@@ -10289,7 +10292,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         <div class="imovel-detalhes-media loja-produto-media">
           ${imagensProduto.length ? `
             <div class="loja-produto-modal-galeria" data-produto-galeria>
-              <img class="loja-produto-modal-img imagem-expandivel" src="${escapePromoHtml(imagensProduto[0])}" alt="${escapePromoHtml(titulo)} - imagem 1" data-produto-galeria-img loading="lazy" title="Clique para ampliar">
+              <img class="loja-produto-modal-img" src="${escapePromoHtml(imagensProduto[0])}" alt="${escapePromoHtml(titulo)} - imagem 1" data-produto-galeria-img loading="lazy" title="Clique para ampliar">
               ${imagensProduto.length > 1 ? `
                 <button type="button" class="loja-produto-galeria-seta anterior" data-produto-galeria-prev aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
                 <button type="button" class="loja-produto-galeria-seta proxima" data-produto-galeria-next aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
@@ -10337,12 +10340,20 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       modal.remove();
     };
     const fecharComEsc = (event) => {
-      if (event.key === "Escape") fechar();
+      if (event.key === "Escape" && !document.querySelector(".produto-gallery-modal")) fechar();
     };
     modal.querySelector(".loja-produto-fechar")?.addEventListener("click", fechar);
+    let imagemAtual = 0;
+    const imgEl = modal.querySelector("[data-produto-galeria-img]");
+    const galeriaEl = modal.querySelector("[data-produto-galeria]");
+    if (imgEl) {
+      imgEl.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        abrirGaleriaAutomovel(imagensProduto, imagemAtual, titulo, "produto-gallery-modal");
+      });
+    }
     if (imagensProduto.length > 1) {
-      let imagemAtual = 0;
-      const imgEl = modal.querySelector("[data-produto-galeria-img]");
       const contadorEl = modal.querySelector("[data-produto-galeria-count]");
       const atualizarGaleria = () => {
         if (!imgEl) return;
@@ -10362,6 +10373,17 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         imagemAtual = (imagemAtual + 1) % imagensProduto.length;
         atualizarGaleria();
       });
+      let toqueInicialX = 0;
+      galeriaEl?.addEventListener("touchstart", (event) => {
+        toqueInicialX = event.changedTouches?.[0]?.clientX || 0;
+      }, { passive: true });
+      galeriaEl?.addEventListener("touchend", (event) => {
+        const toqueFinalX = event.changedTouches?.[0]?.clientX || 0;
+        const delta = toqueFinalX - toqueInicialX;
+        if (Math.abs(delta) <= 45) return;
+        imagemAtual = (imagemAtual + (delta > 0 ? -1 : 1) + imagensProduto.length) % imagensProduto.length;
+        atualizarGaleria();
+      }, { passive: true });
     }
     modal.addEventListener("click", (event) => {
       if (event.target === modal) fechar();
@@ -13159,18 +13181,18 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
   }
 
-  function abrirGaleriaAutomovel(imagens, inicio = 0, titulo = "Automovel") {
+  function abrirGaleriaAutomovel(imagens, inicio = 0, titulo = "Automovel", classeExtra = "") {
     if (!imagens.length) return;
     let indice = Math.max(0, Math.min(inicio, imagens.length - 1));
     document.querySelector(".auto-gallery-modal")?.remove();
     const modal = document.createElement("div");
-    modal.className = "auto-gallery-modal";
+    modal.className = `auto-gallery-modal${classeExtra ? ` ${classeExtra}` : ""}`;
     modal.innerHTML = `
       <div class="auto-gallery-modal-box" role="dialog" aria-label="${textoSeguroAutomoveis(titulo)}">
         <button class="auto-gallery-modal-close" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-        <button class="auto-gallery-modal-nav auto-gallery-modal-prev" type="button" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        ${imagens.length > 1 ? `<button class="auto-gallery-modal-nav auto-gallery-modal-prev" type="button" aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button>` : ""}
         <img src="" alt="${textoSeguroAutomoveis(titulo)}">
-        <button class="auto-gallery-modal-nav auto-gallery-modal-next" type="button" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>
+        ${imagens.length > 1 ? `<button class="auto-gallery-modal-nav auto-gallery-modal-next" type="button" aria-label="Proxima imagem"><i class="fa-solid fa-chevron-right"></i></button>` : ""}
         <span class="auto-gallery-modal-count"></span>
       </div>
     `;
