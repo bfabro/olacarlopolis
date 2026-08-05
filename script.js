@@ -4855,7 +4855,9 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   function novidadeCategoriaInfo(item) {
     const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
-    const clienteInstitucional = novidadeTipoCliente(item).includes("institucional");
+    const tipoCliente = novidadeTipoCliente(item);
+    const clienteInstitucional = tipoCliente.includes("institucional");
+    const clienteServico = tipoCliente.includes("servic");
     const texto = normalizeName(`${item?.titulo || ""} ${item?.acao || ""} ${item?.descricao || ""}`);
     if (tipo.includes("imovel")) return { key: "imoveis", label: "Imóvel", icon: "fa-house" };
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
@@ -4863,16 +4865,24 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
     if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
     if (tipo.includes("grupo") || tipo.includes("whatsapp")) return { key: "grupo-whatsapp", label: "Grupo WhatsApp", icon: "fa-user-group" };
-    if (texto.includes("destaque")) return { key: "comercios", label: "Destaque", icon: "fa-star" };
+    if (texto.includes("destaque")) {
+      return clienteServico
+        ? { key: "servicos", label: "Serviço", icon: "fa-screwdriver-wrench" }
+        : { key: "comercios", label: "Destaque", icon: "fa-star" };
+    }
     if (tipo.includes("cliente") || tipo.includes("endereco") || tipo.includes("telefone") || tipo.includes("horario") || tipo.includes("cardapio") || tipo.includes("rede")) {
       return clienteInstitucional
         ? { key: "comercios", label: "Institucional", icon: "fa-building-columns" }
-        : { key: "comercios", label: "Comércio", icon: "fa-store" };
+        : (clienteServico
+          ? { key: "servicos", label: "Serviço", icon: "fa-screwdriver-wrench" }
+          : { key: "comercios", label: "Comércio", icon: "fa-store" });
     }
     if (tipo.includes("estabelecimento")) {
       return clienteInstitucional
         ? { key: "comercios", label: "Institucional", icon: "fa-building-columns" }
-        : { key: "comercios", label: "Comércio", icon: "fa-store" };
+        : (clienteServico
+          ? { key: "servicos", label: "Serviço", icon: "fa-screwdriver-wrench" }
+          : { key: "comercios", label: "Comércio", icon: "fa-store" });
     }
     return { key: "servicos", label: "Serviço", icon: "fa-bell" };
   }
@@ -5528,11 +5538,13 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       add("fa-location-dot", novidadeValorCampo(item, ["local", "endereco"]) || item.estabelecimento, "Local");
       add("fa-ticket", novidadeValorCampo(item, ["entrada", "valor", "valorEntrada"]) || "Confira detalhes", "Entrada");
     } else {
-      const clienteInstitucional = novidadeTipoCliente(item).includes("institucional");
+      const tipoCliente = novidadeTipoCliente(item);
+      const clienteInstitucional = tipoCliente.includes("institucional");
+      const clienteServico = tipoCliente.includes("servic");
       add(
-        clienteInstitucional ? "fa-building-columns" : "fa-store",
+        clienteInstitucional ? "fa-building-columns" : (clienteServico ? "fa-screwdriver-wrench" : "fa-store"),
         item.estabelecimento || novidadeTituloDestino(item),
-        clienteInstitucional ? "Institucional" : "Responsável"
+        clienteInstitucional ? "Institucional" : (clienteServico ? "Serviço" : "Responsável")
       );
       add("fa-location-dot", novidadeValorCampo(item, ["endereco", "cidade"]) || "Carlópolis - PR", "Local");
       add("fa-bell", item.categoria || item.descricao || "Novidade recente", "Informação");
@@ -5564,6 +5576,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     const tipoClass = novidadeTipoClasse(item.destinoTipo || item.tipo, item);
     const categoria = novidadeCategoriaInfo(item);
     const anunciante = novidadeEstabelecimentoCard(item) || novidadeNomePrincipal(item);
+    const anuncianteEhServico = novidadeTipoCliente(item).includes("servic");
     const logo = novidadeLogoAnunciante(item, anunciante);
     const destaque = novidadeDestaquePrincipal(item);
     const infos = novidadeInfoRapida(item);
@@ -5590,7 +5603,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         ${anunciante ? `
           <div class="novidade-preview-owner">
             <span class="novidade-preview-owner-logo">
-              ${logo ? `<img src="${escapePromoHtml(logo)}" alt="${escapePromoHtml(anunciante)}" loading="lazy" decoding="async">` : `<i class="fa-solid fa-store"></i>`}
+              ${logo ? `<img src="${escapePromoHtml(logo)}" alt="${escapePromoHtml(anunciante)}" loading="lazy" decoding="async">` : `<i class="fa-solid ${anuncianteEhServico ? "fa-screwdriver-wrench" : "fa-store"}"></i>`}
             </span>
             <span>${escapePromoHtml(anunciante)}</span>
           </div>
