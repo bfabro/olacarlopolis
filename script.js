@@ -9958,6 +9958,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           observacoes: item.observacoes || item.obs || item.detalhes || "",
           categoria: item.categoria || item.tipo || "",
           setor: item.setor || item.segmento || item.departamento || "",
+          palavrasRelacionadas: item.palavrasRelacionadas || item.palavrasChave || item.palavras || item.keywords || item.tags || "",
           marca: item.marca || item.brand || "",
           modelo: item.modelo || item.model || "",
           tipoMedida: item.tipoMedida || item.measureType || (item.volume ? "Volume" : item.medida ? "Medida" : item.tamanho ? "Tamanho" : ""),
@@ -10115,6 +10116,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
     const isPromocao = tipo === "promocao";
     const preco = produtoPrecoPublico(item, tipo);
+    const mostrarPrecoCard = !item.ocultarPrecoAusente
+      || (item.mostrarPreco !== false && String(item.preco || "").trim());
     const precoAntigo = formatarMoedaPromo(item.precoAntigo || item.precoReal || item.valorReal || item.precoOriginal || "");
     const titulo = escapePromoHtml(item.titulo || "Produto");
     const descricao = escapePromoHtml(item.descricao || item.observacoes || "");
@@ -10147,16 +10150,24 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           <div class="loja-produto-info">
             ${setorCategoria ? `<div class="loja-produto-categoria">${escapePromoHtml(setorCategoria)}</div>` : ""}
             <div class="loja-produto-nome">${titulo}</div>
+            ${item.exibirEmpresaNoCard && item.estabelecimento ? `<div class="loja-produto-empresa"><i class="fa-solid fa-store"></i>${escapePromoHtml(item.estabelecimento)}</div>` : ""}
             ${descricao ? `<div class="loja-produto-descricao">${descricao}</div>` : ""}
             ${isPromocao && infoPromocao ? `<div class="loja-produto-promocao-info">${escapePromoHtml(infoPromocao)}</div>` : ""}
           </div>
-          <div class="loja-produto-preco ${isPromocao ? "loja-promocao-preco" : ""}">
+          ${mostrarPrecoCard ? `<div class="loja-produto-preco ${isPromocao ? "loja-promocao-preco" : ""}">
             ${isPromocao && precoAntigo ? `<small>De <s>${escapePromoHtml(precoAntigo)}</s></small>` : ""}
             <span>${escapePromoHtml(preco || (isPromocao ? "Ver promoção" : "Ver detalhes"))}</span>
-          </div>
-          ${(tipo === "produto" || isPromocao) ? (whatsapp
+          </div>` : ""}
+          ${item.exibirBotaoDetalhes ? `
+            <div class="loja-produto-acoes vitrine-produto-acoes">
+              <button type="button" class="vitrine-produto-detalhes" data-vitrine-produto-detalhes="${escapePromoHtml(cacheKey)}"><i class="fa-solid fa-circle-info"></i> Detalhes</button>
+              ${whatsapp
+                ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>`
+                : `<button type="button" class="loja-produto-interesse is-disabled" disabled><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>`}
+            </div>
+          ` : ((tipo === "produto" || isPromocao) ? (whatsapp
             ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>`
-            : `<button type="button" class="loja-produto-interesse is-disabled" disabled>Tenho interesse</button>`) : ""}
+            : `<button type="button" class="loja-produto-interesse is-disabled" disabled>Tenho interesse</button>`) : "")}
         </div>
       </article>
     `;
@@ -10230,7 +10241,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const titulo = item.titulo || tituloPadrao;
     const isProduto = normalizeName(tituloPadrao || "").includes("produto");
     const isPromocao = normalizeName(tituloPadrao || "").includes("promocao");
-    const preco = produtoPrecoPublico(item, isProduto ? "produto" : "promocao");
+    const precoCalculado = produtoPrecoPublico(item, isProduto ? "produto" : "promocao");
+    const preco = item.ocultarPrecoAusente && (item.mostrarPreco === false || !String(item.preco || "").trim())
+      ? ""
+      : precoCalculado;
     const whatsapp = (isProduto || isPromocao) ? produtoWhatsappLink(item, isPromocao ? "promocao" : "produto") : "";
     const imagensProduto = [
       ...(Array.isArray(item.imagens) ? item.imagens : []),
@@ -23614,7 +23628,190 @@ plotarPinsImoveis(stateImoveis.filtered);
     }, 220);
   }
 
+  function valorNumericoProdutoPublico(value) {
+    if (typeof value === "number") return Number.isFinite(value) ? value : null;
+    const raw = String(value || "").trim();
+    if (!raw) return null;
+    const normalizado = raw.includes(",")
+      ? raw.replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")
+      : raw.replace(/[^\d.-]/g, "");
+    const numero = Number(normalizado);
+    return Number.isFinite(numero) ? numero : null;
+  }
+
+  function textoPalavrasRelacionadasProduto(value) {
+    if (Array.isArray(value)) return value.join(" ");
+    if (value && typeof value === "object") return [...Object.keys(value), ...Object.values(value)].join(" ");
+    return String(value || "");
+  }
+
+  function coletarProdutosVitrinePublica() {
+    const produtos = [];
+    const vistos = new Set();
+    (categories || []).forEach((categoria) => {
+      (categoria.establishments || []).forEach((estabelecimento) => {
+        const empresa = estabelecimento.name || estabelecimento.nome || "Empresa local";
+        const empresaId = normalizeName(estabelecimento.nomeNormalizado || estabelecimento.clienteId || estabelecimento.id || empresa);
+        if (statusEstabelecimentos[empresaId] !== "s") return;
+        if (!moduloClientePublicoAtivo(estabelecimento, "produtos")) return;
+        produtosDoEstabelecimentoPublico(estabelecimento).forEach((produto, index) => {
+          const id = String(produto.id || `produto-${empresaId}-${index}`);
+          const chave = `${empresaId}|${id}`;
+          if (vistos.has(chave)) return;
+          vistos.add(chave);
+          produtos.push({
+            ...produto,
+            id,
+            estabelecimento: produto.estabelecimento || empresa,
+            estabelecimentoId: produto.estabelecimentoId || empresaId,
+            categoriaVitrine: produto.setor || produto.categoria || categoria.title || "Outros",
+            palavrasRelacionadas: produto.palavrasRelacionadas || "",
+            exibirEmpresaNoCard: true,
+            exibirBotaoDetalhes: true,
+            ocultarPrecoAusente: true
+          });
+        });
+      });
+    });
+    return produtos;
+  }
+
+  function mostrarProdutosPublicos() {
+    if (location.hash !== "#produtos") location.hash = "#produtos";
+    atualizarVisibilidadeHomeQuickBanner();
+    if (typeof definirTelaContentArea === "function") definirTelaContentArea(null);
+    const area = document.querySelector(".content_area");
+    if (!area) return;
+
+    if (!ADMIN_CLIENTES_LOADED) {
+      area.innerHTML = `<section class="vitrine-produtos-page"><h2 class="highlighted"><i class="fa-solid fa-bag-shopping"></i> Produtos</h2><div class="vitrine-produtos-loading"><i class="fa-solid fa-spinner fa-spin"></i><span>Carregando produtos locais...</span></div></section>`;
+      aplicarDadosAdminClientes().then(() => {
+        ADMIN_CLIENTES_LOADED = true;
+        if (location.hash === "#produtos") mostrarProdutosPublicos();
+      }).catch((error) => {
+        console.warn("Nao foi possivel carregar a vitrine de produtos.", error);
+        if (location.hash === "#produtos") area.querySelector(".vitrine-produtos-loading").innerHTML = "Nao foi possivel carregar os produtos agora.";
+      });
+      return;
+    }
+
+    const todosProdutos = coletarProdutosVitrinePublica();
+    const categoriasProdutos = [...new Set(todosProdutos.map((item) => item.categoriaVitrine).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+    const empresasProdutos = [...new Set(todosProdutos.map((item) => item.estabelecimento).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+    area.innerHTML = `
+      <section class="vitrine-produtos-page">
+        <header class="vitrine-produtos-header">
+          <h2 class="highlighted"><i class="fa-solid fa-bag-shopping"></i> Produtos</h2>
+          <p>Encontre produtos oferecidos pelas empresas de Carlópolis em uma única vitrine.</p>
+        </header>
+        <div class="vitrine-produtos-pesquisa">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input id="vitrineProdutosBusca" type="search" placeholder="Produto, empresa, descrição, categoria ou palavra relacionada" autocomplete="off">
+          <button id="vitrineProdutosLimpar" type="button" aria-label="Limpar pesquisa" title="Limpar pesquisa"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <section class="vitrine-produtos-controles" aria-label="Filtros e ordenação de produtos">
+          <div class="vitrine-produtos-filtro-card">
+            <div class="vitrine-controle-titulo"><i class="fa-solid fa-sliders"></i><span>Filtrar</span></div>
+            <label><span>Categoria</span><select id="vitrineProdutosCategoria"><option value="">Todas as categorias</option>${categoriasProdutos.map((nome) => `<option value="${escapePromoHtml(nome)}">${escapePromoHtml(nome)}</option>`).join("")}</select></label>
+            <label><span>Empresa</span><select id="vitrineProdutosEmpresa"><option value="">Todas as empresas</option>${empresasProdutos.map((nome) => `<option value="${escapePromoHtml(nome)}">${escapePromoHtml(nome)}</option>`).join("")}</select></label>
+          </div>
+          <div class="vitrine-produtos-ordem-card">
+            <div class="vitrine-controle-titulo"><i class="fa-solid fa-arrow-down-wide-short"></i><span>Ordenar</span></div>
+            <label><span>Exibição</span><select id="vitrineProdutosOrdem"><option value="recentes">Data: mais recentes</option><option value="antigos">Data: mais antigos</option><option value="preco-asc">Preço: menor para maior</option><option value="preco-desc">Preço: maior para menor</option><option value="az">Nome: A a Z</option><option value="za">Nome: Z a A</option></select></label>
+          </div>
+        </section>
+        <div class="vitrine-produtos-resumo" id="vitrineProdutosResumo" aria-live="polite"></div>
+        <div class="vitrine-produtos-grid loja-produtos-grid loja-cards-grid" id="vitrineProdutosGrid"></div>
+      </section>`;
+
+    const busca = area.querySelector("#vitrineProdutosBusca");
+    const limpar = area.querySelector("#vitrineProdutosLimpar");
+    const categoria = area.querySelector("#vitrineProdutosCategoria");
+    const empresa = area.querySelector("#vitrineProdutosEmpresa");
+    const ordem = area.querySelector("#vitrineProdutosOrdem");
+    const resumo = area.querySelector("#vitrineProdutosResumo");
+    const grid = area.querySelector("#vitrineProdutosGrid");
+    let timerBusca = null;
+
+    const renderizar = () => {
+      const termo = normalizeName(busca.value || "");
+      const categoriaSelecionada = categoria.value;
+      const empresaSelecionada = empresa.value;
+      const filtrados = todosProdutos.filter((item) => {
+        if (categoriaSelecionada && item.categoriaVitrine !== categoriaSelecionada) return false;
+        if (empresaSelecionada && item.estabelecimento !== empresaSelecionada) return false;
+        if (!termo) return true;
+        const texto = normalizeName([
+          item.titulo,
+          item.estabelecimento,
+          item.descricao,
+          item.observacoes,
+          item.categoriaVitrine,
+          item.categoria,
+          item.setor,
+          textoPalavrasRelacionadasProduto(item.palavrasRelacionadas)
+        ].filter(Boolean).join(" "));
+        return texto.includes(termo);
+      });
+
+      filtrados.sort((a, b) => {
+        if (ordem.value === "az") return String(a.titulo || "").localeCompare(String(b.titulo || ""), "pt-BR");
+        if (ordem.value === "za") return String(b.titulo || "").localeCompare(String(a.titulo || ""), "pt-BR");
+        if (ordem.value === "preco-asc" || ordem.value === "preco-desc") {
+          const precoA = valorNumericoProdutoPublico(a.preco);
+          const precoB = valorNumericoProdutoPublico(b.preco);
+          if (precoA === null && precoB === null) return 0;
+          if (precoA === null) return 1;
+          if (precoB === null) return -1;
+          return ordem.value === "preco-asc" ? precoA - precoB : precoB - precoA;
+        }
+        const dataA = novidadeCidadeMs(a.updatedAt || a.createdAt);
+        const dataB = novidadeCidadeMs(b.updatedAt || b.createdAt);
+        return ordem.value === "antigos" ? dataA - dataB : dataB - dataA;
+      });
+
+      const empresasAtivas = new Set(filtrados.map((item) => normalizeName(item.estabelecimento)).filter(Boolean));
+      resumo.innerHTML = `<i class="fa-solid fa-box-open"></i><strong>${filtrados.length}</strong> ${filtrados.length === 1 ? "produto cadastrado" : "produtos cadastrados"}<span>•</span><strong>${empresasAtivas.size}</strong> ${empresasAtivas.size === 1 ? "empresa participante" : "empresas participantes"}`;
+      grid.innerHTML = filtrados.length
+        ? filtrados.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")
+        : `<div class="vitrine-produtos-vazio"><i class="fa-solid fa-magnifying-glass"></i><strong>Nenhum produto encontrado</strong><span>Tente alterar a pesquisa ou os filtros.</span></div>`;
+    };
+
+    busca.addEventListener("input", () => {
+      clearTimeout(timerBusca);
+      limpar.classList.toggle("is-visible", Boolean(busca.value));
+      timerBusca = setTimeout(renderizar, 120);
+    });
+    limpar.addEventListener("click", () => {
+      clearTimeout(timerBusca);
+      busca.value = "";
+      limpar.classList.remove("is-visible");
+      busca.focus();
+      renderizar();
+    });
+    categoria.addEventListener("change", renderizar);
+    empresa.addEventListener("change", renderizar);
+    ordem.addEventListener("change", renderizar);
+    grid.addEventListener("click", (event) => {
+      const detalhes = event.target.closest("[data-vitrine-produto-detalhes]");
+      if (!detalhes) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const item = window.__lojaProdutosDetalhes?.[detalhes.dataset.vitrineProdutoDetalhes];
+      if (item) abrirModalProdutoEstabelecimento(item, "Produto");
+    });
+    renderizar();
+  }
+
   function abrirHomeQuickAction(action) {
+    if (action === "produtos") {
+      if (location.hash !== "#produtos") history.pushState(null, "", `${location.pathname}${location.search}#produtos`);
+      mostrarProdutosPublicos();
+      return;
+    }
     if (action === "destaques") {
       limparRotaParaSecaoInicial();
       document.querySelector('.botao-menu-topo[data-target="divulgacao"]')?.click();
@@ -23690,6 +23887,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     try {
       if (h === "#eventos") return window.mostrarEventosPublicos?.();
       if (h === "#ondecomer") return mostrarOndeComer();
+      if (h === "#produtos") return mostrarProdutosPublicos();
       if (h === "#promocoes" || h.startsWith("#promocoes-")) return mostrarPromocoes(getPromoFiltroFromHash());
       if (h === "#sobre-nos") return mostrarSobreNos();
       const categoriaMatch = h.match(/^#comercios-(.+)$/);
@@ -25045,6 +25243,7 @@ ${produtosIniciaisLoja.length ? `
     }
 
     if (h === "#ondecomer") { return mostrarOndeComer(); }
+    if (h === "#produtos") { return mostrarProdutosPublicos(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
