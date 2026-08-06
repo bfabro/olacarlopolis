@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 575,
-  label: "v582",
+  numero: 576,
+  label: "v583",
   data: "2026-08-06",
-  nota: "Lista de clientes que pagaram no relatório financeiro do Admin Master."
+  nota: "Compatibilidade do relatório financeiro com clientes pagos em registros legados."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1532,6 +1532,8 @@ const CLIENT_FINANCE_FIELDS = [
   "financeiroObs",
   "mesesEmAberto",
   "faturas",
+  "competenciaPagamento",
+  "ultimoPagamentoMes",
   "financeiroStatus",
   "statusFinanceiro",
   "observacaoAdmin",
@@ -9024,12 +9026,23 @@ function effectivePaymentStatus(client) {
   return client?.pagamentoStatus || "em_aberto";
 }
 
+function financePaidReferenceMonth(client = {}) {
+  const configuredMonth = [
+    client?.competenciaPagamento,
+    client?.ultimoPagamentoMes
+  ]
+    .map((value) => String(value || "").slice(0, 7))
+    .find((value) => /^\d{4}-\d{2}$/.test(value));
+  return configuredMonth || (effectivePaymentStatus(client) === "pago" ? currentMonthKey() : "");
+}
+
 function financePaymentStatusForMonth(client, monthKey = currentMonthKey()) {
   if (!isBillableClientType(client)) return "isento";
   const currentStatus = effectivePaymentStatus(client);
   if (currentStatus === "isento") return "isento";
   const invoiceStatus = client?.faturas?.[monthKey]?.status;
   if (["pago", "isento"].includes(invoiceStatus)) return invoiceStatus;
+  if (currentStatus === "pago" && financePaidReferenceMonth(client) === monthKey) return "pago";
   if (Array.isArray(client?.mesesEmAberto)) {
     if (!client.mesesEmAberto.includes(monthKey)) return "pago";
     return invoiceStatus === "em_analise" ? "em_analise" : "em_aberto";
@@ -13893,6 +13906,7 @@ function financeInvoiceRowsForRange(clients = [], periodRange = getReportDateRan
   clients.forEach((client) => {
     if (!isBillableClientType(client)) return;
     const savedMonths = new Set();
+    const paidReferenceMonth = financePaidReferenceMonth(client);
     Object.entries(client.faturas || {}).forEach(([month, invoice]) => {
       if (!/^\d{4}-\d{2}$/.test(month) || month < startMonth || month > endMonth) return;
       if (invoice?.status === "isento") return;
@@ -13908,7 +13922,26 @@ function financeInvoiceRowsForRange(clients = [], periodRange = getReportDateRan
       });
     });
     if (
-      currentMonth >= startMonth
+      effectivePaymentStatus(client) === "pago"
+      && paidReferenceMonth >= startMonth
+      && paidReferenceMonth <= endMonth
+      && !savedMonths.has(paidReferenceMonth)
+    ) {
+      rows.push({
+        client,
+        month: paidReferenceMonth,
+        invoice: { mes: paidReferenceMonth, status: "pago" },
+        planType: client.tipoPlano || "mensal",
+        status: "pago",
+        value: financeInvoiceValueForMonth(client, paidReferenceMonth),
+        synthetic: true,
+        legacyPaymentStatus: true
+      });
+      savedMonths.add(paidReferenceMonth);
+    }
+    if (
+      paidReferenceMonth !== currentMonth
+      && currentMonth >= startMonth
       && currentMonth <= endMonth
       && !savedMonths.has(currentMonth)
       && client.status !== "inativo"
