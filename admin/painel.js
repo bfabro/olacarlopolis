@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 571,
-  label: "v578",
-  data: "2026-08-05",
-  nota: "Novidades agora respeitam a classificação de clientes de serviços."
+  numero: 572,
+  label: "v579",
+  data: "2026-08-06",
+  nota: "Contratação de planos mensal, semestral e anual pela tela de faturas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -8814,6 +8814,115 @@ function clientForInvoicePlan(client, tipoPlano) {
   };
 }
 
+function planPeriodMonths(tipoPlano = "mensal") {
+  return tipoPlano === "anual" ? 12 : (tipoPlano === "semestral" ? 6 : 1);
+}
+
+function planAnnualProjection(tipoPlano = "mensal", value = 0) {
+  const numericValue = Number(value || 0);
+  if (tipoPlano === "anual") return numericValue;
+  if (tipoPlano === "semestral") return numericValue * 2;
+  return numericValue * 12;
+}
+
+function planAnnualSavings(tipoPlano = "mensal", value = 0) {
+  const monthlyAnnual = defaultPlanValue("mensal") * 12;
+  if (tipoPlano === "mensal" || monthlyAnnual <= 0) return 0;
+  return Math.max(0, monthlyAnnual - planAnnualProjection(tipoPlano, value));
+}
+
+function clientPlanPeriod(tipoPlano = "mensal", startDate = dateKeyFromDate(new Date())) {
+  const inicio = String(startDate || dateKeyFromDate(new Date())).slice(0, 10);
+  return {
+    inicio,
+    fim: dateKeyOffsetMonths(inicio, planPeriodMonths(tipoPlano))
+  };
+}
+
+function activeClientPlanRequest(client = {}) {
+  const request = client.solicitacaoPlano || client.solicitacaoPagamentoPlano || null;
+  if (!request || request.status === "pago" || request.status === "cancelado") return null;
+  return request;
+}
+
+function clientPlanOptionsHtml(client = {}) {
+  const requestedPlan = activeClientPlanRequest(client)?.tipoPlano;
+  const selectedPlan = requestedPlan || client.tipoPlano || "mensal";
+  return ["mensal", "semestral", "anual"].map((tipoPlano) => {
+    const value = defaultPlanValue(tipoPlano);
+    const annualProjection = planAnnualProjection(tipoPlano, value);
+    const savings = planAnnualSavings(tipoPlano, value);
+    const months = planPeriodMonths(tipoPlano);
+    const unavailable = value <= 0;
+    const detail = tipoPlano === "mensal"
+      ? `${moneyBR(annualProjection)} em 12 meses`
+      : `${months} meses de acesso`;
+    return `
+      <label class="invoice-plan-option${selectedPlan === tipoPlano ? " is-selected" : ""}${unavailable ? " is-disabled" : ""}">
+        <input type="radio" name="clientInvoicePlanChoice" value="${tipoPlano}" ${selectedPlan === tipoPlano ? "checked" : ""} ${unavailable ? "disabled" : ""}>
+        <span class="invoice-plan-option-head">
+          <i class="fa-solid ${tipoPlano === "anual" ? "fa-crown" : (tipoPlano === "semestral" ? "fa-calendar-check" : "fa-calendar-day")}"></i>
+          <strong>${escapeHtml(planLabel(tipoPlano))}</strong>
+        </span>
+        <b>${unavailable ? "Indisponível" : moneyBR(value)}</b>
+        <small>${escapeHtml(detail)}</small>
+        ${savings > 0 ? `<em>Economize ${escapeHtml(moneyBR(savings))} em 1 ano</em>` : ""}
+      </label>
+    `;
+  }).join("");
+}
+
+function selectedClientPlanPayment(client = {}, mount = document) {
+  const tipoPlano = mount.querySelector('input[name="clientInvoicePlanChoice"]:checked')?.value
+    || activeClientPlanRequest(client)?.tipoPlano
+    || client.tipoPlano
+    || "mensal";
+  const valorPlano = defaultPlanValue(tipoPlano);
+  const periodo = clientPlanPeriod(tipoPlano);
+  const plannedClient = clientForInvoicePlan(client, tipoPlano);
+  const invoice = buildClientInvoice(plannedClient, currentMonthKey(), state.pagamentoSistema || {}, valorPlano, {
+    ignoreSaved: true,
+    dueDateOverride: invoiceDueDateForMonth(client, currentMonthKey())
+  });
+  return {
+    tipoPlano,
+    valorPlano,
+    valorTotal: valorPlano,
+    periodoInicio: periodo.inicio,
+    periodoFim: periodo.fim,
+    vencimentoDataPlano: tipoPlano === "mensal" ? "" : periodo.fim,
+    invoice: {
+      ...invoice,
+      tipoPlano,
+      periodoInicio: periodo.inicio,
+      periodoFim: periodo.fim,
+      proximaRenovacao: periodo.fim
+    },
+    plannedClient
+  };
+}
+
+async function saveClientPlanRequest(client = {}, selection = {}, status = "aguardando_pagamento", extra = {}) {
+  if (!client.id || !state.user?.uid) throw new Error("Cliente ou usuário não identificado.");
+  const payload = {
+    clientId: client.id,
+    uid: state.user.uid,
+    tipoPlano: selection.tipoPlano || "mensal",
+    valorPlano: Number(selection.valorPlano || 0),
+    valorTotal: Number(selection.valorTotal || selection.valorPlano || 0),
+    competencia: currentMonthKey(),
+    periodoInicio: selection.periodoInicio || dateKeyFromDate(new Date()),
+    periodoFim: selection.periodoFim || "",
+    vencimentoDataPlano: selection.vencimentoDataPlano || "",
+    status,
+    updatedAt: Date.now(),
+    ...extra
+  };
+  await firebaseUpdate(ref(db, `clientesFinanceiro/${client.id}/solicitacaoPlano`), payload);
+  client.solicitacaoPlano = { ...(client.solicitacaoPlano || {}), ...payload };
+  return payload;
+}
+
 function valorFinalPlano(client) {
   if (!isBillableClientType(client)) return 0;
   const valorCliente = Number(client.valorPlano ?? client.valorMensal ?? 0);
@@ -8934,19 +9043,38 @@ function financePaidInvoicePayload(client, monthKey = currentMonthKey()) {
 
 async function markFinanceClientPaid(client, monthKey = currentMonthKey()) {
   if (!client?.id) throw new Error("Cliente financeiro não identificado.");
+  const planRequest = activeClientPlanRequest(client);
+  const paidClient = planRequest?.tipoPlano
+    ? { ...clientForInvoicePlan(client, planRequest.tipoPlano), descontoValor: 0 }
+    : client;
   const mesesEmAberto = (Array.isArray(client.mesesEmAberto) ? client.mesesEmAberto : [])
     .filter((month) => month !== monthKey);
-  await update(ref(db, `clientesFinanceiro/${client.id}`), {
+  const payload = {
     pagamentoStatus: "pago",
     competenciaPagamento: monthKey,
     ultimoPagamentoMes: monthKey,
     mesesEmAberto,
-    ...financePaidInvoicePayload(client, monthKey),
+    ...financePaidInvoicePayload(paidClient, monthKey),
     updatedAt: serverTimestamp(),
     updatedBy: state.user?.uid || "",
     origem: "painel",
     editadoNoPainel: true
-  });
+  };
+  if (planRequest?.tipoPlano) {
+    const renewalDate = planRequest.vencimentoDataPlano || planRequest.periodoFim || "";
+    payload.tipoPlano = planRequest.tipoPlano;
+    payload.valorPlano = defaultPlanValue(planRequest.tipoPlano);
+    payload.vencimentoDataPlano = planRequest.tipoPlano === "mensal" ? null : renewalDate;
+    payload.dataVencimentoPlano = planRequest.tipoPlano === "mensal" ? null : renewalDate;
+    payload[`faturas/${monthKey}/tipoPlano`] = planRequest.tipoPlano;
+    payload[`faturas/${monthKey}/periodoInicio`] = planRequest.periodoInicio || "";
+    payload[`faturas/${monthKey}/periodoFim`] = planRequest.periodoFim || "";
+    payload[`faturas/${monthKey}/proximaRenovacao`] = renewalDate;
+    payload["solicitacaoPlano/status"] = "pago";
+    payload["solicitacaoPlano/pagoEm"] = Date.now();
+    payload["solicitacaoPlano/confirmadoPor"] = state.user?.uid || "";
+  }
+  await update(ref(db, `clientesFinanceiro/${client.id}`), payload);
 }
 
 function financeInvoiceValueForMonth(client, monthKey = currentMonthKey()) {
@@ -9143,7 +9271,7 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
           </div>
           <div>
             <span>Plano</span>
-            <b>${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</b>
+            <b>${escapeHtml(planLabel(invoice.tipoPlano || client.tipoPlano || "mensal"))}</b>
           </div>
         </div>
       </header>
@@ -9165,6 +9293,8 @@ function printableBoletoHtml(client, invoice, paymentConfig = {}) {
           </div>
           <section class="boleto-charge-details">
             <div><span>Valor do plano</span><strong>${escapeHtml(moneyBR(invoice.valorPlano))}</strong></div>
+            ${invoice.periodoInicio && invoice.periodoFim ? `<div><span>Período contratado</span><strong>${escapeHtml(formatDateBR(invoice.periodoInicio))} a ${escapeHtml(formatDateBR(invoice.periodoFim))}</strong></div>` : ""}
+            ${invoice.proximaRenovacao ? `<div><span>Próxima renovação</span><strong>${escapeHtml(formatDateBR(invoice.proximaRenovacao))}</strong></div>` : ""}
             ${invoice.valorDestaque > 0 ? `<div class="destaque-value"><span>Adicional de destaque</span><strong>${escapeHtml(moneyBR(invoice.valorDestaque))}</strong></div>` : ""}
             ${invoice.valorDestaque > 0 ? `<div class="wide destaque-description"><span>Descrição do adicional</span><strong>Destaque comercial contratado durante ${escapeHtml(monthLabel(invoice.mes))}, somado ao valor do plano.</strong></div>` : ""}
             ${paymentConfig.observacaoFatura ? `<div class="wide note"><span>Observação</span><strong>${escapeHtml(paymentConfig.observacaoFatura)}</strong></div>` : ""}
@@ -13513,6 +13643,15 @@ function renderFinanceiro() {
       });
       const selectedOpenMonths = [...row.querySelectorAll("[data-finance-month]:checked")].map((input) => input.value).sort();
       const currentClient = state.clientes.find((client) => client.id === id) || {};
+      const planRequest = payload.pagamentoStatus === "pago" ? activeClientPlanRequest(currentClient) : null;
+      if (planRequest?.tipoPlano) {
+        payload.tipoPlano = planRequest.tipoPlano;
+        payload.valorPlano = defaultPlanValue(planRequest.tipoPlano);
+        payload.descontoValor = 0;
+        payload.vencimentoDataPlano = planRequest.tipoPlano === "mensal"
+          ? ""
+          : (planRequest.vencimentoDataPlano || planRequest.periodoFim || "");
+      }
       const nextClient = { ...currentClient, ...payload };
       const publicPayload = {};
       if (Object.prototype.hasOwnProperty.call(payload, "status")) {
@@ -13529,6 +13668,15 @@ function renderFinanceiro() {
         payload.competenciaPagamento = paymentMonth;
         payload.ultimoPagamentoMes = paymentMonth;
         Object.assign(payload, financePaidInvoicePayload(nextClient, paymentMonth));
+        if (planRequest?.tipoPlano) {
+          payload.dataVencimentoPlano = payload.vencimentoDataPlano || null;
+          payload[`faturas/${paymentMonth}/periodoInicio`] = planRequest.periodoInicio || "";
+          payload[`faturas/${paymentMonth}/periodoFim`] = planRequest.periodoFim || "";
+          payload[`faturas/${paymentMonth}/proximaRenovacao`] = planRequest.vencimentoDataPlano || planRequest.periodoFim || "";
+          payload["solicitacaoPlano/status"] = "pago";
+          payload["solicitacaoPlano/pagoEm"] = Date.now();
+          payload["solicitacaoPlano/confirmadoPor"] = state.user?.uid || "";
+        }
       } else {
         nextOpenMonths.forEach((mes) => {
           const valorDestaqueFatura = destaqueIncludedInInvoiceMonth(nextClient, mes) ? destaqueValueForClient(nextClient) : 0;
@@ -13830,15 +13978,18 @@ function renderFinancePendingPaymentList(items = []) {
   return `
     <div class="finance-pending-payment-list">
       ${items.map(({ client, rows }) => {
+        const planRequest = activeClientPlanRequest(client);
         const months = [...new Set(rows.map((row) => row.month).filter(Boolean))].sort();
-        const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
+        const requestTotal = planRequest?.tipoPlano ? defaultPlanValue(planRequest.tipoPlano) : 0;
+        const total = requestTotal > 0 ? requestTotal : rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
         const monthsValue = months.join(",");
         return `
           <article class="finance-pending-payment-item" data-finance-pending-client="${escapeAttr(client.id)}">
             <div class="finance-pending-payment-head">
               <div>
                 <strong>${escapeHtml(client.nome || client.id)}</strong>
-                <span>${escapeHtml(client.categoria || "Sem categoria")} · ${escapeHtml(planLabel(client.tipoPlano || "mensal"))}</span>
+                <span>${escapeHtml(client.categoria || "Sem categoria")} · ${escapeHtml(planLabel(planRequest?.tipoPlano || client.tipoPlano || "mensal"))}</span>
+                ${planRequest ? `<span class="finance-plan-request-note"><i class="fa-solid fa-arrows-rotate"></i> Plano solicitado · ${escapeHtml(formatDateBR(planRequest.periodoInicio))} a ${escapeHtml(formatDateBR(planRequest.periodoFim))}</span>` : ""}
               </div>
               <div class="finance-pending-payment-total">
                 <small>${rows.length} ${rows.length === 1 ? "fatura pendente" : "faturas pendentes"}</small>
@@ -13846,7 +13997,13 @@ function renderFinancePendingPaymentList(items = []) {
               </div>
             </div>
             <div class="finance-pending-payment-months">
-              ${rows.map((row) => `
+              ${planRequest ? `
+                <span>
+                  <i class="fa-regular fa-calendar-check"></i>
+                  Plano ${escapeHtml(planLabel(planRequest.tipoPlano))}
+                  <b>${escapeHtml(moneyBR(total))}</b>
+                </span>
+              ` : rows.map((row) => `
                 <span>
                   <i class="fa-regular fa-calendar"></i>
                   ${escapeHtml(monthLabel(row.month))}
@@ -15393,7 +15550,9 @@ function bindReportControls(mount) {
       const months = String(button.dataset.pendingMonths || "").split(",").filter(Boolean);
       const total = Number(button.dataset.pendingTotal || 0);
       const reference = months.length === 1 ? months[0] : `${months[0] || currentMonthKey()}-${months.length}M`;
-      const invoice = buildClientInvoice(client, reference, paymentConfig, total, { ignoreSaved: true });
+      const planRequest = activeClientPlanRequest(client);
+      const plannedClient = planRequest?.tipoPlano ? clientForInvoicePlan(client, planRequest.tipoPlano) : client;
+      const invoice = buildClientInvoice(plannedClient, reference, paymentConfig, total, { ignoreSaved: true });
       if (!invoice.pixCode || total <= 0) return showToast("Não foi possível gerar o Pix desta pendência.");
       const item = button.closest("[data-finance-pending-client]");
       const result = item?.querySelector("[data-pending-pix-result]");
@@ -15431,6 +15590,23 @@ function bindReportControls(mount) {
       const startMonth = months[0] || currentMonthKey();
       const item = button.closest("[data-finance-pending-client]");
       const quantity = Number(item?.querySelector("[data-pending-boleto-quantity]")?.value || 1);
+      const planRequest = activeClientPlanRequest(client);
+      if (planRequest?.tipoPlano) {
+        const plannedClient = clientForInvoicePlan(client, planRequest.tipoPlano);
+        const value = defaultPlanValue(planRequest.tipoPlano);
+        const invoice = buildClientInvoice(plannedClient, currentMonthKey(), state.pagamentoSistema || {}, value, {
+          ignoreSaved: true,
+          dueDateOverride: invoiceDueDateForMonth(client, currentMonthKey())
+        });
+        openPrintableBoletos(plannedClient, [{
+          ...invoice,
+          tipoPlano: planRequest.tipoPlano,
+          periodoInicio: planRequest.periodoInicio || "",
+          periodoFim: planRequest.periodoFim || "",
+          proximaRenovacao: planRequest.vencimentoDataPlano || planRequest.periodoFim || ""
+        }]);
+        return;
+      }
       const invoices = buildInvoiceBatch(client, quantity, startMonth);
       openPrintableBoletos(client, invoices);
     });
@@ -19547,6 +19723,135 @@ async function syncClientsFromScript(options = {}) {
   }
 }
 
+function clientPlanChooserCard(client = {}, paymentConfig = {}) {
+  const request = activeClientPlanRequest(client);
+  return `
+    <article class="invoice-card invoice-plan-chooser-card">
+      <div class="section-head compact">
+        <div>
+          <h3>Escolha o melhor plano</h3>
+          <p>Compare os períodos, veja a economia em um ano e gere a cobrança no valor exato do plano escolhido.</p>
+        </div>
+        ${request ? `<span class="badge ${request.status === "em_analise" ? "em_analise" : "em_aberto"}">${request.status === "em_analise" ? "Pagamento em análise" : "Aguardando pagamento"}</span>` : ""}
+      </div>
+      <div class="invoice-plan-options">${clientPlanOptionsHtml(client)}</div>
+      <div class="invoice-plan-choice-summary" data-plan-choice-summary></div>
+      ${paymentConfig.pixChave ? `
+        <div class="invoice-plan-payment-actions">
+          <button type="button" data-generate-plan-pix><i class="fa-solid fa-qrcode"></i> Gerar QR Code/Pix</button>
+          <button type="button" class="ghost-button" data-generate-plan-boleto><i class="fa-solid fa-file-invoice-dollar"></i> Gerar boleto</button>
+        </div>
+        <div class="pix-box invoice-selected-pix hidden" data-plan-pix-box>
+          <div class="pix-generated-total"><span>Valor do plano escolhido</span><strong data-plan-pix-total></strong></div>
+          <img alt="QR Code Pix do plano" data-plan-pix-qr loading="lazy" decoding="async">
+          <label class="wide">Código Pix Copia e Cola<textarea rows="5" readonly data-plan-pix-code></textarea></label>
+          <div class="list-meta wide">Chave Pix: <strong>${escapeHtml(paymentConfig.pixChave || "")}</strong></div>
+          <div class="form-actions">
+            <button type="button" class="ghost-button" data-copy-plan-pix><i class="fa-solid fa-copy"></i> Copiar código Pix</button>
+          </div>
+        </div>
+        <div class="upload-panel invoice-plan-receipt-panel">
+          <h3>Comprovante do plano escolhido</h3>
+          <input type="file" accept="image/*,application/pdf" data-plan-payment-receipt>
+          <div class="list-meta">Após o envio, o pagamento ficará em análise. Quando confirmado, o plano e a próxima renovação serão atualizados automaticamente.</div>
+        </div>
+      ` : `<div class="list-meta">A chave Pix ainda não foi configurada pelo admin master.</div>`}
+    </article>
+  `;
+}
+
+function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
+  const summary = mount.querySelector("[data-plan-choice-summary]");
+  const pixBox = mount.querySelector("[data-plan-pix-box]");
+  const pixCode = mount.querySelector("[data-plan-pix-code]");
+  const pixQr = mount.querySelector("[data-plan-pix-qr]");
+  const renderSelection = () => {
+    const selection = selectedClientPlanPayment(client, mount);
+    const savings = planAnnualSavings(selection.tipoPlano, selection.valorPlano);
+    mount.querySelectorAll(".invoice-plan-option").forEach((option) => {
+      option.classList.toggle("is-selected", Boolean(option.querySelector("input:checked")));
+    });
+    if (summary) {
+      summary.innerHTML = `
+        <div><span>Plano escolhido</span><strong>${escapeHtml(planLabel(selection.tipoPlano))}</strong></div>
+        <div><span>Valor a pagar</span><strong>${escapeHtml(moneyBR(selection.valorTotal))}</strong></div>
+        <div><span>Período</span><strong>${escapeHtml(formatDateBR(selection.periodoInicio))} a ${escapeHtml(formatDateBR(selection.periodoFim))}</strong></div>
+        <div><span>Próxima renovação</span><strong>${escapeHtml(formatDateBR(selection.periodoFim))}</strong></div>
+        ${savings > 0 ? `<em><i class="fa-solid fa-piggy-bank"></i> Economia de ${escapeHtml(moneyBR(savings))} em 1 ano comparado ao mensal.</em>` : ""}
+      `;
+    }
+    if (pixCode) pixCode.value = "";
+    pixQr?.removeAttribute("src");
+    pixBox?.classList.add("hidden");
+    return selection;
+  };
+  mount.querySelectorAll('input[name="clientInvoicePlanChoice"]').forEach((input) => input.addEventListener("change", renderSelection));
+  renderSelection();
+
+  mount.querySelector("[data-generate-plan-pix]")?.addEventListener("click", async () => {
+    const selection = selectedClientPlanPayment(client, mount);
+    if (selection.valorTotal <= 0 || !selection.invoice.pixCode) return showToast("Este plano ainda não possui um valor configurado.");
+    try {
+      await saveClientPlanRequest(client, selection, "aguardando_pagamento", { pixCodigo: selection.invoice.pixCode });
+      if (pixCode) pixCode.value = selection.invoice.pixCode;
+      if (mount.querySelector("[data-plan-pix-total]")) mount.querySelector("[data-plan-pix-total]").textContent = moneyBR(selection.valorTotal);
+      if (pixQr) {
+        pixQr.onerror = () => {
+          pixQr.onerror = null;
+          pixQr.src = qrCodeUrl(selection.invoice.pixCode, "quickchart");
+        };
+        pixQr.src = selection.invoice.qrUrl;
+      }
+      pixBox?.classList.remove("hidden");
+      showToast(`Pix do plano ${planLabel(selection.tipoPlano)} gerado.`);
+    } catch (error) {
+      console.error("Falha ao registrar a escolha do plano.", error);
+      showToast("Não foi possível registrar a escolha do plano.");
+    }
+  });
+
+  mount.querySelector("[data-generate-plan-boleto]")?.addEventListener("click", async () => {
+    const selection = selectedClientPlanPayment(client, mount);
+    if (selection.valorTotal <= 0 || !selection.invoice.pixCode) return showToast("Este plano ainda não possui um valor configurado.");
+    try {
+      await saveClientPlanRequest(client, selection, "aguardando_pagamento", { pixCodigo: selection.invoice.pixCode });
+      openPrintableBoletos(selection.plannedClient, [selection.invoice]);
+    } catch (error) {
+      console.error("Falha ao gerar o boleto do plano.", error);
+      showToast("Não foi possível gerar o boleto do plano.");
+    }
+  });
+
+  mount.querySelector("[data-copy-plan-pix]")?.addEventListener("click", async () => {
+    await navigator.clipboard?.writeText(pixCode?.value || "");
+    showToast("Código Pix copiado.");
+  });
+
+  mount.querySelector("[data-plan-payment-receipt]")?.addEventListener("change", async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const selection = selectedClientPlanPayment(client, mount);
+    try {
+      showToast("Enviando comprovante do plano...");
+      const receipt = await uploadInvoiceReceiptForClient(client.id, file);
+      await saveClientPlanRequest(client, selection, "em_analise", {
+        pixCodigo: pixCode?.value || selection.invoice.pixCode || "",
+        comprovantePath: receipt.path,
+        comprovanteNome: receipt.name,
+        comprovanteTipo: receipt.contentType,
+        enviadoEm: Date.now()
+      });
+      showToast("Comprovante enviado. O pagamento está em análise.");
+      await loadAllData();
+      renderClientInvoices();
+    } catch (error) {
+      console.error("Falha ao enviar o comprovante do plano.", error);
+      showToast("Não foi possível enviar o comprovante.");
+      event.target.value = "";
+    }
+  });
+}
+
 function renderClientInvoices() {
   const mount = $("clientInvoicesMount");
   if (!mount) return;
@@ -19562,7 +19867,7 @@ function renderClientInvoices() {
 
   const paymentConfig = state.pagamentoSistema || {};
   const canWriteClientFinance = canManageClients();
-  const planChangeNotice = `<div class="list-meta">Alteracoes de plano e comprovantes devem ser solicitados ao administrador.</div>`;
+  const planChoiceCard = clientPlanChooserCard(client, paymentConfig);
   const meses = pendingMonthsForClient(client);
   const faturas = meses.map((mes) => buildClientInvoice(client, mes, paymentConfig));
   const firstInvoice = faturas[0] || buildClientInvoice(client, currentMonthKey(), paymentConfig, null, { ignoreSaved: true });
@@ -19620,6 +19925,7 @@ function renderClientInvoices() {
   if (!faturas.length) {
     mount.innerHTML = `
       ${planOverviewCard}
+      ${planChoiceCard}
       ${featuredPixCard}
       <article class="invoice-card invoice-summary-card">
         <div class="section-head compact">
@@ -19629,18 +19935,6 @@ function renderClientInvoices() {
           </div>
           <span class="badge pago">Em dia</span>
         </div>
-        ${canWriteClientFinance ? `
-          <div class="invoice-plan-row">
-            <label>Plano atual
-              <select id="clientInvoicePlan">
-                <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
-                <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
-                <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
-              </select>
-            </label>
-            <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
-          </div>
-        ` : planChangeNotice}
         ${paymentConfig.pixChave ? `
           <div class="invoice-boleto-actions">
             <label>Quantidade de meses
@@ -19653,22 +19947,11 @@ function renderClientInvoices() {
         ` : ""}
       </article>
     `;
+    bindClientPlanPaymentControls(mount, client, paymentConfig);
     bindFeaturedInvoicePix(featuredPix);
     $("generateClientBoletos")?.addEventListener("click", () => {
       const quantity = Number($("clientBoletoQuantity")?.value || 1);
       openPrintableBoletos(client, buildInvoiceBatch(client, quantity, currentMonthKey()));
-    });
-    if (canWriteClientFinance) $("saveClientInvoicePlan")?.addEventListener("click", async () => {
-      const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
-      await update(ref(db, `clientesFinanceiro/${client.id}`), {
-        tipoPlano,
-        updatedAt: serverTimestamp(),
-        updatedBy: state.user.uid,
-        origem: "painel"
-      });
-      showToast("Plano atualizado.");
-      await loadAllData();
-      renderClientInvoices();
     });
     return;
   }
@@ -19678,6 +19961,7 @@ function renderClientInvoices() {
   mount.innerHTML = `
     <div class="invoice-list">
       ${planOverviewCard}
+      ${planChoiceCard}
       ${featuredPixCard}
       <article class="invoice-card invoice-summary-card">
         <div class="section-head compact">
@@ -19686,18 +19970,6 @@ function renderClientInvoices() {
             <p>Selecione os meses que deseja pagar agora. O Pix abaixo soma somente os meses marcados.</p>
           </div>
           <span class="badge em_aberto">${moneyBR(totalAberto)} em aberto</span>
-        </div>
-        <div class="invoice-plan-row">
-          ${canWriteClientFinance ? `
-            <label>Plano atual
-              <select id="clientInvoicePlan">
-                <option value="mensal" ${client.tipoPlano === "mensal" || !client.tipoPlano ? "selected" : ""}>Mensal</option>
-                <option value="semestral" ${client.tipoPlano === "semestral" ? "selected" : ""}>Semestral</option>
-                <option value="anual" ${client.tipoPlano === "anual" ? "selected" : ""}>Anual</option>
-              </select>
-            </label>
-            <button id="saveClientInvoicePlan" type="button" class="ghost-button"><i class="fa-solid fa-arrows-rotate"></i> Atualizar plano</button>
-          ` : planChangeNotice}
         </div>
         <div class="invoice-month-selector">
           ${faturas.map((fatura) => `
@@ -19747,6 +20019,7 @@ function renderClientInvoices() {
       </article>
     </div>
   `;
+  bindClientPlanPaymentControls(mount, client, paymentConfig);
   bindFeaturedInvoicePix(featuredPix);
 
   const selectedPixCode = $("selectedInvoicePixCode");
@@ -19754,7 +20027,7 @@ function renderClientInvoices() {
   const selectedPixBox = $("selectedInvoicePixBox");
   const selectedInvoiceData = () => {
     const selected = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
-    const selectedPlan = canWriteClientFinance ? ($("clientInvoicePlan")?.value || client.tipoPlano || "mensal") : (client.tipoPlano || "mensal");
+    const selectedPlan = client.tipoPlano || "mensal";
     const plannedClient = clientForInvoicePlan(client, selectedPlan);
     const selectedInvoices = selected.map((mes) => buildClientInvoice(plannedClient, mes, paymentConfig, null, { ignoreSaved: true }));
     const selectedTotal = selectedInvoices.reduce((sum, fatura) => sum + fatura.valorTotal, 0);
@@ -19773,7 +20046,6 @@ function renderClientInvoices() {
   mount.querySelectorAll("[data-invoice-select]").forEach((input) => {
     input.addEventListener("change", refreshSelectedInvoicePayment);
   });
-  if (canWriteClientFinance) $("clientInvoicePlan")?.addEventListener("change", refreshSelectedInvoicePayment);
   refreshSelectedInvoicePayment();
 
   $("generateSelectedInvoicePix")?.addEventListener("click", () => {
@@ -19801,19 +20073,6 @@ function renderClientInvoices() {
     const startMonth = selected.sort()[0] || currentMonthKey();
     const invoices = buildInvoiceBatch(client, quantity, startMonth);
     openPrintableBoletos(client, invoices);
-  });
-
-  if (canWriteClientFinance) $("saveClientInvoicePlan")?.addEventListener("click", async () => {
-    const tipoPlano = $("clientInvoicePlan")?.value || "mensal";
-    await update(ref(db, `clientesFinanceiro/${client.id}`), {
-      tipoPlano,
-      updatedAt: serverTimestamp(),
-      updatedBy: state.user.uid,
-      origem: "painel"
-    });
-    showToast("Plano atualizado.");
-    await loadAllData();
-    renderClientInvoices();
   });
 
   $("copySelectedInvoicePix")?.addEventListener("click", async () => {
