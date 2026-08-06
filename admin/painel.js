@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 573,
-  label: "v580",
+  numero: 574,
+  label: "v581",
   data: "2026-08-06",
-  nota: "Correção da geração de Pix e boleto na contratação de planos."
+  nota: "Avisos de vencimento a partir de dois dias, com alerta vermelho no dia e após o vencimento."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3109,14 +3109,17 @@ function renderClientBillingAlert() {
   const dueDate = (client.tipoPlano !== "mensal" ? financePlanDueDate(client) : "") || firstInvoice.dueDate;
   const daysUntilDue = calendarDaysBetween(dateKeyFromDate(new Date()), dueDate);
   const reminderMessages = {
-    5: `Sua mensalidade vence em 5 dias, no dia ${formatDateBR(dueDate)}.`,
-    3: `Sua mensalidade vence em 3 dias, no dia ${formatDateBR(dueDate)}.`,
+    2: `Sua mensalidade vence em 2 dias, no dia ${formatDateBR(dueDate)}.`,
     1: `Sua mensalidade vence amanhã, dia ${formatDateBR(dueDate)}.`
   };
   const isOverdue = Number.isFinite(daysUntilDue) && daysUntilDue < 0;
+  const isDueToday = daysUntilDue === 0;
+  const requiresPayment = isOverdue || isDueToday;
   const message = isOverdue
     ? `Sua mensalidade está vencida desde ${formatDateBR(dueDate)}. Caso o pagamento não seja regularizado, o cadastro poderá ser inativado em até 5 dias.`
-    : reminderMessages[daysUntilDue];
+    : (isDueToday
+      ? `Sua mensalidade vence hoje, dia ${formatDateBR(dueDate)}. Realize o pagamento para manter seu cadastro em dia.`
+      : reminderMessages[daysUntilDue]);
 
   if (!message) {
     box.classList.add("hidden");
@@ -3135,11 +3138,12 @@ function renderClientBillingAlert() {
     : "";
 
   box.classList.toggle("is-overdue", isOverdue);
-  box.classList.toggle("is-upcoming", !isOverdue);
+  box.classList.toggle("is-due-today", isDueToday);
+  box.classList.toggle("is-upcoming", !requiresPayment);
   box.classList.remove("hidden");
   box.innerHTML = `
     <div class="client-billing-alert-copy">
-      <strong><i class="fa-solid ${isOverdue ? "fa-triangle-exclamation" : "fa-calendar-day"}"></i> ${isOverdue ? "Mensalidade vencida" : "Lembrete de vencimento"}</strong>
+      <strong><i class="fa-solid ${requiresPayment ? "fa-triangle-exclamation" : "fa-calendar-day"}"></i> ${isOverdue ? "Mensalidade vencida" : (isDueToday ? "Pagamento vence hoje" : "Lembrete de vencimento")}</strong>
       <p>${escapeHtml(message)}</p>
       <small>Plano ${escapeHtml(planLabel(client.tipoPlano))}${total > 0 ? ` - ${escapeHtml(moneyBR(total))}` : ""}</small>
     </div>
