@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 574,
-  label: "v581",
+  numero: 575,
+  label: "v582",
   data: "2026-08-06",
-  nota: "Avisos de vencimento a partir de dois dias, com alerta vermelho no dia e após o vencimento."
+  nota: "Lista de clientes que pagaram no relatório financeiro do Admin Master."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13983,6 +13983,54 @@ function renderFinancialAttentionList(items = []) {
   }).join("")}</div>`;
 }
 
+function financePaymentTimestamp(invoice = {}) {
+  const rawValue = invoice.pagoEm || invoice.dataPagamento || invoice.pagamentoEm || invoice.updatedAt;
+  if (!rawValue) return 0;
+  const numericValue = Number(rawValue);
+  const date = Number.isFinite(numericValue) && numericValue > 0
+    ? new Date(numericValue)
+    : new Date(rawValue);
+  return Number.isNaN(date.getTime()) ? 0 : date.getTime();
+}
+
+function financePaymentDateLabel(invoice = {}) {
+  const timestamp = financePaymentTimestamp(invoice);
+  if (!timestamp) return "Não informado";
+  const date = new Date(timestamp);
+  return `${date.toLocaleDateString("pt-BR")} às ${date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+function renderFinancePaidClientList(items = []) {
+  if (!items.length) {
+    return `<div class="list-meta">Nenhum cliente com pagamento registrado neste período.</div>`;
+  }
+  return `
+    <div class="report-table-wrap">
+      <table class="report-click-table">
+        <thead>
+          <tr><th>Cliente</th><th>Competências</th><th>Planos</th><th>Último pagamento</th><th>Total pago</th></tr>
+        </thead>
+        <tbody>
+          ${items.map(({ client, rows }) => {
+            const months = [...new Set(rows.map((row) => row.month).filter(Boolean))].sort().reverse();
+            const plans = [...new Set(rows.map((row) => row.planType || client.tipoPlano || "mensal"))];
+            const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
+            const latestRow = [...rows].sort((a, b) => financePaymentTimestamp(b.invoice) - financePaymentTimestamp(a.invoice))[0];
+            return `
+            <tr>
+              <td><strong>${escapeHtml(client.nome || client.id)}</strong><br><small>${escapeHtml(client.categoria || "Sem categoria")} · ${rows.length} ${rows.length === 1 ? "pagamento" : "pagamentos"}</small></td>
+              <td>${escapeHtml(months.map(monthLabel).join(", "))}</td>
+              <td>${escapeHtml(plans.map(planLabel).join(", "))}</td>
+              <td>${escapeHtml(financePaymentDateLabel(latestRow?.invoice))}</td>
+              <td><strong>${escapeHtml(moneyBR(total))}</strong></td>
+            </tr>
+          `}).join("")}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
 function renderFinancePendingPaymentList(items = []) {
   if (!items.length) {
     return `<div class="list-meta">Nenhum cliente com pagamento pendente neste período.</div>`;
@@ -15676,6 +15724,15 @@ function renderReports(reportType = "") {
   const isentos = reportClients.filter((c) => effectivePaymentStatus(c) === "isento");
   const financeInvoiceRows = financeInvoiceRowsForRange(reportClients, periodRange);
   const financePaidRows = financeInvoiceRows.filter((item) => item.status === "pago");
+  const financePaidClients = [...financePaidRows.reduce((grouped, row) => {
+    const clientId = String(row.client?.id || "");
+    if (!clientId) return grouped;
+    if (!grouped.has(clientId)) grouped.set(clientId, { client: row.client, rows: [] });
+    grouped.get(clientId).rows.push(row);
+    return grouped;
+  }, new Map()).values()]
+    .sort((a, b) => String(a.client.nome || a.client.id || "").localeCompare(String(b.client.nome || b.client.id || ""), "pt-BR"));
+  const financePaidClientCount = financePaidClients.length;
   const financeMonthlyPaidRows = financePaidRows.filter((item) => item.planType === "mensal");
   const financeSemiannualPaidRows = financePaidRows.filter((item) => item.planType === "semestral");
   const financeAnnualPaidRows = financePaidRows.filter((item) => item.planType === "anual");
@@ -15951,6 +16008,14 @@ function renderReports(reportType = "") {
         </div>
       `, true)}
 
+
+      ${isFinanceReport ? renderFinanceReportSection(
+        "clientes-pagos",
+        `Clientes que pagaram (${financePaidClientCount})`,
+        periodRange,
+        () => renderFinancePaidClientList(financePaidClients),
+        true
+      ) : ""}
       ${isFinanceReport ? renderFinanceReportSection(
         "clientes-pendentes-pagamento",
         `Clientes pendentes de pagamento (${financePendingClients.length})`,
