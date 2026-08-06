@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 577,
-  label: "v584",
+  numero: 578,
+  label: "v585",
   data: "2026-08-06",
-  nota: "Filtro por tipo de plano na lista de clientes pagos do relatório financeiro."
+  nota: "Vencimento dos planos anuais na lista de clientes pagos do relatório financeiro."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -14051,22 +14051,42 @@ function financePaidClientsTotal(items = []) {
   ), 0);
 }
 
+function financePaidAnnualDueDate(client = {}, rows = []) {
+  const annualRows = rows.filter((row) => (row.planType || client.tipoPlano || "mensal") === "anual");
+  if (!annualRows.length) return "";
+  const latestAnnualRow = [...annualRows]
+    .sort((a, b) => financePaymentTimestamp(b.invoice) - financePaymentTimestamp(a.invoice))[0];
+  const invoice = latestAnnualRow?.invoice || {};
+  const dueDate = invoice.proximaRenovacao
+    || invoice.vencimentoDataPlano
+    || invoice.dataVencimentoPlano
+    || invoice.vencimento
+    || invoice.dataVencimento
+    || invoice.periodoFim
+    || financePlanDueDate(client);
+  return String(dueDate || "").slice(0, 10);
+}
+
 function renderFinancePaidClientTable(items = []) {
   if (!items.length) {
     return `<div class="list-meta">Nenhum cliente com pagamento registrado para este tipo de plano no período.</div>`;
   }
+  const showAnnualDueDate = items.some(({ client, rows }) => rows.some((row) => (row.planType || client.tipoPlano || "mensal") === "anual"));
   return `
     <div class="report-table-wrap"><table class="report-click-table">
-      <thead><tr><th>Cliente</th><th>Competências</th><th>Planos</th><th>Último pagamento</th><th>Total pago</th></tr></thead>
+      <thead><tr><th>Cliente</th><th>Competências</th><th>Planos</th>${showAnnualDueDate ? "<th>Vencimento anual</th>" : ""}<th>Último pagamento</th><th>Total pago</th></tr></thead>
       <tbody>${items.map(({ client, rows }) => {
         const months = [...new Set(rows.map((row) => row.month).filter(Boolean))].sort().reverse();
         const plans = [...new Set(rows.map((row) => row.planType || client.tipoPlano || "mensal"))];
         const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
         const latestRow = [...rows].sort((a, b) => financePaymentTimestamp(b.invoice) - financePaymentTimestamp(a.invoice))[0];
+        const hasAnnualPlan = rows.some((row) => (row.planType || client.tipoPlano || "mensal") === "anual");
+        const annualDueDate = financePaidAnnualDueDate(client, rows);
         return `<tr>
           <td><strong>${escapeHtml(client.nome || client.id)}</strong><br><small>${escapeHtml(client.categoria || "Sem categoria")} · ${rows.length} ${rows.length === 1 ? "pagamento" : "pagamentos"}</small></td>
           <td>${escapeHtml(months.map(monthLabel).join(", "))}</td>
           <td>${escapeHtml(plans.map(planLabel).join(", "))}</td>
+          ${showAnnualDueDate ? `<td>${annualDueDate ? escapeHtml(formatDateBR(annualDueDate)) : (hasAnnualPlan ? "Não definido" : "—")}</td>` : ""}
           <td>${escapeHtml(financePaymentDateLabel(latestRow?.invoice))}</td>
           <td><strong>${escapeHtml(moneyBR(total))}</strong></td>
         </tr>`;
