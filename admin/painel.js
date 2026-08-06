@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 576,
-  label: "v583",
+  numero: 577,
+  label: "v584",
   data: "2026-08-06",
-  nota: "Compatibilidade do relatório financeiro com clientes pagos em registros legados."
+  nota: "Filtro por tipo de plano na lista de clientes pagos do relatório financeiro."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13975,6 +13975,8 @@ function renderFinanceStatCard(title, value, meta, periodLabel, tone = "") {
 const deferredReportSectionContent = new Map();
 let deferredReportSectionSequence = 0;
 
+let financePaidReportItems = [];
+
 function renderFinanceReportSection(id, title, periodRange, content, wide = false) {
   const deferredKey = typeof content === "function" ? `report-section-${++deferredReportSectionSequence}` : "";
   if (deferredKey) deferredReportSectionContent.set(deferredKey, content);
@@ -14033,33 +14035,65 @@ function financePaymentDateLabel(invoice = {}) {
   return `${date.toLocaleDateString("pt-BR")} às ${date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
 }
 
-function renderFinancePaidClientList(items = []) {
+function financePaidClientsForPlan(items = [], planType = "todos") {
+  if (planType === "todos") return items;
+  return items
+    .map(({ client, rows }) => ({
+      client,
+      rows: rows.filter((row) => (row.planType || client.tipoPlano || "mensal") === planType)
+    }))
+    .filter((item) => item.rows.length);
+}
+
+function financePaidClientsTotal(items = []) {
+  return items.reduce((total, item) => (
+    total + item.rows.reduce((clientTotal, row) => clientTotal + Number(row.value || 0), 0)
+  ), 0);
+}
+
+function renderFinancePaidClientTable(items = []) {
   if (!items.length) {
-    return `<div class="list-meta">Nenhum cliente com pagamento registrado neste período.</div>`;
+    return `<div class="list-meta">Nenhum cliente com pagamento registrado para este tipo de plano no período.</div>`;
   }
   return `
-    <div class="report-table-wrap">
-      <table class="report-click-table">
-        <thead>
-          <tr><th>Cliente</th><th>Competências</th><th>Planos</th><th>Último pagamento</th><th>Total pago</th></tr>
-        </thead>
-        <tbody>
-          ${items.map(({ client, rows }) => {
-            const months = [...new Set(rows.map((row) => row.month).filter(Boolean))].sort().reverse();
-            const plans = [...new Set(rows.map((row) => row.planType || client.tipoPlano || "mensal"))];
-            const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
-            const latestRow = [...rows].sort((a, b) => financePaymentTimestamp(b.invoice) - financePaymentTimestamp(a.invoice))[0];
-            return `
-            <tr>
-              <td><strong>${escapeHtml(client.nome || client.id)}</strong><br><small>${escapeHtml(client.categoria || "Sem categoria")} · ${rows.length} ${rows.length === 1 ? "pagamento" : "pagamentos"}</small></td>
-              <td>${escapeHtml(months.map(monthLabel).join(", "))}</td>
-              <td>${escapeHtml(plans.map(planLabel).join(", "))}</td>
-              <td>${escapeHtml(financePaymentDateLabel(latestRow?.invoice))}</td>
-              <td><strong>${escapeHtml(moneyBR(total))}</strong></td>
-            </tr>
-          `}).join("")}
-        </tbody>
-      </table>
+    <div class="report-table-wrap"><table class="report-click-table">
+      <thead><tr><th>Cliente</th><th>Competências</th><th>Planos</th><th>Último pagamento</th><th>Total pago</th></tr></thead>
+      <tbody>${items.map(({ client, rows }) => {
+        const months = [...new Set(rows.map((row) => row.month).filter(Boolean))].sort().reverse();
+        const plans = [...new Set(rows.map((row) => row.planType || client.tipoPlano || "mensal"))];
+        const total = rows.reduce((sum, row) => sum + Number(row.value || 0), 0);
+        const latestRow = [...rows].sort((a, b) => financePaymentTimestamp(b.invoice) - financePaymentTimestamp(a.invoice))[0];
+        return `<tr>
+          <td><strong>${escapeHtml(client.nome || client.id)}</strong><br><small>${escapeHtml(client.categoria || "Sem categoria")} · ${rows.length} ${rows.length === 1 ? "pagamento" : "pagamentos"}</small></td>
+          <td>${escapeHtml(months.map(monthLabel).join(", "))}</td>
+          <td>${escapeHtml(plans.map(planLabel).join(", "))}</td>
+          <td>${escapeHtml(financePaymentDateLabel(latestRow?.invoice))}</td>
+          <td><strong>${escapeHtml(moneyBR(total))}</strong></td>
+        </tr>`;
+      }).join("")}</tbody>
+    </table></div>
+  `;
+}
+
+function renderFinancePaidClientList(items = []) {
+  if (!items.length) return `<div class="list-meta">Nenhum cliente com pagamento registrado neste período.</div>`;
+  return `
+    <div class="finance-paid-report" data-finance-paid-report>
+      <div class="finance-paid-plan-filter">
+        <label>Tipo de plano
+          <select data-finance-paid-plan-filter>
+            <option value="todos">Todos os planos</option>
+            <option value="mensal">Mensal</option>
+            <option value="semestral">Semestral</option>
+            <option value="anual">Anual</option>
+          </select>
+        </label>
+        <div class="finance-paid-filter-summary">
+          <span><strong data-finance-paid-count>${items.length}</strong> <small data-finance-paid-count-label>${items.length === 1 ? "cliente encontrado" : "clientes encontrados"}</small></span>
+          <b data-finance-paid-total>${escapeHtml(moneyBR(financePaidClientsTotal(items)))}</b>
+        </div>
+      </div>
+      <div data-finance-paid-result>${renderFinancePaidClientTable(items)}</div>
     </div>
   `;
 }
@@ -15551,8 +15585,33 @@ async function refreshMasterAccessMetrics({
   }
 }
 
+function bindFinancePaidPlanFilter(container) {
+  container?.querySelectorAll("[data-finance-paid-plan-filter]").forEach((select) => {
+    if (select.dataset.filterBound === "true") return;
+    select.dataset.filterBound = "true";
+    const applyFilter = () => {
+      const report = select.closest("[data-finance-paid-report]");
+      const section = select.closest("[data-finance-report-section]");
+      const filteredItems = financePaidClientsForPlan(financePaidReportItems, select.value || "todos");
+      const result = report?.querySelector("[data-finance-paid-result]");
+      const count = report?.querySelector("[data-finance-paid-count]");
+      const countLabel = report?.querySelector("[data-finance-paid-count-label]");
+      const total = report?.querySelector("[data-finance-paid-total]");
+      const sectionTitle = section?.querySelector(".finance-report-section-toggle strong");
+      if (result) result.innerHTML = renderFinancePaidClientTable(filteredItems);
+      if (count) count.textContent = String(filteredItems.length);
+      if (countLabel) countLabel.textContent = filteredItems.length === 1 ? "cliente encontrado" : "clientes encontrados";
+      if (total) total.textContent = moneyBR(financePaidClientsTotal(filteredItems));
+      if (sectionTitle) sectionTitle.textContent = `Clientes que pagaram (${filteredItems.length})`;
+    };
+    select.addEventListener("change", applyFilter);
+    applyFilter();
+  });
+}
+
 function bindReportControls(mount) {
   const isFinanceReport = mount.id === "reportsFinanceMount";
+  bindFinancePaidPlanFilter(mount);
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
     button.addEventListener("click", async () => {
       state.reportSection = button.dataset.reportSection;
@@ -15583,6 +15642,7 @@ function bindReportControls(mount) {
         requestAnimationFrame(() => {
           if (!content.isConnected) return;
           content.innerHTML = typeof contentFactory === "function" ? contentFactory() : "";
+          bindFinancePaidPlanFilter(content);
           content.dataset.loaded = "true";
           deferredReportSectionContent.delete(deferredKey);
         });
@@ -15766,6 +15826,7 @@ function renderReports(reportType = "") {
   }, new Map()).values()]
     .sort((a, b) => String(a.client.nome || a.client.id || "").localeCompare(String(b.client.nome || b.client.id || ""), "pt-BR"));
   const financePaidClientCount = financePaidClients.length;
+  financePaidReportItems = financePaidClients;
   const financeMonthlyPaidRows = financePaidRows.filter((item) => item.planType === "mensal");
   const financeSemiannualPaidRows = financePaidRows.filter((item) => item.planType === "semestral");
   const financeAnnualPaidRows = financePaidRows.filter((item) => item.planType === "anual");
