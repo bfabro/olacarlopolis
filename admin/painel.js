@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 572,
-  label: "v579",
+  numero: 573,
+  label: "v580",
   data: "2026-08-06",
-  nota: "Contratação de planos mensal, semestral e anual pela tela de faturas."
+  nota: "Correção da geração de Pix e boleto na contratação de planos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -8768,14 +8768,18 @@ function fillEventClientSelect(selectedId = "") {
   }
 }
 
-function defaultPlanValue(tipoPlano) {
+function configuredPlanValue(tipoPlano) {
   const config = state.pagamentoSistema || {};
-  const defaults = {
-    mensal: Number(config.valorPlanoMensal || config.planoMensalValor || 0),
-    semestral: Number(config.valorPlanoSemestral || config.planoSemestralValor || 0),
-    anual: Number(config.valorPlanoAnual || config.planoAnualValor || 0)
+  const configuredValues = {
+    mensal: config.valorPlanoMensal || config.planoMensalValor || 0,
+    semestral: config.valorPlanoSemestral || config.planoSemestralValor || 0,
+    anual: config.valorPlanoAnual || config.planoAnualValor || 0
   };
-  return defaults[tipoPlano || "mensal"] || 0;
+  return configuredValues[tipoPlano || "mensal"] || 0;
+}
+
+function defaultPlanValue(tipoPlano) {
+  return Number(configuredPlanValue(tipoPlano) || 0);
 }
 
 function financePlanValue(client, tipoPlano) {
@@ -8904,12 +8908,16 @@ function selectedClientPlanPayment(client = {}, mount = document) {
 
 async function saveClientPlanRequest(client = {}, selection = {}, status = "aguardando_pagamento", extra = {}) {
   if (!client.id || !state.user?.uid) throw new Error("Cliente ou usuário não identificado.");
+  const configuredValue = configuredPlanValue(selection.tipoPlano);
+  const storedPlanValue = Number(configuredValue) > 0
+    ? configuredValue
+    : Number(selection.valorPlano || 0);
   const payload = {
     clientId: client.id,
     uid: state.user.uid,
     tipoPlano: selection.tipoPlano || "mensal",
-    valorPlano: Number(selection.valorPlano || 0),
-    valorTotal: Number(selection.valorTotal || selection.valorPlano || 0),
+    valorPlano: storedPlanValue,
+    valorTotal: storedPlanValue,
     competencia: currentMonthKey(),
     periodoInicio: selection.periodoInicio || dateKeyFromDate(new Date()),
     periodoFim: selection.periodoFim || "",
