@@ -6751,17 +6751,19 @@ carlopdiesel:"s",
         "menuOndeComer",
         "menuJogos"
       ]],
-      ["Informações e utilidades", [
+      ["Informações", [
         "menuSol",
-        "menuConsultaCEP",        
-         "menuEconomiaLuz",
         "menuEventos",       
-        "menuGruposWhats",        
         "menuRepresa",        
         "menuNotaFalecimento" ,
         "menuNoticiasCidade" ,
         "menuPrevisaoTempo"  ,    
          "menuVagasTrabalho"  
+      ]],
+      ["Utilidades", [
+        "menuConsultaCEP",
+        "menuEconomiaLuz",
+        "menuGruposWhats"
       ]]
      
      
