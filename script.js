@@ -6751,6 +6751,11 @@ carlopdiesel:"s",
         "menuOndeComer",
         "menuJogos"
       ]],
+      ["Utilidades", [
+        "menuConsultaCEP",
+        "menuEconomiaLuz",
+        "menuGruposWhats"
+      ]],
       ["Informações", [
         "menuSol",
         "menuEventos",       
@@ -6759,11 +6764,6 @@ carlopdiesel:"s",
         "menuNoticiasCidade" ,
         "menuPrevisaoTempo"  ,    
          "menuVagasTrabalho"  
-      ]],
-      ["Utilidades", [
-        "menuConsultaCEP",
-        "menuEconomiaLuz",
-        "menuGruposWhats"
       ]]
      
      
