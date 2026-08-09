@@ -2829,7 +2829,77 @@ function resumirPontosGraficoRepresa(registros = [], limite = 90) {
   return Array.from({ length: limite }, (_, index) => registros[Math.round(index * passo)]);
 }
 
-async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
+const REPRESA_FAIXAS_COTA = [
+  { id: 'maximo', nome: 'Máximo normal', minimo: 474, faixa: '474,00 m', descricao: 'Reservatório cheio no limite normal' },
+  { id: 'normal', nome: 'Normal', minimo: 469.06, faixa: '469,06 a 473,99 m', descricao: 'Operação normal' },
+  { id: 'atencao', nome: 'Atenção', minimo: 468.15, faixa: '468,15 a 469,05 m', descricao: 'Acompanhamento reforçado' },
+  { id: 'alerta', nome: 'Alerta', minimo: 467.21, faixa: '467,21 a 468,14 m', descricao: 'Nível baixo' },
+  { id: 'restricao', nome: 'Restrição', minimo: 465.23, faixa: '465,23 a 467,20 m', descricao: 'Operação com restrições' },
+  { id: 'critico', nome: 'Abaixo do mínimo', minimo: -Infinity, faixa: 'Abaixo de 465,23 m', descricao: 'Fora da faixa operacional' }
+];
+
+function classificarCotaRepresa(valor) {
+  const cota = typeof valor === 'number' ? valor : valorNumeroRepresa(valor);
+  if (!Number.isFinite(cota)) return { id: 'indisponivel', nome: 'Não informado', faixa: '—', descricao: 'Cota indisponível' };
+  return REPRESA_FAIXAS_COTA.find((faixa) => cota >= faixa.minimo) || REPRESA_FAIXAS_COTA.at(-1);
+}
+
+function atualizarStatusCotaRepresa(valor) {
+  const elemento = document.getElementById('represaStatusAtual');
+  if (!elemento) return;
+  const status = classificarCotaRepresa(valor);
+  elemento.className = `represa-current-status status-${status.id}`;
+  elemento.innerHTML = `<i class="fa-solid fa-circle"></i> ${status.nome}`;
+  elemento.title = status.descricao;
+}
+
+function mediaCampoRepresa(registros, campo) {
+  const valores = registros.map((item) => item[campo]).filter(Number.isFinite);
+  return valores.length ? valores.reduce((total, valor) => total + valor, 0) / valores.length : null;
+}
+
+function agruparHistoricoRepresaPorMedia(registros = [], visualizacao = 'diaria') {
+  if (visualizacao === 'diaria') return registros.map((item) => ({ ...item, rotuloCurto: item.dataLabel?.slice(0, 5) || '' }));
+  const grupos = new Map();
+  registros.forEach((item) => {
+    const data = new Date(item.dataISO);
+    if (Number.isNaN(data.getTime())) return;
+    data.setHours(12, 0, 0, 0);
+    let chave, inicio, dataLabel, rotuloCurto;
+    if (visualizacao === 'mensal') {
+      chave = `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, '0')}`;
+      inicio = new Date(data.getFullYear(), data.getMonth(), 1, 12);
+      dataLabel = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(inicio);
+      rotuloCurto = new Intl.DateTimeFormat('pt-BR', { month: 'short', year: '2-digit' }).format(inicio).replace('.', '');
+    } else {
+      inicio = new Date(data);
+      inicio.setDate(inicio.getDate() - ((inicio.getDay() + 6) % 7));
+      chave = inicio.toISOString().slice(0, 10);
+      const fim = new Date(inicio);
+      fim.setDate(fim.getDate() + 6);
+      const inicioTexto = inicio.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const fimTexto = fim.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      dataLabel = `${inicioTexto} a ${fimTexto}`;
+      rotuloCurto = inicioTexto;
+    }
+    if (!grupos.has(chave)) grupos.set(chave, { inicio, dataLabel, rotuloCurto, itens: [] });
+    grupos.get(chave).itens.push(item);
+  });
+  return Array.from(grupos.values()).sort((a, b) => a.inicio - b.inicio).map((grupo) => ({
+    id: `media-${visualizacao}-${grupo.inicio.toISOString()}`,
+    dataISO: grupo.inicio.toISOString(),
+    dataLabel: grupo.dataLabel,
+    rotuloCurto: grupo.rotuloCurto,
+    horario: '',
+    cota: mediaCampoRepresa(grupo.itens, 'cota'),
+    volume: mediaCampoRepresa(grupo.itens, 'volume'),
+    defluencia: mediaCampoRepresa(grupo.itens, 'defluencia'),
+    afluencia: mediaCampoRepresa(grupo.itens, 'afluencia'),
+    quantidade: grupo.itens.length
+  }));
+}
+
+async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visualizacao = 'diaria') {
   const box = document.getElementById('represaHistoricoBox');
   if (!box) return;
   const mapa = new Map((await filtrarHistoricoRepresa(periodo)).map((item) => [item.id, item]));
@@ -2855,6 +2925,7 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
 
   const cotaValores = dadosDiarios.map((item) => item.cota).filter(Number.isFinite);
   const volumeValores = dadosDiarios.map((item) => item.volume).filter(Number.isFinite);
+  const dadosVisualizacao = agruparHistoricoRepresaPorMedia(dadosDiarios, visualizacao);
   if (!cotaValores.length) {
     box.innerHTML = '<div class="represa-history-empty">Os registros encontrados ainda não possuem uma cota válida para montar o gráfico.</div>';
     return;
@@ -2866,19 +2937,25 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
   const escalaMax = cotaMax + cotaPadding;
   const span = escalaMax - escalaMin || 1;
   const volumeMedio = volumeValores.length ? volumeValores.reduce((sum, value) => sum + value, 0) / volumeValores.length : null;
+  const cotaMedia = cotaValores.length ? cotaValores.reduce((sum, value) => sum + value, 0) / cotaValores.length : null;
   const cotaAtual = cotaValores.length ? cotaValores[cotaValores.length - 1] : null;
   const primeiraCota = cotaValores.length ? cotaValores[0] : null;
   const variacao = Number.isFinite(cotaAtual) && Number.isFinite(primeiraCota) ? cotaAtual - primeiraCota : null;
   const tendenciaClasse = variacao > 0.005 ? 'up' : variacao < -0.005 ? 'down' : 'stable';
   const tendenciaIcone = tendenciaClasse === 'up' ? 'fa-arrow-trend-up' : tendenciaClasse === 'down' ? 'fa-arrow-trend-down' : 'fa-minus';
   const tendenciaTexto = tendenciaClasse === 'up' ? 'Subiu no período' : tendenciaClasse === 'down' ? 'Baixou no período' : 'Estável no período';
+  const statusAtual = classificarCotaRepresa(cotaAtual);
+  const tituloVisualizacao = visualizacao === 'mensal' ? 'Média mensal' : visualizacao === 'semanal' ? 'Média semanal' : 'Evolução diária';
+  const descricaoVisualizacao = visualizacao === 'diaria'
+    ? 'Passe o cursor ou toque nos pontos para consultar cada medição.'
+    : `Cada ponto representa a média ${visualizacao === 'mensal' ? 'do mês' : 'da semana'} dentro do período selecionado.`;
 
   const largura = 760;
   const altura = 280;
   const margem = { top: 24, right: 38, bottom: 46, left: 58 };
   const graficoLargura = largura - margem.left - margem.right;
   const graficoAltura = altura - margem.top - margem.bottom;
-  const pontosVisiveis = resumirPontosGraficoRepresa(dadosDiarios);
+  const pontosVisiveis = resumirPontosGraficoRepresa(dadosVisualizacao);
   const xDoPonto = (index) => margem.left + (pontosVisiveis.length === 1 ? graficoLargura / 2 : (index / (pontosVisiveis.length - 1)) * graficoLargura);
   const yDaCota = (valor) => margem.top + ((escalaMax - valor) / span) * graficoAltura;
   const yDoVolume = (valor) => margem.top + ((100 - valor) / 100) * graficoAltura;
@@ -2906,28 +2983,48 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
   const indicesDatas = [...new Set([0, Math.round((pontosVisiveis.length - 1) * .25), Math.round((pontosVisiveis.length - 1) * .5), Math.round((pontosVisiveis.length - 1) * .75), pontosVisiveis.length - 1])];
   const rotulosDatas = indicesDatas.map((index) => {
     const item = pontosVisiveis[index];
-    return item ? `<text class="represa-chart-x-label" x="${xDoPonto(index)}" y="${altura - 15}" text-anchor="middle">${item.dataLabel?.slice(0, 5) || ''}</text>` : '';
+    return item ? `<text class="represa-chart-x-label" x="${xDoPonto(index)}" y="${altura - 15}" text-anchor="middle">${item.rotuloCurto || item.dataLabel?.slice(0, 5) || ''}</text>` : '';
   }).join('');
   const marcadores = pontosVisiveis.map((item, index) => {
     if (!Number.isFinite(item.cota)) return '';
     const detalhe = `${item.dataLabel || ''}${item.horario ? ` às ${item.horario}` : ''}: ${item.cota.toFixed(2)} m${Number.isFinite(item.volume) ? `, volume ${item.volume.toFixed(2)}%` : ''}`;
-    return `<circle class="represa-chart-point" cx="${xDoPonto(index)}" cy="${yDaCota(item.cota)}" r="4" tabindex="0"><title>${detalhe}</title></circle>`;
+    const status = classificarCotaRepresa(item.cota);
+    return `<circle class="represa-chart-point status-${status.id}" cx="${xDoPonto(index)}" cy="${yDaCota(item.cota)}" r="4" tabindex="0"><title>${detalhe} (${status.nome})</title></circle>`;
   }).join('');
 
+  const legendaFaixas = REPRESA_FAIXAS_COTA.map((faixa) => `
+    <tr class="status-${faixa.id}">
+      <td><span class="represa-level-badge"><i></i>${faixa.nome}</span></td>
+      <td>${faixa.faixa}</td>
+      <td>${faixa.descricao}</td>
+    </tr>
+  `).join('');
   box.innerHTML = `
     <div class="represa-history-summary">
       <div><span>Dias monitorados</span><strong>${dadosDiarios.length}</strong></div>
       <div><span>Cota atual</span><strong>${Number.isFinite(cotaAtual) ? cotaAtual.toFixed(2) + ' m' : '-'}</strong></div>
+      <div><span>Cota média no período</span><strong>${Number.isFinite(cotaMedia) ? cotaMedia.toFixed(2) + ' m' : '-'}</strong></div>
+      <div class="represa-summary-status status-${statusAtual.id}"><span>Situação atual</span><strong><i></i>${statusAtual.nome}</strong><small>${statusAtual.descricao}</small></div>
       <div><span>Mínima / máxima</span><strong>${cotaMin.toFixed(2)} / ${cotaMax.toFixed(2)} m</strong></div>
       <div class="represa-history-trend ${tendenciaClasse}"><span>${tendenciaTexto}</span><strong><i class="fa-solid ${tendenciaIcone}"></i> ${Number.isFinite(variacao) ? `${variacao > 0 ? '+' : ''}${variacao.toFixed(2)} m` : '-'}</strong></div>
     </div>
+    <div class="represa-level-reference">
+      <div class="represa-level-reference-head">
+        <div><strong><i class="fa-solid fa-layer-group"></i> Faixas operacionais da cota</strong><span>Referência para entender se o nível está normal, baixo ou próximo do máximo.</span></div>
+        <a href="https://www.gov.br/ana/pt-br/legislacao/resolucoes/resolucoes-regulatorias/2022/132" target="_blank" rel="noopener noreferrer">Fonte: ANA</a>
+      </div>
+      <div class="represa-level-reference-scroll">
+        <table><thead><tr><th>Situação</th><th>Cota da água</th><th>Interpretação</th></tr></thead><tbody>${legendaFaixas}</tbody></table>
+      </div>
+      <p><i class="fa-solid fa-circle-info"></i> A cota é a altitude da superfície da água. Ela não representa a profundidade da represa, e sua variação não é linear ao volume útil.</p>
+    </div>
     <div class="represa-history-chart-card">
       <div class="represa-history-chart-title">
-        <div><strong>Evolução diária</strong><span>Passe o cursor ou toque nos pontos para consultar cada medição.</span></div>
+        <div><strong>${tituloVisualizacao}</strong><span>${descricaoVisualizacao}</span></div>
         <div class="represa-chart-legend"><span><i class="level"></i>Nível (m)</span>${pontosVolume.length > 1 ? '<span><i class="volume"></i>Volume (%)</span>' : ''}</div>
       </div>
       <div class="represa-history-chart-scroll">
-        <div class="represa-history-chart" aria-label="Gráfico da evolução diária do nível da Represa de Chavantes">
+        <div class="represa-history-chart" aria-label="Gráfico de ${tituloVisualizacao.toLowerCase()} do nível da Represa de Chavantes">
         <svg viewBox="0 0 ${largura} ${altura}" role="img">
           <defs>
             <linearGradient id="represaAreaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#1688f8" stop-opacity=".28"></stop><stop offset="100%" stop-color="#1688f8" stop-opacity=".02"></stop></linearGradient>
@@ -2948,21 +3045,23 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null) {
       <table class="represa-history-table">
         <thead>
           <tr>
-            <th>Data</th>
+            <th>Data / período</th>
             <th>Nivel</th>
             <th>Volume</th>
             <th>Defluencia</th>
           </tr>
         </thead>
         <tbody>
-          ${dadosDiarios.slice().reverse().map((item) => `
+          ${dadosVisualizacao.slice().reverse().map((item) => {
+            const status = classificarCotaRepresa(item.cota);
+            return `
             <tr>
-              <td data-label="Data">${item.dataLabel}${item.horario ? `<small>${item.horario}</small>` : ''}</td>
-              <td data-label="Nível">${Number.isFinite(item.cota) ? item.cota.toFixed(2) + ' m' : '-'}</td>
+              <td data-label="Período">${item.dataLabel}${item.horario ? `<small>${item.horario}</small>` : ''}${item.quantidade ? `<small>${item.quantidade} dia${item.quantidade > 1 ? 's' : ''} com dados</small>` : ''}</td>
+              <td data-label="Nível"><span class="represa-table-level status-${status.id}">${Number.isFinite(item.cota) ? item.cota.toFixed(2) + ' m' : '-'}<small>${status.nome}</small></span></td>
               <td data-label="Volume">${Number.isFinite(item.volume) ? item.volume.toFixed(2) + '%' : '-'}</td>
               <td data-label="Defluência">${Number.isFinite(item.defluencia) ? item.defluencia.toFixed(2) + ' m³/s' : '-'}</td>
             </tr>
-          `).join('')}
+          `}).join('')}
         </tbody>
       </table>
     </div>
@@ -27864,6 +27963,7 @@ async function carregarDadosRepresa() {
 
     // Preenche UI principal
     setTexto('#cotaAtual', cotaAtual);
+    atualizarStatusCotaRepresa(cotaAtual);
     setTexto('#volumeUtil', volumeUtil);
     setTexto('#vazaoAfluente', vazaoAfluente);
     setTexto('#vazaoDefluente', vazaoDefluente);
@@ -27879,7 +27979,7 @@ async function carregarDadosRepresa() {
     setTexto('#nr-volume', volumeUtil);
     setTexto('#nr-data', new Date(atualizadoEm).toLocaleDateString('pt-BR'));
     const registroAtual = await salvarHistoricoRepresa(data);
-    await renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
+    await renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual, document.getElementById('represaHistoricoVisualizacao')?.value || 'diaria');
 
     // Destaque visual
     if (typeof destacarMudancas === 'function') destacarMudancas();
@@ -27891,6 +27991,7 @@ async function carregarDadosRepresa() {
       if (typeof buscarCTGviaJina === 'function') {
         const dados = await buscarCTGviaJina(); // mantém seu leitor como 2ª opção
         setTexto('#cotaAtual', dados.cota);
+        atualizarStatusCotaRepresa(dados.cota);
         setTexto('#volumeUtil', dados.volume);
         setTexto('#vazaoAfluente', dados.vazaoAfluente ?? '—');
         setTexto('#vazaoDefluente', dados.vazaoDefluente ?? '—');
@@ -27908,7 +28009,7 @@ async function carregarDadosRepresa() {
           atualizadoEm: Date.now(),
           fonte: dados.fonte
         });
-        await renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual);
+        await renderHistoricoRepresa(document.getElementById('represaHistoricoPeriodo')?.value || '30', registroAtual, document.getElementById('represaHistoricoVisualizacao')?.value || 'diaria');
         if (typeof destacarMudancas === 'function') destacarMudancas();
         return;
       }
@@ -27982,7 +28083,7 @@ function mostrarRepresaChavantes() {
         <div class="represa-dados">
           <div class="dado-item">
             <span class="dado-icon level"><i class="fa-solid fa-ruler-vertical"></i></span>
-            <div><div class="dado-label">Cota atual</div><div class="dado-line"><strong class="dado-valor" id="cotaAtual">—</strong><span class="dado-unidade">m</span></div></div>
+            <div><div class="dado-label">Cota atual</div><div class="dado-line"><strong class="dado-valor" id="cotaAtual">—</strong><span class="dado-unidade">m</span></div><span id="represaStatusAtual" class="represa-current-status status-indisponivel"><i class="fa-solid fa-circle"></i> Carregando</span></div>
           </div>
           <div class="dado-item">
             <span class="dado-icon volume"><i class="fa-solid fa-droplet"></i></span>
@@ -28022,16 +28123,26 @@ function mostrarRepresaChavantes() {
               <h4>Histórico do nível</h4>
               <p>Uma medição consolidada por dia para facilitar a comparação.</p>
             </div>
-            <label>
-              Periodo
-              <select id="represaHistoricoPeriodo">
-                <option value="7">7 dias</option>
-                <option value="30" selected>30 dias</option>
-                <option value="90">90 dias</option>
-                <option value="365">1 ano</option>
-                <option value="todos">Todos</option>
-              </select>
-            </label>
+            <div class="represa-history-controls">
+              <label>
+                Período
+                <select id="represaHistoricoPeriodo">
+                  <option value="7">7 dias</option>
+                  <option value="30" selected>30 dias</option>
+                  <option value="90">90 dias</option>
+                  <option value="365">1 ano</option>
+                  <option value="todos">Todos</option>
+                </select>
+              </label>
+              <label>
+                Visualização
+                <select id="represaHistoricoVisualizacao">
+                  <option value="diaria" selected>Diária</option>
+                  <option value="semanal">Média semanal</option>
+                  <option value="mensal">Média mensal</option>
+                </select>
+              </label>
+            </div>
           </div>
           <div id="represaHistoricoBox" class="represa-history-box">
             <div class="represa-history-empty">Carregando historico...</div>
@@ -28051,12 +28162,15 @@ function mostrarRepresaChavantes() {
   `;
 
   // Carrega os dados ao abrir a página
-  renderHistoricoRepresa('30');
+  renderHistoricoRepresa('30', null, 'diaria');
   carregarDadosRepresa();
 
-  document.getElementById('represaHistoricoPeriodo')?.addEventListener('change', (event) => {
-    renderHistoricoRepresa(event.target.value);
-  });
+  const atualizarVisualizacaoHistorico = () => renderHistoricoRepresa(
+    document.getElementById('represaHistoricoPeriodo')?.value || '30', null,
+    document.getElementById('represaHistoricoVisualizacao')?.value || 'diaria'
+  );
+  document.getElementById('represaHistoricoPeriodo')?.addEventListener('change', atualizarVisualizacaoHistorico);
+  document.getElementById('represaHistoricoVisualizacao')?.addEventListener('change', atualizarVisualizacaoHistorico);
 
   document.querySelector('.btn-refresh')?.addEventListener('click', carregarDadosRepresa);
 
