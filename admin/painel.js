@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 584,
-  label: "v591",
+  numero: 585,
+  label: "v592",
   data: "2026-08-10",
-  nota: "Ordenação crescente e decrescente adicionada às colunas quantitativas do relatório de acessos."
+  nota: "Detalhamento por cliente consolidado com registros da linha do tempo para evitar acessos ausentes."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -14312,23 +14312,51 @@ function filterDailyMetrics(data = {}, range = getReportDateRange()) {
   return Object.fromEntries(Object.entries(data || {}).filter(([date]) => date >= range.start && date <= range.end));
 }
 
-function aggregateCliquesPorBotao(data = {}) {
+function aggregateCliquesPorBotao(primary = {}, detailed = {}) {
   const porCliente = new Map();
   const porTipo = new Map();
   const detalhes = new Map();
-  Object.values(data || {}).forEach((dia) => {
-    Object.entries(dia || {}).forEach(([clienteId, tipos]) => {
-      Object.entries(tipos || {}).forEach(([tipo, count]) => {
-        incrementMetric(porCliente, clienteId, count);
-        incrementMetric(porTipo, tipo, count);
-        if (!detalhes.has(clienteId)) detalhes.set(clienteId, new Map());
-        incrementMetric(detalhes.get(clienteId), tipo, count);
+  const dates = new Set([...Object.keys(primary || {}), ...Object.keys(detailed || {})]);
+
+  dates.forEach((date) => {
+    const clients = new Map();
+    const clientEntry = (clientKey) => {
+      if (!clients.has(clientKey)) clients.set(clientKey, { primary: new Map(), detailed: new Map() });
+      return clients.get(clientKey);
+    };
+
+    Object.entries(primary?.[date] || {}).forEach(([clientKey, types]) => {
+      Object.entries(types || {}).forEach(([type, count]) => {
+        clientEntry(clientKey).primary.set(type, Number(count || 0));
+      });
+    });
+
+    Object.entries(detailed?.[date] || {}).forEach(([clientKey, logs]) => {
+      Object.values(logs || {}).forEach((item) => {
+        const type = String(item?.tipo || "clique");
+        incrementMetric(clientEntry(clientKey).detailed, type, 1);
+      });
+    });
+
+    clients.forEach((sources, clientKey) => {
+      const types = new Set([...sources.primary.keys(), ...sources.detailed.keys()]);
+      types.forEach((type) => {
+        const count = Math.max(
+          Number(sources.primary.get(type) || 0),
+          Number(sources.detailed.get(type) || 0)
+        );
+        if (!count) return;
+        incrementMetric(porCliente, clientKey, count);
+        incrementMetric(porTipo, type, count);
+        if (!detalhes.has(clientKey)) detalhes.set(clientKey, new Map());
+        incrementMetric(detalhes.get(clientKey), type, count);
       });
     });
   });
-  return { porCliente, porTipo, detalhes };
-}
 
+  return { porCliente, porTipo, detalhes };
+
+}
 function aggregateSimpleDaily(data = {}) {
   const map = new Map();
   Object.values(data || {}).forEach((dia) => {
@@ -15944,6 +15972,7 @@ function renderReports(reportType = "") {
   }
   const filteredMetrics = {
     cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, periodRange),
+    cliquesBotoesDetalhado: filterDailyMetrics(state.metricas.cliquesBotoesDetalhado, periodRange),
     acessosClientes: filterDailyMetrics(state.metricas.acessosClientes, periodRange),
     cliquesMenu: filterDailyMetrics(state.metricas.cliquesMenu, periodRange),
     acessos: filterDailyMetrics(state.metricas.acessos, periodRange),
@@ -16020,7 +16049,7 @@ function renderReports(reportType = "") {
     return acc;
   }, {});
 
-  const cliquesBotoes = aggregateCliquesPorBotao(filteredMetrics.cliquesBotoes);
+  const cliquesBotoes = aggregateCliquesPorBotao(filteredMetrics.cliquesBotoes, filteredMetrics.cliquesBotoesDetalhado);
   const acessosClientes = aggregateClientPageAccesses(filteredMetrics.acessosClientes);
   const detalhesClientes = new Map();
   cliquesBotoes.detalhes.forEach((types, clientKey) => {
@@ -16085,9 +16114,9 @@ function renderReports(reportType = "") {
   const totalButtonClicks = totalMetricMap(cliquesBotoes.porTipo);
   const totalOndeComerInteractions = totalMetricMap(cliquesOndeComerCardapios)
     + totalMetricMap(cliquesOndeComerWhats)
+    + totalMetricMap(cliquesOndeComerFotos);
   const totalClientPageAccesses = totalMetricMap(acessosClientes);
   const totalAccessedClients = acessosClientes.size;
-    + totalMetricMap(cliquesOndeComerFotos);
   const totalPromotionInteractions = totalMetricMap(cliquesPromocoes);
 
   const clientesAtencao = reportClients
