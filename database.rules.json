@@ -88,6 +88,11 @@
       }
     },
 
+    "acessosClientesPorDia": {
+      ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
+      ".write": true
+    },
+
     "noticias": {
       ".read": true,
       "$newsId": {

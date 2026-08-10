@@ -2169,6 +2169,7 @@ function registrarOrigemPaginaCliente(idEstabelecimento, detalhes = {}) {
   const agora = new Date();
   const db = firebase.database();
   const contador = db.ref(`metricasClientes/${clienteKey}/${hoje}/origensPagina/${origemKey}`).transaction((atual) => (atual || 0) + 1);
+  const acessoCliente = db.ref(`acessosClientesPorDia/${hoje}/${clienteKey}`).transaction((atual) => (atual || 0) + 1);
   const log = db.ref(`metricasClientes/${clienteKey}/${hoje}/detalhesOrigemPagina`).push().set({
     grupo: "origensPagina",
     tipo: "origem_pagina",
@@ -2181,7 +2182,7 @@ function registrarOrigemPaginaCliente(idEstabelecimento, detalhes = {}) {
     pagina: window.location.href
   });
 
-  return Promise.allSettled([contador, log]);
+  return Promise.allSettled([contador, acessoCliente, log]);
 }
 
 function erroPermissaoFirebase(erro) {

@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 582,
-  label: "v589",
-  data: "2026-08-09",
-  nota: "Total geral e filtrado de clientes adicionado à tela Onde Comer."
+  numero: 583,
+  label: "v590",
+  data: "2026-08-10",
+  nota: "Acessos às páginas dos clientes adicionados ao relatório Estabelecimentos e serviços."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1636,6 +1636,7 @@ async function getPanelSnapshot(path, options = {}) {
 function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
   const metrics = {
     cliquesBotoes: {},
+    acessosClientes: {},
     cliquesMenu: {},
     acessos: {},
     ondeComerCardapios: {},
@@ -1683,6 +1684,10 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
       if (!metrics[target][date]) metrics[target][date] = { [clientKey]: {} };
       metrics[target][date][clientKey][logId] = item;
     });
+    const totalAcessosCliente = Object.values(origensPagina)
+      .reduce((sum, count) => sum + Number(count || 0), 0);
+    if (totalAcessosCliente) metrics.acessosClientes[date] = { [clientKey]: totalAcessosCliente };
+
     if (Object.keys(origensPagina).length) metrics.origemPaginaCliente[date] = { [clientKey]: origensPagina };
     Object.entries(detalhesOrigemPagina).forEach(([logId, item]) => {
       if (!metrics.origemPaginaClienteDetalhado[date]) metrics.origemPaginaClienteDetalhado[date] = { [clientKey]: {} };
@@ -2788,6 +2793,7 @@ async function loadAllData(onProgress = null) {
   progress(72, "Preparando informações do painel...");
   state.metricas = scopedClientMetrics || {
     cliquesBotoes: cliquesBotoesSnap.exists() ? cliquesBotoesSnap.val() : {},
+    acessosClientes: {},
     cliquesMenu: cliquesMenuSnap.exists() ? cliquesMenuSnap.val() : {},
     acessos: acessosSnap.exists() ? acessosSnap.val() : {},
     ondeComerCardapios: ondeComerCardapiosSnap.exists() ? ondeComerCardapiosSnap.val() : {},
@@ -14331,6 +14337,51 @@ function aggregateSimpleDaily(data = {}) {
   return map;
 }
 
+function clientPageAccessesFromMetricRoot(data = {}, range = getReportDateRange()) {
+  const accesses = {};
+  Object.entries(data || {}).forEach(([clientKey, dates]) => {
+    Object.entries(dates || {}).forEach(([date, day]) => {
+      if (date < range.start || date > range.end) return;
+      const total = Object.values(day?.origensPagina || {})
+        .reduce((sum, count) => sum + Number(count || 0), 0);
+      if (!total) return;
+      if (!accesses[date]) accesses[date] = {};
+      accesses[date][clientKey] = total;
+    });
+  });
+  return accesses;
+}
+
+function mergeClientPageAccessTrees(primary = {}, fallback = {}) {
+  const merged = {};
+  const dates = new Set([...Object.keys(primary || {}), ...Object.keys(fallback || {})]);
+  dates.forEach((date) => {
+    const clientKeys = new Set([
+      ...Object.keys(primary?.[date] || {}),
+      ...Object.keys(fallback?.[date] || {})
+    ]);
+    clientKeys.forEach((clientKey) => {
+      const count = Math.max(
+        Number(primary?.[date]?.[clientKey] || 0),
+        Number(fallback?.[date]?.[clientKey] || 0)
+      );
+      if (!count) return;
+      if (!merged[date]) merged[date] = {};
+      merged[date][clientKey] = count;
+    });
+  });
+  return merged;
+}
+
+function aggregateClientPageAccesses(data = {}) {
+  const totals = new Map();
+  Object.values(data || {}).forEach((day) => {
+    Object.entries(day || {}).forEach(([clientKey, count]) => {
+      incrementMetric(totals, clientLabelFromMetricKey(clientKey), count);
+    });
+  });
+  return totals;
+}
 function menuMetricIdentity(value = "") {
   return normalizeName(value).replace(/^menu/, "") || "menu";
 }
@@ -14429,7 +14480,8 @@ function clientLabelFromMetricKey(key) {
       item.nome,
       item.name,
       normalizeName(item.nome || item.name || ""),
-      clientCanonicalId(item)
+      clientCanonicalId(item),
+      ...Object.keys(item.aliases || {}),
     ].filter(Boolean).map((value) => normalizeName(value));
     return candidates.includes(normalized);
   });
@@ -14440,6 +14492,7 @@ function metricButtonLabel(tipo) {
   return {
     telefone: "Telefone",
     perfil: "Visualizacao do perfil",
+    acesso_pagina: "Acesso \u00e0 p\u00e1gina",
     whatsapp: "WhatsApp",
     whatsapp_promocao: "WhatsApp da promocao",
     grupoWhatsapp: "Grupo WhatsApp",
@@ -15510,6 +15563,7 @@ async function applyReportFilterWithLoading(sourceButton, reportType, updatePeri
 }
 
 const ACCESS_METRIC_PATHS = {
+  acessosClientes: "acessosClientesPorDia",
   cliquesBotoes: "cliquesPorBotao",
   cliquesMenu: "cliquesMenuLateral",
   acessos: "acessosPorDia",
@@ -15566,6 +15620,13 @@ async function refreshMasterAccessMetrics({
     return result;
   }
   const refreshPromise = (async () => {
+    let clientMetricsSnapshot = EMPTY_SNAPSHOT;
+    try {
+      clientMetricsSnapshot = await get(ref(db, "metricasClientes"));
+    } catch (error) {
+      console.warn("Nao foi possivel recuperar os acessos historicos dos clientes.", error);
+    }
+
     const results = await Promise.allSettled(Object.entries(ACCESS_METRIC_PATHS).map(async ([key, path]) => {
       const periodQuery = query(ref(db, path), orderByKey(), startAt(range.start), endAt(range.end));
       const snapshot = await get(periodQuery);
@@ -15585,6 +15646,11 @@ async function refreshMasterAccessMetrics({
     Object.keys(ACCESS_METRIC_PATHS).forEach((key) => {
       if (!(key in metrics)) metrics[key] = cached?.metrics?.[key] || {};
     });
+    const historicalClientAccesses = clientPageAccessesFromMetricRoot(
+      clientMetricsSnapshot.exists() ? clientMetricsSnapshot.val() : {},
+      range
+    );
+    metrics.acessosClientes = mergeClientPageAccessTrees(metrics.acessosClientes, historicalClientAccesses);
     if (updated) {
       accessMetricsRangeCache.set(cacheKey, { loadedAt: Date.now(), metrics });
       while (accessMetricsRangeCache.size > ACCESS_METRICS_CACHE_MAX_PERIODS) {
@@ -15815,6 +15881,7 @@ function renderReports(reportType = "") {
   }
   const filteredMetrics = {
     cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, periodRange),
+    acessosClientes: filterDailyMetrics(state.metricas.acessosClientes, periodRange),
     cliquesMenu: filterDailyMetrics(state.metricas.cliquesMenu, periodRange),
     acessos: filterDailyMetrics(state.metricas.acessos, periodRange),
     ondeComerCardapios: filterDailyMetrics(state.metricas.ondeComerCardapios, periodRange),
@@ -15891,6 +15958,18 @@ function renderReports(reportType = "") {
   }, {});
 
   const cliquesBotoes = aggregateCliquesPorBotao(filteredMetrics.cliquesBotoes);
+  const acessosClientes = aggregateClientPageAccesses(filteredMetrics.acessosClientes);
+  const detalhesClientes = new Map();
+  cliquesBotoes.detalhes.forEach((types, clientKey) => {
+    const clientName = clientLabelFromMetricKey(clientKey);
+    if (!detalhesClientes.has(clientName)) detalhesClientes.set(clientName, new Map());
+    types.forEach((count, type) => incrementMetric(detalhesClientes.get(clientName), type, count));
+  });
+  acessosClientes.forEach((count, clientName) => {
+    if (!detalhesClientes.has(clientName)) detalhesClientes.set(clientName, new Map());
+    detalhesClientes.get(clientName).set("acesso_pagina", count);
+  });
+
   const cliquesMenu = aggregateMenuDaily(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
   const cliquesOndeComerCardapios = aggregateDailyWithDetails(
     filteredMetrics.ondeComerCardapios,
@@ -15932,7 +16011,7 @@ function renderReports(reportType = "") {
   const getClickTimeline = () => clickTimeline ??= buildClickTimeline(state.metricas, periodRange);
   const getItemAccessRows = () => itemAccessRows ??= buildItemAccessRows(state.metricas, periodRange);
   const getAccessTimeline = () => accessTimeline ??= buildAccessTimeline(filteredMetrics.acessos, periodRange);
-  const getGeneralClickReport = () => generalClickReport ??= buildGeneralClickRows(cliquesBotoes.detalhes);
+  const getGeneralClickReport = () => generalClickReport ??= buildGeneralClickRows(detalhesClientes);
   const getOndeComerClickRows = () => ondeComerClickRows ??= buildOndeComerClickRows(
     cliquesOndeComerCardapios,
     cliquesOndeComerWhats,
@@ -15943,6 +16022,8 @@ function renderReports(reportType = "") {
   const totalButtonClicks = totalMetricMap(cliquesBotoes.porTipo);
   const totalOndeComerInteractions = totalMetricMap(cliquesOndeComerCardapios)
     + totalMetricMap(cliquesOndeComerWhats)
+  const totalClientPageAccesses = totalMetricMap(acessosClientes);
+  const totalAccessedClients = acessosClientes.size;
     + totalMetricMap(cliquesOndeComerFotos);
   const totalPromotionInteractions = totalMetricMap(cliquesPromocoes);
 
@@ -16064,11 +16145,16 @@ function renderReports(reportType = "") {
       `, true)}
 
       ${isFinanceReport ? "" : renderFinanceReportSection("estabelecimentos-servicos", "Estabelecimentos e serviços", periodRange, () => `
+        <div class="access-report-kpi-strip">
+          <article><span>Acessos às páginas</span><strong>${totalClientPageAccesses}</strong><small>Aberturas das páginas dos clientes</small></article>
+          <article><span>Clientes acessados</span><strong>${totalAccessedClients}</strong><small>Clientes distintos com pelo menos um acesso</small></article>
+          <article><span>Interações em botões</span><strong>${totalButtonClicks}</strong><small>WhatsApp, telefone, redes sociais e outros</small></article>
+        </div>
         <div class="access-report-columns">
           <section class="access-report-subsection">
             <h3><i class="fa-solid fa-ranking-star"></i> Mais acessados</h3>
-            <p>Clientes com maior número de interações no período.</p>
-            ${renderReportList(topFromMap(cliquesBotoes.porCliente, 12), "Ainda não há cliques de estabelecimentos registrados.")}
+            <p>Clientes com maior número de aberturas de página no período.</p>
+            ${renderReportList(topFromMap(acessosClientes, 12, "acesso", "acessos"), "Ainda não há acessos às páginas dos clientes registrados.")}
           </section>
           <section class="access-report-subsection">
             <h3><i class="fa-solid fa-arrow-pointer"></i> Botões mais usados</h3>
@@ -16078,7 +16164,7 @@ function renderReports(reportType = "") {
         </div>
         <div class="access-report-detail-block">
           <h3>Detalhamento por estabelecimento ou serviço</h3>
-          ${renderClickReportTable(getGeneralClickReport().rows, getGeneralClickReport().types, "Ainda não há cliques por estabelecimento ou serviço.")}
+          ${renderClickReportTable(getGeneralClickReport().rows, getGeneralClickReport().types, "Ainda não há acessos ou cliques por estabelecimento ou serviço.")}
         </div>
       `, true)}
 
