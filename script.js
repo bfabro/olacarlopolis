@@ -13450,6 +13450,11 @@ plotarPinsImoveis(stateImoveis.filtered);
     const introRest = intro.blocks.slice(1);
 
     area.innerHTML = `
+      <div class="page-header">
+        <h2>ℹ️ Sobre nós</h2>
+        <i class="fa-solid fa-share-nodes share-btn" title="Compartilhar esta página"
+          onclick="compartilharPagina('#sobre-nos','Sobre o Olá Carlópolis','Conheça o portal que conecta Carlópolis.')"></i>
+      </div>
       <section class="about-public-page">
         <header class="about-public-hero">
           <div class="about-public-hero-orb about-orb-one"></div>
@@ -13460,7 +13465,6 @@ plotarPinsImoveis(stateImoveis.filtered);
             <p>${sobreNosInline(heroLead)}</p>
             <div class="about-public-hero-actions">
               <button type="button" data-about-target="nossa-missao"><i class="fa-solid fa-compass"></i> Conheça nosso propósito</button>
-              <button type="button" class="about-share-button" onclick="compartilharPagina('#sobre-nos','Sobre o Olá Carlópolis','Conheça o portal que conecta Carlópolis.')"><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>
             </div>
           </div>
           <div class="about-public-hero-mark" aria-hidden="true">
