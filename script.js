@@ -9308,6 +9308,7 @@ carlopdiesel:"s",
       `<option value="${cat}" ${filtroCategoria === cat ? 'selected' : ''}>${iconesCategorias[cat] || '🍽️'} ${cat}</option>`
     ).join("")}
 </select>
+  <div id="ondeComerTotal" class="onde-comer-total" role="status" aria-live="polite"></div>
 
   </div>
   <div class="onde-comer-lista">
@@ -9444,9 +9445,21 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
 `;
 
     });
+    if (!lista.length) {
+      html += `<div class="onde-comer-empty"><i class="fa-solid fa-magnifying-glass"></i><strong>Nenhum cliente encontrado</strong><span>Tente selecionar outra categoria.</span></div>`;
+    }
     html += `</div>`;
     const areaOndeComer = definirTelaContentArea(null);
     areaOndeComer.innerHTML = html;
+    const totalOndeComer = areaOndeComer.querySelector("#ondeComerTotal");
+    if (totalOndeComer) {
+      const totalTexto = lista.length === 1 ? "cliente" : "clientes";
+      const contextoTotal = filtroCategoria === "Todos" ? "no total" : "neste filtro";
+      totalOndeComer.innerHTML = `
+        <i class="fa-solid fa-store"></i>
+        <strong>${lista.length}</strong>
+        <span>${totalTexto} ${contextoTotal}</span>`;
+    }
 
     // 4. Evento do filtro
     document.getElementById("filtroComidas").addEventListener("change", function () {

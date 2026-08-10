@@ -27388,3 +27388,64 @@ body.eventos-image-open { overflow: hidden; }
 @media (max-width: 390px) {
   .represa-dashboard .represa-history-summary { grid-template-columns: 1fr; }
 }
+
+/* Onde Comer: total geral e resultado dos filtros */
+.filtro-comidas-card {
+  flex-wrap: wrap;
+}
+
+.onde-comer-total {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: 3px;
+  padding-top: 11px;
+  border-top: 1px solid #ffead0;
+  color: #536577;
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.onde-comer-total i {
+  display: grid;
+  width: 25px;
+  height: 25px;
+  place-items: center;
+  border-radius: 8px;
+  background: #eef4ff;
+  color: #4070f4;
+  font-size: .72rem;
+}
+
+.onde-comer-total strong {
+  color: #e96f00;
+  font-size: 1.06rem;
+  line-height: 1;
+}
+
+.onde-comer-empty {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 6px;
+  justify-items: center;
+  width: 100%;
+  padding: 30px 18px;
+  border: 1px dashed #f3bd80;
+  border-radius: 14px;
+  background: #fffaf5;
+  color: #728196;
+  text-align: center;
+}
+
+.onde-comer-empty i { color: #ff8800; font-size: 1.4rem; }
+.onde-comer-empty strong { color: #334155; font-size: .96rem; }
+.onde-comer-empty span { font-size: .78rem; }
+
+@media (max-width: 600px) {
+  .onde-comer-total {
+    margin-top: 7px;
+    padding-top: 10px;
+  }
+}
