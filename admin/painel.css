@@ -2813,6 +2813,37 @@ button[type="submit"]:hover,
   text-transform: uppercase;
 }
 
+.report-click-table th.report-quantity-sort {
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.18s ease, color 0.18s ease;
+}
+
+.report-click-table th.report-quantity-sort::after {
+  content: "\2195";
+  display: inline-block;
+  margin-left: 7px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.report-click-table th.report-quantity-sort:hover,
+.report-click-table th.report-quantity-sort:focus-visible {
+  background: #eaf3ff;
+  color: var(--primary);
+  outline: none;
+}
+
+.report-click-table th.report-quantity-sort.is-sort-desc::after {
+  content: "\2193";
+  color: var(--primary);
+}
+
+.report-click-table th.report-quantity-sort.is-sort-asc::after {
+  content: "\2191";
+  color: var(--primary);
+}
+
 .report-click-table td:not(:first-child):not(:nth-child(2)),
 .report-click-table th:not(:first-child):not(:nth-child(2)) {
   text-align: right;

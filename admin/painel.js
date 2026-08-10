@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 583,
-  label: "v590",
+  numero: 584,
+  label: "v591",
   data: "2026-08-10",
-  nota: "Acessos às páginas dos clientes adicionados ao relatório Estabelecimentos e serviços."
+  nota: "Ordenação crescente e decrescente adicionada às colunas quantitativas do relatório de acessos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -14608,7 +14608,7 @@ function renderNewsClickReportTable(rows, emptyMessage) {
           </tr>
         </thead>
         <tbody>
-          ${rows.slice(0, 30).map((row) => `
+          ${rows.map((row) => `
             <tr>
               <td><strong>${escapeHtml(row.titulo)}</strong></td>
               <td>${escapeHtml(row.tipoInformacao || "Notícia")}</td>
@@ -14637,7 +14637,7 @@ function renderClickReportTable(rows, types, emptyMessage) {
           </tr>
         </thead>
         <tbody>
-          ${rows.slice(0, 30).map((row) => `
+          ${rows.map((row) => `
             <tr>
               <td><strong>${escapeHtml(row.nome)}</strong></td>
               <td>${escapeHtml(row.categoria || "-")}</td>
@@ -15695,9 +15695,71 @@ function bindFinancePaidPlanFilter(container) {
   });
 }
 
+function reportQuantityValue(cell) {
+  const value = String(cell?.textContent || "").replace(/\u00a0/g, " ").trim().replace(/\s+/g, "");
+  if (!/^-?\d+(?:[.,]\d+)?$/.test(value)) return null;
+  if (/^-?\d{1,3}(?:\.\d{3})+$/.test(value)) return Number(value.replace(/\./g, ""));
+  return Number(value.replace(",", "."));
+}
+
+function enableAccessReportQuantitySorting(root) {
+  root?.querySelectorAll(".report-click-table").forEach((table) => {
+    const tbody = table.tBodies?.[0];
+    const headerRow = table.tHead?.rows?.[0];
+    const rows = [...(tbody?.rows || [])];
+    if (!tbody || !headerRow || rows.length < 2) return;
+
+    rows.forEach((row, index) => {
+      if (!row.dataset.reportOriginalOrder) row.dataset.reportOriginalOrder = String(index);
+    });
+
+    [...headerRow.cells].forEach((header, columnIndex) => {
+      if (header.dataset.quantitySortBound === "true") return;
+      const values = rows.map((row) => reportQuantityValue(row.cells[columnIndex]));
+      if (!values.length || values.some((value) => value === null || !Number.isFinite(value))) return;
+
+      header.dataset.quantitySortBound = "true";
+      header.classList.add("report-quantity-sort");
+      header.setAttribute("role", "button");
+      header.setAttribute("tabindex", "0");
+      header.setAttribute("aria-sort", "none");
+      header.title = "Ordenar esta coluna por quantidade";
+
+      const sortColumn = () => {
+        const sameColumn = table.dataset.quantitySortColumn === String(columnIndex);
+        const direction = sameColumn && table.dataset.quantitySortDirection === "desc" ? "asc" : "desc";
+        const sortedRows = [...tbody.rows].sort((rowA, rowB) => {
+          const valueA = reportQuantityValue(rowA.cells[columnIndex]) ?? 0;
+          const valueB = reportQuantityValue(rowB.cells[columnIndex]) ?? 0;
+          const difference = direction === "asc" ? valueA - valueB : valueB - valueA;
+          return difference || Number(rowA.dataset.reportOriginalOrder || 0) - Number(rowB.dataset.reportOriginalOrder || 0);
+        });
+
+        tbody.append(...sortedRows);
+        [...headerRow.cells].forEach((cell) => {
+          cell.classList.remove("is-sort-asc", "is-sort-desc");
+          if (cell.dataset.quantitySortBound === "true") cell.setAttribute("aria-sort", "none");
+        });
+        header.classList.add(direction === "asc" ? "is-sort-asc" : "is-sort-desc");
+        header.setAttribute("aria-sort", direction === "asc" ? "ascending" : "descending");
+        table.dataset.quantitySortColumn = String(columnIndex);
+        table.dataset.quantitySortDirection = direction;
+      };
+
+      header.addEventListener("click", sortColumn);
+      header.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        sortColumn();
+      });
+    });
+  });
+}
+
 function bindReportControls(mount) {
   const isFinanceReport = mount.id === "reportsFinanceMount";
   bindFinancePaidPlanFilter(mount);
+  if (!isFinanceReport) enableAccessReportQuantitySorting(mount);
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
     button.addEventListener("click", async () => {
       state.reportSection = button.dataset.reportSection;
@@ -15729,6 +15791,7 @@ function bindReportControls(mount) {
           if (!content.isConnected) return;
           content.innerHTML = typeof contentFactory === "function" ? contentFactory() : "";
           bindFinancePaidPlanFilter(content);
+          if (!isFinanceReport) enableAccessReportQuantitySorting(content);
           content.dataset.loaded = "true";
           deferredReportSectionContent.delete(deferredKey);
         });
