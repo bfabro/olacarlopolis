@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 585,
-  label: "v592",
+  numero: 586,
+  label: "v593",
   data: "2026-08-10",
-  nota: "Detalhamento por cliente consolidado com registros da linha do tempo para evitar acessos ausentes."
+  nota: "Acessos à página incluídos no total e no resumo do relatório individual dos clientes."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -15217,6 +15217,7 @@ function renderClientMetricReportContent(client = {}) {
   const keys = clientMetricKeys(client);
   const filtered = {
     cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, range),
+    acessosClientes: filterDailyMetrics(state.metricas.acessosClientes, range),
     ondeComerCardapios: filterDailyMetrics(state.metricas.ondeComerCardapios, range),
     ondeComerWhats: filterDailyMetrics(state.metricas.ondeComerWhats, range),
     ondeComerFotos: filterDailyMetrics(state.metricas.ondeComerFotos, range),
@@ -15243,6 +15244,8 @@ function renderClientMetricReportContent(client = {}) {
   const promocoes = Math.max(0, promocoesTotal - whatsappPromocao);
   const novidades = Number(tiposPermitidos.get("novidades") || 0);
   const perfil = Number(tiposPermitidos.get("perfil") || 0);
+  const acessosPagina = sumMetricMapForClient(aggregateSimpleDaily(filtered.acessosClientes), keys);
+  const acessosPerfil = Math.max(perfil, acessosPagina);
   const imoveisVisualizacoes = Number(tiposPermitidos.get("imovel_visualizacao") || 0);
   const imoveisFotos = Number(tiposPermitidos.get("imovel_fotos") || 0);
   const imoveisWhatsapp = Number(tiposPermitidos.get("imovel_whatsapp") || 0);
@@ -15267,7 +15270,7 @@ function renderClientMetricReportContent(client = {}) {
   const redes = instagram + facebook + tiktok + site + outrasRedes;
   const promocoesLiquidas = Math.max(0, promocoes - instagramPromocao);
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
-  const categorizedTotal = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + perfil + imoveis + veiculos + destaques + gruposWhatsapp + compartilhamentos + redes;
+  const categorizedTotal = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + acessosPerfil + imoveis + veiculos + destaques + gruposWhatsapp + compartilhamentos + redes;
   const outros = Math.max(0, totalBotoes - categorizedTotal);
   const historicoPromocoes = sumMetricMapForClient(aggregateSimpleDaily(state.metricas.promocoes), keys) > 0;
   const availability = clientReportAvailability(client, {
@@ -15286,7 +15289,7 @@ function renderClientMetricReportContent(client = {}) {
     { key: "cardapios", label: "Cardapio", count: cardapios, note: "Cliques no cardapio" },
     { key: "fotos", label: "Fotos / divulgacao", count: fotos, note: "Fotos e divulgacoes" },
     { key: "novidades", label: "Novidades", count: novidades, note: "Cliques na tela inicial" },
-    { key: "perfil", label: "Visualizacao do perfil", count: perfil, note: "Aberturas da area do cliente" },
+    { key: "perfil", label: "Acessos à página", count: acessosPerfil, note: "Aberturas da página do cliente", unit: "acesso" },
     { key: "imoveis", label: "Imoveis - visualizacoes", count: imoveisVisualizacoes, note: "Aberturas dos anuncios" },
     { key: "imoveis", label: "Imoveis - fotos", count: imoveisFotos, note: "Cliques para ampliar as fotos" },
     { key: "imoveis", label: "Imoveis - WhatsApp", count: imoveisWhatsapp, note: "Cliques no botao Falar no WhatsApp" },
@@ -15366,7 +15369,7 @@ function renderClientMetricReportContent(client = {}) {
       <div class="reports-grid client-report-grid">
         <section class="panel-card report-card">
           <h3>Resumo por tipo</h3>
-          ${renderReportList(resourceEntries.filter((entry) => entry.count > 0).map((entry) => ({ title: entry.label, meta: `${entry.count} clique${entry.count === 1 ? "" : "s"}` })), "Ainda nao ha cliques registrados para este cliente no periodo.")}
+          ${renderReportList(resourceEntries.filter((entry) => entry.count > 0).map((entry) => ({ title: entry.label, meta: `${entry.count} ${entry.unit || "clique"}${entry.count === 1 ? "" : "s"}` })), "Ainda nao ha interacoes registradas para este cliente no periodo.")}
         </section>
         <section class="panel-card report-card">
           <h3>Cidades de origem dos cliques</h3>
