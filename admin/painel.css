@@ -3461,45 +3461,155 @@ button[type="submit"]:hover,
 
 .permissions-box {
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 12px;
+  border-radius: 16px;
+  padding: 16px;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 16px;
+  background: #f8fafc;
 }
 
 .permissions-box legend {
-  font-weight: 800;
+  font-weight: 900;
   color: var(--ink);
-  padding: 0 6px;
+  padding: 0 8px;
 }
 
 .permissions-box label {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 1px solid #e5eaf1;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 13px;
   font-weight: 700;
+  line-height: 1.35;
+  cursor: pointer;
+  transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+
+.permissions-box label:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  transform: translateY(-1px);
 }
 
 .permissions-box input {
+  flex: 0 0 auto;
   width: auto;
+  accent-color: var(--primary);
 }
 
-.permission-group {
+.permission-card {
+  display: grid;
+  gap: 14px;
+  align-content: start;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .045);
+}
+
+.permission-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #edf1f5;
+}
+
+.permission-card-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #e8f0fe;
+  color: var(--primary);
+}
+
+.permission-card-admin .permission-card-icon {
+  background: #eef2f7;
+  color: #475569;
+}
+
+.permission-card-standard .permission-card-icon {
+  background: #fff7d6;
+  color: #a16207;
+}
+
+.permission-card-head h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.permission-card-head p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.permission-options,
+.permission-segments {
   display: grid;
   gap: 9px;
-  align-content: start;
-  padding: 12px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #f8fafc;
 }
 
-.permission-group > strong {
-  color: var(--primary);
-  font-size: 13px;
+.permission-segment {
+  --segment-color: #64748b;
+  --segment-soft: #f1f5f9;
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #e5eaf1;
+  border-left: 3px solid var(--segment-color);
+  border-radius: 12px;
+  background: #fbfcfe;
+}
+
+.permission-segment-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: 7px;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: var(--segment-soft);
+  color: var(--segment-color);
+  font-size: 11px;
   font-weight: 900;
+  letter-spacing: .025em;
   text-transform: uppercase;
+}
+
+.segment-food {
+  --segment-color: #15803d;
+  --segment-soft: #eaf8ef;
+}
+
+.segment-vehicles {
+  --segment-color: #1d4ed8;
+  --segment-soft: #eaf1ff;
+}
+
+.segment-properties {
+  --segment-color: #7e22ce;
+  --segment-soft: #f4eafe;
+}
+
+.segment-other {
+  --segment-color: #c2410c;
+  --segment-soft: #fff1e8;
 }
 
 .search-input {

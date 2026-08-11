@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=379">
+  <link rel="stylesheet" href="painel.css?v=380">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1744,38 +1744,89 @@
                 </select>
               </label>
               <fieldset class="permissions-box wide">
-                <legend>Permissoes</legend>
-                <div class="permission-group">
-                  <strong>Parte admin</strong>
-                  <label><input type="checkbox" value="financeiro"> Financeiro</label>
-                  <label><input type="checkbox" value="informacoes"> Menu Informacoes</label>
-                  <label><input type="checkbox" value="noticias"> Noticias</label>
-                </div>
-                <div class="permission-group">
-                  <strong>Tipo de cliente especifico</strong>
-                  <label><input id="newUserPartnerPermission" type="checkbox" value="parceiro"> Parceiro de benefícios</label>
-                  <label><input type="checkbox" value="veiculos"> Automoveis</label>
-                  <label><input type="checkbox" value="gerar_imagens_veiculos"> Gerar imagens de veiculos</label>
-                  <label><input type="checkbox" value="ocultar_logo_arte_veiculo"> Permitir arte de veiculo sem logo Ola Carlopolis</label>
-                  <label><input type="checkbox" value="cardapio" checked> Cardapio</label>
-                  <label><input type="checkbox" value="eventos"> Eventos</label>
-                  <label><input type="checkbox" value="imoveis"> Imoveis</label>
-                  <label><input type="checkbox" value="gerar_imagens_imoveis"> Gerar imagens de imoveis</label>
-                  <label><input type="checkbox" value="informacoes_nota_falecimento"> Nota de falecimento</label>
-                </div>
-                <div class="permission-group">
-                  <strong>Liberacao comum</strong>
-                  <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
-                  <label><input type="checkbox" value="destaque" checked> Destaque da semana</label>
-                  <label><input type="checkbox" value="faturas" checked> Faturas</label>
-                  <label><input type="checkbox" value="imagens" checked> Imagens</label>
-                  <label><input type="checkbox" value="produtos" checked> Produtos</label>
-                  <label><input type="checkbox" value="promocoes" checked> Promocoes</label>
-                  <label><input type="checkbox" value="gerar_imagens_promocoes"> Arte para Postagem</label>
-                  <label><input type="checkbox" value="relatorios"> Relatorios do cliente</label>
-                  <label><input type="checkbox" value="origem_acessos"> Origem dos acessos / QR Code</label>
-                  <label><input type="checkbox" value="vagas" checked> Vagas de trabalho</label>
-                </div>
+                <legend>Permiss&otilde;es</legend>
+
+                <section class="permission-card permission-card-admin">
+                  <div class="permission-card-head">
+                    <span class="permission-card-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                    <div>
+                      <h3>Administra&ccedil;&atilde;o</h3>
+                      <p>Acessos de gest&atilde;o do painel.</p>
+                    </div>
+                  </div>
+                  <div class="permission-options">
+                    <label><input type="checkbox" value="financeiro"> Financeiro</label>
+                    <label><input type="checkbox" value="informacoes"> Menu Informa&ccedil;&otilde;es</label>
+                    <label><input type="checkbox" value="noticias"> Not&iacute;cias</label>
+                  </div>
+                </section>
+
+                <section class="permission-card permission-card-modules">
+                  <div class="permission-card-head">
+                    <span class="permission-card-icon"><i class="fa-solid fa-layer-group"></i></span>
+                    <div>
+                      <h3>M&oacute;dulos espec&iacute;ficos do cliente</h3>
+                      <p>Permiss&otilde;es organizadas por segmento.</p>
+                    </div>
+                  </div>
+
+                  <div class="permission-segments">
+                    <div class="permission-segment segment-food">
+                      <strong class="permission-segment-tag"><i class="fa-solid fa-utensils"></i> Alimenta&ccedil;&atilde;o / Com&eacute;rcio</strong>
+                      <div class="permission-options">
+                        <label><input type="checkbox" value="cardapio" checked> Card&aacute;pio</label>
+                        <label><input type="checkbox" value="produtos" checked> Produtos</label>
+                        <label><input type="checkbox" value="promocoes" checked> Promo&ccedil;&otilde;es</label>
+                      </div>
+                    </div>
+
+                    <div class="permission-segment segment-vehicles">
+                      <strong class="permission-segment-tag"><i class="fa-solid fa-car-side"></i> Autom&oacute;veis</strong>
+                      <div class="permission-options">
+                        <label><input type="checkbox" value="veiculos"> Autom&oacute;veis</label>
+                        <label><input type="checkbox" value="gerar_imagens_veiculos"> Gerar imagens de ve&iacute;culos</label>
+                        <label><input type="checkbox" value="ocultar_logo_arte_veiculo"> Permitir arte de ve&iacute;culo sem logo Ol&aacute; Carl&oacute;polis</label>
+                      </div>
+                    </div>
+
+                    <div class="permission-segment segment-properties">
+                      <strong class="permission-segment-tag"><i class="fa-solid fa-house-chimney"></i> Im&oacute;veis</strong>
+                      <div class="permission-options">
+                        <label><input type="checkbox" value="imoveis"> Im&oacute;veis</label>
+                        <label><input type="checkbox" value="gerar_imagens_imoveis"> Gerar imagens de im&oacute;veis</label>
+                      </div>
+                    </div>
+
+                    <div class="permission-segment segment-other">
+                      <strong class="permission-segment-tag"><i class="fa-solid fa-shapes"></i> Outros</strong>
+                      <div class="permission-options">
+                        <label><input type="checkbox" value="eventos"> Eventos</label>
+                        <label><input id="newUserPartnerPermission" type="checkbox" value="parceiro"> Parceiro de benef&iacute;cios</label>
+                        <label><input type="checkbox" value="informacoes_nota_falecimento"> Nota de falecimento</label>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="permission-card permission-card-standard">
+                  <div class="permission-card-head">
+                    <span class="permission-card-icon"><i class="fa-solid fa-star"></i></span>
+                    <div>
+                      <h3>Recursos padr&atilde;o</h3>
+                      <p>Fun&ccedil;&otilde;es gerais para clientes.</p>
+                    </div>
+                  </div>
+                  <div class="permission-options">
+                    <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
+                    <label><input type="checkbox" value="destaque" checked> Destaque da semana</label>
+                    <label><input type="checkbox" value="faturas" checked> Faturas</label>
+                    <label><input type="checkbox" value="imagens" checked> Imagens</label>
+                    <label><input type="checkbox" value="gerar_imagens_promocoes"> Arte para Postagem</label>
+                    <label><input type="checkbox" value="relatorios"> Relat&oacute;rios do cliente</label>
+                    <label><input type="checkbox" value="origem_acessos"> Origem dos acessos / QR Code</label>
+                    <label><input type="checkbox" value="vagas" checked> Vagas de trabalho</label>
+                  </div>
+                </section>
               </fieldset>
               <div class="form-actions wide">
                 <button id="saveUserButton" type="submit"><i class="fa-solid fa-user-plus"></i> Criar usuario</button>
@@ -2024,6 +2075,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=524"></script>
+  <script type="module" src="painel.js?v=525"></script>
 </body>
 </html>
