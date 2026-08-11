@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 586,
-  label: "v593",
+  numero: 587,
+  label: "v594",
   data: "2026-08-10",
-  nota: "Acessos à página incluídos no total e no resumo do relatório individual dos clientes."
+  nota: "Cliques no cardápio da área Onde Comer incluídos no relatório individual quando o recurso está habilitado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -15064,9 +15064,19 @@ function clientReportCategory(row = {}) {
   return row.tipo || row.area || "Clique";
 }
 
+function clientReportMenuEnabled(client = currentClientRecord() || {}) {
+  return Boolean(
+    client.cardapioAtivo
+    || client.menuAtivo
+    || client.exibirCardapio
+    || client.cardapioLink
+    || normalizeUrlList(client.menuImages).length
+  );
+}
+
 function clientReportResourceAllowed(category = "") {
   const normalized = normalizeName(category);
-  if (/cardapio/.test(normalized)) return hasPermission("cardapio");
+  if (/cardapio/.test(normalized)) return hasPermission("cardapio") || clientReportMenuEnabled();
   if (/novidade/.test(normalized)) return true;
   if (/promoc/.test(normalized)) return hasPermission("promocoes");
   if (/foto|divulgacao|imagem/.test(normalized)) return hasPermission("imagens") || hasPermission("destaque");
@@ -15182,7 +15192,7 @@ function renderClientReportDisclosure(title, content, description = "Clique para
 function clientReportAvailability(client = {}, counts = {}) {
   const hasContacts = normalizeClientContactDetails(client).length > 0;
   const hasImages = Boolean(client.imagem || client.image || normalizeImageItems(client.imagens).length);
-  const hasMenu = Boolean(client.cardapioAtivo || client.menuAtivo || client.exibirCardapio || client.cardapioLink || normalizeUrlList(client.menuImages).length);
+  const hasMenu = clientReportMenuEnabled(client);
   const hasPromotions = normalizePromocoes(client.promocoes).length > 0
     || Boolean(counts.historicoPromocoes)
     || Number(counts.promocoes || 0) > 0
@@ -15193,7 +15203,7 @@ function clientReportAvailability(client = {}, counts = {}) {
   return {
     whats: hasContacts,
     whatsappPromocao: hasPromotions,
-    cardapios: hasPermission("cardapio") && hasMenu,
+    cardapios: hasMenu,
     fotos: (hasPermission("imagens") || hasPermission("destaque")) && hasImages,
     novidades: Number(counts.novidades || 0) > 0,
     perfil: true,
@@ -15229,7 +15239,7 @@ function renderClientMetricReportContent(client = {}) {
     normalizeName(tipo) !== "gerarcard"
     && clientReportResourceAllowed(clientReportCategory({ tipo }))
   )));
-  const canShowCardapioReport = clientReportResourceAllowed("Cardapio");
+  const canShowCardapioReport = clientReportMenuEnabled(client);
   const cardapios = canShowCardapioReport
     ? sumMetricMapForClient(aggregateSimpleDaily(filtered.ondeComerCardapios), keys) + Number(tiposPermitidos.get("cardapio") || 0)
     : 0;
@@ -15286,7 +15296,7 @@ function renderClientMetricReportContent(client = {}) {
   const resourceEntries = [
     { key: "whats", label: "WhatsApp / telefone", count: whats, note: "Telefone e contato" },
     { key: "whatsappPromocao", label: "WhatsApp da promocao", count: whatsappPromocao, note: "Interesse direto nas ofertas" },
-    { key: "cardapios", label: "Cardapio", count: cardapios, note: "Cliques no cardapio" },
+    { key: "cardapios", label: "Cardapio", count: cardapios, note: "Cliques no cardapio, inclusive na tela Onde Comer" },
     { key: "fotos", label: "Fotos / divulgacao", count: fotos, note: "Fotos e divulgacoes" },
     { key: "novidades", label: "Novidades", count: novidades, note: "Cliques na tela inicial" },
     { key: "perfil", label: "Acessos à página", count: acessosPerfil, note: "Aberturas da página do cliente", unit: "acesso" },
