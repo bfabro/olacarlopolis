@@ -9364,7 +9364,8 @@ carlopdiesel:"s",
   
     <div class="onde-comer-card-esq">
 
-      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel" loading="lazy" decoding="async">
+      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel" loading="lazy" decoding="async"
+        onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'imagem')">
   ${est.novidadesImages && est.novidadesImages.length ? `
    <button class="btn-fotos_onde" onclick="registrarCliqueFotosOndeComer('${normalizeName(est.name)}'); mostrarFotos('${normalizeName(est.name)}')">
   📷 Fotos
@@ -9383,7 +9384,7 @@ carlopdiesel:"s",
        aria-label="Abrir Instagram de ${est.name}"
        target="_blank"
        rel="noopener noreferrer"
-       onclick="registrarCliqueBotao('instagram_onde_comer', '${normalizeName(est.name)}', 'onde-comer')">
+       onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'instagram')">
       <i class="fa-brands fa-instagram"></i>
     </a>
   ` : ''}
@@ -9395,7 +9396,7 @@ carlopdiesel:"s",
       
       <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
   ${est.address && est.address.trim().toLowerCase() !== "somente delivery"
-          ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank">${est.address}</a>`
+          ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank" rel="noopener noreferrer" onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'endereco')">${est.address}</a>`
           : `<span style="color:#ff0000; font-weight:bold">${est.address}</span>`
         }
 </span>
@@ -9404,7 +9405,7 @@ ${est.funcionamento24Horas ? `
   <div class="onde-comer-horario-texto funcionamento-24-horas"><i class="fas fa-clock"></i> Funcionamento: 24 horas</div>
 ` : (est.horarios ? `
   <details class="onde-comer-horarios">
-    <summary><i class="fas fa-clock"></i> Dias e horarios</summary>
+    <summary onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'horarios')"><i class="fas fa-clock"></i> Dias e horarios</summary>
     ${renderHorariosFuncionamento(est.horarios)}
   </details>
 ` : (est.hours ? `
@@ -26328,7 +26329,7 @@ document.body.addEventListener('click', function (e) {
 
 
 
-function registrarCliqueOndeComerDetalhado(nomeEstabelecimento, tipo) {
+function registrarCliqueOndeComerDetalhado(nomeEstabelecimento, tipo, detalhes = {}) {
   const hoje = getHojeBR();
   const db = firebase.database();
   const ref = db.ref(`cliquesOndeComerDetalhado/${hoje}/${nomeEstabelecimento}`).push();
@@ -26337,6 +26338,7 @@ function registrarCliqueOndeComerDetalhado(nomeEstabelecimento, tipo) {
   return ref.set({
     area: "onde-comer",
     tipo,
+    ...detalhes,
     ...origemClique,
     horario: agora.toLocaleTimeString("pt-BR"),
     dataHoraISO: agora.toISOString(),
@@ -26345,30 +26347,42 @@ function registrarCliqueOndeComerDetalhado(nomeEstabelecimento, tipo) {
   }).catch((e) => console.error("[OndeComerDetalhado] Erro:", e));
 }
 
-function registrarCliqueCardapioOndeComer(nomeEstabelecimento) {
+function registrarCliqueOndeComer(nomeEstabelecimento, tipo, detalhes = {}) {
   const hoje = getHojeBR();
-  const ref = firebase.database().ref(`cliquesCardapiosOndeComer/${hoje}/${nomeEstabelecimento}`);
-  ref.transaction(valorAtual => (valorAtual || 0) + 1);
-  registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "cardapio");
-  registrarMetricaCliente(nomeEstabelecimento, "ondeComer", "cardapio", { area: "onde-comer" });
+  const caminhosLegados = {
+    cardapio: "cliquesCardapiosOndeComer",
+    whatsapp: "cliquesWhatsOndeComer",
+    fotos: "cliquesFotosOndeComer"
+  };
+  const gravacoes = [];
+  const caminhoLegado = caminhosLegados[tipo];
+  if (caminhoLegado) {
+    gravacoes.push(
+      firebase.database().ref(`${caminhoLegado}/${hoje}/${nomeEstabelecimento}`)
+        .transaction(valorAtual => (valorAtual || 0) + 1)
+    );
+  }
+  gravacoes.push(registrarCliqueOndeComerDetalhado(nomeEstabelecimento, tipo, detalhes));
+  gravacoes.push(registrarMetricaCliente(nomeEstabelecimento, "ondeComer", tipo, {
+    area: "onde-comer",
+    ...detalhes
+  }));
+  return Promise.allSettled(gravacoes);
+}
+
+function registrarCliqueCardapioOndeComer(nomeEstabelecimento) {
+  return registrarCliqueOndeComer(nomeEstabelecimento, "cardapio");
 }
 
 function registrarCliqueWhatsOndeComer(nomeEstabelecimento) {
-  const hoje = getHojeBR();
-  const ref = firebase.database().ref(`cliquesWhatsOndeComer/${hoje}/${nomeEstabelecimento}`);
-  ref.transaction(valorAtual => (valorAtual || 0) + 1);
-  registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "whatsapp");
-  registrarMetricaCliente(nomeEstabelecimento, "ondeComer", "whatsapp", { area: "onde-comer" });
+  return registrarCliqueOndeComer(nomeEstabelecimento, "whatsapp");
 }
 
 function registrarCliqueFotosOndeComer(nomeEstabelecimento) {
-  const hoje = getHojeBR();
-  const ref = firebase.database().ref(`cliquesFotosOndeComer/${hoje}/${nomeEstabelecimento}`);
-  ref.transaction(valorAtual => (valorAtual || 0) + 1);
-  registrarCliqueOndeComerDetalhado(nomeEstabelecimento, "fotos");
-  registrarMetricaCliente(nomeEstabelecimento, "ondeComer", "fotos", { area: "onde-comer" });
+  return registrarCliqueOndeComer(nomeEstabelecimento, "fotos");
 }
 
+window.registrarCliqueOndeComer = registrarCliqueOndeComer;
 window.registrarCliqueCardapioOndeComer = registrarCliqueCardapioOndeComer;
 window.registrarCliqueWhatsOndeComer = registrarCliqueWhatsOndeComer;
 window.registrarCliqueFotosOndeComer = registrarCliqueFotosOndeComer;
