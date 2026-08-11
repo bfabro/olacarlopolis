@@ -2890,6 +2890,109 @@ button[type="submit"]:hover,
   background: linear-gradient(135deg, #eff6ff 0%, #ffffff 70%);
 }
 
+.client-report-overall {
+  grid-template-columns: minmax(220px, 420px);
+  gap: 10px;
+}
+
+.client-report-overall .stat-card {
+  min-height: 112px;
+  background: linear-gradient(135deg, #eff6ff 0%, #ffffff 72%);
+}
+
+.client-report-monitored-screens {
+  display: grid;
+  gap: 14px;
+}
+
+.client-report-monitor-section {
+  overflow: hidden;
+  border: 1px solid #dbe4ee;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, .05);
+}
+
+.client-report-monitor-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+  border-bottom: 1px solid #dbe4ee;
+  background: linear-gradient(90deg, #eff6ff 0%, #f8fafc 62%, #fff 100%);
+}
+
+.client-report-monitor-icon {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  background: #2563eb;
+  color: #fff;
+}
+
+.client-report-monitor-divider > span:last-child {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.client-report-monitor-divider small {
+  color: #2563eb;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.client-report-monitor-divider strong {
+  color: var(--text);
+  font-size: 16px;
+}
+
+.client-report-monitor-divider em {
+  color: var(--muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.client-report-monitor-cards {
+  grid-template-columns: repeat(auto-fill, minmax(150px, 190px));
+  justify-content: start;
+  gap: 9px;
+  padding: 12px;
+}
+
+.client-report-monitor-cards .stat-card {
+  min-height: 104px;
+  padding: 13px;
+  border-left-width: 4px;
+  border-radius: 12px;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, .045);
+}
+
+.client-report-monitor-cards .stat-card:first-child {
+  grid-column: auto;
+  background: #f8fafc;
+}
+
+.client-report-monitor-cards .stat-card strong {
+  margin-top: 5px;
+  font-size: 25px;
+}
+
+.client-report-monitor-cards .stat-card small {
+  margin-top: 4px;
+  line-height: 1.25;
+}
+
+.client-report-monitor-section > .client-report-disclosure {
+  width: auto;
+  margin: 0 12px 12px;
+}
 .client-report-grid {
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   align-items: start;

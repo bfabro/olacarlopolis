@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 588,
-  label: "v595",
+  numero: 589,
+  label: "v596",
   data: "2026-08-11",
-  nota: "Interações do Onde Comer separadas por origem e tipo no relatório individual, com atualização em tempo real."
+  nota: "Relatório individual organizado por telas monitoradas, com cards compactos para Cardápio, Onde Comer, Produtos e Promoções."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1643,6 +1643,7 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
     ondeComerCardapios: {},
     ondeComerWhats: {},
     ondeComerFotos: {},
+    promocoesBotoes: {},
     promocoes: {},
     cliquesBotoesDetalhado: {},
     cliquesOndeComerDetalhado: {},
@@ -1675,6 +1676,7 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
     if (Number(ondeComer.whatsapp || 0)) metrics.ondeComerWhats[date] = { [clientKey]: Number(ondeComer.whatsapp) };
     if (Number(ondeComer.fotos || 0)) metrics.ondeComerFotos[date] = { [clientKey]: Number(ondeComer.fotos) };
 
+    if (Object.keys(promocoes).length) metrics.promocoesBotoes[date] = { [clientKey]: promocoes };
     const totalPromocoes = Object.values(promocoes).reduce((sum, count) => sum + Number(count || 0), 0);
     if (totalPromocoes) metrics.promocoes[date] = { [clientKey]: totalPromocoes };
 
@@ -14537,6 +14539,15 @@ function metricButtonLabel(tipo) {
     imagem: "Imagem do estabelecimento",
     instagram: "Instagram",
     instagram_promocao: "Instagram",
+    produtos: "Abertura de Produtos",
+    produto_visualizacao: "Produto visualizado",
+    produto_whatsapp: "WhatsApp do produto",
+    produto_fotos: "Fotos do produto",
+    produto_compartilhamento: "Produto compartilhado",
+    promocoes: "Abertura de Promocoes",
+    promocao_visualizacao: "Promocao visualizada",
+    promocao_fotos: "Fotos da promocao",
+    promocao_compartilhamento: "Promocao compartilhada",
     facebook: "Facebook",
     tiktok: "TikTok",
     site: "Site",
@@ -15199,6 +15210,25 @@ function renderClientReportDisclosure(title, content, description = "Clique para
   `;
 }
 
+function renderClientReportMonitorSection({ title = "", icon = "fa-chart-column", description = "", entries = [], total = 0, rangeLabel = "", timeline = [], timelineTitle = "" } = {}) {
+  return `
+    <section class="client-report-monitor-section">
+      <header class="client-report-monitor-divider">
+        <span class="client-report-monitor-icon"><i class="fa-solid ${escapeAttr(icon)}"></i></span>
+        <span><small>Tela monitorada</small><strong>${escapeHtml(title)}</strong><em>${escapeHtml(description)}</em></span>
+      </header>
+      <div class="stats-grid client-report-monitor-cards">
+        <article class="stat-card client-report-monitor-total"><span>Total nesta tela</span><strong>${total}</strong><small>${escapeHtml(rangeLabel)}</small></article>
+        ${entries.map((entry) => `<article class="stat-card"><span>${escapeHtml(entry.label)}</span><strong>${entry.count}</strong><small>${escapeHtml(entry.note)}</small></article>`).join("")}
+      </div>
+      ${timelineTitle ? renderClientReportDisclosure(
+        timelineTitle,
+        renderClientTimelineTable(timeline, `Ainda nao ha cliques detalhados em ${title} neste periodo.`)
+      ) : ""}
+    </section>
+  `;
+}
+
 function clientReportAvailability(client = {}, counts = {}) {
   const hasContacts = normalizeClientContactDetails(client).length > 0;
   const hasImages = Boolean(client.imagem || client.image || normalizeImageItems(client.imagens).length);
@@ -15243,6 +15273,8 @@ function renderClientMetricReportContent(client = {}) {
     ondeComerCardapios: filterDailyMetrics(state.metricas.ondeComerCardapios, range),
     ondeComerWhats: filterDailyMetrics(state.metricas.ondeComerWhats, range),
     ondeComerFotos: filterDailyMetrics(state.metricas.ondeComerFotos, range),
+    promocoesBotoes: filterDailyMetrics(state.metricas.promocoesBotoes, range),
+    cliquesPromocoesDetalhado: filterDailyMetrics(state.metricas.cliquesPromocoesDetalhado, range),
     promocoes: filterDailyMetrics(state.metricas.promocoes, range)
   };
   const botoes = aggregateCliquesPorBotao(filtered.cliquesBotoes);
@@ -15271,15 +15303,38 @@ function renderClientMetricReportContent(client = {}) {
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
   const canShowCardapioReport = clientReportMenuEnabled(client);
   const cardapios = canShowCardapioReport ? Number(tiposPermitidos.get("cardapio") || 0) : 0;
+
+  const produtosAberturas = Number(tiposPermitidos.get("produtos") || 0);
+  const produtoVisualizacoes = Number(tiposPermitidos.get("produto_visualizacao") || 0);
+  const produtoWhatsapp = Number(tiposPermitidos.get("produto_whatsapp") || 0);
+  const produtoFotos = Number(tiposPermitidos.get("produto_fotos") || 0);
+  const produtoCompartilhamentos = Number(tiposPermitidos.get("produto_compartilhamento") || 0);
+  const produtoTiposConhecidos = new Set(["produtos", "produto_visualizacao", "produto_whatsapp", "produto_fotos", "produto_compartilhamento"]);
+  const produtoOutros = [...tiposPermitidos.entries()]
+    .filter(([type]) => /^produto/.test(type) && !produtoTiposConhecidos.has(type))
+    .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  const produtosInteracoes = produtoVisualizacoes + produtoWhatsapp + produtoFotos + produtoCompartilhamentos + produtoOutros;
+  const produtosTotal = produtosAberturas + produtosInteracoes;
+
+  const promocoesAgregado = aggregateCliquesPorBotao(filtered.promocoesBotoes, filtered.cliquesPromocoesDetalhado);
+  const promocoesTipos = aggregateButtonTypesForClient(promocoesAgregado.detalhes, keys);
+  const promocaoCount = (...types) => types.reduce((sum, type) => sum + Number(promocoesTipos.get(type) || 0), 0);
+  const promocoesAberturas = Number(tiposPermitidos.get("promocoes") || 0);
+  const promocaoVisualizacoes = promocaoCount("promocao_visualizacao");
+  const promocaoFotos = promocaoCount("promocao_fotos");
+  const promocaoCompartilhamentos = promocaoCount("promocao_compartilhamento");
+  const whatsappPromocao = Math.max(promocaoCount("whatsapp_promocao"), Number(tiposPermitidos.get("whatsapp_promocao") || 0));
+  const instagramPromocao = Math.max(promocaoCount("instagram_promocao"), Number(tiposPermitidos.get("instagram_promocao") || 0));
+  const promocoesTotalHistorico = sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys);
+  const promocoesConhecidas = promocaoVisualizacoes + promocaoFotos + promocaoCompartilhamentos + whatsappPromocao + instagramPromocao;
+  const promocoesOutros = Math.max(promocaoCount("promocao"), promocoesTotalHistorico - promocoesConhecidas, 0);
+  const promocoesInteracoes = promocoesConhecidas + promocoesOutros;
+  const promocoesTotal = promocoesAberturas + promocoesInteracoes;
+
   const whats = Number(tiposPermitidos.get("whatsapp") || 0) + Number(tiposPermitidos.get("telefone") || 0);
   const fotos = clientReportResourceAllowed("Fotos / divulgacao")
     ? Number(tiposPermitidos.get("fotos") || 0) + Number(tiposPermitidos.get("divulgacao") || 0)
     : 0;
-  const promocoesTotal = clientReportResourceAllowed("Promocoes")
-    ? sumMetricMapForClient(aggregateSimpleDaily(filtered.promocoes), keys)
-    : 0;
-  const whatsappPromocao = Number(tiposPermitidos.get("whatsapp_promocao") || 0);
-  const promocoes = Math.max(0, promocoesTotal - whatsappPromocao);
   const novidades = Number(tiposPermitidos.get("novidades") || 0);
   const perfil = Number(tiposPermitidos.get("perfil") || 0);
   const acessosPagina = sumMetricMapForClient(aggregateSimpleDaily(filtered.acessosClientes), keys);
@@ -15297,8 +15352,7 @@ function renderClientMetricReportContent(client = {}) {
   const destaques = Number(tiposPermitidos.get("destaque") || 0);
   const gruposWhatsapp = Number(tiposPermitidos.get("grupoWhatsapp") || 0);
   const compartilhamentos = Number(tiposPermitidos.get("compartilhamento") || 0);
-  const instagramPromocao = Number(tiposPermitidos.get("instagram_promocao") || 0);
-  const instagram = Number(tiposPermitidos.get("instagram") || 0) + instagramPromocao;
+  const instagram = Number(tiposPermitidos.get("instagram") || 0);
   const facebook = Number(tiposPermitidos.get("facebook") || 0);
   const tiktok = Number(tiposPermitidos.get("tiktok") || 0);
   const site = Number(tiposPermitidos.get("site") || 0);
@@ -15306,13 +15360,16 @@ function renderClientMetricReportContent(client = {}) {
     .filter(([tipo]) => /youtube|linkedin|rede|social|link/i.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
   const redes = instagram + facebook + tiktok + site + outrasRedes;
-  const promocoesLiquidas = Math.max(0, promocoes - instagramPromocao);
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
-  const categorizedTotal = cardapios + whats + whatsappPromocao + fotos + promocoesLiquidas + novidades + acessosPerfil + imoveis + veiculos + destaques + gruposWhatsapp + compartilhamentos + redes + ondeComerInstagramHistorico;
+  const promocoesBotoesGenericos = Number(tiposPermitidos.get("promocao_visualizacao") || 0)
+    + Number(tiposPermitidos.get("promocao_fotos") || 0) + Number(tiposPermitidos.get("promocao_compartilhamento") || 0);
+  const categorizedTotal = cardapios + produtosTotal + promocoesAberturas + whatsappPromocao + instagramPromocao + promocoesBotoesGenericos
+    + whats + fotos + novidades + perfil + imoveis + veiculos + destaques + gruposWhatsapp
+    + compartilhamentos + redes + ondeComerInstagramHistorico;
   const outros = Math.max(0, totalBotoes - categorizedTotal);
   const historicoPromocoes = sumMetricMapForClient(aggregateSimpleDaily(state.metricas.promocoes), keys) > 0;
   const availability = clientReportAvailability(client, {
-    promocoes: promocoesLiquidas,
+    promocoes: promocoesInteracoes,
     whatsappPromocao,
     historicoPromocoes,
     imoveis,
@@ -15334,10 +15391,30 @@ function renderClientMetricReportContent(client = {}) {
     { label: "Onde Comer - Imagem", count: ondeComerImagem, note: "Cliques na imagem do estabelecimento", available: Boolean(client.imagem || client.image) },
     { label: "Onde Comer - Outros", count: ondeComerOutros, note: "Outros controles desta tela", available: false }
   ].filter((entry) => entry.count > 0 || (ondeComerAtivo && entry.available));
+  const cardapioEntries = canShowCardapioReport
+    ? [{ label: "Aberturas do cardapio", count: cardapios, note: "Cliques na opcao Cardapio" }]
+    : [];
+  const produtosAtivo = hasPermission("produtos") || normalizeProdutos(client.produtos).length > 0 || produtosTotal > 0;
+  const produtosEntries = [
+    { label: "Aberturas de Produtos", count: produtosAberturas, note: "Cliques para abrir a aba" },
+    { label: "Produtos visualizados", count: produtoVisualizacoes, note: "Aberturas dos detalhes" },
+    { label: "WhatsApp dos produtos", count: produtoWhatsapp, note: "Cliques em Tenho interesse" },
+    { label: "Fotos dos produtos", count: produtoFotos, note: "Cliques e navegacao nas imagens" },
+    { label: "Compartilhamentos", count: produtoCompartilhamentos, note: "Cliques para compartilhar produto" },
+    { label: "Outras interacoes", count: produtoOutros, note: "Outros controles de Produtos" }
+  ].filter((entry) => entry.count > 0 || (produtosAtivo && entry.label !== "Outras interacoes"));
+  const promocoesAtivo = hasPermission("promocoes") || normalizePromocoes(client.promocoes).length > 0 || promocoesTotal > 0;
+  const promocoesEntries = [
+    { label: "Aberturas de Promocoes", count: promocoesAberturas, note: "Cliques para abrir a aba" },
+    { label: "Promocoes visualizadas", count: promocaoVisualizacoes, note: "Aberturas dos detalhes" },
+    { label: "WhatsApp das promocoes", count: whatsappPromocao, note: "Cliques de interesse nas ofertas" },
+    { label: "Instagram das promocoes", count: instagramPromocao, note: "Cliques no Instagram da oferta" },
+    { label: "Fotos das promocoes", count: promocaoFotos, note: "Cliques e navegacao nas imagens" },
+    { label: "Compartilhamentos", count: promocaoCompartilhamentos, note: "Cliques para compartilhar promocao" },
+    { label: "Outras interacoes", count: promocoesOutros, note: "Historico e outros controles" }
+  ].filter((entry) => entry.count > 0 || (promocoesAtivo && entry.label !== "Outras interacoes"));
   const resourceEntries = [
     { key: "whats", label: "WhatsApp / telefone", count: whats, note: "Telefone e contato" },
-    { key: "whatsappPromocao", label: "WhatsApp da promocao", count: whatsappPromocao, note: "Interesse direto nas ofertas" },
-    { key: "cardapios", label: "Cardapio", count: cardapios, note: "Cliques no cardapio da pagina do cliente" },
     { key: "fotos", label: "Fotos / divulgacao", count: fotos, note: "Fotos e divulgacoes" },
     { key: "novidades", label: "Novidades", count: novidades, note: "Cliques na tela inicial" },
     { key: "perfil", label: "Acessos à página", count: acessosPerfil, note: "Aberturas da página do cliente", unit: "acesso" },
@@ -15350,7 +15427,6 @@ function renderClientMetricReportContent(client = {}) {
     { key: "veiculos", label: "Automoveis - WhatsApp", count: veiculosWhatsapp, note: "Cliques no botao Chamar no Whats" },
     { key: "veiculos", label: "Automoveis - Instagram", count: veiculosInstagram, note: "Cliques no Instagram do anunciante" },
     { key: "destaques", label: "Destaques", count: destaques, note: "Cards e slides em destaque" },
-    { key: "promocoes", label: "Promocoes", count: promocoesLiquidas, note: "Cliques em ofertas" },
     { key: "gruposWhatsapp", label: "Grupo WhatsApp", count: gruposWhatsapp, note: "Entradas pelo link do grupo" },
     { key: "instagram", label: "Instagram", count: instagram, note: "Cliques no Instagram" },
     { key: "facebook", label: "Facebook", count: facebook, note: "Cliques no Facebook" },
@@ -15360,13 +15436,13 @@ function renderClientMetricReportContent(client = {}) {
     { key: "compartilhamentos", label: "Compartilhamentos", count: compartilhamentos, note: "Botao de compartilhar cliente" },
     { key: "outros", label: "Outros botoes", count: outros, note: "Demais interacoes" }
   ].filter((entry) => availability[entry.key]);
-  const allResourceEntries = [...resourceEntries, ...ondeComerEntries];
+  const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...promocoesEntries];
   const total = allResourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
     .filter((row) => normalizeName(row.tipo) !== "gerarcard")
     .map((row) => ({ ...row, categoria: clientReportCategory(row) }))
-    .filter((row) => normalizeName(row.area).includes("ondecomer") || clientReportResourceAllowed(row.categoria));
+    .filter((row) => /ondecomer|produto|promoc|cardapio/.test(normalizeName(`${row.area} ${row.tipo}`)) || clientReportResourceAllowed(row.categoria));
   const moduleTypes = {
     imoveis: (row) => row.categoria === "Imoveis",
     veiculos: (row) => row.categoria === "Veiculos"
@@ -15394,16 +15470,25 @@ function renderClientMetricReportContent(client = {}) {
     if (/compartilh/.test(normalized)) return availability.compartilhamentos;
     return availability.outros;
   };
+  const timelineIdentity = (row = {}) => normalizeName(`${row.area} ${row.tipo} ${row.categoria}`);
   const isOndeComerTimelineRow = (row = {}) => normalizeName(row.area).includes("ondecomer");
+  const isCardapioTimelineRow = (row = {}) => !isOndeComerTimelineRow(row) && /cardapio/.test(timelineIdentity(row));
+  const isProdutosTimelineRow = (row = {}) => /produto/.test(timelineIdentity(row));
+  const isPromocoesTimelineRow = (row = {}) => /promoc/.test(timelineIdentity(row));
   const ondeComerTimeline = timeline.filter(isOndeComerTimelineRow);
+  const cardapioTimeline = timeline.filter(isCardapioTimelineRow);
+  const produtosTimeline = timeline.filter(isProdutosTimelineRow);
+  const promocoesTimeline = timeline.filter(isPromocoesTimelineRow);
   const commonTimeline = timeline.filter((row) => (
     !isOndeComerTimelineRow(row)
+    && !isCardapioTimelineRow(row)
+    && !isProdutosTimelineRow(row)
+    && !isPromocoesTimelineRow(row)
     && !moduleTypes.imoveis(row)
     && !moduleTypes.veiculos(row)
     && categoryIsAvailable(row)
   ));
-  const recursosTexto = resourceEntries.map((entry) => entry.label).join(", ");
-  const ondeComerRecursosTexto = ondeComerEntries.map((entry) => entry.label).join(", ");
+  const paginaClienteTotal = resourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const itemAccessRows = buildItemAccessRows(state.metricas, range, keys);
   const imovelAccessRows = itemAccessRows.filter((row) => row.kind === "imovel");
   const veiculoAccessRows = itemAccessRows.filter((row) => row.kind === "veiculo");
@@ -15419,9 +15504,60 @@ function renderClientMetricReportContent(client = {}) {
   return `
     ${renderClientReportPeriodControls(range)}
     <div class="client-report-summary">
-      <div class="stats-grid client-report-stats">
-        <article class="stat-card"><span>Total de interacoes</span><strong>${total}</strong><small>${escapeHtml(range.label)}</small></article>
-        ${resourceEntries.map((entry) => `<article class="stat-card"><span>${escapeHtml(entry.label)}</span><strong>${entry.count}</strong><small>${escapeHtml(entry.note)}</small></article>`).join("")}
+      <div class="stats-grid client-report-overall">
+        <article class="stat-card"><span>Total de interacoes monitoradas</span><strong>${total}</strong><small>${escapeHtml(range.label)}</small></article>
+      </div>
+      <div class="client-report-monitored-screens">
+        ${renderClientReportMonitorSection({
+          title: "Pagina do cliente",
+          icon: "fa-store",
+          description: "Perfil, contatos, fotos, redes sociais e demais recursos da pagina principal.",
+          entries: resourceEntries,
+          total: paginaClienteTotal,
+          rangeLabel: range.label,
+          timeline: commonTimeline,
+          timelineTitle: "Cliques detalhados da pagina do cliente"
+        })}
+        ${canShowCardapioReport ? renderClientReportMonitorSection({
+          title: "Cardapio",
+          icon: "fa-utensils",
+          description: "Acessos ao cardapio feitos pela pagina normal do estabelecimento.",
+          entries: cardapioEntries,
+          total: cardapios,
+          rangeLabel: range.label,
+          timeline: cardapioTimeline,
+          timelineTitle: "Cliques detalhados do Cardapio"
+        }) : ""}
+        ${ondeComerAtivo ? renderClientReportMonitorSection({
+          title: "Onde Comer",
+          icon: "fa-location-dot",
+          description: "Interacoes originadas exclusivamente nos cards da tela Onde Comer.",
+          entries: ondeComerEntries,
+          total: ondeComerTotal,
+          rangeLabel: range.label,
+          timeline: ondeComerTimeline,
+          timelineTitle: "Cliques detalhados vindos do Onde Comer"
+        }) : ""}
+        ${produtosAtivo ? renderClientReportMonitorSection({
+          title: "Produtos",
+          icon: "fa-box-open",
+          description: "Aberturas da aba, visualizacoes, fotos, WhatsApp e compartilhamentos dos produtos.",
+          entries: produtosEntries,
+          total: produtosTotal,
+          rangeLabel: range.label,
+          timeline: produtosTimeline,
+          timelineTitle: "Cliques detalhados de Produtos"
+        }) : ""}
+        ${promocoesAtivo ? renderClientReportMonitorSection({
+          title: "Promocoes",
+          icon: "fa-tags",
+          description: "Aberturas, visualizacoes e interacoes feitas nas ofertas do cliente.",
+          entries: promocoesEntries,
+          total: promocoesTotal,
+          rangeLabel: range.label,
+          timeline: promocoesTimeline,
+          timelineTitle: "Cliques detalhados de Promocoes"
+        }) : ""}
       </div>
       <div class="reports-grid client-report-grid">
         <section class="panel-card report-card">
@@ -15433,19 +15569,6 @@ function renderClientMetricReportContent(client = {}) {
           <p class="list-meta">Cidade identificada no acesso do visitante quando o clique foi registrado.</p>
           ${renderReportList(cidadesClique, "Ainda nao ha dados de cidade nos cliques deste cliente.")}
         </section>
-        ${ondeComerAtivo ? `<section class="panel-card report-card report-wide">
-          <h3>Interacoes vindas do Onde Comer</h3>
-          <p class="list-meta">Estes cliques ficam separados dos acessos feitos na pagina normal do cliente.</p>
-          <div class="stats-grid client-report-stats">
-            <article class="stat-card"><span>Total do Onde Comer</span><strong>${ondeComerTotal}</strong><small>${escapeHtml(range.label)}</small></article>
-            ${ondeComerEntries.map((entry) => `<article class="stat-card"><span>${escapeHtml(entry.label)}</span><strong>${entry.count}</strong><small>${escapeHtml(entry.note)}</small></article>`).join("")}
-          </div>
-          ${renderReportList(ondeComerEntries.filter((entry) => entry.count > 0).map((entry) => ({ title: entry.label, meta: `${entry.count} clique${entry.count === 1 ? "" : "s"}` })), "Ainda nao ha cliques vindos do Onde Comer neste periodo.")}
-          ${renderClientReportDisclosure(
-            "Cliques detalhados vindos do Onde Comer",
-            `<p class="list-meta">Origem identificada nos controles: ${escapeHtml(ondeComerRecursosTexto || "Onde Comer")}.</p>${renderClientTimelineTable(ondeComerTimeline, "Ainda nao ha horarios detalhados do Onde Comer neste periodo.")}`
-          )}
-        </section>` : ""}
         ${canShowOrigemAcessos ? `<section class="panel-card report-card report-wide">
           <h3>Origem dos acessos a pagina</h3>
           <p class="list-meta">Mostra de onde vieram os acessos ao perfil do cliente. Para QR Codes, use links com <strong>?o=nome-do-qrcode</strong>, <strong>?qr=nome</strong> ou UTM.</p>
@@ -15464,12 +15587,6 @@ function renderClientMetricReportContent(client = {}) {
           ${renderClientReportDisclosure("Acessos dos veículos por referência", renderItemAccessTable(veiculoAccessRows, "Ainda nao ha acessos nos veiculos neste periodo."))}
           ${renderClientReportDisclosure("Cliques dos veículos por data e horário", renderClientModuleTimelineTable(veiculosTimeline, "Veiculos", "Ainda nao ha horarios de cliques nos veiculos neste periodo."))}
         </section>` : ""}
-        <section class="panel-card report-card report-wide">
-          ${renderClientReportDisclosure(
-            "Cliques detalhados da página do cliente",
-            `<p class="list-meta">Use essa tabela para conferir interações reais em ${escapeHtml(recursosTexto)}.</p>${renderClientTimelineTable(commonTimeline, "Ainda nao ha horarios detalhados para a pagina do cliente neste periodo.")}`
-          )}
-        </section>
       </div>
     </div>
   `;

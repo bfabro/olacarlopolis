@@ -10246,6 +10246,24 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     };
   }
 
+  function registrarInteracaoProdutoPublico(item = {}, tipo = "produto", acao = "visualizacao") {
+    const responsavel = item.clienteId || item.estabelecimentoId || item.estabelecimento || item.clienteNome || item.loja || "";
+    if (!responsavel) return Promise.resolve();
+    const detalhes = {
+      produtoId: item.id || "",
+      tituloConteudo: item.titulo || item.nome || "",
+      acao
+    };
+    if (tipo === "promocao") {
+      return registrarCliqueNaPromocao(responsavel, {
+        promoId: item.id || "",
+        promoTitulo: item.titulo || item.nome || "",
+        acao
+      });
+    }
+    return registrarCliqueBotao(`produto_${acao}`, responsavel, "produtos", detalhes);
+  }
+
   function renderProdutoCardEstabelecimento(item = {}, tipo = "produto") {
     const isPromocao = tipo === "promocao";
     const preco = produtoPrecoPublico(item, tipo);
@@ -10374,6 +10392,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const titulo = item.titulo || tituloPadrao;
     const isProduto = normalizeName(tituloPadrao || "").includes("produto");
     const isPromocao = normalizeName(tituloPadrao || "").includes("promocao");
+    const tipoMetrica = isPromocao ? "promocao" : "produto";
+    registrarInteracaoProdutoPublico(item, tipoMetrica, "visualizacao");
     const precoCalculado = produtoPrecoPublico(item, isProduto ? "produto" : "promocao");
     const preco = item.ocultarPrecoAusente && (item.mostrarPreco === false || !String(item.preco || "").trim())
       ? ""
@@ -10472,6 +10492,12 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       if (event.key === "Escape" && !document.querySelector(".produto-gallery-modal")) fechar();
     };
     modal.querySelector(".loja-produto-fechar")?.addEventListener("click", fechar);
+    modal.querySelector(".loja-produto-whatsapp")?.addEventListener("click", () => {
+      registrarInteracaoProdutoPublico(item, tipoMetrica, "whatsapp");
+    });
+    modal.querySelector("[data-item-modal-share]")?.addEventListener("click", () => {
+      registrarInteracaoProdutoPublico(item, tipoMetrica, "compartilhamento");
+    });
     let imagemAtual = 0;
     const imgEl = modal.querySelector("[data-produto-galeria-img]");
     const galeriaEl = modal.querySelector("[data-produto-galeria]");
@@ -10479,6 +10505,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       imgEl.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        registrarInteracaoProdutoPublico(item, tipoMetrica, "fotos");
         abrirGaleriaAutomovel(imagensProduto, imagemAtual, titulo, "produto-gallery-modal");
       });
     }
@@ -10493,12 +10520,14 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       modal.querySelector("[data-produto-galeria-prev]")?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        registrarInteracaoProdutoPublico(item, tipoMetrica, "fotos");
         imagemAtual = (imagemAtual - 1 + imagensProduto.length) % imagensProduto.length;
         atualizarGaleria();
       });
       modal.querySelector("[data-produto-galeria-next]")?.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
+        registrarInteracaoProdutoPublico(item, tipoMetrica, "fotos");
         imagemAtual = (imagemAtual + 1) % imagensProduto.length;
         atualizarGaleria();
       });
@@ -10536,10 +10565,16 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       }
       if (event.__lojaProdutoHandled) return;
       const card = event.target.closest("[data-loja-produto]");
-      if (!card || event.target.closest("a, button")) return;
+      if (!card) return;
       const tipo = card.dataset.lojaProdutoTipo || "produto";
       const key = card.dataset.lojaProdutoKey || `${tipo}:${card.dataset.lojaProduto || ""}`;
       const item = window.__lojaProdutosDetalhes?.[key];
+      const interesse = event.target.closest("a.loja-produto-interesse");
+      if (interesse && item) {
+        registrarInteracaoProdutoPublico(item, tipo, "whatsapp");
+        return;
+      }
+      if (event.target.closest("a, button")) return;
       if (!item) return;
       event.__lojaProdutoHandled = true;
       abrirModalProdutoEstabelecimento(item, tipo === "promocao" ? "Promocao" : "Produto");
@@ -26392,7 +26427,16 @@ function registrarCliqueNaPromocao(nomeComercio, detalhes = {}) {
   const ref = firebase.database().ref(`cliquesPromocoesPorComercio/${hoje}/${nomeComercio}`);
   ref.transaction(valorAtual => (valorAtual || 0) + 1);
   const acao = detalhes.acao || "promocao";
-  const tipoMetrica = acao === "whatsapp" ? "whatsapp_promocao" : (acao === "instagram" ? "instagram_promocao" : "promocao");
+  const tiposPromocao = {
+    whatsapp: "whatsapp_promocao",
+    instagram: "instagram_promocao",
+    detalhes: "promocao_visualizacao",
+    visualizacao: "promocao_visualizacao",
+    imagem: "promocao_fotos",
+    fotos: "promocao_fotos",
+    compartilhamento: "promocao_compartilhamento"
+  };
+  const tipoMetrica = tiposPromocao[acao] || "promocao";
   if (tipoMetrica !== "promocao") {
     firebase.database().ref(`cliquesPorBotao/${hoje}/${nomeComercio}/${tipoMetrica}`)
       .transaction(valorAtual => (valorAtual || 0) + 1);
