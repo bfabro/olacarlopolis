@@ -9417,15 +9417,10 @@ ${est.funcionamento24Horas ? `
 
 ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   <div class="botoes-abaixo-nome">
-    ${cardapioVisivel(est) && Array.isArray(est.menuImages) && est.menuImages.length ? `
-        <button type="button" class="btn-cardapio btn-cardapio-imagens" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">
-          <i class="fa-solid fa-images"></i> Ver imagens
+    ${cardapioVisivel(est) ? `
+        <button type="button" class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">
+          <i class="fa-solid fa-utensils"></i> Cardápio
         </button>
-      ` : ''}
-    ${cardapioVisivel(est) && est.cardapioLink ? `
-        <a class="btn-cardapio btn-cardapio-link" href="${escapePromoHtml(est.cardapioLink)}" target="_blank" rel="noopener noreferrer" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}')">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir link
-        </a>
       ` : ''}
     ${getContatosDetalhadosEstabelecimento(est).map((contato) => `
       <a href="https://wa.me/${numeroWhatsAppBrasil(contato.numero)}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
@@ -15042,16 +15037,14 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function mostrarCardapio(nomeNormalizado) {
-    // Procura sempre o PRIMEIRO que tem menuImages
     let est = null;
     categories.forEach(cat => {
       cat.establishments.forEach(e => {
-        if (normalizeName(e.name) === nomeNormalizado && cardapioVisivel(e) && e.menuImages && e.menuImages.length) {
+        if (!est && normalizeName(e.name) === nomeNormalizado && cardapioVisivel(e)) {
           est = e;
         }
       });
     });
-
 
     if (!est) return;
 
@@ -15061,17 +15054,32 @@ plotarPinsImoveis(stateImoveis.filtered);
     // Remove modal antiga se existir
     document.querySelectorAll('.modal-cardapio-overlay').forEach(el => el.remove());
 
-    // Monta HTML do modal
+    const imagensCardapio = Array.isArray(est.menuImages) ? est.menuImages.filter(Boolean) : [];
+    const linkCardapio = String(est.cardapioLink || "").trim();
     let html = `
     <div class="modal-cardapio-overlay">
       <div class="modal-cardapio">
         <button class="close-modal-cardapio" title="Fechar">&times;</button>
-        <h2>Cardápio - ${est.name}</h2>
+        <h2>Cardápio - ${escapePromoHtml(est.name)}</h2>
+        ${linkCardapio ? `
+          <div class="modal-cardapio-link-box">
+            <span><i class="fa-solid fa-bag-shopping"></i><strong>Pedidos pelo cardápio online</strong></span>
+            <a href="${escapePromoHtml(linkCardapio)}" target="_blank" rel="noopener noreferrer">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Fazer pedido / abrir link
+            </a>
+          </div>
+        ` : ""}
+        ${imagensCardapio.length ? `
+          <div class="modal-cardapio-section-title">
+            <i class="fa-solid fa-images"></i>
+            <strong>Cardápio em imagens</strong>
+          </div>
+        ` : ""}
         <div class="modal-cardapio-imgs">
     `;
 
-    est.menuImages.forEach(img => {
-      html += `<img src="${img}" class="cardapio-img" loading="lazy">`;
+    imagensCardapio.forEach((img, index) => {
+      html += `<a href="${escapePromoHtml(img)}" target="_blank" rel="noopener noreferrer" title="Abrir imagem do cardápio"><img src="${escapePromoHtml(img)}" class="cardapio-img" alt="Cardápio ${index + 1} de ${escapePromoHtml(est.name)}" loading="lazy"></a>`;
     });
 
     html += `
@@ -24947,9 +24955,9 @@ ${produtosIniciaisLoja.length ? `
           <section class="cliente-cardapio-publico">
             ${linkCardapio ? `
               <div class="cliente-cardapio-link-box">
-                <span><i class="fa-solid fa-link"></i><strong>Cardápio online ou PDF</strong></span>
+                <span><i class="fa-solid fa-bag-shopping"></i><strong>Pedidos pelo cardápio online</strong></span>
                 <a href="${escapePromoHtml(linkCardapio)}" target="_blank" rel="noopener noreferrer" data-cardapio-link-cliente>
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir link do cardápio
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Fazer pedido / abrir link
                 </a>
               </div>
             ` : ""}
@@ -24959,13 +24967,13 @@ ${produtosIniciaisLoja.length ? `
                 <strong>Cardápio em imagens</strong>
                 <span>${imagensCardapio.length} imagem${imagensCardapio.length === 1 ? "" : "s"}</span>
               </div>
-              <div class="swiper" id="menu-${encodeURIComponent(establishment.name)}">
-                <div class="swiper-wrapper">
-                  ${imagensCardapio.map((img, idx) => `<div class="swiper-slide"><img src="${escapePromoHtml(img)}" alt="Cardápio ${idx + 1}" loading="lazy">${establishment.menuDescriptions?.[idx] ? `<div class="descricao-foto">${escapePromoHtml(establishment.menuDescriptions[idx])}</div>` : ""}</div>`).join("")}
-                </div>
-                <div class="swiper-pagination"></div>
-                <div class="swiper-button-prev"></div>
-                <div class="swiper-button-next"></div>
+              <div class="cliente-cardapio-imagens-grid">
+                ${imagensCardapio.map((img, idx) => `
+                  <a href="${escapePromoHtml(img)}" target="_blank" rel="noopener noreferrer" title="Abrir imagem do cardápio">
+                    <img src="${escapePromoHtml(img)}" alt="Cardápio ${idx + 1} de ${escapePromoHtml(establishment.name)}" loading="lazy" decoding="async">
+                    <span>Imagem ${idx + 1}</span>
+                  </a>
+                `).join("")}
               </div>
             ` : ""}
           </section>
