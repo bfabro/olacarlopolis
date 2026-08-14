@@ -28528,16 +28528,58 @@ function mostrarCombustivel() {
 // ===== MODULO PUBLICO DE NOTICIAS =====
 (() => {
   const newsState = { all: [] };
+  const NEWS_TIME_ZONE = "America/Sao_Paulo";
   const escNews = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
   const normalizeNews = (value) => String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const categories = ["Todas", "Cidade", "Utilidade Pública", "Eventos", "Empregos", "Saúde", "Educação", "Esporte", "Comércio Local", "Prefeitura", "Turismo", "Represa", "Trânsito", "Aviso", "Informe Comercial"];
   const categoryClass = (category) => `news-cat-${normalizeNews(category).replace(/[^a-z0-9]+/g, "-")}`;
-  const dateTime = (item) => [item.dataPublicacao ? item.dataPublicacao.split("-").reverse().join("/") : "", item.horaPublicacao].filter(Boolean).join(" às ") || "Data não informada";
-  const published = (item, home = false) => item.status === "publicado" && (!home || item.exibirNaHome !== false) && (!home || !item.dataExpiracao || item.dataExpiracao >= new Date().toISOString().slice(0, 10));
+
+  const newsClock = (value = Date.now()) => {
+    const date = value instanceof Date ? value : new Date(Number(value || Date.now()));
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: NEWS_TIME_ZONE,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23"
+    }).formatToParts(date).reduce((result, part) => {
+      if (part.type !== "literal") result[part.type] = part.value;
+      return result;
+    }, {});
+    return {
+      date: `${parts.year}-${parts.month}-${parts.day}`,
+      time: `${parts.hour}:${parts.minute}`
+    };
+  };
+
+  const publicationClock = (item = {}) => {
+    const timestamp = Number(item.publishedAt || item.createdAt || 0);
+    if (timestamp > 0 && Number.isFinite(timestamp)) {
+      const clock = newsClock(timestamp);
+      if (item.publishedAt || !item.dataPublicacao || item.dataPublicacao === clock.date) return clock;
+    }
+    return {
+      date: String(item.dataPublicacao || ""),
+      time: String(item.horaPublicacao || "")
+    };
+  };
+
+  const dateTime = (item) => {
+    const clock = publicationClock(item);
+    const date = clock.date ? clock.date.split("-").reverse().join("/") : "";
+    return [date, clock.time].filter(Boolean).join(" às ") || "Data não informada";
+  };
+  const newsSortKey = (item) => {
+    const clock = publicationClock(item);
+    return `${clock.date} ${clock.time}`;
+  };
+  const published = (item, home = false) => item.status === "publicado" && (!home || item.exibirNaHome !== false) && (!home || !item.dataExpiracao || item.dataExpiracao >= newsClock().date);
   const sorted = (home = false) => newsState.all.filter((item) => published(item, home)).sort((a, b) => {
     if (home && Boolean(a.destaquePrincipal) !== Boolean(b.destaquePrincipal)) return a.destaquePrincipal ? -1 : 1;
     const order = Number(a.ordem || 0) - Number(b.ordem || 0);
-    return order || `${b.dataPublicacao || ""} ${b.horaPublicacao || ""}`.localeCompare(`${a.dataPublicacao || ""} ${a.horaPublicacao || ""}`);
+    return order || newsSortKey(b).localeCompare(newsSortKey(a));
   });
   const image = (item) => item.imagemPrincipalUrl || item.imagensExtrasUrls?.[0] || "";
   const placeholder = (item) => `<div class="news-placeholder ${categoryClass(item.tipoInformacao)}"><i class="fa-solid fa-newspaper"></i></div>`;

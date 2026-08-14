@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 590,
-  label: "v597",
-  data: "2026-08-11",
-  nota: "Permissões de usuários reorganizadas em administração, módulos por segmento e recursos padrão."
+  numero: 591,
+  label: "v598",
+  data: "2026-08-14",
+  nota: "Horário das notícias corrigido pelo momento real da publicação no fuso de São Paulo."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13349,12 +13349,47 @@ async function uploadInfoWhatsappGroupImage(file) {
   showToast("Imagem do grupo enviada.");
 }
 
+const NEWS_TIME_ZONE = "America/Sao_Paulo";
+
+function newsPublicationClock(value = Date.now()) {
+  const date = value instanceof Date ? value : new Date(Number(value || Date.now()));
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: NEWS_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(date).reduce((result, part) => {
+    if (part.type !== "literal") result[part.type] = part.value;
+    return result;
+  }, {});
+  return {
+    date: `${parts.year}-${parts.month}-${parts.day}`,
+    time: `${parts.hour}:${parts.minute}`
+  };
+}
+
+function newsClockFromItem(item = {}) {
+  const timestamp = Number(item.publishedAt || item.createdAt || 0);
+  if (timestamp > 0 && Number.isFinite(timestamp)) {
+    const clock = newsPublicationClock(timestamp);
+    if (item.publishedAt || !item.dataPublicacao || item.dataPublicacao === clock.date) return clock;
+  }
+  return {
+    date: String(item.dataPublicacao || ""),
+    time: String(item.horaPublicacao || "")
+  };
+}
+
 function resetNewsForm() {
   $("newsForm")?.reset();
   if ($("newsId")) $("newsId").value = "";
   if ($("newsMainImageUrl")) $("newsMainImageUrl").value = "";
-  if ($("newsDate")) $("newsDate").value = new Date().toISOString().slice(0, 10);
-  if ($("newsTime")) $("newsTime").value = new Date().toTimeString().slice(0, 5);
+  const publicationClock = newsPublicationClock();
+  if ($("newsDate")) $("newsDate").value = publicationClock.date;
+  if ($("newsTime")) $("newsTime").value = publicationClock.time;
   if ($("newsShowHome")) $("newsShowHome").checked = true;
   state.noticiaExtraImages = [];
   $("deleteNewsButton")?.classList.add("hidden");
@@ -13393,6 +13428,8 @@ function newsFormPayload(forcedStatus = "") {
   const current = state.noticias.find((item) => item.id === $("newsId")?.value) || {};
   const title = $("newsTitle").value.trim();
   const status = forcedStatus || $("newsStatus").value || "rascunho";
+  const publishingNow = status === "publicado" && current.status !== "publicado" && !current.publishedAt;
+  const publicationClock = publishingNow ? newsPublicationClock() : null;
   return cleanForFirebase({
     id: $("newsId").value || slugify(`${title}-${Date.now()}`),
     tipoInformacao: $("newsCategory").value,
@@ -13402,8 +13439,8 @@ function newsFormPayload(forcedStatus = "") {
     textoCompleto: $("newsContent").value.trim(),
     imagemPrincipalUrl: $("newsMainImageUrl").value.trim(),
     imagensExtrasUrls: [...state.noticiaExtraImages],
-    dataPublicacao: $("newsDate").value,
-    horaPublicacao: $("newsTime").value,
+    dataPublicacao: publicationClock?.date || $("newsDate").value,
+    horaPublicacao: publicationClock?.time || $("newsTime").value,
     local: $("newsLocation").value.trim(),
     fonteMateria: $("newsSource").value.trim(),
     linkPublicacaoOficial: $("newsOfficialLink").value.trim(),
@@ -13418,6 +13455,7 @@ function newsFormPayload(forcedStatus = "") {
     ordem: Number($("newsOrder").value || 0),
     slug: slugify($("newsSlug").value.trim() || title),
     createdAt: current.createdAt || serverTimestamp(),
+    publishedAt: current.publishedAt || (publishingNow ? serverTimestamp() : ""),
     updatedAt: serverTimestamp(),
     createdBy: current.createdBy || state.user?.uid || "",
     createdByName: current.createdByName || state.profile?.nome || state.user?.email || "",
@@ -13444,8 +13482,9 @@ function fillNewsForm(item) {
   $("newsSlug").value = item.slug || "";
   $("newsSummary").value = item.resumoCurto || "";
   $("newsContent").value = item.textoCompleto || "";
-  $("newsDate").value = item.dataPublicacao || "";
-  $("newsTime").value = item.horaPublicacao || "";
+  const publicationClock = newsClockFromItem(item);
+  $("newsDate").value = publicationClock.date;
+  $("newsTime").value = publicationClock.time;
   $("newsLocation").value = item.local || "";
   $("newsSource").value = item.fonteMateria || "";
   $("newsOfficialLink").value = item.linkPublicacaoOficial || "";
