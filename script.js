@@ -9417,12 +9417,16 @@ ${est.funcionamento24Horas ? `
 
 ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   <div class="botoes-abaixo-nome">
+    ${cardapioVisivel(est) && Array.isArray(est.menuImages) && est.menuImages.length ? `
+        <button type="button" class="btn-cardapio btn-cardapio-imagens" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">
+          <i class="fa-solid fa-images"></i> Ver imagens
+        </button>
+      ` : ''}
     ${cardapioVisivel(est) && est.cardapioLink ? `
-        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); window.open('${est.cardapioLink}', '_blank')">Cardápio</button>
-      ` : (cardapioVisivel(est) && est.menuImages && est.menuImages.length ? `
-        <button class="btn-cardapio" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}'); mostrarCardapio('${normalizeName(est.name)}')">Cardápio</button>
-      ` : '')
-          }
+        <a class="btn-cardapio btn-cardapio-link" href="${escapePromoHtml(est.cardapioLink)}" target="_blank" rel="noopener noreferrer" onclick="registrarCliqueCardapioOndeComer('${normalizeName(est.name)}')">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir link
+        </a>
+      ` : ''}
     ${getContatosDetalhadosEstabelecimento(est).map((contato) => `
       <a href="https://wa.me/${numeroWhatsAppBrasil(contato.numero)}?text=${encodeURIComponent(gerarMensagemWhatsApp())}"
         target="_blank"
@@ -24655,8 +24659,7 @@ ${!establishment.descricaoFalecido ? `
       label: "Cardapio",
       icon: "fa-solid fa-utensils",
       count: establishment.menuImages?.length || 0,
-      tone: "purple",
-      extra: establishment.cardapioLink ? `data-link="${establishment.cardapioLink}"` : ""
+      tone: "purple"
     })}
   ` : ''}
 
@@ -24893,8 +24896,8 @@ ${(establishment.novidadesImages && establishment.novidadesImages.length > 0) ? 
 ` : ``}
 
 <!-- CARDÁPIO -->
-${(cardapioVisivel(establishment) && establishment.menuImages && establishment.menuImages.length > 0) ? `
-  <div class="aba" id="cardapio-${slugEstabelecimentoPublico}" style="display:none"></div>
+${cardapioVisivel(establishment) ? `
+  <div class="aba cliente-cardapio-aba" id="cardapio-${slugEstabelecimentoPublico}" style="display:none"></div>
 ` : ``}
 
 ${produtosIniciaisLoja.length ? `
@@ -24938,7 +24941,41 @@ ${produtosIniciaisLoja.length ? `
         pane.innerHTML = `<section class="loja-itens-wrap loja-fotos-wrap"><div class="loja-fotos-grid loja-cards-grid">${(establishment.novidadesImages || []).map((img, idx) => renderFotoCardEstabelecimento(establishment, img, idx)).join("")}</div></section>`;
       });
       prepararAbaSobDemanda(contentArea.querySelector(`#${CSS.escape(`cardapio-${slug}`)}`), (pane) => {
-        pane.innerHTML = `<div class="swiper" id="menu-${encodeURIComponent(establishment.name)}"><div class="swiper-wrapper">${(establishment.menuImages || []).map((img, idx) => `<div class="swiper-slide"><img src="${img}" alt="Cardápio ${idx + 1}" loading="lazy">${establishment.menuDescriptions?.[idx] ? `<div class="descricao-foto">${establishment.menuDescriptions[idx]}</div>` : ""}</div>`).join("")}</div><div class="swiper-pagination"></div><div class="swiper-button-prev"></div><div class="swiper-button-next"></div></div>`;
+        const imagensCardapio = Array.isArray(establishment.menuImages) ? establishment.menuImages.filter(Boolean) : [];
+        const linkCardapio = String(establishment.cardapioLink || "").trim();
+        pane.innerHTML = `
+          <section class="cliente-cardapio-publico">
+            ${linkCardapio ? `
+              <div class="cliente-cardapio-link-box">
+                <span><i class="fa-solid fa-link"></i><strong>Cardápio online ou PDF</strong></span>
+                <a href="${escapePromoHtml(linkCardapio)}" target="_blank" rel="noopener noreferrer" data-cardapio-link-cliente>
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir link do cardápio
+                </a>
+              </div>
+            ` : ""}
+            ${imagensCardapio.length ? `
+              <div class="cliente-cardapio-imagens-head">
+                <i class="fa-solid fa-images"></i>
+                <strong>Cardápio em imagens</strong>
+                <span>${imagensCardapio.length} imagem${imagensCardapio.length === 1 ? "" : "s"}</span>
+              </div>
+              <div class="swiper" id="menu-${encodeURIComponent(establishment.name)}">
+                <div class="swiper-wrapper">
+                  ${imagensCardapio.map((img, idx) => `<div class="swiper-slide"><img src="${escapePromoHtml(img)}" alt="Cardápio ${idx + 1}" loading="lazy">${establishment.menuDescriptions?.[idx] ? `<div class="descricao-foto">${escapePromoHtml(establishment.menuDescriptions[idx])}</div>` : ""}</div>`).join("")}
+                </div>
+                <div class="swiper-pagination"></div>
+                <div class="swiper-button-prev"></div>
+                <div class="swiper-button-next"></div>
+              </div>
+            ` : ""}
+          </section>
+        `;
+        pane.querySelector("[data-cardapio-link-cliente]")?.addEventListener("click", () => {
+          window.registrarCliqueBotao?.("cardapio_link", slug, "servicos-comercios", {
+            estabelecimento: establishment.name || "",
+            origem: "pagina-cliente"
+          });
+        });
       });
       const produtosIniciais = moduloClientePublicoAtivo(establishment, "produtos")
         ? produtosDoEstabelecimentoPublico(establishment)

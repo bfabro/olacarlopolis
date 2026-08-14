@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 591,
-  label: "v598",
+  numero: 592,
+  label: "v599",
   data: "2026-08-14",
-  nota: "Horário das notícias corrigido pelo momento real da publicação no fuso de São Paulo."
+  nota: "Link e imagens de cardápio exibidos juntos na página do cliente e em Onde Comer."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
