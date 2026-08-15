@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 596,
-  label: "v603",
+  numero: 597,
+  label: "v604",
   data: "2026-08-15",
-  nota: "Permissão de acesso e cadastro de múltiplos grupos de WhatsApp para clientes."
+  nota: "Clientes com permissão de eventos podem cadastrar e gerenciar os próprios eventos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1047,6 +1047,7 @@ function canAccessView(viewName) {
   }
   if (viewName === "relatorioExclusoes") return isMaster();
   if (viewName === "dashboard") return canManageClients();
+  if (viewName === "eventos") return canManageClients() || hasPermission("eventos");
   if (canManageClients()) {
     if (viewName === "usuariosOnline") return isMaster();
     if (viewName === "pagamentoSistema") return isMaster();
@@ -3072,6 +3073,9 @@ function updateChrome() {
   });
   document.querySelectorAll("[data-permission='noticias']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("noticias"));
+  });
+  document.querySelectorAll("[data-permission='eventos']").forEach((el) => {
+    el.classList.toggle("hidden", !hasPermission("eventos") || canManageClients());
   });
   document.querySelectorAll("[data-permission='faturas']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("faturas") || canManageClients());
@@ -5855,6 +5859,10 @@ function switchView(name) {
   }
   if (target === "usuariosOnline") startOnlinePresenceMonitor();
   else stopOnlinePresenceMonitor();
+  if (target === "eventos") {
+    configureEventAccessForProfile();
+    renderEventsList();
+  }
   if (target === "promocoesClientes") renderStaffPromocoesView();
   if (target === "noticias") renderNewsAdminList();
   if (target === "imoveis") renderImoveisList();
@@ -8770,6 +8778,15 @@ function fillEventClientSelect(selectedId = "") {
   const select = $("eventClient");
   if (!select) return;
   const currentSelectedId = selectedId || select.value || "";
+  if (!canManageClients()) {
+    const client = currentClientRecord();
+    const clientId = client?.id || currentClientId();
+    select.innerHTML = clientId
+      ? `<option value="${escapeAttr(clientId)}">${escapeHtml(client?.nome || clientId)}</option>`
+      : `<option value="">Cliente nao vinculado</option>`;
+    select.value = clientId || "";
+    return;
+  }
   const query = normalizeName($("eventClientSearch")?.value || "");
   const clients = [...state.clientes]
     .sort((a, b) => String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR", { sensitivity: "base" }))
@@ -9496,13 +9513,35 @@ function bindFeaturedInvoicePix(featuredPix) {
   });
 }
 
+function eventBelongsToCurrentClient(evento = {}) {
+  const clientId = currentClientId();
+  return Boolean(clientId && evento.clienteId === clientId);
+}
+
+function canManageEventRecord(evento = {}) {
+  return canManageClients() || (hasPermission("eventos") && eventBelongsToCurrentClient(evento));
+}
+
+function configureEventAccessForProfile() {
+  const isClientEditor = !canManageClients();
+  $("eventClientSearchField")?.classList.toggle("hidden", isClientEditor);
+  $("eventClientField")?.classList.toggle("hidden", isClientEditor);
+  if ($("eventClient")) $("eventClient").disabled = isClientEditor;
+  if (isClientEditor) {
+    const client = currentClientRecord();
+    if ($("eventClientSearch")) $("eventClientSearch").value = client?.nome || "";
+    fillEventClientSelect(client?.id || currentClientId());
+  } else {
+    fillEventClientSelect();
+  }
+}
+
 function splitMonthsInput(value) {
   return String(value || "")
     .split(/[,\s;]+/)
     .map((item) => item.trim())
     .filter((item) => /^\d{4}-\d{2}$/.test(item));
 }
-
 function resetEventForm() {
   state.selectedEventId = null;
   $("eventForm").reset();
@@ -9514,6 +9553,10 @@ function resetEventForm() {
 }
 
 function fillEventForm(evento) {
+  if (!canManageEventRecord(evento)) {
+    showToast("Voce nao tem permissao para editar este evento.");
+    return;
+  }
   state.selectedEventId = evento.id;
   $("eventId").value = evento.id || "";
   $("eventTitle").value = evento.titulo || "";
@@ -9552,7 +9595,7 @@ function normalizeEventExternalUrl(value = "") {
 
 function getEventFormData() {
   const title = $("eventTitle").value.trim();
-  const clienteId = $("eventClient").value;
+  const clienteId = canManageClients() ? $("eventClient").value : currentClientId();
   const client = state.clientes.find((item) => item.id === clienteId);
   const contatosDetalhados = [1, 2, 3].map((position) => ({
     numero: $(`eventContact${position}`).value.trim(),
@@ -9562,7 +9605,7 @@ function getEventFormData() {
   const whatsappPrincipal = contatosDetalhados.find((item) => item.whatsapp)?.numero || "";
   const linkInstagram = normalizeEventExternalUrl($("eventLink").value);
   return {
-    id: $("eventId").value || `${slugify(title)}-${Date.now()}`,
+    id: state.selectedEventId || `${slugify(title)}-${Date.now()}`,
     titulo: title,
     clienteId,
     clienteNome: client?.nome || "",
@@ -9588,7 +9631,8 @@ function renderEventsList() {
   if (!box) return;
 
   const q = String($("eventSearch")?.value || "").toLowerCase().trim();
-  const list = state.eventos.filter(eventVisible).filter((evento) => {
+  const scopedEvents = canManageClients() ? state.eventos : state.eventos.filter(eventBelongsToCurrentClient);
+  const list = scopedEvents.filter(eventVisible).filter((evento) => {
     const contatosBusca = normalizeClientContactDetails(evento)
       .map((contato) => `${contato.referencia} ${contato.numero}`)
       .join(" ");
@@ -9624,7 +9668,7 @@ function renderEventsList() {
   box.querySelectorAll("[data-edit-event]").forEach((button) => {
     button.addEventListener("click", () => {
       const evento = state.eventos.find((item) => item.id === button.dataset.editEvent);
-      if (evento) fillEventForm(evento);
+      if (evento && canManageEventRecord(evento)) fillEventForm(evento);
     });
   });
 }
@@ -21760,11 +21804,25 @@ function bindEvents() {
 
   $("eventForm").addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!canManageClients()) return;
+    if (!canManageClients() && (!hasPermission("eventos") || !currentClientId())) {
+      showToast("Usuario sem permissao ou cliente vinculado para salvar eventos.");
+      return;
+    }
     const payload = getEventFormData();
     const id = payload.id;
     delete payload.id;
     const isNewEvent = !state.selectedEventId;
+    const originalEvent = state.eventos.find((item) => item.id === state.selectedEventId);
+    if (!isNewEvent && !canManageEventRecord(originalEvent)) {
+      showToast("Voce nao tem permissao para alterar este evento.");
+      return;
+    }
+    if (!canManageClients()) {
+      payload.origem = "painel-cliente";
+      payload.createdBy = originalEvent?.createdBy || state.user?.uid || "";
+      payload.clienteId = currentClientId();
+      payload.clienteNome = currentClientRecord()?.nome || "";
+    }
     if (isNewEvent) payload.createdAt = serverTimestamp();
     await update(ref(db, `eventos/${id}`), payload);
     const acao = acaoNovidadeAdmin("evento", isNewEvent, payload);
@@ -21790,6 +21848,10 @@ function bindEvents() {
     if (!state.selectedEventId) return;
     const evento = state.eventos.find((item) => item.id === state.selectedEventId);
     if (!(await confirmarExclusao(evento?.titulo || evento?.nome || state.selectedEventId, "evento"))) return;
+    if (!canManageEventRecord(evento)) {
+      showToast("Voce nao tem permissao para excluir este evento.");
+      return;
+    }
     await update(ref(db, `eventos/${state.selectedEventId}`), {
       status: "excluido",
       deletedAt: serverTimestamp(),

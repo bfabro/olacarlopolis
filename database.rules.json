@@ -93,6 +93,12 @@
       ".write": true
     },
 
+    "eventos": {
+      ".read": true,
+      "$eventId": {
+        ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('eventos').val() === true && ((!data.exists() && newData.child('clienteId').val() === root.child('usuariosByUid').child(auth.uid).child('clienteId').val()) || (data.exists() && data.child('clienteId').val() === root.child('usuariosByUid').child(auth.uid).child('clienteId').val() && newData.child('clienteId').val() === root.child('usuariosByUid').child(auth.uid).child('clienteId').val()))))"
+      }
+    },
     "noticias": {
       ".read": true,
       "$newsId": {
@@ -278,7 +284,7 @@
 
     "$other": {
       ".read": "$other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
-      ".write": "$other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
+      ".write": "$other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
     }
   }
 }
