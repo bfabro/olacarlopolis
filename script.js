@@ -24419,8 +24419,60 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     document.body.classList.add("home-quick-banner-route-hidden");
 
     if (paidEstablishments.length === 0) {
-      const vazio = isVagasTrabalho ? "Nenhuma vaga de trabalho cadastrada no momento." : "Nenhum estabelecimento se cadastrou ainda.";
-      contentArea.innerHTML = `<h2 class="highlighted">${title}</h2><p>${vazio}</p>`;
+      const mensagensEspeciais = {
+        eventosemcarlopolis: "Nenhum evento ativo no momento.",
+        vagasdetrabalho: "Nenhuma vaga de trabalho cadastrada no momento.",
+        notadefalecimento: "Nenhuma nota de falecimento cadastrada no momento."
+      };
+      if (mensagensEspeciais[titleSlug]) {
+        contentArea.innerHTML = `<h2 class="highlighted">${escapePromoHtml(title)}</h2><p>${mensagensEspeciais[titleSlug]}</p>`;
+        return;
+      }
+
+      const categoria = String(title || "esta categoria").trim();
+      const categoriaSegura = escapePromoHtml(categoria);
+      const mensagemCadastro = `Olá! Encontrei a categoria "${categoria}" no Olá Carlópolis e gostaria de cadastrar meu negócio.`;
+      const cadastroUrl = `https://wa.me/5543991766639?text=${encodeURIComponent(mensagemCadastro)}`;
+      const enderecoPortal = `${window.location.origin}${window.location.pathname}`;
+      const mensagemConvite = `Olá! A categoria "${categoria}" ainda não tem nenhuma empresa cadastrada no Olá Carlópolis. Conheço o seu trabalho e achei que seria uma boa oportunidade para divulgar seu negócio. Veja o portal: ${enderecoPortal}\n\nPara saber como cadastrar: ${cadastroUrl}`;
+      const conviteUrl = `https://wa.me/?text=${encodeURIComponent(mensagemConvite)}`;
+
+      contentArea.innerHTML = `
+        <section class="category-empty-state" aria-labelledby="category-empty-title">
+          <div class="category-empty-visual" aria-hidden="true">
+            <span class="category-empty-orbit category-empty-orbit-one"></span>
+            <span class="category-empty-orbit category-empty-orbit-two"></span>
+            <div class="category-empty-icon"><i class="fa-solid fa-store"></i></div>
+          </div>
+          <div class="category-empty-copy">
+            <span class="category-empty-kicker"><i class="fa-solid fa-seedling"></i> Categoria em crescimento</span>
+            <h2 id="category-empty-title">Ainda não temos empresas em <strong>${categoriaSegura}</strong></h2>
+            <p>Esta pode ser a primeira empresa desta categoria a aparecer para quem pesquisa em Carlópolis.</p>
+            <div class="category-empty-actions">
+              <a class="category-empty-primary" href="${cadastroUrl}" target="_blank" rel="noopener noreferrer" data-category-empty-action="cadastro">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>Cadastrar meu negócio</span>
+              </a>
+              <a class="category-empty-secondary" href="${conviteUrl}" target="_blank" rel="noopener noreferrer" data-category-empty-action="convite">
+                <i class="fa-solid fa-share-nodes"></i>
+                <span>Convidar um conhecido</span>
+              </a>
+            </div>
+            <div class="category-empty-benefits" aria-label="Benefícios do cadastro">
+              <span><i class="fa-solid fa-circle-check"></i> Mais visibilidade local</span>
+              <span><i class="fa-solid fa-circle-check"></i> Contato direto com clientes</span>
+            </div>
+          </div>
+        </section>`;
+
+      contentArea.querySelectorAll("[data-category-empty-action]").forEach((link) => {
+        link.addEventListener("click", () => {
+          registrarCliqueBotao(link.dataset.categoryEmptyAction || "contato", "portal-ola-carlopolis", "categoria-vazia", {
+            categoria,
+            origem: "categoria-sem-clientes"
+          }).catch(() => { });
+        });
+      });
       return;
     }
 

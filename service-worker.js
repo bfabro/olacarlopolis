@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-15-youtube-clientes-v652'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-15-categorias-vazias-v653'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
