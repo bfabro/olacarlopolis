@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 595,
-  label: "v602",
+  numero: 596,
+  label: "v603",
   data: "2026-08-15",
-  nota: "Gerador de currículo ajustado sem criação automática de textos no perfil profissional."
+  nota: "Permissão de acesso e cadastro de múltiplos grupos de WhatsApp para clientes."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -218,6 +218,7 @@ let state = {
   selectedAutomovelId: null,
   selectedDeathNoticeId: null,
   selectedWhatsappGroupId: null,
+  selectedClientWhatsappGroupId: null,
   selectedCategoryId: null,
   duplicateCleanupPlan: null,
   clientImages: [],
@@ -2534,7 +2535,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -2588,7 +2589,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -18770,12 +18771,13 @@ function renderClientOnlyEditor() {
   const canEditDestaque = hasPermission("destaque") || hasPermission("dados");
   const isRealEstateClient = clienteAssociadoImoveis(client, true);
   const canViewRelatorios = hasPermission("relatorios");
-  const clientWhatsappGroupId = client.grupoWhatsappId || `cliente-${slugify(client.id || client.nome || "grupo")}`;
-  const clientWhatsappGroup = state.gruposWhatsapp.find((item) => (
-    item.id === clientWhatsappGroupId ||
-    item.clienteId === client.id
-  )) || {};
-  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditProdutos || canEditPromocoes || canGeneratePromoImages || canEditDestaque;
+  const canEditWhatsappGroups = hasPermission("grupos_whatsapp");
+  const clientWhatsappGroups = state.gruposWhatsapp
+    .filter((item) => item.clienteId === client.id || item.id === client.grupoWhatsappId)
+    .sort((a, b) => String(a.nome || a.name || "").localeCompare(String(b.nome || b.name || ""), "pt-BR"));
+  const clientWhatsappGroup = clientWhatsappGroups.find((item) => item.id === state.selectedClientWhatsappGroupId) || {};
+  const clientWhatsappGroupId = clientWhatsappGroup.id || "";
+  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditProdutos || canEditPromocoes || canGeneratePromoImages || canEditDestaque || canEditWhatsappGroups;
   const hasAnyClientModule = true;
   let coPromoEditIndex = -1;
   let coProductEditIndex = -1;
@@ -18826,7 +18828,7 @@ function renderClientOnlyEditor() {
       label: "Negocio",
       items: [
         { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque },
-        { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: true },
+        { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: canEditWhatsappGroups },
         { id: "client-module-produtos", icon: "fa-solid fa-box-open", label: "Produtos", show: canEditProdutos },
         { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes || canGeneratePromoImages },
         { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas }
@@ -19167,44 +19169,66 @@ function renderClientOnlyEditor() {
           ` : ""}
         </section>
       ` : ""}
-      <section id="client-module-grupo-whatsapp" class="wide upload-panel client-feature-card feature-whatsapp-group client-module-panel">
-        <div class="section-head compact feature-card-head">
-          <div>
-            <span class="feature-kicker">Comunidade</span>
-            <h3>Grupo WhatsApp</h3>
-            <p>Cadastre o grupo da sua empresa para aparecer no menu publico Grupos WhatsApp.</p>
-          </div>
-          <span class="badge ${escapeAttr(clientWhatsappGroup.status || "inativo")}">${clientWhatsappGroup.link && clientWhatsappGroup.status !== "inativo" ? "Publicado" : "Nao publicado"}</span>
-        </div>
-        <div class="client-whatsapp-group-editor">
-          <div class="client-whatsapp-group-image">
-            <img id="coWhatsappGroupPreview" src="${escapeAttr(displayImageUrl(clientWhatsappGroup.imagem || clientWhatsappGroup.image || client.grupoWhatsappImagem || "../images/img_padrao_site/logo_1.png"))}" alt="Imagem do grupo WhatsApp" ${lazyImageAttrs()} ${imageFallbackAttr()}>
-            <label>Imagem do grupo
-              <input id="coWhatsappGroupImageUpload" type="file" accept="image/*">
-            </label>
-            <input id="coWhatsappGroupImage" type="hidden" value="${escapeAttr(clientWhatsappGroup.imagem || clientWhatsappGroup.image || client.grupoWhatsappImagem || "")}">
-          </div>
-          <div class="client-whatsapp-group-fields">
-            <label>Nome do grupo
-              <input id="coWhatsappGroupName" value="${escapeAttr(clientWhatsappGroup.nome || clientWhatsappGroup.name || client.grupoWhatsappNome || client.nome || "")}" placeholder="Ex.: Ofertas da minha empresa">
-            </label>
-            <label>Link do grupo
-              <input id="coWhatsappGroupLink" type="url" value="${escapeAttr(clientWhatsappGroup.link || client.grupoWhatsappLink || "")}" placeholder="https://chat.whatsapp.com/...">
-            </label>
-            <label class="wide">Descricao do grupo
-              <textarea id="coWhatsappGroupDescription" rows="5" placeholder="Explique o objetivo e o conteúdo do grupo">${escapeHtml(clientWhatsappGroup.descricao || clientWhatsappGroup.description || client.grupoWhatsappDescricao || "")}</textarea>
-            </label>
-            <label class="check-row wide">
-              <input id="coWhatsappGroupEnabled" type="checkbox" ${clientWhatsappGroup.link && clientWhatsappGroup.status !== "inativo" ? "checked" : ""}>
-              Exibir no menu publico Grupos WhatsApp
-            </label>
-            <div class="form-actions wide">
-              <button id="coSaveWhatsappGroupButton" type="button"><i class="fa-solid fa-floppy-disk"></i> Salvar grupo</button>
-              ${clientWhatsappGroup.link ? `<button id="coDeleteWhatsappGroupButton" type="button" class="danger-button"><i class="fa-solid fa-trash"></i> Excluir grupo</button>` : ""}
+      ${canEditWhatsappGroups ? `
+        <section id="client-module-grupo-whatsapp" class="wide upload-panel client-feature-card feature-whatsapp-group client-module-panel">
+          <div class="section-head compact feature-card-head">
+            <div>
+              <span class="feature-kicker">Comunidade</span>
+              <h3>Grupos WhatsApp</h3>
+              <p>Cadastre quantos grupos quiser para aparecerem no menu publico Grupos WhatsApp.</p>
+            </div>
+            <div class="client-whatsapp-group-head-actions">
+              <span class="badge">${clientWhatsappGroups.length} ${clientWhatsappGroups.length === 1 ? "grupo" : "grupos"}</span>
+              <button id="coNewWhatsappGroupButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo grupo</button>
             </div>
           </div>
-        </div>
-      </section>
+          <div class="client-whatsapp-group-editor">
+            <div class="client-whatsapp-group-image">
+              <img id="coWhatsappGroupPreview" src="${escapeAttr(displayImageUrl(clientWhatsappGroup.imagem || clientWhatsappGroup.image || "../images/img_padrao_site/logo_1.png"))}" alt="Imagem do grupo WhatsApp" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+              <label>Imagem do grupo
+                <input id="coWhatsappGroupImageUpload" type="file" accept="image/*">
+              </label>
+              <input id="coWhatsappGroupImage" type="hidden" value="${escapeAttr(clientWhatsappGroup.imagem || clientWhatsappGroup.image || "")}">
+            </div>
+            <div class="client-whatsapp-group-fields">
+              <label>Nome do grupo
+                <input id="coWhatsappGroupName" value="${escapeAttr(clientWhatsappGroup.nome || clientWhatsappGroup.name || "")}" placeholder="Ex.: Ofertas da minha empresa">
+              </label>
+              <label>Link do grupo
+                <input id="coWhatsappGroupLink" type="url" value="${escapeAttr(clientWhatsappGroup.link || "")}" placeholder="https://chat.whatsapp.com/...">
+              </label>
+              <label class="wide">Descricao do grupo
+                <textarea id="coWhatsappGroupDescription" rows="5" placeholder="Explique o objetivo e o conteúdo do grupo">${escapeHtml(clientWhatsappGroup.descricao || clientWhatsappGroup.description || "")}</textarea>
+              </label>
+              <label class="check-row wide">
+                <input id="coWhatsappGroupEnabled" type="checkbox" ${!clientWhatsappGroupId || clientWhatsappGroup.status !== "inativo" ? "checked" : ""}>
+                Exibir no menu publico Grupos WhatsApp
+              </label>
+              <div class="form-actions wide">
+                <button id="coSaveWhatsappGroupButton" type="button"><i class="fa-solid fa-floppy-disk"></i> ${clientWhatsappGroupId ? "Salvar alteracoes" : "Adicionar grupo"}</button>
+                ${clientWhatsappGroupId ? `<button id="coDeleteWhatsappGroupButton" type="button" class="danger-button"><i class="fa-solid fa-trash"></i> Excluir grupo</button>` : ""}
+              </div>
+            </div>
+          </div>
+          ${clientWhatsappGroups.length ? `
+            <div class="client-whatsapp-group-list">
+              ${clientWhatsappGroups.map((group) => `
+                <article class="client-whatsapp-group-item ${group.id === clientWhatsappGroupId ? "is-editing" : ""}">
+                  <div>
+                    <strong>${escapeHtml(group.nome || group.name || "Grupo sem nome")}</strong>
+                    <span class="badge ${escapeAttr(group.status || "inativo")}">${group.status !== "inativo" ? "Publicado" : "Oculto"}</span>
+                    <small>${escapeHtml(group.descricao || group.description || group.link || "Sem descricao")}</small>
+                  </div>
+                  <div class="form-actions">
+                    <button type="button" class="ghost-button" data-co-edit-whatsapp-group="${escapeAttr(group.id)}"><i class="fa-solid fa-pen"></i> Editar</button>
+                    <button type="button" class="danger-button" data-co-delete-whatsapp-group="${escapeAttr(group.id)}"><i class="fa-solid fa-trash"></i> Excluir</button>
+                  </div>
+                </article>
+              `).join("")}
+            </div>
+          ` : `<p class="client-whatsapp-group-empty">Nenhum grupo cadastrado. Preencha os dados acima para adicionar o primeiro.</p>`}
+        </section>
+      ` : ""}
       ${canEditDestaque ? `
         <section id="client-module-destaque" class="wide upload-panel client-feature-card feature-destaque client-module-panel">
           <div class="section-head compact feature-card-head">
@@ -19670,8 +19694,50 @@ function renderClientOnlyEditor() {
     showToast("Imagem do grupo enviada.");
   });
 
+  mount.querySelector("#coNewWhatsappGroupButton")?.addEventListener("click", () => {
+    state.selectedClientWhatsappGroupId = null;
+    state.pendingClientModuleTarget = "client-module-grupo-whatsapp";
+    renderClientOnlyEditor();
+  });
+
+  mount.querySelectorAll("[data-co-edit-whatsapp-group]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.selectedClientWhatsappGroupId = button.dataset.coEditWhatsappGroup || null;
+      state.pendingClientModuleTarget = "client-module-grupo-whatsapp";
+      renderClientOnlyEditor();
+    });
+  });
+
+  const clientWhatsappLegacyUpdates = (group = null) => ({
+    [`clientes/${client.id}/grupoWhatsappId`]: group?.id || null,
+    [`clientes/${client.id}/grupoWhatsappNome`]: group ? (group.nome || group.name || "") : null,
+    [`clientes/${client.id}/grupoWhatsappLink`]: group?.link || null,
+    [`clientes/${client.id}/grupoWhatsappDescricao`]: group ? (group.descricao || group.description || "") : null,
+    [`clientes/${client.id}/grupoWhatsappImagem`]: group ? (group.imagem || group.image || "") : null,
+    [`clientes/${client.id}/grupoWhatsappAtivo`]: group ? group.status !== "inativo" : null
+  });
+
+  const deleteClientWhatsappGroup = async (groupId) => {
+    const group = clientWhatsappGroups.find((item) => item.id === groupId);
+    if (!group) return;
+    if (!(await confirmarExclusao(group.nome || group.name || "grupo", "grupo WhatsApp"))) return;
+    const remainingGroups = clientWhatsappGroups.filter((item) => item.id !== groupId);
+    const updates = { [`conteudosInformativos/gruposWhatsapp/${groupId}`]: null };
+    const hasValidPrimary = clientWhatsappGroups.some((item) => item.id === client.grupoWhatsappId);
+    if (client.grupoWhatsappId === groupId || !hasValidPrimary) {
+      Object.assign(updates, clientWhatsappLegacyUpdates(remainingGroups[0] || null));
+    }
+    await update(ref(db), updates);
+    await removerNovidadesPorDestino("grupoWhatsapp", groupId, groupId);
+    state.selectedClientWhatsappGroupId = null;
+    showToast("Grupo WhatsApp excluido.");
+    await loadAllData();
+    state.pendingClientModuleTarget = "client-module-grupo-whatsapp";
+    renderClientOnlyEditor();
+  };
+
   mount.querySelector("#coSaveWhatsappGroupButton")?.addEventListener("click", async () => {
-    const nome = mount.querySelector("#coWhatsappGroupName")?.value.trim() || client.nome || "";
+    const nome = mount.querySelector("#coWhatsappGroupName")?.value.trim() || "";
     const link = mount.querySelector("#coWhatsappGroupLink")?.value.trim() || "";
     const descricao = mount.querySelector("#coWhatsappGroupDescription")?.value.trim() || "";
     const imagem = mount.querySelector("#coWhatsappGroupImage")?.value.trim() || "";
@@ -19684,7 +19750,8 @@ function renderClientOnlyEditor() {
       showToast("Informe um link valido de grupo do WhatsApp.");
       return;
     }
-    const isNewGroup = !clientWhatsappGroup.link;
+    const id = clientWhatsappGroupId || `cliente-${slugify(client.id || client.nome || "grupo")}-${Date.now().toString(36)}`;
+    const isNewGroup = !clientWhatsappGroupId;
     const payload = cleanForFirebase({
       nome,
       name: nome,
@@ -19701,15 +19768,12 @@ function renderClientOnlyEditor() {
       updatedAt: serverTimestamp(),
       updatedBy: state.user.uid
     });
-    await update(ref(db), {
-      [`conteudosInformativos/gruposWhatsapp/${clientWhatsappGroupId}`]: payload,
-      [`clientes/${client.id}/grupoWhatsappId`]: clientWhatsappGroupId,
-      [`clientes/${client.id}/grupoWhatsappNome`]: nome,
-      [`clientes/${client.id}/grupoWhatsappLink`]: link,
-      [`clientes/${client.id}/grupoWhatsappDescricao`]: descricao,
-      [`clientes/${client.id}/grupoWhatsappImagem`]: imagem,
-      [`clientes/${client.id}/grupoWhatsappAtivo`]: enabled
-    });
+    const updates = { [`conteudosInformativos/gruposWhatsapp/${id}`]: payload };
+    const hasValidPrimary = clientWhatsappGroups.some((item) => item.id === client.grupoWhatsappId);
+    if (!hasValidPrimary || client.grupoWhatsappId === id) {
+      Object.assign(updates, clientWhatsappLegacyUpdates({ id, ...payload }));
+    }
+    await update(ref(db), updates);
     if (enabled) {
       const acao = acaoNovidadeAdmin("grupoWhatsapp", isNewGroup, payload);
       await registrarNovidadeAdmin({
@@ -19722,11 +19786,12 @@ function renderClientOnlyEditor() {
         imagem,
         categoria: "Grupos WhatsApp",
         destinoTipo: "grupoWhatsapp",
-        destinoId: clientWhatsappGroupId,
-        itemId: clientWhatsappGroupId,
+        destinoId: id,
+        itemId: id,
         link
       });
     }
+    state.selectedClientWhatsappGroupId = id;
     showToast(enabled ? "Grupo WhatsApp publicado." : "Grupo WhatsApp salvo como oculto.");
     await loadAllData();
     state.pendingClientModuleTarget = "client-module-grupo-whatsapp";
@@ -19734,23 +19799,14 @@ function renderClientOnlyEditor() {
   });
 
   mount.querySelector("#coDeleteWhatsappGroupButton")?.addEventListener("click", async () => {
-    if (!(await confirmarExclusao(clientWhatsappGroup.nome || client.nome || "grupo", "grupo WhatsApp"))) return;
-    await update(ref(db), {
-      [`conteudosInformativos/gruposWhatsapp/${clientWhatsappGroupId}`]: null,
-      [`clientes/${client.id}/grupoWhatsappId`]: null,
-      [`clientes/${client.id}/grupoWhatsappNome`]: null,
-      [`clientes/${client.id}/grupoWhatsappLink`]: null,
-      [`clientes/${client.id}/grupoWhatsappDescricao`]: null,
-      [`clientes/${client.id}/grupoWhatsappImagem`]: null,
-      [`clientes/${client.id}/grupoWhatsappAtivo`]: null
-    });
-    await removerNovidadesPorDestino("grupoWhatsapp", clientWhatsappGroupId, clientWhatsappGroupId);
-    showToast("Grupo WhatsApp excluido.");
-    await loadAllData();
-    state.pendingClientModuleTarget = "client-module-grupo-whatsapp";
-    renderClientOnlyEditor();
+    await deleteClientWhatsappGroup(clientWhatsappGroupId);
   });
 
+  mount.querySelectorAll("[data-co-delete-whatsapp-group]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      await deleteClientWhatsappGroup(button.dataset.coDeleteWhatsappGroup || "");
+    });
+  });
   mount.querySelectorAll("[data-co-main]").forEach((button) => {
     button.addEventListener("click", () => {
       const index = Number(button.dataset.coMain);
@@ -21915,16 +21971,15 @@ function bindEvents() {
     }
     if (payload.clienteId) {
       const targetClient = state.clientes.find((client) => client.id === payload.clienteId);
-      if (targetClient?.grupoWhatsappId && targetClient.grupoWhatsappId !== id) {
-        updates[`conteudosInformativos/gruposWhatsapp/${targetClient.grupoWhatsappId}/clienteId`] = null;
-        updates[`conteudosInformativos/gruposWhatsapp/${targetClient.grupoWhatsappId}/clienteNome`] = null;
+      const shouldUpdatePrimary = !targetClient?.grupoWhatsappId || targetClient.grupoWhatsappId === id || targetClient.grupoWhatsappId === state.selectedWhatsappGroupId;
+      if (shouldUpdatePrimary) {
+        updates[`clientes/${payload.clienteId}/grupoWhatsappId`] = id;
+        updates[`clientes/${payload.clienteId}/grupoWhatsappNome`] = payload.nome;
+        updates[`clientes/${payload.clienteId}/grupoWhatsappLink`] = payload.link;
+        updates[`clientes/${payload.clienteId}/grupoWhatsappDescricao`] = payload.descricao || "";
+        updates[`clientes/${payload.clienteId}/grupoWhatsappImagem`] = payload.imagem || "";
+        updates[`clientes/${payload.clienteId}/grupoWhatsappAtivo`] = payload.status === "ativo";
       }
-      updates[`clientes/${payload.clienteId}/grupoWhatsappId`] = id;
-      updates[`clientes/${payload.clienteId}/grupoWhatsappNome`] = payload.nome;
-      updates[`clientes/${payload.clienteId}/grupoWhatsappLink`] = payload.link;
-      updates[`clientes/${payload.clienteId}/grupoWhatsappDescricao`] = payload.descricao || "";
-      updates[`clientes/${payload.clienteId}/grupoWhatsappImagem`] = payload.imagem || "";
-      updates[`clientes/${payload.clienteId}/grupoWhatsappAtivo`] = payload.status === "ativo";
     }
     await update(ref(db), updates);
     const acao = acaoNovidadeAdmin("grupoWhatsapp", isNewGroup, payload);

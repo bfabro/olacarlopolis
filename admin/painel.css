@@ -6847,6 +6847,63 @@ button.admin-button-loading::after {
   grid-column: 1 / -1;
 }
 
+.client-whatsapp-group-head-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.client-whatsapp-group-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid #d9e1ec;
+}
+
+.client-whatsapp-group-item {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px;
+  border: 1px solid #d9e1ec;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.client-whatsapp-group-item.is-editing {
+  border-color: #22c55e;
+  box-shadow: 0 0 0 2px rgba(34, 197, 94, .12);
+}
+
+.client-whatsapp-group-item > div:first-child {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 5px 10px;
+  min-width: 0;
+}
+
+.client-whatsapp-group-item small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.client-whatsapp-group-item .form-actions {
+  flex: 0 0 auto;
+}
+
+.client-whatsapp-group-empty {
+  margin: 18px 0 0;
+  padding: 14px;
+  border: 1px dashed #b8c4d4;
+  border-radius: 10px;
+  color: var(--muted);
+  text-align: center;
+}
 /* ===== Gerador de stories comerciais v289 ===== */
 .story-generator {
   padding: 24px;
@@ -6961,6 +7018,19 @@ button.admin-button-loading::after {
 
   .client-whatsapp-group-fields .wide {
     grid-column: auto;
+  }
+
+  .client-whatsapp-group-head-actions {
+    justify-content: flex-start;
+  }
+
+  .client-whatsapp-group-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .client-whatsapp-group-item .form-actions {
+    width: 100%;
   }
 }
 /* ===== Clube de beneficios v513 ===== */
