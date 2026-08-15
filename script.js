@@ -4065,8 +4065,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         active: true,
         timestamp: firebase.database.ServerValue.TIMESTAMP,
         lastSeen: firebase.database.ServerValue.TIMESTAMP
-      });
-      myUserRef.onDisconnect().remove();
+      }).catch(() => {});
+      myUserRef.onDisconnect().remove().catch(() => {});
       updateArchivedPresence({
         active: true,
         timestamp: navigationHistory[0]?.timestamp || Date.now(),
@@ -4077,7 +4077,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         active: false,
         endedAt: firebase.database.ServerValue.TIMESTAMP,
         lastSeen: firebase.database.ServerValue.TIMESTAMP
-      });
+      }).catch(() => {});
       lastPresenceWriteAt = Date.now();
       scheduleIdleExpiration();
     };
@@ -4307,7 +4307,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         canal: detectarCanalAcesso(), // ✅ NOVO (Site vs App)
         tela: `${window.screen.width}x${window.screen.height}`,
         dispositivo: /Mobi|Android/i.test(navigator.userAgent) ? "mobile" : "desktop"
-      });
+      }).catch((error) => console.warn("Nao foi possivel registrar os detalhes do acesso.", error));
 
       // NOVO: registrar usuário único
       if (info.ip) {
@@ -24399,9 +24399,10 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     const isEventos = titleSlug === "eventosemcarlopolis";
     const isVagasTrabalho = titleSlug === "vagasdetrabalho";
     const isNotaFalecimento = titleSlug === "notadefalecimento";
+    const listaEstabelecimentos = Array.isArray(establishments) ? establishments : [];
     const sourceEstablishments = isVagasTrabalho
-      ? establishments.flatMap((establishment) => normalizarVagasTrabalhoPublicas(establishment))
-      : establishments;
+      ? listaEstabelecimentos.flatMap((establishment) => normalizarVagasTrabalhoPublicas(establishment))
+      : listaEstabelecimentos;
     const paidEstablishments = sourceEstablishments.filter((establishment) => {
       if (isEventos) return eventoPublicoAtivo(establishment);
       if (isVagasTrabalho) return vagaTrabalhoVisivel(establishment);
@@ -25333,8 +25334,10 @@ ${produtosIniciaisLoja.length ? `
       categories.forEach((cat) => cat.link?.classList.remove("active"));
       this.classList.add("active");
 
-      // define a rota da categoria; o roteador renderiza
+      // Renderiza imediatamente; a navegacao nao depende apenas do evento hashchange.
       location.hash = "#comercios-" + normalizeName(category.title);
+      prepararMenuParaCategoria(category);
+      loadContent(category.title, category.establishments || []);
 
       if (sidebar.classList.contains("close")) {
         sidebar.classList.remove("close");
