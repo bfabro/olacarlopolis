@@ -22919,6 +22919,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (campoExiste(cliente, "instagram")) est.instagram = cliente.instagram || "";
     if (campoExiste(cliente, "facebook")) est.facebook = cliente.facebook || "";
     if (campoExiste(cliente, "tiktok")) est.tiktok = cliente.tiktok || "";
+    if (campoExiste(cliente, "youtube")) est.youtube = cliente.youtube || "";
     if (campoExiste(cliente, "site")) est.site = cliente.site || "";
     est.categoria = cliente.categoria || est.categoria || "";
     est.categoriaId = cliente.categoriaId || est.categoriaId || normalizeName(est.categoria || "");
@@ -22992,6 +22993,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       instagram: cliente.instagram || "",
       facebook: cliente.facebook || "",
       tiktok: cliente.tiktok || "",
+      youtube: cliente.youtube || "",
       site: cliente.site || "",
       grupoWhatsappId: cliente.grupoWhatsappId || "",
       grupoWhatsappNome: cliente.grupoWhatsappNome || "",
@@ -24839,7 +24841,7 @@ ${!establishment.descricaoFalecido ? `
                    
                 
 
-                  ${(establishment.instagram || establishment.instagram2 || establishment.facebook || establishment.tiktok || establishment.site) ? `
+                  ${(establishment.instagram || establishment.instagram2 || establishment.facebook || establishment.tiktok || establishment.youtube || establishment.site) ? `
   <div class="info-box">
     <i class="fas fa-share-alt info-icon" role="button" tabindex="0" title="Gerar arte para divulgacao" aria-label="Gerar arte para divulgacao"></i>
     <div>
@@ -24867,6 +24869,12 @@ ${!establishment.descricaoFalecido ? `
           <a href="${fixUrl(establishment.tiktok)}" target="_blank" rel="noopener noreferrer"
              data-social-client="${normalizeName(establishment.name)}" data-social-type="tiktok">
             <i class="fab fa-tiktok" style="color: #111; font-size: 16px;"></i> TikTok
+          </a>` : ""}
+
+        ${establishment.youtube ? `
+          <a href="${fixUrl(establishment.youtube)}" target="_blank" rel="noopener noreferrer"
+             data-social-client="${normalizeName(establishment.name)}" data-social-type="youtube">
+            <i class="fab fa-youtube" style="color: #FF0000; font-size: 16px;"></i> YouTube
           </a>` : ""}
 
         ${establishment.site ? `

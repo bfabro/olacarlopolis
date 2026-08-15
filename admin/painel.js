@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 598,
-  label: "v605",
+  numero: 599,
+  label: "v606",
   data: "2026-08-15",
-  nota: "Navegação das novidades corrigida para priorizar o estabelecimento com nome exato."
+  nota: "Campo e ícone do YouTube adicionados às redes sociais dos clientes."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1668,7 +1668,7 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
     const detalhesOrigemPagina = day?.detalhesOrigemPagina || {};
 
     if (Object.keys(botoes).length) metrics.cliquesBotoes[date] = { [clientKey]: botoes };
-    ["whatsapp_promocao", "instagram_promocao", "facebook", "tiktok", "site"].forEach((tipo) => {
+    ["whatsapp_promocao", "instagram_promocao", "facebook", "tiktok", "youtube", "site"].forEach((tipo) => {
       if (!Number(promocoes[tipo] || 0)) return;
       if (!metrics.cliquesBotoes[date]) metrics.cliquesBotoes[date] = { [clientKey]: {} };
       metrics.cliquesBotoes[date][clientKey][tipo] = Number(promocoes[tipo]);
@@ -6125,6 +6125,7 @@ function getClientFormData() {
     instagram: $("clientInstagram").value.trim(),
     facebook: $("clientFacebook").value.trim(),
     tiktok: $("clientTiktok").value.trim(),
+    youtube: $("clientYoutube").value.trim(),
     site: $("clientSite").value.trim(),
     destaqueSemanal: $("clientFeaturedWeek").checked,
     destaqueSemanas: destaqueWeeksForClient({ destaqueSemanas: $("clientFeaturedWeeks")?.value || 1 }),
@@ -6425,12 +6426,13 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     String(client.instagram || "").trim(),
     String(client.facebook || "").trim(),
     String(client.tiktok || "").trim(),
+    String(client.youtube || "").trim(),
     String(client.site || "").trim()
   ]);
   const oldSocial = socialFingerprint(original);
   const newSocial = socialFingerprint(effective);
   if (oldSocial !== newSocial) {
-    if ([effective.instagram, effective.facebook, effective.tiktok, effective.site].some((value) => String(value || "").trim())) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
+    if ([effective.instagram, effective.facebook, effective.tiktok, effective.youtube, effective.site].some((value) => String(value || "").trim())) add("redesSociais", "cliente-redes", "Redes sociais atualizadas");
     else remove("cliente-redes", "redesSociais");
   }
   const menuFingerprint = (client = {}) => JSON.stringify({
@@ -6582,6 +6584,7 @@ function fillClientForm(client) {
   $("clientInstagram").value = client.instagram || "";
   $("clientFacebook").value = client.facebook || "";
   $("clientTiktok").value = client.tiktok || "";
+  $("clientYoutube").value = client.youtube || "";
   $("clientSite").value = client.site || "";
   $("clientFeaturedWeek").checked = Boolean(client.destaqueSemanal);
   if ($("clientFeaturedWeeks")) $("clientFeaturedWeeks").value = destaqueWeeksForClient(client);
@@ -14634,6 +14637,7 @@ function metricButtonLabel(tipo) {
     promocao_compartilhamento: "Promocao compartilhada",
     facebook: "Facebook",
     tiktok: "TikTok",
+    youtube: "YouTube",
     site: "Site",
     destaque: "Destaque",
     compartilhamento: "Compartilhamento",
@@ -15160,7 +15164,7 @@ function clientReportCategory(row = {}) {
   if (/foto|fotos|imagem|divulgacao/.test(text)) return "Fotos / divulgacao";
   if (/instagrampromocao/.test(text)) return "Redes sociais / links";
   if (/promocao|promocoes|oferta/.test(text)) return "Promocoes";
-  if (/instagram|facebook|tiktok|site|rede|social|link/.test(text)) return "Redes sociais / links";
+  if (/instagram|facebook|tiktok|youtube|site|rede|social|link/.test(text)) return "Redes sociais / links";
   return row.tipo || row.area || "Clique";
 }
 
@@ -15339,6 +15343,7 @@ function clientReportAvailability(client = {}, counts = {}) {
     instagram: Boolean(String(client.instagram || "").trim()),
     facebook: Boolean(String(client.facebook || "").trim()),
     tiktok: Boolean(String(client.tiktok || "").trim()),
+    youtube: Boolean(String(client.youtube || "").trim()),
     site: Boolean(String(client.site || "").trim()),
     outrasRedes: Number(counts.outrasRedes || 0) > 0,
     compartilhamentos: true,
@@ -15439,11 +15444,12 @@ function renderClientMetricReportContent(client = {}) {
   const instagram = Number(tiposPermitidos.get("instagram") || 0);
   const facebook = Number(tiposPermitidos.get("facebook") || 0);
   const tiktok = Number(tiposPermitidos.get("tiktok") || 0);
+  const youtube = Number(tiposPermitidos.get("youtube") || 0);
   const site = Number(tiposPermitidos.get("site") || 0);
   const outrasRedes = [...tiposPermitidos.entries()]
-    .filter(([tipo]) => /youtube|linkedin|rede|social|link/i.test(String(tipo)))
+    .filter(([tipo]) => /linkedin|rede|social|link/i.test(String(tipo)))
     .reduce((sum, [, count]) => sum + Number(count || 0), 0);
-  const redes = instagram + facebook + tiktok + site + outrasRedes;
+  const redes = instagram + facebook + tiktok + youtube + site + outrasRedes;
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
   const promocoesBotoesGenericos = Number(tiposPermitidos.get("promocao_visualizacao") || 0)
     + Number(tiposPermitidos.get("promocao_fotos") || 0) + Number(tiposPermitidos.get("promocao_compartilhamento") || 0);
@@ -15515,6 +15521,7 @@ function renderClientMetricReportContent(client = {}) {
     { key: "instagram", label: "Instagram", count: instagram, note: "Cliques no Instagram" },
     { key: "facebook", label: "Facebook", count: facebook, note: "Cliques no Facebook" },
     { key: "tiktok", label: "TikTok", count: tiktok, note: "Cliques no TikTok" },
+    { key: "youtube", label: "YouTube", count: youtube, note: "Cliques no YouTube" },
     { key: "site", label: "Site", count: site, note: "Cliques no site do cliente" },
     { key: "outrasRedes", label: "Outras redes / links", count: outrasRedes, note: "Outros links cadastrados" },
     { key: "compartilhamentos", label: "Compartilhamentos", count: compartilhamentos, note: "Botao de compartilhar cliente" },
@@ -15540,6 +15547,7 @@ function renderClientMetricReportContent(client = {}) {
     if (/instagram/.test(type)) return availability.instagram;
     if (/facebook/.test(type)) return availability.facebook;
     if (/tiktok/.test(type)) return availability.tiktok;
+    if (/youtube/.test(type)) return availability.youtube;
     if (/^site$|sitecliente/.test(type)) return availability.site;
     if (/whatsapppromocao/.test(normalized)) return availability.whatsappPromocao;
     if (/whatsapptelefone/.test(normalized)) return availability.whats;
@@ -15550,7 +15558,7 @@ function renderClientMetricReportContent(client = {}) {
     if (/destaque/.test(normalized)) return availability.destaques;
     if (/promoc/.test(normalized)) return availability.promocoes;
     if (/grupowhatsapp/.test(normalized)) return availability.gruposWhatsapp;
-    if (/redessociaislinks/.test(normalized)) return availability.instagram || availability.facebook || availability.tiktok || availability.site || availability.outrasRedes;
+    if (/redessociaislinks/.test(normalized)) return availability.instagram || availability.facebook || availability.tiktok || availability.youtube || availability.site || availability.outrasRedes;
     if (/compartilh/.test(normalized)) return availability.compartilhamentos;
     return availability.outros;
   };
@@ -18973,6 +18981,7 @@ function renderClientOnlyEditor() {
         <label class="admin-field-line field-instagram">Instagram<input id="coInstagram" value="${escapeAttr(client.instagram || "")}"></label>
         <label class="admin-field-line field-facebook">Facebook<input id="coFacebook" value="${escapeAttr(client.facebook || "")}"></label>
         <label class="admin-field-line field-tiktok">TikTok<input id="coTiktok" value="${escapeAttr(client.tiktok || "")}"></label>
+        <label class="admin-field-line field-youtube">YouTube<input id="coYoutube" value="${escapeAttr(client.youtube || "")}" placeholder="https://www.youtube.com/@canal"></label>
         <label class="admin-field-line field-site">Site<input id="coSite" value="${escapeAttr(client.site || "")}"></label>
         <div class="form-section-title wide">
           <i class="fa-solid fa-note-sticky"></i>
@@ -20065,6 +20074,7 @@ function renderClientOnlyEditor() {
         instagram: $("coInstagram").value.trim(),
         facebook: $("coFacebook").value.trim(),
         tiktok: $("coTiktok").value.trim(),
+        youtube: $("coYoutube").value.trim(),
         site: $("coSite").value.trim(),
         infoAdicional: $("coInfo").value.trim()
       });
