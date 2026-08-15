@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-14-cardapio-modal-unificada-v646'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-15-gerador-curriculo-v647'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
