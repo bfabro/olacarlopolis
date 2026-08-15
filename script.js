@@ -9937,6 +9937,13 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   function encontrarCategoriaEstabelecimentoPublico(chave = "") {
     const alvo = normalizeName(chave);
     if (!alvo) return null;
+    // Prioriza a identidade exata em todas as categorias antes de aceitar aliases parciais.
+    for (const categoria of categories || []) {
+      for (const estabelecimento of categoria.establishments || []) {
+        const chaves = chavesEstabelecimentoPublico(estabelecimento);
+        if (chaves.includes(alvo)) return { categoria, estabelecimento };
+      }
+    }
     const corresponde = (item) => {
       if (item === alvo) return true;
       if (item.length < 12 || alvo.length < 12) return false;
