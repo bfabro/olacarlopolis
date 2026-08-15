@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 594,
-  label: "v601",
+  numero: 595,
+  label: "v602",
   data: "2026-08-15",
-  nota: "Gerador profissional de currículo em PDF e PNG integrado à página pública de vagas."
+  nota: "Gerador de currículo ajustado sem criação automática de textos no perfil profissional."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

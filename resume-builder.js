@@ -84,7 +84,7 @@
       <section class="rb-form-section" data-progress="objective"><h3><i class="fa-solid fa-bullseye"></i> Perfil profissional</h3><div class="rb-grid">
         ${textarea("Objetivo profissional", "objective", "Busco oportunidade na área de atendimento, vendas ou serviços, contribuindo com responsabilidade, organização e bom relacionamento com clientes e equipe.")}
         ${textarea("Resumo profissional", "summary", "Profissional comprometido, com facilidade para aprender novas rotinas, boa comunicação e foco em resultados.")}
-      </div><button type="button" class="rb-secondary-btn" data-auto-text><i class="fa-solid fa-wand-magic-sparkles"></i> Criar texto automaticamente</button></section>
+      </div></section>
 
       <section class="rb-form-section" data-progress="experience"><h3><i class="fa-solid fa-briefcase"></i> Experiências profissionais</h3><div data-repeat-list="experiences">
         ${data.experiences.map((item, i) => repeatCard("experiences", i, "Experiência", `${itemInput("experiences", i, "company", "Nome da empresa")}${itemInput("experiences", i, "role", "Cargo")}${itemInput("experiences", i, "start", "Início", { type: "month" })}${itemInput("experiences", i, "end", "Término", { type: "month" })}<label class="rb-check"><input type="checkbox" data-array="experiences" data-index="${i}" data-key="current"${item.current ? " checked" : ""}> Trabalho atualmente aqui</label>${itemInput("experiences", i, "description", "Atividades", { textarea: true, placeholder: "Uma atividade por linha" })}`)).join("")}
@@ -246,7 +246,6 @@
     if (button.dataset.removeSkill !== undefined) { data.skills.splice(Number(button.dataset.removeSkill), 1); save(); renderForm(); renderPreview(); }
     if (button.dataset.addSkill !== undefined) addSkill();
     if (button.dataset.removePhoto !== undefined) { data.photo = ""; save(); renderForm(); renderPreview(); }
-    if (button.dataset.autoText !== undefined) { const role = data.desiredRole || "atendimento, vendas ou serviços"; if (!has(data.objective)) data.objective = `Busco uma oportunidade na área de ${role}, contribuindo com responsabilidade, organização e bom relacionamento com clientes e equipe.`; if (!has(data.summary)) data.summary = "Profissional comprometido, com facilidade para aprender novas rotinas, boa comunicação, organização e foco em resultados."; save(); renderForm(); renderPreview(); }
     if (button.dataset.viewPreview !== undefined) modal.querySelector(".rb-preview-column")?.scrollIntoView({ behavior: "smooth" });
     if (button.dataset.clear !== undefined && confirm("Deseja apagar todos os dados deste currículo?")) { data = clone(EMPTY); localStorage.removeItem(STORAGE_KEY); renderForm(); renderPreview(); }
     if (button.dataset.pdf !== undefined) generatePdf();
@@ -262,7 +261,7 @@
   window.ResumeBuilder = { open, close };
   document.addEventListener("click", (event) => { if (event.target.closest("[data-open-resume-builder]")) { event.preventDefault(); open(); } });
   function mountVacancyCta() {
-    document.querySelectorAll(".sidebar-version").forEach((item) => { item.textContent = "Olá Carlópolis v356"; });
+    document.querySelectorAll(".sidebar-version").forEach((item) => { item.textContent = "Olá Carlópolis v357"; });
     const area = document.querySelector(".content_area");
     if (!area || area.querySelector(".vagas-resume-cta")) return;
     const vacancyPage = area.querySelector(".vagas-public-page");
