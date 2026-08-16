@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 609,
-  label: "v616",
+  numero: 610,
+  label: "v617",
   data: "2026-08-16",
-  nota: "Gestão completa de postos e preços de combustível com consulta oficial da ANP."
+  nota: "Correção do botão de busca de postos disponíveis na integração ANP."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -21788,13 +21788,13 @@ function bindEvents() {
     await uploadPaymentInvoiceLogo(event.target.files?.[0]);
     event.target.value = "";
   });
-  $("homePageForm")?.addEventListener("submit", async (event) => {
   $("fuelAdminSearch")?.addEventListener("click", searchFuelStationsFromAnp);
   $("fuelAdminConfigForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     await saveFuelAdminSettings();
   });
 
+  $("homePageForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!isMaster()) {
       showToast("Somente master pode alterar a pagina inicial.");
