@@ -6754,6 +6754,7 @@ carlopdiesel:"s",
       ]],
       ["Utilidades", [
         "menuConsultaCEP",
+        "menuCombustivel",
         "menuEconomiaLuz",
         "menuGruposWhats"
       ]],
