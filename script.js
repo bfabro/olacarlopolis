@@ -28767,6 +28767,15 @@ function fuelPublicEscape(value) {
   }[character]));
 }
 
+function fuelPublicNormalize(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[ç]/g, "c")
+    .replace(/\s+/g, "");
+}
+
 let fuelPublicConfigPromise = null;
 async function fuelPublicEnsureConfig() {
   const current = fuelPublicConfig();
@@ -28801,7 +28810,7 @@ function aplicarConfiguracaoCombustiveisPublicos(config = {}, options = {}) {
 }
 
 function fuelPublicLabel(name) {
-  const key = normalizeName(name || "");
+  const key = fuelPublicNormalize(name || "");
   if (key.includes("gasolinaccomumaditivada") || key.includes("gasolinaaditivada")) return "Gasolina Aditivada";
   if (key.includes("gasolinaccomum") || key === "gasolina") return "Gasolina Comum";
   if (key.includes("etanol")) return "Etanol";
@@ -28845,7 +28854,7 @@ function fuelPublicCheapest(stations) {
   stations.forEach((station) => {
     fuelPublicProducts(station).forEach((product) => {
       if (!product.price) return;
-      const key = normalizeName(product.label);
+      const key = fuelPublicNormalize(product.label);
       const current = cheapest.get(key);
       if (!current || product.price < current.price) cheapest.set(key, { ...product, station });
     });
