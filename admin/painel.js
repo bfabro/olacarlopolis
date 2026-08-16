@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 603,
-  label: "v610",
+  numero: 604,
+  label: "v611",
   data: "2026-08-16",
-  nota: "Correção da troca sequencial entre categorias públicas vazias."
+  nota: "Quantidade de cliques no WhatsApp adicionada ao relatório de exclusões."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -195,6 +195,9 @@ let state = {
   beneficiosParceiroDuvidas: [],
   beneficiosParceiroNotificacoes: [],
   exclusoes: [],
+  deletionWhatsappLogs: [],
+  deletionWhatsappMetricsLoaded: false,
+  deletionWhatsappMetricsPromise: null,
   deletionReportFilters: {
     search: "",
     type: "todos",
@@ -5657,6 +5660,126 @@ function deletionReportFilteredItems() {
     return haystack.includes(search);
   });
 }
+function deletionWhatsappIdentity(value = "") {
+  return normalizeName(String(value || "").replace(/^(id|ref):/i, "").trim());
+}
+
+function deletionWhatsappClientKeys(item = {}) {
+  const linkedClient = state.clientes.find((client) => (
+    String(client.id || "") === String(item.clienteId || "")
+    || normalizeName(client.nome || client.name || "") === normalizeName(item.clienteNome || "")
+  ));
+  return [...new Set([
+    item.clienteId,
+    item.clienteNome,
+    linkedClient?.id,
+    linkedClient?.nome,
+    linkedClient?.name,
+    linkedClient?.nomeNormalizado,
+    linkedClient ? clientCanonicalId(linkedClient) : "",
+    ...Object.keys(linkedClient?.aliases || {})
+  ].flatMap(aliasKeyVariants).map((value) => normalizeName(value)).filter(Boolean))];
+}
+
+function deletionWhatsappTypeMatches(item = {}, log = {}) {
+  const recordType = normalizeName(item.tipo || "");
+  const logType = normalizeName([log.tipo, log.grupo, log.area, log.acao].filter(Boolean).join(" "));
+  const rules = [
+    [/imovel/, /imovel/],
+    [/automovel|veiculo/, /automovel|veiculo/],
+    [/produto/, /produto/],
+    [/promocao/, /promocao/],
+    [/vaga/, /vaga/],
+    [/noticia/, /noticia/],
+    [/evento/, /evento/]
+  ];
+  const rule = rules.find(([recordPattern]) => recordPattern.test(recordType));
+  return !rule || rule[1].test(logType);
+}
+
+function deletionWhatsappCount(item = {}) {
+  if (!state.deletionWhatsappMetricsLoaded) return null;
+  const recordIds = new Set([
+    item.itemId,
+    String(item.caminho || "").split("/").filter(Boolean).pop()
+  ].map(deletionWhatsappIdentity).filter(Boolean));
+  const recordReference = normalizeName(item.referencia || "");
+  const clientKeys = deletionWhatsappClientKeys(item);
+
+  return (state.deletionWhatsappLogs || []).reduce((total, entry) => {
+    const log = entry.log || {};
+    if (clientKeys.length && !metricKeyBelongsToClient(entry.clientKey, clientKeys)) return total;
+    if (!deletionWhatsappTypeMatches(item, log)) return total;
+
+    const logIds = [
+      log.itemId,
+      log.imovelId,
+      log.veiculoId,
+      log.automovelId,
+      log.produtoId,
+      log.promoId,
+      log.promocaoId,
+      log.vagaId,
+      log.noticiaId,
+      log.eventoId,
+      log.codRef,
+      log.codigo
+    ].map(deletionWhatsappIdentity).filter(Boolean);
+    const idMatches = logIds.some((id) => recordIds.has(id));
+    if (idMatches) return total + 1;
+
+    if (!recordReference || logIds.length) return total;
+    const logReferences = [
+      log.tituloConteudo,
+      log.imovelTitulo,
+      log.promoTitulo,
+      log.promocaoTitulo,
+      log.titulo,
+      log.nome
+    ].map((value) => normalizeName(value || "")).filter(Boolean);
+    const referenceMatches = logReferences.some((value) => (
+      value === recordReference
+      || (value.length > 5 && recordReference.length > 5 && (value.includes(recordReference) || recordReference.includes(value)))
+    ));
+    return total + (referenceMatches ? 1 : 0);
+  }, 0);
+}
+
+async function loadDeletionWhatsappMetrics({ force = false } = {}) {
+  if (!isMaster()) return [];
+  if (state.deletionWhatsappMetricsLoaded && !force) return state.deletionWhatsappLogs;
+  if (state.deletionWhatsappMetricsPromise && !force) return state.deletionWhatsappMetricsPromise;
+
+  state.deletionWhatsappMetricsLoaded = false;
+  state.deletionWhatsappMetricsPromise = (async () => {
+    const snapshot = await get(ref(db, "metricasClientes"));
+    const logs = [];
+    const root = snapshot.exists() ? snapshot.val() : {};
+    Object.entries(root || {}).forEach(([clientKey, days]) => {
+      Object.values(days || {}).forEach((day) => {
+        Object.values(day?.detalhes || {}).forEach((log) => {
+          const action = normalizeName([log?.tipo, log?.acao, log?.area].filter(Boolean).join(" "));
+          if (/whatsapp|whats|telefone|contato|zap/.test(action)) logs.push({ clientKey, log: log || {} });
+        });
+      });
+    });
+    state.deletionWhatsappLogs = logs;
+    state.deletionWhatsappMetricsLoaded = true;
+    return logs;
+  })()
+    .catch((error) => {
+      console.warn("Nao foi possivel carregar os cliques de WhatsApp das exclusoes.", error);
+      state.deletionWhatsappLogs = [];
+      state.deletionWhatsappMetricsLoaded = true;
+      return [];
+    })
+    .finally(() => {
+      state.deletionWhatsappMetricsPromise = null;
+    });
+
+  return state.deletionWhatsappMetricsPromise;
+}
+
 
 function renderDeletionReportRows() {
   const rows = deletionReportFilteredItems();
@@ -5677,6 +5800,8 @@ function renderDeletionReportRows() {
     const createdAt = Number(item.createdAt || 0);
     const roleLabel = item.role === "cliente" ? "Admin cliente" : (item.role === "master" ? "Admin master" : (item.role || "Administrador"));
     const clientLabel = item.clienteNome || item.clienteId || "Item geral";
+    const whatsappCount = deletionWhatsappCount(item);
+    const whatsappLabel = whatsappCount === null ? "..." : String(whatsappCount);
     return `
       <tr>
         <td><strong>${escapeHtml(createdAt ? new Date(createdAt).toLocaleDateString("pt-BR") : "-")}</strong><small>${escapeHtml(createdAt ? new Date(createdAt).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "")}</small></td>
@@ -5684,6 +5809,7 @@ function renderDeletionReportRows() {
         <td><strong>${escapeHtml(item.referencia || "Item sem referencia")}</strong><small>ID: ${escapeHtml(item.itemId || "-")}</small></td>
         <td><strong>${escapeHtml(clientLabel)}</strong><small>${escapeHtml(item.clienteId && item.clienteNome ? item.clienteId : "")}</small></td>
         <td><strong>${escapeHtml(item.email || "-")}</strong><small>${escapeHtml(roleLabel)}</small></td>
+        <td class="deletion-whatsapp-cell"><span class="deletion-whatsapp-count ${whatsappCount > 0 ? "has-clicks" : ""}"><i class="fa-brands fa-whatsapp"></i>${whatsappLabel}</span></td>
         <td>
           <details class="deletion-details">
             <summary>Ver dados</summary>
@@ -5693,7 +5819,7 @@ function renderDeletionReportRows() {
         </td>
       </tr>
     `;
-  }).join("") : `<tr><td colspan="6"><div class="deletion-empty"><i class="fa-solid fa-shield-halved"></i><strong>Nenhuma exclusao encontrada</strong><span>Ajuste os filtros ou aguarde novos registros.</span></div></td></tr>`;
+  }).join("") : `<tr><td colspan="7"><div class="deletion-empty"><i class="fa-solid fa-shield-halved"></i><strong>Nenhuma exclusao encontrada</strong><span>Ajuste os filtros ou aguarde novos registros.</span></div></td></tr>`;
 }
 
 function renderDeletionReport() {
@@ -5749,7 +5875,7 @@ function renderDeletionReport() {
       </div>
       <div class="report-table-wrap">
         <table class="report-table deletion-report-table">
-          <thead><tr><th>Data</th><th>Tipo</th><th>Item / referencia</th><th>Cliente</th><th>Excluido por</th><th>Detalhes</th></tr></thead>
+          <thead><tr><th>Data</th><th>Tipo</th><th>Item / referencia</th><th>Cliente</th><th>Excluido por</th><th>WhatsApp</th><th>Detalhes</th></tr></thead>
           <tbody id="deletionReportRows"></tbody>
         </table>
       </div>
@@ -5784,6 +5910,7 @@ function renderDeletionReport() {
         });
       }
       state.exclusoes.sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+      await loadDeletionWhatsappMetrics({ force: true });
       renderDeletionReport();
       showToast("Relatorio de exclusoes atualizado.");
     } catch (error) {
@@ -5793,6 +5920,11 @@ function renderDeletionReport() {
     }
   });
   renderDeletionReportRows();
+  if (!$("relatorioExclusoesView")?.classList.contains("hidden") && !state.deletionWhatsappMetricsLoaded) {
+    loadDeletionWhatsappMetrics().then(() => {
+      if (!$("relatorioExclusoesView")?.classList.contains("hidden")) renderDeletionReportRows();
+    });
+  }
 }
 
 function syncAdminMenuActiveState(target) {

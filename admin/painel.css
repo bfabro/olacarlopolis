@@ -8349,6 +8349,36 @@ button.admin-button-loading::after {
   white-space: nowrap;
 }
 
+.deletion-whatsapp-cell {
+  min-width: 94px;
+  text-align: center;
+}
+
+.deletion-whatsapp-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 64px;
+  padding: 7px 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  color: #64748b;
+  background: #f8fafc;
+  font-size: 13px;
+  font-weight: 850;
+}
+
+.deletion-whatsapp-count i {
+  font-size: 15px;
+}
+
+.deletion-whatsapp-count.has-clicks {
+  border-color: #86efac;
+  color: #166534;
+  background: #dcfce7;
+}
+
 .deletion-details summary {
   cursor: pointer;
   color: #1d4ed8;
