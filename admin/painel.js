@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 608,
-  label: "v615",
+  numero: 609,
+  label: "v616",
   data: "2026-08-16",
-  nota: "Gerador de currículo restaurado e integrado às telas públicas de vagas."
+  nota: "Gestão completa de postos e preços de combustível com consulta oficial da ANP."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -184,6 +184,8 @@ let state = {
   pagamentoSistema: {},
   paginaInicialSite: {},
   novidadesConfig: {},
+  combustiveisConfig: {},
+  combustiveisBusca: [],
   sobreNos: {},
   xadrezConfig: {},
   beneficios: [],
@@ -745,6 +747,7 @@ const views = {
   pagamentoSistema: $("pagamentoSistemaView"),
   paginaInicialSite: $("paginaInicialSiteView"),
   novidadesConfig: $("novidadesConfigView"),
+  combustiveisConfig: $("combustiveisConfigView"),
   sobreNos: $("sobreNosView"),
   xadrezConfig: $("xadrezConfigView"),
   storiesComerciais: $("storiesComerciaisView"),
@@ -777,6 +780,7 @@ const viewCopy = {
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
   paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
   novidadesConfig: ["Novidades do site", "Defina quais atualizações aparecem na tela principal pública."],
+  combustiveisConfig: ["Preço Combustível", "Busque postos da ANP, selecione os publicados e atualize os preços de bomba."],
   sobreNos: ["Sobre nós", "Edite o conteúdo institucional apresentado no site público."],
   xadrezConfig: ["Xadrez", "Configure campeonato e premio do jogo de xadrez."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
@@ -1055,6 +1059,7 @@ function canAccessView(viewName) {
     if (viewName === "usuariosOnline") return isMaster();
     if (viewName === "pagamentoSistema") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
+    if (viewName === "combustiveisConfig") return isMaster();
     if (viewName === "novidadesConfig") return isMaster();
     if (viewName === "sobreNos") return isMaster();
     if (viewName === "xadrezConfig") return isMaster();
@@ -2674,6 +2679,7 @@ async function loadAllData(onProgress = null) {
     gruposWhatsappSnap,
     pagamentoSnap,
     paginaInicialSnap,
+    combustiveisSnap,
     novidadesConfigSnap,
     sobreNosSnap,
     xadrezConfigSnap,
@@ -2704,6 +2710,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("conteudosInformativos/gruposWhatsapp"),
     getPanelSnapshot("configuracoes/pagamento"),
     getPanelSnapshot("configuracoes/paginaInicial"),
+    getPanelSnapshot("configuracoes/combustiveis"),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -2788,6 +2795,7 @@ async function loadAllData(onProgress = null) {
   state.gruposWhatsapp.sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
+  state.combustiveisConfig = combustiveisSnap.exists() ? combustiveisSnap.val() : {};
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
@@ -5963,6 +5971,7 @@ function switchView(name) {
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "paginaInicialSite") renderHomePageSettings();
+  if (target === "combustiveisConfig") renderFuelAdminSettings();
   if (target === "novidadesConfig") renderNovidadesConfig();
   if (target === "sobreNos") renderSobreNosSettings();
   if (target === "xadrezConfig") renderXadrezConfig();
@@ -16791,6 +16800,196 @@ async function uploadPaymentInvoiceLogo(file) {
   showToast("Logo enviada. Clique em Salvar pagamento para confirmar.");
 }
 
+function fuelAdminStationMap() {
+  const postos = state.combustiveisConfig?.postos;
+  return postos && typeof postos === "object" ? { ...postos } : {};
+}
+
+function fuelAdminProductMap(station) {
+  const produtos = station?.combustiveis;
+  if (produtos && typeof produtos === "object") return { ...produtos };
+  return {};
+}
+
+function normalizeAnpStationForAdmin(station) {
+  const id = String(station?.codigoSIMP || station?.cnpj || "").replace(/[^a-zA-Z0-9_-]/g, "");
+  const existing = fuelAdminStationMap()[id] || {};
+  const existingProducts = fuelAdminProductMap(existing);
+  const combustiveis = {};
+  (Array.isArray(station?.produtos) ? station.produtos : []).forEach((product) => {
+    const nome = String(product?.produto || "").trim();
+    if (!nome) return;
+    const key = slugify(nome) || `combustivel-${Object.keys(combustiveis).length + 1}`;
+    combustiveis[key] = {
+      nome,
+      ativo: existingProducts[key]?.ativo !== false,
+      preco: Number(existingProducts[key]?.preco || 0) || 0,
+      atualizadoEm: existingProducts[key]?.atualizadoEm || ""
+    };
+  });
+  Object.entries(existingProducts).forEach(([key, product]) => {
+    if (!combustiveis[key]) combustiveis[key] = product;
+  });
+  return {
+    ...existing,
+    codigoSIMP: id,
+    razaoSocial: station?.razaoSocial || existing.razaoSocial || "",
+    nomeExibicao: existing.nomeExibicao || station?.razaoSocial || "",
+    cnpj: station?.cnpj || existing.cnpj || "",
+    endereco: station?.endereco || existing.endereco || "",
+    bairro: station?.bairro || existing.bairro || "",
+    municipio: station?.municipio || existing.municipio || "",
+    uf: station?.uf || existing.uf || "",
+    distribuidora: station?.distribuidora || existing.distribuidora || "",
+    latitude: station?.latitude || existing.latitude || "",
+    longitude: station?.longitude || existing.longitude || "",
+    ativo: existing.ativo !== false,
+    combustiveis
+  };
+}
+
+function collectFuelAdminStationsFromForm() {
+  const result = {};
+  $("fuelAdminSelectedStations")?.querySelectorAll("[data-fuel-station-id]").forEach((card) => {
+    const id = card.dataset.fuelStationId;
+    const base = fuelAdminStationMap()[id] || {};
+    const combustiveis = {};
+    card.querySelectorAll("[data-fuel-product-id]").forEach((row) => {
+      const productId = row.dataset.fuelProductId;
+      const preco = Number(String(row.querySelector("[data-fuel-price]")?.value || "").replace(",", ".")) || 0;
+      combustiveis[productId] = {
+        nome: row.dataset.fuelProductName || productId,
+        ativo: row.querySelector("[data-fuel-enabled]")?.checked !== false,
+        preco: Math.max(0, preco),
+        atualizadoEm: row.querySelector("[data-fuel-date]")?.value || ""
+      };
+    });
+    result[id] = {
+      ...base,
+      codigoSIMP: id,
+      nomeExibicao: card.querySelector("[data-fuel-station-name]")?.value.trim() || base.razaoSocial || "Posto",
+      ativo: card.querySelector("[data-fuel-station-active]")?.checked !== false,
+      combustiveis
+    };
+  });
+  return result;
+}
+
+function renderFuelAdminSearchResults() {
+  const box = $("fuelAdminSearchResults");
+  if (!box) return;
+  const selected = fuelAdminStationMap();
+  const list = Array.isArray(state.combustiveisBusca) ? state.combustiveisBusca : [];
+  box.innerHTML = list.length ? list.map((station) => {
+    const id = String(station.codigoSIMP || station.cnpj || "");
+    const added = Boolean(selected[id]);
+    const products = (station.produtos || []).map((item) => item.produto).filter(Boolean);
+    return `<article class="fuel-admin-result-card">
+      <div><span class="badge">${escapeHtml(station.distribuidora || "Sem bandeira")}</span><h3>${escapeHtml(station.razaoSocial || "Posto")}</h3><p>${escapeHtml(station.endereco || "")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}</p><small>${products.length} combustível(is): ${escapeHtml(products.join(", "))}</small></div>
+      <button type="button" data-add-fuel-station="${escapeAttr(id)}" ${added ? "disabled" : ""}><i class="fa-solid ${added ? "fa-check" : "fa-plus"}"></i> ${added ? "Adicionado" : "Adicionar"}</button>
+    </article>`;
+  }).join("") : `<div class="list-meta">Nenhum resultado carregado.</div>`;
+  box.querySelectorAll("[data-add-fuel-station]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const current = collectFuelAdminStationsFromForm();
+      const station = list.find((item) => String(item.codigoSIMP || item.cnpj || "") === button.dataset.addFuelStation);
+      if (!station) return;
+      state.combustiveisConfig = { ...state.combustiveisConfig, ativo: $("fuelAdminActive")?.checked === true, cidade: $("fuelAdminCity")?.value.trim() || "CARLOPOLIS", uf: $("fuelAdminUf")?.value.trim().toUpperCase() || "PR", postos: { ...current, [button.dataset.addFuelStation]: normalizeAnpStationForAdmin(station) } };
+      renderFuelAdminSettings();
+      showToast("Posto adicionado. Informe os preços e salve para publicar.");
+    });
+  });
+}
+
+function renderFuelAdminSelectedStations() {
+  const box = $("fuelAdminSelectedStations");
+  if (!box) return;
+  const stations = Object.values(fuelAdminStationMap());
+  box.innerHTML = stations.length ? stations.map((station) => {
+    const id = String(station.codigoSIMP || station.cnpj || "");
+    const products = Object.entries(fuelAdminProductMap(station));
+    return `<article class="fuel-admin-station" data-fuel-station-id="${escapeAttr(id)}">
+      <header><div><span class="feature-kicker">${escapeHtml(station.distribuidora || "Posto")}</span><h3>${escapeHtml(station.razaoSocial || station.nomeExibicao || "Posto")}</h3><p>${escapeHtml(station.endereco || "")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}</p></div><button type="button" class="danger-mini" data-remove-fuel-station="${escapeAttr(id)}"><i class="fa-solid fa-trash"></i> Remover</button></header>
+      <div class="fuel-admin-station-settings"><label>Nome exibido<input data-fuel-station-name value="${escapeAttr(station.nomeExibicao || station.razaoSocial || "")}"></label><label class="check-row"><input data-fuel-station-active type="checkbox" ${station.ativo !== false ? "checked" : ""}> Publicar este posto</label></div>
+      <div class="fuel-admin-products">${products.map(([productId, product]) => `<div class="fuel-admin-product" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}"><label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)}</label><label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${Number(product.preco || 0) || ""}" placeholder="0,000"></label><label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label></div>`).join("")}</div>
+    </article>`;
+  }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
+
+  box.querySelectorAll("[data-remove-fuel-station]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const stationsMap = collectFuelAdminStationsFromForm();
+      delete stationsMap[button.dataset.removeFuelStation];
+      state.combustiveisConfig = { ...state.combustiveisConfig, ativo: $("fuelAdminActive")?.checked === true, cidade: $("fuelAdminCity")?.value.trim() || "CARLOPOLIS", uf: $("fuelAdminUf")?.value.trim().toUpperCase() || "PR", postos: stationsMap };
+      renderFuelAdminSettings();
+    });
+  });
+  box.querySelectorAll("[data-fuel-price]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const row = input.closest("[data-fuel-product-id]");
+      const date = row?.querySelector("[data-fuel-date]");
+      if (Number(input.value) > 0 && date && !date.value) date.value = dateKeyFromDate(new Date());
+    });
+  });
+}
+
+function renderFuelAdminSettings() {
+  if (!$("fuelAdminConfigForm")) return;
+  const config = state.combustiveisConfig || {};
+  $("fuelAdminActive").checked = config.ativo === true;
+  $("fuelAdminCity").value = config.cidade || "CARLOPOLIS";
+  $("fuelAdminUf").value = config.uf || "PR";
+  renderFuelAdminSelectedStations();
+  renderFuelAdminSearchResults();
+}
+
+async function searchFuelStationsFromAnp() {
+  if (!isMaster()) return;
+  const city = $("fuelAdminCity")?.value.trim();
+  const uf = $("fuelAdminUf")?.value.trim().toUpperCase();
+  if (!city || uf.length !== 2) { showToast("Informe a cidade e a UF."); return; }
+  const button = $("fuelAdminSearch");
+  const status = $("fuelAdminSearchStatus");
+  button.disabled = true;
+  button.classList.add("admin-button-loading");
+  if (status) status.textContent = `Consultando postos de ${city}/${uf} na ANP...`;
+  try {
+    const response = await fetch(`/api/anp-postos?municipio=${encodeURIComponent(city)}&uf=${encodeURIComponent(uf)}`, { headers: { accept: "application/json" } });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.message || "Falha na consulta.");
+    state.combustiveisBusca = Array.isArray(payload.postos) ? payload.postos : [];
+    if (status) status.textContent = `${state.combustiveisBusca.length} posto(s) encontrado(s) em ${payload.municipio || city}/${payload.uf || uf}.`;
+    renderFuelAdminSearchResults();
+  } catch (error) {
+    state.combustiveisBusca = [];
+    if (status) status.textContent = error.message || "Não foi possível consultar a ANP.";
+    renderFuelAdminSearchResults();
+    showToast("Não foi possível consultar os postos agora.");
+  } finally {
+    button.disabled = false;
+    button.classList.remove("admin-button-loading");
+  }
+}
+
+async function saveFuelAdminSettings() {
+  if (!isMaster()) { showToast("Somente master pode publicar preços de combustível."); return; }
+  const cidade = $("fuelAdminCity")?.value.trim().toUpperCase();
+  const uf = $("fuelAdminUf")?.value.trim().toUpperCase();
+  if (!cidade || uf.length !== 2) { showToast("Informe uma cidade e UF válidas."); return; }
+  const payload = {
+    ativo: $("fuelAdminActive")?.checked === true,
+    cidade,
+    uf,
+    fonte: "ANP - cadastro de revendedores; preços confirmados pelo Admin Master",
+    postos: collectFuelAdminStationsFromForm(),
+    updatedAt: Date.now(),
+    updatedBy: state.user?.uid || ""
+  };
+  await set(ref(db, "configuracoes/combustiveis"), payload);
+  state.combustiveisConfig = payload;
+  renderFuelAdminSettings();
+  showToast("Configuração de combustíveis salva e publicada.");
+}
+
 function renderHomePageSettings() {
   if (!$("homePageForm")) return;
   const config = state.paginaInicialSite || {};
@@ -21590,6 +21789,12 @@ function bindEvents() {
     event.target.value = "";
   });
   $("homePageForm")?.addEventListener("submit", async (event) => {
+  $("fuelAdminSearch")?.addEventListener("click", searchFuelStationsFromAnp);
+  $("fuelAdminConfigForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await saveFuelAdminSettings();
+  });
+
     event.preventDefault();
     if (!isMaster()) {
       showToast("Somente master pode alterar a pagina inicial.");

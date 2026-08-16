@@ -8,6 +8,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/anp-postos"
+  to = "/.netlify/functions/anp-postos"
+  status = 200
+
+[[redirects]]
   from = "/old/*"
   to = "/"
   status = 301

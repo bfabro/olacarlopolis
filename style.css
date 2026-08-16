@@ -28153,3 +28153,65 @@ body.eventos-image-open { overflow: hidden; }
 @media (max-width: 720px) {
   .vagas-empty-page > .vagas-resume-cta { margin-bottom: 14px; }
 }
+
+/* Preco Combustivel publico por postos - v432 */
+.fuel-public-page { color: #172033; }
+.fuel-public-page .fuel-results { display: grid; gap: 18px; }
+.fuel-cheapest-section, .fuel-calculator-card, .fuel-stations-section { padding: 20px; border: 1px solid #e3e9f1; border-radius: 22px; background: #fff; box-shadow: 0 10px 28px rgba(15, 23, 42, .07); }
+.fuel-section-kicker { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 7px; color: #d65b00; font-size: .74rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.fuel-cheapest-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.fuel-cheapest-card { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: center; min-height: 112px; padding: 15px; border: 1px solid #ffe0bf; border-radius: 17px; background: linear-gradient(145deg, #fffaf4, #fff); }
+.fuel-cheapest-card > i { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 13px; color: #fff; background: linear-gradient(135deg, #ff8a00, #ef5b00); box-shadow: 0 8px 18px rgba(239, 91, 0, .22); }
+.fuel-cheapest-card div { min-width: 0; }
+.fuel-cheapest-card span, .fuel-cheapest-card strong, .fuel-cheapest-card small { display: block; }
+.fuel-cheapest-card span { color: #5d6675; font-size: .8rem; font-weight: 800; }
+.fuel-cheapest-card strong { margin: 3px 0; color: #11213b; font-size: 1.45rem; line-height: 1; }
+.fuel-cheapest-card small { overflow-wrap: anywhere; color: #7a8494; font-size: .7rem; line-height: 1.35; }
+.fuel-calculator-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; align-items: center; background: linear-gradient(135deg, #11243f, #173c5d); color: #fff; }
+.fuel-calculator-card h3 { margin: 0 0 5px; color: #fff; }
+.fuel-calculator-card p { margin: 0; color: #cfe0ef; }
+.fuel-calculator-card > button { min-height: 46px; padding: 0 18px; border: 0; border-radius: 13px; color: #173c5d; background: #fff; font-weight: 900; cursor: pointer; }
+.fuel-calculator-card > button i { margin-right: 7px; }
+.fuel-calculator-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, .14); }
+.fuel-calculator-fields label { display: grid; gap: 6px; color: #d8e7f3; font-size: .76rem; font-weight: 800; }
+.fuel-calculator-fields label:first-child { grid-column: 1 / -1; }
+.fuel-calculator-fields input, .fuel-calculator-fields select { width: 100%; min-height: 43px; padding: 8px 11px; border: 1px solid rgba(255, 255, 255, .18); border-radius: 10px; outline: 0; color: #14263d; background: #fff; font: 700 .86rem inherit; }
+.fuel-calculator-result { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 9px; padding: 12px; border-radius: 13px; background: rgba(255, 255, 255, .09); }
+.fuel-calculator-result > span { color: #d7e5ef; font-size: .82rem; }
+.fuel-calculator-result div { display: grid; gap: 3px; }
+.fuel-calculator-result div span { color: #bcd0df; font-size: .7rem; }
+.fuel-calculator-result div strong { color: #fff; font-size: 1rem; }
+.fuel-count-badge { padding: 8px 12px; border-radius: 999px; color: #1455a0; background: #eaf3ff; font-size: .78rem; }
+.fuel-stations-list { display: grid; gap: 14px; }
+.fuel-station-card { overflow: hidden; border: 1px solid #dfe7f0; border-radius: 19px; background: #fff; box-shadow: 0 7px 20px rgba(15, 23, 42, .05); }
+.fuel-station-card > header { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 15px 17px; background: #f7faff; }
+.fuel-station-icon { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 14px; color: #fff; background: linear-gradient(135deg, #1d75d8, #124b9c); }
+.fuel-station-card header span { color: #6f7e91; font-size: .68rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.fuel-station-card header h4 { margin: 2px 0 3px; color: #13233b; font-size: 1rem; }
+.fuel-station-card header p { margin: 0; color: #6c7888; font-size: .78rem; }
+.fuel-station-card header a { display: inline-flex; align-items: center; gap: 6px; min-height: 38px; padding: 0 12px; border-radius: 10px; color: #1455a0; background: #e8f2ff; font-size: .75rem; font-weight: 900; text-decoration: none; }
+.fuel-station-products { display: grid; }
+.fuel-station-product { display: grid; grid-template-columns: minmax(150px, 1fr) auto minmax(180px, auto); gap: 12px; align-items: center; min-height: 58px; padding: 11px 17px; border-top: 1px solid #e8edf3; }
+.fuel-station-product > span { color: #33445a; font-size: .86rem; font-weight: 800; }
+.fuel-station-product > strong { color: #0f8a50; font-size: 1.05rem; }
+.fuel-station-product > strong.is-pending { color: #8a6a36; font-size: .78rem; }
+.fuel-station-product > small { color: #7a8797; font-size: .72rem; text-align: right; }
+.fuel-source-note { display: flex; align-items: flex-start; gap: 9px; margin: 0; padding: 13px 15px; border-radius: 14px; color: #5e6b7b; background: #f5f7fa; font-size: .76rem; line-height: 1.45; }
+.fuel-public-empty { grid-column: 1 / -1; padding: 18px; border: 1px dashed #cfd8e3; border-radius: 15px; color: #687688; background: #f8fafc; text-align: center; }
+.fuel-public-empty-large { display: grid; place-items: center; gap: 7px; min-height: 170px; }
+.fuel-public-empty-large i { color: #d97706; font-size: 2rem; }
+.fuel-public-empty-large strong { color: #24364d; }
+.fuel-unavailable { width: min(520px, calc(100% - 24px)); margin: 30px auto; padding: 35px; border: 1px solid #e1e7ef; border-radius: 24px; background: #fff; text-align: center; box-shadow: 0 12px 32px rgba(15, 23, 42, .08); }
+.fuel-unavailable > i { color: #d97706; font-size: 2.5rem; }
+@media (max-width: 720px) {
+  .fuel-cheapest-section, .fuel-calculator-card, .fuel-stations-section { padding: 15px; border-radius: 18px; }
+  .fuel-calculator-card { grid-template-columns: 1fr; }
+  .fuel-calculator-card > button { width: 100%; }
+  .fuel-calculator-fields { grid-template-columns: 1fr; }
+  .fuel-calculator-fields label:first-child { grid-column: auto; }
+  .fuel-station-card > header { grid-template-columns: 42px minmax(0, 1fr); padding: 13px; }
+  .fuel-station-icon { width: 42px; height: 42px; }
+  .fuel-station-card header a { grid-column: 1 / -1; justify-content: center; }
+  .fuel-station-product { grid-template-columns: minmax(0, 1fr) auto; gap: 5px 10px; padding: 11px 13px; }
+  .fuel-station-product > small { grid-column: 1 / -1; text-align: left; }
+}

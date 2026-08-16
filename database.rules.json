@@ -54,6 +54,10 @@
         ".read": true,
         ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')"
       },
+      "combustiveis": {
+        ".read": true,
+        ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+      },
       "pagamento": {
         ".read": "auth != null",
         ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",

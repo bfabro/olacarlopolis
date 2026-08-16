@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=382">
+  <link rel="stylesheet" href="painel.css?v=383">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -95,6 +95,7 @@
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
           <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
           <button data-view="sobreNos" data-master="true"><i class="fa-solid fa-circle-info"></i> Sobre nós</button>
+          <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</button>
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
@@ -1960,6 +1961,45 @@
         </section>
       </section>
 
+      <section id="combustiveisConfigView" class="panel-view hidden">
+        <section class="panel-card fuel-admin-card">
+          <div class="section-head">
+            <div>
+              <span class="feature-kicker"><i class="fa-solid fa-gas-pump"></i> Fonte oficial ANP</span>
+              <h2>Preço Combustível</h2>
+              <p>Busque os postos em operação na cidade, escolha quais serão publicados e informe os preços de bomba com a data da atualização.</p>
+            </div>
+          </div>
+          <form id="fuelAdminConfigForm" class="grid-form">
+            <label class="check-row wide">
+              <input id="fuelAdminActive" type="checkbox">
+              Exibir Preço Combustível no menu do site público
+            </label>
+            <label>Cidade configurada
+              <input id="fuelAdminCity" maxlength="80" placeholder="CARLOPOLIS" required>
+            </label>
+            <label>UF
+              <input id="fuelAdminUf" maxlength="2" placeholder="PR" required>
+            </label>
+            <div class="form-actions wide fuel-admin-search-actions">
+              <button id="fuelAdminSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i> Buscar postos disponíveis</button>
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar e publicar</button>
+            </div>
+            <div class="wide fuel-admin-source-note">
+              <i class="fa-solid fa-circle-info"></i>
+              <span>A ANP fornece cadastro, endereço e combustíveis autorizados de cada posto. Os preços e suas datas são confirmados neste painel antes da publicação.</span>
+            </div>
+            <div id="fuelAdminSelectedStations" class="wide fuel-admin-selected"></div>
+          </form>
+        </section>
+        <section class="panel-card">
+          <div class="section-head">
+            <div><h2>Resultado da busca</h2><p id="fuelAdminSearchStatus">Informe a cidade e clique em Buscar postos disponíveis.</p></div>
+          </div>
+          <div id="fuelAdminSearchResults" class="fuel-admin-results"></div>
+        </section>
+      </section>
+
       <section id="paginaInicialSiteView" class="panel-view hidden">
         <section class="panel-card">
           <div class="section-head">
@@ -2078,6 +2118,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=543"></script>
+  <script type="module" src="painel.js?v=544"></script>
 </body>
 </html>
