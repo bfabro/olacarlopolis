@@ -24442,9 +24442,78 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     document.body.classList.add("home-quick-banner-route-hidden");
 
     if (paidEstablishments.length === 0) {
+      if (isVagasTrabalho) {
+        const mensagemDivulgacao = "Olá! Gostaria de divulgar uma vaga de trabalho no Olá Carlópolis.";
+        const divulgacaoUrl = `https://wa.me/5543991766639?text=${encodeURIComponent(mensagemDivulgacao)}`;
+        const mensagemCompartilhamento = "Acompanhe as oportunidades de trabalho de Carlópolis pelo Olá Carlópolis.";
+        const urlVagas = window.location.href;
+
+        contentArea.innerHTML = `
+          <section class="category-empty-state jobs-empty-state" aria-labelledby="jobs-empty-title">
+            <span class="category-empty-kicker"><i class="fa-solid fa-briefcase"></i> Oportunidades de trabalho</span>
+
+            <div class="category-empty-visual jobs-empty-visual" aria-hidden="true">
+              <span class="category-empty-orbit category-empty-orbit-one"></span>
+              <span class="category-empty-orbit category-empty-orbit-two"></span>
+              <i class="fa-solid fa-magnifying-glass category-empty-search"></i>
+              <i class="fa-solid fa-bell category-empty-heart"></i>
+              <span class="category-empty-spark category-empty-spark-one">✦</span>
+              <span class="category-empty-spark category-empty-spark-two">✦</span>
+              <div class="category-empty-icon"><i class="fa-solid fa-briefcase"></i></div>
+              <span class="category-empty-medal jobs-empty-badge"><i class="fa-solid fa-clock"></i><strong>Em breve</strong><small>novas vagas</small></span>
+            </div>
+
+            <div class="category-empty-copy">
+              <h2 id="jobs-empty-title">Nenhuma vaga disponível <strong>no momento</strong></h2>
+              <p>Assim que novas oportunidades forem publicadas em Carlópolis, elas aparecerão nesta página.</p>
+              <p class="category-empty-subcopy">Volte em breve para conferir as novidades.</p>
+            </div>
+
+            <div class="category-empty-actions">
+              <a class="category-empty-primary" href="${divulgacaoUrl}" target="_blank" rel="noopener noreferrer" data-jobs-empty-action="divulgar">
+                <i class="fa-brands fa-whatsapp"></i>
+                <span>Quero divulgar uma vaga</span>
+              </a>
+              <button class="category-empty-secondary" type="button" data-jobs-empty-share>
+                <i class="fa-solid fa-share-nodes"></i>
+                <span><strong>Conhece alguém procurando emprego?</strong><small>Compartilhe esta página</small></span>
+              </button>
+            </div>
+
+            <ul class="category-empty-benefits" aria-label="Informações sobre as vagas no Olá Carlópolis">
+              <li><i class="fa-solid fa-circle-check"></i><span>Oportunidades de empresas e profissionais locais</span></li>
+              <li><i class="fa-solid fa-circle-check"></i><span>Informações da vaga reunidas em um só lugar</span></li>
+              <li><i class="fa-solid fa-circle-check"></i><span>Acesso rápido e gratuito para candidatos</span></li>
+            </ul>
+          </section>`;
+
+        contentArea.querySelector("[data-jobs-empty-action]")?.addEventListener("click", () => {
+          registrarCliqueBotao("divulgar-vaga", "portal-ola-carlopolis", "vagas-vazias", {
+            origem: "vagas-sem-anuncios"
+          }).catch(() => { });
+        });
+
+        contentArea.querySelector("[data-jobs-empty-share]")?.addEventListener("click", async () => {
+          registrarCliqueBotao("compartilhar", "portal-ola-carlopolis", "vagas-vazias", {
+            origem: "vagas-sem-anuncios"
+          }).catch(() => { });
+          try {
+            if (navigator.share) {
+              await navigator.share({ title: "Vagas de Trabalho | Olá Carlópolis", text: mensagemCompartilhamento, url: urlVagas });
+            } else {
+              if (!navigator.clipboard?.writeText) throw new Error("Clipboard indisponível");
+              await navigator.clipboard.writeText(`${mensagemCompartilhamento}\n\n${urlVagas}`);
+              mostrarToast("Link copiado para compartilhar");
+            }
+          } catch (error) {
+            if (error?.name === "AbortError" || error?.name === "NotAllowedError") return;
+            mostrarToast("Não foi possível compartilhar agora.");
+          }
+        });
+        return;
+      }
       const mensagensEspeciais = {
         eventosemcarlopolis: "Nenhum evento ativo no momento.",
-        vagasdetrabalho: "Nenhuma vaga de trabalho cadastrada no momento.",
         notadefalecimento: "Nenhuma nota de falecimento cadastrada no momento."
       };
       if (mensagensEspeciais[titleSlug]) {
