@@ -24432,47 +24432,84 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
       const categoria = String(title || "esta categoria").trim();
       const categoriaSegura = escapePromoHtml(categoria);
-      const mensagemCadastro = `Olá! Encontrei a categoria "${categoria}" no Olá Carlópolis e gostaria de cadastrar meu negócio.`;
+      const categoriaAtual = categories.find((item) => normalizeName(item?.title || "") === titleSlug);
+      const iconeDoMenu = categoriaAtual?.link?.querySelector("i");
+      const iconeCategoria = Array.from(iconeDoMenu?.classList || [])
+        .filter((classe) => /^[a-z0-9-]+$/i.test(classe))
+        .join(" ") || "fa-solid fa-store";
+      const mensagemCadastro = `Olá! Vi no Olá Carlópolis que a categoria ${categoria} ainda está disponível e gostaria de saber como faço para aparecer nela.`;
       const cadastroUrl = `https://wa.me/5543991766639?text=${encodeURIComponent(mensagemCadastro)}`;
-      const enderecoPortal = `${window.location.origin}${window.location.pathname}`;
-      const mensagemConvite = `Olá! A categoria "${categoria}" ainda não tem nenhuma empresa cadastrada no Olá Carlópolis. Conheço o seu trabalho e achei que seria uma boa oportunidade para divulgar seu negócio. Veja o portal: ${enderecoPortal}\n\nPara saber como cadastrar: ${cadastroUrl}`;
-      const conviteUrl = `https://wa.me/?text=${encodeURIComponent(mensagemConvite)}`;
+      const mensagemConvite = `Vi que ainda não tem ninguém cadastrado em ${categoria} no Olá Carlópolis. Pode ser uma ótima oportunidade para aparecer quando alguém procurar por esse serviço na cidade.`;
+      const urlCategoria = window.location.href;
 
       contentArea.innerHTML = `
         <section class="category-empty-state" aria-labelledby="category-empty-title">
+          <span class="category-empty-kicker"><i class="fa-solid fa-star"></i> Seja o primeiro</span>
+
           <div class="category-empty-visual" aria-hidden="true">
             <span class="category-empty-orbit category-empty-orbit-one"></span>
             <span class="category-empty-orbit category-empty-orbit-two"></span>
-            <div class="category-empty-icon"><i class="fa-solid fa-store"></i></div>
+            <i class="fa-solid fa-magnifying-glass category-empty-search"></i>
+            <i class="fa-solid fa-heart category-empty-heart"></i>
+            <span class="category-empty-spark category-empty-spark-one">✦</span>
+            <span class="category-empty-spark category-empty-spark-two">✦</span>
+            <div class="category-empty-icon"><i class="${iconeCategoria}"></i></div>
+            <span class="category-empty-medal"><i class="fa-solid fa-crown"></i><strong>1º</strong><small>da categoria</small></span>
           </div>
+
           <div class="category-empty-copy">
-            <span class="category-empty-kicker"><i class="fa-solid fa-seedling"></i> Categoria em crescimento</span>
-            <h2 id="category-empty-title">Ainda não temos empresas em <strong>${categoriaSegura}</strong></h2>
-            <p>Esta pode ser a primeira empresa desta categoria a aparecer para quem pesquisa em Carlópolis.</p>
-            <div class="category-empty-actions">
-              <a class="category-empty-primary" href="${cadastroUrl}" target="_blank" rel="noopener noreferrer" data-category-empty-action="cadastro">
-                <i class="fa-brands fa-whatsapp"></i>
-                <span>Cadastrar meu negócio</span>
-              </a>
-              <a class="category-empty-secondary" href="${conviteUrl}" target="_blank" rel="noopener noreferrer" data-category-empty-action="convite">
-                <i class="fa-solid fa-share-nodes"></i>
-                <span>Convidar um conhecido</span>
-              </a>
-            </div>
-            <div class="category-empty-benefits" aria-label="Benefícios do cadastro">
-              <span><i class="fa-solid fa-circle-check"></i> Mais visibilidade local</span>
-              <span><i class="fa-solid fa-circle-check"></i> Contato direto com clientes</span>
-            </div>
+            <h2 id="category-empty-title">Seja o primeiro destaque em <strong>${categoriaSegura}</strong><span>no Olá Carlópolis</span></h2>
+            <p>Quem procurar por <strong>${categoriaSegura}</strong> em Carlópolis poderá encontrar você aqui.</p>
+            <p class="category-empty-subcopy">Cadastre seu perfil e ganhe visibilidade local.</p>
           </div>
+
+          <div class="category-empty-actions">
+            <a class="category-empty-primary" href="${cadastroUrl}" target="_blank" rel="noopener noreferrer" data-category-empty-action="cadastro" aria-label="Quero aparecer em ${categoriaSegura} no Olá Carlópolis">
+              <i class="fa-brands fa-whatsapp"></i>
+              <span>Quero aparecer aqui</span>
+            </a>
+            <button class="category-empty-secondary" type="button" data-category-empty-share aria-label="Indicar a oportunidade em ${categoriaSegura}">
+              <i class="fa-solid fa-user-plus"></i>
+              <span><strong>Conhece alguém desta categoria?</strong><small>Indique esta oportunidade</small></span>
+            </button>
+          </div>
+
+          <ul class="category-empty-benefits" aria-label="Benefícios de aparecer no Olá Carlópolis">
+            <li><i class="fa-solid fa-circle-check"></i><span>Apareça nas pesquisas locais</span></li>
+            <li><i class="fa-solid fa-circle-check"></i><span>Receba contatos direto pelo WhatsApp</span></li>
+            <li><i class="fa-solid fa-circle-check"></i><span>Divulgue seus serviços, horários e informações</span></li>
+          </ul>
         </section>`;
 
-      contentArea.querySelectorAll("[data-category-empty-action]").forEach((link) => {
-        link.addEventListener("click", () => {
-          registrarCliqueBotao(link.dataset.categoryEmptyAction || "contato", "portal-ola-carlopolis", "categoria-vazia", {
-            categoria,
-            origem: "categoria-sem-clientes"
-          }).catch(() => { });
-        });
+      contentArea.querySelector("[data-category-empty-action]")?.addEventListener("click", () => {
+        registrarCliqueBotao("cadastro", "portal-ola-carlopolis", "categoria-vazia", {
+          categoria,
+          origem: "categoria-sem-clientes"
+        }).catch(() => { });
+      });
+
+      contentArea.querySelector("[data-category-empty-share]")?.addEventListener("click", async () => {
+        registrarCliqueBotao("convite", "portal-ola-carlopolis", "categoria-vazia", {
+          categoria,
+          origem: "categoria-sem-clientes"
+        }).catch(() => { });
+
+        try {
+          if (navigator.share) {
+            await navigator.share({
+              title: `Oportunidade em ${categoria} | Olá Carlópolis`,
+              text: mensagemConvite,
+              url: urlCategoria
+            });
+          } else {
+            if (!navigator.clipboard?.writeText) throw new Error("Clipboard indisponível");
+            await navigator.clipboard.writeText(`${mensagemConvite}\n\n${urlCategoria}`);
+            mostrarToast("Link copiado para compartilhar");
+          }
+        } catch (error) {
+          if (error?.name === "AbortError" || error?.name === "NotAllowedError") return;
+          mostrarToast("Não foi possível compartilhar agora.");
+        }
       });
       return;
     }
