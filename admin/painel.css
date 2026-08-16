@@ -8931,3 +8931,22 @@ button.admin-button-loading::after {
 @media (max-width: 760px) {
   .fuel-admin-station-settings { grid-template-columns: 1fr; }
 }
+
+/* Dados completos retornados pela ANP - v385 */
+.fuel-admin-anp-details { margin: 12px 16px 16px; overflow: hidden; border: 1px solid #d7e3ef; border-radius: 13px; background: #f8fbfe; }
+.fuel-admin-result-card .fuel-admin-anp-details { margin: 12px 0 0; }
+.fuel-admin-anp-details summary { display: flex; align-items: center; gap: 8px; padding: 11px 13px; color: #1766a8; font-size: .78rem; font-weight: 850; cursor: pointer; user-select: none; }
+.fuel-admin-anp-details summary i { color: #2584ce; }
+.fuel-admin-anp-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; border-top: 1px solid #dce7f1; background: #dce7f1; }
+.fuel-admin-anp-grid > div, .fuel-admin-anp-products article > div { display: grid; gap: 4px; min-width: 0; padding: 10px 12px; background: #fff; }
+.fuel-admin-anp-grid span, .fuel-admin-anp-products article span { color: #718096; font-size: .68rem; font-weight: 800; text-transform: uppercase; }
+.fuel-admin-anp-grid strong, .fuel-admin-anp-products article strong { overflow-wrap: anywhere; color: #243b53; font-size: .76rem; line-height: 1.4; }
+.fuel-admin-anp-products { padding: 13px; border-top: 1px solid #dce7f1; }
+.fuel-admin-anp-products h4 { margin: 0 0 10px; color: #274968; font-size: .82rem; }
+.fuel-admin-anp-products article { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; overflow: hidden; margin-top: 8px; border: 1px solid #dce7f1; border-radius: 10px; background: #dce7f1; }
+.fuel-admin-anp-products p { margin: 0; color: #718096; font-size: .76rem; }
+@media (max-width: 900px) {
+  .fuel-admin-anp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fuel-admin-anp-products article { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) { .fuel-admin-anp-grid, .fuel-admin-anp-products article { grid-template-columns: 1fr; } }

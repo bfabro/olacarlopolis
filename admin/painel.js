@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 616,
-  label: "v623",
+  numero: 617,
+  label: "v624",
   data: "2026-08-16",
-  nota: "Upload de fotos dos postos restrito ao Admin Master."
+  nota: "Dados completos da ANP, flag pública e ampliação das fotos dos postos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -16832,6 +16832,7 @@ function normalizeAnpStationForAdmin(station) {
   });
   return {
     ...existing,
+    dadosAnp: station && typeof station === "object" ? station : (existing.dadosAnp || {}),
     codigoSIMP: id,
     razaoSocial: station?.razaoSocial || existing.razaoSocial || "",
     nomeExibicao: existing.nomeExibicao || station?.razaoSocial || "",
@@ -16874,7 +16875,65 @@ function collectFuelAdminStationsFromForm() {
     };
   });
   return result;
+
 }
+const FUEL_ADMIN_ANP_LABELS = {
+  codigoSIMP: "Código SIMP",
+  autorizacao: "Autorização",
+  dataPublicacao: "Data de publicação",
+  razaoSocial: "Razão social",
+  cnpj: "CNPJ",
+  endereco: "Endereço",
+  complemento: "Complemento",
+  bairro: "Bairro",
+  cep: "CEP",
+  uf: "UF",
+  municipio: "Município",
+  distribuidora: "Distribuidora",
+  dataVinculacao: "Data de vinculação",
+  classe: "Classe",
+  latitude: "Latitude",
+  longitude: "Longitude",
+  latitude_ANP4C: "Latitude ANP4C",
+  longitude_ANP4C: "Longitude ANP4C",
+  validacao: "Validação geográfica",
+  estimativaAcuracia: "Estimativa de acurácia",
+  srid: "SRID",
+  src: "Sistema de referência",
+  dataObtencao: "Data de obtenção",
+  origemInformacao: "Origem da informação",
+  situacaoConstatada: "Situação constatada",
+  observacao: "Observação",
+  statusSIGAF: "Status SIGAF",
+  inadimplenciaPMQC: "Inadimplência PMQC",
+  produto: "Produto",
+  tancagem: "Tancagem",
+  unidMedidaTancagem: "Unidade",
+  qtdeBicos: "Quantidade de bicos"
+};
+
+function fuelAdminAnpLabel(key) {
+  return FUEL_ADMIN_ANP_LABELS[key] || String(key || "").replace(/([a-z])([A-Z])/g, "$1 $2");
+}
+
+function fuelAdminAnpValue(value) {
+  if (Array.isArray(value)) return value.length ? value.map((item) => typeof item === "object" ? JSON.stringify(item) : String(item)).join(", ") : "Nenhum registro";
+  if (value && typeof value === "object") return JSON.stringify(value);
+  return String(value ?? "").trim() || "Não informado";
+}
+
+function renderFuelAdminAnpDetails(station) {
+  const raw = station?.dadosAnp && typeof station.dadosAnp === "object" ? station.dadosAnp : station || {};
+  const ignored = new Set(["dadosAnp", "combustiveis", "ativo", "imagem", "nomeExibicao", "produtos"]);
+  const fields = Object.entries(raw).filter(([key]) => !ignored.has(key));
+  const products = Array.isArray(raw.produtos) ? raw.produtos : [];
+  return `<details class="fuel-admin-anp-details">
+    <summary><i class="fa-solid fa-database"></i> Todos os dados retornados pela ANP</summary>
+    <div class="fuel-admin-anp-grid">${fields.map(([key, value]) => `<div><span>${escapeHtml(fuelAdminAnpLabel(key))}</span><strong>${escapeHtml(fuelAdminAnpValue(value))}</strong></div>`).join("")}</div>
+    <section class="fuel-admin-anp-products"><h4>Produtos autorizados (${products.length})</h4>${products.length ? products.map((product) => `<article>${Object.entries(product || {}).map(([key, value]) => `<div><span>${escapeHtml(fuelAdminAnpLabel(key))}</span><strong>${escapeHtml(fuelAdminAnpValue(value))}</strong></div>`).join("")}</article>`).join("") : `<p>Nenhum produto informado no retorno.</p>`}</section>
+  </details>`;
+}
+
 
 function renderFuelAdminSearchResults() {
   const box = $("fuelAdminSearchResults");
@@ -16886,7 +16945,7 @@ function renderFuelAdminSearchResults() {
     const added = Boolean(selected[id]);
     const products = (station.produtos || []).map((item) => item.produto).filter(Boolean);
     return `<article class="fuel-admin-result-card">
-      <div><span class="badge">${escapeHtml(station.distribuidora || "Sem bandeira")}</span><h3>${escapeHtml(station.razaoSocial || "Posto")}</h3><p>${escapeHtml(station.endereco || "")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}</p><small>${products.length} combustível(is): ${escapeHtml(products.join(", "))}</small></div>
+      <div><span class="badge">${escapeHtml(station.distribuidora || "Sem bandeira")}</span><h3>${escapeHtml(station.razaoSocial || "Posto")}</h3><p><i class="fa-solid fa-location-dot"></i> ${escapeHtml(station.endereco || "Endereço não informado")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}${station.municipio ? ` · ${escapeHtml(station.municipio)}/${escapeHtml(station.uf || "")}` : ""}</p><small>${products.length} combustível(is): ${escapeHtml(products.join(", "))}</small>${renderFuelAdminAnpDetails(station)}</div>
       <button type="button" data-add-fuel-station="${escapeAttr(id)}" ${added ? "disabled" : ""}><i class="fa-solid ${added ? "fa-check" : "fa-plus"}"></i> ${added ? "Adicionado" : "Adicionar"}</button>
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum resultado carregado.</div>`;
@@ -16919,6 +16978,7 @@ function renderFuelAdminSelectedStations() {
         <div class="fuel-admin-image-preview">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(station.nomeExibicao || station.razaoSocial || "posto")}" loading="lazy">` : `<i class="fa-solid fa-camera"></i><span>Nenhuma foto cadastrada</span>`}</div>
       </div>
       <div class="fuel-admin-products">${products.map(([productId, product]) => `<div class="fuel-admin-product" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}"><label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)}</label><label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${Number(product.preco || 0) || ""}" placeholder="0,000"></label><label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label></div>`).join("")}</div>
+      ${renderFuelAdminAnpDetails(station)}
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
   box.querySelectorAll("[data-fuel-station-image]").forEach((input) => {
@@ -17004,8 +17064,20 @@ async function searchFuelStationsFromAnp() {
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.message || "Falha na consulta.");
     state.combustiveisBusca = Array.isArray(payload.postos) ? payload.postos : [];
+    const selectedStations = fuelAdminStationMap();
+    let selectedStationUpdated = false;
+    state.combustiveisBusca.forEach((station) => {
+      const id = String(station?.codigoSIMP || station?.cnpj || "").replace(/[^a-zA-Z0-9_-]/g, "");
+      if (!id || !selectedStations[id]) return;
+      selectedStations[id] = normalizeAnpStationForAdmin(station);
+      selectedStationUpdated = true;
+    });
+    if (selectedStationUpdated) {
+      state.combustiveisConfig = { ...state.combustiveisConfig, postos: selectedStations };
+    }
     if (status) status.textContent = `${state.combustiveisBusca.length} posto(s) encontrado(s) em ${payload.municipio || city}/${payload.uf || uf}.`;
-    renderFuelAdminSearchResults();
+    if (selectedStationUpdated) renderFuelAdminSettings();
+    else renderFuelAdminSearchResults();
   } catch (error) {
     state.combustiveisBusca = [];
     if (status) status.textContent = error.message || "Não foi possível consultar a ANP.";

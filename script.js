@@ -23589,6 +23589,20 @@ plotarPinsImoveis(stateImoveis.filtered);
     ADMIN_CLIENTES_PROMISE = (async () => {
       const dbAdmin = await esperarFirebaseDatabase();
       if (!dbAdmin) return;
+      if (!window.__combustiveisConfigListenerBound) {
+        window.__combustiveisConfigListenerBound = true;
+        dbAdmin.ref("configuracoes/combustiveis").on("value", (snapshot) => {
+          const config = snapshot?.val?.() || {};
+          aplicarConfiguracaoCombustiveisPublicos(config);
+        }, (error) => {
+          window.__combustiveisConfigListenerBound = false;
+          const menu = document.getElementById("menuCombustivel");
+          menu?.classList.add("hidden");
+          if (menu) menu.hidden = true;
+          console.warn("Configuração pública de combustíveis indisponível.", error);
+        });
+      }
+
 
       try {
         const lerDadoPublicoAdmin = (caminho) => dbAdmin.ref(caminho).once("value").catch((error) => {
@@ -28805,7 +28819,11 @@ function aplicarConfiguracaoCombustiveisPublicos(config = {}, options = {}) {
   const active = config.ativo === true;
   menu?.classList.toggle("hidden", !active);
   menu?.setAttribute("aria-hidden", active ? "false" : "true");
-  if (menu) menu.tabIndex = active ? 0 : -1;
+  if (menu) {
+    menu.hidden = !active;
+    menu.style.display = active ? "" : "none";
+    menu.tabIndex = active ? 0 : -1;
+  }
   if (active && location.hash === "#combustivel" && options.renderRoute !== false) mostrarCombustivel();
 }
 
@@ -28999,7 +29017,7 @@ function renderizarValoresCombustivel() {
         const locationLabel = [station.bairro, station.municipio || config.cidade].filter(Boolean).join(" · ");
         return `<article class="fuel-station-card fuel-station-card-compact">
           <header class="fuel-station-summary">
-            <div class="fuel-station-photo">${station.imagem ? `<img src="${fuelPublicEscape(station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName)}" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
+            <div class="fuel-station-photo">${station.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName)}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
             <div class="fuel-station-identity"><h3>${fuelPublicEscape(stationName)}</h3><p><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(locationLabel || station.endereco || city)}</p><small>${fuelPublicEscape(station.endereco || "")}</small></div>
             <span class="fuel-station-updated">Atualizado em ${fuelPublicLatestDate(station)}</span>
             ${mapUrl ? `<a class="fuel-go-button" href="${mapUrl}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-arrow"></i> Ir</a>` : ""}
