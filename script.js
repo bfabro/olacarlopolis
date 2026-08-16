@@ -28862,7 +28862,7 @@ function fuelPublicCheapest(stations) {
   return [...cheapest.values()].sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
 }
 
-function renderizarValoresCombustivel() {
+function renderizarValoresCombustivelAnterior() {
   const box = document.getElementById("fuelResultados");
   if (!box) return;
   const config = fuelPublicConfig();
@@ -28922,6 +28922,132 @@ function renderizarValoresCombustivel() {
   [priceInput, litersInput, consumptionInput].forEach((input) => input?.addEventListener("input", calculate));
 }
 
+let fuelPublicActiveFilter = "";
+
+function fuelPublicMapUrl(station, config) {
+  const coordinates = station.latitude && station.longitude
+    ? `${station.latitude},${station.longitude}`
+    : "";
+  const address = [
+    station.endereco,
+    station.bairro,
+    station.municipio || config.cidade,
+    station.uf || config.uf
+  ].filter(Boolean).join(", ");
+  const destination = coordinates || address;
+  return destination ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}` : "";
+}
+
+function fuelPublicLatestDate(station) {
+  const dates = fuelPublicProducts(station)
+    .map((product) => String(product.atualizadoEm || "").slice(0, 10))
+    .filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(value))
+    .sort()
+    .reverse();
+  return dates[0] ? fuelPublicDate(dates[0]) : "Data não informada";
+}
+
+function fuelPublicFilterOptions(stations) {
+  const options = new Map();
+  stations.forEach((station) => {
+    fuelPublicProducts(station).forEach((product) => {
+      const key = fuelPublicNormalize(product.label);
+      if (key && !options.has(key)) options.set(key, product.label);
+    });
+  });
+  return [...options.entries()].map(([key, label]) => ({ key, label }));
+}
+
+function renderizarValoresCombustivel() {
+  const box = document.getElementById("fuelResultados");
+  if (!box) return;
+  const config = fuelPublicConfig();
+  const stations = fuelPublicStations(config);
+  const options = fuelPublicFilterOptions(stations);
+  const optionKeys = new Set(options.map((option) => option.key));
+  if (!fuelPublicActiveFilter || (fuelPublicActiveFilter !== "todos" && !optionKeys.has(fuelPublicActiveFilter))) {
+    fuelPublicActiveFilter = options.find((option) => option.key.includes("gasolina"))?.key || options[0]?.key || "todos";
+  }
+  const visibleStations = fuelPublicActiveFilter === "todos"
+    ? stations
+    : stations.filter((station) => fuelPublicProducts(station).some((product) => fuelPublicNormalize(product.label) === fuelPublicActiveFilter));
+  const cheapest = fuelPublicCheapest(stations);
+  const highlighted = fuelPublicActiveFilter === "todos"
+    ? (cheapest.find((item) => fuelPublicNormalize(item.label).includes("gasolina")) || cheapest[0])
+    : cheapest.find((item) => fuelPublicNormalize(item.label) === fuelPublicActiveFilter);
+  const city = `${config.cidade || "Cidade"}${config.uf ? ` / ${config.uf}` : ""}`;
+  const calculatorOptions = cheapest.map((item) => `<option value="${item.price}">${fuelPublicEscape(item.label)} · ${fuelPublicMoney(item.price)}</option>`).join("");
+
+  box.innerHTML = `
+    <header class="fuel-page-heading">
+      <div><i class="fa-solid fa-gas-pump"></i><h2>Combustíveis</h2></div>
+      <span><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(city)}</span>
+    </header>
+    <section class="fuel-best-banner">
+      <i class="fa-solid fa-gas-pump"></i>
+      <div>${highlighted ? `Menor ${fuelPublicEscape(highlighted.label)} hoje: <strong>${fuelPublicMoney(highlighted.price)}</strong><small>${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `Os preços ainda estão sendo atualizados.<small>Consulte novamente em breve.</small>`}</div>
+    </section>
+    <nav class="fuel-filter-chips" aria-label="Filtrar postos por combustível">
+      ${options.map((option) => `<button type="button" data-fuel-filter="${fuelPublicEscape(option.key)}" class="${fuelPublicActiveFilter === option.key ? "active" : ""}">${fuelPublicEscape(option.label)}</button>`).join("")}
+      <button type="button" data-fuel-filter="todos" class="${fuelPublicActiveFilter === "todos" ? "active" : ""}">Todos</button>
+    </nav>
+    <section class="fuel-stations-section fuel-stations-section-compact">
+      <div class="fuel-stations-list">${visibleStations.length ? visibleStations.map((station) => {
+        const products = fuelPublicProducts(station);
+        const mapUrl = fuelPublicMapUrl(station, config);
+        const stationName = station.nomeExibicao || station.razaoSocial || "Posto";
+        const locationLabel = [station.bairro, station.municipio || config.cidade].filter(Boolean).join(" · ");
+        return `<article class="fuel-station-card fuel-station-card-compact">
+          <header class="fuel-station-summary">
+            <div class="fuel-station-photo">${station.imagem ? `<img src="${fuelPublicEscape(station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName)}" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
+            <div class="fuel-station-identity"><h3>${fuelPublicEscape(stationName)}</h3><p><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(locationLabel || station.endereco || city)}</p><small>${fuelPublicEscape(station.endereco || "")}</small></div>
+            <span class="fuel-station-updated">Atualizado em ${fuelPublicLatestDate(station)}</span>
+            ${mapUrl ? `<a class="fuel-go-button" href="${mapUrl}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-arrow"></i> Ir</a>` : ""}
+          </header>
+          <div class="fuel-station-products fuel-station-products-grid">${products.length ? products.map((product) => `<div class="fuel-station-product"><span>${fuelPublicEscape(product.label)}</span><strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small>${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small></div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível disponível.</div>`}</div>
+        </article>`;
+      }).join("") : `<div class="fuel-public-empty fuel-public-empty-large"><i class="fa-solid fa-gas-pump"></i><strong>Nenhum posto encontrado</strong><span>Não há posto publicado para este filtro.</span></div>`}</div>
+    </section>
+    <section class="fuel-calculator-card">
+      <div><span class="fuel-section-kicker"><i class="fa-solid fa-calculator"></i> Planeje o abastecimento</span><h3>Calcule gasto e autonomia</h3><p>Informe o preço, os litros e o consumo médio do veículo.</p></div>
+      <button id="fuelCalculatorToggle" type="button"><i class="fa-solid fa-calculator"></i> Fazer cálculo</button>
+      <div id="fuelCalculatorFields" class="fuel-calculator-fields hidden">
+        <label>Combustível de referência<select id="fuelCalculatorPreset"><option value="">Informar outro valor</option>${calculatorOptions}</select></label>
+        <label>Valor por litro (R$)<input id="fuelCalculatorPrice" type="number" min="0" step="0.001" inputmode="decimal" placeholder="6,199"></label>
+        <label>Quantidade de litros<input id="fuelCalculatorLiters" type="number" min="0" step="0.1" inputmode="decimal" placeholder="40"></label>
+        <label>Consumo do veículo (km/l)<input id="fuelCalculatorConsumption" type="number" min="0" step="0.1" inputmode="decimal" placeholder="10"></label>
+        <div id="fuelCalculatorResult" class="fuel-calculator-result"><span>Preencha os campos para calcular.</span></div>
+      </div>
+    </section>
+    <p class="fuel-source-note"><i class="fa-solid fa-shield-halved"></i> Postos e produtos consultados na API oficial da ANP. Preços e datas são confirmados pelo administrador antes da publicação e podem mudar no estabelecimento.</p>
+  `;
+
+  box.querySelectorAll("[data-fuel-filter]").forEach((button) => button.addEventListener("click", () => {
+    fuelPublicActiveFilter = button.dataset.fuelFilter || "todos";
+    renderizarValoresCombustivel();
+  }));
+  const toggle = document.getElementById("fuelCalculatorToggle");
+  const fields = document.getElementById("fuelCalculatorFields");
+  const preset = document.getElementById("fuelCalculatorPreset");
+  const priceInput = document.getElementById("fuelCalculatorPrice");
+  const litersInput = document.getElementById("fuelCalculatorLiters");
+  const consumptionInput = document.getElementById("fuelCalculatorConsumption");
+  const result = document.getElementById("fuelCalculatorResult");
+  const calculate = () => {
+    const price = fuelPublicPrice(priceInput?.value);
+    const liters = Number(litersInput?.value || 0);
+    const consumption = Number(consumptionInput?.value || 0);
+    if (!result || !price || liters <= 0) { if (result) result.innerHTML = "<span>Informe pelo menos o valor e a quantidade de litros.</span>"; return; }
+    const total = price * liters;
+    const autonomy = consumption > 0 ? liters * consumption : 0;
+    const costKm = consumption > 0 ? price / consumption : 0;
+    result.innerHTML = `<div><span>Gasto estimado</span><strong>${total.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</strong></div>${autonomy ? `<div><span>Autonomia estimada</span><strong>${autonomy.toLocaleString("pt-BR", { maximumFractionDigits: 1 })} km</strong></div><div><span>Custo aproximado por km</span><strong>${costKm.toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></div>` : ""}`;
+  };
+  toggle?.addEventListener("click", () => { fields?.classList.toggle("hidden"); toggle.classList.toggle("is-open", !fields?.classList.contains("hidden")); });
+  preset?.addEventListener("change", () => { if (preset.value && priceInput) priceInput.value = Number(preset.value).toFixed(3); calculate(); });
+  [priceInput, litersInput, consumptionInput].forEach((input) => input?.addEventListener("input", calculate));
+}
+
 async function mostrarCombustivel() {
   const area = document.querySelector(".content_area");
   if (!area) return;
@@ -28941,8 +29067,7 @@ async function mostrarCombustivel() {
     area.innerHTML = `<section class="fuel-unavailable"><i class="fa-solid fa-gas-pump"></i><h2>Preço Combustível indisponível</h2><p>Esta área ainda não está ativa para a cidade.</p></section>`;
     return;
   }
-  const city = `${config.cidade || "Cidade"}${config.uf ? ` / ${config.uf}` : ""}`;
-  area.innerHTML = `<div class="fuel-wrap fuel-public-page"><div class="fuel-hero fuel-hero--premium"><div class="fuel-hero-left"><div class="fuel-hero-kicker"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</div><h2 class="fuel-main-title">Compare antes de abastecer</h2><p class="fuel-subtitle">Consulte os preços publicados por posto, encontre o menor valor de cada combustível e estime seu gasto.</p></div><div class="fuel-hero-right"><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Cidade</span><strong>${fuelPublicEscape(city)}</strong></div><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Postos publicados</span><strong>${fuelPublicStations(config).length}</strong></div></div></div><div id="fuelResultados" class="fuel-results"></div></div>`;
+  area.innerHTML = `<main class="fuel-wrap fuel-public-page"><div id="fuelResultados" class="fuel-results"></div></main>`;
   renderizarValoresCombustivel();
 }
 

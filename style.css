@@ -28215,3 +28215,54 @@ body.eventos-image-open { overflow: hidden; }
   .fuel-station-product { grid-template-columns: minmax(0, 1fr) auto; gap: 5px 10px; padding: 11px 13px; }
   .fuel-station-product > small { grid-column: 1 / -1; text-align: left; }
 }
+
+/* Combustiveis - cards compactos por posto v433 */
+.fuel-public-page { width: min(940px, 100%); margin: 0 auto; padding: 18px 14px 34px; }
+.fuel-public-page .fuel-results { gap: 14px; }
+.fuel-page-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 2px 2px; }
+.fuel-page-heading > div { display: flex; align-items: center; gap: 10px; }
+.fuel-page-heading > div > i { color: #e27700; font-size: 1.45rem; }
+.fuel-page-heading h2 { margin: 0; color: #101d33; font-size: clamp(1.45rem, 4vw, 2rem); }
+.fuel-page-heading > span { display: inline-flex; align-items: center; gap: 6px; color: #68778b; font-size: .78rem; font-weight: 800; }
+.fuel-best-banner { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 12px; align-items: center; padding: 13px 16px; border: 1px solid #b9d9ff; border-radius: 14px; background: linear-gradient(135deg, #f7fbff, #eef7ff); color: #1a2941; box-shadow: 0 6px 18px rgba(29, 117, 216, .07); }
+.fuel-best-banner > i { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; color: #fff; background: #2493ed; font-size: 1.15rem; }
+.fuel-best-banner div { min-width: 0; font-size: .9rem; font-weight: 800; }
+.fuel-best-banner strong { margin-left: 4px; color: #078a42; font-size: 1.12rem; }
+.fuel-best-banner small { display: block; margin-top: 3px; color: #718095; font-size: .68rem; font-weight: 700; }
+.fuel-filter-chips { display: flex; gap: 8px; overflow-x: auto; padding: 1px 1px 4px; scrollbar-width: thin; }
+.fuel-filter-chips button { flex: 0 0 auto; min-width: 78px; min-height: 34px; padding: 0 15px; border: 1px solid #d8e0ea; border-radius: 999px; color: #34445b; background: #fff; font-size: .75rem; font-weight: 850; cursor: pointer; }
+.fuel-filter-chips button.active { border-color: #1688e7; color: #fff; background: #1688e7; box-shadow: 0 5px 14px rgba(22, 136, 231, .2); }
+.fuel-stations-section-compact { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.fuel-stations-section-compact .fuel-stations-list { gap: 12px; }
+.fuel-station-card-compact { border-radius: 15px; box-shadow: 0 5px 16px rgba(15, 23, 42, .07); }
+.fuel-station-card-compact > .fuel-station-summary { display: grid; grid-template-columns: 58px minmax(0, 1fr) auto auto; gap: 11px; align-items: center; padding: 13px 14px; border: 0; background: #fff; }
+.fuel-station-photo { display: grid; place-items: center; width: 58px; height: 58px; overflow: hidden; border: 1px solid #d9e8f7; border-radius: 13px; color: #1786df; background: #edf7ff; font-size: 1.35rem; }
+.fuel-station-photo img { width: 100%; height: 100%; object-fit: cover; }
+.fuel-station-identity { min-width: 0; }
+.fuel-station-identity h3 { overflow: hidden; margin: 0 0 4px; color: #17253d; font-size: .98rem; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+.fuel-station-identity p { display: flex; align-items: center; gap: 5px; margin: 0 0 3px; color: #3979c4; font-size: .7rem; }
+.fuel-station-identity small { display: block; overflow: hidden; color: #7b8797; font-size: .66rem; text-overflow: ellipsis; white-space: nowrap; }
+.fuel-station-updated { color: #7d8795 !important; font-size: .66rem !important; font-weight: 700 !important; letter-spacing: 0 !important; text-transform: none !important; white-space: nowrap; }
+.fuel-go-button { display: inline-flex !important; align-items: center; justify-content: center; gap: 5px; min-width: 54px; min-height: 36px; padding: 0 11px !important; border-radius: 10px !important; color: #fff !important; background: #1688e7 !important; font-size: .74rem !important; font-weight: 900 !important; text-decoration: none !important; }
+.fuel-station-products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(128px, 1fr)); border-top: 1px solid #e6ebf1; }
+.fuel-station-products-grid .fuel-station-product { display: flex; flex-direction: column; justify-content: center; gap: 3px; min-width: 0; min-height: 78px; padding: 11px 10px; border: 0; border-right: 1px solid #edf0f4; text-align: center; }
+.fuel-station-products-grid .fuel-station-product:last-child { border-right: 0; }
+.fuel-station-products-grid .fuel-station-product > span { overflow-wrap: anywhere; color: #29384e; font-size: .7rem; font-weight: 750; }
+.fuel-station-products-grid .fuel-station-product > strong { color: #078a42; font-size: 1rem; line-height: 1.1; }
+.fuel-station-products-grid .fuel-station-product > small { color: #8a95a4; font-size: .59rem; line-height: 1.25; text-align: center; }
+.fuel-station-products-grid .fuel-station-product > strong.is-pending { font-size: .68rem; }
+
+@media (max-width: 720px) {
+  .fuel-public-page { padding: 14px 9px 28px; }
+  .fuel-page-heading { padding-inline: 6px; }
+  .fuel-page-heading > span { display: none; }
+  .fuel-best-banner { grid-template-columns: 40px minmax(0, 1fr); padding: 10px 12px; }
+  .fuel-best-banner > i { width: 40px; height: 40px; }
+  .fuel-station-card-compact > .fuel-station-summary { grid-template-columns: 52px minmax(0, 1fr) auto; gap: 9px; padding: 11px; }
+  .fuel-station-photo { width: 52px; height: 52px; }
+  .fuel-station-updated { grid-column: 2; grid-row: 2; white-space: normal; }
+  .fuel-go-button { grid-column: 3; grid-row: 1 / span 2; min-width: 48px; padding: 0 9px !important; }
+  .fuel-station-identity small { display: none; }
+  .fuel-station-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); overflow-x: auto; }
+  .fuel-station-products-grid .fuel-station-product { min-width: 108px; min-height: 72px; padding: 9px 7px; }
+}

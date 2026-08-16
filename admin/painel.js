@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 614,
-  label: "v621",
+  numero: 615,
+  label: "v622",
   data: "2026-08-16",
-  nota: "Normalização independente dos combustíveis no site público."
+  nota: "Fotos e novo layout público dos postos de combustível."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -16868,6 +16868,7 @@ function collectFuelAdminStationsFromForm() {
       ...base,
       codigoSIMP: id,
       nomeExibicao: card.querySelector("[data-fuel-station-name]")?.value.trim() || base.razaoSocial || "Posto",
+      imagem: card.querySelector("[data-fuel-station-image]")?.value.trim() || "",
       ativo: card.querySelector("[data-fuel-station-active]")?.checked !== false,
       combustiveis
     };
@@ -16910,10 +16911,56 @@ function renderFuelAdminSelectedStations() {
     const products = Object.entries(fuelAdminProductMap(station));
     return `<article class="fuel-admin-station" data-fuel-station-id="${escapeAttr(id)}">
       <header><div><span class="feature-kicker">${escapeHtml(station.distribuidora || "Posto")}</span><h3>${escapeHtml(station.razaoSocial || station.nomeExibicao || "Posto")}</h3><p>${escapeHtml(station.endereco || "")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}</p></div><button type="button" class="danger-mini" data-remove-fuel-station="${escapeAttr(id)}"><i class="fa-solid fa-trash"></i> Remover</button></header>
-      <div class="fuel-admin-station-settings"><label>Nome exibido<input data-fuel-station-name value="${escapeAttr(station.nomeExibicao || station.razaoSocial || "")}"></label><label class="check-row"><input data-fuel-station-active type="checkbox" ${station.ativo !== false ? "checked" : ""}> Publicar este posto</label></div>
+      <div class="fuel-admin-station-settings">
+        <label>Nome exibido<input data-fuel-station-name value="${escapeAttr(station.nomeExibicao || station.razaoSocial || "")}"></label>
+        <label>Foto do posto (URL)<input data-fuel-station-image type="url" value="${escapeAttr(station.imagem || "")}" placeholder="https://..."></label>
+        <label class="fuel-admin-image-upload"><span>Enviar foto</span><input data-fuel-station-image-upload type="file" accept="image/*"></label>
+        <label class="check-row"><input data-fuel-station-active type="checkbox" ${station.ativo !== false ? "checked" : ""}> Publicar este posto</label>
+        <div class="fuel-admin-image-preview">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(station.nomeExibicao || station.razaoSocial || "posto")}" loading="lazy">` : `<i class="fa-solid fa-camera"></i><span>Nenhuma foto cadastrada</span>`}</div>
+      </div>
       <div class="fuel-admin-products">${products.map(([productId, product]) => `<div class="fuel-admin-product" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}"><label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)}</label><label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${Number(product.preco || 0) || ""}" placeholder="0,000"></label><label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label></div>`).join("")}</div>
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
+  box.querySelectorAll("[data-fuel-station-image]").forEach((input) => {
+    input.addEventListener("input", () => {
+      const preview = input.closest("[data-fuel-station-id]")?.querySelector(".fuel-admin-image-preview");
+      if (!preview) return;
+      const url = input.value.trim();
+      preview.innerHTML = url
+        ? `<img src="${escapeAttr(url)}" alt="Prévia da foto do posto">`
+        : `<i class="fa-solid fa-camera"></i><span>Nenhuma foto cadastrada</span>`;
+    });
+  });
+
+  box.querySelectorAll("[data-fuel-station-image-upload]").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const file = input.files?.[0];
+      const card = input.closest("[data-fuel-station-id]");
+      const id = card?.dataset.fuelStationId || "";
+      if (!file || !id) return;
+      input.disabled = true;
+      try {
+        const stationsMap = collectFuelAdminStationsFromForm();
+        const path = `configuracoes/combustiveis/postos/${id}/${Date.now()}-${slugify(file.name || "posto")}`;
+        const url = await uploadFileWithProgress(storageRef(storage, path), file, "Enviando foto do posto", file.name || "posto");
+        stationsMap[id] = { ...(stationsMap[id] || {}), imagem: url };
+        state.combustiveisConfig = {
+          ...state.combustiveisConfig,
+          ativo: $("fuelAdminActive")?.checked === true,
+          cidade: $("fuelAdminCity")?.value.trim() || "CARLOPOLIS",
+          uf: $("fuelAdminUf")?.value.trim().toUpperCase() || "PR",
+          postos: stationsMap
+        };
+        renderFuelAdminSettings();
+        showToast("Foto enviada. Clique em Salvar e publicar para confirmar.");
+      } catch (error) {
+        console.error("Falha ao enviar foto do posto.", error);
+        showToast("Não foi possível enviar a foto do posto.");
+        input.disabled = false;
+      }
+    });
+  });
+
 
   box.querySelectorAll("[data-remove-fuel-station]").forEach((button) => {
     button.addEventListener("click", () => {

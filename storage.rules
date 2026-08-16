@@ -97,6 +97,12 @@ service firebase.storage {
       allow delete: if signedIn();
     }
 
+    match /configuracoes/combustiveis/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if signedIn() && isNewImage();
+      allow delete: if signedIn();
+    }
+
     match /beneficios/{allPaths=**} {
       allow read: if true;
       allow create, update: if signedIn() && isNewImage();
