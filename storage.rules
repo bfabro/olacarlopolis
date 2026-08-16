@@ -99,8 +99,7 @@ service firebase.storage {
 
     match /configuracoes/combustiveis/{allPaths=**} {
       allow read: if true;
-      allow create, update: if signedIn() && isNewImage();
-      allow delete: if signedIn();
+      allow create, update, delete: if signedIn() && request.auth.token.email == 'bruno.4and@gmail.com' && (request.resource == null || isNewImage());
     }
 
     match /beneficios/{allPaths=**} {
