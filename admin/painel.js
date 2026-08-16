@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 621,
-  label: "v628",
+  numero: 622,
+  label: "v629",
   data: "2026-08-16",
-  nota: "Coluna Telefone / WhatsApp priorizada no detalhamento por estabelecimento."
+  nota: "Cards do relatório do cliente alinhados aos registros detalhados."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -15323,6 +15323,24 @@ function clientReportCategory(row = {}) {
   return row.tipo || row.area || "Clique";
 }
 
+function clientPageTimelineResourceKey(row = {}) {
+  const identity = normalizeName(`${row.tipo || ""} ${row.area || ""} ${row.categoria || ""}`);
+  if (/perfil|acessopagina/.test(identity)) return "perfil";
+  if (/grupowhatsapp|grupowhats|grupozap/.test(identity)) return "gruposWhatsapp";
+  if (/whatsapp|telefone|contato|zap/.test(identity)) return "whats";
+  if (/foto|imagem|divulgacao/.test(identity)) return "fotos";
+  if (/novidade/.test(identity)) return "novidades";
+  if (/compartilh/.test(identity)) return "compartilhamentos";
+  if (/destaque/.test(identity)) return "destaques";
+  if (/instagram/.test(identity)) return "instagram";
+  if (/facebook/.test(identity)) return "facebook";
+  if (/tiktok/.test(identity)) return "tiktok";
+  if (/youtube/.test(identity)) return "youtube";
+  if (/site/.test(identity)) return "site";
+  if (/rede|social|link/.test(identity)) return "outrasRedes";
+  return "outros";
+}
+
 function clientReportMenuEnabled(client = currentClientRecord() || {}) {
   return Boolean(
     client.cardapioAtivo
@@ -15658,7 +15676,7 @@ function renderClientMetricReportContent(client = {}) {
     { label: "Compartilhamentos", count: promocaoCompartilhamentos, note: "Cliques para compartilhar promocao" },
     { label: "Outras interacoes", count: promocoesOutros, note: "Historico e outros controles" }
   ].filter((entry) => entry.count > 0 || (promocoesAtivo && entry.label !== "Outras interacoes"));
-  const resourceEntries = [
+  let resourceEntries = [
     { key: "whats", label: "WhatsApp / telefone", count: whats, note: "Telefone e contato" },
     { key: "fotos", label: "Fotos / divulgacao", count: fotos, note: "Fotos e divulgacoes" },
     { key: "novidades", label: "Novidades", count: novidades, note: "Cliques na tela inicial" },
@@ -15682,8 +15700,6 @@ function renderClientMetricReportContent(client = {}) {
     { key: "compartilhamentos", label: "Compartilhamentos", count: compartilhamentos, note: "Botao de compartilhar cliente" },
     { key: "outros", label: "Outros botoes", count: outros, note: "Demais interacoes" }
   ].filter((entry) => availability[entry.key]);
-  const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...promocoesEntries];
-  const total = allResourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const timeline = buildClickTimeline(state.metricas, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
     .filter((row) => normalizeName(row.tipo) !== "gerarcard")
@@ -15735,6 +15751,19 @@ function renderClientMetricReportContent(client = {}) {
     && !moduleTypes.veiculos(row)
     && categoryIsAvailable(row)
   ));
+  if (commonTimeline.length) {
+    const detailedPageCounts = commonTimeline.reduce((counts, row) => {
+      const key = clientPageTimelineResourceKey(row);
+      counts.set(key, Number(counts.get(key) || 0) + 1);
+      return counts;
+    }, new Map());
+    const detailedPageKeys = new Set(["whats", "fotos", "novidades", "perfil", "destaques", "gruposWhatsapp", "instagram", "facebook", "tiktok", "youtube", "site", "outrasRedes", "compartilhamentos", "outros"]);
+    resourceEntries = resourceEntries.map((entry) => detailedPageKeys.has(entry.key)
+      ? { ...entry, count: Number(detailedPageCounts.get(entry.key) || 0) }
+      : entry);
+  }
+  const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...promocoesEntries];
+  const total = allResourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const paginaClienteTotal = resourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const itemAccessRows = buildItemAccessRows(state.metricas, range, keys);
   const imovelAccessRows = itemAccessRows.filter((row) => row.kind === "imovel");
