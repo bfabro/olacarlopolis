@@ -28965,8 +28965,7 @@ function fuelPublicStationAddress(station, config = fuelPublicConfig()) {
     station?.endereco || api.endereco,
     station?.complemento || api.complemento,
     station?.bairro || api.bairro,
-    locality,
-    station?.cep || api.cep ? `CEP ${station?.cep || api.cep}` : ""
+    locality
   ].map((value) => String(value || "").trim()).filter(Boolean).join(" · ");
 }
 
