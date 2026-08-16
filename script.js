@@ -25289,15 +25289,10 @@ ${produtosIniciaisLoja.length ? `
   }
 
   async function loadPaidEstablishments() {
-    const categories = window.categories || [];
-    categories.forEach((category) => {
-      loadContent(category.title, category.establishments);
-    });
+    // Renderiza apenas a rota atual para nao sobrescrever a categoria escolhida.
+    renderizarTelaAtualComDadosAdmin();
     aplicarDadosAdminClientesEmSegundoPlano(() => {
-      const updatedCategories = window.categories || [];
-      updatedCategories.forEach((category) => {
-        loadContent(category.title, category.establishments);
-      });
+      renderizarTelaAtualComDadosAdmin();
     });
   }
 
