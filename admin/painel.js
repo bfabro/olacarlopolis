@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 602,
-  label: "v609",
+  numero: 603,
+  label: "v610",
   data: "2026-08-16",
-  nota: "Layout azul de conversão aplicado às categorias públicas sem clientes."
+  nota: "Correção da troca sequencial entre categorias públicas vazias."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

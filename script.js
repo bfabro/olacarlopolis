@@ -23287,8 +23287,10 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function encontrarCategoriaPorSlugAdmin(slugOuTitulo = "") {
     const slug = normalizeName(slugOuTitulo);
+    const categoriaExata = categories.find((cat) => normalizeName(cat.title || "") === slug);
+    if (categoriaExata) return categoriaExata;
     const chave = chaveMenuCategoriaAdmin(slugOuTitulo);
-    return categories.find((cat) => normalizeName(cat.title || "") === slug || chaveMenuCategoriaAdmin(cat.title || "") === chave) || null;
+    return categories.find((cat) => chaveMenuCategoriaAdmin(cat.title || "") === chave) || null;
   }
 
   function hashCategoriaAdmin(tituloCategoria = "") {
