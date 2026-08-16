@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 611,
-  label: "v618",
+  numero: 612,
+  label: "v619",
   data: "2026-08-16",
-  nota: "Correção da exibição pública da tela de preços de combustível."
+  nota: "Carregamento seguro dos preços de combustível no site público."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

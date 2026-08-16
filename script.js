@@ -28757,14 +28757,37 @@ function fuelPublicConfig() {
   return config && typeof config === "object" ? config : {};
 }
 
-function aplicarConfiguracaoCombustiveisPublicos(config = {}) {
+let fuelPublicConfigPromise = null;
+async function fuelPublicEnsureConfig() {
+  const current = fuelPublicConfig();
+  if (typeof current.ativo === "boolean") return current;
+  if (!fuelPublicConfigPromise) {
+    fuelPublicConfigPromise = fetch("https://contadoracessos-default-rtdb.firebaseio.com/configuracoes/combustiveis.json", {
+      cache: "no-store",
+      headers: { accept: "application/json" }
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Falha ao consultar combustíveis (${response.status}).`);
+        return response.json();
+      })
+      .then((config) => {
+        const publicConfig = config && typeof config === "object" ? config : {};
+        aplicarConfiguracaoCombustiveisPublicos(publicConfig, { renderRoute: false });
+        return publicConfig;
+      })
+      .finally(() => { fuelPublicConfigPromise = null; });
+  }
+  return fuelPublicConfigPromise;
+}
+
+function aplicarConfiguracaoCombustiveisPublicos(config = {}, options = {}) {
   window.__combustiveisConfig = config;
   const menu = document.getElementById("menuCombustivel");
   const active = config.ativo === true;
   menu?.classList.toggle("hidden", !active);
   menu?.setAttribute("aria-hidden", active ? "false" : "true");
   if (menu) menu.tabIndex = active ? 0 : -1;
-  if (active && location.hash === "#combustivel") mostrarCombustivel();
+  if (active && location.hash === "#combustivel" && options.renderRoute !== false) mostrarCombustivel();
 }
 
 function fuelPublicLabel(name) {
@@ -28880,15 +28903,25 @@ function renderizarValoresCombustivel() {
   [priceInput, litersInput, consumptionInput].forEach((input) => input?.addEventListener("input", calculate));
 }
 
-function mostrarCombustivel() {
+async function mostrarCombustivel() {
   const area = document.querySelector(".content_area");
   if (!area) return;
-  const config = fuelPublicConfig();
+  if (location.hash !== "#combustivel") location.hash = "#combustivel";
+  let config = fuelPublicConfig();
+  if (typeof config.ativo !== "boolean") {
+    area.innerHTML = `<section class="fuel-unavailable"><i class="fa-solid fa-spinner fa-spin"></i><h2>Carregando preços de combustível</h2><p>Consultando os postos e valores publicados...</p></section>`;
+    try {
+      config = await fuelPublicEnsureConfig();
+    } catch (error) {
+      console.warn("Não foi possível carregar a configuração pública de combustíveis.", error);
+      area.innerHTML = `<section class="fuel-unavailable"><i class="fa-solid fa-triangle-exclamation"></i><h2>Não foi possível carregar os preços</h2><p>Tente novamente em alguns instantes.</p></section>`;
+      return;
+    }
+  }
   if (config.ativo !== true) {
     area.innerHTML = `<section class="fuel-unavailable"><i class="fa-solid fa-gas-pump"></i><h2>Preço Combustível indisponível</h2><p>Esta área ainda não está ativa para a cidade.</p></section>`;
     return;
   }
-  if (location.hash !== "#combustivel") location.hash = "#combustivel";
   const city = `${config.cidade || "Cidade"}${config.uf ? ` / ${config.uf}` : ""}`;
   area.innerHTML = `<div class="fuel-wrap fuel-public-page"><div class="fuel-hero fuel-hero--premium"><div class="fuel-hero-left"><div class="fuel-hero-kicker"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</div><h2 class="fuel-main-title">Compare antes de abastecer</h2><p class="fuel-subtitle">Consulte os preços publicados por posto, encontre o menor valor de cada combustível e estime seu gasto.</p></div><div class="fuel-hero-right"><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Cidade</span><strong>${escapePromoHtml(city)}</strong></div><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Postos publicados</span><strong>${fuelPublicStations(config).length}</strong></div></div></div><div id="fuelResultados" class="fuel-results"></div></div>`;
   renderizarValoresCombustivel();
