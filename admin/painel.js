@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 620,
-  label: "v627",
+  numero: 621,
+  label: "v628",
   data: "2026-08-16",
-  nota: "Relatórios recolhidos, ordenáveis e com cabeçalhos fixos."
+  nota: "Coluna Telefone / WhatsApp priorizada no detalhamento por estabelecimento."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -14751,6 +14751,7 @@ function clientLabelFromMetricKey(key) {
 function metricButtonLabel(tipo) {
   return {
     telefone: "Telefone",
+    telefone_whatsapp: "Telefone / WhatsApp",
     perfil: "Visualizacao do perfil",
     acesso_pagina: "Acesso \u00e0 p\u00e1gina",
     whatsapp: "WhatsApp",
@@ -14798,14 +14799,15 @@ function metricButtonLabel(tipo) {
 }
 
 function buildGeneralClickRows(details = new Map()) {
-  const types = new Set();
+  const types = new Set(["telefone_whatsapp"]);
   const rows = [...details.entries()].map(([clientId, map]) => {
     const clicks = {};
     let total = 0;
     map.forEach((count, type) => {
-      types.add(type);
-      clicks[type] = count;
-      total += count;
+      const reportType = type === "telefone" || type === "whatsapp" ? "telefone_whatsapp" : type;
+      types.add(reportType);
+      clicks[reportType] = Number(clicks[reportType] || 0) + Number(count || 0);
+      total += Number(count || 0);
     });
     return {
       id: clientId,
@@ -14815,7 +14817,12 @@ function buildGeneralClickRows(details = new Map()) {
       total
     };
   }).filter((row) => row.total > 0).sort((a, b) => b.total - a.total);
-  return { rows, types: [...types].sort((a, b) => metricButtonLabel(a).localeCompare(metricButtonLabel(b), "pt-BR")) };
+  const orderedTypes = [...types].sort((a, b) => {
+    if (a === "telefone_whatsapp") return -1;
+    if (b === "telefone_whatsapp") return 1;
+    return metricButtonLabel(a).localeCompare(metricButtonLabel(b), "pt-BR");
+  });
+  return { rows, types: orderedTypes };
 }
 
 function buildOndeComerClickRows(cardapios = new Map(), whats = new Map(), fotos = new Map()) {
