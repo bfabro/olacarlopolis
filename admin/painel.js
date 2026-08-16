@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 604,
-  label: "v611",
+  numero: 605,
+  label: "v612",
   data: "2026-08-16",
-  nota: "Quantidade de cliques no WhatsApp adicionada ao relatório de exclusões."
+  nota: "Referências de categorias vazias atualizadas a cada novo clique."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

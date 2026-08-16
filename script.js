@@ -23360,6 +23360,23 @@ plotarPinsImoveis(stateImoveis.filtered);
       .replace(/\u00a0/g, " ")
       .trim();
   }
+  function categoriaAtualDoLink(link, fallbackTitle = "") {
+    const slugs = [
+      normalizeName(textoLinkCategoriaAdmin(link)),
+      normalizeName(link?.dataset?.adminCategory || ""),
+      normalizeName(fallbackTitle)
+    ].filter(Boolean);
+
+    for (const slug of slugs) {
+      const categoriaExata = categories.find((item) => normalizeName(item?.title || "") === slug);
+      if (categoriaExata) return categoriaExata;
+    }
+
+    const categoriasDoLink = categories.filter((item) => item?.link === link);
+    if (categoriasDoLink.length === 1) return categoriasDoLink[0];
+    return encontrarCategoriaPorSlugAdmin(fallbackTitle);
+  }
+
 
   function encontrarLinkCategoriaAdmin(submenu, title) {
     const slug = normalizeName(title);
@@ -23373,14 +23390,17 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function ligarLinkCategoriaAdmin(link, title) {
-    if (!link || link.dataset.adminCategoryBound === "true") return;
-    const slug = normalizeName(title);
+    if (!link) return;
+    link.dataset.adminCategory = normalizeName(title);
+    if (link.dataset.adminCategoryBound === "true") return;
     link.dataset.adminCategoryBound = "true";
     link.addEventListener("click", function (event) {
       event.preventDefault();
-      location.hash = hashCategoriaAdmin(title);
-      const cat = encontrarCategoriaPorSlugAdmin(title) || categories.find((item) => normalizeName(item.title) === slug);
-      if (cat) loadContent(cat.title, cat.establishments);
+      const categoriaAtual = categoriaAtualDoLink(this, title);
+      if (!categoriaAtual) return;
+      location.hash = hashCategoriaAdmin(categoriaAtual.title);
+      prepararMenuParaCategoria(categoriaAtual);
+      loadContent(categoriaAtual.title, categoriaAtual.establishments || []);
     });
   }
 
@@ -25369,14 +25389,15 @@ ${produtosIniciaisLoja.length ? `
     if (!category.link) return;
     category.link.addEventListener("click", function (event) {
       event.preventDefault();
+      const categoriaAtual = categoriaAtualDoLink(this, category.title) || category;
       if (typeof definirTelaContentArea === "function") definirTelaContentArea(null);
       categories.forEach((cat) => cat.link?.classList.remove("active"));
       this.classList.add("active");
 
-      // Renderiza imediatamente; a navegacao nao depende apenas do evento hashchange.
-      location.hash = "#comercios-" + normalizeName(category.title);
-      prepararMenuParaCategoria(category);
-      loadContent(category.title, category.establishments || []);
+      // Resolve novamente pelo link clicado para nao reutilizar referencias anteriores.
+      location.hash = "#comercios-" + normalizeName(categoriaAtual.title);
+      prepararMenuParaCategoria(categoriaAtual);
+      loadContent(categoriaAtual.title, categoriaAtual.establishments || []);
 
       if (sidebar.classList.contains("close")) {
         sidebar.classList.remove("close");
