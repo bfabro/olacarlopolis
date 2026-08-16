@@ -25209,7 +25209,7 @@ ${produtosIniciaisLoja.length ? `
         registrarOrigemPaginaCliente(clientId || clientName, {
           estabelecimento: clientName,
           categoria: title,
-          origemEvento: "clique-card"
+          origemEvento: "abertura-perfil"
         }).catch(() => { });
       });
     });

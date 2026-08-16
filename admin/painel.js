@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 619,
-  label: "v626",
+  numero: 620,
+  label: "v627",
   data: "2026-08-16",
-  nota: "Ajuste da apresentação pública do endereço dos postos."
+  nota: "Relatórios recolhidos, ordenáveis e com cabeçalhos fixos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -14948,6 +14948,13 @@ function origemLabel(value) {
   return raw;
 }
 
+function clientReportEntryLabel(value) {
+  const raw = String(value || "").trim();
+  const normalized = normalizeName(raw);
+  if (normalized === "cliquecard" || normalized === "aberturaperfil") return "Abertura do perfil";
+  return raw || "-";
+}
+
 function consolidateAccessMetrics(acessos = {}, origemAcessos = {}, usoPWAData = {}) {
   const detalhadosPorCanal = new Map();
   const origensExternas = new Map();
@@ -15071,7 +15078,7 @@ function buildClientPageOriginTimeline(data = {}, range = getReportDateRange(), 
           canal: item?.canal || "-",
           cidade: [item?.cidade || "Desconhecida", item?.estado || ""].filter(Boolean).join(" - "),
           dispositivo: item?.dispositivo || "-",
-          evento: item?.origemEvento || "-",
+          evento: clientReportEntryLabel(item?.origemEvento),
           pagina: item?.pagina || ""
         });
       });
@@ -15832,6 +15839,7 @@ function renderClientMetricReport(client = {}) {
 function bindClientMetricReportControls(client = {}) {
   const root = $("clientMetricReportMount");
   if (!root) return;
+  enhanceReportTables(root);
   const refresh = () => {
     root.innerHTML = renderClientMetricReportContent(client);
     bindClientMetricReportControls(client);
@@ -16146,55 +16154,97 @@ function bindFinancePaidPlanFilter(container) {
   });
 }
 
-function reportQuantityValue(cell) {
-  const value = String(cell?.textContent || "").replace(/\u00a0/g, " ").trim().replace(/\s+/g, "");
-  if (!/^-?\d+(?:[.,]\d+)?$/.test(value)) return null;
-  if (/^-?\d{1,3}(?:\.\d{3})+$/.test(value)) return Number(value.replace(/\./g, ""));
-  return Number(value.replace(",", "."));
+function reportTableCellValue(cell) {
+  const selectValue = cell?.querySelector("select")?.selectedOptions?.[0]?.textContent;
+  const fieldValue = cell?.querySelector("input, textarea")?.value;
+  const source = cell?.dataset.sortValue || selectValue || fieldValue || cell?.textContent || "";
+  const raw = String(source).replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+  const brDate = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[, ]+(\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (brDate) return { type: "number", value: Date.UTC(Number(brDate[3]), Number(brDate[2]) - 1, Number(brDate[1]), Number(brDate[4] || 0), Number(brDate[5] || 0), Number(brDate[6] || 0)) };
+  const isoDate = raw.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?/);
+  if (isoDate) return { type: "number", value: Date.UTC(Number(isoDate[1]), Number(isoDate[2]) - 1, Number(isoDate[3]), Number(isoDate[4] || 0), Number(isoDate[5] || 0), Number(isoDate[6] || 0)) };
+  const clock = raw.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?$/);
+  if (clock) return { type: "number", value: Number(clock[1]) * 3600 + Number(clock[2]) * 60 + Number(clock[3] || 0) };
+  const numeric = raw.replace(/R\$/gi, "").replace(/%/g, "").replace(/\s/g, "");
+  if (/^-?[\d.,]+$/.test(numeric) && /\d/.test(numeric)) {
+    const normalized = numeric.includes(",") ? numeric.replace(/\./g, "").replace(",", ".") : numeric.replace(/\.(?=\d{3}(?:\D|$))/g, "");
+    const value = Number(normalized);
+    if (Number.isFinite(value)) return { type: "number", value };
+  }
+  return { type: "text", value: raw };
 }
 
-function enableAccessReportQuantitySorting(root) {
-  root?.querySelectorAll(".report-click-table").forEach((table) => {
+const reportTableTextCollator = new Intl.Collator("pt-BR", { numeric: true, sensitivity: "base" });
+
+function reportTableDisclosureTitle(wrap) {
+  const card = wrap.closest(".panel-card, .client-report-monitor-section, .access-report-detail-block");
+  const heading = card?.querySelector(":scope > .section-head h2, :scope > .section-head h3, :scope > h2, :scope > h3");
+  return String(heading?.textContent || "Dados detalhados").trim();
+}
+
+function collapseStandaloneReportTable(wrap) {
+  if (!wrap || wrap.closest("details, [data-finance-report-content], .report-table-disclosure")) return;
+  const disclosure = document.createElement("details");
+  disclosure.className = "report-table-disclosure";
+  const summary = document.createElement("summary");
+  summary.innerHTML = `<span><i class="fa-solid fa-table-list"></i><strong>${escapeHtml(reportTableDisclosureTitle(wrap))}</strong><small>Clique para visualizar e organizar os dados</small></span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>`;
+  wrap.before(disclosure);
+  disclosure.append(summary, wrap);
+}
+
+function enhanceReportTables(root = document) {
+  if (!root) return;
+  const wrappers = [
+    ...(root.matches?.(".report-table-wrap") ? [root] : []),
+    ...root.querySelectorAll?.(".report-table-wrap") || []
+  ];
+  wrappers.forEach((wrap) => {
+    collapseStandaloneReportTable(wrap);
+    wrap.querySelectorAll("table").forEach((table) => {
     const tbody = table.tBodies?.[0];
     const headerRow = table.tHead?.rows?.[0];
-    const rows = [...(tbody?.rows || [])];
-    if (!tbody || !headerRow || rows.length < 2) return;
-
-    rows.forEach((row, index) => {
-      if (!row.dataset.reportOriginalOrder) row.dataset.reportOriginalOrder = String(index);
-    });
+      if (!tbody || !headerRow) return;
 
     [...headerRow.cells].forEach((header, columnIndex) => {
-      if (header.dataset.quantitySortBound === "true") return;
-      const values = rows.map((row) => reportQuantityValue(row.cells[columnIndex]));
-      if (!values.length || values.some((value) => value === null || !Number.isFinite(value))) return;
-
-      header.dataset.quantitySortBound = "true";
-      header.classList.add("report-quantity-sort");
+        if (header.dataset.reportSortBound === "true") return;
+      header.dataset.reportSortBound = "true";
+        header.classList.add("report-column-sort");
       header.setAttribute("role", "button");
       header.setAttribute("tabindex", "0");
       header.setAttribute("aria-sort", "none");
-      header.title = "Ordenar esta coluna por quantidade";
+        header.title = "Clique para ordenar esta coluna";
 
       const sortColumn = () => {
-        const sameColumn = table.dataset.quantitySortColumn === String(columnIndex);
-        const direction = sameColumn && table.dataset.quantitySortDirection === "desc" ? "asc" : "desc";
-        const sortedRows = [...tbody.rows].sort((rowA, rowB) => {
-          const valueA = reportQuantityValue(rowA.cells[columnIndex]) ?? 0;
-          const valueB = reportQuantityValue(rowB.cells[columnIndex]) ?? 0;
-          const difference = direction === "asc" ? valueA - valueB : valueB - valueA;
-          return difference || Number(rowA.dataset.reportOriginalOrder || 0) - Number(rowB.dataset.reportOriginalOrder || 0);
+          const rows = [...tbody.rows].filter((row) => row.cells.length > columnIndex);
+          rows.forEach((row, index) => {
+            if (!row.dataset.reportOriginalOrder) row.dataset.reportOriginalOrder = String(index);
+          });
+          if (rows.length < 2) return;
+          const sample = rows.map((row) => reportTableCellValue(row.cells[columnIndex]));
+          const numericColumn = sample.filter((item) => item.type === "number").length >= Math.ceil(sample.length / 2);
+          const sameColumn = table.dataset.reportSortColumn === String(columnIndex);
+          const direction = sameColumn
+            ? (table.dataset.reportSortDirection === "asc" ? "desc" : "asc")
+            : (numericColumn ? "desc" : "asc");
+          const sortedRows = rows.sort((rowA, rowB) => {
+            const valueA = reportTableCellValue(rowA.cells[columnIndex]);
+            const valueB = reportTableCellValue(rowB.cells[columnIndex]);
+            const comparison = valueA.type === "number" && valueB.type === "number"
+              ? valueA.value - valueB.value
+              : reportTableTextCollator.compare(String(valueA.value), String(valueB.value));
+            const ordered = direction === "asc" ? comparison : -comparison;
+            return ordered || Number(rowA.dataset.reportOriginalOrder || 0) - Number(rowB.dataset.reportOriginalOrder || 0);
         });
 
         tbody.append(...sortedRows);
         [...headerRow.cells].forEach((cell) => {
           cell.classList.remove("is-sort-asc", "is-sort-desc");
-          if (cell.dataset.quantitySortBound === "true") cell.setAttribute("aria-sort", "none");
+            if (cell.dataset.reportSortBound === "true") cell.setAttribute("aria-sort", "none");
         });
         header.classList.add(direction === "asc" ? "is-sort-asc" : "is-sort-desc");
         header.setAttribute("aria-sort", direction === "asc" ? "ascending" : "descending");
-        table.dataset.quantitySortColumn = String(columnIndex);
-        table.dataset.quantitySortDirection = direction;
+          table.dataset.reportSortColumn = String(columnIndex);
+          table.dataset.reportSortDirection = direction;
       };
 
       header.addEventListener("click", sortColumn);
@@ -16204,13 +16254,35 @@ function enableAccessReportQuantitySorting(root) {
         sortColumn();
       });
     });
+    });
   });
+}
+
+let reportTableObserver = null;
+
+function initializeReportTableEnhancements() {
+  enhanceReportTables(document);
+  if (reportTableObserver || !document.body) return;
+  reportTableObserver = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        const element = node;
+        if (element.matches?.(".report-table-wrap") || element.querySelector?.(".report-table-wrap")) enhanceReportTables(element);
+      });
+    });
+  });
+  reportTableObserver.observe(document.body, { childList: true, subtree: true });
+}
+
+function enableAccessReportQuantitySorting(root) {
+  enhanceReportTables(root);
 }
 
 function bindReportControls(mount) {
   const isFinanceReport = mount.id === "reportsFinanceMount";
   bindFinancePaidPlanFilter(mount);
-  if (!isFinanceReport) enableAccessReportQuantitySorting(mount);
+  enhanceReportTables(mount);
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
     button.addEventListener("click", async () => {
       state.reportSection = button.dataset.reportSection;
@@ -16242,7 +16314,7 @@ function bindReportControls(mount) {
           if (!content.isConnected) return;
           content.innerHTML = typeof contentFactory === "function" ? contentFactory() : "";
           bindFinancePaidPlanFilter(content);
-          if (!isFinanceReport) enableAccessReportQuantitySorting(content);
+          enhanceReportTables(content);
           content.dataset.loaded = "true";
           deferredReportSectionContent.delete(deferredKey);
         });
@@ -22602,6 +22674,7 @@ function bindEvents() {
 renderPanelVersion();
 updateClientShortDescriptionCount();
 bindEvents();
+initializeReportTableEnhancements();
 bindAdminIdleTimer();
 
 onAuthStateChanged(auth, async (user) => {
