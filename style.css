@@ -28267,3 +28267,41 @@ body.eventos-image-open { overflow: hidden; }
   .fuel-station-products-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); overflow-x: auto; }
   .fuel-station-products-grid .fuel-station-product { min-width: 108px; min-height: 72px; padding: 9px 7px; }
 }
+
+/* Combustiveis - identificacao, endereco e horarios v435 */
+.fuel-best-banner { grid-template-columns: 68px minmax(0, 1fr); }
+.fuel-best-photo { display: grid; place-items: center; width: 68px; height: 68px; overflow: hidden; border: 1px solid #c6def8; border-radius: 15px; color: #fff; background: #2493ed; font-size: 1.3rem; }
+.fuel-best-photo img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+.fuel-best-content { display: grid; gap: 3px; min-width: 0; }
+.fuel-best-content > span { color: #34465e; font-size: .78rem; font-weight: 850; }
+.fuel-best-content > strong { margin: 0; color: #078a42; font-size: 1.22rem; line-height: 1.1; }
+.fuel-best-content .fuel-best-station-name { display: block; margin: 2px 0 0; color: #17253d; font-size: 1rem; font-weight: 900; line-height: 1.25; }
+.fuel-station-card-compact > .fuel-station-summary { grid-template-columns: 78px minmax(0, 1fr) auto; align-items: start; }
+.fuel-station-photo { width: 78px; height: 78px; border-radius: 15px; font-size: 1.6rem; }
+.fuel-station-identity h3 { overflow: visible; margin-bottom: 6px; font-size: 1.06rem; line-height: 1.25; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
+.fuel-station-identity .fuel-station-address { align-items: flex-start; margin: 0; color: #5d6f84; font-size: .72rem; line-height: 1.45; }
+.fuel-station-address i { flex: 0 0 auto; margin-top: 3px; color: #1688e7; }
+.fuel-station-address span { min-width: 0; overflow-wrap: anywhere; }
+.fuel-station-updated { align-self: start; padding-top: 2px; }
+.fuel-station-footer { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 11px 14px 13px; border-top: 1px solid #e7edf3; background: #fbfdff; }
+.fuel-station-hours { flex: 1 1 auto; min-width: 0; }
+.fuel-station-hours summary { display: flex; align-items: center; gap: 7px; width: fit-content; color: #35516f; font-size: .72rem; font-weight: 850; cursor: pointer; list-style: none; }
+.fuel-station-hours summary::-webkit-details-marker { display: none; }
+.fuel-station-hours summary .fa-chevron-down { margin-left: 2px; color: #8a9aab; font-size: .58rem; transition: transform .2s ease; }
+.fuel-station-hours[open] summary .fa-chevron-down { transform: rotate(180deg); }
+.fuel-station-hours > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px 12px; margin-top: 10px; }
+.fuel-station-hours-row { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 8px; padding: 5px 7px; border-radius: 7px; background: #eef7ff; color: #334b65; font-size: .66rem; }
+.fuel-station-hours-row.closed { color: #8a95a3; background: #f2f4f6; }
+.fuel-station-hours-row strong { font-weight: 850; }
+.fuel-station-hours-empty { display: inline-flex; align-items: center; gap: 6px; color: #7b8797; font-size: .7rem; font-weight: 750; }
+.fuel-station-footer .fuel-go-button { flex: 0 0 auto; min-width: 92px; }
+@media (max-width: 720px) {
+  .fuel-best-banner { grid-template-columns: 60px minmax(0, 1fr); }
+  .fuel-best-photo { width: 60px; height: 60px; }
+  .fuel-station-card-compact > .fuel-station-summary { grid-template-columns: 68px minmax(0, 1fr); }
+  .fuel-station-photo { width: 68px; height: 68px; }
+  .fuel-station-updated { grid-column: 2; grid-row: 2; padding: 0; }
+  .fuel-station-footer { flex-direction: column; align-items: stretch; }
+  .fuel-station-footer .fuel-go-button { width: 100%; min-height: 40px; }
+  .fuel-station-hours > div { grid-template-columns: 1fr; }
+}

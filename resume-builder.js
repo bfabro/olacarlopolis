@@ -261,7 +261,7 @@
   window.ResumeBuilder = { open, close };
   document.addEventListener("click", (event) => { if (event.target.closest("[data-open-resume-builder]")) { event.preventDefault(); open(); } });
   function mountVacancyCta() {
-    document.querySelectorAll(".sidebar-version").forEach((item) => { item.textContent = "Olá Carlópolis v379"; });
+    document.querySelectorAll(".sidebar-version").forEach((item) => { item.textContent = "Olá Carlópolis v380"; });
     const area = document.querySelector(".content_area");
     if (!area || area.querySelector(".vagas-resume-cta")) return;
     const vacancyPage = area.querySelector(".vagas-public-page");

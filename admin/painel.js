@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 617,
-  label: "v624",
+  numero: 618,
+  label: "v625",
   data: "2026-08-16",
-  nota: "Dados completos da ANP, flag pública e ampliação das fotos dos postos."
+  nota: "Horários, endereços completos e novo layout público dos postos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -16838,7 +16838,9 @@ function normalizeAnpStationForAdmin(station) {
     nomeExibicao: existing.nomeExibicao || station?.razaoSocial || "",
     cnpj: station?.cnpj || existing.cnpj || "",
     endereco: station?.endereco || existing.endereco || "",
+    complemento: station?.complemento || existing.complemento || "",
     bairro: station?.bairro || existing.bairro || "",
+    cep: station?.cep || existing.cep || "",
     municipio: station?.municipio || existing.municipio || "",
     uf: station?.uf || existing.uf || "",
     distribuidora: station?.distribuidora || existing.distribuidora || "",
@@ -16865,12 +16867,25 @@ function collectFuelAdminStationsFromForm() {
         atualizadoEm: row.querySelector("[data-fuel-date]")?.value || ""
       };
     });
+    const horarios = emptySchedule();
+    card.querySelectorAll("[data-fuel-schedule-day]").forEach((row) => {
+      const day = row.dataset.fuelScheduleDay;
+      if (!day || row.querySelector("[data-fuel-schedule-open]")?.checked !== true) return;
+      const slots = [];
+      [0, 1].forEach((index) => {
+        const inicio = row.querySelector(`[data-fuel-schedule-slot="${index}"][data-field="inicio"]`)?.value || "";
+        const fim = row.querySelector(`[data-fuel-schedule-slot="${index}"][data-field="fim"]`)?.value || "";
+        if (inicio && fim) slots.push({ inicio, fim });
+      });
+      horarios[day] = slots;
+    });
     result[id] = {
       ...base,
       codigoSIMP: id,
       nomeExibicao: card.querySelector("[data-fuel-station-name]")?.value.trim() || base.razaoSocial || "Posto",
       imagem: card.querySelector("[data-fuel-station-image]")?.value.trim() || "",
       ativo: card.querySelector("[data-fuel-station-active]")?.checked !== false,
+      horarios,
       combustiveis
     };
   });
@@ -16961,6 +16976,26 @@ function renderFuelAdminSearchResults() {
   });
 }
 
+function renderFuelAdminSchedule(station) {
+  const schedule = normalizeSchedule(station?.horarios || {});
+  return `<details class="fuel-admin-hours">
+    <summary><i class="fa-regular fa-clock"></i> Horários de funcionamento</summary>
+    <div class="fuel-admin-schedule">
+      ${WEEK_DAYS.map(([key, label]) => {
+        const slots = schedule[key] || [];
+        const open = slots.length > 0;
+        return `<div class="fuel-admin-schedule-day ${open ? "" : "closed"}" data-fuel-schedule-day="${key}">
+          <label><input type="checkbox" data-fuel-schedule-open ${open ? "checked" : ""}> <strong>${label}</strong></label>
+          <div class="fuel-admin-schedule-periods">
+            <input type="time" data-fuel-schedule-slot="0" data-field="inicio" value="${escapeAttr(slots[0]?.inicio || "")}" ${open ? "" : "disabled"}><span>às</span><input type="time" data-fuel-schedule-slot="0" data-field="fim" value="${escapeAttr(slots[0]?.fim || "")}" ${open ? "" : "disabled"}>
+            <small>2º período</small><input type="time" data-fuel-schedule-slot="1" data-field="inicio" value="${escapeAttr(slots[1]?.inicio || "")}" ${open ? "" : "disabled"}><span>às</span><input type="time" data-fuel-schedule-slot="1" data-field="fim" value="${escapeAttr(slots[1]?.fim || "")}" ${open ? "" : "disabled"}>
+          </div>
+        </div>`;
+      }).join("")}
+    </div>
+  </details>`;
+}
+
 function renderFuelAdminSelectedStations() {
   const box = $("fuelAdminSelectedStations");
   if (!box) return;
@@ -16977,10 +17012,20 @@ function renderFuelAdminSelectedStations() {
         <label class="check-row"><input data-fuel-station-active type="checkbox" ${station.ativo !== false ? "checked" : ""}> Publicar este posto</label>
         <div class="fuel-admin-image-preview">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(station.nomeExibicao || station.razaoSocial || "posto")}" loading="lazy">` : `<i class="fa-solid fa-camera"></i><span>Nenhuma foto cadastrada</span>`}</div>
       </div>
+      ${renderFuelAdminSchedule(station)}
       <div class="fuel-admin-products">${products.map(([productId, product]) => `<div class="fuel-admin-product" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}"><label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)}</label><label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${Number(product.preco || 0) || ""}" placeholder="0,000"></label><label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label></div>`).join("")}</div>
       ${renderFuelAdminAnpDetails(station)}
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
+  box.querySelectorAll("[data-fuel-schedule-open]").forEach((input) => {
+    input.addEventListener("change", () => {
+      const row = input.closest("[data-fuel-schedule-day]");
+      row?.classList.toggle("closed", !input.checked);
+      row?.querySelectorAll('input[type="time"]').forEach((timeInput) => {
+        timeInput.disabled = !input.checked;
+      });
+    });
+  });
   box.querySelectorAll("[data-fuel-station-image]").forEach((input) => {
     input.addEventListener("input", () => {
       const preview = input.closest("[data-fuel-station-id]")?.querySelector(".fuel-admin-image-preview");

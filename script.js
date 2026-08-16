@@ -28956,6 +28956,38 @@ function fuelPublicMapUrl(station, config) {
   return destination ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}` : "";
 }
 
+function fuelPublicStationAddress(station, config = fuelPublicConfig()) {
+  const api = station?.dadosAnp && typeof station.dadosAnp === "object" ? station.dadosAnp : {};
+  const city = station?.municipio || api.municipio || config.cidade || "";
+  const uf = station?.uf || api.uf || config.uf || "";
+  const locality = [city, uf].filter(Boolean).join(" / ");
+  return [
+    station?.endereco || api.endereco,
+    station?.complemento || api.complemento,
+    station?.bairro || api.bairro,
+    locality,
+    station?.cep || api.cep ? `CEP ${station?.cep || api.cep}` : ""
+  ].map((value) => String(value || "").trim()).filter(Boolean).join(" · ");
+}
+
+function fuelPublicSchedule(station) {
+  const schedule = station?.horarios && typeof station.horarios === "object" ? station.horarios : {};
+  const days = [
+    ["seg", "Segunda"], ["ter", "Terça"], ["qua", "Quarta"], ["qui", "Quinta"],
+    ["sex", "Sexta"], ["sab", "Sábado"], ["dom", "Domingo"]
+  ];
+  const hasSchedule = days.some(([key]) => Array.isArray(schedule[key]) && schedule[key].some((slot) => slot?.inicio && slot?.fim));
+  if (!hasSchedule) return `<span class="fuel-station-hours-empty"><i class="fa-regular fa-clock"></i> Horário não informado</span>`;
+  const rows = days.map(([key, label]) => {
+    const slots = Array.isArray(schedule[key]) ? schedule[key].filter((slot) => slot?.inicio && slot?.fim) : [];
+    return `<div class="fuel-station-hours-row ${slots.length ? "" : "closed"}"><strong>${label}</strong><span>${slots.length ? slots.map((slot) => `${fuelPublicEscape(slot.inicio)} às ${fuelPublicEscape(slot.fim)}`).join(" / ") : "Fechado"}</span></div>`;
+  }).join("");
+  return `<details class="fuel-station-hours">
+    <summary><i class="fa-regular fa-clock"></i> Horários de funcionamento <i class="fa-solid fa-chevron-down"></i></summary>
+    <div>${rows}</div>
+  </details>`;
+}
+
 function fuelPublicLatestDate(station) {
   const dates = fuelPublicProducts(station)
     .map((product) => String(product.atualizadoEm || "").slice(0, 10))
@@ -29002,8 +29034,8 @@ function renderizarValoresCombustivel() {
       <span><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(city)}</span>
     </header>
     <section class="fuel-best-banner">
-      <i class="fa-solid fa-gas-pump"></i>
-      <div>${highlighted ? `Menor ${fuelPublicEscape(highlighted.label)} hoje: <strong>${fuelPublicMoney(highlighted.price)}</strong><small>${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `Os preços ainda estão sendo atualizados.<small>Consulte novamente em breve.</small>`}</div>
+      <div class="fuel-best-photo">${highlighted?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(highlighted.station.imagem)}" alt="Foto de ${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
+      <div class="fuel-best-content">${highlighted ? `<span>Menor ${fuelPublicEscape(highlighted.label)} hoje</span><strong>${fuelPublicMoney(highlighted.price)}</strong><small class="fuel-best-station-name">${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `<span>Os preços ainda estão sendo atualizados.</span><small>Consulte novamente em breve.</small>`}</div>
     </section>
     <nav class="fuel-filter-chips" aria-label="Filtrar postos por combustível">
       ${options.map((option) => `<button type="button" data-fuel-filter="${fuelPublicEscape(option.key)}" class="${fuelPublicActiveFilter === option.key ? "active" : ""}">${fuelPublicEscape(option.label)}</button>`).join("")}
@@ -29014,15 +29046,15 @@ function renderizarValoresCombustivel() {
         const products = fuelPublicProducts(station);
         const mapUrl = fuelPublicMapUrl(station, config);
         const stationName = station.nomeExibicao || station.razaoSocial || "Posto";
-        const locationLabel = [station.bairro, station.municipio || config.cidade].filter(Boolean).join(" · ");
+        const address = fuelPublicStationAddress(station, config);
         return `<article class="fuel-station-card fuel-station-card-compact">
           <header class="fuel-station-summary">
             <div class="fuel-station-photo">${station.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName)}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
-            <div class="fuel-station-identity"><h3>${fuelPublicEscape(stationName)}</h3><p><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(locationLabel || station.endereco || city)}</p><small>${fuelPublicEscape(station.endereco || "")}</small></div>
+            <div class="fuel-station-identity"><h3>${fuelPublicEscape(stationName)}</h3><p class="fuel-station-address"><i class="fa-solid fa-location-dot"></i><span>${fuelPublicEscape(address || city)}</span></p></div>
             <span class="fuel-station-updated">Atualizado em ${fuelPublicLatestDate(station)}</span>
-            ${mapUrl ? `<a class="fuel-go-button" href="${mapUrl}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-arrow"></i> Ir</a>` : ""}
           </header>
           <div class="fuel-station-products fuel-station-products-grid">${products.length ? products.map((product) => `<div class="fuel-station-product"><span>${fuelPublicEscape(product.label)}</span><strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small>${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small></div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível disponível.</div>`}</div>
+          <footer class="fuel-station-footer">${fuelPublicSchedule(station)}${mapUrl ? `<a class="fuel-go-button" href="${mapUrl}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-arrow"></i> Ir</a>` : ""}</footer>
         </article>`;
       }).join("") : `<div class="fuel-public-empty fuel-public-empty-large"><i class="fa-solid fa-gas-pump"></i><strong>Nenhum posto encontrado</strong><span>Não há posto publicado para este filtro.</span></div>`}</div>
     </section>
