@@ -25384,6 +25384,34 @@ ${produtosIniciaisLoja.length ? `
       event.preventDefault(); // Evita recarregar a página
       mostrarConteudo(); // Esconde o novidades e mostra o conteúdo
 
+      const submenuAtual = this.closest("ul.submenu");
+      const ehCategoriaPublica = submenuAtual
+        && (submenuAtual === submenuComercioAdmin() || submenuAtual === submenuServicoAdmin());
+      let categoriaDoLink = categories.find((item) => item?.link === this);
+
+      // Alguns itens fixos existem no menu, mas ainda nao possuem cliente ou
+      // cadastro na lista de categorias. Nesses casos, cria a referencia a
+      // partir do item realmente clicado para nao manter a tela anterior.
+      if (ehCategoriaPublica && (!categoriaDoLink || categoriaDoLink.metaAdmin?.menuFallback)) {
+        const tituloCategoria = textoLinkCategoriaAdmin(this) || "Esta categoria";
+        if (!categoriaDoLink) {
+          categoriaDoLink = {
+            link: this,
+            title: tituloCategoria,
+            establishments: [],
+            metaAdmin: {
+              menuFallback: true,
+              menuGroup: submenuAtual === submenuServicoAdmin() ? "servicos" : "comercios"
+            }
+          };
+          this.dataset.adminCategory = normalizeName(tituloCategoria);
+          categories.push(categoriaDoLink);
+        }
+        location.hash = "#comercios-" + normalizeName(categoriaDoLink.title);
+        prepararMenuParaCategoria(categoriaDoLink);
+        loadContent(categoriaDoLink.title, categoriaDoLink.establishments || []);
+      }
+
       // Retrai a sidebar em dispositivos móveis
       if (window.innerWidth < 768) {
         sidebar.classList.add("close");
