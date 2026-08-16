@@ -28757,6 +28757,16 @@ function fuelPublicConfig() {
   return config && typeof config === "object" ? config : {};
 }
 
+function fuelPublicEscape(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[character]));
+}
+
 let fuelPublicConfigPromise = null;
 async function fuelPublicEnsureConfig() {
   const current = fuelPublicConfig();
@@ -28849,12 +28859,12 @@ function renderizarValoresCombustivel() {
   const config = fuelPublicConfig();
   const stations = fuelPublicStations(config);
   const cheapest = fuelPublicCheapest(stations);
-  const calculatorOptions = cheapest.map((item) => `<option value="${item.price}">${escapePromoHtml(item.label)} · ${fuelPublicMoney(item.price)}</option>`).join("");
+  const calculatorOptions = cheapest.map((item) => `<option value="${item.price}">${fuelPublicEscape(item.label)} · ${fuelPublicMoney(item.price)}</option>`).join("");
 
   box.innerHTML = `
     <section class="fuel-cheapest-section" aria-labelledby="fuel-cheapest-title">
       <div class="fuel-section-head"><div><span class="fuel-section-kicker"><i class="fa-solid fa-arrow-trend-down"></i> Menores preços</span><h3 id="fuel-cheapest-title">Onde abastecer mais barato</h3><p>Menor valor publicado para cada combustível na cidade configurada.</p></div></div>
-      <div class="fuel-cheapest-grid">${cheapest.length ? cheapest.map((item) => `<article class="fuel-cheapest-card"><i class="fa-solid fa-gas-pump"></i><div><span>${escapePromoHtml(item.label)}</span><strong>${fuelPublicMoney(item.price)}</strong><small>${escapePromoHtml(item.station.nomeExibicao || item.station.razaoSocial || "Posto")} · ${fuelPublicDate(item.atualizadoEm)}</small></div></article>`).join("") : `<div class="fuel-public-empty">Os postos selecionados ainda não possuem preços publicados.</div>`}</div>
+      <div class="fuel-cheapest-grid">${cheapest.length ? cheapest.map((item) => `<article class="fuel-cheapest-card"><i class="fa-solid fa-gas-pump"></i><div><span>${fuelPublicEscape(item.label)}</span><strong>${fuelPublicMoney(item.price)}</strong><small>${fuelPublicEscape(item.station.nomeExibicao || item.station.razaoSocial || "Posto")} · ${fuelPublicDate(item.atualizadoEm)}</small></div></article>`).join("") : `<div class="fuel-public-empty">Os postos selecionados ainda não possuem preços publicados.</div>`}</div>
     </section>
 
     <section class="fuel-calculator-card">
@@ -28874,7 +28884,7 @@ function renderizarValoresCombustivel() {
       <div class="fuel-stations-list">${stations.length ? stations.map((station) => {
         const products = fuelPublicProducts(station);
         const mapUrl = station.latitude && station.longitude ? `https://www.google.com/maps?q=${encodeURIComponent(`${station.latitude},${station.longitude}`)}` : "";
-        return `<article class="fuel-station-card"><header><div class="fuel-station-icon"><i class="fa-solid fa-gas-pump"></i></div><div><span>${escapePromoHtml(station.distribuidora || "Posto")}</span><h4>${escapePromoHtml(station.nomeExibicao || station.razaoSocial || "Posto")}</h4><p>${escapePromoHtml(station.endereco || "")}${station.bairro ? ` · ${escapePromoHtml(station.bairro)}` : ""}</p></div>${mapUrl ? `<a href="${mapUrl}" target="_blank" rel="noopener noreferrer" aria-label="Abrir localização no mapa"><i class="fa-solid fa-location-arrow"></i> Como chegar</a>` : ""}</header><div class="fuel-station-products">${products.length ? products.map((product) => `<div class="fuel-station-product"><span>${escapePromoHtml(product.label)}</span><strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small><i class="fa-regular fa-clock"></i> ${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small></div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível habilitado.</div>`}</div></article>`;
+        return `<article class="fuel-station-card"><header><div class="fuel-station-icon"><i class="fa-solid fa-gas-pump"></i></div><div><span>${fuelPublicEscape(station.distribuidora || "Posto")}</span><h4>${fuelPublicEscape(station.nomeExibicao || station.razaoSocial || "Posto")}</h4><p>${fuelPublicEscape(station.endereco || "")}${station.bairro ? ` · ${fuelPublicEscape(station.bairro)}` : ""}</p></div>${mapUrl ? `<a href="${mapUrl}" target="_blank" rel="noopener noreferrer" aria-label="Abrir localização no mapa"><i class="fa-solid fa-location-arrow"></i> Como chegar</a>` : ""}</header><div class="fuel-station-products">${products.length ? products.map((product) => `<div class="fuel-station-product"><span>${fuelPublicEscape(product.label)}</span><strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small><i class="fa-regular fa-clock"></i> ${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small></div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível habilitado.</div>`}</div></article>`;
       }).join("") : `<div class="fuel-public-empty fuel-public-empty-large"><i class="fa-solid fa-gas-pump"></i><strong>Nenhum posto publicado ainda</strong><span>O Admin Master pode buscar e selecionar os postos disponíveis para esta cidade.</span></div>`}</div>
     </section>
 
@@ -28923,7 +28933,7 @@ async function mostrarCombustivel() {
     return;
   }
   const city = `${config.cidade || "Cidade"}${config.uf ? ` / ${config.uf}` : ""}`;
-  area.innerHTML = `<div class="fuel-wrap fuel-public-page"><div class="fuel-hero fuel-hero--premium"><div class="fuel-hero-left"><div class="fuel-hero-kicker"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</div><h2 class="fuel-main-title">Compare antes de abastecer</h2><p class="fuel-subtitle">Consulte os preços publicados por posto, encontre o menor valor de cada combustível e estime seu gasto.</p></div><div class="fuel-hero-right"><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Cidade</span><strong>${escapePromoHtml(city)}</strong></div><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Postos publicados</span><strong>${fuelPublicStations(config).length}</strong></div></div></div><div id="fuelResultados" class="fuel-results"></div></div>`;
+  area.innerHTML = `<div class="fuel-wrap fuel-public-page"><div class="fuel-hero fuel-hero--premium"><div class="fuel-hero-left"><div class="fuel-hero-kicker"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</div><h2 class="fuel-main-title">Compare antes de abastecer</h2><p class="fuel-subtitle">Consulte os preços publicados por posto, encontre o menor valor de cada combustível e estime seu gasto.</p></div><div class="fuel-hero-right"><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Cidade</span><strong>${fuelPublicEscape(city)}</strong></div><div class="fuel-hero-stat"><span class="fuel-hero-stat-label">Postos publicados</span><strong>${fuelPublicStations(config).length}</strong></div></div></div><div id="fuelResultados" class="fuel-results"></div></div>`;
   renderizarValoresCombustivel();
 }
 
