@@ -24445,11 +24445,11 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
       if (isVagasTrabalho) {
         const mensagemDivulgacao = "Olá! Gostaria de divulgar uma vaga de trabalho no Olá Carlópolis.";
         const divulgacaoUrl = `https://wa.me/5543991766639?text=${encodeURIComponent(mensagemDivulgacao)}`;
-        const mensagemCompartilhamento = "Acompanhe as oportunidades de trabalho de Carlópolis pelo Olá Carlópolis.";
-        const urlVagas = window.location.href;
 
         contentArea.innerHTML = `
-          <section class="category-empty-state jobs-empty-state" aria-labelledby="jobs-empty-title">
+          <section class="vagas-public-page vagas-empty-page">
+            <h2 class="highlighted">${escapePromoHtml(title)}</h2>
+            <section class="category-empty-state jobs-empty-state" aria-labelledby="jobs-empty-title">
             <span class="category-empty-kicker"><i class="fa-solid fa-briefcase"></i> Oportunidades de trabalho</span>
 
             <div class="category-empty-visual jobs-empty-visual" aria-hidden="true">
@@ -24474,10 +24474,6 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
                 <i class="fa-brands fa-whatsapp"></i>
                 <span>Quero divulgar uma vaga</span>
               </a>
-              <button class="category-empty-secondary" type="button" data-jobs-empty-share>
-                <i class="fa-solid fa-share-nodes"></i>
-                <span><strong>Conhece alguém procurando emprego?</strong><small>Compartilhe esta página</small></span>
-              </button>
             </div>
 
             <ul class="category-empty-benefits" aria-label="Informações sobre as vagas no Olá Carlópolis">
@@ -24485,6 +24481,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
               <li><i class="fa-solid fa-circle-check"></i><span>Informações da vaga reunidas em um só lugar</span></li>
               <li><i class="fa-solid fa-circle-check"></i><span>Acesso rápido e gratuito para candidatos</span></li>
             </ul>
+            </section>
           </section>`;
 
         contentArea.querySelector("[data-jobs-empty-action]")?.addEventListener("click", () => {
@@ -24493,23 +24490,6 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
           }).catch(() => { });
         });
 
-        contentArea.querySelector("[data-jobs-empty-share]")?.addEventListener("click", async () => {
-          registrarCliqueBotao("compartilhar", "portal-ola-carlopolis", "vagas-vazias", {
-            origem: "vagas-sem-anuncios"
-          }).catch(() => { });
-          try {
-            if (navigator.share) {
-              await navigator.share({ title: "Vagas de Trabalho | Olá Carlópolis", text: mensagemCompartilhamento, url: urlVagas });
-            } else {
-              if (!navigator.clipboard?.writeText) throw new Error("Clipboard indisponível");
-              await navigator.clipboard.writeText(`${mensagemCompartilhamento}\n\n${urlVagas}`);
-              mostrarToast("Link copiado para compartilhar");
-            }
-          } catch (error) {
-            if (error?.name === "AbortError" || error?.name === "NotAllowedError") return;
-            mostrarToast("Não foi possível compartilhar agora.");
-          }
-        });
         return;
       }
       const mensagensEspeciais = {

@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-16-vagas-vazias-layout-v660'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-16-vagas-curriculo-integrado-v661'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
