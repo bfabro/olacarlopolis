@@ -1,7 +1,19 @@
-// Pagina publica de atualizacao de combustiveis - v1
+// Pagina publica de atualizacao de combustiveis - v2
 (() => {
   const byId = (id) => document.getElementById(id);
-  const state = { posto: "", token: "", station: null };
+  const state = { posto: "", email: "", password: "", station: null, user: null };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
+    authDomain: "contadoracessos.firebaseapp.com",
+    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
+    projectId: "contadoracessos",
+    storageBucket: "contadoracessos.firebasestorage.app",
+    messagingSenderId: "521517291315",
+    appId: "1:521517291315:web:74f8d878d2d8769460d046"
+  };
+  const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
+  const auth = app.auth();
+  const db = app.database();
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
@@ -16,9 +28,36 @@
     return match ? `${match[3]}/${match[2]}/${match[1]}` : "Ainda nao atualizado";
   }
 
+  function saoPauloDate(timestamp = Date.now()) {
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/Sao_Paulo",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit"
+    }).formatToParts(new Date(timestamp)).reduce((result, part) => {
+      if (part.type !== "literal") result[part.type] = part.value;
+      return result;
+    }, {});
+    return `${parts.year}-${parts.month}-${parts.day}`;
+  }
+
   function parsePrice(value) {
     const number = Number(String(value || "").trim().replace(",", "."));
     return Number.isFinite(number) ? Math.round(number * 1000) / 1000 : 0;
+  }
+
+  function safeStation(station = {}) {
+    const products = Object.entries(station.combustiveis || {})
+      .filter(([, product]) => product && product.ativo !== false)
+      .map(([id, product]) => ({ id, nome: String(product.nome || id), preco: Number(product.preco || 0) || 0, atualizadoEm: String(product.atualizadoEm || "") }));
+    return {
+      id: state.posto,
+      nome: String(station.nomeExibicao || station.razaoSocial || "Posto"),
+      imagem: String(station.imagem || ""),
+      endereco: String(station.endereco || ""),
+      bairro: String(station.bairro || ""),
+      combustiveis: products
+    };
   }
 
   function renderStation(station) {
@@ -36,45 +75,55 @@
     show("content");
   }
 
-  async function callApi(action, prices = null) {
-    const response = await fetch("/api/atualizar-combustivel", {
-      method: "POST",
-      headers: { "content-type": "application/json", accept: "application/json" },
-      cache: "no-store",
-      body: JSON.stringify({ action, posto: state.posto, token: state.token, precos: prices })
-    });
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok || !payload.success) throw new Error(payload.message || "Nao foi possivel continuar.");
-    return payload;
+  async function authenticateLink() {
+    await auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
+    const credential = await auth.signInWithEmailAndPassword(state.email, state.password);
+    const profileSnapshot = await db.ref(`usuariosByUid/${credential.user.uid}`).once("value");
+    const profile = profileSnapshot.val() || {};
+    const authorized = profile.status === "ativo"
+      && profile.role === "cliente"
+      && profile.postoCombustivelId === state.posto
+      && profile.permissoes?.combustiveis_precos === true;
+    if (!authorized) throw new Error("Este link foi revogado ou nao possui mais permissao.");
+    state.user = credential.user;
   }
 
   async function load() {
     const params = new URLSearchParams(location.hash.replace(/^#/, ""));
     state.posto = params.get("posto") || "";
-    state.token = params.get("token") || "";
-    if (!state.posto || !state.token) {
-      byId("fuelUpdateErrorMessage").textContent = "Este link esta incompleto. Solicite um novo link ao Ola Carlopolis.";
+    state.email = params.get("email") || "";
+    state.password = params.get("chave") || "";
+    if (!state.posto || !state.email || !state.password) {
+      byId("fuelUpdateErrorMessage").textContent = "Este link e antigo ou esta incompleto. Solicite um novo link ao Ola Carlopolis.";
       show("error");
       return;
     }
     show("loading");
     try {
-      const payload = await callApi("load");
-      if (!payload.posto?.combustiveis?.length) throw new Error("Este posto ainda nao possui combustiveis habilitados.");
-      renderStation(payload.posto);
+      await authenticateLink();
+      const stationSnapshot = await db.ref(`configuracoes/combustiveis/postos/${state.posto}`).once("value");
+      if (!stationSnapshot.exists()) throw new Error("Posto nao encontrado.");
+      const station = safeStation(stationSnapshot.val());
+      if (!station.combustiveis.length) throw new Error("Este posto ainda nao possui combustiveis habilitados.");
+      renderStation(station);
     } catch (error) {
-      byId("fuelUpdateErrorMessage").textContent = error.message || "Solicite um novo link ao Ola Carlopolis.";
+      console.error("Falha ao validar o link do posto.", error);
+      byId("fuelUpdateErrorMessage").textContent = error?.code === "auth/wrong-password" || error?.code === "auth/user-not-found" || error?.code === "auth/invalid-login-credentials"
+        ? "Este link foi revogado ou substituido. Solicite um novo link ao Ola Carlopolis."
+        : (error.message || "Solicite um novo link ao Ola Carlopolis.");
       show("error");
     }
   }
 
   byId("fuelUpdateForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
+    if (!state.user) return;
     const prices = {};
     let invalid = false;
     byId("fuelUpdateProducts")?.querySelectorAll("[data-product-id]").forEach((row) => {
-      const price = parsePrice(row.querySelector("[data-price]")?.value);
-      row.querySelector("[data-price]")?.setCustomValidity(price > 0 && price <= 99.999 ? "" : "Informe um preco valido.");
+      const input = row.querySelector("[data-price]");
+      const price = parsePrice(input?.value);
+      input?.setCustomValidity(price > 0 && price <= 99.999 ? "" : "Informe um preco valido.");
       if (!(price > 0 && price <= 99.999)) invalid = true;
       prices[row.dataset.productId] = price;
     });
@@ -83,12 +132,34 @@
     button.disabled = true;
     button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...';
     try {
-      const payload = await callApi("update", prices);
-      state.station = payload.posto;
+      const now = Date.now();
+      const date = saoPauloDate(now);
+      const updates = {};
+      Object.entries(prices).forEach(([productId, price]) => {
+        const base = `configuracoes/combustiveis/postos/${state.posto}/combustiveis/${productId}`;
+        updates[`${base}/preco`] = price;
+        updates[`${base}/atualizadoEm`] = date;
+        updates[`${base}/atualizadoEmTimestamp`] = now;
+        updates[`${base}/origemAtualizacao`] = "link";
+      });
+      const historyId = db.ref(`combustiveisHistorico/${state.posto}`).push().key;
+      updates[`combustiveisHistorico/${state.posto}/${historyId}`] = {
+        postoId: state.posto,
+        postoNome: state.station.nome,
+        origem: "link",
+        uid: state.user.uid,
+        email: state.email,
+        atualizadoEm: date,
+        atualizadoEmTimestamp: now,
+        precos: prices
+      };
+      await db.ref().update(updates);
+      state.station.combustiveis = state.station.combustiveis.map((product) => ({ ...product, preco: prices[product.id], atualizadoEm: date }));
       byId("fuelUpdateConfirm").checked = false;
       show("success");
     } catch (error) {
-      alert(error.message || "Nao foi possivel atualizar os precos agora.");
+      console.error("Falha ao atualizar os precos do posto.", error);
+      alert(error?.code === "PERMISSION_DENIED" || error?.code === "permission_denied" ? "Este link nao possui mais permissao. Solicite um novo link." : "Nao foi possivel atualizar os precos agora.");
     } finally {
       button.disabled = false;
       button.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar e atualizar precos';

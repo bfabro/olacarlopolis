@@ -28793,7 +28793,7 @@ function mostrarCombustivelLegado() {
 }
 
 
-// ===== PRECO COMBUSTIVEL PUBLICO - v1 =====
+// ===== PRECO COMBUSTIVEL PUBLICO - v2 =====
 function fuelPublicConfig() {
   const config = window.__combustiveisConfig;
   return config && typeof config === "object" ? config : {};
@@ -28841,6 +28841,18 @@ async function fuelPublicEnsureConfig() {
   return fuelPublicConfigPromise;
 }
 
+function renderFuelHomeTicker(config = fuelPublicConfig()) {
+  const ticker = document.getElementById("fuelHomeTicker");
+  const track = document.getElementById("fuelHomeTickerTrack");
+  if (!ticker || !track) return;
+  const cheapest = config.ativo === true ? fuelPublicCheapest(fuelPublicStations(config)) : [];
+  const visible = cheapest.length > 0;
+  ticker.classList.toggle("hidden", !visible);
+  ticker.setAttribute("aria-hidden", visible ? "false" : "true");
+  if (!visible) { track.innerHTML = ""; return; }
+  const items = cheapest.map((item) => `<span class="fuel-home-ticker-item"><strong>${fuelPublicEscape(item.label)}</strong> <b>${fuelPublicMoney(item.price)}</b> <small>${fuelPublicEscape(item.station.nomeExibicao || item.station.razaoSocial || "Posto")}</small></span>`).join("");
+  track.innerHTML = `<span class="fuel-home-ticker-group">${items}</span><span class="fuel-home-ticker-group" aria-hidden="true">${items}</span>`;
+}
 function aplicarConfiguracaoCombustiveisPublicos(config = {}, options = {}) {
   window.__combustiveisConfig = config;
   const menu = document.getElementById("menuCombustivel");
@@ -28852,6 +28864,7 @@ function aplicarConfiguracaoCombustiveisPublicos(config = {}, options = {}) {
     menu.style.display = active ? "" : "none";
     menu.tabIndex = active ? 0 : -1;
   }
+  renderFuelHomeTicker(config);
   if (active && location.hash === "#combustivel" && options.renderRoute !== false) mostrarCombustivel();
 }
 

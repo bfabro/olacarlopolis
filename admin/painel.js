@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 624,
-  label: "v631",
+  numero: 625,
+  label: "v632",
   data: "2026-08-17",
-  nota: "Links seguros e painel do posto para atualizar precos de combustiveis."
+  nota: "Links de combustiveis sem dependencia do servidor e letreiro publico de menores precos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3049,7 +3049,7 @@ function renderStats() {
   if ($("statComercios")) $("statComercios").textContent = String(clientTypeCounts.comercio);
   if ($("statServicos")) $("statServicos").textContent = String(clientTypeCounts.servico);
   if ($("statInstitucionais")) $("statInstitucionais").textContent = String(clientTypeCounts.institucional);
-  $("statUsuarios").textContent = String(state.usuarios.length);
+  $("statUsuarios").textContent = String(state.usuarios.filter((user) => !isFuelTechnicalUser(user)).length);
   $("statAtivos").textContent = String(state.clientes.filter((c) => c.status === "ativo").length);
   $("statPendentes").textContent = String(state.clientes.filter((c) => c.status === "pendente").length);
   if ($("statInativos")) $("statInativos").textContent = String(state.clientes.filter((c) => c.status === "inativo").length);
@@ -8766,11 +8766,16 @@ function renderCategoriesList() {
   });
 }
 
+function isFuelTechnicalUser(user = {}) {
+  return String(user.email || "").toLowerCase().endsWith("@acesso.olacarlopolis.com");
+}
+
 function renderUsersList() {
   const box = $("usersList");
   if (!box) return;
   const query = normalizeName($("userSearch")?.value || "");
   const users = state.usuarios.filter((user) => {
+    if (isFuelTechnicalUser(user)) return false;
     if (!query) return true;
     const client = state.clientes.find((item) => item.id === user.clienteId);
     return normalizeName([
@@ -16950,10 +16955,10 @@ function fuelAdminProductMap(station) {
   return {};
 }
 
-function fuelAdminStationUpdateUrl(stationId, token = "") {
-  if (!stationId || !token) return "";
+function fuelAdminStationUpdateUrl(stationId, access = {}) {
+  if (!stationId || !access.email || !access.password) return "";
   const pageUrl = new URL("../atualizar-combustivel.html", window.location.href);
-  pageUrl.hash = new URLSearchParams({ posto: stationId, token }).toString();
+  pageUrl.hash = new URLSearchParams({ posto: stationId, email: access.email, chave: access.password }).toString();
   return pageUrl.href;
 }
 
@@ -16964,8 +16969,8 @@ function fuelAdminSecureToken() {
 
 function renderFuelAdminLinkBox(stationId) {
   const access = state.combustiveisLinks?.[stationId] || {};
-  const active = access.ativo === true && Boolean(access.token);
-  const link = active ? fuelAdminStationUpdateUrl(stationId, access.token) : "";
+  const active = access.ativo === true && Boolean(access.email && access.password && access.uid);
+  const link = active ? fuelAdminStationUpdateUrl(stationId, access) : "";
   return `<section class="fuel-admin-link-box">
     <div class="fuel-admin-link-head"><div><strong><i class="fa-solid fa-link"></i> Link para o responsavel do posto</strong><small> Exclusivo, revogavel e sem necessidade de login.</small></div><span class="badge ${active ? "ativo" : "inativo"}">${active ? "Ativo" : "Nao gerado"}</span></div>
     <div class="fuel-admin-link-controls">
@@ -16977,21 +16982,54 @@ function renderFuelAdminLinkBox(stationId) {
   </section>`;
 }
 
+function fuelAdminDeactivateAccessUpdates(access = {}) {
+  const updates = {};
+  if (access.uid) updates[`usuariosByUid/${access.uid}/status`] = "inativo";
+  if (access.email) updates[`usuarios/${emailKey(access.email)}/status`] = "inativo";
+  return updates;
+}
+
 async function generateFuelStationUpdateLink(stationId) {
   if (!isMaster() || !stationId) return;
   const stations = collectFuelAdminStationsFromForm();
   const station = stations[stationId];
   if (!station) { showToast("Posto nao encontrado."); return; }
-  const token = fuelAdminSecureToken();
-  const access = { token, ativo: true, postoId: stationId, postoNome: station.nomeExibicao || station.razaoSocial || "Posto", geradoEm: Date.now(), geradoPor: state.user?.uid || "" };
+
+  const previousAccess = state.combustiveisLinks?.[stationId] || {};
+  const password = `Oc!${fuelAdminSecureToken().slice(0, 28)}`;
+  const emailSuffix = `${Date.now()}${Math.random().toString(36).slice(2, 8)}`;
+  const email = `posto.${slugify(stationId).slice(0, 28) || "combustivel"}.${emailSuffix}@acesso.olacarlopolis.com`.toLowerCase();
+  const authUser = await createAuthUserWithTemporaryPassword(email, password);
+  await saveUserProfile({
+    uid: authUser.uid,
+    email,
+    role: "cliente",
+    clienteId: "",
+    postoCombustivelId: stationId,
+    status: "ativo",
+    permissoes: { combustiveis_precos: true }
+  });
+
+  const access = {
+    uid: authUser.uid,
+    email,
+    password,
+    ativo: true,
+    postoId: stationId,
+    postoNome: station.nomeExibicao || station.razaoSocial || "Posto",
+    geradoEm: Date.now(),
+    geradoPor: state.user?.uid || "",
+    tipo: "firebase-auth"
+  };
   await update(ref(db), {
+    ...fuelAdminDeactivateAccessUpdates(previousAccess),
     [`configuracoes/combustiveis/postos/${stationId}`]: station,
     [`combustiveisLinks/${stationId}`]: access
   });
   state.combustiveisConfig = { ...state.combustiveisConfig, postos: stations };
   state.combustiveisLinks = { ...(state.combustiveisLinks || {}), [stationId]: access };
   renderFuelAdminSelectedStations();
-  const link = fuelAdminStationUpdateUrl(stationId, token);
+  const link = fuelAdminStationUpdateUrl(stationId, access);
   try { await navigator.clipboard.writeText(link); showToast("Link gerado e copiado."); }
   catch { showToast("Link gerado. Use o botao Copiar."); }
 }
@@ -16999,12 +17037,17 @@ async function generateFuelStationUpdateLink(stationId) {
 async function revokeFuelStationUpdateLink(stationId) {
   if (!isMaster() || !stationId || !state.combustiveisLinks?.[stationId]) return;
   if (!confirm("Revogar o link deste posto? O responsavel nao conseguira mais usa-lo.")) return;
-  await update(ref(db, `combustiveisLinks/${stationId}`), { ativo: false, revogadoEm: Date.now(), revogadoPor: state.user?.uid || "" });
-  state.combustiveisLinks[stationId] = { ...state.combustiveisLinks[stationId], ativo: false };
+  const access = state.combustiveisLinks[stationId];
+  await update(ref(db), {
+    ...fuelAdminDeactivateAccessUpdates(access),
+    [`combustiveisLinks/${stationId}/ativo`]: false,
+    [`combustiveisLinks/${stationId}/revogadoEm`]: Date.now(),
+    [`combustiveisLinks/${stationId}/revogadoPor`]: state.user?.uid || ""
+  });
+  state.combustiveisLinks[stationId] = { ...access, ativo: false };
   renderFuelAdminSelectedStations();
   showToast("Link revogado.");
 }
-
 function normalizeAnpStationForAdmin(station) {
   const id = String(station?.codigoSIMP || station?.cnpj || "").replace(/[^a-zA-Z0-9_-]/g, "");
   const existing = fuelAdminStationMap()[id] || {};
