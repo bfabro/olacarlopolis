@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=387">
+  <link rel="stylesheet" href="painel.css?v=388">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -105,6 +105,7 @@
         <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
         <button data-view="faturas" data-role="cliente" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
         <button data-view="eventos" data-role="cliente" data-permission="eventos"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
+        <button data-view="combustiveisPrecos" data-role="cliente" data-permission="combustiveis_precos"><i class="fa-solid fa-gas-pump"></i> Ajustar pre&ccedil;os</button>
       </nav>
 
       <div class="sidebar-footer">
@@ -1740,6 +1741,10 @@
                 <select id="newUserPartner"></select>
                 <small>O usuário visualizará somente solicitações e dúvidas deste parceiro.</small>
               </label>
+              <label id="newUserFuelStationField" class="hidden">Posto vinculado para atualizar pre&ccedil;os
+                <select id="newUserFuelStation"></select>
+                <small>Este usu&aacute;rio poder&aacute; alterar somente os combust&iacute;veis do posto selecionado.</small>
+              </label>
               <label>Status
                 <select id="editUserStatus">
                   <option value="ativo">Ativo</option>
@@ -1807,6 +1812,7 @@
                         <label><input id="newUserPartnerPermission" type="checkbox" value="parceiro"> Parceiro de benef&iacute;cios</label>
                         <label><input type="checkbox" value="informacoes_nota_falecimento"> Nota de falecimento</label>
                         <label><input type="checkbox" value="grupos_whatsapp"> Grupos de WhatsApp</label>
+                        <label><input id="newUserFuelPermission" type="checkbox" value="combustiveis_precos"> Ajustar pre&ccedil;os do posto</label>
                       </div>
                     </div>
                   </div>
@@ -2000,6 +2006,19 @@
         </section>
       </section>
 
+      <section id="combustiveisPrecosView" class="panel-view hidden">
+        <section class="panel-card fuel-client-card">
+          <div class="section-head">
+            <div>
+              <span class="feature-kicker"><i class="fa-solid fa-gas-pump"></i> Acesso do posto</span>
+              <h2>Atualizar pre&ccedil;os dos combust&iacute;veis</h2>
+              <p>Informe os valores atuais da bomba. A data e o hor&aacute;rio ser&atilde;o registrados automaticamente.</p>
+            </div>
+          </div>
+          <div id="fuelClientPriceEditor"></div>
+        </section>
+      </section>
+
       <section id="paginaInicialSiteView" class="panel-view hidden">
         <section class="panel-card">
           <div class="section-head">
@@ -2118,6 +2137,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=558"></script>
+  <script type="module" src="painel.js?v=559"></script>
 </body>
 </html>

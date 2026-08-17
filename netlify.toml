@@ -13,6 +13,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/atualizar-combustivel"
+  to = "/.netlify/functions/atualizar-combustivel"
+  status = 200
+
+[[redirects]]
   from = "/old/*"
   to = "/"
   status = 301

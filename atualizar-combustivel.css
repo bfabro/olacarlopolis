@@ -1,0 +1,45 @@
+/* Pagina simples de atualizacao de combustiveis - v1 */
+:root { color-scheme: light; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --blue: #0867d7; --dark: #10243b; --muted: #62748a; --line: #d9e4ef; }
+* { box-sizing: border-box; }
+body { min-height: 100vh; margin: 0; color: var(--dark); background: linear-gradient(155deg, #eaf4ff 0%, #f7f9fc 45%, #edf2f7 100%); }
+button, input { font: inherit; }
+.hidden { display: none !important; }
+.fuel-update-shell { width: min(100% - 24px, 620px); margin: 0 auto; padding: 24px 0 40px; }
+.fuel-update-brand { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 18px; }
+.fuel-update-brand img { width: 58px; height: 58px; object-fit: contain; }
+.fuel-update-brand div { display: grid; gap: 2px; }
+.fuel-update-brand span { color: var(--blue); font-size: .72rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.fuel-update-brand strong { font-size: 1.05rem; }
+.fuel-update-card, .fuel-update-state { overflow: hidden; border: 1px solid rgba(185, 203, 222, .9); border-radius: 22px; background: #fff; box-shadow: 0 18px 45px rgba(35, 70, 105, .12); }
+.fuel-update-state { display: grid; justify-items: center; gap: 8px; padding: 54px 24px; text-align: center; }
+.fuel-update-state > i { color: var(--blue); font-size: 2.5rem; }
+.fuel-update-state h1 { margin: 8px 0 0; font-size: 1.35rem; }
+.fuel-update-state p { max-width: 390px; margin: 0; color: var(--muted); line-height: 1.55; }
+.fuel-update-error > i { color: #d13b3b; }
+.fuel-update-success > i { color: #14a05a; }
+.fuel-update-success button { margin-top: 12px; padding: 11px 18px; border: 1px solid #b9cce0; border-radius: 11px; color: var(--blue); background: #f3f8ff; font-weight: 800; cursor: pointer; }
+.fuel-update-station { display: grid; grid-template-columns: 88px minmax(0, 1fr); gap: 15px; align-items: center; padding: 20px; background: linear-gradient(135deg, #075ec5, #0b79e9); color: #fff; }
+.fuel-update-photo { display: grid; place-items: center; width: 88px; height: 88px; overflow: hidden; border: 3px solid rgba(255,255,255,.75); border-radius: 18px; background: rgba(255,255,255,.16); font-size: 2rem; }
+.fuel-update-photo img { width: 100%; height: 100%; object-fit: cover; }
+.fuel-update-station span { font-size: .7rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; opacity: .82; }
+.fuel-update-station h1 { margin: 4px 0; font-size: clamp(1.25rem, 5vw, 1.75rem); line-height: 1.15; overflow-wrap: anywhere; }
+.fuel-update-station p { margin: 0; font-size: .78rem; opacity: .9; }
+.fuel-update-guidance { display: flex; gap: 11px; margin: 18px 18px 0; padding: 13px 14px; border: 1px solid #cfe1f4; border-radius: 13px; color: #3f5871; background: #f2f8ff; }
+.fuel-update-guidance i { margin-top: 3px; color: var(--blue); }
+.fuel-update-guidance p { margin: 0; font-size: .79rem; line-height: 1.5; }
+#fuelUpdateForm { padding: 18px; }
+.fuel-update-products { display: grid; gap: 12px; }
+.fuel-update-product { display: grid; grid-template-columns: minmax(0, 1fr) 145px; gap: 12px; align-items: center; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #fbfdff; }
+.fuel-update-product div { display: grid; gap: 4px; }
+.fuel-update-product strong { font-size: .95rem; }
+.fuel-update-product small { color: var(--muted); font-size: .7rem; }
+.fuel-update-product label { position: relative; display: flex; align-items: center; }
+.fuel-update-product label span { position: absolute; left: 11px; color: #52677d; font-weight: 800; }
+.fuel-update-product input { width: 100%; min-height: 48px; padding: 8px 10px 8px 34px; border: 2px solid #bfcddd; border-radius: 11px; color: #12334f; background: #fff; font-size: 1.18rem; font-weight: 900; outline: 0; }
+.fuel-update-product input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(8,103,215,.12); }
+.fuel-update-confirm { display: flex; gap: 9px; align-items: flex-start; margin: 18px 2px 14px; color: #425b73; font-size: .82rem; line-height: 1.4; }
+.fuel-update-confirm input { width: 19px; height: 19px; margin: 0; accent-color: var(--blue); }
+#fuelUpdateSubmit { width: 100%; min-height: 54px; border: 0; border-radius: 13px; color: #fff; background: linear-gradient(135deg, #0874e8, #075bc4); font-weight: 900; box-shadow: 0 9px 20px rgba(8,103,215,.25); cursor: pointer; }
+#fuelUpdateSubmit:disabled { opacity: .65; cursor: wait; }
+.fuel-update-privacy { display: flex; justify-content: center; gap: 7px; margin: 0; padding: 0 18px 20px; color: #738297; font-size: .7rem; }
+@media (max-width: 480px) { .fuel-update-shell { width: min(100% - 16px, 620px); padding-top: 14px; } .fuel-update-station { grid-template-columns: 72px minmax(0,1fr); padding: 16px; } .fuel-update-photo { width: 72px; height: 72px; } .fuel-update-product { grid-template-columns: 1fr; } .fuel-update-product input { min-height: 52px; } }

@@ -56,7 +56,31 @@
       },
       "combustiveis": {
         ".read": true,
-        ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+        ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        "postos": {
+          "$stationId": {
+            "combustiveis": {
+              "$productId": {
+                "preco": {
+                  ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId",
+                  ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 99.999"
+                },
+                "atualizadoEm": {
+                  ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId",
+                  ".validate": "newData.isString() && newData.val().matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/)"
+                },
+                "atualizadoEmTimestamp": {
+                  ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId",
+                  ".validate": "newData.isNumber() && newData.val() <= now + 60000"
+                },
+                "origemAtualizacao": {
+                  ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId",
+                  ".validate": "newData.val() === 'painel'"
+                }
+              }
+            }
+          }
+        }
       },
       "pagamento": {
         ".read": "auth != null",
@@ -76,6 +100,20 @@
       "$other": {
         ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
         ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+      }
+    },
+
+    "combustiveisLinks": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+    },
+
+    "combustiveisHistorico": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$stationId": {
+        "$historyId": {
+          ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId && !data.exists() && newData.child('postoId').val() === $stationId && newData.child('uid').val() === auth.uid && newData.child('origem').val() === 'painel'"
+        }
       }
     },
 
@@ -287,8 +325,8 @@
     },
 
     "$other": {
-      ".read": "$other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
-      ".write": "$other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
+      ".read": "$other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
+      ".write": "$other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
     }
   }
 }

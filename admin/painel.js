@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 623,
-  label: "v630",
-  data: "2026-08-16",
-  nota: "Categorias vazias do site atualizadas a cada item selecionado."
+  numero: 624,
+  label: "v631",
+  data: "2026-08-17",
+  nota: "Links seguros e painel do posto para atualizar precos de combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -185,6 +185,7 @@ let state = {
   paginaInicialSite: {},
   novidadesConfig: {},
   combustiveisConfig: {},
+  combustiveisLinks: {},
   combustiveisBusca: [],
   sobreNos: {},
   xadrezConfig: {},
@@ -748,6 +749,7 @@ const views = {
   paginaInicialSite: $("paginaInicialSiteView"),
   novidadesConfig: $("novidadesConfigView"),
   combustiveisConfig: $("combustiveisConfigView"),
+  combustiveisPrecos: $("combustiveisPrecosView"),
   sobreNos: $("sobreNosView"),
   xadrezConfig: $("xadrezConfigView"),
   storiesComerciais: $("storiesComerciaisView"),
@@ -780,6 +782,7 @@ const viewCopy = {
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
   paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
   novidadesConfig: ["Novidades do site", "Defina quais atualizações aparecem na tela principal pública."],
+  combustiveisPrecos: ["Ajustar precos", "Atualize os valores de bomba do posto vinculado ao seu acesso."],
   combustiveisConfig: ["Preço Combustível", "Busque postos da ANP, selecione os publicados e atualize os preços de bomba."],
   sobreNos: ["Sobre nós", "Edite o conteúdo institucional apresentado no site público."],
   xadrezConfig: ["Xadrez", "Configure campeonato e premio do jogo de xadrez."],
@@ -1055,6 +1058,7 @@ function canAccessView(viewName) {
   if (viewName === "relatorioExclusoes") return isMaster();
   if (viewName === "dashboard") return canManageClients();
   if (viewName === "eventos") return canManageClients() || hasPermission("eventos");
+  if (viewName === "combustiveisPrecos") return canManageClients() || hasPermission("combustiveis_precos");
   if (canManageClients()) {
     if (viewName === "usuariosOnline") return isMaster();
     if (viewName === "pagamentoSistema") return isMaster();
@@ -2544,7 +2548,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -2598,13 +2602,14 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
     role: masterEmail ? "master" : (profile.role || "cliente"),
     clienteId: masterEmail ? "" : (profile.clienteId || ""),
     parceiroId: masterEmail ? "" : (profile.parceiroId || ""),
+    postoCombustivelId: masterEmail ? "" : (profile.role === "cliente" && profile.permissoes?.combustiveis_precos ? (profile.postoCombustivelId || "") : ""),
     status: masterEmail ? "ativo" : (profile.status || "ativo"),
     permissoes: masterEmail ? { ...masterPermissions, ...(profile.permissoes || {}) } : (profile.permissoes || {}),
     updatedAt: serverTimestamp()
@@ -2622,7 +2627,7 @@ async function createAuthUserWithTemporaryPassword(email, password) {
   return cred.user;
 }
 
-async function migratePanelUserEmail({ currentUser, email, password, role, clienteId, parceiroId, status, permissoes }) {
+async function migratePanelUserEmail({ currentUser, email, password, role, clienteId, parceiroId, postoCombustivelId, status, permissoes }) {
   if (!isMaster()) {
     showToast("Somente master pode trocar o e-mail de acesso.");
     return false;
@@ -2646,6 +2651,7 @@ async function migratePanelUserEmail({ currentUser, email, password, role, clien
     role,
     clienteId: role === "cliente" ? clienteId : "",
     parceiroId: role === "parceiro" || (role === "cliente" && permissoes?.parceiro) ? parceiroId : "",
+    postoCombustivelId: role === "cliente" && permissoes?.combustiveis_precos ? postoCombustivelId : "",
     status,
     permissoes
   });
@@ -2680,6 +2686,7 @@ async function loadAllData(onProgress = null) {
     pagamentoSnap,
     paginaInicialSnap,
     combustiveisSnap,
+    combustiveisLinksSnap,
     novidadesConfigSnap,
     sobreNosSnap,
     xadrezConfigSnap,
@@ -2711,6 +2718,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("configuracoes/pagamento"),
     getPanelSnapshot("configuracoes/paginaInicial"),
     getPanelSnapshot("configuracoes/combustiveis"),
+    getPanelSnapshot("combustiveisLinks", { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -2796,6 +2804,7 @@ async function loadAllData(onProgress = null) {
   state.pagamentoSistema = pagamentoSnap.exists() ? pagamentoSnap.val() : {};
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
   state.combustiveisConfig = combustiveisSnap.exists() ? combustiveisSnap.val() : {};
+  state.combustiveisLinks = combustiveisLinksSnap.exists() ? combustiveisLinksSnap.val() : {};
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
@@ -3087,6 +3096,9 @@ function updateChrome() {
   });
   document.querySelectorAll("[data-permission='eventos']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("eventos") || canManageClients());
+  });
+  document.querySelectorAll("[data-permission='combustiveis_precos']").forEach((el) => {
+    el.classList.toggle("hidden", !hasPermission("combustiveis_precos") || canManageClients());
   });
   document.querySelectorAll("[data-permission='faturas']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("faturas") || canManageClients());
@@ -5972,6 +5984,7 @@ function switchView(name) {
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "paginaInicialSite") renderHomePageSettings();
   if (target === "combustiveisConfig") renderFuelAdminSettings();
+  if (target === "combustiveisPrecos") renderFuelClientPrices();
   if (target === "novidadesConfig") renderNovidadesConfig();
   if (target === "sobreNos") renderSobreNosSettings();
   if (target === "xadrezConfig") renderXadrezConfig();
@@ -8804,15 +8817,31 @@ function fillUserPartnerSelect(selectedId = "") {
   select.innerHTML = `<option value="">Selecione o parceiro...</option>${state.beneficios.map((benefit) => `<option value="${escapeAttr(benefit.id)}" ${benefit.id === selectedId ? "selected" : ""}>${escapeHtml(benefit.parceiro || benefit.titulo || benefit.id)}</option>`).join("")}`;
 }
 
+function fillUserFuelStationSelect(selectedId = "") {
+  const select = $("newUserFuelStation");
+  if (!select) return;
+  const stations = Object.values(fuelAdminStationMap()).sort((a, b) => String(a.nomeExibicao || a.razaoSocial || "").localeCompare(String(b.nomeExibicao || b.razaoSocial || ""), "pt-BR"));
+  select.innerHTML = `<option value="">Selecione o posto...</option>${stations.map((station) => {
+    const id = String(station.codigoSIMP || station.cnpj || "");
+    const name = station.nomeExibicao || station.razaoSocial || id;
+    return `<option value="${escapeAttr(id)}" ${id === selectedId ? "selected" : ""}>${escapeHtml(name)}</option>`;
+  }).join("")}`;
+}
+
 function syncUserLinkFields() {
   const role = $("newUserRole")?.value || "cliente";
   const partnerPermission = Boolean($("newUserPartnerPermission")?.checked);
+  const fuelPermission = Boolean($("newUserFuelPermission")?.checked);
   const hasPartnerLink = role === "parceiro" || (role === "cliente" && partnerPermission);
+  const hasFuelStationLink = role === "cliente" && fuelPermission;
   const partnerField = $("newUserPartnerField");
+  const fuelStationField = $("newUserFuelStationField");
   const clientSelect = $("newUserClient")?.closest("label");
   partnerField?.classList.toggle("hidden", !hasPartnerLink);
+  fuelStationField?.classList.toggle("hidden", !hasFuelStationLink);
   clientSelect?.classList.toggle("hidden", role === "parceiro");
   if ($("newUserPartner")) $("newUserPartner").required = hasPartnerLink;
+  if ($("newUserFuelStation")) $("newUserFuelStation").required = hasFuelStationLink;
   if ($("newUserClient")) $("newUserClient").required = role === "cliente";
 }
 
@@ -8826,6 +8855,7 @@ function resetUserForm() {
   if ($("newUserClientSearch")) $("newUserClientSearch").value = "";
   fillUserClientSelect();
   fillUserPartnerSelect();
+  fillUserFuelStationSelect();
   syncUserLinkFields();
   $("editUserStatus").value = "ativo";
   $("saveUserButton").innerHTML = `<i class="fa-solid fa-user-plus"></i> Criar usuario`;
@@ -8849,6 +8879,7 @@ function fillUserForm(user) {
   if ($("newUserClientSearch")) $("newUserClientSearch").value = linkedClient?.nome || "";
   fillUserClientSelect(user.clienteId || "");
   fillUserPartnerSelect(user.parceiroId || "");
+  fillUserFuelStationSelect(user.postoCombustivelId || "");
   $("editUserStatus").value = user.status || "ativo";
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     input.checked = Boolean(user.permissoes?.[input.value]);
@@ -16919,6 +16950,61 @@ function fuelAdminProductMap(station) {
   return {};
 }
 
+function fuelAdminStationUpdateUrl(stationId, token = "") {
+  if (!stationId || !token) return "";
+  const pageUrl = new URL("../atualizar-combustivel.html", window.location.href);
+  pageUrl.hash = new URLSearchParams({ posto: stationId, token }).toString();
+  return pageUrl.href;
+}
+
+function fuelAdminSecureToken() {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+function renderFuelAdminLinkBox(stationId) {
+  const access = state.combustiveisLinks?.[stationId] || {};
+  const active = access.ativo === true && Boolean(access.token);
+  const link = active ? fuelAdminStationUpdateUrl(stationId, access.token) : "";
+  return `<section class="fuel-admin-link-box">
+    <div class="fuel-admin-link-head"><div><strong><i class="fa-solid fa-link"></i> Link para o responsavel do posto</strong><small> Exclusivo, revogavel e sem necessidade de login.</small></div><span class="badge ${active ? "ativo" : "inativo"}">${active ? "Ativo" : "Nao gerado"}</span></div>
+    <div class="fuel-admin-link-controls">
+      <input data-fuel-update-link readonly value="${escapeAttr(link)}" placeholder="Clique em Gerar link">
+      <button class="primary" type="button" data-generate-fuel-link="${escapeAttr(stationId)}"><i class="fa-solid fa-wand-magic-sparkles"></i> ${active ? "Gerar novo" : "Gerar link"}</button>
+      <button type="button" data-copy-fuel-link="${escapeAttr(stationId)}" ${active ? "" : "disabled"}><i class="fa-solid fa-copy"></i> Copiar</button>
+      <button type="button" data-revoke-fuel-link="${escapeAttr(stationId)}" ${active ? "" : "disabled"}><i class="fa-solid fa-ban"></i> Revogar</button>
+    </div>
+  </section>`;
+}
+
+async function generateFuelStationUpdateLink(stationId) {
+  if (!isMaster() || !stationId) return;
+  const stations = collectFuelAdminStationsFromForm();
+  const station = stations[stationId];
+  if (!station) { showToast("Posto nao encontrado."); return; }
+  const token = fuelAdminSecureToken();
+  const access = { token, ativo: true, postoId: stationId, postoNome: station.nomeExibicao || station.razaoSocial || "Posto", geradoEm: Date.now(), geradoPor: state.user?.uid || "" };
+  await update(ref(db), {
+    [`configuracoes/combustiveis/postos/${stationId}`]: station,
+    [`combustiveisLinks/${stationId}`]: access
+  });
+  state.combustiveisConfig = { ...state.combustiveisConfig, postos: stations };
+  state.combustiveisLinks = { ...(state.combustiveisLinks || {}), [stationId]: access };
+  renderFuelAdminSelectedStations();
+  const link = fuelAdminStationUpdateUrl(stationId, token);
+  try { await navigator.clipboard.writeText(link); showToast("Link gerado e copiado."); }
+  catch { showToast("Link gerado. Use o botao Copiar."); }
+}
+
+async function revokeFuelStationUpdateLink(stationId) {
+  if (!isMaster() || !stationId || !state.combustiveisLinks?.[stationId]) return;
+  if (!confirm("Revogar o link deste posto? O responsavel nao conseguira mais usa-lo.")) return;
+  await update(ref(db, `combustiveisLinks/${stationId}`), { ativo: false, revogadoEm: Date.now(), revogadoPor: state.user?.uid || "" });
+  state.combustiveisLinks[stationId] = { ...state.combustiveisLinks[stationId], ativo: false };
+  renderFuelAdminSelectedStations();
+  showToast("Link revogado.");
+}
+
 function normalizeAnpStationForAdmin(station) {
   const id = String(station?.codigoSIMP || station?.cnpj || "").replace(/[^a-zA-Z0-9_-]/g, "");
   const existing = fuelAdminStationMap()[id] || {};
@@ -17113,6 +17199,7 @@ function renderFuelAdminSelectedStations() {
     const products = Object.entries(fuelAdminProductMap(station));
     return `<article class="fuel-admin-station" data-fuel-station-id="${escapeAttr(id)}">
       <header><div><span class="feature-kicker">${escapeHtml(station.distribuidora || "Posto")}</span><h3>${escapeHtml(station.razaoSocial || station.nomeExibicao || "Posto")}</h3><p>${escapeHtml(station.endereco || "")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}</p></div><button type="button" class="danger-mini" data-remove-fuel-station="${escapeAttr(id)}"><i class="fa-solid fa-trash"></i> Remover</button></header>
+      ${renderFuelAdminLinkBox(id)}
       <div class="fuel-admin-station-settings">
         <label>Nome exibido<input data-fuel-station-name value="${escapeAttr(station.nomeExibicao || station.razaoSocial || "")}"></label>
         <label>Foto do posto (URL)<input data-fuel-station-image type="url" value="${escapeAttr(station.imagem || "")}" placeholder="https://..."></label>
@@ -17125,6 +17212,27 @@ function renderFuelAdminSelectedStations() {
       ${renderFuelAdminAnpDetails(station)}
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
+  box.querySelectorAll("[data-generate-fuel-link]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      setBusy(button, true, "Gerando...");
+      try { await generateFuelStationUpdateLink(button.dataset.generateFuelLink); }
+      catch (error) { console.error(error); showToast("Nao foi possivel gerar o link."); }
+      finally { setBusy(button, false); }
+    });
+  });
+  box.querySelectorAll("[data-copy-fuel-link]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const input = button.closest(".fuel-admin-link-controls")?.querySelector("[data-fuel-update-link]");
+      const link = input?.value || "";
+      if (!link) return;
+      try { await navigator.clipboard.writeText(link); showToast("Link copiado."); }
+      catch { input.select(); document.execCommand("copy"); showToast("Link copiado."); }
+    });
+  });
+  box.querySelectorAll("[data-revoke-fuel-link]").forEach((button) => {
+    button.addEventListener("click", () => revokeFuelStationUpdateLink(button.dataset.revokeFuelLink));
+  });
+
   box.querySelectorAll("[data-fuel-schedule-open]").forEach((input) => {
     input.addEventListener("change", () => {
       const row = input.closest("[data-fuel-schedule-day]");
@@ -17260,6 +17368,102 @@ async function saveFuelAdminSettings() {
   state.combustiveisConfig = payload;
   renderFuelAdminSettings();
   showToast("Configuração de combustíveis salva e publicada.");
+}
+
+function fuelClientAssignedStation() {
+  const stationId = String(state.profile?.postoCombustivelId || "");
+  return { stationId, station: fuelAdminStationMap()[stationId] || null };
+}
+
+function renderFuelClientPrices() {
+  const box = $("fuelClientPriceEditor");
+  if (!box) return;
+  if (!hasPermission("combustiveis_precos")) {
+    box.innerHTML = '<div class="list-meta">Seu usuario nao possui permissao para atualizar combustiveis.</div>';
+    return;
+  }
+  const { stationId, station } = fuelClientAssignedStation();
+  if (!stationId || !station) {
+    box.innerHTML = '<div class="list-meta">Nenhum posto foi vinculado a este acesso. Solicite o vinculo ao Admin Master.</div>';
+    return;
+  }
+  const products = Object.entries(fuelAdminProductMap(station)).filter(([, product]) => product?.ativo !== false);
+  const stationName = station.nomeExibicao || station.razaoSocial || "Posto";
+  box.innerHTML = `<form id="fuelClientPriceForm" class="fuel-client-editor">
+    <header class="fuel-client-station-head">
+      ${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(stationName)}">` : '<div class="fuel-client-station-icon"><i class="fa-solid fa-gas-pump"></i></div>'}
+      <div><h3>${escapeHtml(stationName)}</h3><p>${escapeHtml([station.endereco, station.bairro].filter(Boolean).join(" - "))}</p></div>
+    </header>
+    <div class="fuel-admin-source-note"><i class="fa-solid fa-circle-info"></i><span>Preencha todos os valores atuais. A data e o horario serao registrados automaticamente ao salvar.</span></div>
+    <div class="fuel-client-products">
+      ${products.map(([productId, product]) => `<article class="fuel-client-product" data-fuel-client-product="${escapeAttr(productId)}">
+        <div><strong>${escapeHtml(product.nome || productId)}</strong><small>Ultima data informada: ${escapeHtml(product.atualizadoEm || "Ainda nao atualizado")}</small></div>
+        <label>Preco por litro (R$)<input data-fuel-client-price type="number" min="0.001" max="99.999" step="0.001" inputmode="decimal" required value="${Number(product.preco || 0) || ""}" placeholder="0,000"></label>
+      </article>`).join("")}
+    </div>
+    <label class="check-row"><input id="fuelClientConfirmPrices" type="checkbox" required> Confirmo que conferi os valores nas bombas.</label>
+    <div class="fuel-client-actions"><button type="submit"><i class="fa-solid fa-check"></i> Salvar e publicar precos</button></div>
+  </form>`;
+  $("fuelClientPriceForm")?.addEventListener("submit", saveFuelClientPrices);
+}
+
+async function saveFuelClientPrices(event) {
+  event.preventDefault();
+  if (!hasPermission("combustiveis_precos") || currentRole() !== "cliente") return;
+  const { stationId, station } = fuelClientAssignedStation();
+  if (!stationId || !station) { showToast("Posto vinculado nao encontrado."); return; }
+  const prices = {};
+  let invalid = false;
+  event.currentTarget.querySelectorAll("[data-fuel-client-product]").forEach((row) => {
+    const productId = row.dataset.fuelClientProduct;
+    const value = Number(String(row.querySelector("[data-fuel-client-price]")?.value || "").replace(",", "."));
+    if (!Number.isFinite(value) || value <= 0 || value > 99.999) invalid = true;
+    else prices[productId] = Math.round(value * 1000) / 1000;
+  });
+  if (invalid || !Object.keys(prices).length) { showToast("Informe um preco valido para todos os combustiveis."); return; }
+
+  const button = event.submitter;
+  setBusy(button, true, "Salvando...");
+  try {
+    const timestamp = Date.now();
+    const date = dateKeyFromDate(new Date(timestamp));
+    const updates = {};
+    Object.entries(prices).forEach(([productId, price]) => {
+      const base = `configuracoes/combustiveis/postos/${stationId}/combustiveis/${productId}`;
+      updates[`${base}/preco`] = price;
+      updates[`${base}/atualizadoEm`] = date;
+      updates[`${base}/atualizadoEmTimestamp`] = timestamp;
+      updates[`${base}/origemAtualizacao`] = "painel";
+    });
+    const historyId = push(ref(db, `combustiveisHistorico/${stationId}`)).key;
+    updates[`combustiveisHistorico/${stationId}/${historyId}`] = {
+      postoId: stationId,
+      postoNome: station.nomeExibicao || station.razaoSocial || "Posto",
+      origem: "painel",
+      uid: state.user?.uid || "",
+      email: state.user?.email || "",
+      atualizadoEm: date,
+      atualizadoEmTimestamp: timestamp,
+      precos: prices
+    };
+    await update(ref(db), updates);
+    Object.entries(prices).forEach(([productId, price]) => {
+      if (!state.combustiveisConfig.postos?.[stationId]?.combustiveis?.[productId]) return;
+      Object.assign(state.combustiveisConfig.postos[stationId].combustiveis[productId], {
+        preco: price,
+        atualizadoEm: date,
+        atualizadoEmTimestamp: timestamp,
+        origemAtualizacao: "painel"
+      });
+    });
+    renderFuelClientPrices();
+    showToast("Precos atualizados e publicados.");
+  } catch (error) {
+    console.error("Falha ao salvar precos do posto.", error);
+    showToast("Nao foi possivel salvar. Verifique sua permissao.");
+  } finally {
+    setBusy(button, false);
+  }
 }
 
 function renderHomePageSettings() {
@@ -21458,6 +21662,12 @@ async function createPanelUser(event) {
     showToast("Selecione o parceiro que ficará vinculado a este usuário.");
     return;
   }
+  const fuelAccessEnabled = role === "cliente" && Boolean($("newUserFuelPermission")?.checked);
+  const postoCombustivelId = $("newUserFuelStation")?.value || "";
+  if (fuelAccessEnabled && !postoCombustivelId) {
+    showToast("Selecione o posto que este usuario podera atualizar.");
+    return;
+  }
   const permissoes = {};
   document.querySelectorAll(".permissions-box input[type='checkbox']").forEach((input) => {
     permissoes[input.value] = input.checked;
@@ -21477,6 +21687,7 @@ async function createPanelUser(event) {
           role,
           clienteId,
           parceiroId,
+          postoCombustivelId,
           status: $("editUserStatus").value || "ativo",
           permissoes
         });
@@ -21493,6 +21704,7 @@ async function createPanelUser(event) {
         role,
         clienteId: role === "cliente" ? clienteId : "",
         parceiroId: partnerAccessEnabled ? parceiroId : "",
+        postoCombustivelId: fuelAccessEnabled ? postoCombustivelId : "",
         status: $("editUserStatus").value || "ativo",
         permissoes
       });
@@ -21515,6 +21727,7 @@ async function createPanelUser(event) {
       role,
       clienteId: role === "cliente" ? clienteId : "",
       parceiroId: partnerAccessEnabled ? parceiroId : "",
+      postoCombustivelId: fuelAccessEnabled ? postoCombustivelId : "",
       status: "ativo",
       permissoes
     });
@@ -22241,6 +22454,7 @@ function bindEvents() {
   $("userSearch")?.addEventListener("input", renderUsersList);
   $("newUserRole")?.addEventListener("change", syncUserLinkFields);
   $("newUserPartnerPermission")?.addEventListener("change", syncUserLinkFields);
+  $("newUserFuelPermission")?.addEventListener("change", syncUserLinkFields);
   $("newUserClientSearch")?.addEventListener("input", () => fillUserClientSelect());
   $("newUserClient")?.addEventListener("change", () => {
     const client = state.clientes.find((item) => item.id === $("newUserClient").value);

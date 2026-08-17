@@ -9005,3 +9005,31 @@ button.admin-button-loading::after {
   .report-table-disclosure > summary > span > i { grid-row: 1 / span 2; }
   .report-table-disclosure > summary > span > small { grid-column: 2; }
 }
+
+
+/* Links e atualizacao de precos por posto - v388 */
+.fuel-admin-link-box { display: grid; gap: 10px; padding: 14px 16px; border-top: 1px solid #dce6f0; background: #f7fbff; }
+.fuel-admin-link-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.fuel-admin-link-head strong { color: #23435f; font-size: .82rem; }
+.fuel-admin-link-head small { color: #718196; font-size: .7rem; }
+.fuel-admin-link-controls { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 8px; }
+.fuel-admin-link-controls input { min-width: 0; min-height: 40px; padding: 8px 10px; border: 1px solid #c7d5e3; border-radius: 9px; color: #3f5369; background: #fff; }
+.fuel-admin-link-controls button { min-height: 40px; padding: 0 12px; border: 1px solid #b9cce0; border-radius: 9px; color: #1767aa; background: #fff; font-weight: 800; cursor: pointer; }
+.fuel-admin-link-controls button.primary { border-color: #176dc1; color: #fff; background: #176dc1; }
+.fuel-admin-link-controls button:disabled { opacity: .5; cursor: not-allowed; }
+.fuel-client-editor { display: grid; gap: 14px; }
+.fuel-client-station-head { display: grid; grid-template-columns: 74px minmax(0,1fr); gap: 13px; align-items: center; padding: 16px; border-radius: 15px; color: #fff; background: linear-gradient(135deg, #1269bc, #1686dd); }
+.fuel-client-station-head img, .fuel-client-station-icon { width: 74px; height: 74px; border-radius: 14px; object-fit: cover; }
+.fuel-client-station-icon { display: grid; place-items: center; background: rgba(255,255,255,.18); font-size: 1.8rem; }
+.fuel-client-station-head h3 { margin: 0 0 4px; font-size: 1.25rem; overflow-wrap: anywhere; }
+.fuel-client-station-head p { margin: 0; font-size: .78rem; opacity: .88; }
+.fuel-client-products { display: grid; gap: 10px; }
+.fuel-client-product { display: grid; grid-template-columns: minmax(0,1fr) minmax(150px,.45fr); gap: 12px; align-items: end; padding: 14px; border: 1px solid #dce5ee; border-radius: 13px; background: #fbfdff; }
+.fuel-client-product div { display: grid; gap: 4px; }
+.fuel-client-product small { color: #718096; }
+.fuel-client-product label { display: grid; gap: 5px; color: #536579; font-size: .74rem; font-weight: 800; }
+.fuel-client-product input { min-height: 44px; padding: 8px 10px; border: 1px solid #bdcddd; border-radius: 9px; font-size: 1rem; font-weight: 850; }
+.fuel-client-actions { display: flex; justify-content: flex-end; }
+.fuel-client-actions button { min-height: 46px; padding: 0 18px; border: 0; border-radius: 11px; color: #fff; background: #1672c4; font-weight: 850; cursor: pointer; }
+@media (max-width: 760px) { .fuel-admin-link-controls { grid-template-columns: 1fr 1fr; } .fuel-admin-link-controls input { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .fuel-admin-link-controls, .fuel-client-product { grid-template-columns: 1fr; } .fuel-admin-link-controls button, .fuel-client-actions button { width: 100%; } }

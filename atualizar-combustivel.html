@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Atualizar pre&ccedil;os dos combust&iacute;veis | Ol&aacute; Carl&oacute;polis</title>
+  <link rel="icon" href="images/img_padrao_site/favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="atualizar-combustivel.css?v=1">
+</head>
+<body>
+  <main class="fuel-update-shell">
+    <header class="fuel-update-brand">
+      <img src="images/img_padrao_site/logo_1.png" alt="Ol&aacute; Carl&oacute;polis">
+      <div><span>Atualiza&ccedil;&atilde;o r&aacute;pida</span><strong>Pre&ccedil;os dos combust&iacute;veis</strong></div>
+    </header>
+
+    <section id="fuelUpdateLoading" class="fuel-update-state">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <h1>Carregando o posto</h1>
+      <p>Aguarde um instante.</p>
+    </section>
+
+    <section id="fuelUpdateError" class="fuel-update-state fuel-update-error hidden">
+      <i class="fa-solid fa-link-slash"></i>
+      <h1>Link indispon&iacute;vel</h1>
+      <p id="fuelUpdateErrorMessage">Solicite um novo link ao Ol&aacute; Carl&oacute;polis.</p>
+    </section>
+
+    <section id="fuelUpdateContent" class="fuel-update-card hidden">
+      <header class="fuel-update-station">
+        <div id="fuelUpdatePhoto" class="fuel-update-photo"><i class="fa-solid fa-gas-pump"></i></div>
+        <div><span>Posto autorizado</span><h1 id="fuelUpdateStationName">Posto</h1><p id="fuelUpdateStationAddress"></p></div>
+      </header>
+
+      <div class="fuel-update-guidance">
+        <i class="fa-solid fa-circle-info"></i>
+        <p>Confira os valores exibidos na bomba, preencha todos os campos e toque em confirmar. A data e o hor&aacute;rio ser&atilde;o registrados automaticamente.</p>
+      </div>
+
+      <form id="fuelUpdateForm">
+        <div id="fuelUpdateProducts" class="fuel-update-products"></div>
+        <label class="fuel-update-confirm"><input id="fuelUpdateConfirm" type="checkbox" required> Confirmo que os valores acima est&atilde;o corretos.</label>
+        <button id="fuelUpdateSubmit" type="submit"><i class="fa-solid fa-check"></i> Confirmar e atualizar pre&ccedil;os</button>
+      </form>
+      <p class="fuel-update-privacy"><i class="fa-solid fa-shield-halved"></i> Este link permite alterar somente os pre&ccedil;os deste posto.</p>
+    </section>
+
+    <section id="fuelUpdateSuccess" class="fuel-update-state fuel-update-success hidden">
+      <i class="fa-solid fa-circle-check"></i>
+      <h1>Pre&ccedil;os atualizados!</h1>
+      <p>Os novos valores j&aacute; foram enviados para o Ol&aacute; Carl&oacute;polis.</p>
+      <button id="fuelUpdateAgain" type="button">Conferir novamente</button>
+    </section>
+  </main>
+  <script defer src="atualizar-combustivel.js?v=1"></script>
+</body>
+</html>
