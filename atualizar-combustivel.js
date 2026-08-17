@@ -1,4 +1,4 @@
-// Pagina publica de atualizacao de combustiveis - v3
+// Pagina publica de atualizacao de combustiveis - v4
 (() => {
   const byId = (id) => document.getElementById(id);
   const state = { posto: "", email: "", password: "", station: null, user: null };
