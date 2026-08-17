@@ -76,6 +76,10 @@
                 "origemAtualizacao": {
                   ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId",
                   ".validate": "newData.val() === 'painel' || (newData.val() === 'link' && auth.token.email.matches(/@acesso[.]olacarlopolis[.]com$/))"
+                },
+                "promocao": {
+                  ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId",
+                  ".validate": "!newData.exists() || (newData.hasChildren(['ativo', 'preco', 'inicioEmTimestamp', 'fimEmTimestamp', 'responsavelNome', 'atualizadoEmTimestamp']) && newData.child('ativo').val() === true && newData.child('preco').isNumber() && newData.child('preco').val() > 0 && newData.child('preco').val() <= 99.999 && newData.child('inicioEmTimestamp').isNumber() && newData.child('fimEmTimestamp').isNumber() && newData.child('fimEmTimestamp').val() > newData.child('inicioEmTimestamp').val() && newData.child('responsavelNome').isString() && newData.child('responsavelNome').val().length >= 3 && newData.child('responsavelNome').val().length <= 80 && newData.child('atualizadoEmTimestamp').isNumber() && newData.child('atualizadoEmTimestamp').val() <= now + 60000)"
                 }
               }
             }
@@ -110,9 +114,11 @@
 
     "combustiveisHistorico": {
       ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
       "$stationId": {
+        ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId))",
         "$historyId": {
-          ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId && !data.exists() && newData.child('postoId').val() === $stationId && newData.child('uid').val() === auth.uid && (newData.child('origem').val() === 'painel' || (newData.child('origem').val() === 'link' && auth.token.email.matches(/@acesso[.]olacarlopolis[.]com$/)))"
+          ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'cliente' && root.child('usuariosByUid').child(auth.uid).child('status').val() === 'ativo' && root.child('usuariosByUid').child(auth.uid).child('permissoes').child('combustiveis_precos').val() === true && root.child('usuariosByUid').child(auth.uid).child('postoCombustivelId').val() === $stationId && !data.exists() && newData.child('postoId').val() === $stationId && newData.child('uid').val() === auth.uid && newData.child('responsavelNome').isString() && newData.child('responsavelNome').val().length >= 3 && newData.child('responsavelNome').val().length <= 80 && (newData.child('origem').val() === 'painel' || (newData.child('origem').val() === 'link' && auth.token.email.matches(/@acesso[.]olacarlopolis[.]com$/)))"
         }
       }
     },

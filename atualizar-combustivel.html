@@ -8,7 +8,7 @@
   <title>Atualizar pre&ccedil;os dos combust&iacute;veis | Ol&aacute; Carl&oacute;polis</title>
   <link rel="icon" href="images/img_padrao_site/favicon.ico">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="atualizar-combustivel.css?v=2">
+  <link rel="stylesheet" href="atualizar-combustivel.css?v=3">
 </head>
 <body>
   <main class="fuel-update-shell">
@@ -46,6 +46,9 @@
       </div>
 
       <form id="fuelUpdateForm">
+        <label class="fuel-update-responsible">Nome de quem est&aacute; atualizando
+          <input id="fuelUpdateResponsible" type="text" maxlength="80" autocomplete="name" required placeholder="Digite seu nome completo">
+        </label>
         <div id="fuelUpdateProducts" class="fuel-update-products"></div>
         <label class="fuel-update-confirm"><input id="fuelUpdateConfirm" type="checkbox" required> Confirmo que os valores acima est&atilde;o corretos.</label>
         <button id="fuelUpdateSubmit" type="submit"><i class="fa-solid fa-check"></i> Confirmar e atualizar pre&ccedil;os</button>
@@ -60,9 +63,22 @@
       <button id="fuelUpdateAgain" type="button">Conferir novamente</button>
     </section>
   </main>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <div id="fuelPromoModal" class="fuel-promo-modal hidden" role="dialog" aria-modal="true" aria-labelledby="fuelPromoTitle">
+    <div class="fuel-promo-dialog">
+      <button id="fuelPromoClose" class="fuel-promo-close" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      <span class="fuel-promo-kicker"><i class="fa-solid fa-tag"></i> Pre&ccedil;o promocional</span>
+      <h2 id="fuelPromoTitle">Configurar promo&ccedil;&atilde;o</h2>
+      <p>O valor promocional ser&aacute; exibido somente durante o per&iacute;odo informado.</p>
+      <div class="fuel-promo-fields">
+        <label>Pre&ccedil;o da promo&ccedil;&atilde;o (R$)<input id="fuelPromoPrice" type="text" inputmode="decimal" placeholder="0,000"></label>
+        <label>In&iacute;cio<input id="fuelPromoStart" type="datetime-local"></label>
+        <label>Validade<input id="fuelPromoEnd" type="datetime-local"></label>
+      </div>
+      <div class="fuel-promo-actions"><button id="fuelPromoCancel" type="button">Cancelar</button><button id="fuelPromoSave" type="button"><i class="fa-solid fa-check"></i> Aplicar promo&ccedil;&atilde;o</button></div>
+    </div>
+  </div>  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script defer src="atualizar-combustivel.js?v=4"></script>
+  <script defer src="atualizar-combustivel.js?v=5"></script>
 </body>
 </html>

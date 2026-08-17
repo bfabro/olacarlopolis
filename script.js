@@ -28793,7 +28793,7 @@ function mostrarCombustivelLegado() {
 }
 
 
-// ===== PRECO COMBUSTIVEL PUBLICO - v3 =====
+// ===== PRECO COMBUSTIVEL PUBLICO - v4 =====
 function fuelPublicConfig() {
   const config = window.__combustiveisConfig;
   return config && typeof config === "object" ? config : {};
@@ -28850,8 +28850,25 @@ function renderFuelHomeTicker(config = fuelPublicConfig()) {
   ticker.classList.toggle("hidden", !visible);
   ticker.setAttribute("aria-hidden", visible ? "false" : "true");
   if (!visible) { track.innerHTML = ""; return; }
-  const items = cheapest.map((item) => `<span class="fuel-home-ticker-item"><span class="fuel-home-ticker-price-line"><strong>${fuelPublicEscape(item.label)}</strong><b>${fuelPublicMoney(item.price)}</b></span><small>${fuelPublicEscape(item.station.nomeExibicao || item.station.razaoSocial || "Posto")}</small></span>`).join("");
+  const items = cheapest.map((item) => `<span class="fuel-home-ticker-item"><span class="fuel-home-ticker-price-line"><strong>${fuelPublicEscape(item.label)}</strong><b>${fuelPublicMoney(item.price)}</b>${item.promotion ? `<em>Promo</em>` : ""}</span><small>${fuelPublicEscape(item.station.nomeExibicao || item.station.razaoSocial || "Posto")}</small></span>`).join("");
   track.innerHTML = `<span class="fuel-home-ticker-group">${items}</span><span class="fuel-home-ticker-group" aria-hidden="true">${items}</span>`;
+}
+let fuelPublicPromotionTimer = 0;
+function scheduleFuelPublicPromotionRefresh(config = fuelPublicConfig()) {
+  if (fuelPublicPromotionTimer) clearTimeout(fuelPublicPromotionTimer);
+  const now = Date.now();
+  const moments = [];
+  fuelPublicStations(config).forEach((station) => Object.values(station?.combustiveis || {}).forEach((product) => {
+    const promotion = product?.promocao;
+    [promotion?.inicioEmTimestamp, promotion?.fimEmTimestamp].forEach((value) => { const timestamp = Number(value || 0); if (timestamp > now) moments.push(timestamp); });
+  }));
+  if (!moments.length) return;
+  const delay = Math.min(Math.max(Math.min(...moments) - now + 500, 500), 2147483000);
+  fuelPublicPromotionTimer = window.setTimeout(() => {
+    renderFuelHomeTicker(config);
+    if (location.hash === "#combustivel" && document.getElementById("fuelResultados")) renderizarValoresCombustivel();
+    scheduleFuelPublicPromotionRefresh(config);
+  }, delay);
 }
 function aplicarConfiguracaoCombustiveisPublicos(config = {}, options = {}) {
   window.__combustiveisConfig = config;
@@ -28865,6 +28882,7 @@ function aplicarConfiguracaoCombustiveisPublicos(config = {}, options = {}) {
     menu.tabIndex = active ? 0 : -1;
   }
   renderFuelHomeTicker(config);
+  scheduleFuelPublicPromotionRefresh(config);
   if (active && location.hash === "#combustivel" && options.renderRoute !== false) mostrarCombustivel();
 }
 
@@ -28899,15 +28917,29 @@ function fuelPublicStations(config = fuelPublicConfig()) {
   return posts.filter((post) => post && post.ativo !== false);
 }
 
-function fuelPublicProducts(station) {
-  const products = station?.combustiveis && typeof station.combustiveis === "object" ? Object.values(station.combustiveis) : [];
-  return products.filter((product) => product && product.ativo !== false).map((product) => ({
-    ...product,
-    label: fuelPublicLabel(product.nome),
-    price: fuelPublicPrice(product.preco)
-  }));
+function fuelPublicActivePromotion(product, timestamp = Date.now()) {
+  const promotion = product?.promocao;
+  if (!promotion || promotion.ativo !== true) return null;
+  const price = fuelPublicPrice(promotion.preco);
+  const start = Number(promotion.inicioEmTimestamp || 0);
+  const end = Number(promotion.fimEmTimestamp || 0);
+  if (!(price > 0) || !(start > 0) || !(end > start) || timestamp < start || timestamp > end) return null;
+  return { ...promotion, preco: price, inicioEmTimestamp: start, fimEmTimestamp: end };
 }
 
+function fuelPublicPromotionValidity(promotion) {
+  if (!promotion?.fimEmTimestamp) return "";
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(promotion.fimEmTimestamp));
+}
+
+function fuelPublicProducts(station) {
+  const products = station?.combustiveis && typeof station.combustiveis === "object" ? Object.values(station.combustiveis) : [];
+  return products.filter((product) => product && product.ativo !== false).map((product) => {
+    const regularPrice = fuelPublicPrice(product.preco);
+    const promotion = fuelPublicActivePromotion(product);
+    return { ...product, label: fuelPublicLabel(product.nome), regularPrice, promotion, price: promotion?.preco || regularPrice };
+  });
+}
 function fuelPublicCheapest(stations) {
   const cheapest = new Map();
   stations.forEach((station) => {
@@ -29075,7 +29107,7 @@ function renderizarValoresCombustivel() {
     </header>
     <section class="fuel-best-banner">
       <div class="fuel-best-photo">${highlighted?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(highlighted.station.imagem)}" alt="Foto de ${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
-      <div class="fuel-best-content">${highlighted ? `<span>Menor ${fuelPublicEscape(highlighted.label)} hoje</span><strong>${fuelPublicMoney(highlighted.price)}</strong><small class="fuel-best-station-name">${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `<span>Os preços ainda estão sendo atualizados.</span><small>Consulte novamente em breve.</small>`}</div>
+      <div class="fuel-best-content">${highlighted ? `<span>Menor ${fuelPublicEscape(highlighted.label)} hoje ${highlighted.promotion ? `<em class="fuel-promo-badge">Promoção</em>` : ""}</span><strong>${fuelPublicMoney(highlighted.price)}</strong>${highlighted.promotion ? `<small class="fuel-best-promo-validity">Válido até ${fuelPublicEscape(fuelPublicPromotionValidity(highlighted.promotion))}</small>` : ""}<small class="fuel-best-station-name">${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `<span>Os preços ainda estão sendo atualizados.</span><small>Consulte novamente em breve.</small>`}</div>
     </section>
     <nav class="fuel-filter-chips" aria-label="Filtrar postos por combustível">
       ${options.map((option) => `<button type="button" data-fuel-filter="${fuelPublicEscape(option.key)}" class="${fuelPublicActiveFilter === option.key ? "active" : ""}">${fuelPublicEscape(option.label)}</button>`).join("")}
@@ -29093,7 +29125,7 @@ function renderizarValoresCombustivel() {
             <div class="fuel-station-identity"><h3>${fuelPublicEscape(stationName)}</h3><p class="fuel-station-address"><i class="fa-solid fa-location-dot"></i><span>${fuelPublicEscape(address || city)}</span></p></div>
             <span class="fuel-station-updated">Atualizado em ${fuelPublicLatestDate(station)}</span>
           </header>
-          <div class="fuel-station-products fuel-station-products-grid">${products.length ? products.map((product) => `<div class="fuel-station-product"><span>${fuelPublicEscape(product.label)}</span><strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small>${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small></div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível disponível.</div>`}</div>
+          <div class="fuel-station-products fuel-station-products-grid">${products.length ? products.map((product) => `<div class="fuel-station-product ${product.promotion ? "is-promotional" : ""}"><span>${fuelPublicEscape(product.label)}${product.promotion ? `<em class="fuel-promo-badge">Promoção</em>` : ""}</span>${product.promotion ? `<div class="fuel-product-price"><del>${fuelPublicMoney(product.regularPrice)}</del><strong>${fuelPublicMoney(product.price)}</strong></div><small>Válido até ${fuelPublicEscape(fuelPublicPromotionValidity(product.promotion))}</small>` : `<strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small>${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small>`}</div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível disponível.</div>`}</div>
           <footer class="fuel-station-footer">${fuelPublicSchedule(station)}${mapUrl ? `<a class="fuel-go-button" href="${mapUrl}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-arrow"></i> Ir</a>` : ""}</footer>
         </article>`;
       }).join("") : `<div class="fuel-public-empty fuel-public-empty-large"><i class="fa-solid fa-gas-pump"></i><strong>Nenhum posto encontrado</strong><span>Não há posto publicado para este filtro.</span></div>`}</div>

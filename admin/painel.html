@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=388">
+  <link rel="stylesheet" href="painel.css?v=389">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1987,6 +1987,9 @@
             <label>UF
               <input id="fuelAdminUf" maxlength="2" placeholder="PR" required>
             </label>
+            <label class="wide">Responsável pela publicação
+              <input id="fuelAdminResponsible" maxlength="80" autocomplete="name" placeholder="Digite o nome completo" required>
+            </label>
             <div class="form-actions wide fuel-admin-search-actions">
               <button id="fuelAdminSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i> Buscar postos disponíveis</button>
               <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar e publicar</button>
@@ -1997,6 +2000,9 @@
             </div>
             <div id="fuelAdminSelectedStations" class="wide fuel-admin-selected"></div>
           </form>
+        </section>
+        <section class="panel-card fuel-history-card">
+          <div id="fuelAdminHistory"></div>
         </section>
         <section class="panel-card">
           <div class="section-head">
@@ -2016,6 +2022,9 @@
             </div>
           </div>
           <div id="fuelClientPriceEditor"></div>
+        </section>
+        <section class="panel-card fuel-history-card">
+          <div id="fuelClientHistory"></div>
         </section>
       </section>
 
@@ -2137,6 +2146,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=562"></script>
+  <script type="module" src="painel.js?v=563"></script>
 </body>
 </html>

@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 627,
-  label: "v634",
+  numero: 628,
+  label: "v635",
   data: "2026-08-17",
-  nota: "Regras de producao publicadas para atualizacao segura dos precos por posto."
+  nota: "Responsavel, historico e precos promocionais com validade para combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -186,6 +186,7 @@ let state = {
   novidadesConfig: {},
   combustiveisConfig: {},
   combustiveisLinks: {},
+  combustiveisHistorico: {},
   combustiveisBusca: [],
   sobreNos: {},
   xadrezConfig: {},
@@ -2687,6 +2688,7 @@ async function loadAllData(onProgress = null) {
     paginaInicialSnap,
     combustiveisSnap,
     combustiveisLinksSnap,
+    combustiveisHistoricoSnap,
     novidadesConfigSnap,
     sobreNosSnap,
     xadrezConfigSnap,
@@ -2719,6 +2721,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("configuracoes/paginaInicial"),
     getPanelSnapshot("configuracoes/combustiveis"),
     getPanelSnapshot("combustiveisLinks", { enabled: isMaster() }),
+    getPanelSnapshot(isMaster() ? "combustiveisHistorico" : `combustiveisHistorico/${state.profile?.postoCombustivelId || "__sem_posto__"}`, { enabled: isMaster() || hasPermission("combustiveis_precos") }),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -2805,6 +2808,7 @@ async function loadAllData(onProgress = null) {
   state.paginaInicialSite = paginaInicialSnap.exists() ? paginaInicialSnap.val() : {};
   state.combustiveisConfig = combustiveisSnap.exists() ? combustiveisSnap.val() : {};
   state.combustiveisLinks = combustiveisLinksSnap.exists() ? combustiveisLinksSnap.val() : {};
+  state.combustiveisHistorico = combustiveisHistoricoSnap.exists() ? (isMaster() ? combustiveisHistoricoSnap.val() : { [state.profile?.postoCombustivelId || ""]: combustiveisHistoricoSnap.val() }) : {};
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
@@ -17058,6 +17062,7 @@ function normalizeAnpStationForAdmin(station) {
     if (!nome) return;
     const key = slugify(nome) || `combustivel-${Object.keys(combustiveis).length + 1}`;
     combustiveis[key] = {
+      ...(existingProducts[key] || {}),
       nome,
       ativo: existingProducts[key]?.ativo !== false,
       preco: Number(existingProducts[key]?.preco || 0) || 0,
@@ -17097,7 +17102,9 @@ function collectFuelAdminStationsFromForm() {
     card.querySelectorAll("[data-fuel-product-id]").forEach((row) => {
       const productId = row.dataset.fuelProductId;
       const preco = Number(String(row.querySelector("[data-fuel-price]")?.value || "").replace(",", ".")) || 0;
+      const productBase = fuelAdminProductMap(base)[productId] || {};
       combustiveis[productId] = {
+        ...productBase,
         nome: row.dataset.fuelProductName || productId,
         ativo: row.querySelector("[data-fuel-enabled]")?.checked !== false,
         preco: Math.max(0, preco),
@@ -17251,7 +17258,7 @@ function renderFuelAdminSelectedStations() {
         <div class="fuel-admin-image-preview">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(station.nomeExibicao || station.razaoSocial || "posto")}" loading="lazy">` : `<i class="fa-solid fa-camera"></i><span>Nenhuma foto cadastrada</span>`}</div>
       </div>
       ${renderFuelAdminSchedule(station)}
-      <div class="fuel-admin-products">${products.map(([productId, product]) => `<div class="fuel-admin-product" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}"><label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)}</label><label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${Number(product.preco || 0) || ""}" placeholder="0,000"></label><label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label></div>`).join("")}</div>
+      <div class="fuel-admin-products">${products.map(([productId, product]) => `<div class="fuel-admin-product" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}"><label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)}</label><label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${escapeAttr(draftPrices[productId] ?? (Number(product.preco || 0) || ""))}" placeholder="0,000"></label><label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label></div>`).join("")}</div>
       ${renderFuelAdminAnpDetails(station)}
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
@@ -17349,8 +17356,10 @@ function renderFuelAdminSettings() {
   $("fuelAdminActive").checked = config.ativo === true;
   $("fuelAdminCity").value = config.cidade || "CARLOPOLIS";
   $("fuelAdminUf").value = config.uf || "PR";
+  if ($("fuelAdminResponsible") && !$("fuelAdminResponsible").value) $("fuelAdminResponsible").value = localStorage.getItem("fuel-admin-responsible") || state.profile?.nome || "";
   renderFuelAdminSelectedStations();
   renderFuelAdminSearchResults();
+  renderFuelHistory("fuelAdminHistory");
 }
 
 async function searchFuelStationsFromAnp() {
@@ -17397,57 +17406,219 @@ async function saveFuelAdminSettings() {
   if (!isMaster()) { showToast("Somente master pode publicar preços de combustível."); return; }
   const cidade = $("fuelAdminCity")?.value.trim().toUpperCase();
   const uf = $("fuelAdminUf")?.value.trim().toUpperCase();
+  const responsible = String($("fuelAdminResponsible")?.value || "").trim().replace(/\s+/g, " ");
   if (!cidade || uf.length !== 2) { showToast("Informe uma cidade e UF válidas."); return; }
+  if (responsible.length < 3) { $("fuelAdminResponsible")?.focus(); showToast("Informe o responsável pela publicação."); return; }
+  const previousConfig = state.combustiveisConfig || {};
+  const timestamp = Date.now();
+  const date = dateKeyFromDate(new Date(timestamp));
   const payload = {
     ativo: $("fuelAdminActive")?.checked === true,
     cidade,
     uf,
     fonte: "ANP - cadastro de revendedores; preços confirmados pelo Admin Master",
     postos: collectFuelAdminStationsFromForm(),
-    updatedAt: Date.now(),
+    updatedAt: timestamp,
     updatedBy: state.user?.uid || ""
   };
-  await set(ref(db, "configuracoes/combustiveis"), payload);
+  const updates = { "configuracoes/combustiveis": payload };
+  const newHistory = {};
+  Object.entries(payload.postos || {}).forEach(([stationId, station]) => {
+    const previousStation = previousConfig.postos?.[stationId] || {};
+    const changes = {};
+    const prices = {};
+    Object.entries(station.combustiveis || {}).forEach(([productId, product]) => {
+      const previous = previousStation.combustiveis?.[productId] || {};
+      const before = Number(previous.preco || 0);
+      const after = Number(product.preco || 0);
+      if (before === after) return;
+      prices[productId] = after;
+      changes[productId] = { nome: product.nome || productId, precoAnterior: before, precoNovo: after, promocaoAnterior: fuelPanelPromotion(previous.promocao), promocaoNova: fuelPanelPromotion(product.promocao) };
+    });
+    if (!Object.keys(changes).length) return;
+    const historyId = push(ref(db, `combustiveisHistorico/${stationId}`)).key;
+    const history = { postoId: stationId, postoNome: station.nomeExibicao || station.razaoSocial || "Posto", origem: "master", viaLink: false, responsavelNome: responsible, uid: state.user?.uid || "", email: state.user?.email || "", atualizadoEm: date, atualizadoEmTimestamp: timestamp, precos: prices, alteracoes: changes };
+    updates[`combustiveisHistorico/${stationId}/${historyId}`] = history;
+    newHistory[stationId] = { ...(newHistory[stationId] || {}), [historyId]: history };
+  });
+  await update(ref(db), updates);
+  localStorage.setItem("fuel-admin-responsible", responsible);
   state.combustiveisConfig = payload;
+  Object.entries(newHistory).forEach(([stationId, entries]) => { state.combustiveisHistorico[stationId] = { ...(state.combustiveisHistorico[stationId] || {}), ...entries }; });
   renderFuelAdminSettings();
   showToast("Configuração de combustíveis salva e publicada.");
 }
-
 function fuelClientAssignedStation() {
   const stationId = String(state.profile?.postoCombustivelId || "");
   return { stationId, station: fuelAdminStationMap()[stationId] || null };
 }
 
-function renderFuelClientPrices() {
+let fuelClientPromotions = {};
+let fuelClientEditingPromoId = "";
+const fuelHistoryFilters = {};
+
+function fuelPanelPrice(value) {
+  const number = Number(String(value || "").replace(",", "."));
+  return Number.isFinite(number) ? Math.round(number * 1000) / 1000 : 0;
+}
+
+function fuelPanelPromotion(value) {
+  if (!value || value.ativo !== true) return null;
+  const price = fuelPanelPrice(value.preco);
+  const start = Number(value.inicioEmTimestamp || 0);
+  const end = Number(value.fimEmTimestamp || 0);
+  return price > 0 && start > 0 && end > start ? { ...value, ativo: true, preco: price, inicioEmTimestamp: start, fimEmTimestamp: end } : null;
+}
+
+function fuelPanelDateTime(timestamp) {
+  if (!Number(timestamp)) return "Nao informado";
+  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(Number(timestamp)));
+}
+
+function fuelPanelLocalDateTime(timestamp) {
+  const date = new Date(Number(timestamp) || Date.now());
+  return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+}
+
+function fuelClientPromotionSummary(productId) {
+  const promotion = fuelClientPromotions[productId];
+  return promotion ? `<span class="fuel-client-promo-summary"><i class="fa-solid fa-tag"></i> R$ ${Number(promotion.preco).toFixed(3).replace(".", ",")} ate ${escapeHtml(fuelPanelDateTime(promotion.fimEmTimestamp))}</span>` : "";
+}
+
+function fuelHistorySortHeader(key, label, filters) {
+  const active = filters.sort === key;
+  return `<th><button type="button" data-fuel-history-sort="${key}">${escapeHtml(label)} <i class="fa-solid ${active && filters.dir === "asc" ? "fa-arrow-up" : "fa-arrow-down"}"></i></button></th>`;
+}
+function renderFuelHistory(mountId, stationId = "", forceOpen = false) {
+  const mount = $(mountId);
+  if (!mount) return;
+  const stationMap = state.combustiveisHistorico && typeof state.combustiveisHistorico === "object" ? state.combustiveisHistorico : {};
+  const records = [];
+  Object.entries(stationMap).forEach(([historyStationId, entries]) => {
+    if (stationId && historyStationId !== stationId) return;
+    Object.entries(entries || {}).forEach(([historyId, entry]) => {
+      const changes = entry?.alteracoes && typeof entry.alteracoes === "object" ? entry.alteracoes : {};
+      const source = Object.keys(changes).length ? changes : Object.fromEntries(Object.entries(entry?.precos || {}).map(([productId, price]) => [productId, { nome: productId, precoAnterior: null, precoNovo: price }]));
+      Object.entries(source).forEach(([productId, change]) => records.push({ historyId, stationId: historyStationId, ...entry, productId, change }));
+    });
+  });
+  records.sort((a, b) => Number(b.atualizadoEmTimestamp || 0) - Number(a.atualizadoEmTimestamp || 0));
+  const filters = fuelHistoryFilters[mountId] || { search: "", product: "", start: "", end: "", sort: "time", dir: "desc" };
+  const productNames = [...new Set(records.map((row) => String(row.change?.nome || row.productId || "")).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+  const visible = records.filter((row) => {
+    const responsible = String(row.responsavelNome || row.email || "Nao informado");
+    const product = String(row.change?.nome || row.productId || "");
+    const day = new Date(Number(row.atualizadoEmTimestamp || 0));
+    const searchOk = !filters.search || `${responsible} ${row.postoNome || ""}`.toLowerCase().includes(filters.search.toLowerCase());
+    const productOk = !filters.product || product === filters.product;
+    const startOk = !filters.start || day >= new Date(`${filters.start}T00:00:00`);
+    const endOk = !filters.end || day <= new Date(`${filters.end}T23:59:59`);
+    return searchOk && productOk && startOk && endOk;
+  });
+  const sortValue = (row) => ({ time: Number(row.atualizadoEmTimestamp || 0), responsible: String(row.responsavelNome || ""), station: String(row.postoNome || ""), product: String(row.change?.nome || row.productId || ""), before: Number(row.change?.precoAnterior || 0), after: Number(row.change?.precoNovo ?? row.precos?.[row.productId] ?? 0), promo: Number(row.change?.promocaoNova?.preco || 0) }[filters.sort] ?? 0);
+  visible.sort((a, b) => { const first = sortValue(a); const second = sortValue(b); const result = typeof first === "string" ? first.localeCompare(second, "pt-BR") : first - second; return filters.dir === "asc" ? result : -result; });
+  mount.innerHTML = `<details class="fuel-history-panel" ${forceOpen ? "open" : ""}>
+    <summary><span><i class="fa-solid fa-clock-rotate-left"></i><strong>Historico de alteracoes</strong><small>${records.length} registro${records.length === 1 ? "" : "s"} de combustivel</small></span><i class="fa-solid fa-chevron-down"></i></summary>
+    <div class="fuel-history-content">
+      <div class="fuel-history-filters">
+        <label>Responsavel ou posto<input data-fuel-history-search value="${escapeAttr(filters.search)}" placeholder="Pesquisar"></label>
+        <label>Combustivel<select data-fuel-history-product><option value="">Todos</option>${productNames.map((name) => `<option value="${escapeAttr(name)}" ${filters.product === name ? "selected" : ""}>${escapeHtml(name)}</option>`).join("")}</select></label>
+        <label>De<input data-fuel-history-start type="date" value="${escapeAttr(filters.start)}"></label>
+        <label>Ate<input data-fuel-history-end type="date" value="${escapeAttr(filters.end)}"></label>
+      </div>
+      <div class="fuel-history-table-wrap"><table class="fuel-history-table"><thead><tr>${fuelHistorySortHeader("time", "Data e horario", filters)}${fuelHistorySortHeader("responsible", "Responsavel", filters)}${stationId ? "" : fuelHistorySortHeader("station", "Posto", filters)}${fuelHistorySortHeader("product", "Combustivel", filters)}${fuelHistorySortHeader("before", "Anterior", filters)}${fuelHistorySortHeader("after", "Novo valor", filters)}${fuelHistorySortHeader("promo", "Promocao", filters)}</tr></thead><tbody>${visible.length ? visible.map((row) => {
+        const change = row.change || {};
+        const promo = fuelPanelPromotion(change.promocaoNova);
+        return `<tr><td>${escapeHtml(fuelPanelDateTime(row.atualizadoEmTimestamp))}</td><td><strong>${escapeHtml(row.responsavelNome || "Nao informado")}</strong>${row.viaLink ? "<small>Via link</small>" : "<small>Area do posto</small>"}</td>${stationId ? "" : `<td>${escapeHtml(row.postoNome || row.stationId || "Posto")}</td>`}<td>${escapeHtml(change.nome || row.productId)}</td><td>${change.precoAnterior === null || change.precoAnterior === undefined ? "-" : `R$ ${Number(change.precoAnterior).toFixed(3).replace(".", ",")}`}</td><td><strong>R$ ${Number(change.precoNovo ?? row.precos?.[row.productId] ?? 0).toFixed(3).replace(".", ",")}</strong></td><td>${promo ? `<span class="fuel-history-promo">R$ ${Number(promo.preco).toFixed(3).replace(".", ",")}<small>ate ${escapeHtml(fuelPanelDateTime(promo.fimEmTimestamp))}</small></span>` : "Sem promocao"}</td></tr>`;
+      }).join("") : '<tr><td colspan="7" class="fuel-history-empty">Nenhuma alteracao encontrada para os filtros.</td></tr>'}</tbody></table></div>
+    </div>
+  </details>`;
+  const refresh = () => {
+    fuelHistoryFilters[mountId] = {
+      search: mount.querySelector("[data-fuel-history-search]")?.value.trim() || "",
+      product: mount.querySelector("[data-fuel-history-product]")?.value || "",
+      start: mount.querySelector("[data-fuel-history-start]")?.value || "",
+      end: mount.querySelector("[data-fuel-history-end]")?.value || "",
+      sort: filters.sort || "time",
+      dir: filters.dir || "desc"
+    };
+    renderFuelHistory(mountId, stationId, true);
+  };
+  mount.querySelector("[data-fuel-history-search]")?.addEventListener("change", refresh);
+  ["product", "start", "end"].forEach((field) => mount.querySelector(`[data-fuel-history-${field}]`)?.addEventListener("change", refresh));
+  mount.querySelectorAll("[data-fuel-history-sort]").forEach((button) => button.addEventListener("click", () => {
+    const key = button.dataset.fuelHistorySort || "time";
+    fuelHistoryFilters[mountId] = { ...filters, sort: key, dir: filters.sort === key && filters.dir === "asc" ? "desc" : "asc" };
+    renderFuelHistory(mountId, stationId, true);
+  }));
+}
+
+function renderFuelClientPrices(preserveDraft = false) {
   const box = $("fuelClientPriceEditor");
   if (!box) return;
-  if (!hasPermission("combustiveis_precos")) {
-    box.innerHTML = '<div class="list-meta">Seu usuario nao possui permissao para atualizar combustiveis.</div>';
-    return;
-  }
+  const draftPrices = preserveDraft ? Object.fromEntries([...box.querySelectorAll("[data-fuel-client-product]")].map((row) => [row.dataset.fuelClientProduct, row.querySelector("[data-fuel-client-price]")?.value || ""])) : {};
+  const draftResponsible = preserveDraft ? box.querySelector("#fuelClientResponsible")?.value || "" : "";
+  if (!hasPermission("combustiveis_precos")) { box.innerHTML = '<div class="list-meta">Seu usuario nao possui permissao para atualizar combustiveis.</div>'; return; }
   const { stationId, station } = fuelClientAssignedStation();
-  if (!stationId || !station) {
-    box.innerHTML = '<div class="list-meta">Nenhum posto foi vinculado a este acesso. Solicite o vinculo ao Admin Master.</div>';
-    return;
-  }
+  if (!stationId || !station) { box.innerHTML = '<div class="list-meta">Nenhum posto foi vinculado a este acesso. Solicite o vinculo ao Admin Master.</div>'; return; }
   const products = Object.entries(fuelAdminProductMap(station)).filter(([, product]) => product?.ativo !== false);
+  if (!preserveDraft) fuelClientPromotions = Object.fromEntries(products.map(([id, product]) => [id, fuelPanelPromotion(product.promocao)]).filter(([, promotion]) => promotion));
   const stationName = station.nomeExibicao || station.razaoSocial || "Posto";
+  const storedResponsible = draftResponsible || localStorage.getItem(`fuel-client-responsible:${stationId}`) || state.profile?.nome || "";
   box.innerHTML = `<form id="fuelClientPriceForm" class="fuel-client-editor">
-    <header class="fuel-client-station-head">
-      ${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(stationName)}">` : '<div class="fuel-client-station-icon"><i class="fa-solid fa-gas-pump"></i></div>'}
-      <div><h3>${escapeHtml(stationName)}</h3><p>${escapeHtml([station.endereco, station.bairro].filter(Boolean).join(" - "))}</p></div>
-    </header>
-    <div class="fuel-admin-source-note"><i class="fa-solid fa-circle-info"></i><span>Preencha todos os valores atuais. A data e o horario serao registrados automaticamente ao salvar.</span></div>
-    <div class="fuel-client-products">
-      ${products.map(([productId, product]) => `<article class="fuel-client-product" data-fuel-client-product="${escapeAttr(productId)}">
-        <div><strong>${escapeHtml(product.nome || productId)}</strong><small>Ultima data informada: ${escapeHtml(product.atualizadoEm || "Ainda nao atualizado")}</small></div>
-        <label>Preco por litro (R$)<input data-fuel-client-price type="number" min="0.001" max="99.999" step="0.001" inputmode="decimal" required value="${Number(product.preco || 0) || ""}" placeholder="0,000"></label>
-      </article>`).join("")}
-    </div>
+    <header class="fuel-client-station-head">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(stationName)}">` : '<div class="fuel-client-station-icon"><i class="fa-solid fa-gas-pump"></i></div>'}<div><h3>${escapeHtml(stationName)}</h3><p>${escapeHtml([station.endereco, station.bairro].filter(Boolean).join(" - "))}</p></div></header>
+    <div class="fuel-admin-source-note"><i class="fa-solid fa-circle-info"></i><span>Preencha os valores atuais. O responsavel, a data e o horario serao registrados no historico.</span></div>
+    <label class="fuel-client-responsible">Nome de quem esta atualizando<input id="fuelClientResponsible" maxlength="80" autocomplete="name" required value="${escapeAttr(storedResponsible)}" placeholder="Digite seu nome completo"></label>
+    <div class="fuel-client-products">${products.map(([productId, product]) => `<article class="fuel-client-product" data-fuel-client-product="${escapeAttr(productId)}">
+      <div><strong>${escapeHtml(product.nome || productId)}</strong><small>Ultima data informada: ${escapeHtml(product.atualizadoEm || "Ainda nao atualizado")}</small>${fuelClientPromotionSummary(productId)}</div>
+      <label>Preco por litro (R$)<input data-fuel-client-price type="number" min="0.001" max="99.999" step="0.001" inputmode="decimal" required value="${escapeAttr(draftPrices[productId] ?? (Number(product.preco || 0) || ""))}" placeholder="0,000"></label>
+      <div class="fuel-client-promo-control"><label><input data-fuel-client-promo-toggle type="checkbox" ${fuelClientPromotions[productId] ? "checked" : ""}> Preco promocional</label>${fuelClientPromotions[productId] ? '<button data-fuel-client-promo-edit type="button"><i class="fa-solid fa-pen"></i> Editar</button>' : ""}</div>
+    </article>`).join("")}</div>
     <label class="check-row"><input id="fuelClientConfirmPrices" type="checkbox" required> Confirmo que conferi os valores nas bombas.</label>
     <div class="fuel-client-actions"><button type="submit"><i class="fa-solid fa-check"></i> Salvar e publicar precos</button></div>
-  </form>`;
+  </form>
+  <div id="fuelClientPromoModal" class="fuel-client-promo-modal hidden" role="dialog" aria-modal="true"><div class="fuel-client-promo-dialog"><button data-fuel-client-promo-close class="fuel-client-promo-close" type="button"><i class="fa-solid fa-xmark"></i></button><span><i class="fa-solid fa-tag"></i> Preco promocional</span><h3 id="fuelClientPromoTitle">Configurar promocao</h3><p>O site usara este valor apenas durante o periodo informado.</p><label>Preco promocional (R$)<input id="fuelClientPromoPrice" type="number" min="0.001" max="99.999" step="0.001"></label><label>Inicio<input id="fuelClientPromoStart" type="datetime-local"></label><label>Validade<input id="fuelClientPromoEnd" type="datetime-local"></label><div><button data-fuel-client-promo-cancel type="button">Cancelar</button><button data-fuel-client-promo-save type="button"><i class="fa-solid fa-check"></i> Aplicar</button></div></div></div>`;
   $("fuelClientPriceForm")?.addEventListener("submit", saveFuelClientPrices);
+  box.querySelectorAll("[data-fuel-client-promo-toggle]").forEach((input) => input.addEventListener("change", () => {
+    const productId = input.closest("[data-fuel-client-product]")?.dataset.fuelClientProduct || "";
+    if (!input.checked) { delete fuelClientPromotions[productId]; renderFuelClientPrices(true); return; }
+    openFuelClientPromo(productId);
+  }));
+  box.querySelectorAll("[data-fuel-client-promo-edit]").forEach((button) => button.addEventListener("click", () => openFuelClientPromo(button.closest("[data-fuel-client-product]")?.dataset.fuelClientProduct || "")));
+  box.querySelector("[data-fuel-client-promo-save]")?.addEventListener("click", saveFuelClientPromo);
+  box.querySelector("[data-fuel-client-promo-cancel]")?.addEventListener("click", () => closeFuelClientPromo(true));
+  box.querySelector("[data-fuel-client-promo-close]")?.addEventListener("click", () => closeFuelClientPromo(true));
+  renderFuelHistory("fuelClientHistory", stationId);
+}
+
+function openFuelClientPromo(productId) {
+  if (!productId) return;
+  fuelClientEditingPromoId = productId;
+  const product = fuelAdminProductMap(fuelClientAssignedStation().station)[productId] || {};
+  const promotion = fuelClientPromotions[productId];
+  $("fuelClientPromoTitle").textContent = `Promocao - ${product.nome || "Combustivel"}`;
+  $("fuelClientPromoPrice").value = promotion?.preco || "";
+  $("fuelClientPromoStart").value = fuelPanelLocalDateTime(promotion?.inicioEmTimestamp || Date.now());
+  $("fuelClientPromoEnd").value = fuelPanelLocalDateTime(promotion?.fimEmTimestamp || (Date.now() + 86400000));
+  $("fuelClientPromoModal").classList.remove("hidden");
+}
+
+function closeFuelClientPromo(cancelled = false) {
+  const productId = fuelClientEditingPromoId;
+  $("fuelClientPromoModal")?.classList.add("hidden"); fuelClientEditingPromoId = "";
+  if (cancelled && productId && !fuelClientPromotions[productId]) renderFuelClientPrices(true);
+}
+
+function saveFuelClientPromo() {
+  const price = fuelPanelPrice($("fuelClientPromoPrice")?.value);
+  const start = new Date($("fuelClientPromoStart")?.value || "").getTime();
+  const end = new Date($("fuelClientPromoEnd")?.value || "").getTime();
+  const regular = fuelPanelPrice(document.querySelector(`[data-fuel-client-product="${CSS.escape(fuelClientEditingPromoId)}"] [data-fuel-client-price]`)?.value);
+  if (!(price > 0 && price <= 99.999)) { showToast("Informe um preco promocional valido."); return; }
+  if (regular > 0 && price >= regular) { showToast("O preco promocional deve ser menor que o valor normal."); return; }
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) { showToast("A validade deve ser posterior ao inicio."); return; }
+  fuelClientPromotions[fuelClientEditingPromoId] = { ativo: true, preco: price, inicioEmTimestamp: start, fimEmTimestamp: end };
+  closeFuelClientPromo(); renderFuelClientPrices(true);
 }
 
 async function saveFuelClientPrices(event) {
@@ -17455,60 +17626,36 @@ async function saveFuelClientPrices(event) {
   if (!hasPermission("combustiveis_precos") || currentRole() !== "cliente") return;
   const { stationId, station } = fuelClientAssignedStation();
   if (!stationId || !station) { showToast("Posto vinculado nao encontrado."); return; }
-  const prices = {};
-  let invalid = false;
+  const responsible = String($("fuelClientResponsible")?.value || "").trim().replace(/\s+/g, " ");
+  if (responsible.length < 3) { $("fuelClientResponsible")?.focus(); showToast("Informe o nome de quem esta atualizando."); return; }
+  const prices = {}; let invalid = false;
   event.currentTarget.querySelectorAll("[data-fuel-client-product]").forEach((row) => {
-    const productId = row.dataset.fuelClientProduct;
-    const value = Number(String(row.querySelector("[data-fuel-client-price]")?.value || "").replace(",", "."));
-    if (!Number.isFinite(value) || value <= 0 || value > 99.999) invalid = true;
-    else prices[productId] = Math.round(value * 1000) / 1000;
+    const productId = row.dataset.fuelClientProduct; const value = fuelPanelPrice(row.querySelector("[data-fuel-client-price]")?.value);
+    if (!(value > 0 && value <= 99.999)) invalid = true; else prices[productId] = value;
+    const promo = fuelClientPromotions[productId]; if (promo && promo.preco >= value) invalid = true;
   });
-  if (invalid || !Object.keys(prices).length) { showToast("Informe um preco valido para todos os combustiveis."); return; }
-
-  const button = event.submitter;
-  setBusy(button, true, "Salvando...");
+  if (invalid || !Object.keys(prices).length) { showToast("Confira os precos. A promocao deve ser menor que o valor normal."); return; }
+  const button = event.submitter; setBusy(button, true, "Salvando...");
   try {
-    const timestamp = Date.now();
-    const date = dateKeyFromDate(new Date(timestamp));
-    const updates = {};
+    const timestamp = Date.now(); const date = dateKeyFromDate(new Date(timestamp)); const updates = {}; const changes = {};
     Object.entries(prices).forEach(([productId, price]) => {
+      const current = fuelAdminProductMap(station)[productId] || {};
+      const promotion = fuelClientPromotions[productId] ? { ...fuelClientPromotions[productId], responsavelNome: responsible, atualizadoEmTimestamp: timestamp } : null;
       const base = `configuracoes/combustiveis/postos/${stationId}/combustiveis/${productId}`;
-      updates[`${base}/preco`] = price;
-      updates[`${base}/atualizadoEm`] = date;
-      updates[`${base}/atualizadoEmTimestamp`] = timestamp;
-      updates[`${base}/origemAtualizacao`] = "painel";
+      updates[`${base}/preco`] = price; updates[`${base}/atualizadoEm`] = date; updates[`${base}/atualizadoEmTimestamp`] = timestamp; updates[`${base}/origemAtualizacao`] = "painel"; updates[`${base}/promocao`] = promotion;
+      changes[productId] = { nome: current.nome || productId, precoAnterior: Number(current.preco || 0), precoNovo: price, promocaoAnterior: fuelPanelPromotion(current.promocao), promocaoNova: promotion };
     });
     const historyId = push(ref(db, `combustiveisHistorico/${stationId}`)).key;
-    updates[`combustiveisHistorico/${stationId}/${historyId}`] = {
-      postoId: stationId,
-      postoNome: station.nomeExibicao || station.razaoSocial || "Posto",
-      origem: "painel",
-      uid: state.user?.uid || "",
-      email: state.user?.email || "",
-      atualizadoEm: date,
-      atualizadoEmTimestamp: timestamp,
-      precos: prices
-    };
+    const history = { postoId: stationId, postoNome: station.nomeExibicao || station.razaoSocial || "Posto", origem: "painel", viaLink: false, responsavelNome: responsible, uid: state.user?.uid || "", email: state.user?.email || "", atualizadoEm: date, atualizadoEmTimestamp: timestamp, precos: prices, alteracoes: changes };
+    updates[`combustiveisHistorico/${stationId}/${historyId}`] = history;
     await update(ref(db), updates);
-    Object.entries(prices).forEach(([productId, price]) => {
-      if (!state.combustiveisConfig.postos?.[stationId]?.combustiveis?.[productId]) return;
-      Object.assign(state.combustiveisConfig.postos[stationId].combustiveis[productId], {
-        preco: price,
-        atualizadoEm: date,
-        atualizadoEmTimestamp: timestamp,
-        origemAtualizacao: "painel"
-      });
-    });
-    renderFuelClientPrices();
-    showToast("Precos atualizados e publicados.");
-  } catch (error) {
-    console.error("Falha ao salvar precos do posto.", error);
-    showToast("Nao foi possivel salvar. Verifique sua permissao.");
-  } finally {
-    setBusy(button, false);
-  }
+    localStorage.setItem(`fuel-client-responsible:${stationId}`, responsible);
+    Object.entries(prices).forEach(([productId, price]) => { const target = state.combustiveisConfig.postos?.[stationId]?.combustiveis?.[productId]; if (target) Object.assign(target, { preco: price, atualizadoEm: date, atualizadoEmTimestamp: timestamp, origemAtualizacao: "painel", promocao: fuelClientPromotions[productId] ? { ...fuelClientPromotions[productId], responsavelNome: responsible, atualizadoEmTimestamp: timestamp } : null }); });
+    state.combustiveisHistorico[stationId] = { ...(state.combustiveisHistorico[stationId] || {}), [historyId]: history };
+    renderFuelClientPrices(); showToast("Precos atualizados e registrados no historico.");
+  } catch (error) { console.error("Falha ao salvar precos do posto.", error); showToast("Nao foi possivel salvar. Verifique sua permissao."); }
+  finally { setBusy(button, false); }
 }
-
 function renderHomePageSettings() {
   if (!$("homePageForm")) return;
   const config = state.paginaInicialSite || {};
