@@ -28793,7 +28793,7 @@ function mostrarCombustivelLegado() {
 }
 
 
-// ===== PRECO COMBUSTIVEL PUBLICO - v4 =====
+// ===== PRECO COMBUSTIVEL PUBLICO - v5 =====
 function fuelPublicConfig() {
   const config = window.__combustiveisConfig;
   return config && typeof config === "object" ? config : {};
@@ -28894,6 +28894,7 @@ function fuelPublicLabel(name) {
   if (key.includes("diesel") && key.includes("s10")) return "Diesel S10";
   if (key.includes("diesel") && (key.includes("s500") || key.includes("comum"))) return "Diesel Comum";
   if (key.includes("gasnatural") || key === "gnv") return "GNV";
+  if (key.includes("arla32") || key === "arla") return "ARLA 32";
   return String(name || "Combustível").trim();
 }
 
@@ -28988,7 +28989,7 @@ function renderizarValoresCombustivelAnterior() {
       }).join("") : `<div class="fuel-public-empty fuel-public-empty-large"><i class="fa-solid fa-gas-pump"></i><strong>Nenhum posto publicado ainda</strong><span>O Admin Master pode buscar e selecionar os postos disponíveis para esta cidade.</span></div>`}</div>
     </section>
 
-    <p class="fuel-source-note"><i class="fa-solid fa-shield-halved"></i> Postos e produtos consultados na API oficial da ANP. Preços e datas são confirmados pelo administrador antes da publicação e podem mudar no estabelecimento.</p>
+    <p class="fuel-source-note"><i class="fa-solid fa-shield-halved"></i> Postos consultados na API oficial da ANP. O ARLA 32 pode ser incluído manualmente pelo administrador. Preços e datas são confirmados antes da publicação e podem mudar no estabelecimento.</p>
   `;
 
   const toggle = document.getElementById("fuelCalculatorToggle");
@@ -29141,7 +29142,7 @@ function renderizarValoresCombustivel() {
         <div id="fuelCalculatorResult" class="fuel-calculator-result"><span>Preencha os campos para calcular.</span></div>
       </div>
     </section>
-    <p class="fuel-source-note"><i class="fa-solid fa-shield-halved"></i> Postos e produtos consultados na API oficial da ANP. Preços e datas são confirmados pelo administrador antes da publicação e podem mudar no estabelecimento.</p>
+    <p class="fuel-source-note"><i class="fa-solid fa-shield-halved"></i> Postos consultados na API oficial da ANP. O ARLA 32 pode ser incluído manualmente pelo administrador. Preços e datas são confirmados antes da publicação e podem mudar no estabelecimento.</p>
   `;
 
   box.querySelectorAll("[data-fuel-filter]").forEach((button) => button.addEventListener("click", () => {

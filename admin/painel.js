@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 628,
-  label: "v635",
+  numero: 629,
+  label: "v636",
   data: "2026-08-17",
-  nota: "Responsavel, historico e precos promocionais com validade para combustiveis."
+  nota: "Cadastro manual de ARLA 32 por posto no modulo de combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -17240,13 +17240,33 @@ function renderFuelAdminSchedule(station) {
   </details>`;
 }
 
+function fuelAdminIsArla(productId, product = {}) {
+  const normalized = normalizeName(`${productId || ""} ${product.nome || ""}`).replace(/[^a-z0-9]/g, "");
+  return normalized.includes("arla32");
+}
+
+function renderFuelAdminProducts(station) {
+  const products = Object.entries(fuelAdminProductMap(station));
+  const hasArla = products.some(([productId, product]) => fuelAdminIsArla(productId, product));
+  return `<section class="fuel-admin-products-section">
+    <header><div><h4>Produtos e preços</h4><p>Além dos produtos retornados pela ANP, você pode incluir ARLA 32 manualmente.</p></div><button type="button" class="fuel-admin-add-arla" data-add-fuel-arla ${hasArla ? "disabled" : ""}><i class="fa-solid fa-plus"></i> ${hasArla ? "ARLA 32 adicionado" : "Adicionar ARLA 32"}</button></header>
+    <div class="fuel-admin-products">${products.map(([productId, product]) => {
+      const manual = product.manual === true || fuelAdminIsArla(productId, product);
+      return `<div class="fuel-admin-product ${manual ? "is-manual-product" : ""}" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}">
+        <label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)} ${manual ? '<span class="fuel-manual-product-badge">Manual</span>' : ""}</label>
+        <label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${escapeAttr(Number(product.preco || 0) || "")}" placeholder="0,000"></label>
+        <label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label>
+        ${manual ? `<button type="button" class="fuel-remove-manual-product" data-remove-fuel-product="${escapeAttr(productId)}" title="Remover ${escapeAttr(product.nome || productId)}"><i class="fa-solid fa-trash"></i><span>Remover</span></button>` : ""}
+      </div>`;
+    }).join("")}</div>
+  </section>`;
+}
 function renderFuelAdminSelectedStations() {
   const box = $("fuelAdminSelectedStations");
   if (!box) return;
   const stations = Object.values(fuelAdminStationMap());
   box.innerHTML = stations.length ? stations.map((station) => {
     const id = String(station.codigoSIMP || station.cnpj || "");
-    const products = Object.entries(fuelAdminProductMap(station));
     return `<article class="fuel-admin-station" data-fuel-station-id="${escapeAttr(id)}">
       <header><div><span class="feature-kicker">${escapeHtml(station.distribuidora || "Posto")}</span><h3>${escapeHtml(station.razaoSocial || station.nomeExibicao || "Posto")}</h3><p>${escapeHtml(station.endereco || "")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}</p></div><button type="button" class="danger-mini" data-remove-fuel-station="${escapeAttr(id)}"><i class="fa-solid fa-trash"></i> Remover</button></header>
       ${renderFuelAdminLinkBox(id)}
@@ -17258,10 +17278,36 @@ function renderFuelAdminSelectedStations() {
         <div class="fuel-admin-image-preview">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(station.nomeExibicao || station.razaoSocial || "posto")}" loading="lazy">` : `<i class="fa-solid fa-camera"></i><span>Nenhuma foto cadastrada</span>`}</div>
       </div>
       ${renderFuelAdminSchedule(station)}
-      <div class="fuel-admin-products">${products.map(([productId, product]) => `<div class="fuel-admin-product" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}"><label class="check-row"><input data-fuel-enabled type="checkbox" ${product.ativo !== false ? "checked" : ""}> ${escapeHtml(product.nome || productId)}</label><label>Preço por litro (R$)<input data-fuel-price type="number" min="0" step="0.001" inputmode="decimal" value="${escapeAttr(draftPrices[productId] ?? (Number(product.preco || 0) || ""))}" placeholder="0,000"></label><label>Data da atualização<input data-fuel-date type="date" value="${escapeAttr(product.atualizadoEm || "")}"></label></div>`).join("")}</div>
+      ${renderFuelAdminProducts(station)}
       ${renderFuelAdminAnpDetails(station)}
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
+  box.querySelectorAll("[data-add-fuel-arla]").forEach((button) => button.addEventListener("click", () => {
+    const card = button.closest("[data-fuel-station-id]");
+    const stationId = card?.dataset.fuelStationId || "";
+    if (!stationId) return;
+    const stationsMap = collectFuelAdminStationsFromForm();
+    const station = stationsMap[stationId];
+    if (!station) return;
+    const products = fuelAdminProductMap(station);
+    if (Object.entries(products).some(([productId, product]) => fuelAdminIsArla(productId, product))) { showToast("Este posto já possui ARLA 32."); return; }
+    products["arla-32"] = { nome: "ARLA 32", tipo: "lubrificante", unidade: "litro", manual: true, ativo: true, preco: 0, atualizadoEm: "" };
+    station.combustiveis = products;
+    state.combustiveisConfig = { ...state.combustiveisConfig, ativo: $("fuelAdminActive")?.checked === true, cidade: $("fuelAdminCity")?.value.trim() || "CARLOPOLIS", uf: $("fuelAdminUf")?.value.trim().toUpperCase() || "PR", postos: stationsMap };
+    renderFuelAdminSettings();
+    showToast("ARLA 32 adicionado. Informe o preço e salve para publicar.");
+  }));
+  box.querySelectorAll("[data-remove-fuel-product]").forEach((button) => button.addEventListener("click", () => {
+    const card = button.closest("[data-fuel-station-id]");
+    const stationId = card?.dataset.fuelStationId || "";
+    const productId = button.dataset.removeFuelProduct || "";
+    if (!stationId || !productId || !confirm("Remover o ARLA 32 deste posto?")) return;
+    const stationsMap = collectFuelAdminStationsFromForm();
+    if (stationsMap[stationId]?.combustiveis) delete stationsMap[stationId].combustiveis[productId];
+    state.combustiveisConfig = { ...state.combustiveisConfig, ativo: $("fuelAdminActive")?.checked === true, cidade: $("fuelAdminCity")?.value.trim() || "CARLOPOLIS", uf: $("fuelAdminUf")?.value.trim().toUpperCase() || "PR", postos: stationsMap };
+    renderFuelAdminSettings();
+    showToast("ARLA 32 removido. Clique em Salvar e publicar para confirmar.");
+  }));
   box.querySelectorAll("[data-generate-fuel-link]").forEach((button) => {
     button.addEventListener("click", async () => {
       setBusy(button, true, "Gerando...");

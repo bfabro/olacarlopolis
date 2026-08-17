@@ -9076,3 +9076,14 @@ button.admin-button-loading::after {
 .fuel-history-empty { padding: 26px !important; color: #718096 !important; text-align: center; }
 @media (max-width: 760px) { .fuel-history-filters { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .fuel-history-filters { grid-template-columns: 1fr; } .fuel-client-promo-dialog { padding: 21px 16px; } }
+/* Produto manual ARLA 32 - v390 */
+.fuel-admin-products-section { border-top: 1px solid #e1e9f1; }
+.fuel-admin-products-section > header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; background: #f7fbff; }
+.fuel-admin-products-section > header h4 { margin: 0 0 3px; color: #18354f; font-size: .92rem; }
+.fuel-admin-products-section > header p { margin: 0; color: #6a7d90; font-size: .72rem; }
+.fuel-admin-add-arla { min-height: 40px; padding: 8px 13px; border: 1px solid #0891b2; border-radius: 10px; color: #08728c; background: #ecfeff; font-weight: 850; white-space: nowrap; cursor: pointer; }
+.fuel-admin-add-arla:disabled { border-color: #b8c9d6; color: #718395; background: #eef3f7; cursor: default; }
+.fuel-admin-product.is-manual-product { grid-template-columns: minmax(210px,1fr) minmax(130px,.45fr) minmax(155px,.5fr) auto; border-left: 4px solid #0891b2; background: #f3fcfd; }
+.fuel-manual-product-badge { display: inline-flex; margin-left: 6px; padding: 3px 7px; border-radius: 999px; color: #08728c; background: #cffafe; font-size: .62rem; font-weight: 900; text-transform: uppercase; }
+.fuel-remove-manual-product { min-height: 40px; padding: 8px 10px; border: 1px solid #efc5c5; border-radius: 9px; color: #b42323; background: #fff7f7; font-weight: 800; cursor: pointer; }
+@media (max-width: 760px) { .fuel-admin-products-section > header { align-items: stretch; flex-direction: column; } .fuel-admin-product.is-manual-product { grid-template-columns: 1fr; } .fuel-remove-manual-product { width: 100%; } }

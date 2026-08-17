@@ -1,4 +1,4 @@
-// Pagina publica de atualizacao de combustiveis - v5
+// Pagina publica de atualizacao de combustiveis - v6
 (() => {
   const byId = (id) => document.getElementById(id);
   const state = { posto: "", email: "", password: "", station: null, user: null, promotions: {}, editingPromoId: "" };
@@ -74,6 +74,7 @@
     if (normalized.includes("diesel") && normalized.includes("s10")) return "fuel-type-diesel-s10";
     if (normalized.includes("diesel")) return "fuel-type-diesel";
     if (normalized.includes("gnv") || normalized.includes("gas natural")) return "fuel-type-gnv";
+    if (normalized.includes("arla")) return "fuel-type-arla";
     return "fuel-type-other";
   }
 
