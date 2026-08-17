@@ -1,4 +1,4 @@
-// Pagina publica de atualizacao de combustiveis - v2
+// Pagina publica de atualizacao de combustiveis - v3
 (() => {
   const byId = (id) => document.getElementById(id);
   const state = { posto: "", email: "", password: "", station: null, user: null };
@@ -60,6 +60,16 @@
     };
   }
 
+  function fuelVisualClass(name) {
+    const normalized = String(name || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (normalized.includes("gasolina") && normalized.includes("aditiv")) return "fuel-type-gasoline-additive";
+    if (normalized.includes("gasolina")) return "fuel-type-gasoline";
+    if (normalized.includes("etanol") || normalized.includes("alcool")) return "fuel-type-ethanol";
+    if (normalized.includes("diesel") && normalized.includes("s10")) return "fuel-type-diesel-s10";
+    if (normalized.includes("diesel")) return "fuel-type-diesel";
+    if (normalized.includes("gnv") || normalized.includes("gas natural")) return "fuel-type-gnv";
+    return "fuel-type-other";
+  }
   function renderStation(station) {
     state.station = station;
     byId("fuelUpdateStationName").textContent = station.nome || "Posto";
@@ -68,7 +78,7 @@
       ? `<img src="${escapeHtml(station.imagem)}" alt="Foto de ${escapeHtml(station.nome || "posto")}">`
       : '<i class="fa-solid fa-gas-pump"></i>';
     byId("fuelUpdateProducts").innerHTML = (station.combustiveis || []).map((product) => `
-      <article class="fuel-update-product" data-product-id="${escapeHtml(product.id)}">
+      <article class="fuel-update-product ${fuelVisualClass(product.nome)}" data-product-id="${escapeHtml(product.id)}">
         <div><strong>${escapeHtml(product.nome)}</strong><small>Ultima atualizacao: ${escapeHtml(dateLabel(product.atualizadoEm))}</small></div>
         <label><span>R$</span><input data-price type="text" inputmode="decimal" autocomplete="off" required value="${product.preco ? Number(product.preco).toFixed(3).replace(".", ",") : ""}" placeholder="0,000" aria-label="Preco de ${escapeHtml(product.nome)}"></label>
       </article>`).join("");
@@ -134,26 +144,31 @@
     try {
       const now = Date.now();
       const date = saoPauloDate(now);
-      const updates = {};
-      Object.entries(prices).forEach(([productId, price]) => {
+      await Promise.all(Object.entries(prices).map(([productId, price]) => {
         const base = `configuracoes/combustiveis/postos/${state.posto}/combustiveis/${productId}`;
-        updates[`${base}/preco`] = price;
-        updates[`${base}/atualizadoEm`] = date;
-        updates[`${base}/atualizadoEmTimestamp`] = now;
-        updates[`${base}/origemAtualizacao`] = "link";
-      });
-      const historyId = db.ref(`combustiveisHistorico/${state.posto}`).push().key;
-      updates[`combustiveisHistorico/${state.posto}/${historyId}`] = {
-        postoId: state.posto,
-        postoNome: state.station.nome,
-        origem: "link",
-        uid: state.user.uid,
-        email: state.email,
-        atualizadoEm: date,
-        atualizadoEmTimestamp: now,
-        precos: prices
-      };
-      await db.ref().update(updates);
+        return db.ref(base).update({
+          preco: price,
+          atualizadoEm: date,
+          atualizadoEmTimestamp: now,
+          origemAtualizacao: "painel"
+        });
+      }));
+      try {
+        const historyId = db.ref(`combustiveisHistorico/${state.posto}`).push().key;
+        await db.ref(`combustiveisHistorico/${state.posto}/${historyId}`).set({
+          postoId: state.posto,
+          postoNome: state.station.nome,
+          origem: "painel",
+          viaLink: true,
+          uid: state.user.uid,
+          email: state.email,
+          atualizadoEm: date,
+          atualizadoEmTimestamp: now,
+          precos: prices
+        });
+      } catch (historyError) {
+        console.warn("Precos salvos, mas o historico nao pode ser registrado.", historyError);
+      }
       state.station.combustiveis = state.station.combustiveis.map((product) => ({ ...product, preco: prices[product.id], atualizadoEm: date }));
       byId("fuelUpdateConfirm").checked = false;
       show("success");
@@ -166,6 +181,12 @@
     }
   });
 
+  byId("fuelUpdateClose")?.addEventListener("click", () => {
+    window.close();
+    window.setTimeout(() => {
+      if (!document.hidden) location.href = "./";
+    }, 180);
+  });
   byId("fuelUpdateAgain")?.addEventListener("click", () => renderStation(state.station));
   load();
 })();

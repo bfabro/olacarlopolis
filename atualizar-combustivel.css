@@ -1,4 +1,4 @@
-/* Pagina simples de atualizacao de combustiveis - v1 */
+/* Pagina simples de atualizacao de combustiveis - v2 */
 :root { color-scheme: light; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --blue: #0867d7; --dark: #10243b; --muted: #62748a; --line: #d9e4ef; }
 * { box-sizing: border-box; }
 body { min-height: 100vh; margin: 0; color: var(--dark); background: linear-gradient(155deg, #eaf4ff 0%, #f7f9fc 45%, #edf2f7 100%); }
@@ -43,3 +43,23 @@ button, input { font: inherit; }
 #fuelUpdateSubmit:disabled { opacity: .65; cursor: wait; }
 .fuel-update-privacy { display: flex; justify-content: center; gap: 7px; margin: 0; padding: 0 18px 20px; color: #738297; font-size: .7rem; }
 @media (max-width: 480px) { .fuel-update-shell { width: min(100% - 16px, 620px); padding-top: 14px; } .fuel-update-station { grid-template-columns: 72px minmax(0,1fr); padding: 16px; } .fuel-update-photo { width: 72px; height: 72px; } .fuel-update-product { grid-template-columns: 1fr; } .fuel-update-product input { min-height: 52px; } }
+/* Acoes e identificacao visual dos combustiveis - v2 */
+.fuel-update-page-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: -4px 0 14px; }
+.fuel-update-page-actions button, .fuel-update-page-actions a { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 42px; padding: 8px 14px; border: 1px solid #c7d7e7; border-radius: 11px; color: #294965; background: rgba(255,255,255,.86); font-weight: 850; text-decoration: none; box-shadow: 0 5px 14px rgba(35,70,105,.08); cursor: pointer; }
+.fuel-update-page-actions a { border-color: #9dc7f2; color: #075fbd; background: #eef7ff; }
+.fuel-update-product { --fuel-accent: #64748b; --fuel-surface: #f8fafc; border-left: 5px solid var(--fuel-accent); background: var(--fuel-surface); }
+.fuel-update-product > div > strong { display: inline-flex; align-items: center; gap: 7px; color: #18324b; }
+.fuel-update-product > div > strong::before { content: ""; flex: 0 0 auto; width: 9px; height: 9px; border-radius: 50%; background: var(--fuel-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--fuel-accent) 14%, transparent); }
+.fuel-update-product input:focus { border-color: var(--fuel-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--fuel-accent) 15%, transparent); }
+.fuel-type-gasoline { --fuel-accent: #2563eb; --fuel-surface: #f2f7ff; }
+.fuel-type-gasoline-additive { --fuel-accent: #7c3aed; --fuel-surface: #f8f4ff; }
+.fuel-type-ethanol { --fuel-accent: #16a34a; --fuel-surface: #f1fbf4; }
+.fuel-type-diesel-s10 { --fuel-accent: #d97706; --fuel-surface: #fff8ed; }
+.fuel-type-diesel { --fuel-accent: #475569; --fuel-surface: #f5f7f9; }
+.fuel-type-gnv { --fuel-accent: #0891b2; --fuel-surface: #eefbfe; }
+.fuel-type-other { --fuel-accent: #64748b; --fuel-surface: #f8fafc; }
+@supports not (color: color-mix(in srgb, #000 10%, transparent)) {
+  .fuel-update-product > div > strong::before { box-shadow: 0 0 0 4px rgba(37,99,235,.10); }
+  .fuel-update-product input:focus { box-shadow: 0 0 0 3px rgba(37,99,235,.12); }
+}
+@media (max-width: 480px) { .fuel-update-page-actions { margin-bottom: 10px; } .fuel-update-page-actions button, .fuel-update-page-actions a { min-height: 40px; font-size: .82rem; } }
