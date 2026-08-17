@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 629,
-  label: "v636",
+  numero: 630,
+  label: "v637",
   data: "2026-08-17",
-  nota: "Cadastro manual de ARLA 32 por posto no modulo de combustiveis."
+  nota: "Salvamento Master sem responsavel obrigatorio e sem bloqueio de permissao."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -17402,7 +17402,6 @@ function renderFuelAdminSettings() {
   $("fuelAdminActive").checked = config.ativo === true;
   $("fuelAdminCity").value = config.cidade || "CARLOPOLIS";
   $("fuelAdminUf").value = config.uf || "PR";
-  if ($("fuelAdminResponsible") && !$("fuelAdminResponsible").value) $("fuelAdminResponsible").value = localStorage.getItem("fuel-admin-responsible") || state.profile?.nome || "";
   renderFuelAdminSelectedStations();
   renderFuelAdminSearchResults();
   renderFuelHistory("fuelAdminHistory");
@@ -17452,47 +17451,25 @@ async function saveFuelAdminSettings() {
   if (!isMaster()) { showToast("Somente master pode publicar preços de combustível."); return; }
   const cidade = $("fuelAdminCity")?.value.trim().toUpperCase();
   const uf = $("fuelAdminUf")?.value.trim().toUpperCase();
-  const responsible = String($("fuelAdminResponsible")?.value || "").trim().replace(/\s+/g, " ");
   if (!cidade || uf.length !== 2) { showToast("Informe uma cidade e UF válidas."); return; }
-  if (responsible.length < 3) { $("fuelAdminResponsible")?.focus(); showToast("Informe o responsável pela publicação."); return; }
-  const previousConfig = state.combustiveisConfig || {};
-  const timestamp = Date.now();
-  const date = dateKeyFromDate(new Date(timestamp));
   const payload = {
     ativo: $("fuelAdminActive")?.checked === true,
     cidade,
     uf,
     fonte: "ANP - cadastro de revendedores; preços confirmados pelo Admin Master",
     postos: collectFuelAdminStationsFromForm(),
-    updatedAt: timestamp,
+    updatedAt: Date.now(),
     updatedBy: state.user?.uid || ""
   };
-  const updates = { "configuracoes/combustiveis": payload };
-  const newHistory = {};
-  Object.entries(payload.postos || {}).forEach(([stationId, station]) => {
-    const previousStation = previousConfig.postos?.[stationId] || {};
-    const changes = {};
-    const prices = {};
-    Object.entries(station.combustiveis || {}).forEach(([productId, product]) => {
-      const previous = previousStation.combustiveis?.[productId] || {};
-      const before = Number(previous.preco || 0);
-      const after = Number(product.preco || 0);
-      if (before === after) return;
-      prices[productId] = after;
-      changes[productId] = { nome: product.nome || productId, precoAnterior: before, precoNovo: after, promocaoAnterior: fuelPanelPromotion(previous.promocao), promocaoNova: fuelPanelPromotion(product.promocao) };
-    });
-    if (!Object.keys(changes).length) return;
-    const historyId = push(ref(db, `combustiveisHistorico/${stationId}`)).key;
-    const history = { postoId: stationId, postoNome: station.nomeExibicao || station.razaoSocial || "Posto", origem: "master", viaLink: false, responsavelNome: responsible, uid: state.user?.uid || "", email: state.user?.email || "", atualizadoEm: date, atualizadoEmTimestamp: timestamp, precos: prices, alteracoes: changes };
-    updates[`combustiveisHistorico/${stationId}/${historyId}`] = history;
-    newHistory[stationId] = { ...(newHistory[stationId] || {}), [historyId]: history };
-  });
-  await update(ref(db), updates);
-  localStorage.setItem("fuel-admin-responsible", responsible);
-  state.combustiveisConfig = payload;
-  Object.entries(newHistory).forEach(([stationId, entries]) => { state.combustiveisHistorico[stationId] = { ...(state.combustiveisHistorico[stationId] || {}), ...entries }; });
-  renderFuelAdminSettings();
-  showToast("Configuração de combustíveis salva e publicada.");
+  try {
+    await set(ref(db, "configuracoes/combustiveis"), payload);
+    state.combustiveisConfig = payload;
+    renderFuelAdminSettings();
+    showToast("Configuração de combustíveis salva e publicada.");
+  } catch (error) {
+    console.error("Falha ao salvar a configuração de combustíveis no Admin Master.", error);
+    showToast("Não foi possível salvar os postos. Verifique a permissão do usuário Master.");
+  }
 }
 function fuelClientAssignedStation() {
   const stationId = String(state.profile?.postoCombustivelId || "");
@@ -17603,18 +17580,15 @@ function renderFuelClientPrices(preserveDraft = false) {
   const box = $("fuelClientPriceEditor");
   if (!box) return;
   const draftPrices = preserveDraft ? Object.fromEntries([...box.querySelectorAll("[data-fuel-client-product]")].map((row) => [row.dataset.fuelClientProduct, row.querySelector("[data-fuel-client-price]")?.value || ""])) : {};
-  const draftResponsible = preserveDraft ? box.querySelector("#fuelClientResponsible")?.value || "" : "";
   if (!hasPermission("combustiveis_precos")) { box.innerHTML = '<div class="list-meta">Seu usuario nao possui permissao para atualizar combustiveis.</div>'; return; }
   const { stationId, station } = fuelClientAssignedStation();
   if (!stationId || !station) { box.innerHTML = '<div class="list-meta">Nenhum posto foi vinculado a este acesso. Solicite o vinculo ao Admin Master.</div>'; return; }
   const products = Object.entries(fuelAdminProductMap(station)).filter(([, product]) => product?.ativo !== false);
   if (!preserveDraft) fuelClientPromotions = Object.fromEntries(products.map(([id, product]) => [id, fuelPanelPromotion(product.promocao)]).filter(([, promotion]) => promotion));
   const stationName = station.nomeExibicao || station.razaoSocial || "Posto";
-  const storedResponsible = draftResponsible || localStorage.getItem(`fuel-client-responsible:${stationId}`) || state.profile?.nome || "";
   box.innerHTML = `<form id="fuelClientPriceForm" class="fuel-client-editor">
     <header class="fuel-client-station-head">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(stationName)}">` : '<div class="fuel-client-station-icon"><i class="fa-solid fa-gas-pump"></i></div>'}<div><h3>${escapeHtml(stationName)}</h3><p>${escapeHtml([station.endereco, station.bairro].filter(Boolean).join(" - "))}</p></div></header>
     <div class="fuel-admin-source-note"><i class="fa-solid fa-circle-info"></i><span>Preencha os valores atuais. O responsavel, a data e o horario serao registrados no historico.</span></div>
-    <label class="fuel-client-responsible">Nome de quem esta atualizando<input id="fuelClientResponsible" maxlength="80" autocomplete="name" required value="${escapeAttr(storedResponsible)}" placeholder="Digite seu nome completo"></label>
     <div class="fuel-client-products">${products.map(([productId, product]) => `<article class="fuel-client-product" data-fuel-client-product="${escapeAttr(productId)}">
       <div><strong>${escapeHtml(product.nome || productId)}</strong><small>Ultima data informada: ${escapeHtml(product.atualizadoEm || "Ainda nao atualizado")}</small>${fuelClientPromotionSummary(productId)}</div>
       <label>Preco por litro (R$)<input data-fuel-client-price type="number" min="0.001" max="99.999" step="0.001" inputmode="decimal" required value="${escapeAttr(draftPrices[productId] ?? (Number(product.preco || 0) || ""))}" placeholder="0,000"></label>
@@ -17672,8 +17646,7 @@ async function saveFuelClientPrices(event) {
   if (!hasPermission("combustiveis_precos") || currentRole() !== "cliente") return;
   const { stationId, station } = fuelClientAssignedStation();
   if (!stationId || !station) { showToast("Posto vinculado nao encontrado."); return; }
-  const responsible = String($("fuelClientResponsible")?.value || "").trim().replace(/\s+/g, " ");
-  if (responsible.length < 3) { $("fuelClientResponsible")?.focus(); showToast("Informe o nome de quem esta atualizando."); return; }
+  const responsible = String(state.profile?.nome || state.user?.email || "Usuario do posto").trim().slice(0, 80);
   const prices = {}; let invalid = false;
   event.currentTarget.querySelectorAll("[data-fuel-client-product]").forEach((row) => {
     const productId = row.dataset.fuelClientProduct; const value = fuelPanelPrice(row.querySelector("[data-fuel-client-price]")?.value);
@@ -17695,7 +17668,6 @@ async function saveFuelClientPrices(event) {
     const history = { postoId: stationId, postoNome: station.nomeExibicao || station.razaoSocial || "Posto", origem: "painel", viaLink: false, responsavelNome: responsible, uid: state.user?.uid || "", email: state.user?.email || "", atualizadoEm: date, atualizadoEmTimestamp: timestamp, precos: prices, alteracoes: changes };
     updates[`combustiveisHistorico/${stationId}/${historyId}`] = history;
     await update(ref(db), updates);
-    localStorage.setItem(`fuel-client-responsible:${stationId}`, responsible);
     Object.entries(prices).forEach(([productId, price]) => { const target = state.combustiveisConfig.postos?.[stationId]?.combustiveis?.[productId]; if (target) Object.assign(target, { preco: price, atualizadoEm: date, atualizadoEmTimestamp: timestamp, origemAtualizacao: "painel", promocao: fuelClientPromotions[productId] ? { ...fuelClientPromotions[productId], responsavelNome: responsible, atualizadoEmTimestamp: timestamp } : null }); });
     state.combustiveisHistorico[stationId] = { ...(state.combustiveisHistorico[stationId] || {}), [historyId]: history };
     renderFuelClientPrices(); showToast("Precos atualizados e registrados no historico.");

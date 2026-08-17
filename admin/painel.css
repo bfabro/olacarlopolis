@@ -9035,8 +9035,6 @@ button.admin-button-loading::after {
 @media (max-width: 560px) { .fuel-admin-link-controls, .fuel-client-product { grid-template-columns: 1fr; } .fuel-admin-link-controls button, .fuel-client-actions button { width: 100%; } }
 
 /* Combustiveis: responsavel, promocao e historico - v389 */
-.fuel-client-responsible { display: grid; gap: 6px; color: #40566d; font-size: .78rem; font-weight: 850; }
-.fuel-client-responsible input { min-height: 46px; padding: 9px 11px; border: 1px solid #b9c9d9; border-radius: 10px; color: #15344f; background: #fff; font: inherit; }
 .fuel-client-promo-control { grid-column: 1 / -1; display: flex !important; flex-flow: row wrap; align-items: center !important; justify-content: space-between; gap: 8px; padding-top: 10px; border-top: 1px solid #e1e8ef; }
 .fuel-client-promo-control label { display: inline-flex; grid-auto-flow: column; align-items: center; gap: 8px; cursor: pointer; }
 .fuel-client-promo-control input { min-height: 18px; width: 18px; padding: 0; accent-color: #df7200; }
@@ -9076,7 +9074,7 @@ button.admin-button-loading::after {
 .fuel-history-empty { padding: 26px !important; color: #718096 !important; text-align: center; }
 @media (max-width: 760px) { .fuel-history-filters { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .fuel-history-filters { grid-template-columns: 1fr; } .fuel-client-promo-dialog { padding: 21px 16px; } }
-/* Produto manual ARLA 32 - v390 */
+/* Produto manual ARLA 32 - v391 */
 .fuel-admin-products-section { border-top: 1px solid #e1e9f1; }
 .fuel-admin-products-section > header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; background: #f7fbff; }
 .fuel-admin-products-section > header h4 { margin: 0 0 3px; color: #18354f; font-size: .92rem; }

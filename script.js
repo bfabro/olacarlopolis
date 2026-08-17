@@ -28793,7 +28793,7 @@ function mostrarCombustivelLegado() {
 }
 
 
-// ===== PRECO COMBUSTIVEL PUBLICO - v5 =====
+// ===== PRECO COMBUSTIVEL PUBLICO - v6 =====
 function fuelPublicConfig() {
   const config = window.__combustiveisConfig;
   return config && typeof config === "object" ? config : {};
