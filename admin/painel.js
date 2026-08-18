@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 630,
-  label: "v637",
-  data: "2026-08-17",
-  nota: "Salvamento Master sem responsavel obrigatorio e sem bloqueio de permissao."
+  numero: 631,
+  label: "v638",
+  data: "2026-08-18",
+  nota: "Correcao do salvamento inicial de postos sem data de preco informada."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -17103,13 +17103,16 @@ function collectFuelAdminStationsFromForm() {
       const productId = row.dataset.fuelProductId;
       const preco = Number(String(row.querySelector("[data-fuel-price]")?.value || "").replace(",", ".")) || 0;
       const productBase = fuelAdminProductMap(base)[productId] || {};
-      combustiveis[productId] = {
+      const dataInformada = row.querySelector("[data-fuel-date]")?.value || "";
+      const product = {
         ...productBase,
         nome: row.dataset.fuelProductName || productId,
         ativo: row.querySelector("[data-fuel-enabled]")?.checked !== false,
-        preco: Math.max(0, preco),
-        atualizadoEm: row.querySelector("[data-fuel-date]")?.value || ""
+        preco: Math.max(0, preco)
       };
+      if (dataInformada) product.atualizadoEm = dataInformada;
+      else delete product.atualizadoEm;
+      combustiveis[productId] = product;
     });
     const horarios = emptySchedule();
     card.querySelectorAll("[data-fuel-schedule-day]").forEach((row) => {

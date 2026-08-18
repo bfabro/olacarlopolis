@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-17-combustiveis-master-save-v684'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-18-combustiveis-postos-save-v685'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

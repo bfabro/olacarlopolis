@@ -9074,7 +9074,7 @@ button.admin-button-loading::after {
 .fuel-history-empty { padding: 26px !important; color: #718096 !important; text-align: center; }
 @media (max-width: 760px) { .fuel-history-filters { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 520px) { .fuel-history-filters { grid-template-columns: 1fr; } .fuel-client-promo-dialog { padding: 21px 16px; } }
-/* Produto manual ARLA 32 - v391 */
+/* Produto manual ARLA 32 - v392 */
 .fuel-admin-products-section { border-top: 1px solid #e1e9f1; }
 .fuel-admin-products-section > header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 16px; background: #f7fbff; }
 .fuel-admin-products-section > header h4 { margin: 0 0 3px; color: #18354f; font-size: .92rem; }
