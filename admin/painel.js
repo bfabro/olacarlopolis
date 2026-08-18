@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 631,
-  label: "v638",
+  numero: 632,
+  label: "v639",
   data: "2026-08-18",
-  nota: "Correcao do salvamento inicial de postos sem data de preco informada."
+  nota: "Consulta ANP sem cache, nomes amigaveis e inclusao manual de combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -17052,18 +17052,52 @@ async function revokeFuelStationUpdateLink(stationId) {
   renderFuelAdminSelectedStations();
   showToast("Link revogado.");
 }
+
+const FUEL_ADMIN_MANUAL_CATALOG = [
+  { key: "gasolina-comum", nome: "Gasolina Comum", tipo: "combustivel" },
+  { key: "gasolina-aditivada", nome: "Gasolina Aditivada", tipo: "combustivel" },
+  { key: "etanol", nome: "Etanol", tipo: "combustivel" },
+  { key: "diesel-s10", nome: "Diesel S10", tipo: "combustivel" },
+  { key: "diesel-s500", nome: "Diesel Comum S500", tipo: "combustivel" },
+  { key: "gnv", nome: "GNV", tipo: "combustivel" },
+  { key: "arla-32", nome: "ARLA 32", tipo: "lubrificante" }
+];
+
+function fuelAdminProductKind(productId = "", product = {}) {
+  const value = normalizeName(`${productId} ${product.nome || ""} ${product.nomeAnp || ""}`).replace(/[^a-z0-9]/g, "");
+  if (value.includes("arla32")) return "arla-32";
+  if (value.includes("gasolina") && (value.includes("aditiv") || value.includes("ipimax"))) return "gasolina-aditivada";
+  if (value.includes("gasolina")) return "gasolina-comum";
+  if (value.includes("diesel") && value.includes("s500")) return "diesel-s500";
+  if (value.includes("diesel") && value.includes("s10")) return "diesel-s10";
+  if (value.includes("etanol") || value.includes("alcool")) return "etanol";
+  if (value.includes("gnv") || value.includes("gasnaturalveicular")) return "gnv";
+  return "";
+}
+
+function fuelAdminFriendlyProductName(name = "") {
+  const kind = fuelAdminProductKind("", { nome: name });
+  return FUEL_ADMIN_MANUAL_CATALOG.find((item) => item.key === kind)?.nome || String(name || "").trim();
+}
+
+function fuelAdminManualOptions(station) {
+  const existingKinds = new Set(Object.entries(fuelAdminProductMap(station)).map(([productId, product]) => fuelAdminProductKind(productId, product)).filter(Boolean));
+  return FUEL_ADMIN_MANUAL_CATALOG.filter((item) => !existingKinds.has(item.key));
+}
+
 function normalizeAnpStationForAdmin(station) {
   const id = String(station?.codigoSIMP || station?.cnpj || "").replace(/[^a-zA-Z0-9_-]/g, "");
   const existing = fuelAdminStationMap()[id] || {};
   const existingProducts = fuelAdminProductMap(existing);
   const combustiveis = {};
   (Array.isArray(station?.produtos) ? station.produtos : []).forEach((product) => {
-    const nome = String(product?.produto || "").trim();
-    if (!nome) return;
-    const key = slugify(nome) || `combustivel-${Object.keys(combustiveis).length + 1}`;
+    const nomeAnp = String(product?.produto || "").trim();
+    if (!nomeAnp) return;
+    const key = slugify(nomeAnp) || `combustivel-${Object.keys(combustiveis).length + 1}`;
     combustiveis[key] = {
       ...(existingProducts[key] || {}),
-      nome,
+      nome: fuelAdminFriendlyProductName(nomeAnp),
+      nomeAnp,
       ativo: existingProducts[key]?.ativo !== false,
       preco: Number(existingProducts[key]?.preco || 0) || 0,
       atualizadoEm: existingProducts[key]?.atualizadoEm || ""
@@ -17205,7 +17239,7 @@ function renderFuelAdminSearchResults() {
   box.innerHTML = list.length ? list.map((station) => {
     const id = String(station.codigoSIMP || station.cnpj || "");
     const added = Boolean(selected[id]);
-    const products = (station.produtos || []).map((item) => item.produto).filter(Boolean);
+    const products = (station.produtos || []).map((item) => fuelAdminFriendlyProductName(item.produto)).filter(Boolean);
     return `<article class="fuel-admin-result-card">
       <div><span class="badge">${escapeHtml(station.distribuidora || "Sem bandeira")}</span><h3>${escapeHtml(station.razaoSocial || "Posto")}</h3><p><i class="fa-solid fa-location-dot"></i> ${escapeHtml(station.endereco || "Endereço não informado")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}${station.municipio ? ` · ${escapeHtml(station.municipio)}/${escapeHtml(station.uf || "")}` : ""}</p><small>${products.length} combustível(is): ${escapeHtml(products.join(", "))}</small>${renderFuelAdminAnpDetails(station)}</div>
       <button type="button" data-add-fuel-station="${escapeAttr(id)}" ${added ? "disabled" : ""}><i class="fa-solid ${added ? "fa-check" : "fa-plus"}"></i> ${added ? "Adicionado" : "Adicionar"}</button>
@@ -17250,9 +17284,9 @@ function fuelAdminIsArla(productId, product = {}) {
 
 function renderFuelAdminProducts(station) {
   const products = Object.entries(fuelAdminProductMap(station));
-  const hasArla = products.some(([productId, product]) => fuelAdminIsArla(productId, product));
+  const manualOptions = fuelAdminManualOptions(station);
   return `<section class="fuel-admin-products-section">
-    <header><div><h4>Produtos e preços</h4><p>Além dos produtos retornados pela ANP, você pode incluir ARLA 32 manualmente.</p></div><button type="button" class="fuel-admin-add-arla" data-add-fuel-arla ${hasArla ? "disabled" : ""}><i class="fa-solid fa-plus"></i> ${hasArla ? "ARLA 32 adicionado" : "Adicionar ARLA 32"}</button></header>
+    <header><div><h4>Produtos e preços</h4><p>Inclua manualmente qualquer produto vendido pelo posto quando o cadastro da ANP estiver desatualizado.</p></div><div class="fuel-admin-add-product-controls"><select data-fuel-add-product-select><option value="">Selecione um produto</option>${manualOptions.map((item) => `<option value="${escapeAttr(item.key)}">${escapeHtml(item.nome)}</option>`).join("")}<option value="outro">Outro combustível...</option></select><button type="button" class="fuel-admin-add-product" data-add-fuel-product><i class="fa-solid fa-plus"></i> Adicionar</button></div></header>
     <div class="fuel-admin-products">${products.map(([productId, product]) => {
       const manual = product.manual === true || fuelAdminIsArla(productId, product);
       return `<div class="fuel-admin-product ${manual ? "is-manual-product" : ""}" data-fuel-product-id="${escapeAttr(productId)}" data-fuel-product-name="${escapeAttr(product.nome || productId)}">
@@ -17285,31 +17319,42 @@ function renderFuelAdminSelectedStations() {
       ${renderFuelAdminAnpDetails(station)}
     </article>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
-  box.querySelectorAll("[data-add-fuel-arla]").forEach((button) => button.addEventListener("click", () => {
+  box.querySelectorAll("[data-add-fuel-product]").forEach((button) => button.addEventListener("click", () => {
     const card = button.closest("[data-fuel-station-id]");
     const stationId = card?.dataset.fuelStationId || "";
+    const select = card?.querySelector("[data-fuel-add-product-select]");
+    const selectedKey = select?.value || "";
     if (!stationId) return;
+    if (!selectedKey) { select?.focus(); showToast("Selecione o produto que deseja adicionar."); return; }
     const stationsMap = collectFuelAdminStationsFromForm();
     const station = stationsMap[stationId];
     if (!station) return;
     const products = fuelAdminProductMap(station);
-    if (Object.entries(products).some(([productId, product]) => fuelAdminIsArla(productId, product))) { showToast("Este posto já possui ARLA 32."); return; }
-    products["arla-32"] = { nome: "ARLA 32", tipo: "lubrificante", unidade: "litro", manual: true, ativo: true, preco: 0, atualizadoEm: "" };
+    const catalogItem = FUEL_ADMIN_MANUAL_CATALOG.find((item) => item.key === selectedKey);
+    const customName = selectedKey === "outro" ? String(window.prompt("Informe o nome do combustivel ou produto:") || "").trim().replace(/\s+/g, " ") : "";
+    const name = catalogItem?.nome || customName;
+    if (!name) return;
+    const kind = catalogItem?.key || fuelAdminProductKind("", { nome: name });
+    if (kind && Object.entries(products).some(([productId, product]) => fuelAdminProductKind(productId, product) === kind)) { showToast("Este produto ja esta cadastrado no posto."); return; }
+    let productId = `manual-${catalogItem?.key || slugify(name) || "produto"}`;
+    if (products[productId]) productId = `${productId}-${Date.now()}`;
+    products[productId] = { nome: name, tipo: catalogItem?.tipo || "combustivel", unidade: "litro", manual: true, ativo: true, preco: 0 };
     station.combustiveis = products;
     state.combustiveisConfig = { ...state.combustiveisConfig, ativo: $("fuelAdminActive")?.checked === true, cidade: $("fuelAdminCity")?.value.trim() || "CARLOPOLIS", uf: $("fuelAdminUf")?.value.trim().toUpperCase() || "PR", postos: stationsMap };
     renderFuelAdminSettings();
-    showToast("ARLA 32 adicionado. Informe o preço e salve para publicar.");
+    showToast(`${name} adicionado. Informe o preco e salve para publicar.`);
   }));
   box.querySelectorAll("[data-remove-fuel-product]").forEach((button) => button.addEventListener("click", () => {
     const card = button.closest("[data-fuel-station-id]");
     const stationId = card?.dataset.fuelStationId || "";
     const productId = button.dataset.removeFuelProduct || "";
-    if (!stationId || !productId || !confirm("Remover o ARLA 32 deste posto?")) return;
+    const productName = card?.querySelector(`[data-fuel-product-id="${CSS.escape(productId)}"]`)?.dataset.fuelProductName || "produto";
+    if (!stationId || !productId || !confirm(`Remover ${productName} deste posto?`)) return;
     const stationsMap = collectFuelAdminStationsFromForm();
     if (stationsMap[stationId]?.combustiveis) delete stationsMap[stationId].combustiveis[productId];
     state.combustiveisConfig = { ...state.combustiveisConfig, ativo: $("fuelAdminActive")?.checked === true, cidade: $("fuelAdminCity")?.value.trim() || "CARLOPOLIS", uf: $("fuelAdminUf")?.value.trim().toUpperCase() || "PR", postos: stationsMap };
     renderFuelAdminSettings();
-    showToast("ARLA 32 removido. Clique em Salvar e publicar para confirmar.");
+    showToast(`${productName} removido. Clique em Salvar e publicar para confirmar.`);
   }));
   box.querySelectorAll("[data-generate-fuel-link]").forEach((button) => {
     button.addEventListener("click", async () => {
@@ -17421,7 +17466,8 @@ async function searchFuelStationsFromAnp() {
   button.classList.add("admin-button-loading");
   if (status) status.textContent = `Consultando postos de ${city}/${uf} na ANP...`;
   try {
-    const response = await fetch(`/api/anp-postos?municipio=${encodeURIComponent(city)}&uf=${encodeURIComponent(uf)}`, { headers: { accept: "application/json" } });
+    const params = new URLSearchParams({ municipio: city, uf, atualizacao: String(Date.now()) });
+    const response = await fetch(`/api/anp-postos?${params.toString()}`, { cache: "no-store", headers: { accept: "application/json", "cache-control": "no-cache" } });
     const payload = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(payload.message || "Falha na consulta.");
     state.combustiveisBusca = Array.isArray(payload.postos) ? payload.postos : [];

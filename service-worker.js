@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-18-combustiveis-postos-save-v685'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-18-combustiveis-anp-sem-cache-v686'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
@@ -42,6 +42,12 @@ self.addEventListener('fetch', (event) => {
 
   // Só trata requisições do seu domínio (evita problemas com cdn / terceiros)
   if (url.origin !== self.location.origin) return;
+
+  // APIs administrativas devem refletir sempre a fonte atual, sem resposta antiga do cache.
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(req, { cache: 'no-store' }));
+    return;
+  }
 
   // NETWORK FIRST para HTML/navegação (não ficar preso em index antigo)
   const isNavigation =

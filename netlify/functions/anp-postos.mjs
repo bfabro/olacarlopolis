@@ -1,4 +1,4 @@
-// Proxy oficial da API de Revendedores ANP - v1
+// Proxy oficial da API de Revendedores ANP - v2 sem cache
 const ANP_ENDPOINT = "https://revendedoresapi.anp.gov.br/v1/combustivel";
 
 const HEADERS = {
@@ -37,14 +37,15 @@ export async function handler(event) {
     url.searchParams.set("municipio", municipio);
     url.searchParams.set("uf", uf);
     const response = await fetch(url, {
-      headers: { accept: "application/json", "user-agent": "OlaCarlopolis/1.0" },
+      cache: "no-store",
+      headers: { accept: "application/json", "cache-control": "no-cache", "user-agent": "OlaCarlopolis/1.0" },
       signal: AbortSignal.timeout(15000)
     });
     const payload = await response.json().catch(() => null);
     if (!response.ok || !payload) throw new Error(`ANP respondeu com status ${response.status}.`);
     return {
       statusCode: 200,
-      headers: { ...HEADERS, "cache-control": "public, max-age=300, s-maxage=3600" },
+      headers: { ...HEADERS, "cache-control": "no-store, no-cache, must-revalidate", pragma: "no-cache", expires: "0" },
       body: JSON.stringify({
         fonte: "Agencia Nacional do Petroleo, Gas Natural e Biocombustiveis - ANP",
         consultadoEm: new Date().toISOString(),

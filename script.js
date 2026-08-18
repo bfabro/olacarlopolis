@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v592.
+// Release do site v593.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -28893,7 +28893,8 @@ function fuelPublicLabel(name) {
   if (key.includes("gasolinaccomum") || key === "gasolina") return "Gasolina Comum";
   if (key.includes("etanol")) return "Etanol";
   if (key.includes("diesel") && key.includes("s10")) return "Diesel S10";
-  if (key.includes("diesel") && (key.includes("s500") || key.includes("comum"))) return "Diesel Comum";
+  if (key.includes("diesel") && key.includes("s500")) return "Diesel Comum S500";
+  if (key.includes("diesel") && key.includes("comum")) return "Diesel Comum";
   if (key.includes("gasnatural") || key === "gnv") return "GNV";
   if (key.includes("arla32") || key === "arla") return "ARLA 32";
   return String(name || "Combustível").trim();
