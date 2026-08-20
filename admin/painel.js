@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 634,
-  label: "v641",
+  numero: 635,
+  label: "v642",
   data: "2026-08-20",
-  nota: "Horarios 24h e sincronizacao horaria com Menor Preco / Nota Parana."
+  nota: "Data e hora completas na atualizacao publica dos combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

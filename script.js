@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v595.
+// Release do site v596.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -28948,9 +28948,28 @@ function fuelPublicMoney(value) {
 }
 
 function fuelPublicDate(value) {
-  const raw = String(value || "").slice(0, 10);
+  const displayValue = String(value || "");
+  if (/^\d{2}\/\d{2}\/\d{4} às \d{2}:\d{2}$/.test(displayValue)) return displayValue;
+  const raw = displayValue.slice(0, 10);
   const match = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   return match ? `${match[3]}/${match[2]}/${match[1]}` : "Data não informada";
+}
+
+function fuelPublicDateTime(timestamp, fallbackDate = "") {
+  const value = Number(timestamp || 0);
+  if (value > 0 && Number.isFinite(new Date(value).getTime())) {
+    const formatted = new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23"
+    }).format(new Date(value));
+    return formatted.replace(",", " às");
+  }
+  return fuelPublicDate(fallbackDate);
 }
 
 function fuelPublicStations(config = fuelPublicConfig()) {
@@ -28978,7 +28997,7 @@ function fuelPublicProducts(station) {
   return products.filter((product) => product && product.ativo !== false).map((product) => {
     const regularPrice = fuelPublicPrice(product.preco);
     const promotion = fuelPublicActivePromotion(product);
-    return { ...product, label: fuelPublicLabel(product.nome), regularPrice, promotion, price: promotion?.preco || regularPrice };
+    return { ...product, atualizadoEmOriginal: product.atualizadoEm, atualizadoEm: fuelPublicDateTime(product.atualizadoEmTimestamp, product.atualizadoEm), label: fuelPublicLabel(product.nome), regularPrice, promotion, price: promotion?.preco || regularPrice };
   });
 }
 function fuelPublicCheapest(stations) {
@@ -29102,8 +29121,11 @@ function fuelPublicSchedule(station) {
 }
 
 function fuelPublicLatestDate(station) {
-  const dates = fuelPublicProducts(station)
-    .map((product) => String(product.atualizadoEm || "").slice(0, 10))
+  const products = fuelPublicProducts(station);
+  const latestTimestamp = products.reduce((latest, product) => Math.max(latest, Number(product.atualizadoEmTimestamp || 0)), 0);
+  if (latestTimestamp > 0) return fuelPublicDateTime(latestTimestamp);
+  const dates = products
+    .map((product) => String(product.atualizadoEmOriginal || "").slice(0, 10))
     .filter((value) => /^\d{4}-\d{2}-\d{2}$/.test(value))
     .sort()
     .reverse();
