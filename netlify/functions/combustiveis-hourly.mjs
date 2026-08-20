@@ -1,4 +1,4 @@
-/* Sincronizacao configuravel de combustiveis com Menor Preco / Nota Parana - v2 */
+/* Sincronizacao configuravel e diagnosticavel de combustiveis - v3 */
 const MENOR_PRECO_API = "https://menorpreco.notaparana.pr.gov.br/api/v1";
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
 const DEFAULT_RADIUS_KM = 10;
@@ -153,7 +153,7 @@ async function menorPrecoJson(path, parameters) {
   Object.entries(parameters).forEach(([key, value]) => url.searchParams.set(key, String(value)));
   const response = await fetch(url, {
     cache: "no-store",
-    headers: { accept: "application/json", referer: "https://menorpreco.notaparana.pr.gov.br/index.html", "user-agent": "Ola-Carlopolis-Combustiveis-Hourly/1.0" },
+    headers: { accept: "application/json" },
     signal: AbortSignal.timeout(12000)
   });
   const payload = await response.json().catch(() => null);
@@ -211,84 +211,120 @@ export default async function handler() {
   const stationEntries = Object.entries(config.postos || {}).filter(([, station]) => station && station.ativo !== false);
   if (!stationEntries.length) return new Response(null, { status: 204 });
 
-  const center = configuredCenter(stationEntries.map(([, station]) => station));
-  const local = encodeGeohash(center.latitude, center.longitude);
-  const radius = Math.min(Math.max(Number(config.menorPrecoRaioKm || DEFAULT_RADIUS_KM), 1), 30);
-  const baseParameters = { local, raio: radius };
-  const [categoriesPayload, ...productPayloads] = await Promise.all([
-    menorPrecoJson("categorias", { ...baseParameters, termo: "gasolina" }),
-    ...FUEL_TYPES.map((type) => menorPrecoJson("produtos", { ...baseParameters, data: 6, tp_comb: type, offset: 0 }))
-  ]);
-  const records = productPayloads.flatMap((payload) => Array.isArray(payload.produtos) ? payload.produtos : []);
-  const updates = {
-    "configuracoes/combustiveis/menorPrecoUltimaConsultaEm": now,
-    "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": "ok",
-    "configuracoes/combustiveis/menorPrecoLocal": local,
-    "configuracoes/combustiveis/menorPrecoCategoria": (categoriesPayload.categorias || []).find((category) => normalizeText(category.desc).includes("combustiveis"))?.id || null
-  };
-  let matchedStations = 0;
-  let updatedProducts = 0;
-
-  stationEntries.forEach(([stationId, station]) => {
-    const matched = matchStation(station, records);
-    if (!matched) return;
-    const stationCode = String(apiStation(matched).codigo || "");
-    if (!stationCode) return;
-    matchedStations += 1;
-    const stationBase = `configuracoes/combustiveis/postos/${stationId}`;
-    updates[`${stationBase}/menorPrecoCodigo`] = stationCode;
-    updates[`${stationBase}/menorPrecoNome`] = apiStation(matched).nm_fan || apiStation(matched).nm_emp || "";
-    updates[`${stationBase}/menorPrecoVerificadoEm`] = now;
-    const latest = latestRecordsForStation(records, stationCode);
-    const changes = {};
-    const prices = {};
-
-    Object.entries(station.combustiveis || {}).forEach(([productId, product]) => {
-      if (!product || product.ativo === false) return;
-      const kind = fuelKind(`${productId} ${product.nome || ""} ${product.nomeAnp || ""}`);
-      const record = latest.get(kind);
-      if (!kind || !record) return;
-      const sourceTimestamp = Date.parse(record.datahora || "");
-      const currentTimestamp = Number(product.atualizadoEmTimestamp || 0);
-      const price = Math.round(Number(record.valor || 0) * 1000) / 1000;
-      if (!Number.isFinite(sourceTimestamp) || sourceTimestamp <= currentTimestamp || sourceTimestamp > now + 300000 || !(price > 0 && price <= 99.999)) return;
-      const productBase = `${stationBase}/combustiveis/${productId}`;
-      updates[`${productBase}/preco`] = price;
-      updates[`${productBase}/atualizadoEm`] = saoPauloDate(sourceTimestamp);
-      updates[`${productBase}/atualizadoEmTimestamp`] = sourceTimestamp;
-      updates[`${productBase}/verificadoEmTimestamp`] = now;
-      updates[`${productBase}/origemAtualizacao`] = "nota-parana";
-      updates[`${productBase}/fonteAtualizacao`] = "Menor Preco / Nota Parana";
-      updates[`${productBase}/menorPrecoProdutoId`] = String(record.id || "");
-      updates[`${productBase}/menorPrecoDescricao`] = String(record.desc || "");
-      prices[productId] = price;
-      if (Number(product.preco || 0) !== price) {
-        changes[productId] = { nome: product.nome || productId, precoAnterior: Number(product.preco || 0), precoNovo: price, fonteDescricao: String(record.desc || ""), fonteDatahora: String(record.datahora || "") };
-      }
-      updatedProducts += 1;
+  try {
+    await firebaseJson(databaseUrl, databaseAuth, "", {
+      method: "PATCH",
+      body: JSON.stringify({
+        "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": "consultando",
+        "configuracoes/combustiveis/menorPrecoUltimaTentativaEm": now,
+        "configuracoes/combustiveis/menorPrecoIntervaloExecutadoMinutos": intervalMinutes
+      })
     });
 
-    if (Object.keys(changes).length) {
-      const historyId = `${now}-${stationId}-nota-parana`;
-      updates[`combustiveisHistorico/${stationId}/${historyId}`] = {
-        postoId: stationId,
-        postoNome: station.nomeExibicao || station.razaoSocial || "Posto",
-        origem: "nota-parana",
-        viaLink: false,
-        responsavelNome: "Menor Preco / Nota Parana",
-        atualizadoEm: saoPauloDate(now),
-        atualizadoEmTimestamp: now,
-        precos: prices,
-        alteracoes: changes
-      };
+    const center = configuredCenter(stationEntries.map(([, station]) => station));
+    const local = encodeGeohash(center.latitude, center.longitude);
+    const radius = Math.min(Math.max(Number(config.menorPrecoRaioKm || DEFAULT_RADIUS_KM), 1), 30);
+    const baseParameters = { local, raio: radius };
+    const apiResults = await Promise.allSettled([
+      menorPrecoJson("categorias", { ...baseParameters, termo: "gasolina" }),
+      ...FUEL_TYPES.map((type) => menorPrecoJson("produtos", { ...baseParameters, data: 6, tp_comb: type, offset: 0 }))
+    ]);
+    const categoriesPayload = apiResults[0].status === "fulfilled" ? apiResults[0].value : null;
+    const successfulProductPayloads = apiResults.slice(1).filter((result) => result.status === "fulfilled").map((result) => result.value);
+    const failedRequests = apiResults.filter((result) => result.status === "rejected");
+    if (!successfulProductPayloads.length) {
+      const reason = failedRequests.map((result) => result.reason?.message || "falha desconhecida").join("; ");
+      throw new Error(`Nenhuma consulta de produtos foi concluida. ${reason}`);
     }
-  });
+    const records = successfulProductPayloads.flatMap((payload) => Array.isArray(payload.produtos) ? payload.produtos : []);
+    const updates = {
+      "configuracoes/combustiveis/menorPrecoUltimaConsultaEm": now,
+      "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": failedRequests.length ? "parcial" : "ok",
+      "configuracoes/combustiveis/menorPrecoUltimoErro": failedRequests.length ? failedRequests.map((result) => result.reason?.message || "Falha na API").join("; ").slice(0, 300) : null,
+      "configuracoes/combustiveis/menorPrecoRequisicoesComFalha": failedRequests.length,
+      "configuracoes/combustiveis/menorPrecoLocal": local,
+      "configuracoes/combustiveis/menorPrecoCategoria": (categoriesPayload?.categorias || []).find((category) => normalizeText(category.desc).includes("combustiveis"))?.id || null
+    };
+    let matchedStations = 0;
+    let updatedProducts = 0;
 
-  updates["configuracoes/combustiveis/menorPrecoPostosEncontrados"] = matchedStations;
-  updates["configuracoes/combustiveis/menorPrecoProdutosAtualizados"] = updatedProducts;
-  await firebaseJson(databaseUrl, databaseAuth, "", { method: "PATCH", body: JSON.stringify(updates) });
-  console.log(`Menor Preco consultado: ${matchedStations} posto(s), ${updatedProducts} produto(s) atualizado(s).`);
-  return new Response(null, { status: 204 });
+    stationEntries.forEach(([stationId, station]) => {
+      const matched = matchStation(station, records);
+      if (!matched) return;
+      const stationCode = String(apiStation(matched).codigo || "");
+      if (!stationCode) return;
+      matchedStations += 1;
+      const stationBase = `configuracoes/combustiveis/postos/${stationId}`;
+      updates[`${stationBase}/menorPrecoCodigo`] = stationCode;
+      updates[`${stationBase}/menorPrecoNome`] = apiStation(matched).nm_fan || apiStation(matched).nm_emp || "";
+      updates[`${stationBase}/menorPrecoVerificadoEm`] = now;
+      const latest = latestRecordsForStation(records, stationCode);
+      const changes = {};
+      const prices = {};
+
+      Object.entries(station.combustiveis || {}).forEach(([productId, product]) => {
+        if (!product || product.ativo === false) return;
+        const kind = fuelKind(`${productId} ${product.nome || ""} ${product.nomeAnp || ""}`);
+        const record = latest.get(kind);
+        if (!kind || !record) return;
+        const sourceTimestamp = Date.parse(record.datahora || "");
+        const currentTimestamp = Number(product.atualizadoEmTimestamp || 0);
+        const price = Math.round(Number(record.valor || 0) * 1000) / 1000;
+        if (!Number.isFinite(sourceTimestamp) || sourceTimestamp <= currentTimestamp || sourceTimestamp > now + 300000 || !(price > 0 && price <= 99.999)) return;
+        const productBase = `${stationBase}/combustiveis/${productId}`;
+        updates[`${productBase}/preco`] = price;
+        updates[`${productBase}/atualizadoEm`] = saoPauloDate(sourceTimestamp);
+        updates[`${productBase}/atualizadoEmTimestamp`] = sourceTimestamp;
+        updates[`${productBase}/verificadoEmTimestamp`] = now;
+        updates[`${productBase}/origemAtualizacao`] = "nota-parana";
+        updates[`${productBase}/fonteAtualizacao`] = "Menor Preco / Nota Parana";
+        updates[`${productBase}/menorPrecoProdutoId`] = String(record.id || "");
+        updates[`${productBase}/menorPrecoDescricao`] = String(record.desc || "");
+        prices[productId] = price;
+        if (Number(product.preco || 0) !== price) {
+          changes[productId] = { nome: product.nome || productId, precoAnterior: Number(product.preco || 0), precoNovo: price, fonteDescricao: String(record.desc || ""), fonteDatahora: String(record.datahora || "") };
+        }
+        updatedProducts += 1;
+      });
+
+      if (Object.keys(changes).length) {
+        const historyId = `${now}-${stationId}-nota-parana`;
+        updates[`combustiveisHistorico/${stationId}/${historyId}`] = {
+          postoId: stationId,
+          postoNome: station.nomeExibicao || station.razaoSocial || "Posto",
+          origem: "nota-parana",
+          viaLink: false,
+          responsavelNome: "Menor Preco / Nota Parana",
+          atualizadoEm: saoPauloDate(now),
+          atualizadoEmTimestamp: now,
+          precos: prices,
+          alteracoes: changes
+        };
+      }
+    });
+
+    updates["configuracoes/combustiveis/menorPrecoPostosEncontrados"] = matchedStations;
+    updates["configuracoes/combustiveis/menorPrecoProdutosAtualizados"] = updatedProducts;
+    await firebaseJson(databaseUrl, databaseAuth, "", { method: "PATCH", body: JSON.stringify(updates) });
+    console.log(`Menor Preco consultado: ${matchedStations} posto(s), ${updatedProducts} produto(s) atualizado(s), ${failedRequests.length} falha(s) parcial(is).`);
+    return new Response(null, { status: 204 });
+  } catch (error) {
+    const message = String(error?.message || error || "Falha desconhecida").slice(0, 300);
+    console.error("Falha na sincronizacao do Menor Preco:", error);
+    try {
+      await firebaseJson(databaseUrl, databaseAuth, "", {
+        method: "PATCH",
+        body: JSON.stringify({
+          "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": "erro",
+          "configuracoes/combustiveis/menorPrecoUltimoErro": message,
+          "configuracoes/combustiveis/menorPrecoUltimaFalhaEm": Date.now()
+        })
+      });
+    } catch (statusError) {
+      console.error("Falha ao registrar o erro da sincronizacao:", statusError);
+    }
+    throw error;
+  }
 }
 
 export const config = {

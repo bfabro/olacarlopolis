@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 637,
-  label: "v644",
+  numero: 638,
+  label: "v645",
   data: "2026-08-20",
-  nota: "Intervalo configuravel da sincronizacao automatica de combustiveis."
+  nota: "Diagnostico e tolerancia a falhas na sincronizacao de combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -17476,6 +17476,20 @@ function renderFuelAdminSettings() {
   if ($("fuelAdminMenorPrecoAutomatico")) $("fuelAdminMenorPrecoAutomatico").checked = config.menorPrecoAutomatico !== false;
   const intervaloAutomatico = [15, 30, 60].includes(Number(config.menorPrecoIntervaloMinutos)) ? Number(config.menorPrecoIntervaloMinutos) : 60;
   if ($("fuelAdminMenorPrecoIntervaloMinutos")) $("fuelAdminMenorPrecoIntervaloMinutos").value = String(intervaloAutomatico);
+  const syncStatus = $("fuelAdminMenorPrecoStatus");
+  if (syncStatus) {
+    const status = String(config.menorPrecoUltimaConsultaStatus || "");
+    const reference = Number(config.menorPrecoUltimaConsultaEm || config.menorPrecoUltimaTentativaEm || 0);
+    const details = status === "erro"
+      ? `Erro na última tentativa: ${config.menorPrecoUltimoErro || "verifique os logs da Netlify"}`
+      : status === "consultando"
+        ? "Consulta ao Menor Preço em andamento."
+        : reference
+          ? `Última consulta em ${fuelPanelDateTime(reference)} · ${Number(config.menorPrecoPostosEncontrados || 0)} posto(s) · ${Number(config.menorPrecoProdutosAtualizados || 0)} produto(s) atualizado(s)${status === "parcial" ? " · resultado parcial" : ""}.`
+          : "Aguardando a primeira execução automática após o deploy.";
+    const text = syncStatus.querySelector("span");
+    if (text) text.textContent = details;
+  }
   renderFuelAdminSelectedStations();
   renderFuelAdminSearchResults();
   renderFuelHistory("fuelAdminHistory");
@@ -17540,8 +17554,8 @@ async function saveFuelAdminSettings() {
     updatedBy: state.user?.uid || ""
   };
   try {
-    await set(ref(db, "configuracoes/combustiveis"), payload);
-    state.combustiveisConfig = payload;
+    await update(ref(db, "configuracoes/combustiveis"), payload);
+    state.combustiveisConfig = { ...state.combustiveisConfig, ...payload };
     renderFuelAdminSettings();
     showToast("Configuração de combustíveis salva e publicada.");
   } catch (error) {
