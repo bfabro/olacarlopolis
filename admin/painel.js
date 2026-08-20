@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 635,
-  label: "v642",
+  numero: 636,
+  label: "v643",
   data: "2026-08-20",
-  nota: "Data e hora completas na atualizacao publica dos combustiveis."
+  nota: "Data e hora automaticas em toda atualizacao manual de combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -17139,13 +17139,20 @@ function collectFuelAdminStationsFromForm() {
       const preco = Number(String(row.querySelector("[data-fuel-price]")?.value || "").replace(",", ".")) || 0;
       const productBase = fuelAdminProductMap(base)[productId] || {};
       const dataInformada = row.querySelector("[data-fuel-date]")?.value || "";
+      const precoNormalizado = Math.max(0, preco);
+      const precoAlterado = Math.abs(precoNormalizado - Number(productBase.preco || 0)) >= 0.0005;
+      const timestampAlteracao = precoAlterado ? Date.now() : 0;
       const product = {
         ...productBase,
         nome: row.dataset.fuelProductName || productId,
         ativo: row.querySelector("[data-fuel-enabled]")?.checked !== false,
-        preco: Math.max(0, preco)
+        preco: precoNormalizado
       };
-      if (dataInformada) product.atualizadoEm = dataInformada;
+      if (precoAlterado) {
+        product.atualizadoEm = fuelPanelSaoPauloDate(timestampAlteracao);
+        product.atualizadoEmTimestamp = timestampAlteracao;
+        product.origemAtualizacao = "painel";
+      } else if (dataInformada) product.atualizadoEm = dataInformada;
       else delete product.atualizadoEm;
       combustiveis[productId] = product;
     });
@@ -17455,7 +17462,7 @@ function renderFuelAdminSelectedStations() {
     input.addEventListener("input", () => {
       const row = input.closest("[data-fuel-product-id]");
       const date = row?.querySelector("[data-fuel-date]");
-      if (Number(input.value) > 0 && date && !date.value) date.value = dateKeyFromDate(new Date());
+      if (Number(input.value) > 0 && date) date.value = fuelPanelSaoPauloDate();
     });
   });
 }
@@ -17559,6 +17566,13 @@ function fuelPanelPromotion(value) {
   const start = Number(value.inicioEmTimestamp || 0);
   const end = Number(value.fimEmTimestamp || 0);
   return price > 0 && start > 0 && end > start ? { ...value, ativo: true, preco: price, inicioEmTimestamp: start, fimEmTimestamp: end } : null;
+}
+
+function fuelPanelSaoPauloDate(timestamp = Date.now()) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(new Date(timestamp))
+    .reduce((result, part) => { if (part.type !== "literal") result[part.type] = part.value; return result; }, {});
+  return `${parts.year}-${parts.month}-${parts.day}`;
 }
 
 function fuelPanelDateTime(timestamp) {
@@ -17725,7 +17739,7 @@ async function saveFuelClientPrices(event) {
   if (invalid || !Object.keys(prices).length) { showToast("Confira os precos. A promocao deve ser menor que o valor normal."); return; }
   const button = event.submitter; setBusy(button, true, "Salvando...");
   try {
-    const timestamp = Date.now(); const date = dateKeyFromDate(new Date(timestamp)); const updates = {}; const changes = {};
+    const timestamp = Date.now(); const date = fuelPanelSaoPauloDate(timestamp); const updates = {}; const changes = {};
     Object.entries(prices).forEach(([productId, price]) => {
       const current = fuelAdminProductMap(station)[productId] || {};
       const promotion = fuelClientPromotions[productId] ? { ...fuelClientPromotions[productId], responsavelNome: responsible, atualizadoEmTimestamp: timestamp } : null;

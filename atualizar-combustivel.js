@@ -1,4 +1,4 @@
-// Pagina publica de atualizacao de combustiveis - v6
+// Pagina publica de atualizacao de combustiveis - v7
 (() => {
   const byId = (id) => document.getElementById(id);
   const state = { posto: "", email: "", password: "", station: null, user: null, promotions: {}, editingPromoId: "" };
@@ -61,7 +61,8 @@
   function safeStation(station = {}) {
     const products = Object.entries(station.combustiveis || {}).filter(([, product]) => product && product.ativo !== false).map(([id, product]) => ({
       id, nome: String(product.nome || id), preco: Number(product.preco || 0) || 0,
-      atualizadoEm: String(product.atualizadoEm || ""), promocao: normalizePromotion(product.promocao)
+      atualizadoEm: String(product.atualizadoEm || ""), atualizadoEmTimestamp: Number(product.atualizadoEmTimestamp || 0),
+      origemAtualizacao: String(product.origemAtualizacao || ""), promocao: normalizePromotion(product.promocao)
     }));
     return { id: state.posto, nome: String(station.nomeExibicao || station.razaoSocial || "Posto"), imagem: String(station.imagem || ""), endereco: String(station.endereco || ""), bairro: String(station.bairro || ""), combustiveis: products };
   }
@@ -206,7 +207,7 @@
       updates[`combustiveisHistorico/${state.posto}/${historyId}`] = { postoId: state.posto, postoNome: state.station.nome, origem: "painel", viaLink: true, responsavelNome: responsible, uid: state.user.uid, email: state.email, atualizadoEm: date, atualizadoEmTimestamp: now, precos: prices, alteracoes: changes };
       await db.ref().update(updates);
       localStorage.setItem(`fuel-update-responsible:${state.posto}`, responsible);
-      state.station.combustiveis = state.station.combustiveis.map((product) => ({ ...product, preco: prices[product.id], atualizadoEm: date, promocao: state.promotions[product.id] ? { ...state.promotions[product.id], responsavelNome: responsible, atualizadoEmTimestamp: now } : null }));
+      state.station.combustiveis = state.station.combustiveis.map((product) => ({ ...product, preco: prices[product.id], atualizadoEm: date, atualizadoEmTimestamp: now, origemAtualizacao: "painel", promocao: state.promotions[product.id] ? { ...state.promotions[product.id], responsavelNome: responsible, atualizadoEmTimestamp: now } : null }));
       byId("fuelUpdateConfirm").checked = false; show("success");
     } catch (error) {
       console.error("Falha ao atualizar os precos do posto.", error);

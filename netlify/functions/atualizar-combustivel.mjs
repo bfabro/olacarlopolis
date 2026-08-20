@@ -1,4 +1,4 @@
-// Atualizacao segura de precos de combustiveis por link exclusivo - v1
+// Atualizacao segura de precos de combustiveis por link exclusivo - v2
 
 
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
@@ -69,7 +69,9 @@ function publicStation(station, stationId) {
       id,
       nome: String(product.nome || id),
       preco: Number(product.preco || 0) || 0,
-      atualizadoEm: String(product.atualizadoEm || "")
+      atualizadoEm: String(product.atualizadoEm || ""),
+      atualizadoEmTimestamp: Number(product.atualizadoEmTimestamp || 0),
+      origemAtualizacao: String(product.origemAtualizacao || "")
     }));
   return {
     id: stationId,
@@ -140,9 +142,11 @@ export default async function handler(request) {
     safeStation.combustiveis = safeStation.combustiveis.map((product) => ({
       ...product,
       preco: prices[product.id],
-      atualizadoEm: date
+      atualizadoEm: date,
+      atualizadoEmTimestamp: now,
+      origemAtualizacao: "link"
     }));
-    return response({ success: true, message: "Precos atualizados com sucesso.", posto: safeStation, atualizadoEm: date });
+    return response({ success: true, message: "Precos atualizados com sucesso.", posto: safeStation, atualizadoEm: date, atualizadoEmTimestamp: now });
   } catch (error) {
     console.error("Falha ao atualizar combustiveis por link.", error);
     return response({ success: false, message: "Nao foi possivel atualizar agora. Tente novamente." }, 500);
