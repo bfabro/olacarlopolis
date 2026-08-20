@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 633,
-  label: "v640",
+  numero: 634,
+  label: "v641",
   data: "2026-08-20",
-  nota: "Ordenacao, filtro maximo correto e mascara monetaria na tela publica de veiculos."
+  nota: "Horarios 24h e sincronizacao horaria com Menor Preco / Nota Parana."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -2127,7 +2127,7 @@ function normalizeSchedule(schedule) {
     base[key] = Array.isArray(schedule[key])
       ? schedule[key]
         .filter((slot) => slot && slot.inicio && slot.fim)
-        .map((slot) => ({ inicio: slot.inicio, fim: slot.fim }))
+        .map((slot) => ({ inicio: slot.inicio, fim: slot.fim, ...(slot.vinteQuatroHoras === true ? { vinteQuatroHoras: true } : {}) }))
         .slice(0, 2)
       : [];
   });
@@ -2214,6 +2214,7 @@ function scheduleToText(schedule) {
   return WEEK_DAYS.map(([key, label]) => {
     const slots = data[key] || [];
     if (!slots.length) return `${label}: Fechado`;
+    if (slots.some((slot) => slot.vinteQuatroHoras === true)) return `${label}: 24 horas`;
     return `${label}: ${slots.map((s) => `${s.inicio} as ${s.fim}`).join(" / ")}`;
   }).join("<br>");
 }
@@ -17152,6 +17153,10 @@ function collectFuelAdminStationsFromForm() {
     card.querySelectorAll("[data-fuel-schedule-day]").forEach((row) => {
       const day = row.dataset.fuelScheduleDay;
       if (!day || row.querySelector("[data-fuel-schedule-open]")?.checked !== true) return;
+      if (row.querySelector("[data-fuel-schedule-all-day]")?.checked === true) {
+        horarios[day] = [{ inicio: "00:00", fim: "23:59", vinteQuatroHoras: true }];
+        return;
+      }
       const slots = [];
       [0, 1].forEach((index) => {
         const inicio = row.querySelector(`[data-fuel-schedule-slot="${index}"][data-field="inicio"]`)?.value || "";
@@ -17164,6 +17169,7 @@ function collectFuelAdminStationsFromForm() {
       ...base,
       codigoSIMP: id,
       nomeExibicao: card.querySelector("[data-fuel-station-name]")?.value.trim() || base.razaoSocial || "Posto",
+      menorPrecoCodigo: card.querySelector("[data-fuel-menor-preco-code]")?.value.trim() || "",
       imagem: card.querySelector("[data-fuel-station-image]")?.value.trim() || "",
       ativo: card.querySelector("[data-fuel-station-active]")?.checked !== false,
       horarios,
@@ -17265,11 +17271,12 @@ function renderFuelAdminSchedule(station) {
       ${WEEK_DAYS.map(([key, label]) => {
         const slots = schedule[key] || [];
         const open = slots.length > 0;
+        const allDay = slots.some((slot) => slot.vinteQuatroHoras === true);
         return `<div class="fuel-admin-schedule-day ${open ? "" : "closed"}" data-fuel-schedule-day="${key}">
-          <label><input type="checkbox" data-fuel-schedule-open ${open ? "checked" : ""}> <strong>${label}</strong></label>
+          <div class="fuel-admin-schedule-head"><label><input type="checkbox" data-fuel-schedule-open ${open ? "checked" : ""}> <strong>${label}</strong></label><label class="fuel-admin-schedule-all-day"><input type="checkbox" data-fuel-schedule-all-day ${allDay ? "checked" : ""} ${open ? "" : "disabled"}> 24 horas</label></div>
           <div class="fuel-admin-schedule-periods">
-            <input type="time" data-fuel-schedule-slot="0" data-field="inicio" value="${escapeAttr(slots[0]?.inicio || "")}" ${open ? "" : "disabled"}><span>às</span><input type="time" data-fuel-schedule-slot="0" data-field="fim" value="${escapeAttr(slots[0]?.fim || "")}" ${open ? "" : "disabled"}>
-            <small>2º período</small><input type="time" data-fuel-schedule-slot="1" data-field="inicio" value="${escapeAttr(slots[1]?.inicio || "")}" ${open ? "" : "disabled"}><span>às</span><input type="time" data-fuel-schedule-slot="1" data-field="fim" value="${escapeAttr(slots[1]?.fim || "")}" ${open ? "" : "disabled"}>
+            <input type="time" data-fuel-schedule-slot="0" data-field="inicio" value="${escapeAttr(allDay ? "" : (slots[0]?.inicio || ""))}" ${open && !allDay ? "" : "disabled"}><span>às</span><input type="time" data-fuel-schedule-slot="0" data-field="fim" value="${escapeAttr(allDay ? "" : (slots[0]?.fim || ""))}" ${open && !allDay ? "" : "disabled"}>
+            <small>2º período</small><input type="time" data-fuel-schedule-slot="1" data-field="inicio" value="${escapeAttr(allDay ? "" : (slots[1]?.inicio || ""))}" ${open && !allDay ? "" : "disabled"}><span>às</span><input type="time" data-fuel-schedule-slot="1" data-field="fim" value="${escapeAttr(allDay ? "" : (slots[1]?.fim || ""))}" ${open && !allDay ? "" : "disabled"}>
           </div>
         </div>`;
       }).join("")}
@@ -17309,6 +17316,7 @@ function renderFuelAdminSelectedStations() {
       ${renderFuelAdminLinkBox(id)}
       <div class="fuel-admin-station-settings">
         <label>Nome exibido<input data-fuel-station-name value="${escapeAttr(station.nomeExibicao || station.razaoSocial || "")}"></label>
+        <label>Identificador Menor Preço<input data-fuel-menor-preco-code value="${escapeAttr(station.menorPrecoCodigo || "")}" placeholder="Identificado automaticamente"><small>${station.menorPrecoVerificadoEm ? `Verificado em ${escapeHtml(fuelPanelDateTime(station.menorPrecoVerificadoEm))}` : "Será vinculado por nome e endereço na primeira atualização."}</small></label>
         <label>Foto do posto (URL)<input data-fuel-station-image type="url" value="${escapeAttr(station.imagem || "")}" placeholder="https://..."></label>
         <label class="fuel-admin-image-upload"><span>Enviar foto</span><input data-fuel-station-image-upload type="file" accept="image/*"></label>
         <label class="check-row"><input data-fuel-station-active type="checkbox" ${station.ativo !== false ? "checked" : ""}> Publicar este posto</label>
@@ -17382,8 +17390,16 @@ function renderFuelAdminSelectedStations() {
       const row = input.closest("[data-fuel-schedule-day]");
       row?.classList.toggle("closed", !input.checked);
       row?.querySelectorAll('input[type="time"]').forEach((timeInput) => {
-        timeInput.disabled = !input.checked;
+        timeInput.disabled = !input.checked || row.querySelector("[data-fuel-schedule-all-day]")?.checked === true;
       });
+      const allDay = row?.querySelector("[data-fuel-schedule-all-day]");
+      if (allDay) allDay.disabled = !input.checked;
+    });
+  });
+  box.querySelectorAll("[data-fuel-schedule-all-day]").forEach((input) => {
+    input.addEventListener("change", () => {
+      const row = input.closest("[data-fuel-schedule-day]");
+      row?.querySelectorAll('input[type="time"]').forEach((timeInput) => { timeInput.disabled = input.checked; });
     });
   });
   box.querySelectorAll("[data-fuel-station-image]").forEach((input) => {
@@ -17450,6 +17466,7 @@ function renderFuelAdminSettings() {
   $("fuelAdminActive").checked = config.ativo === true;
   $("fuelAdminCity").value = config.cidade || "CARLOPOLIS";
   $("fuelAdminUf").value = config.uf || "PR";
+  if ($("fuelAdminMenorPrecoAutomatico")) $("fuelAdminMenorPrecoAutomatico").checked = config.menorPrecoAutomatico !== false;
   renderFuelAdminSelectedStations();
   renderFuelAdminSearchResults();
   renderFuelHistory("fuelAdminHistory");
@@ -17505,7 +17522,9 @@ async function saveFuelAdminSettings() {
     ativo: $("fuelAdminActive")?.checked === true,
     cidade,
     uf,
-    fonte: "ANP - cadastro de revendedores; preços confirmados pelo Admin Master",
+    fonte: "ANP - cadastro de revendedores; Menor Preco / Nota Parana e atualizacao manual dos postos",
+    menorPrecoAutomatico: $("fuelAdminMenorPrecoAutomatico")?.checked !== false,
+    menorPrecoRaioKm: Number(state.combustiveisConfig?.menorPrecoRaioKm || 10),
     postos: collectFuelAdminStationsFromForm(),
     updatedAt: Date.now(),
     updatedBy: state.user?.uid || ""
@@ -17601,7 +17620,8 @@ function renderFuelHistory(mountId, stationId = "", forceOpen = false) {
       <div class="fuel-history-table-wrap"><table class="fuel-history-table"><thead><tr>${fuelHistorySortHeader("time", "Data e horario", filters)}${fuelHistorySortHeader("responsible", "Responsavel", filters)}${stationId ? "" : fuelHistorySortHeader("station", "Posto", filters)}${fuelHistorySortHeader("product", "Combustivel", filters)}${fuelHistorySortHeader("before", "Anterior", filters)}${fuelHistorySortHeader("after", "Novo valor", filters)}${fuelHistorySortHeader("promo", "Promocao", filters)}</tr></thead><tbody>${visible.length ? visible.map((row) => {
         const change = row.change || {};
         const promo = fuelPanelPromotion(change.promocaoNova);
-        return `<tr><td>${escapeHtml(fuelPanelDateTime(row.atualizadoEmTimestamp))}</td><td><strong>${escapeHtml(row.responsavelNome || "Nao informado")}</strong>${row.viaLink ? "<small>Via link</small>" : "<small>Area do posto</small>"}</td>${stationId ? "" : `<td>${escapeHtml(row.postoNome || row.stationId || "Posto")}</td>`}<td>${escapeHtml(change.nome || row.productId)}</td><td>${change.precoAnterior === null || change.precoAnterior === undefined ? "-" : `R$ ${Number(change.precoAnterior).toFixed(3).replace(".", ",")}`}</td><td><strong>R$ ${Number(change.precoNovo ?? row.precos?.[row.productId] ?? 0).toFixed(3).replace(".", ",")}</strong></td><td>${promo ? `<span class="fuel-history-promo">R$ ${Number(promo.preco).toFixed(3).replace(".", ",")}<small>ate ${escapeHtml(fuelPanelDateTime(promo.fimEmTimestamp))}</small></span>` : "Sem promocao"}</td></tr>`;
+        const sourceLabel = row.origem === "nota-parana" ? "Automatico Nota Parana" : (row.viaLink ? "Via link" : "Area do posto");
+        return `<tr><td>${escapeHtml(fuelPanelDateTime(row.atualizadoEmTimestamp))}</td><td><strong>${escapeHtml(row.responsavelNome || "Nao informado")}</strong><small>${sourceLabel}</small></td>${stationId ? "" : `<td>${escapeHtml(row.postoNome || row.stationId || "Posto")}</td>`}<td>${escapeHtml(change.nome || row.productId)}</td><td>${change.precoAnterior === null || change.precoAnterior === undefined ? "-" : `R$ ${Number(change.precoAnterior).toFixed(3).replace(".", ",")}`}</td><td><strong>R$ ${Number(change.precoNovo ?? row.precos?.[row.productId] ?? 0).toFixed(3).replace(".", ",")}</strong></td><td>${promo ? `<span class="fuel-history-promo">R$ ${Number(promo.preco).toFixed(3).replace(".", ",")}<small>ate ${escapeHtml(fuelPanelDateTime(promo.fimEmTimestamp))}</small></span>` : "Sem promocao"}</td></tr>`;
       }).join("") : '<tr><td colspan="7" class="fuel-history-empty">Nenhuma alteracao encontrada para os filtros.</td></tr>'}</tbody></table></div>
     </div>
   </details>`;

@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=393">
+  <link rel="stylesheet" href="painel.css?v=394">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1981,6 +1981,10 @@
               <input id="fuelAdminActive" type="checkbox">
               Exibir Preço Combustível no menu do site público
             </label>
+            <label class="check-row wide">
+              <input id="fuelAdminMenorPrecoAutomatico" type="checkbox" checked>
+              Atualizar automaticamente a cada 1 hora com o Menor Preço / Nota Paraná
+            </label>
             <label>Cidade configurada
               <input id="fuelAdminCity" maxlength="80" placeholder="CARLOPOLIS" required>
             </label>
@@ -1993,7 +1997,7 @@
             </div>
             <div class="wide fuel-admin-source-note">
               <i class="fa-solid fa-circle-info"></i>
-              <span>A ANP fornece cadastro, endereço e combustíveis autorizados de cada posto. Os preços e suas datas são confirmados neste painel antes da publicação.</span>
+              <span>A ANP fornece o cadastro dos postos. Os valores são verificados a cada hora no Menor Preço / Nota Paraná e também podem ser atualizados manualmente pelo link exclusivo de cada posto.</span>
             </div>
             <div id="fuelAdminSelectedStations" class="wide fuel-admin-selected"></div>
           </form>
@@ -2143,6 +2147,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=568"></script>
+  <script type="module" src="painel.js?v=569"></script>
 </body>
 </html>

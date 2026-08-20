@@ -9086,3 +9086,10 @@ button.admin-button-loading::after {
 .fuel-manual-product-badge { display: inline-flex; margin-left: 6px; padding: 3px 7px; border-radius: 999px; color: #08728c; background: #cffafe; font-size: .62rem; font-weight: 900; text-transform: uppercase; }
 .fuel-remove-manual-product { min-height: 40px; padding: 8px 10px; border: 1px solid #efc5c5; border-radius: 9px; color: #b42323; background: #fff7f7; font-weight: 800; cursor: pointer; }
 @media (max-width: 760px) { .fuel-admin-products-section > header { align-items: stretch; flex-direction: column; } .fuel-admin-add-product-controls { align-items: stretch; flex-direction: column; min-width: 0; } .fuel-admin-add-product-controls select, .fuel-admin-add-product { width: 100%; } .fuel-admin-product.is-manual-product { grid-template-columns: 1fr; } .fuel-remove-manual-product { width: 100%; } }
+/* Menor Preco / Nota Parana e horarios 24h - v394 */
+.fuel-admin-schedule-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.fuel-admin-schedule-head label { display: inline-flex; align-items: center; gap: 7px; color: #29465f; font-size: .76rem; }
+.fuel-admin-schedule-all-day { padding: 5px 8px; border-radius: 999px; color: #08728c !important; background: #ecfeff; font-weight: 850; cursor: pointer; }
+.fuel-admin-schedule-all-day input { accent-color: #0891b2; }
+.fuel-admin-station-settings label small { color: #718196; font-size: .66rem; font-weight: 650; line-height: 1.35; }
+@media (max-width: 480px) { .fuel-admin-schedule-head { align-items: flex-start; flex-direction: column; } }
