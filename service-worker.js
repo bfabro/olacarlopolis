@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-18-combustiveis-anp-sem-cache-v686'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-20-veiculos-filtro-preco-v687'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

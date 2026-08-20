@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v593.
+// Release do site v594.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -13026,6 +13026,17 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
   }
 
+  function formatarFiltroValorAutomoveis(valor) {
+    const numero = numeroAutomoveis(valor);
+    if (!numero) return "";
+    return numero.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
   function imagensAutomovelPublico(item) {
     const valores = [];
     const adicionar = (valor) => {
@@ -13680,7 +13691,8 @@ plotarPinsImoveis(stateImoveis.filtered);
             <div class="campo"><label>Marca</label><select id="autoFiltroMarca"><option value="">Todas</option></select></div>
             <div class="campo"><label>Modelo</label><select id="autoFiltroModelo"><option value="">Todos</option></select></div>
             <div class="campo"><label>Ano</label><input id="autoFiltroAno" placeholder="Ex: 2020"></div>
-            <div class="campo"><label>Valor ate</label><input id="autoFiltroValor" placeholder="Ex: 50000"></div>
+            <div class="campo"><label>Valor ate</label><input id="autoFiltroValor" inputmode="numeric" autocomplete="off" placeholder="Ex: R$ 20.000,00"></div>
+            <div class="campo"><label>Ordenar por preco</label><select id="autoOrdenacaoPreco"><option value="">Sem ordenacao</option><option value="preco_asc">Menor preco</option><option value="preco_desc">Maior preco</option></select></div>
             <div class="campo"><label>Vendedor</label><select id="autoFiltroVendedor"><option value="">Todos</option></select></div>
             <div class="campo"><label>Novo/usado</label><select id="autoFiltroCondicao"><option value="">Todos</option></select></div>
             <div class="campo"><label>KM ate</label><input id="autoFiltroKm" placeholder="Ex: 80000"></div>
@@ -13775,6 +13787,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         km: numeroAutomoveis(document.getElementById("autoFiltroKm")?.value || ""),
         combustivel: document.getElementById("autoFiltroCombustivel")?.value || "",
         cambio: document.getElementById("autoFiltroCambio")?.value || "",
+        ordenacao: document.getElementById("autoOrdenacaoPreco")?.value || "",
         busca: normalizarTextoAutomoveis(document.getElementById("autoFiltroBusca")?.value || "")
       };
       const filtrados = lista.filter((item) => {
@@ -13786,7 +13799,10 @@ plotarPinsImoveis(stateImoveis.filtered);
         }
         if (filtros.modelo && item.modelo !== filtros.modelo) return false;
         if (filtros.ano && !normalizarTextoAutomoveis(item.ano).includes(filtros.ano)) return false;
-        if (filtros.valor && numeroAutomoveis(item.preco) > filtros.valor) return false;
+        if (filtros.valor) {
+          const preco = numeroAutomoveis(item.preco);
+          if (!preco || preco > filtros.valor) return false;
+        }
         if (filtros.vendedor && (item.vendedor || item.loja) !== filtros.vendedor) return false;
         if (filtros.condicao && item.condicao !== filtros.condicao) return false;
         if (filtros.km && numeroAutomoveis(item.km) > filtros.km) return false;
@@ -13795,6 +13811,16 @@ plotarPinsImoveis(stateImoveis.filtered);
         if (filtros.busca && !hay.includes(filtros.busca)) return false;
         return true;
       });
+      if (filtros.ordenacao) {
+        filtrados.sort((a, b) => {
+          const precoA = numeroAutomoveis(a.preco);
+          const precoB = numeroAutomoveis(b.preco);
+          if (!precoA && !precoB) return 0;
+          if (!precoA) return 1;
+          if (!precoB) return -1;
+          return filtros.ordenacao === "preco_desc" ? precoB - precoA : precoA - precoB;
+        });
+      }
       atualizarTotalAutomoveis(filtrados.length);
       renderAutomoveisCards(filtrados, box);
     };
@@ -13805,6 +13831,18 @@ plotarPinsImoveis(stateImoveis.filtered);
     });
     document.getElementById("autoFiltroTipo")?.addEventListener("change", () => preencherFiltroMarca(false));
     document.getElementById("autoModoCards")?.addEventListener("change", aplicarModoCards);
+    const filtroValor = document.getElementById("autoFiltroValor");
+    filtroValor?.addEventListener("focus", () => {
+      const valor = numeroAutomoveis(filtroValor.value);
+      filtroValor.value = valor ? String(valor).replace(/\D/g, "") : "";
+    });
+    filtroValor?.addEventListener("input", () => {
+      filtroValor.value = filtroValor.value.replace(/\D/g, "");
+    });
+    filtroValor?.addEventListener("blur", () => {
+      filtroValor.value = formatarFiltroValorAutomoveis(filtroValor.value);
+      aplicar();
+    });
     document.querySelectorAll("#filtrosAutomoveis input:not(#autoModoCards), #filtrosAutomoveis select").forEach((el) => {
       el.addEventListener("input", aplicar);
       el.addEventListener("change", aplicar);
