@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 636,
-  label: "v643",
+  numero: 637,
+  label: "v644",
   data: "2026-08-20",
-  nota: "Data e hora automaticas em toda atualizacao manual de combustiveis."
+  nota: "Intervalo configuravel da sincronizacao automatica de combustiveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -17474,6 +17474,8 @@ function renderFuelAdminSettings() {
   $("fuelAdminCity").value = config.cidade || "CARLOPOLIS";
   $("fuelAdminUf").value = config.uf || "PR";
   if ($("fuelAdminMenorPrecoAutomatico")) $("fuelAdminMenorPrecoAutomatico").checked = config.menorPrecoAutomatico !== false;
+  const intervaloAutomatico = [15, 30, 60].includes(Number(config.menorPrecoIntervaloMinutos)) ? Number(config.menorPrecoIntervaloMinutos) : 60;
+  if ($("fuelAdminMenorPrecoIntervaloMinutos")) $("fuelAdminMenorPrecoIntervaloMinutos").value = String(intervaloAutomatico);
   renderFuelAdminSelectedStations();
   renderFuelAdminSearchResults();
   renderFuelHistory("fuelAdminHistory");
@@ -17531,6 +17533,7 @@ async function saveFuelAdminSettings() {
     uf,
     fonte: "ANP - cadastro de revendedores; Menor Preco / Nota Parana e atualizacao manual dos postos",
     menorPrecoAutomatico: $("fuelAdminMenorPrecoAutomatico")?.checked !== false,
+    menorPrecoIntervaloMinutos: [15, 30, 60].includes(Number($("fuelAdminMenorPrecoIntervaloMinutos")?.value)) ? Number($("fuelAdminMenorPrecoIntervaloMinutos").value) : 60,
     menorPrecoRaioKm: Number(state.combustiveisConfig?.menorPrecoRaioKm || 10),
     postos: collectFuelAdminStationsFromForm(),
     updatedAt: Date.now(),

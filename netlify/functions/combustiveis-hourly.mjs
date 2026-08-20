@@ -1,8 +1,9 @@
-/* Sincronizacao horaria de combustiveis com Menor Preco / Nota Parana - v1 */
+/* Sincronizacao configuravel de combustiveis com Menor Preco / Nota Parana - v2 */
 const MENOR_PRECO_API = "https://menorpreco.notaparana.pr.gov.br/api/v1";
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
 const DEFAULT_RADIUS_KM = 10;
 const FUEL_TYPES = [1, 2, 3, 4, 5];
+const AUTO_INTERVAL_MINUTES = [15, 30, 60];
 const GEOHASH_ALPHABET = "0123456789bcdefghjkmnpqrstuvwxyz";
 
 function env(name) {
@@ -199,6 +200,14 @@ export default async function handler() {
     console.log("Sincronizacao do Menor Preco desativada.");
     return new Response(null, { status: 204 });
   }
+  const intervalMinutes = AUTO_INTERVAL_MINUTES.includes(Number(config.menorPrecoIntervaloMinutos)) ? Number(config.menorPrecoIntervaloMinutos) : 60;
+  const now = Date.now();
+  const lastConsultation = Number(config.menorPrecoUltimaConsultaEm || 0);
+  const elapsed = now - lastConsultation;
+  if (lastConsultation > 0 && elapsed >= 0 && elapsed + 30000 < intervalMinutes * 60000) {
+    console.log(`Menor Preco aguardando intervalo de ${intervalMinutes} minuto(s).`);
+    return new Response(null, { status: 204 });
+  }
   const stationEntries = Object.entries(config.postos || {}).filter(([, station]) => station && station.ativo !== false);
   if (!stationEntries.length) return new Response(null, { status: 204 });
 
@@ -211,7 +220,6 @@ export default async function handler() {
     ...FUEL_TYPES.map((type) => menorPrecoJson("produtos", { ...baseParameters, data: 6, tp_comb: type, offset: 0 }))
   ]);
   const records = productPayloads.flatMap((payload) => Array.isArray(payload.produtos) ? payload.produtos : []);
-  const now = Date.now();
   const updates = {
     "configuracoes/combustiveis/menorPrecoUltimaConsultaEm": now,
     "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": "ok",
@@ -284,5 +292,5 @@ export default async function handler() {
 }
 
 export const config = {
-  schedule: "@hourly"
+  schedule: "*/15 * * * *"
 };

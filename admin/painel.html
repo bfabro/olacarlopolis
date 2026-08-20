@@ -1983,7 +1983,14 @@
             </label>
             <label class="check-row wide">
               <input id="fuelAdminMenorPrecoAutomatico" type="checkbox" checked>
-              Atualizar automaticamente a cada 1 hora com o Menor Preço / Nota Paraná
+              Atualizar automaticamente com o Menor Preço / Nota Paraná
+            </label>
+            <label class="wide">Intervalo da atualização automática
+              <select id="fuelAdminMenorPrecoIntervaloMinutos">
+                <option value="15">A cada 15 minutos</option>
+                <option value="30">A cada 30 minutos</option>
+                <option value="60" selected>A cada 1 hora</option>
+              </select>
             </label>
             <label>Cidade configurada
               <input id="fuelAdminCity" maxlength="80" placeholder="CARLOPOLIS" required>
@@ -1997,7 +2004,7 @@
             </div>
             <div class="wide fuel-admin-source-note">
               <i class="fa-solid fa-circle-info"></i>
-              <span>A ANP fornece o cadastro dos postos. Os valores são verificados a cada hora no Menor Preço / Nota Paraná e também podem ser atualizados manualmente pelo link exclusivo de cada posto.</span>
+              <span>A ANP fornece o cadastro dos postos. Os valores são verificados no intervalo escolhido no Menor Preço / Nota Paraná e também podem ser atualizados manualmente pelo link exclusivo de cada posto.</span>
             </div>
             <div id="fuelAdminSelectedStations" class="wide fuel-admin-selected"></div>
           </form>
@@ -2147,6 +2154,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=571"></script>
+  <script type="module" src="painel.js?v=572"></script>
 </body>
 </html>
