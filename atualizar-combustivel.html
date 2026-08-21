@@ -8,7 +8,7 @@
   <title>Atualizar pre&ccedil;os dos combust&iacute;veis | Ol&aacute; Carl&oacute;polis</title>
   <link rel="icon" href="images/img_padrao_site/favicon.ico">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="atualizar-combustivel.css?v=5">
+  <link rel="stylesheet" href="atualizar-combustivel.css?v=6">
 </head>
 <body>
   <main class="fuel-update-shell">
@@ -68,17 +68,16 @@
       <button id="fuelPromoClose" class="fuel-promo-close" type="button" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
       <span class="fuel-promo-kicker"><i class="fa-solid fa-tag"></i> Pre&ccedil;o promocional</span>
       <h2 id="fuelPromoTitle">Configurar promo&ccedil;&atilde;o</h2>
-      <p>O valor promocional ser&aacute; exibido somente durante o per&iacute;odo informado.</p>
+      <p>A promo&ccedil;&atilde;o ser&aacute; exibida nos dias selecionados e ficar&aacute; ativa at&eacute; 23:59 de cada dia.</p>
+      <div class="fuel-promo-current"><span>Pre&ccedil;o atual para confer&ecirc;ncia</span><strong id="fuelPromoCurrentValue">R$ 0,000</strong></div>
       <div class="fuel-promo-fields">
         <label>Pre&ccedil;o da promo&ccedil;&atilde;o (R$)<input id="fuelPromoPrice" type="text" inputmode="decimal" placeholder="0,000"></label>
         <label class="wide">Descri&ccedil;&atilde;o da promo&ccedil;&atilde;o<textarea id="fuelPromoDescription" maxlength="240" rows="3" placeholder="Ex.: Abaste&ccedil;a acima de 20 litros e aproveite"></textarea></label>
         <label>Tipo de desconto<select id="fuelPromoDiscountType"><option value="">N&atilde;o informar</option><option value="percentual">Percentual (%)</option><option value="valor">Valor (R$)</option></select></label>
         <label>Valor do desconto<input id="fuelPromoDiscountValue" type="text" inputmode="decimal" placeholder="Ex.: 10 ou 0,50"></label>
-        <label>In&iacute;cio<input id="fuelPromoStart" type="datetime-local"></label>
-        <label>Validade<input id="fuelPromoEnd" type="datetime-local"></label>
         <fieldset class="fuel-promo-weekdays wide">
           <legend>Dias da semana</legend>
-          <p>Se nenhum dia for marcado, a promo&ccedil;&atilde;o aparecer&aacute; todos os dias. Para uma oferta toda sexta, marque apenas Sexta.</p>
+          <p>Selecione pelo menos um dia. Para uma oferta toda sexta, marque apenas Sexta.</p>
           <div>
             <label><input type="checkbox" name="fuelPromoWeekday" value="0"> Dom</label>
             <label><input type="checkbox" name="fuelPromoWeekday" value="1"> Seg</label>
@@ -93,6 +92,6 @@
       <div class="fuel-promo-actions"><button id="fuelPromoCancel" type="button">Cancelar</button><button id="fuelPromoSave" type="button"><i class="fa-solid fa-check"></i> Aplicar promo&ccedil;&atilde;o</button></div>
     </div>
   </div>
-  <script defer src="atualizar-combustivel.js?v=9"></script>
+  <script defer src="atualizar-combustivel.js?v=10"></script>
 </body>
 </html>

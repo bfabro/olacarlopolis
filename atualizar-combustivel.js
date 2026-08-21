@@ -58,8 +58,9 @@
     const days = [...new Set((Array.isArray(promotion.diasSemana) ? promotion.diasSemana : []).map(Number).filter((day) => day >= 0 && day <= 6))];
     const discountType = ["percentual", "valor"].includes(promotion.descontoTipo) ? promotion.descontoTipo : "";
     const discountValue = parsePrice(promotion.descontoValor);
-    return price > 0 && start > 0 && end > start ? {
-      ativo: true, preco: price, inicioEmTimestamp: start, fimEmTimestamp: end,
+    const recurring = days.length > 0;
+    return price > 0 && (recurring || (start > 0 && end > start)) ? {
+      ativo: true, preco: price, inicioEmTimestamp: recurring ? 0 : start, fimEmTimestamp: recurring ? 0 : end,
       descricao: String(promotion.descricao || "").trim().slice(0, 240),
       diasSemana: days, descontoTipo: discountType, descontoValor: discountType ? discountValue : 0
     } : null;
@@ -94,7 +95,7 @@
 
   function promotionSummary(productId) {
     const promotion = state.promotions[productId];
-    return promotion ? `<span class="fuel-promo-summary"><i class="fa-solid fa-tag"></i> R$ ${Number(promotion.preco).toFixed(3).replace(".", ",")} - ${escapeHtml(promotionWeekdaysLabel(promotion.diasSemana))} - ate ${escapeHtml(dateTimeLabel(promotion.fimEmTimestamp))}</span>` : "";
+    return promotion ? `<span class="fuel-promo-summary"><i class="fa-solid fa-tag"></i> R$ ${Number(promotion.preco).toFixed(3).replace(".", ",")} - ${escapeHtml(promotionWeekdaysLabel(promotion.diasSemana))} - até 23:59 no dia</span>` : "";
   }
 
   function bindProductActions() {
@@ -139,10 +140,11 @@
     byId("fuelPromoDescription").value = promotion?.descricao || "";
     byId("fuelPromoDiscountType").value = promotion?.descontoTipo || "";
     byId("fuelPromoDiscountValue").value = promotion?.descontoValor ? String(promotion.descontoValor).replace(".", ",") : "";
+    const currentInput = byId("fuelUpdateProducts")?.querySelector(`[data-product-id="${CSS.escape(productId)}"] [data-price]`);
+    const currentPrice = parsePrice(currentInput?.value) || parsePrice(product?.preco);
+    byId("fuelPromoCurrentValue").textContent = currentPrice > 0 ? `R$ ${currentPrice.toFixed(3).replace(".", ",")}` : "Nao informado";
     const selectedDays = new Set((promotion?.diasSemana || []).map(Number));
     document.querySelectorAll('input[name="fuelPromoWeekday"]').forEach((input) => { input.checked = selectedDays.has(Number(input.value)); });
-    byId("fuelPromoStart").value = localDateTimeValue(promotion?.inicioEmTimestamp || Date.now());
-    byId("fuelPromoEnd").value = localDateTimeValue(promotion?.fimEmTimestamp || (Date.now() + 86400000));
     byId("fuelPromoModal").classList.remove("hidden");
     byId("fuelPromoPrice").focus();
   }
@@ -160,19 +162,17 @@
     const discountType = String(byId("fuelPromoDiscountType")?.value || "");
     const discountValue = parsePrice(byId("fuelPromoDiscountValue")?.value);
     const days = [...document.querySelectorAll('input[name="fuelPromoWeekday"]:checked')].map((input) => Number(input.value));
-    const start = new Date(byId("fuelPromoStart")?.value || "").getTime();
-    const end = new Date(byId("fuelPromoEnd")?.value || "").getTime();
     const regular = parsePrice(byId("fuelUpdateProducts")?.querySelector(`[data-product-id="${CSS.escape(state.editingPromoId)}"] [data-price]`)?.value);
     if (!(price > 0 && price <= 99.999)) { alert("Informe um preco promocional valido."); return; }
     if (regular > 0 && price >= regular) { alert("O preco promocional deve ser menor que o valor normal."); return; }
     if (discountType && !(discountValue > 0)) { alert("Informe o valor do desconto."); return; }
     if (discountType === "percentual" && discountValue > 100) { alert("O desconto percentual nao pode ser maior que 100%."); return; }
     if (discountType === "valor" && regular > 0 && discountValue >= regular) { alert("O desconto em reais deve ser menor que o preco normal."); return; }
-    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) { alert("A validade deve ser posterior ao inicio da promocao."); return; }
+    if (!days.length) { alert("Selecione pelo menos um dia da semana para a promocao."); return; }
     state.promotions[state.editingPromoId] = {
       ativo: true, preco: price, descricao: description, diasSemana: days,
       descontoTipo: discountType, descontoValor: discountType ? discountValue : 0,
-      inicioEmTimestamp: start, fimEmTimestamp: end
+      inicioEmTimestamp: 0, fimEmTimestamp: 0
     };
     closePromoModal();
     renderStation(state.station, false);

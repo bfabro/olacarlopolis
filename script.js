@@ -28889,7 +28889,7 @@ function renderFuelHomeTicker(config = fuelPublicConfig()) {
   ticker.classList.toggle("hidden", !visible);
   ticker.setAttribute("aria-hidden", visible ? "false" : "true");
   if (!visible) { track.innerHTML = ""; return; }
-  const items = cheapest.map((item) => `<span class="fuel-home-ticker-item"><span class="fuel-home-ticker-price-line"><strong>${fuelPublicEscape(item.label)}</strong><b>${fuelPublicMoney(item.price)}</b>${item.promotion ? `<em>Promo</em>` : ""}</span><small>${fuelPublicEscape(item.station.nomeExibicao || item.station.razaoSocial || "Posto")}</small></span>`).join("");
+  const items = cheapest.map((item) => `<span class="fuel-home-ticker-item ${item.promotion ? "is-promotional" : ""}"><span class="fuel-home-ticker-price-line"><strong>${fuelPublicEscape(item.label)}</strong><b>${fuelPublicMoney(item.price)}</b>${item.promotion ? `<em>Promo</em>` : ""}</span><small>${fuelPublicEscape(item.station.nomeExibicao || item.station.razaoSocial || "Posto")}</small></span>`).join("");
   track.innerHTML = `<span class="fuel-home-ticker-group">${items}</span><span class="fuel-home-ticker-group" aria-hidden="true">${items}</span>`;
 }
 let fuelPublicPromotionTimer = 0;
@@ -28992,10 +28992,15 @@ function fuelPublicActivePromotion(product, timestamp = Date.now()) {
   const price = fuelPublicPrice(promotion.preco);
   const start = Number(promotion.inicioEmTimestamp || 0);
   const end = Number(promotion.fimEmTimestamp || 0);
-  if (!(price > 0) || !(start > 0) || !(end > start) || timestamp < start || timestamp > end) return null;
   const days = Array.isArray(promotion.diasSemana) ? [...new Set(promotion.diasSemana.map(Number).filter((day) => day >= 0 && day <= 6))] : [];
-  if (days.length && !days.includes(fuelPublicSaoPauloWeekday(timestamp))) return null;
-  return { ...promotion, preco: price, inicioEmTimestamp: start, fimEmTimestamp: end };
+  const recurring = days.length > 0;
+  if (!(price > 0)) return null;
+  if (recurring) {
+    if (!days.includes(fuelPublicSaoPauloWeekday(timestamp))) return null;
+  } else if (!(start > 0) || !(end > start) || timestamp < start || timestamp > end) {
+    return null;
+  }
+  return { ...promotion, preco: price, inicioEmTimestamp: recurring ? 0 : start, fimEmTimestamp: recurring ? 0 : end };
 }
 
 function fuelPublicPromotionDays(promotion) {
@@ -29008,19 +29013,23 @@ function fuelPublicPromotionDiscount(promotion) {
   const value = Number(promotion?.descontoValor || 0);
   if (!(value > 0)) return "";
   return promotion.descontoTipo === "percentual"
-    ? `${value.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}% de desconto`
-    : promotion.descontoTipo === "valor" ? `${fuelPublicMoney(value)} de desconto` : "";
+    ? `Desconto de ${value.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`
+    : promotion.descontoTipo === "valor"
+      ? `Desconto de R$ ${value.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+      : "";
 }
 
 function fuelPublicPromotionDetails(promotion) {
   const description = String(promotion?.descricao || "").trim();
   const discount = fuelPublicPromotionDiscount(promotion);
+  const recurring = Array.isArray(promotion?.diasSemana) && promotion.diasSemana.length > 0;
   return `${description ? `<small class="fuel-promo-description">${fuelPublicEscape(description)}</small>` : ""}
     ${discount ? `<small class="fuel-promo-discount">${fuelPublicEscape(discount)}</small>` : ""}
-    <small>Disponivel: ${fuelPublicEscape(fuelPublicPromotionDays(promotion))} - Valido ate ${fuelPublicEscape(fuelPublicPromotionValidity(promotion))}</small>`;
+    <small class="fuel-promo-validity">Oferta válida hoje até 23:59${recurring ? ` - repete: ${fuelPublicEscape(fuelPublicPromotionDays(promotion))}` : ""}</small>`;
 }
 
 function fuelPublicPromotionValidity(promotion) {
+  if (Array.isArray(promotion?.diasSemana) && promotion.diasSemana.length) return "hoje às 23:59";
   if (!promotion?.fimEmTimestamp) return "";
   return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(promotion.fimEmTimestamp));
 }

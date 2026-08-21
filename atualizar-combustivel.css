@@ -81,6 +81,9 @@ button, input { font: inherit; }
 .fuel-promo-kicker { display: inline-flex; align-items: center; gap: 7px; color: #b65600; font-size: .75rem; font-weight: 900; text-transform: uppercase; letter-spacing: .05em; }
 .fuel-promo-dialog h2 { margin: 7px 42px 5px 0; color: #102d49; font-size: 1.3rem; }
 .fuel-promo-dialog > p { margin: 0 0 18px; color: #60758a; font-size: .84rem; }
+.fuel-promo-current { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 0 16px; padding: 11px 13px; border: 1px solid #b9d9f3; border-radius: 11px; color: #29445d; background: #eef8ff; }
+.fuel-promo-current span { font-size: .77rem; font-weight: 800; }
+.fuel-promo-current strong { color: #0878df; font-size: 1.05rem; white-space: nowrap; }
 .fuel-promo-fields { display: grid; gap: 12px; }
 .fuel-promo-fields label { display: grid; gap: 6px; color: #29445d; font-size: .77rem; font-weight: 850; }
 .fuel-promo-fields input { min-height: 46px; padding: 9px 11px; border: 1px solid #bdcddd; border-radius: 10px; color: #12334f; background: #fff; font: inherit; }
