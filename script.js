@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v600.
+// Release do site v601.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -28940,7 +28940,7 @@ function fuelPublicLabel(name) {
 
 function fuelPublicPrice(value) {
   const number = Number(String(value ?? "").replace(",", "."));
-  return Number.isFinite(number) && number > 0 ? number : 0;
+  return Number.isFinite(number) && number > 0 && number <= 15 ? number : 0;
 }
 
 function fuelPublicMoney(value) {

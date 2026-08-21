@@ -46,8 +46,8 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 639,
-  label: "v646",
+  numero: 640,
+  label: "v647",
   data: "2026-08-20",
   nota: "Diagnostico e tolerancia a falhas na sincronizacao de combustiveis."
 };

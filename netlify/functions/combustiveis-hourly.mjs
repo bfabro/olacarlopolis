@@ -1,4 +1,4 @@
-/* Sincronizacao configuravel e diagnosticavel de combustiveis - v4 */
+/* Sincronizacao configuravel e diagnosticavel de combustiveis - v5 */
 const MENOR_PRECO_API = "https://menorpreco.notaparana.pr.gov.br/api/v1";
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
 const DEFAULT_RADIUS_KM = 10;
@@ -91,25 +91,39 @@ function apiStationAddress(record = {}) {
 function stationMatchScore(station = {}, record = {}) {
   const establishment = apiStation(record);
   const configuredCode = String(station.menorPrecoCodigo || "").trim();
-  if (configuredCode) return configuredCode === String(establishment.codigo || "") ? 10000 : -1;
+  const configuredCodeIsManual = station.menorPrecoCodigoManual === true || station.menorPrecoCodigoOrigem === "manual";
+  if (configuredCode && configuredCodeIsManual) return configuredCode === String(establishment.codigo || "") ? 10000 : -1;
 
   const configuredNames = `${station.nomeExibicao || ""} ${station.razaoSocial || ""}`;
   const apiNames = `${establishment.nm_fan || ""} ${establishment.nm_emp || ""}`;
   const configuredAddress = station.endereco || "";
   const returnedAddress = apiStationAddress(record);
-  let score = 0;
   const normalizedConfiguredNames = normalizeText(configuredNames).replace(/\s/g, "");
   const normalizedApiNames = normalizeText(apiNames).replace(/\s/g, "");
-  if (normalizedConfiguredNames && normalizedApiNames && (normalizedConfiguredNames.includes(normalizedApiNames) || normalizedApiNames.includes(normalizedConfiguredNames))) score += 50;
-  score += wordOverlap(configuredNames, apiNames) * 60;
-  score += wordOverlap(configuredAddress, returnedAddress) * 35;
+  const namesContainEachOther = normalizedConfiguredNames && normalizedApiNames && (normalizedConfiguredNames.includes(normalizedApiNames) || normalizedApiNames.includes(normalizedConfiguredNames));
+  const nameOverlap = wordOverlap(configuredNames, apiNames);
+  const addressOverlap = wordOverlap(configuredAddress, returnedAddress);
   const configuredNumber = addressNumber(configuredAddress);
   const returnedNumber = addressNumber(returnedAddress);
-  if (configuredNumber && returnedNumber && configuredNumber === returnedNumber) score += 45;
-  if (normalizeText(station.municipio) && normalizeText(station.municipio) === normalizeText(establishment.mun)) score += 10;
+  const sameNumber = configuredNumber && returnedNumber && configuredNumber === returnedNumber;
+  const sameCity = normalizeText(station.municipio) && normalizeText(station.municipio) === normalizeText(establishment.mun);
+  const strongNameEvidence = namesContainEachOther || nameOverlap >= 0.5;
+  const strongAddressEvidence = addressOverlap >= 0.6 && sameNumber && sameCity;
+  if (!strongNameEvidence && !strongAddressEvidence) return -1;
+  let score = 0;
+  if (namesContainEachOther) score += 50;
+  score += nameOverlap * 60;
+  score += addressOverlap * 35;
+  if (sameNumber) score += 45;
+  if (sameCity) score += 10;
   return score;
 }
 
+function plausibleFuelPrice(kind, value) {
+  const price = Number(value);
+  const minimum = kind === "etanol" || kind === "gnv" ? 2 : 3;
+  return Number.isFinite(price) && price >= minimum && price <= 15;
+}
 export function matchStation(station = {}, records = []) {
   const representatives = new Map();
   records.forEach((record) => {
@@ -121,7 +135,8 @@ export function matchStation(station = {}, records = []) {
     .filter((entry) => entry.score >= 60)
     .sort((a, b) => b.score - a.score);
   if (!ranked.length) return null;
-  if (!station.menorPrecoCodigo && ranked[1] && ranked[0].score - ranked[1].score < 15) return null;
+  const hasManualCode = station.menorPrecoCodigo && (station.menorPrecoCodigoManual === true || station.menorPrecoCodigoOrigem === "manual");
+  if (!hasManualCode && ranked[1] && ranked[0].score - ranked[1].score < 15) return null;
   return ranked[0].record;
 }
 
@@ -247,16 +262,35 @@ export default async function handler() {
     };
     let matchedStations = 0;
     let updatedProducts = 0;
+    let ignoredProducts = 0;
 
     stationEntries.forEach(([stationId, station]) => {
+      const stationBase = `configuracoes/combustiveis/postos/${stationId}`;
+      Object.entries(station.combustiveis || {}).forEach(([productId, product]) => {
+        const kind = fuelKind(`${productId} ${product?.nome || ""} ${product?.nomeAnp || ""}`);
+        if (product?.origemAtualizacao !== "nota-parana" || !kind || plausibleFuelPrice(kind, product.preco)) return;
+        const productBase = `${stationBase}/combustiveis/${productId}`;
+        ["preco", "atualizadoEm", "atualizadoEmTimestamp", "verificadoEmTimestamp", "origemAtualizacao", "fonteAtualizacao", "menorPrecoProdutoId", "menorPrecoDescricao"]
+          .forEach((field) => { updates[`${productBase}/${field}`] = null; });
+        ignoredProducts += 1;
+      });
+
       const matched = matchStation(station, records);
-      if (!matched) return;
+      if (!matched) {
+        const automaticCode = station.menorPrecoCodigo && station.menorPrecoCodigoManual !== true && station.menorPrecoCodigoOrigem !== "manual";
+        if (automaticCode) {
+          updates[`${stationBase}/menorPrecoCodigo`] = null;
+          updates[`${stationBase}/menorPrecoNome`] = null;
+          updates[`${stationBase}/menorPrecoCodigoOrigem`] = null;
+        }
+        return;
+      }
       const stationCode = String(apiStation(matched).codigo || "");
       if (!stationCode) return;
       matchedStations += 1;
-      const stationBase = `configuracoes/combustiveis/postos/${stationId}`;
       updates[`${stationBase}/menorPrecoCodigo`] = stationCode;
       updates[`${stationBase}/menorPrecoNome`] = apiStation(matched).nm_fan || apiStation(matched).nm_emp || "";
+      updates[`${stationBase}/menorPrecoCodigoOrigem`] = "automatico";
       updates[`${stationBase}/menorPrecoVerificadoEm`] = now;
       const latest = latestRecordsForStation(records, stationCode);
       const changes = {};
@@ -270,7 +304,11 @@ export default async function handler() {
         const sourceTimestamp = Date.parse(record.datahora || "");
         const currentTimestamp = Number(product.atualizadoEmTimestamp || 0);
         const price = Math.round(Number(record.valor || 0) * 1000) / 1000;
-        if (!Number.isFinite(sourceTimestamp) || sourceTimestamp <= currentTimestamp || sourceTimestamp > now + 300000 || !(price > 0 && price <= 99.999)) return;
+        if (!Number.isFinite(sourceTimestamp) || sourceTimestamp <= currentTimestamp || sourceTimestamp > now + 300000) return;
+        if (!plausibleFuelPrice(kind, price)) {
+          ignoredProducts += 1;
+          return;
+        }
         const productBase = `${stationBase}/combustiveis/${productId}`;
         updates[`${productBase}/preco`] = price;
         updates[`${productBase}/atualizadoEm`] = saoPauloDate(sourceTimestamp);
@@ -305,6 +343,11 @@ export default async function handler() {
 
     updates["configuracoes/combustiveis/menorPrecoPostosEncontrados"] = matchedStations;
     updates["configuracoes/combustiveis/menorPrecoProdutosAtualizados"] = updatedProducts;
+    updates["configuracoes/combustiveis/menorPrecoRegistrosIgnorados"] = ignoredProducts;
+    if (ignoredProducts > 0) {
+      updates["configuracoes/combustiveis/menorPrecoUltimaConsultaStatus"] = "parcial";
+      updates["configuracoes/combustiveis/menorPrecoUltimoErro"] = `${ignoredProducts} registro(s) ignorado(s) por preco ou identificacao inconsistente.`;
+    }
     await firebaseJson(databaseUrl, databaseAuth, "", { method: "PATCH", body: JSON.stringify(updates) });
     console.log(`Menor Preco consultado: ${matchedStations} posto(s), ${updatedProducts} produto(s) atualizado(s), ${failedRequests.length} falha(s) parcial(is).`);
     return new Response(null, { status: 204 });
