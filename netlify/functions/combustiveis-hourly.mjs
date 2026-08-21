@@ -1,4 +1,4 @@
-/* Sincronizacao configuravel e diagnosticavel de combustiveis - v3 */
+/* Sincronizacao configuravel e diagnosticavel de combustiveis - v4 */
 const MENOR_PRECO_API = "https://menorpreco.notaparana.pr.gov.br/api/v1";
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
 const DEFAULT_RADIUS_KM = 10;

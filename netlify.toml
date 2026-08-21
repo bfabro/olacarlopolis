@@ -2,6 +2,10 @@
   publish = "."
   functions = "netlify/functions"
 
+# Agendamento de combustiveis - v1
+[functions."combustiveis-hourly"]
+  schedule = "*/15 * * * *"
+
 [[redirects]]
   from = "/api/image-proxy"
   to = "/.netlify/functions/image-proxy"
