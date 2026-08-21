@@ -56,7 +56,7 @@
       },
       "combustiveis": {
         ".read": true,
-        ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || (auth.token.email_verified === true && auth.token.email === 'bruno.4and@gmail.com'))",
         "postos": {
           "$stationId": {
             "combustiveis": {
