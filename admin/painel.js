@@ -46,8 +46,8 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 648,
-  label: "v655",
+  numero: 649,
+  label: "v656",
   data: "2026-08-21",
   nota: "Promocoes de combustiveis com descricao, recorrencia semanal e desconto."
 };
@@ -17538,6 +17538,23 @@ async function searchFuelStationsFromAnp() {
   }
 }
 
+function fuelAdminIsPlainObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function fuelAdminCollectChangedPaths(current, next, path = "", updates = {}) {
+  if (next === undefined) {
+    if (path && current !== undefined) updates[path] = null;
+    return updates;
+  }
+  if (fuelAdminIsPlainObject(current) && fuelAdminIsPlainObject(next)) {
+    const keys = new Set([...Object.keys(current), ...Object.keys(next)]);
+    keys.forEach((key) => fuelAdminCollectChangedPaths(current[key], next[key], path ? `${path}/${key}` : key, updates));
+    return updates;
+  }
+  if (JSON.stringify(current) !== JSON.stringify(next) && path) updates[path] = next;
+  return updates;
+}
 async function saveFuelAdminSettings() {
   if (!isMaster()) { showToast("Somente master pode publicar preços de combustível."); return; }
   const cidade = $("fuelAdminCity")?.value.trim().toUpperCase();
@@ -17556,7 +17573,12 @@ async function saveFuelAdminSettings() {
     updatedBy: state.user?.uid || ""
   };
   try {
-    await update(ref(db, "configuracoes/combustiveis"), payload);
+    const updates = {};
+    Object.entries(payload).forEach(([key, value]) => {
+      if (key === "postos") fuelAdminCollectChangedPaths(fuelAdminStationMap(), value, "postos", updates);
+      else if (JSON.stringify(state.combustiveisConfig?.[key]) !== JSON.stringify(value)) updates[key] = value;
+    });
+    await update(ref(db, "configuracoes/combustiveis"), updates);
     state.combustiveisConfig = { ...state.combustiveisConfig, ...payload };
     renderFuelAdminSettings();
     showToast("Configuração de combustíveis salva e publicada.");
