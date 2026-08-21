@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-21-combustiveis-api-headers-v695'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-21-combustiveis-api-cache-v696'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

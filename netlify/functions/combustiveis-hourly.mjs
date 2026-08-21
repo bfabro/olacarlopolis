@@ -1,4 +1,4 @@
-/* Sincronizacao configuravel e diagnosticavel de combustiveis - v6 */
+/* Sincronizacao configuravel e diagnosticavel de combustiveis - v7 */
 const MENOR_PRECO_API = "https://menorpreco.notaparana.pr.gov.br/api/v1";
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
 const DEFAULT_RADIUS_KM = 10;
@@ -166,9 +166,10 @@ async function firebaseJson(databaseUrl, databaseAuth, path, options = {}) {
 async function menorPrecoJson(path, parameters) {
   const url = new URL(`${MENOR_PRECO_API}/${path}`);
   Object.entries(parameters).forEach(([key, value]) => url.searchParams.set(key, String(value)));
+  url.searchParams.set("_ts", String(Date.now()));
   const response = await fetch(url, {
     cache: "no-store",
-    headers: { accept: "application/json", "accept-language": "pt-BR,pt;q=0.9", referer: "https://menorpreco.notaparana.pr.gov.br/", "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36" },
+    headers: { accept: "application/json", "accept-language": "pt-BR,pt;q=0.9", "cache-control": "no-cache, no-store, max-age=0", pragma: "no-cache", referer: "https://menorpreco.notaparana.pr.gov.br/index.html", "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36" },
     signal: AbortSignal.timeout(12000)
   });
   const payload = await response.json().catch(() => null);
@@ -259,12 +260,24 @@ export default async function handler() {
     }
     const records = successfulProductPayloads.flatMap((payload) => Array.isArray(payload.produtos) ? payload.produtos : []);
     const noRecords = records.length === 0;
+    const sampleStations = [...new Map(records.map((record) => {
+      const establishment = apiStation(record);
+      const code = String(establishment.codigo || "");
+      const key = code || [establishment.nm_fan, establishment.nm_emp, apiStationAddress(record)].filter(Boolean).join("|");
+      return [key, {
+        codigo: code,
+        nome: establishment.nm_fan || establishment.nm_emp || "",
+        endereco: apiStationAddress(record),
+        municipio: establishment.mun || ""
+      }];
+    })).values()].slice(0, 10);
     const updates = {
       "configuracoes/combustiveis/menorPrecoUltimaConsultaEm": now,
       "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": failedRequests.length ? "parcial" : noRecords ? "sem-dados" : "ok",
       "configuracoes/combustiveis/menorPrecoUltimoErro": failedRequests.length ? failedRequests.map((result) => result.reason?.message || "Falha na API").join("; ").slice(0, 300) : noRecords ? "A API Menor Preco respondeu sem registros para os combustiveis consultados." : null,
       "configuracoes/combustiveis/menorPrecoRequisicoesComFalha": failedRequests.length,
       "configuracoes/combustiveis/menorPrecoRegistrosRecebidos": records.length,
+      "configuracoes/combustiveis/menorPrecoAmostraPostos": sampleStations,
       "configuracoes/combustiveis/menorPrecoRegistrosPorTipo": recordsByType,
       "configuracoes/combustiveis/menorPrecoLocal": local,
       "configuracoes/combustiveis/menorPrecoCategoria": (categoriesPayload?.categorias || []).find((category) => normalizeText(category.desc).includes("combustiveis"))?.id || null
