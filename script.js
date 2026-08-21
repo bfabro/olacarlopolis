@@ -28897,10 +28897,13 @@ function scheduleFuelPublicPromotionRefresh(config = fuelPublicConfig()) {
   if (fuelPublicPromotionTimer) clearTimeout(fuelPublicPromotionTimer);
   const now = Date.now();
   const moments = [];
+  let hasRecurringPromotion = false;
   fuelPublicStations(config).forEach((station) => Object.values(station?.combustiveis || {}).forEach((product) => {
     const promotion = product?.promocao;
+    if (Array.isArray(promotion?.diasSemana) && promotion.diasSemana.length) hasRecurringPromotion = true;
     [promotion?.inicioEmTimestamp, promotion?.fimEmTimestamp].forEach((value) => { const timestamp = Number(value || 0); if (timestamp > now) moments.push(timestamp); });
   }));
+  if (hasRecurringPromotion) moments.push(now + 60000);
   if (!moments.length) return;
   const delay = Math.min(Math.max(Math.min(...moments) - now + 500, 500), 2147483000);
   fuelPublicPromotionTimer = window.setTimeout(() => {
@@ -28977,6 +28980,12 @@ function fuelPublicStations(config = fuelPublicConfig()) {
   return posts.filter((post) => post && post.ativo !== false);
 }
 
+function fuelPublicSaoPauloWeekday(timestamp = Date.now()) {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(new Date(timestamp)).reduce((result, part) => { if (part.type !== "literal") result[part.type] = Number(part.value); return result; }, {});
+  return new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay();
+}
+
 function fuelPublicActivePromotion(product, timestamp = Date.now()) {
   const promotion = product?.promocao;
   if (!promotion || promotion.ativo !== true) return null;
@@ -28984,7 +28993,31 @@ function fuelPublicActivePromotion(product, timestamp = Date.now()) {
   const start = Number(promotion.inicioEmTimestamp || 0);
   const end = Number(promotion.fimEmTimestamp || 0);
   if (!(price > 0) || !(start > 0) || !(end > start) || timestamp < start || timestamp > end) return null;
+  const days = Array.isArray(promotion.diasSemana) ? [...new Set(promotion.diasSemana.map(Number).filter((day) => day >= 0 && day <= 6))] : [];
+  if (days.length && !days.includes(fuelPublicSaoPauloWeekday(timestamp))) return null;
   return { ...promotion, preco: price, inicioEmTimestamp: start, fimEmTimestamp: end };
+}
+
+function fuelPublicPromotionDays(promotion) {
+  const labels = ["domingo", "segunda", "terca", "quarta", "quinta", "sexta", "sabado"];
+  const days = Array.isArray(promotion?.diasSemana) ? [...new Set(promotion.diasSemana.map(Number).filter((day) => day >= 0 && day <= 6))] : [];
+  return days.length ? days.map((day) => labels[day]).join(", ") : "todos os dias";
+}
+
+function fuelPublicPromotionDiscount(promotion) {
+  const value = Number(promotion?.descontoValor || 0);
+  if (!(value > 0)) return "";
+  return promotion.descontoTipo === "percentual"
+    ? `${value.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}% de desconto`
+    : promotion.descontoTipo === "valor" ? `${fuelPublicMoney(value)} de desconto` : "";
+}
+
+function fuelPublicPromotionDetails(promotion) {
+  const description = String(promotion?.descricao || "").trim();
+  const discount = fuelPublicPromotionDiscount(promotion);
+  return `${description ? `<small class="fuel-promo-description">${fuelPublicEscape(description)}</small>` : ""}
+    ${discount ? `<small class="fuel-promo-discount">${fuelPublicEscape(discount)}</small>` : ""}
+    <small>Disponivel: ${fuelPublicEscape(fuelPublicPromotionDays(promotion))} - Valido ate ${fuelPublicEscape(fuelPublicPromotionValidity(promotion))}</small>`;
 }
 
 function fuelPublicPromotionValidity(promotion) {
@@ -29170,7 +29203,7 @@ function renderizarValoresCombustivel() {
     </header>
     <section class="fuel-best-banner">
       <div class="fuel-best-photo">${highlighted?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(highlighted.station.imagem)}" alt="Foto de ${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
-      <div class="fuel-best-content">${highlighted ? `<span>Menor ${fuelPublicEscape(highlighted.label)} hoje ${highlighted.promotion ? `<em class="fuel-promo-badge">Promoção</em>` : ""}</span><strong>${fuelPublicMoney(highlighted.price)}</strong>${highlighted.promotion ? `<small class="fuel-best-promo-validity">Válido até ${fuelPublicEscape(fuelPublicPromotionValidity(highlighted.promotion))}</small>` : ""}<small class="fuel-best-station-name">${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `<span>Os preços ainda estão sendo atualizados.</span><small>Consulte novamente em breve.</small>`}</div>
+      <div class="fuel-best-content">${highlighted ? `<span>Menor ${fuelPublicEscape(highlighted.label)} hoje ${highlighted.promotion ? `<em class="fuel-promo-badge">Promoção</em>` : ""}</span><strong>${fuelPublicMoney(highlighted.price)}</strong>${highlighted.promotion ? fuelPublicPromotionDetails(highlighted.promotion) : ""}<small class="fuel-best-station-name">${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `<span>Os preços ainda estão sendo atualizados.</span><small>Consulte novamente em breve.</small>`}</div>
     </section>
     <nav class="fuel-filter-chips" aria-label="Filtrar postos por combustível">
       ${options.map((option) => `<button type="button" data-fuel-filter="${fuelPublicEscape(option.key)}" class="${fuelPublicActiveFilter === option.key ? "active" : ""}">${fuelPublicEscape(option.label)}</button>`).join("")}
@@ -29188,7 +29221,7 @@ function renderizarValoresCombustivel() {
             <div class="fuel-station-identity"><h3>${fuelPublicEscape(stationName)}</h3><p class="fuel-station-address"><i class="fa-solid fa-location-dot"></i><span>${fuelPublicEscape(address || city)}</span></p></div>
             <span class="fuel-station-updated">Atualizado em ${fuelPublicLatestDate(station)}</span>
           </header>
-          <div class="fuel-station-products fuel-station-products-grid">${products.length ? products.map((product) => `<div class="fuel-station-product ${product.promotion ? "is-promotional" : ""}"><span>${fuelPublicEscape(product.label)}${product.promotion ? `<em class="fuel-promo-badge">Promoção</em>` : ""}</span>${product.promotion ? `<div class="fuel-product-price"><del>${fuelPublicMoney(product.regularPrice)}</del><strong>${fuelPublicMoney(product.price)}</strong></div><small>Válido até ${fuelPublicEscape(fuelPublicPromotionValidity(product.promotion))}</small>` : `<strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small>${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small>`}</div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível disponível.</div>`}</div>
+          <div class="fuel-station-products fuel-station-products-grid">${products.length ? products.map((product) => `<div class="fuel-station-product ${product.promotion ? "is-promotional" : ""}"><span>${fuelPublicEscape(product.label)}${product.promotion ? `<em class="fuel-promo-badge">Promoção</em>` : ""}</span>${product.promotion ? `<div class="fuel-product-price"><del>${fuelPublicMoney(product.regularPrice)}</del><strong>${fuelPublicMoney(product.price)}</strong></div>${fuelPublicPromotionDetails(product.promotion)}` : `<strong class="${product.price ? "" : "is-pending"}">${product.price ? fuelPublicMoney(product.price) : "Aguardando preço"}</strong><small>${product.price ? `Atualizado em ${fuelPublicDate(product.atualizadoEm)}` : "Preço ainda não publicado"}</small>`}</div>`).join("") : `<div class="fuel-public-empty">Nenhum combustível disponível.</div>`}</div>
           <footer class="fuel-station-footer">${fuelPublicSchedule(station)}${mapUrl ? `<a class="fuel-go-button" href="${mapUrl}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-location-arrow"></i> Ir</a>` : ""}</footer>
         </article>`;
       }).join("") : `<div class="fuel-public-empty fuel-public-empty-large"><i class="fa-solid fa-gas-pump"></i><strong>Nenhum posto encontrado</strong><span>Não há posto publicado para este filtro.</span></div>`}</div>

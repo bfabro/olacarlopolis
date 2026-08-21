@@ -28384,3 +28384,8 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
 /* Release ARLA 32 - v439 */
 
 /* Release salvamento inicial dos postos de combustiveis - v442 */
+
+/* Detalhes das promocoes de combustiveis - v443 */
+.fuel-station-product .fuel-promo-description, .fuel-best-content .fuel-promo-description { color: #6b3b0b; font-weight: 750; }
+.fuel-station-product .fuel-promo-discount, .fuel-best-content .fuel-promo-discount { color: #b64700; font-weight: 900; }
+.fuel-station-product.is-promotional > small { line-height: 1.35; }

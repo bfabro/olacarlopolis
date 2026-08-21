@@ -89,3 +89,16 @@ button, input { font: inherit; }
 .fuel-promo-actions button:last-child { border-color: #df7200; color: #fff; background: #df7200; }
 @media (max-width: 480px) { .fuel-update-product { grid-template-columns: 1fr; } .fuel-promo-dialog { padding: 22px 17px; } .fuel-promo-actions { display: grid; grid-template-columns: 1fr 1fr; } }
 .fuel-type-arla { --fuel-accent: #0891b2; --fuel-surface: #ecfeff; }
+
+/* Promocao recorrente e descontos - v5 */
+.fuel-promo-dialog { width: min(100%, 620px); max-height: calc(100vh - 36px); overflow-y: auto; }
+.fuel-promo-fields { grid-template-columns: 1fr 1fr; }
+.fuel-promo-fields input, .fuel-promo-fields select, .fuel-promo-fields textarea { min-height: 46px; padding: 9px 11px; border: 1px solid #bdcddd; border-radius: 10px; color: #12334f; background: #fff; font: inherit; resize: vertical; }
+.fuel-promo-fields .wide { grid-column: 1 / -1; }
+.fuel-promo-weekdays { margin: 0; padding: 12px; border: 1px solid #cbd8e5; border-radius: 12px; }
+.fuel-promo-weekdays legend { padding: 0 5px; color: #29445d; font-size: .78rem; font-weight: 900; }
+.fuel-promo-weekdays p { margin: 0 0 10px; color: #60758a; font-size: .72rem; }
+.fuel-promo-weekdays div { display: flex; flex-wrap: wrap; gap: 7px; }
+.fuel-promo-weekdays div label { display: inline-flex; grid-auto-flow: column; align-items: center; gap: 5px; padding: 7px 9px; border-radius: 9px; background: #f0f5fa; cursor: pointer; }
+.fuel-promo-weekdays input { width: 17px; min-height: 17px; padding: 0; accent-color: #df7200; }
+@media (max-width: 480px) { .fuel-promo-fields { grid-template-columns: 1fr; } .fuel-promo-fields .wide { grid-column: 1; } }

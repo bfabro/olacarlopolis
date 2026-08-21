@@ -1,4 +1,4 @@
-// Atualizacao segura de precos e promocoes por link exclusivo - v3
+// Atualizacao segura de precos e promocoes por link exclusivo - v4
 
 
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
@@ -89,8 +89,18 @@ function normalizePromotion(promotion) {
   const price = Number(promotion.preco || 0);
   const start = Number(promotion.inicioEmTimestamp || 0);
   const end = Number(promotion.fimEmTimestamp || 0);
-  return Number.isFinite(price) && price > 0 && price <= 99.999 && start > 0 && end > start
-    ? { ativo: true, preco: Math.round(price * 1000) / 1000, inicioEmTimestamp: start, fimEmTimestamp: end }
+  const days = [...new Set((Array.isArray(promotion.diasSemana) ? promotion.diasSemana : []).map(Number).filter((day) => Number.isInteger(day) && day >= 0 && day <= 6))];
+  const discountType = ["percentual", "valor"].includes(promotion.descontoTipo) ? promotion.descontoTipo : "";
+  const discountValue = Number(promotion.descontoValor || 0);
+  const validDiscount = !discountType || (Number.isFinite(discountValue) && discountValue > 0 && (discountType !== "percentual" || discountValue <= 100));
+  return Number.isFinite(price) && price > 0 && price <= 99.999 && start > 0 && end > start && validDiscount
+    ? {
+      ativo: true, preco: Math.round(price * 1000) / 1000, inicioEmTimestamp: start, fimEmTimestamp: end,
+      descricao: String(promotion.descricao || "").trim().replace(/\s+/g, " ").slice(0, 240),
+      diasSemana: days,
+      descontoTipo: discountType,
+      descontoValor: discountType ? Math.round(discountValue * 1000) / 1000 : 0
+    }
     : null;
 }
 
@@ -143,7 +153,7 @@ export default async function handler(request) {
     const promotions = {};
     for (const product of safeStation.combustiveis) {
       const promotion = normalizePromotion(submittedPromotions[product.id]);
-      if (submittedPromotions[product.id] && (!promotion || promotion.preco >= prices[product.id])) {
+      if (submittedPromotions[product.id] && (!promotion || promotion.preco >= prices[product.id] || (promotion.descontoTipo === "valor" && promotion.descontoValor >= prices[product.id]))) {
         return response({ success: false, message: `Confira a promocao de ${product.nome}.` }, 400);
       }
       promotions[product.id] = promotion;
