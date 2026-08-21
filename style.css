@@ -28355,7 +28355,8 @@ body.home-quick-banner-hidden .fuel-home-ticker,
 body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important; }
 @keyframes fuel-home-ticker-scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes fuel-promo-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .25; transform: scale(1.08); } }
-.fuel-home-ticker-item.is-promotional .fuel-home-ticker-price-line b, .fuel-home-ticker-item.is-promotional .fuel-home-ticker-price-line em { animation: fuel-promo-pulse 1s ease-in-out infinite; transform-origin: center; }
+.fuel-home-ticker-item.is-promotional .fuel-home-ticker-price-line b, .fuel-home-ticker-item.is-promotional .fuel-home-ticker-price-line em { color: #d40000; animation: fuel-promo-pulse 1s ease-in-out infinite; transform-origin: center; }
+.fuel-home-ticker-item.is-promotional .fuel-home-ticker-price-line em { border: 1px solid #ff6b6b; background: #ffe3e3; }
 @media (prefers-reduced-motion: reduce) { .fuel-home-ticker-track { animation-duration: 90s; } }
 @media (prefers-reduced-motion: reduce) { .fuel-home-ticker-item.is-promotional .fuel-home-ticker-price-line b, .fuel-home-ticker-item.is-promotional .fuel-home-ticker-price-line em { animation: none; } }
 @media screen and (max-width: 1200px) {

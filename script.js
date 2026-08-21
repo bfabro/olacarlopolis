@@ -28994,13 +28994,12 @@ function fuelPublicActivePromotion(product, timestamp = Date.now()) {
   const end = Number(promotion.fimEmTimestamp || 0);
   const days = Array.isArray(promotion.diasSemana) ? [...new Set(promotion.diasSemana.map(Number).filter((day) => day >= 0 && day <= 6))] : [];
   const recurring = days.length > 0;
+  const hasPeriod = start > 0 && end > start;
   if (!(price > 0)) return null;
-  if (recurring) {
-    if (!days.includes(fuelPublicSaoPauloWeekday(timestamp))) return null;
-  } else if (!(start > 0) || !(end > start) || timestamp < start || timestamp > end) {
-    return null;
-  }
-  return { ...promotion, preco: price, inicioEmTimestamp: recurring ? 0 : start, fimEmTimestamp: recurring ? 0 : end };
+  if (recurring && !days.includes(fuelPublicSaoPauloWeekday(timestamp))) return null;
+  if (hasPeriod && (timestamp < start || timestamp > end)) return null;
+  if (!recurring && !hasPeriod) return null;
+  return { ...promotion, preco: price, inicioEmTimestamp: hasPeriod ? start : 0, fimEmTimestamp: hasPeriod ? end : 0 };
 }
 
 function fuelPublicPromotionDays(promotion) {
@@ -29022,16 +29021,21 @@ function fuelPublicPromotionDiscount(promotion) {
 function fuelPublicPromotionDetails(promotion) {
   const description = String(promotion?.descricao || "").trim();
   const discount = fuelPublicPromotionDiscount(promotion);
-  const recurring = Array.isArray(promotion?.diasSemana) && promotion.diasSemana.length > 0;
   return `${description ? `<small class="fuel-promo-description">${fuelPublicEscape(description)}</small>` : ""}
     ${discount ? `<small class="fuel-promo-discount">${fuelPublicEscape(discount)}</small>` : ""}
-    <small class="fuel-promo-validity">Oferta válida hoje até 23:59${recurring ? ` - repete: ${fuelPublicEscape(fuelPublicPromotionDays(promotion))}` : ""}</small>`;
+    <small class="fuel-promo-validity">Oferta válida hoje até ${fuelPublicEscape(fuelPublicPromotionValidity(promotion))}</small>`;
 }
 
-function fuelPublicPromotionValidity(promotion) {
-  if (Array.isArray(promotion?.diasSemana) && promotion.diasSemana.length) return "hoje às 23:59";
-  if (!promotion?.fimEmTimestamp) return "";
-  return new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(promotion.fimEmTimestamp));
+function fuelPublicPromotionValidity(promotion, timestamp = Date.now()) {
+  const end = Number(promotion?.fimEmTimestamp || 0);
+  if (!(end > 0)) return "23:59";
+  const dateKey = (value) => new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit"
+  }).format(new Date(value));
+  if (dateKey(end) !== dateKey(timestamp)) return "23:59";
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", hourCycle: "h23"
+  }).format(new Date(end));
 }
 
 function fuelPublicProducts(station) {

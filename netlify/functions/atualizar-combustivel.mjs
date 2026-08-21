@@ -1,4 +1,4 @@
-// Atualizacao segura de precos e promocoes por link exclusivo - v5
+// Atualizacao segura de precos e promocoes por link exclusivo - v6
 
 
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
@@ -92,11 +92,12 @@ function normalizePromotion(promotion) {
   const days = [...new Set((Array.isArray(promotion.diasSemana) ? promotion.diasSemana : []).map(Number).filter((day) => Number.isInteger(day) && day >= 0 && day <= 6))];
   const discountType = ["percentual", "valor"].includes(promotion.descontoTipo) ? promotion.descontoTipo : "";
   const discountValue = Number(promotion.descontoValor || 0);
-  const recurring = days.length > 0;
+  const hasPeriod = start > 0 && end > start;
+  const hasNoPeriod = start === 0 && end === 0;
   const validDiscount = !discountType || (Number.isFinite(discountValue) && discountValue > 0 && (discountType !== "percentual" || discountValue <= 100));
-  return Number.isFinite(price) && price > 0 && price <= 99.999 && (recurring || (start > 0 && end > start)) && validDiscount
+  return Number.isFinite(price) && price > 0 && price <= 99.999 && days.length > 0 && (hasNoPeriod || hasPeriod) && validDiscount
     ? {
-      ativo: true, preco: Math.round(price * 1000) / 1000, inicioEmTimestamp: recurring ? 0 : start, fimEmTimestamp: recurring ? 0 : end,
+      ativo: true, preco: Math.round(price * 1000) / 1000, inicioEmTimestamp: hasPeriod ? start : 0, fimEmTimestamp: hasPeriod ? end : 0,
       descricao: String(promotion.descricao || "").trim().replace(/\s+/g, " ").slice(0, 240),
       diasSemana: days,
       descontoTipo: discountType,
