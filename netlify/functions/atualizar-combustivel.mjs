@@ -1,4 +1,4 @@
-// Atualizacao segura de precos de combustiveis por link exclusivo - v2
+// Atualizacao segura de precos e promocoes por link exclusivo - v3
 
 
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
@@ -71,7 +71,8 @@ function publicStation(station, stationId) {
       preco: Number(product.preco || 0) || 0,
       atualizadoEm: String(product.atualizadoEm || ""),
       atualizadoEmTimestamp: Number(product.atualizadoEmTimestamp || 0),
-      origemAtualizacao: String(product.origemAtualizacao || "")
+      origemAtualizacao: String(product.origemAtualizacao || ""),
+      promocao: normalizePromotion(product.promocao)
     }));
   return {
     id: stationId,
@@ -81,6 +82,16 @@ function publicStation(station, stationId) {
     bairro: String(station?.bairro || ""),
     combustiveis: products
   };
+}
+
+function normalizePromotion(promotion) {
+  if (!promotion || promotion.ativo !== true) return null;
+  const price = Number(promotion.preco || 0);
+  const start = Number(promotion.inicioEmTimestamp || 0);
+  const end = Number(promotion.fimEmTimestamp || 0);
+  return Number.isFinite(price) && price > 0 && price <= 99.999 && start > 0 && end > start
+    ? { ativo: true, preco: Math.round(price * 1000) / 1000, inicioEmTimestamp: start, fimEmTimestamp: end }
+    : null;
 }
 
 export default async function handler(request) {
@@ -94,14 +105,18 @@ export default async function handler(request) {
     const body = await request.json().catch(() => ({}));
     const action = body.action === "update" ? "update" : "load";
     const stationId = safeId(body.posto);
-    const token = String(body.token || "").trim();
-    if (!stationId || token.length < 40 || token.length > 160) return response({ success: false, message: "Link invalido ou expirado." }, 404);
+    const email = String(body.email || "").trim().toLowerCase();
+    const secret = String(body.chave || body.token || "").trim();
+    if (!stationId || secret.length < 20 || secret.length > 160) return response({ success: false, message: "Link invalido ou expirado." }, 404);
 
     const [linkAccess, station] = await Promise.all([
       firebaseJson(databaseUrl, databaseAuth, `combustiveisLinks/${stationId}`),
       firebaseJson(databaseUrl, databaseAuth, `configuracoes/combustiveis/postos/${stationId}`)
     ]);
-    if (!linkAccess?.ativo || !station || !constantTimeEqual(linkAccess.token, token)) {
+    const savedSecret = String(linkAccess?.password || linkAccess?.token || "");
+    const savedEmail = String(linkAccess?.email || "").trim().toLowerCase();
+    const emailMatches = !savedEmail || constantTimeEqual(savedEmail, email);
+    if (!linkAccess?.ativo || !station || !emailMatches || !constantTimeEqual(savedSecret, secret)) {
       return response({ success: false, message: "Link invalido ou expirado." }, 404);
     }
 
@@ -109,6 +124,11 @@ export default async function handler(request) {
     if (action === "load") return response({ success: true, posto: safeStation });
 
     const submitted = body.precos && typeof body.precos === "object" ? body.precos : {};
+    const submittedPromotions = body.promocoes && typeof body.promocoes === "object" ? body.promocoes : {};
+    const responsible = String(body.responsavelNome || "").trim().replace(/\s+/g, " ");
+    if (responsible.length < 3 || responsible.length > 80) {
+      return response({ success: false, message: "Informe o nome de quem esta realizando a atualizacao." }, 400);
+    }
     const now = Date.now();
     const date = saoPauloDate(now);
     const prices = {};
@@ -120,6 +140,15 @@ export default async function handler(request) {
       return response({ success: false, message: "Informe um valor valido para todos os combustiveis." }, 400);
     }
 
+    const promotions = {};
+    for (const product of safeStation.combustiveis) {
+      const promotion = normalizePromotion(submittedPromotions[product.id]);
+      if (submittedPromotions[product.id] && (!promotion || promotion.preco >= prices[product.id])) {
+        return response({ success: false, message: `Confira a promocao de ${product.nome}.` }, 400);
+      }
+      promotions[product.id] = promotion;
+    }
+
     const historyId = `${now}-${Math.random().toString(36).slice(2, 9)}`;
     const updates = {};
     Object.entries(prices).forEach(([productId, price]) => {
@@ -128,14 +157,22 @@ export default async function handler(request) {
       updates[`${base}/atualizadoEm`] = date;
       updates[`${base}/atualizadoEmTimestamp`] = now;
       updates[`${base}/origemAtualizacao`] = "link";
+      updates[`${base}/promocao`] = promotions[productId]
+        ? { ...promotions[productId], responsavelNome: responsible, atualizadoEmTimestamp: now }
+        : null;
     });
     updates[`combustiveisHistorico/${stationId}/${historyId}`] = {
       postoId: stationId,
       postoNome: safeStation.nome,
       origem: "link",
+      viaLink: true,
+      responsavelNome: responsible,
+      uid: String(linkAccess.uid || ""),
+      email: savedEmail,
       atualizadoEm: date,
       atualizadoEmTimestamp: now,
-      precos: prices
+      precos: prices,
+      promocoes: promotions
     };
     await firebaseJson(databaseUrl, databaseAuth, "", { method: "PATCH", body: JSON.stringify(updates) });
 
@@ -144,7 +181,10 @@ export default async function handler(request) {
       preco: prices[product.id],
       atualizadoEm: date,
       atualizadoEmTimestamp: now,
-      origemAtualizacao: "link"
+      origemAtualizacao: "link",
+      promocao: promotions[product.id]
+        ? { ...promotions[product.id], responsavelNome: responsible, atualizadoEmTimestamp: now }
+        : null
     }));
     return response({ success: true, message: "Precos atualizados com sucesso.", posto: safeStation, atualizadoEm: date, atualizadoEmTimestamp: now });
   } catch (error) {

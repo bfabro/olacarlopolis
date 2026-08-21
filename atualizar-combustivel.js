@@ -1,19 +1,19 @@
-// Pagina publica de atualizacao de combustiveis - v7
+// Pagina publica de atualizacao de combustiveis - v8
 (() => {
   const byId = (id) => document.getElementById(id);
-  const state = { posto: "", email: "", password: "", station: null, user: null, promotions: {}, editingPromoId: "" };
-  const firebaseConfig = {
-    apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
-    authDomain: "contadoracessos.firebaseapp.com",
-    databaseURL: "https://contadoracessos-default-rtdb.firebaseio.com",
-    projectId: "contadoracessos",
-    storageBucket: "contadoracessos.firebasestorage.app",
-    messagingSenderId: "521517291315",
-    appId: "1:521517291315:web:74f8d878d2d8769460d046"
-  };
-  const app = firebase.apps.length ? firebase.app() : firebase.initializeApp(firebaseConfig);
-  const auth = app.auth();
-  const db = app.database();
+  const state = { posto: "", email: "", password: "", station: null, promotions: {}, editingPromoId: "" };
+
+  async function apiRequest(payload) {
+    const result = await fetch("/api/atualizar-combustivel", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      cache: "no-store",
+      body: JSON.stringify({ posto: state.posto, email: state.email, chave: state.password, ...payload })
+    });
+    const data = await result.json().catch(() => ({}));
+    if (!result.ok || !data.success) throw new Error(data.message || "Nao foi possivel concluir a atualizacao.");
+    return data;
+  }
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
@@ -151,38 +151,26 @@
   byId("fuelPromoCancel")?.addEventListener("click", () => closePromoModal(true));
   byId("fuelPromoClose")?.addEventListener("click", () => closePromoModal(true));
 
-  async function authenticateLink() {
-    await auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
-    const credential = await auth.signInWithEmailAndPassword(state.email, state.password);
-    const profileSnapshot = await db.ref(`usuariosByUid/${credential.user.uid}`).once("value");
-    const profile = profileSnapshot.val() || {};
-    const authorized = profile.status === "ativo" && profile.role === "cliente" && profile.postoCombustivelId === state.posto && profile.permissoes?.combustiveis_precos === true;
-    if (!authorized) throw new Error("Este link foi revogado ou nao possui mais permissao.");
-    state.user = credential.user;
-  }
-
   async function load() {
     const params = new URLSearchParams(location.hash.replace(/^#/, ""));
     state.posto = params.get("posto") || ""; state.email = params.get("email") || ""; state.password = params.get("chave") || "";
     if (!state.posto || !state.email || !state.password) { byId("fuelUpdateErrorMessage").textContent = "Este link e antigo ou esta incompleto. Solicite um novo link ao Ola Carlopolis."; show("error"); return; }
     show("loading");
     try {
-      await authenticateLink();
-      const stationSnapshot = await db.ref(`configuracoes/combustiveis/postos/${state.posto}`).once("value");
-      if (!stationSnapshot.exists()) throw new Error("Posto nao encontrado.");
-      const station = safeStation(stationSnapshot.val());
+      const data = await apiRequest({ action: "load" });
+      const station = data.posto;
       if (!station.combustiveis.length) throw new Error("Este posto ainda nao possui combustiveis habilitados.");
       renderStation(station);
     } catch (error) {
       console.error("Falha ao validar o link do posto.", error);
-      byId("fuelUpdateErrorMessage").textContent = ["auth/wrong-password", "auth/user-not-found", "auth/invalid-login-credentials"].includes(error?.code) ? "Este link foi revogado ou substituido. Solicite um novo link ao Ola Carlopolis." : (error.message || "Solicite um novo link ao Ola Carlopolis.");
+      byId("fuelUpdateErrorMessage").textContent = error.message || "Solicite um novo link ao Ola Carlopolis.";
       show("error");
     }
   }
 
   byId("fuelUpdateForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!state.user) return;
+    if (!state.station) return;
     const responsible = String(byId("fuelUpdateResponsible")?.value || "").trim().replace(/\s+/g, " ");
     if (responsible.length < 3) { byId("fuelUpdateResponsible")?.focus(); alert("Informe o nome de quem esta realizando a atualizacao."); return; }
     const prices = {}; let invalid = false;
@@ -195,23 +183,19 @@
     if (invalid || !event.currentTarget.reportValidity()) { alert("Confira os valores. O preco promocional deve ser menor que o valor normal."); return; }
     const button = byId("fuelUpdateSubmit"); button.disabled = true; button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Atualizando...';
     try {
-      const now = Date.now(); const date = saoPauloDate(now); const updates = {}; const changes = {};
-      Object.entries(prices).forEach(([productId, price]) => {
-        const product = state.station.combustiveis.find((item) => item.id === productId) || {};
-        const promotion = state.promotions[productId] ? { ...state.promotions[productId], responsavelNome: responsible, atualizadoEmTimestamp: now } : null;
-        const base = `configuracoes/combustiveis/postos/${state.posto}/combustiveis/${productId}`;
-        updates[`${base}/preco`] = price; updates[`${base}/atualizadoEm`] = date; updates[`${base}/atualizadoEmTimestamp`] = now; updates[`${base}/origemAtualizacao`] = "painel"; updates[`${base}/promocao`] = promotion;
-        changes[productId] = { nome: product.nome || productId, precoAnterior: Number(product.preco || 0), precoNovo: price, promocaoAnterior: product.promocao || null, promocaoNova: promotion };
+      const data = await apiRequest({
+        action: "update",
+        responsavelNome: responsible,
+        precos: prices,
+        promocoes: state.promotions
       });
-      const historyId = db.ref(`combustiveisHistorico/${state.posto}`).push().key;
-      updates[`combustiveisHistorico/${state.posto}/${historyId}`] = { postoId: state.posto, postoNome: state.station.nome, origem: "painel", viaLink: true, responsavelNome: responsible, uid: state.user.uid, email: state.email, atualizadoEm: date, atualizadoEmTimestamp: now, precos: prices, alteracoes: changes };
-      await db.ref().update(updates);
       localStorage.setItem(`fuel-update-responsible:${state.posto}`, responsible);
-      state.station.combustiveis = state.station.combustiveis.map((product) => ({ ...product, preco: prices[product.id], atualizadoEm: date, atualizadoEmTimestamp: now, origemAtualizacao: "painel", promocao: state.promotions[product.id] ? { ...state.promotions[product.id], responsavelNome: responsible, atualizadoEmTimestamp: now } : null }));
+      state.station = data.posto;
+      state.promotions = Object.fromEntries((data.posto.combustiveis || []).filter((product) => product.promocao).map((product) => [product.id, product.promocao]));
       byId("fuelUpdateConfirm").checked = false; show("success");
     } catch (error) {
       console.error("Falha ao atualizar os precos do posto.", error);
-      alert(error?.code === "PERMISSION_DENIED" || error?.code === "permission_denied" ? "Este link nao possui mais permissao. Solicite um novo link." : "Nao foi possivel atualizar os precos agora.");
+      alert(error.message || "Nao foi possivel atualizar os precos agora.");
     } finally { button.disabled = false; button.innerHTML = '<i class="fa-solid fa-check"></i> Confirmar e atualizar precos'; }
   });
 
