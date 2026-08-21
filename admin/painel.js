@@ -46,8 +46,8 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 640,
-  label: "v647",
+  numero: 641,
+  label: "v648",
   data: "2026-08-20",
   nota: "Diagnostico e tolerancia a falhas na sincronizacao de combustiveis."
 };
@@ -17484,8 +17484,10 @@ function renderFuelAdminSettings() {
       ? `Erro na última tentativa: ${config.menorPrecoUltimoErro || "verifique os logs da Netlify"}`
       : status === "consultando"
         ? "Consulta ao Menor Preço em andamento."
-        : reference
-          ? `Última consulta em ${fuelPanelDateTime(reference)} · ${Number(config.menorPrecoPostosEncontrados || 0)} posto(s) · ${Number(config.menorPrecoProdutosAtualizados || 0)} produto(s) atualizado(s)${status === "parcial" ? " · resultado parcial" : ""}.`
+        : status === "sem-dados"
+          ? `Última consulta em ${fuelPanelDateTime(reference)} · a API respondeu sem registros de combustível para a região.`
+          : reference
+            ? `Última consulta em ${fuelPanelDateTime(reference)} · ${Number(config.menorPrecoRegistrosRecebidos || 0)} registro(s) recebido(s) · ${Number(config.menorPrecoPostosEncontrados || 0)} posto(s) · ${Number(config.menorPrecoProdutosAtualizados || 0)} produto(s) atualizado(s)${status === "parcial" ? " · resultado parcial" : ""}.`
           : "Aguardando a primeira execução automática após o deploy.";
     const text = syncStatus.querySelector("span");
     if (text) text.textContent = details;

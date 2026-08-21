@@ -1,4 +1,4 @@
-/* Sincronizacao configuravel e diagnosticavel de combustiveis - v5 */
+/* Sincronizacao configuravel e diagnosticavel de combustiveis - v6 */
 const MENOR_PRECO_API = "https://menorpreco.notaparana.pr.gov.br/api/v1";
 const DEFAULT_DATABASE_URL = "https://contadoracessos-default-rtdb.firebaseio.com";
 const DEFAULT_RADIUS_KM = 10;
@@ -168,7 +168,7 @@ async function menorPrecoJson(path, parameters) {
   Object.entries(parameters).forEach(([key, value]) => url.searchParams.set(key, String(value)));
   const response = await fetch(url, {
     cache: "no-store",
-    headers: { accept: "application/json" },
+    headers: { accept: "application/json", "accept-language": "pt-BR,pt;q=0.9", referer: "https://menorpreco.notaparana.pr.gov.br/", "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/140.0.0.0 Safari/537.36" },
     signal: AbortSignal.timeout(12000)
   });
   const payload = await response.json().catch(() => null);
@@ -245,18 +245,27 @@ export default async function handler() {
       ...FUEL_TYPES.map((type) => menorPrecoJson("produtos", { ...baseParameters, data: 6, tp_comb: type, offset: 0 }))
     ]);
     const categoriesPayload = apiResults[0].status === "fulfilled" ? apiResults[0].value : null;
-    const successfulProductPayloads = apiResults.slice(1).filter((result) => result.status === "fulfilled").map((result) => result.value);
+    const productResults = apiResults.slice(1);
+    const successfulProductPayloads = productResults.filter((result) => result.status === "fulfilled").map((result) => result.value);
+    const recordsByType = Object.fromEntries(FUEL_TYPES.map((type, index) => {
+      const result = productResults[index];
+      const count = result?.status === "fulfilled" && Array.isArray(result.value?.produtos) ? result.value.produtos.length : 0;
+      return [String(type), count];
+    }));
     const failedRequests = apiResults.filter((result) => result.status === "rejected");
     if (!successfulProductPayloads.length) {
       const reason = failedRequests.map((result) => result.reason?.message || "falha desconhecida").join("; ");
       throw new Error(`Nenhuma consulta de produtos foi concluida. ${reason}`);
     }
     const records = successfulProductPayloads.flatMap((payload) => Array.isArray(payload.produtos) ? payload.produtos : []);
+    const noRecords = records.length === 0;
     const updates = {
       "configuracoes/combustiveis/menorPrecoUltimaConsultaEm": now,
-      "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": failedRequests.length ? "parcial" : "ok",
-      "configuracoes/combustiveis/menorPrecoUltimoErro": failedRequests.length ? failedRequests.map((result) => result.reason?.message || "Falha na API").join("; ").slice(0, 300) : null,
+      "configuracoes/combustiveis/menorPrecoUltimaConsultaStatus": failedRequests.length ? "parcial" : noRecords ? "sem-dados" : "ok",
+      "configuracoes/combustiveis/menorPrecoUltimoErro": failedRequests.length ? failedRequests.map((result) => result.reason?.message || "Falha na API").join("; ").slice(0, 300) : noRecords ? "A API Menor Preco respondeu sem registros para os combustiveis consultados." : null,
       "configuracoes/combustiveis/menorPrecoRequisicoesComFalha": failedRequests.length,
+      "configuracoes/combustiveis/menorPrecoRegistrosRecebidos": records.length,
+      "configuracoes/combustiveis/menorPrecoRegistrosPorTipo": recordsByType,
       "configuracoes/combustiveis/menorPrecoLocal": local,
       "configuracoes/combustiveis/menorPrecoCategoria": (categoriesPayload?.categorias || []).find((category) => normalizeText(category.desc).includes("combustiveis"))?.id || null
     };
