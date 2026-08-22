@@ -21853,10 +21853,6 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   border-color: #fed7aa;
 }
 
-.loja-promocao-badge {
-  background: #f97316;
-}
-
 .loja-produto-info {
   display: flex;
   flex-direction: column;
@@ -28393,3 +28389,29 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
 .fuel-station-product .fuel-promo-description, .fuel-best-content .fuel-promo-description { color: #6b3b0b; font-weight: 750; }
 .fuel-station-product .fuel-promo-discount, .fuel-best-content .fuel-promo-discount { color: #b64700; font-weight: 900; }
 .fuel-station-product.is-promotional > small { line-height: 1.35; }
+/* Modal e cards de promocoes publicas - v449 */
+.loja-produto-modal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; min-height: 42px; margin: -8px 0 12px; }
+.loja-produto-modal-actions .item-modal-share,
+.loja-produto-modal-actions .imovel-detalhes-fechar { position: static; inset: auto; flex: 0 0 40px; width: 40px; height: 40px; }
+.loja-produto-modal-actions .imovel-detalhes-fechar { color: #fff; background: #172033; }
+.loja-produto-empresa-link { width: fit-content; color: #075ec8; text-decoration: none; }
+.loja-produto-empresa-link:hover,
+.loja-produto-empresa-link:focus-visible { color: #03479a; text-decoration: underline; }
+.loja-produto-empresa-link .fa-arrow-up-right-from-square { font-size: .68rem; }
+.loja-promocao-modal-meta { display: flex; flex-wrap: wrap; gap: 8px; margin: 15px 0 10px; }
+.loja-promocao-modal-meta > span { display: inline-flex; align-items: center; gap: 6px; padding: 8px 11px; border: 1px solid #fed7aa; border-radius: 999px; color: #9a3412; background: #fff7ed; font-size: .82rem; }
+.loja-promocao-modal-loja { display: flex; align-items: center; gap: 11px; margin: 10px 0 14px; padding: 12px 14px; border: 1px solid #bfdbfe; border-radius: 13px; color: #143b66; background: linear-gradient(135deg, #eff6ff, #f8fbff); text-decoration: none; transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.loja-promocao-modal-loja > i:first-child { display: grid; place-items: center; flex: 0 0 38px; width: 38px; height: 38px; border-radius: 50%; color: #fff; background: #0878df; }
+.loja-promocao-modal-loja span { display: grid; flex: 1 1 auto; gap: 1px; min-width: 0; }
+.loja-promocao-modal-loja small { color: #64748b; font-size: .7rem; font-weight: 750; text-transform: uppercase; }
+.loja-promocao-modal-loja strong { overflow: hidden; color: #0f3760; font-size: .92rem; text-overflow: ellipsis; white-space: nowrap; }
+.loja-promocao-modal-loja > i:last-child { color: #0878df; }
+.loja-promocao-modal-loja:hover,
+.loja-promocao-modal-loja:focus-visible { border-color: #60a5fa; outline: none; box-shadow: 0 8px 22px rgba(8, 120, 223, .14); transform: translateY(-1px); }
+@media (max-width: 720px) {
+  .loja-produto-dialog.is-promocao .loja-produto-modal-galeria,
+  .loja-produto-dialog.is-promocao .loja-produto-modal-galeria .loja-produto-modal-img { min-height: 210px; max-height: 280px; }
+  .loja-produto-modal-actions { margin: -5px 0 10px; }
+  .loja-produto-dialog.is-promocao .imovel-detalhes-topo h2 { padding-right: 0; }
+  .loja-promocao-modal-meta > span { width: 100%; border-radius: 10px; }
+}

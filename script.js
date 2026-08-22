@@ -10224,6 +10224,22 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     return ["Tamanho", "Medida", "Volume"].includes(label) ? label : "Tamanho";
   }
 
+  function dataPromocaoPublicaBR(value) {
+    const parts = String(value || "").split("-");
+    return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : String(value || "");
+  }
+
+  function descricaoPromocaoPublica(value) {
+    return String(value || "")
+      .split(String.fromCharCode(10))
+      .filter((line) => {
+        const normalized = normalizeName(line).trim();
+        return !(normalized.startsWith("valido ate ") || normalized.startsWith("valido de "));
+      })
+      .join(" ")
+      .trim();
+  }
+
   function promocaoComoProdutoPublico(promo = {}, estabelecimento = {}) {
     const contatoPadrao = getPrimeiroContato(
       estabelecimento.contact || estabelecimento.contato || estabelecimento.whatsapp || estabelecimento.telefone || ""
@@ -10235,7 +10251,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       ...promo,
       id: promo.id,
       titulo: promo.titulo || promo.nome || "Promocao",
-      descricao: promo.descricao || promo.obs || promo.observacoes || "",
+      descricao: descricaoPromocaoPublica(promo.descricao || promo.obs || promo.observacoes || ""),
       preco: promo.preco,
       precoAntigo: promo.precoAntigo || promo.precoReal || promo.valorReal || promo.precoOriginal || "",
       imagem: promo.imagem || promo.image || promo.foto || "",
@@ -10243,10 +10259,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       validadeFim: promo.validadeFim || "",
       desconto: promo.desconto || "",
       entregaRetirada: promo.entregaRetirada || "",
-      observacoes: [
-        promo.validadeFim ? `Valido ate ${promo.validadeFim}` : "",
-        promo.desconto ? `Desconto: ${promo.desconto}` : ""
-      ].filter(Boolean).join(" | "),
+      observacoes: "",
+      obs: "",
       categoria: "Promocao",
       contato: contatoPromocao,
       whatsapp: promo.whatsapp || promo.contato || promo.contact || contatoPadrao,
@@ -10280,12 +10294,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const precoAntigo = formatarMoedaPromo(item.precoAntigo || item.precoReal || item.valorReal || item.precoOriginal || "");
     const titulo = escapePromoHtml(item.titulo || "Produto");
     const descricao = escapePromoHtml(item.descricao || item.observacoes || "");
-    const dataPromocaoBR = (value) => {
-      const parts = String(value || "").split("-");
-      return parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : String(value || "");
-    };
     const infoPromocao = [
-      item.validadeFim ? `Valido ate ${dataPromocaoBR(item.validadeFim)}` : "",
+      item.validadeFim ? `Válido até ${dataPromocaoPublicaBR(item.validadeFim)}` : "",
       item.desconto ? `Desconto: ${item.desconto}` : "",
       item.entregaRetirada || ""
     ].filter(Boolean).join(" | ");
@@ -10304,12 +10314,12 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ${item.imagem
                 ? `<img src="${escapePromoHtml(item.imagem)}" alt="${titulo}" loading="lazy">`
                 : `<div class="loja-produto-sem-imagem">Imagem do produto</div>`}
-              ${isPromocao ? `<span class="loja-produto-badge loja-promocao-badge">Promoção</span>` : (item.destaque ? `<span class="loja-produto-badge">Destaque</span>` : "")}
+              ${!isPromocao && item.destaque ? `<span class="loja-produto-badge">Destaque</span>` : ""}
           </div>
           <div class="loja-produto-info">
             ${setorCategoria && !item.ocultarCategoriaCard ? `<div class="loja-produto-categoria">${escapePromoHtml(setorCategoria)}</div>` : ""}
             <div class="loja-produto-nome">${titulo}</div>
-            ${item.exibirEmpresaNoCard && item.estabelecimento ? `<div class="loja-produto-empresa"><i class="fa-solid fa-store"></i>${escapePromoHtml(item.estabelecimento)}</div>` : ""}
+            ${isPromocao && item.estabelecimento ? `<a class="loja-produto-empresa loja-produto-empresa-link" href="#${escapePromoHtml(item.estabelecimentoId || normalizeName(item.estabelecimento))}" data-public-client-link="${escapePromoHtml(item.estabelecimentoId || item.estabelecimento)}"><i class="fa-solid fa-store"></i><span>${escapePromoHtml(item.estabelecimento)}</span><i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ""}
             ${descricao && !item.ocultarDescricaoCard ? `<div class="loja-produto-descricao">${descricao}</div>` : ""}
             ${isPromocao && infoPromocao ? `<div class="loja-produto-promocao-info">${escapePromoHtml(infoPromocao)}</div>` : ""}
           </div>
@@ -10407,6 +10417,9 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       ? ""
       : precoCalculado;
     const whatsapp = (isProduto || isPromocao) ? produtoWhatsappLink(item, isPromocao ? "promocao" : "produto") : "";
+    const lojaNome = String(item.estabelecimento || item.clienteNome || item.loja || "").trim();
+    const lojaChave = String(item.estabelecimentoId || item.clienteId || lojaNome || "").trim();
+    const validadePromocao = isPromocao && item.validadeFim ? dataPromocaoPublicaBR(item.validadeFim) : "";
     const imagensProduto = [
       ...(Array.isArray(item.imagens) ? item.imagens : []),
       ...(Array.isArray(item.fotos) ? item.fotos : []),
@@ -10443,9 +10456,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const modal = document.createElement("div");
     modal.className = "imovel-detalhes-modal loja-produto-modal";
     modal.innerHTML = `
-      <section class="imovel-detalhes-dialog loja-produto-dialog" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(titulo)}">
-        <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
-        <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
+      <section class="imovel-detalhes-dialog loja-produto-dialog ${isPromocao ? "is-promocao" : ""}" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(titulo)}">
         <div class="imovel-detalhes-media loja-produto-media">
           ${imagensProduto.length ? `
             <div class="loja-produto-modal-galeria" data-produto-galeria>
@@ -10459,6 +10470,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
           ` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-box-open"></i></div>`}
         </div>
         <div class="imovel-detalhes-conteudo">
+          <div class="loja-produto-modal-actions">
+            <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
+            <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
+          </div>
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${escapePromoHtml(titulo)}</h2>
@@ -10466,6 +10481,8 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
             </div>
             ${preco ? `<div class="imovel-detalhes-financeiro"><strong class="imovel-detalhes-valor">${escapePromoHtml(preco)}</strong></div>` : ""}
           </div>
+          ${isPromocao && (validadePromocao || item.desconto) ? `<div class="loja-promocao-modal-meta">${validadePromocao ? `<span><i class="fa-regular fa-calendar-check"></i> Válido até <strong>${escapePromoHtml(validadePromocao)}</strong></span>` : ""}${item.desconto ? `<span><i class="fa-solid fa-percent"></i> ${escapePromoHtml(item.desconto)}</span>` : ""}</div>` : ""}
+          ${isPromocao && lojaNome ? `<a class="loja-promocao-modal-loja" href="#${escapePromoHtml(item.estabelecimentoId || normalizeName(lojaNome))}" data-public-client-link="${escapePromoHtml(lojaChave)}"><i class="fa-solid fa-store"></i><span><small>Oferta de</small><strong>${escapePromoHtml(lojaNome)}</strong></span><i class="fa-solid fa-arrow-right"></i></a>` : ""}
           ${(item.descricao || item.observacoes || item.obs) ? `
             <section class="imovel-detalhes-descricao loja-produto-informacoes loja-produto-detalhes-texto">
               <div class="imovel-detalhes-descricao-titulo"><i class="fa-solid fa-align-left"></i><span>Detalhes</span></div>
@@ -10500,6 +10517,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       if (event.key === "Escape" && !document.querySelector(".produto-gallery-modal")) fechar();
     };
     modal.querySelector(".loja-produto-fechar")?.addEventListener("click", fechar);
+    modal.querySelector(".loja-promocao-modal-loja")?.addEventListener("click", () => fechar());
     modal.querySelector(".loja-produto-whatsapp")?.addEventListener("click", () => {
       registrarInteracaoProdutoPublico(item, tipoMetrica, "whatsapp");
     });
@@ -12312,6 +12330,10 @@ plotarPinsImoveis(stateImoveis.filtered);
           ` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-house"></i></div>`}
         </div>
         <div class="imovel-detalhes-conteudo">
+          <div class="loja-produto-modal-actions">
+            <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
+            <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
+          </div>
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${escapePromoHtml(im.titulo || "Imovel")}</h2>
@@ -13225,6 +13247,10 @@ plotarPinsImoveis(stateImoveis.filtered);
           ` : `<div class="imovel-detalhes-sem-foto auto-detalhes-sem-foto"><i class="fa-solid fa-car-side"></i></div>`}
         </div>
         <div class="imovel-detalhes-conteudo">
+          <div class="loja-produto-modal-actions">
+            <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
+            <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
+          </div>
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${textoSeguroAutomoveis(titulo)}</h2>
