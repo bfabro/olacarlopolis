@@ -14059,7 +14059,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         abasInseridas = adicionarAba(li, slug, "promocoes", "Promocoes", "fa-tags", (pane) => {
           const promocoesUnicas = deduplicarPromocoesMesmoEstabelecimentoPublico(promocoes);
           const itens = promocoesUnicas.map((promo) => promocaoComoProdutoPublico(promo, est));
-          pane.innerHTML = `<section class="loja-itens-wrap loja-promocoes-wrap promo-city-screen"><div class="loja-produtos-grid loja-cards-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
+          pane.innerHTML = `<section class="loja-itens-wrap loja-promocoes-wrap auto-cards-mode"><div class="loja-produtos-grid loja-cards-grid loja-itens-grid loja-promocoes-grid">${itens.map((item) => renderProdutoCardEstabelecimento(item, "promocao")).join("")}</div></section>`;
           pane.querySelectorAll("[data-loja-produto]").forEach((card) => {
             card.addEventListener("click", (event) => {
               if (event.__lojaProdutoHandled) return;
