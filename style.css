@@ -21812,6 +21812,33 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   background: #eef4fb;
 }
 
+.loja-produto-zoom-hint {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 2;
+  display: grid;
+  width: 29px;
+  height: 29px;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.78);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(15, 23, 42, 0.62);
+  box-shadow: 0 3px 10px rgba(15, 23, 42, 0.2);
+  font-size: 0.78rem;
+  opacity: 0.9;
+  pointer-events: none;
+  backdrop-filter: blur(3px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.loja-produto-card:hover .loja-produto-zoom-hint,
+.loja-produto-card:focus-within .loja-produto-zoom-hint {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
 .loja-produto-media img,
 .loja-produto-sem-imagem {
   display: block;

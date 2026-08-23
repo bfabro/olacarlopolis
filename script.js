@@ -10299,7 +10299,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       item.desconto ? `Desconto: ${item.desconto}` : "",
       item.entregaRetirada || ""
     ].filter(Boolean).join(" | ");
-    const setorCategoria = isPromocao ? "Promocao" : [item.setor, item.categoria].filter(Boolean).join(" / ");
+    const setorCategoria = isPromocao ? "" : [item.setor, item.categoria].filter(Boolean).join(" / ");
     const whatsapp = produtoWhatsappLink(item, tipo);
     const id = String(item.id || `produto-${normalizeName(item.titulo || item.nome || "item")}`);
     const cacheKey = `${tipo}:${id}`;
@@ -10314,6 +10314,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ${item.imagem
                 ? `<img src="${escapePromoHtml(item.imagem)}" alt="${titulo}" loading="lazy">`
                 : `<div class="loja-produto-sem-imagem">Imagem do produto</div>`}
+              ${item.imagem ? `<span class="loja-produto-zoom-hint" aria-hidden="true" title="Ver mais detalhes"><i class="fa-solid fa-magnifying-glass-plus"></i></span>` : ""}
               ${!isPromocao && item.destaque ? `<span class="loja-produto-badge">Destaque</span>` : ""}
           </div>
           <div class="loja-produto-info">
@@ -10331,12 +10332,12 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
             <div class="loja-produto-acoes vitrine-produto-acoes">
               <button type="button" class="vitrine-produto-detalhes" data-vitrine-produto-detalhes="${escapePromoHtml(cacheKey)}"><i class="fa-solid fa-circle-info"></i> Detalhes</button>
               ${whatsapp
-                ? `<a class="loja-produto-interesse${item.whatsappSomenteIcone ? " is-icon-only" : ""}" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="Falar pelo WhatsApp"><i class="fa-brands fa-whatsapp"></i>${item.whatsappSomenteIcone ? "" : " WhatsApp"}</a>`
-                : `<button type="button" class="loja-produto-interesse is-disabled${item.whatsappSomenteIcone ? " is-icon-only" : ""}" disabled aria-label="WhatsApp indisponível" title="WhatsApp indisponível"><i class="fa-brands fa-whatsapp"></i>${item.whatsappSomenteIcone ? "" : " WhatsApp"}</button>`}
+                ? `<a class="loja-produto-interesse${item.whatsappSomenteIcone ? " is-icon-only" : ""}" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" title="Falar pelo WhatsApp"><i class="fa-brands fa-whatsapp"></i>${item.whatsappSomenteIcone ? "" : (isPromocao ? " Pedir pelo Whats" : " WhatsApp")}</a>`
+                : `<button type="button" class="loja-produto-interesse is-disabled${item.whatsappSomenteIcone ? " is-icon-only" : ""}" disabled aria-label="WhatsApp indisponível" title="WhatsApp indisponível"><i class="fa-brands fa-whatsapp"></i>${item.whatsappSomenteIcone ? "" : (isPromocao ? " Pedir pelo Whats" : " WhatsApp")}</button>`}
             </div>
           ` : ((tipo === "produto" || isPromocao) ? (whatsapp
-            ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>`
-            : `<button type="button" class="loja-produto-interesse is-disabled" disabled>Tenho interesse</button>`) : "")}
+            ? `<a class="loja-produto-interesse" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${isPromocao ? "Pedir pelo Whats" : "Tenho interesse"}</a>`
+            : `<button type="button" class="loja-produto-interesse is-disabled" disabled>${isPromocao ? "Pedir pelo Whats" : "Tenho interesse"}</button>`) : "")}
         </div>
       </article>
     `;
@@ -10505,7 +10506,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
               ` : ""}
             </section>
           ` : ""}
-          ${(isProduto || isPromocao) && whatsapp ? `<a class="auto-whatsapp-button loja-produto-whatsapp" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Tenho interesse</a>` : ""}
+          ${(isProduto || isPromocao) && whatsapp ? `<a class="auto-whatsapp-button loja-produto-whatsapp" href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${isPromocao ? "Pedir pelo Whats" : "Tenho interesse"}</a>` : ""}
         </div>
       </section>
     `;
