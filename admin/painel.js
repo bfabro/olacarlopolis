@@ -46,8 +46,8 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 653,
-  label: "v660",
+  numero: 654,
+  label: "v661",
   data: "2026-08-23",
   nota: "Promocoes de combustiveis com descricao, recorrencia semanal e desconto."
 };

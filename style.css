@@ -14997,7 +14997,7 @@ tr[data-inativo="true"] {
 
 .home-quick-copy p {
   max-width: 560px;
-  margin: 10px 0 0;
+  margin: 10px auto 0;
   color: rgba(255,255,255,.9);
   font-size: 1rem;
   line-height: 1.45;
