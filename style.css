@@ -21880,6 +21880,10 @@ body.home-quick-banner-route-hidden .sidebar.close ~ .home-quick-banner + .home-
   border-color: #fed7aa;
 }
 
+.loja-itens-aba .loja-promocoes-wrap.auto-cards-mode .loja-promocoes-grid {
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
 .loja-produto-info {
   display: flex;
   flex-direction: column;
