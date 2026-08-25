@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=394">
+  <link rel="stylesheet" href="painel.css?v=395">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -2010,7 +2010,14 @@
               <i class="fa-solid fa-circle-info"></i>
               <span>A ANP fornece o cadastro dos postos. Os valores são verificados no intervalo escolhido no Menor Preço / Nota Paraná e também podem ser atualizados manualmente pelo link exclusivo de cada posto.</span>
             </div>
-            <div id="fuelAdminSelectedStations" class="wide fuel-admin-selected"></div>
+            <div class="wide fuel-admin-workspace">
+              <div class="fuel-admin-workspace-tabs" role="tablist" aria-label="Gest&atilde;o dos postos de combust&iacute;vel">
+                <button type="button" role="tab" data-fuel-admin-tab="stations" aria-controls="fuelAdminSelectedStations"><i class="fa-solid fa-gas-pump"></i> Postos</button>
+                <button type="button" role="tab" data-fuel-admin-tab="promotions" aria-controls="fuelAdminPromotions"><i class="fa-solid fa-tags"></i> Promo&ccedil;&otilde;es <span id="fuelAdminPromotionsCount">0</span></button>
+              </div>
+              <div id="fuelAdminSelectedStations" class="fuel-admin-selected" role="tabpanel"></div>
+              <div id="fuelAdminPromotions" class="fuel-admin-promotions hidden" role="tabpanel"></div>
+            </div>
           </form>
         </section>
         <section class="panel-card fuel-history-card">
@@ -2158,6 +2165,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=589"></script>
+  <script type="module" src="painel.js?v=590"></script>
 </body>
 </html>

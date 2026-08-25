@@ -17034,6 +17034,9 @@ async function generateFuelStationUpdateLink(stationId) {
   state.combustiveisConfig = { ...state.combustiveisConfig, postos: stations };
   state.combustiveisLinks = { ...(state.combustiveisLinks || {}), [stationId]: access };
   renderFuelAdminSelectedStations();
+  renderFuelAdminPromotions();
+  bindFuelAdminWorkspaceTabs();
+  setFuelAdminWorkspaceTab(fuelAdminActiveWorkspaceTab);
   const link = fuelAdminStationUpdateUrl(stationId, access);
   try { await navigator.clipboard.writeText(link); showToast("Link gerado e copiado."); }
   catch { showToast("Link gerado. Use o botao Copiar."); }
@@ -17051,6 +17054,9 @@ async function revokeFuelStationUpdateLink(stationId) {
   });
   state.combustiveisLinks[stationId] = { ...access, ativo: false };
   renderFuelAdminSelectedStations();
+  renderFuelAdminPromotions();
+  bindFuelAdminWorkspaceTabs();
+  setFuelAdminWorkspaceTab(fuelAdminActiveWorkspaceTab);
   showToast("Link revogado.");
 }
 
@@ -17312,6 +17318,112 @@ function renderFuelAdminProducts(station) {
     }).join("")}</div>
   </section>`;
 }
+let fuelAdminActiveWorkspaceTab = "stations";
+
+function fuelAdminConfiguredPromotion(value) {
+  if (!value || value.ativo !== true) return null;
+  const price = fuelPanelPrice(value.preco);
+  const start = Number(value.inicioEmTimestamp || 0);
+  const end = Number(value.fimEmTimestamp || 0);
+  const days = [...new Set((Array.isArray(value.diasSemana) ? value.diasSemana : []).map(Number).filter((day) => day >= 0 && day <= 6))];
+  const hasPeriod = start > 0 && end > start;
+  if (!(price > 0) || (!hasPeriod && !days.length)) return null;
+  return { ...value, preco: price, inicioEmTimestamp: hasPeriod ? start : 0, fimEmTimestamp: hasPeriod ? end : 0, diasSemana: days };
+}
+
+function fuelAdminPromotionWeekday() {
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" })
+    .formatToParts(new Date()).reduce((result, part) => { if (part.type !== "literal") result[part.type] = Number(part.value); return result; }, {});
+  return new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay();
+}
+
+function fuelAdminPromotionStatus(promotion) {
+  const now = Date.now();
+  const start = Number(promotion.inicioEmTimestamp || 0);
+  const end = Number(promotion.fimEmTimestamp || 0);
+  if (end > 0 && now > end) return { label: "Encerrada", className: "is-ended" };
+  if (start > 0 && now < start) return { label: "Programada", className: "" };
+  if (promotion.diasSemana.length && !promotion.diasSemana.includes(fuelAdminPromotionWeekday())) return { label: "Fora do dia", className: "" };
+  return { label: "Ativa hoje", className: "is-active" };
+}
+
+function fuelAdminPromotionDays(days = []) {
+  const labels = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sab"];
+  return days.length ? days.map((day) => labels[day]).join(", ") : "Periodo informado";
+}
+
+function renderFuelAdminPromotions() {
+  const mount = $("fuelAdminPromotions");
+  if (!mount) return;
+  const rows = [];
+  Object.entries(fuelAdminStationMap()).forEach(([stationId, station]) => {
+    Object.entries(fuelAdminProductMap(station)).forEach(([productId, product]) => {
+      const promotion = fuelAdminConfiguredPromotion(product?.promocao);
+      if (promotion) rows.push({ stationId, station, productId, product, promotion });
+    });
+  });
+  rows.sort((a, b) => String(a.station.nomeExibicao || a.station.razaoSocial || "").localeCompare(String(b.station.nomeExibicao || b.station.razaoSocial || ""), "pt-BR")
+    || String(a.product.nome || a.productId).localeCompare(String(b.product.nome || b.productId), "pt-BR"));
+  const count = $("fuelAdminPromotionsCount");
+  if (count) count.textContent = String(rows.length);
+  if (!rows.length) {
+    mount.innerHTML = '<div class="fuel-admin-promotions-empty"><i class="fa-solid fa-tags"></i><strong>Nenhuma promo&ccedil;&atilde;o configurada</strong><span>Quando um posto cadastrar um pre&ccedil;o promocional, ele aparecer&aacute; aqui para confer&ecirc;ncia.</span></div>';
+    return;
+  }
+  mount.innerHTML = `<div class="fuel-admin-promotions-head"><div><h3>Promo&ccedil;&otilde;es configuradas</h3><p>Confira pre&ccedil;os, dias, validade e respons&aacute;vel pela atualiza&ccedil;&atilde;o.</p></div><span>${rows.length} promo&ccedil;${rows.length === 1 ? "&atilde;o" : "&otilde;es"}</span></div>
+    ${rows.map(({ station, product, productId, promotion }) => {
+      const stationName = station.nomeExibicao || station.razaoSocial || "Posto";
+      const status = fuelAdminPromotionStatus(promotion);
+      const regularPrice = fuelPanelPrice(product.preco);
+      const period = promotion.inicioEmTimestamp && promotion.fimEmTimestamp
+        ? `${fuelPanelDateTime(promotion.inicioEmTimestamp)} at\u00e9 ${fuelPanelDateTime(promotion.fimEmTimestamp)}`
+        : "Recorrente, sem data final";
+      const discountValue = fuelPanelPrice(promotion.descontoValor);
+      const discount = promotion.descontoTipo === "percentual" && discountValue > 0
+        ? `Desconto: ${discountValue.toLocaleString("pt-BR", { maximumFractionDigits: 2 })}%`
+        : promotion.descontoTipo === "valor" && discountValue > 0
+          ? `Desconto: R$ ${discountValue.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+          : "";
+      return `<article class="fuel-admin-promotion-card">
+        <div class="fuel-admin-promotion-photo">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(stationName)}" loading="lazy">` : '<i class="fa-solid fa-gas-pump"></i>'}</div>
+        <div class="fuel-admin-promotion-content">
+          <div class="fuel-admin-promotion-title"><div><span>${escapeHtml(stationName)}</span><h4>${escapeHtml(product.nome || productId)}</h4></div><strong class="fuel-admin-promotion-status ${status.className}">${status.label}</strong></div>
+          <div class="fuel-admin-promotion-prices">${regularPrice > 0 ? `<del>R$ ${regularPrice.toFixed(3).replace(".", ",")}</del>` : ""}<strong>R$ ${promotion.preco.toFixed(3).replace(".", ",")}</strong></div>
+          ${promotion.descricao ? `<p class="fuel-admin-promotion-description">${escapeHtml(promotion.descricao)}</p>` : ""}
+          <div class="fuel-admin-promotion-meta">
+            <span><i class="fa-regular fa-calendar-days"></i> ${escapeHtml(fuelAdminPromotionDays(promotion.diasSemana))}</span>
+            <span><i class="fa-regular fa-clock"></i> ${escapeHtml(period)}</span>
+            ${discount ? `<span><i class="fa-solid fa-arrow-trend-down"></i> ${escapeHtml(discount)}</span>` : ""}
+            ${promotion.responsavelNome ? `<span><i class="fa-regular fa-user"></i> ${escapeHtml(promotion.responsavelNome)}</span>` : ""}
+            ${promotion.atualizadoEmTimestamp ? `<span><i class="fa-solid fa-rotate"></i> ${escapeHtml(fuelPanelDateTime(promotion.atualizadoEmTimestamp))}</span>` : ""}
+          </div>
+        </div>
+      </article>`;
+    }).join("")}`;
+}
+
+function setFuelAdminWorkspaceTab(tab) {
+  fuelAdminActiveWorkspaceTab = tab === "promotions" ? "promotions" : "stations";
+  const stations = $("fuelAdminSelectedStations");
+  const promotions = $("fuelAdminPromotions");
+  stations?.classList.toggle("hidden", fuelAdminActiveWorkspaceTab !== "stations");
+  promotions?.classList.toggle("hidden", fuelAdminActiveWorkspaceTab !== "promotions");
+  document.querySelectorAll("[data-fuel-admin-tab]").forEach((button) => {
+    const active = button.dataset.fuelAdminTab === fuelAdminActiveWorkspaceTab;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-selected", String(active));
+    button.tabIndex = active ? 0 : -1;
+  });
+}
+
+function bindFuelAdminWorkspaceTabs() {
+  document.querySelectorAll("[data-fuel-admin-tab]").forEach((button) => {
+    if (button.dataset.bound === "true") return;
+    button.dataset.bound = "true";
+    button.addEventListener("click", () => setFuelAdminWorkspaceTab(button.dataset.fuelAdminTab));
+  });
+}
+
 function renderFuelAdminSelectedStations() {
   const box = $("fuelAdminSelectedStations");
   if (!box) return;
@@ -17493,6 +17605,9 @@ function renderFuelAdminSettings() {
     if (text) text.textContent = details;
   }
   renderFuelAdminSelectedStations();
+  renderFuelAdminPromotions();
+  bindFuelAdminWorkspaceTabs();
+  setFuelAdminWorkspaceTab(fuelAdminActiveWorkspaceTab);
   renderFuelAdminSearchResults();
   renderFuelHistory("fuelAdminHistory");
 }

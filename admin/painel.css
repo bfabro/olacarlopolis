@@ -8920,8 +8920,8 @@ button.admin-button-loading::after {
 .fuel-admin-station-settings { grid-template-columns: minmax(210px, 1fr) minmax(260px, 1.2fr) minmax(170px, .65fr) auto; }
 .fuel-admin-image-upload { display: grid; gap: 6px; color: #536579; font-size: .75rem; font-weight: 800; }
 .fuel-admin-image-upload input { padding: 6px; background: #f8fafc; }
-.fuel-admin-image-preview { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 130px; overflow: hidden; border: 1px dashed #bfd0e1; border-radius: 13px; color: #77869a; background: #f6f9fc; }
-.fuel-admin-image-preview img { width: 100%; max-height: 260px; object-fit: cover; }
+.fuel-admin-image-preview { grid-column: 1 / -1; display: flex; align-items: center; justify-content: center; gap: 9px; min-height: 180px; max-height: 420px; overflow: hidden; padding: 12px; border: 1px dashed #bfd0e1; border-radius: 13px; color: #77869a; background: linear-gradient(135deg, #f8fbfe, #edf3f8); }
+.fuel-admin-image-preview img { display: block; width: 100%; height: auto; max-height: 396px; object-fit: contain; object-position: center; border-radius: 9px; }
 .fuel-admin-image-preview i { color: #2b7dc5; font-size: 1.45rem; }
 .fuel-admin-image-preview span { font-size: .78rem; font-weight: 800; }
 
@@ -9093,3 +9093,42 @@ button.admin-button-loading::after {
 .fuel-admin-schedule-all-day input { accent-color: #0891b2; }
 .fuel-admin-station-settings label small { color: #718196; font-size: .66rem; font-weight: 650; line-height: 1.35; }
 @media (max-width: 480px) { .fuel-admin-schedule-head { align-items: flex-start; flex-direction: column; } }
+
+
+/* Abas e conferencia de promocoes de combustiveis - v395 */
+.fuel-admin-workspace { display: grid; gap: 13px; min-width: 0; }
+.fuel-admin-workspace-tabs { display: flex; gap: 7px; padding: 5px; border: 1px solid #d4e0eb; border-radius: 13px; background: #eef4f9; }
+.fuel-admin-workspace-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 8px 15px; border: 0; border-radius: 9px; color: #526a80; background: transparent; font-weight: 850; cursor: pointer; }
+.fuel-admin-workspace-tabs button.active { color: #fff; background: #176dc1; box-shadow: 0 5px 14px rgba(23,109,193,.22); }
+.fuel-admin-workspace-tabs button span { display: inline-grid; min-width: 23px; height: 23px; place-items: center; padding: 0 6px; border-radius: 999px; color: #176dc1; background: #fff; font-size: .68rem; }
+.fuel-admin-promotions { display: grid; gap: 12px; }
+.fuel-admin-promotions-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 15px 16px; border: 1px solid #f1d5ad; border-radius: 14px; background: #fff9ef; }
+.fuel-admin-promotions-head h3 { margin: 0 0 3px; color: #75400d; font-size: 1rem; }
+.fuel-admin-promotions-head p { margin: 0; color: #8a6745; font-size: .75rem; }
+.fuel-admin-promotions-head > span { padding: 6px 10px; border-radius: 999px; color: #9b4e00; background: #ffe7bd; font-size: .72rem; font-weight: 900; white-space: nowrap; }
+.fuel-admin-promotion-card { display: grid; grid-template-columns: 112px minmax(0,1fr); gap: 15px; overflow: hidden; padding: 14px; border: 1px solid #e2e8ef; border-left: 4px solid #e47a0b; border-radius: 15px; background: #fff; box-shadow: 0 6px 18px rgba(26,48,70,.06); }
+.fuel-admin-promotion-photo { display: grid; place-items: center; min-height: 105px; overflow: hidden; border-radius: 11px; color: #8b6847; background: #fff4df; font-size: 1.55rem; }
+.fuel-admin-promotion-photo img { width: 100%; height: 105px; object-fit: contain; object-position: center; }
+.fuel-admin-promotion-content { display: grid; gap: 9px; min-width: 0; }
+.fuel-admin-promotion-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.fuel-admin-promotion-title span { color: #a45406; font-size: .67rem; font-weight: 900; text-transform: uppercase; }
+.fuel-admin-promotion-title h4 { margin: 2px 0 0; color: #173650; font-size: .96rem; }
+.fuel-admin-promotion-status { padding: 5px 8px; border-radius: 999px; color: #805000; background: #fff0c9; font-size: .64rem; font-weight: 900; white-space: nowrap; }
+.fuel-admin-promotion-status.is-active { color: #17633d; background: #dcf7e9; }
+.fuel-admin-promotion-status.is-ended { color: #7b5960; background: #f1e8ea; }
+.fuel-admin-promotion-prices { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px; }
+.fuel-admin-promotion-prices del { color: #7b8996; font-size: .78rem; }
+.fuel-admin-promotion-prices strong { color: #c45c00; font-size: 1.28rem; }
+.fuel-admin-promotion-description { margin: 0; color: #526b80; font-size: .77rem; line-height: 1.4; }
+.fuel-admin-promotion-meta { display: flex; flex-wrap: wrap; gap: 7px; }
+.fuel-admin-promotion-meta span { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 8px; color: #536a7e; background: #f1f5f8; font-size: .67rem; font-weight: 750; }
+.fuel-admin-promotions-empty { display: grid; justify-items: center; gap: 7px; padding: 34px 18px; border: 1px dashed #cad7e3; border-radius: 15px; color: #718397; background: #f8fafc; text-align: center; }
+.fuel-admin-promotions-empty i { color: #d18232; font-size: 1.7rem; }
+.fuel-admin-promotions-empty strong { color: #3c566d; }
+@media (max-width: 620px) {
+  .fuel-admin-workspace-tabs button { flex: 1; padding-inline: 8px; }
+  .fuel-admin-promotion-card { grid-template-columns: 1fr; }
+  .fuel-admin-promotion-photo { min-height: 150px; }
+  .fuel-admin-promotion-photo img { height: 150px; }
+  .fuel-admin-promotions-head, .fuel-admin-promotion-title { align-items: flex-start; flex-direction: column; }
+}
