@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-23-acesso-rapido-subtitulo-v708'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-25-admin-combustiveis-retraidos-v709'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

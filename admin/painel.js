@@ -17318,7 +17318,20 @@ function renderFuelAdminProducts(station) {
     }).join("")}</div>
   </section>`;
 }
+function renderFuelAdminStationPriceSummary(station) {
+  const products = Object.entries(fuelAdminProductMap(station)).filter(([, product]) => product?.ativo !== false);
+  if (!products.length) return `<span class="fuel-admin-overview-empty">Nenhum produto habilitado</span>`;
+  return products.map(([productId, product]) => {
+    const regularPrice = fuelPanelPrice(product.preco);
+    const promotion = fuelAdminConfiguredPromotion(product.promocao);
+    const promotionActive = promotion && fuelAdminPromotionStatus(promotion).className === "is-active";
+    const currentPrice = promotionActive ? promotion.preco : regularPrice;
+    return `<span class="fuel-admin-overview-price ${promotionActive ? "is-promotional" : ""}"><small>${escapeHtml(product.nome || productId)}</small><strong>${currentPrice > 0 ? `R$ ${currentPrice.toFixed(3).replace(".", ",")}` : "Aguardando"}</strong>${promotionActive ? "<em>Promo</em>" : ""}</span>`;
+  }).join("");
+}
+
 let fuelAdminActiveWorkspaceTab = "stations";
+const fuelAdminExpandedStations = new Set();
 
 function fuelAdminConfiguredPromotion(value) {
   if (!value || value.ativo !== true) return null;
@@ -17430,8 +17443,15 @@ function renderFuelAdminSelectedStations() {
   const stations = Object.values(fuelAdminStationMap());
   box.innerHTML = stations.length ? stations.map((station) => {
     const id = String(station.codigoSIMP || station.cnpj || "");
-    return `<article class="fuel-admin-station" data-fuel-station-id="${escapeAttr(id)}">
-      <header><div><span class="feature-kicker">${escapeHtml(station.distribuidora || "Posto")}</span><h3>${escapeHtml(station.razaoSocial || station.nomeExibicao || "Posto")}</h3><p>${escapeHtml(station.endereco || "")}${station.bairro ? ` · ${escapeHtml(station.bairro)}` : ""}</p></div><button type="button" class="danger-mini" data-remove-fuel-station="${escapeAttr(id)}"><i class="fa-solid fa-trash"></i> Remover</button></header>
+    const stationName = station.nomeExibicao || station.razaoSocial || "Posto";
+    return `<details class="fuel-admin-station" data-fuel-station-id="${escapeAttr(id)}" ${fuelAdminExpandedStations.has(id) ? "open" : ""}>
+      <summary class="fuel-admin-station-overview">
+        <span class="fuel-admin-overview-photo">${station.imagem ? `<img src="${escapeAttr(station.imagem)}" alt="Foto de ${escapeAttr(stationName)}" loading="lazy">` : '<i class="fa-solid fa-gas-pump"></i>'}</span>
+        <span class="fuel-admin-overview-main"><small>${escapeHtml(station.distribuidora || "Posto")}</small><strong>${escapeHtml(stationName)}</strong><span>${escapeHtml(station.endereco || "")}${station.bairro ? ` \u00b7 ${escapeHtml(station.bairro)}` : ""}</span></span>
+        <span class="fuel-admin-overview-toggle"><span>Detalhes</span><i class="fa-solid fa-chevron-down"></i></span>
+        <span class="fuel-admin-overview-prices">${renderFuelAdminStationPriceSummary(station)}</span>
+      </summary>
+      <div class="fuel-admin-station-expanded-head"><div><strong>Configuracoes completas</strong><small>Edite os dados, precos, horarios e integracoes deste posto.</small></div><button type="button" class="danger-mini" data-remove-fuel-station="${escapeAttr(id)}"><i class="fa-solid fa-trash"></i> Remover</button></div>
       ${renderFuelAdminLinkBox(id)}
       <div class="fuel-admin-station-settings">
         <label>Nome exibido<input data-fuel-station-name value="${escapeAttr(station.nomeExibicao || station.razaoSocial || "")}"></label>
@@ -17444,8 +17464,14 @@ function renderFuelAdminSelectedStations() {
       ${renderFuelAdminSchedule(station)}
       ${renderFuelAdminProducts(station)}
       ${renderFuelAdminAnpDetails(station)}
-    </article>`;
+    </details>`;
   }).join("") : `<div class="list-meta">Nenhum posto selecionado. Faça a busca abaixo e adicione os postos desejados.</div>`;
+  box.querySelectorAll("[data-fuel-station-id]").forEach((card) => card.addEventListener("toggle", () => {
+    const stationId = card.dataset.fuelStationId || "";
+    if (!stationId) return;
+    if (card.open) fuelAdminExpandedStations.add(stationId);
+    else fuelAdminExpandedStations.delete(stationId);
+  }));
   box.querySelectorAll("[data-add-fuel-product]").forEach((button) => button.addEventListener("click", () => {
     const card = button.closest("[data-fuel-station-id]");
     const stationId = card?.dataset.fuelStationId || "";
