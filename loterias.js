@@ -1,4 +1,4 @@
-// Loterias publicas - v3
+// Loterias publicas - v4
 (() => {
   "use strict";
 
@@ -142,9 +142,11 @@
     const label = estimated ? compactMoney(estimated) : config.slug === "federal" ? "Veja as faixas" : "Não informado";
     return `<article class="lottery-card lottery-${config.slug} ${config.slug === "megasena" && data.acumulado ? "is-highlighted" : ""}" data-lottery-card="${config.slug}">
       <div class="lottery-card-heading"><span class="lottery-game-icon"><i class="fa-solid ${config.icon}"></i></span><div><h3>${esc(config.nome)}</h3><small>Concurso ${esc(data.numero || "—")} • ${esc(data.dataApuracao || "Data não informada")}</small></div>${data.acumulado ? `<span class="lottery-accumulated">Acumulou</span>` : ""}</div>
+      ${balls(data.listaDezenas, config.slug)}
+      <div class="lottery-draw-summary">
       <div class="lottery-prize"><span>${estimated ? "Prêmio estimado do próximo concurso" : "Premiação do concurso"}</span><strong>${esc(label)}</strong></div>
       ${data.dataProximoConcurso ? `<p class="lottery-next"><i class="fa-regular fa-calendar"></i><span><small>Próximo sorteio</small><strong>${esc(dateFull(data.dataProximoConcurso))}</strong></span></p>` : ""}
-      ${balls(data.listaDezenas, config.slug)}
+      </div>
       ${specialMarkup(data, config.slug)}
       ${item.stale ? `<p class="lottery-card-stale"><i class="fa-solid fa-clock-rotate-left"></i> Último resultado disponível</p>` : ""}
       <button type="button" class="lottery-details-button" data-lottery-details="${config.slug}">Ver detalhes <i class="fa-solid fa-arrow-right"></i></button>
@@ -248,7 +250,6 @@
   }
 
   function bindPageEvents(area) {
-    area.querySelector("#lotteryBack")?.addEventListener("click", closePage);
     area.querySelector("#lotteryShare")?.addEventListener("click", share);
     area.querySelector("#lotteryShare")?.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); share(); } });
     area.querySelector("#lotteryRetry")?.addEventListener("click", () => loadResults(true));
@@ -284,7 +285,7 @@
 
   function pageMarkup() {
     return `<main class="lottery-page">
-      <div class="page-header lottery-page-header"><h2><i class="fa-solid fa-clover"></i> Resultados das Loterias</h2><div class="lottery-page-header-actions"><button id="lotteryBack" class="lottery-page-back" type="button"><i class="fa-solid fa-arrow-left"></i><span>Voltar</span></button><i id="lotteryShare" class="fa-solid fa-share-nodes share-btn" role="button" tabindex="0" aria-label="Compartilhar resultados das loterias"></i></div></div>
+      <div class="page-header lottery-page-header"><h2><i class="fa-solid fa-clover"></i> Resultados das Loterias</h2><i id="lotteryShare" class="fa-solid fa-share-nodes share-btn" role="button" tabindex="0" aria-label="Compartilhar resultados das loterias"></i></div>
       <section class="lottery-intro"><span class="lottery-intro-icon"><i class="fa-solid fa-clover"></i></span><div class="lottery-intro-copy"><span class="lottery-kicker">Informação oficial</span><p>Confira os últimos resultados e os prêmios estimados das Loterias CAIXA.</p></div><div id="lotteryStatus" class="lottery-status" aria-live="polite"><span><i class="fa-solid fa-spinner fa-spin"></i> Atualizando resultados...</span></div></section>
       <section class="lottery-tools" aria-label="Filtros de loterias"><div class="lottery-filter-chips"><button type="button" class="is-active" data-lottery-filter="todas">Todas</button><button type="button" data-lottery-filter="megasena">Mega-Sena</button><button type="button" data-lottery-filter="lotofacil">Lotofácil</button><button type="button" data-lottery-filter="quina">Quina</button><button type="button" data-lottery-filter="outras">Outras</button></div><label class="lottery-search"><i class="fa-solid fa-magnifying-glass"></i><span class="sr-only">Buscar loteria</span><input id="lotterySearch" type="search" placeholder="Buscar loteria" autocomplete="off"></label><button id="lotteryRetry" class="lottery-refresh" type="button" title="Atualizar resultados"><i class="fa-solid fa-rotate"></i><span>Atualizar</span></button></section>
       <div id="lotteryResults" class="lottery-results" aria-live="polite">${skeleton()}</div>
