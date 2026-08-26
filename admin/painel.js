@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 659,
-  label: "v666",
+  numero: 660,
+  label: "v667",
   data: "2026-08-26",
-  nota: "Loterias públicas integradas ao site com resultados oficiais, cache e busca."
+  nota: "Resultados das loterias corrigidos com consulta consolidada, redundância e cache."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

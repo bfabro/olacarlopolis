@@ -1,8 +1,8 @@
-// Loterias publicas - v1
+// Loterias publicas - v2
 (() => {
   "use strict";
 
-  const CACHE_KEY = "ola_carlopolis_loterias_cache_v1";
+  const CACHE_KEY = "ola_carlopolis_loterias_cache_v2";
   const CACHE_TTL = 15 * 60 * 1000;
   const HOME_TITLE = document.title;
   const GAME_CONFIG = [
