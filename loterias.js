@@ -1,4 +1,4 @@
-// Loterias publicas - v5
+// Loterias publicas - v6
 (() => {
   "use strict";
 
@@ -17,6 +17,49 @@
     { slug: "supersete", nome: "Super Sete", grupo: "outras", icon: "fa-table-cells-large", regra: "O volante tem 7 colunas com dígitos de 0 a 9. Escolha ao menos um por coluna; é sorteado um dígito em cada coluna e há prêmio de 3 a 7 acertos." },
     { slug: "federal", nome: "Loteria Federal", grupo: "outras", icon: "fa-ticket", regra: "Compre um bilhete inteiro ou uma fração já numerada. Você pode ganhar pelos cinco prêmios principais e também por aproximações e combinações do número." }
   ];
+  function betCombination(total, selected) {
+    let result = 1;
+    for (let index = 1; index <= selected; index += 1) result = result * (total - selected + index) / index;
+    return Math.round(result);
+  }
+
+  function betValue(value) {
+    return Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  }
+
+  function combinationPriceRows(minimum, maximum, selected, basePrice, suffix = "") {
+    return Array.from({ length: maximum - minimum + 1 }, (_, index) => {
+      const quantity = minimum + index;
+      return [`${quantity}${suffix}`, betValue(betCombination(quantity, selected) * basePrice)];
+    });
+  }
+
+  const BET_PRICE_TABLES = {
+    megasena: { headers: ["Números", "Valor da aposta"], rows: combinationPriceRows(6, 20, 6, 6) },
+    lotofacil: { headers: ["Números", "Valor da aposta"], rows: combinationPriceRows(15, 20, 15, 3.5) },
+    quina: { headers: ["Números", "Valor da aposta"], rows: combinationPriceRows(5, 15, 5, 3) },
+    maismilionaria: {
+      headers: ["Números", "Trevos", "Apostas simples", "Valor"],
+      rows: Array.from({ length: 7 }, (_, numberIndex) => Array.from({ length: 5 }, (_, cloverIndex) => {
+        const numbers = numberIndex + 6;
+        const clovers = cloverIndex + 2;
+        const simpleBets = betCombination(numbers, 6) * betCombination(clovers, 2);
+        return [String(numbers), String(clovers), simpleBets.toLocaleString("pt-BR"), betValue(simpleBets * 6)];
+      })).flat()
+    },
+    lotomania: { headers: ["Quantidade", "Valor da aposta"], rows: [["50 números", "R$ 3,00"]] },
+    timemania: { headers: ["Quantidade", "Valor da aposta"], rows: [["10 números + Time do Coração", "R$ 3,50"]] },
+    duplasena: { headers: ["Números", "Valor da aposta"], rows: combinationPriceRows(6, 15, 6, 3) },
+    diadesorte: { headers: ["Números + Mês de Sorte", "Valor da aposta"], rows: combinationPriceRows(7, 15, 7, 2.5) },
+    supersete: {
+      headers: ["Números marcados", "Valor da aposta"],
+      rows: [3, 6, 12, 24, 48, 96, 192, 384, 576, 864, 1296, 1944, 2916, 4374, 6561].map((value, index) => [String(index + 7), betValue(value)])
+    },
+    federal: {
+      headers: ["Bilhete / fração", "Valor"],
+      rows: [["1 fração — extração regular", "R$ 4,00"], ["Bilhete inteiro — extração regular", "R$ 40,00"], ["1 fração — Enricou ou Natal", "R$ 10,00"], ["Bilhete inteiro — Enricou ou Natal", "R$ 100,00"]]
+    }
+  };
   const state = { resultados: [], consultadoEm: "", stale: false, loading: false, open: false, filter: "todas", query: "", savedNodes: null, previousHash: "", lastTrigger: null };
   let originalDescription = "";
 
@@ -135,13 +178,20 @@
     return `<div class="lottery-balls ${slug === "federal" ? "is-federal" : ""}" aria-label="${esc(label)}">${list.map((value, index) => `<span class="lottery-ball ${kind === "trevo" ? "is-trevo" : ""}" aria-label="${kind === "trevo" ? "Trevo" : "Número"} ${index + 1}: ${esc(value)}">${esc(value)}</span>`).join("")}</div>`;
   }
 
+  function betPricesMarkup(slug) {
+    const table = BET_PRICE_TABLES[slug];
+    if (!table?.rows?.length) return "";
+    return `<section class="lottery-bet-prices" aria-label="Valores das apostas"><h4><i class="fa-solid fa-coins"></i> Valores das apostas</h4><div class="lottery-bet-prices-scroll"><table><thead><tr>${table.headers.map((header) => `<th scope="col">${esc(header)}</th>`).join("")}</tr></thead><tbody>${table.rows.map((row) => `<tr>${row.map((cell, index) => `<${index === 0 ? "th" : "td"}${index === 0 ? ' scope="row"' : ""}>${esc(cell)}</${index === 0 ? "th" : "td"}>`).join("")}</tr>`).join("")}</tbody></table></div><small>Valores oficiais consultados em 26/08/2026. Confirme antes de apostar.</small></section>`;
+  }
+
   function cardMarkup(config, item) {
     if (!item?.ok || !item.data) return `<article class="lottery-card lottery-${config.slug} is-unavailable"><div class="lottery-card-heading"><span class="lottery-game-icon"><i class="fa-solid ${config.icon}"></i></span><h3>${esc(config.nome)}</h3></div><p>Resultado temporariamente indisponível.</p><button type="button" data-lottery-retry><i class="fa-solid fa-rotate"></i> Tentar novamente</button></article>`;
     const data = item.data;
     const estimated = number(data.valorEstimadoProximoConcurso);
     const label = estimated ? compactMoney(estimated) : config.slug === "federal" ? "Veja as faixas" : "Não informado";
     return `<article class="lottery-card lottery-${config.slug} ${config.slug === "megasena" && data.acumulado ? "is-highlighted" : ""}" data-lottery-card="${config.slug}">
-      <div class="lottery-card-heading"><span class="lottery-game-icon"><i class="fa-solid ${config.icon}"></i></span><div><h3>${esc(config.nome)}</h3><small>Concurso ${esc(data.numero || "—")} • ${esc(data.dataApuracao || "Data não informada")}</small></div>${data.acumulado ? `<span class="lottery-accumulated">Acumulou</span>` : ""}</div>
+      <div class="lottery-card-heading"><span class="lottery-game-icon"><i class="fa-solid ${config.icon}"></i></span><div><h3>${esc(config.nome)}</h3><small>Concurso ${esc(data.numero || "—")} • ${esc(data.dataApuracao || "Data não informada")}</small></div></div>
+      ${data.acumulado ? `<div class="lottery-accumulated-row"><span class="lottery-accumulated"><i class="fa-solid fa-arrow-trend-up"></i> Acumulou</span></div>` : ""}
       ${balls(data.listaDezenas, config.slug)}
       <div class="lottery-draw-summary">
       <div class="lottery-prize"><span>${estimated ? "Prêmio estimado do próximo concurso" : "Premiação do concurso"}</span><strong>${esc(label)}</strong></div>
@@ -149,7 +199,7 @@
       </div>
       ${specialMarkup(data, config.slug)}
       ${item.stale ? `<p class="lottery-card-stale"><i class="fa-solid fa-clock-rotate-left"></i> Último resultado disponível</p>` : ""}
-      <details class="lottery-rules"><summary><span><i class="fa-solid fa-circle-question"></i> Regras do jogo</span><i class="fa-solid fa-chevron-down lottery-rules-chevron"></i></summary><div><p>${esc(config.regra || "Consulte as regras oficiais desta modalidade nos canais das Loterias CAIXA.")}</p></div></details>
+      <details class="lottery-rules"><summary><span><i class="fa-solid fa-circle-question"></i> Regras do jogo</span><i class="fa-solid fa-chevron-down lottery-rules-chevron"></i></summary><div><p>${esc(config.regra || "Consulte as regras oficiais desta modalidade nos canais das Loterias CAIXA.")}</p>${betPricesMarkup(config.slug)}</div></details>
       <button type="button" class="lottery-details-button" data-lottery-details="${config.slug}">Ver detalhes <i class="fa-solid fa-arrow-right"></i></button>
     </article>`;
   }
