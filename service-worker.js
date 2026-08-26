@@ -1,10 +1,12 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-26-promocao-validade-campos-v713'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-26-loterias-publicas-v714'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
+  '/loterias.css',
+  '/loterias.js',
   '/images/img_padrao_site/icon-192_2.png',
   '/images/img_padrao_site/icon-512_2.png',
 ];
@@ -44,7 +46,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin !== self.location.origin) return;
 
   // APIs administrativas devem refletir sempre a fonte atual, sem resposta antiga do cache.
-  if (url.pathname.startsWith('/api/')) {
+  if (url.pathname.startsWith('/api/') || url.pathname.startsWith('/.netlify/functions/')) {
     event.respondWith(fetch(req, { cache: 'no-store' }));
     return;
   }

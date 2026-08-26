@@ -6762,6 +6762,7 @@ carlopdiesel:"s",
       ["Informações", [
         "menuSol",
         "menuEventos",       
+        "menuLoterias",
         "menuRepresa",        
         "menuNotaFalecimento" ,
         "menuNoticiasCidade" ,
@@ -25572,7 +25573,16 @@ ${produtosIniciaisLoja.length ? `
   }
 
   function abrirResultadoBusca(item) {
-    if (!item || !item.category) return;
+    if (!item) return;
+    if (item.tipo === "loteria") {
+      if (typeof window.abrirLoterias === "function") window.abrirLoterias(item.slug || "");
+      else location.hash = item.slug ? `#loterias-${item.slug}` : "#loterias";
+      if (searchInput) searchInput.value = "";
+      if (clearSearch) clearSearch.style.display = "none";
+      if (window.innerWidth < 768) sidebar?.classList.add("close");
+      return;
+    }
+    if (!item.category) return;
 
     const category = item.category;
     const destino = "#comercios-" + normalizeName(category.title);
@@ -25610,6 +25620,22 @@ ${produtosIniciaisLoja.length ? `
     }
 
     const resultados = [];
+    const loteriasBusca = [
+      { slug: "", titulo: "Resultados das Loterias", termos: "loteria loterias resultado loteria resultados loterias" },
+      { slug: "megasena", titulo: "Mega-Sena", termos: "mega mega sena megasena" },
+      { slug: "lotofacil", titulo: "Lotofácil", termos: "lotofacil loto facil" },
+      { slug: "quina", titulo: "Quina", termos: "quina" },
+      { slug: "lotomania", titulo: "Lotomania", termos: "lotomania" },
+      { slug: "timemania", titulo: "Timemania", termos: "timemania" },
+      { slug: "duplasena", titulo: "Dupla Sena", termos: "dupla sena duplasena" },
+      { slug: "diadesorte", titulo: "Dia de Sorte", termos: "dia de sorte diadesorte" },
+      { slug: "supersete", titulo: "Super Sete", termos: "super sete supersete" },
+      { slug: "maismilionaria", titulo: "+Milionária", termos: "milionaria mais milionaria +milionaria maismilionaria" },
+      { slug: "federal", titulo: "Loteria Federal", termos: "federal loteria federal" }
+    ];
+    loteriasBusca.forEach((item) => {
+      if (removerAcentosBusca(item.termos).includes(termo)) resultados.push({ tipo: "loteria", titulo: item.titulo, subtitulo: "Loterias CAIXA", slug: item.slug });
+    });
 
     categories.forEach((category) => {
       const tituloCategoria = removerAcentosBusca(category.title);
@@ -25798,6 +25824,7 @@ ${produtosIniciaisLoja.length ? `
     if (h === "#ranking-xadrez") { return mostrarRankingXadrez(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#combustivel") { return mostrarCombustivel(); }
+    if (h === "#loterias" || h.startsWith("#loterias-")) { return window.mostrarLoterias?.(h.replace("#loterias-", "").replace("#loterias", "")); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
     if (h === "#vagas" || h === "#vagas-trabalho") { return mostrarVagasTrabalhoPublicas(); }

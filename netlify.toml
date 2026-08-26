@@ -17,6 +17,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/loterias"
+  to = "/.netlify/functions/loterias"
+  status = 200
+
+[[redirects]]
   from = "/api/atualizar-combustivel"
   to = "/.netlify/functions/atualizar-combustivel"
   status = 200
