@@ -1,4 +1,4 @@
-/* Loterias publicas - v5 */
+/* Loterias publicas - v6 */
 :root {
   --lottery-blue: #1267ad;
   --lottery-ink: #17324a;
@@ -69,10 +69,11 @@ body.lottery-modal-open { overflow: hidden; }
 .lottery-card-heading { display: flex; align-items: center; gap: 10px; min-height: 44px; }
 .lottery-game-icon { display: grid; flex: 0 0 auto; width: 42px; height: 42px; border-radius: 12px; color: var(--game-color); background: var(--game-soft); place-items: center; }
 .lottery-card-heading > div { min-width: 0; }
+.lottery-title-row { display: flex; flex-wrap: nowrap; align-items: center; gap: 6px 9px; }
 .lottery-card h3 { margin: 0; color: var(--lottery-ink); font-size: 18px; }
 .lottery-card-heading small { display: block; margin-top: 2px; color: var(--lottery-muted); font-size: 11px; line-height: 1.35; white-space: normal; }
-.lottery-accumulated-row { display: flex; justify-content: flex-end; margin: 7px 0 -5px; }
-.lottery-accumulated { display: inline-flex; align-items: center; gap: 5px; padding: 5px 8px; border-radius: 999px; color: #7a4d00; background: #fff0b8; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+.lottery-accumulated { display: inline-flex; align-items: center; gap: 5px; padding: 4px 7px; border: 1px solid #ef4444; border-radius: 999px; color: #fff; background: #dc2626; box-shadow: 0 0 0 rgba(220, 38, 38, 0); font-size: 9px; font-weight: 900; line-height: 1; text-transform: uppercase; animation: lottery-accumulated-pulse 1.35s ease-in-out infinite; }
+@keyframes lottery-accumulated-pulse { 0%, 100% { background: #dc2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, .4); transform: scale(1); } 50% { background: #ef4444; box-shadow: 0 0 0 5px rgba(220, 38, 38, 0); transform: scale(1.04); } }
 .lottery-card > .lottery-balls { margin: 14px 0 13px; }
 .lottery-draw-summary {
   display: grid;
@@ -131,14 +132,20 @@ body.lottery-modal-open { overflow: hidden; }
 .lottery-bet-prices { margin-top: 13px; }
 .lottery-bet-prices h4 { display: flex; align-items: center; gap: 7px; margin: 0 0 8px; color: var(--lottery-ink); font-size: 12px; }
 .lottery-bet-prices h4 i { color: var(--game-color); }
-.lottery-bet-prices-scroll { overflow: auto; max-height: 230px; border: 1px solid var(--lottery-line); border-radius: 9px; scrollbar-width: thin; }
-.lottery-bet-prices table { width: 100%; min-width: 290px; border-collapse: collapse; color: #40596d; background: #fff; font-size: 11px; }
-.lottery-bet-prices th, .lottery-bet-prices td { padding: 7px 9px; border-bottom: 1px solid #e6edf3; text-align: left; white-space: nowrap; }
+.lottery-bet-prices-scroll { overflow-x: hidden; overflow-y: auto; max-height: 230px; border: 1px solid var(--lottery-line); border-radius: 9px; scrollbar-width: thin; }
+.lottery-bet-prices table { width: 100%; min-width: 0; border-collapse: collapse; table-layout: fixed; color: #40596d; background: #fff; font-size: 11px; }
+.lottery-bet-prices th, .lottery-bet-prices td { padding: 7px 6px; border-bottom: 1px solid #e6edf3; text-align: left; white-space: normal; overflow-wrap: anywhere; }
 .lottery-bet-prices thead th { position: sticky; z-index: 1; top: 0; color: #fff; background: var(--game-color); font-size: 10px; }
 .lottery-bet-prices tbody tr:last-child > * { border-bottom: 0; }
 .lottery-bet-prices tbody tr:nth-child(even) { background: #f7fafc; }
 .lottery-bet-prices tbody th { color: var(--lottery-ink); font-weight: 800; }
-.lottery-bet-prices th:last-child, .lottery-bet-prices td:last-child { text-align: right; }
+.lottery-bet-prices th:last-child, .lottery-bet-prices td:last-child { width: 38%; text-align: right; white-space: nowrap; }
+.lottery-bet-prices.is-maismilionaria th, .lottery-bet-prices.is-maismilionaria td { padding-inline: 4px; text-align: center; }
+.lottery-bet-prices.is-maismilionaria th:nth-child(1) { width: 12%; }
+.lottery-bet-prices.is-maismilionaria th:nth-child(2) { width: 18%; }
+.lottery-bet-prices.is-maismilionaria th:nth-child(3) { width: 25%; }
+.lottery-bet-prices.is-maismilionaria th:nth-child(4) { width: 45%; text-align: right; }
+.lottery-bet-prices.is-maismilionaria td:last-child { width: auto; text-align: right; }
 .lottery-bet-prices > small { display: block; margin-top: 7px; color: #718497; font-size: 9px; line-height: 1.4; }
 .lottery-rules + .lottery-details-button { margin-top: 0; }
 .lottery-details-button, .lottery-card.is-unavailable button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 42px; margin-top: auto; border: 0; border-radius: 11px; color: #fff; background: var(--game-color); font-weight: 850; cursor: pointer; }
@@ -253,4 +260,8 @@ body.lottery-modal-open { overflow: hidden; }
   .lottery-next { border-top: 1px solid color-mix(in srgb, var(--game-color) 22%, #dbe5ee); border-left: 0; }
   .lottery-ball { min-width: 42px; height: 42px; padding: 0 6px; font-size: 15px; }
   .lottery-section-title h2 { font-size: 19px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lottery-accumulated { animation: none; }
 }

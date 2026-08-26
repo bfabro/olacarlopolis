@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 664,
-  label: "v671",
+  numero: 665,
+  label: "v672",
   data: "2026-08-26",
-  nota: "Loterias com tag Acumulou reposicionada e valores das apostas por quantidade de números."
+  nota: "Loterias com Acumulou pulsante ao lado do jogo e tabelas sem rolagem horizontal."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

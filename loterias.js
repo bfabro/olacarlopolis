@@ -1,4 +1,4 @@
-// Loterias publicas - v6
+// Loterias publicas - v7
 (() => {
   "use strict";
 
@@ -39,7 +39,7 @@
     lotofacil: { headers: ["Números", "Valor da aposta"], rows: combinationPriceRows(15, 20, 15, 3.5) },
     quina: { headers: ["Números", "Valor da aposta"], rows: combinationPriceRows(5, 15, 5, 3) },
     maismilionaria: {
-      headers: ["Números", "Trevos", "Apostas simples", "Valor"],
+      headers: ["Nº", "Trevos", "Apostas", "Valor"],
       rows: Array.from({ length: 7 }, (_, numberIndex) => Array.from({ length: 5 }, (_, cloverIndex) => {
         const numbers = numberIndex + 6;
         const clovers = cloverIndex + 2;
@@ -181,7 +181,7 @@
   function betPricesMarkup(slug) {
     const table = BET_PRICE_TABLES[slug];
     if (!table?.rows?.length) return "";
-    return `<section class="lottery-bet-prices" aria-label="Valores das apostas"><h4><i class="fa-solid fa-coins"></i> Valores das apostas</h4><div class="lottery-bet-prices-scroll"><table><thead><tr>${table.headers.map((header) => `<th scope="col">${esc(header)}</th>`).join("")}</tr></thead><tbody>${table.rows.map((row) => `<tr>${row.map((cell, index) => `<${index === 0 ? "th" : "td"}${index === 0 ? ' scope="row"' : ""}>${esc(cell)}</${index === 0 ? "th" : "td"}>`).join("")}</tr>`).join("")}</tbody></table></div><small>Valores oficiais consultados em 26/08/2026. Confirme antes de apostar.</small></section>`;
+    return `<section class="lottery-bet-prices is-${esc(slug)}" aria-label="Valores das apostas"><h4><i class="fa-solid fa-coins"></i> Valores das apostas</h4><div class="lottery-bet-prices-scroll"><table><thead><tr>${table.headers.map((header) => `<th scope="col">${esc(header)}</th>`).join("")}</tr></thead><tbody>${table.rows.map((row) => `<tr>${row.map((cell, index) => `<${index === 0 ? "th" : "td"}${index === 0 ? ' scope="row"' : ""}>${esc(cell)}</${index === 0 ? "th" : "td"}>`).join("")}</tr>`).join("")}</tbody></table></div><small>Valores oficiais consultados em 26/08/2026. Confirme antes de apostar.</small></section>`;
   }
 
   function cardMarkup(config, item) {
@@ -190,8 +190,7 @@
     const estimated = number(data.valorEstimadoProximoConcurso);
     const label = estimated ? compactMoney(estimated) : config.slug === "federal" ? "Veja as faixas" : "Não informado";
     return `<article class="lottery-card lottery-${config.slug} ${config.slug === "megasena" && data.acumulado ? "is-highlighted" : ""}" data-lottery-card="${config.slug}">
-      <div class="lottery-card-heading"><span class="lottery-game-icon"><i class="fa-solid ${config.icon}"></i></span><div><h3>${esc(config.nome)}</h3><small>Concurso ${esc(data.numero || "—")} • ${esc(data.dataApuracao || "Data não informada")}</small></div></div>
-      ${data.acumulado ? `<div class="lottery-accumulated-row"><span class="lottery-accumulated"><i class="fa-solid fa-arrow-trend-up"></i> Acumulou</span></div>` : ""}
+      <div class="lottery-card-heading"><span class="lottery-game-icon"><i class="fa-solid ${config.icon}"></i></span><div><div class="lottery-title-row"><h3>${esc(config.nome)}</h3>${data.acumulado ? `<span class="lottery-accumulated"><i class="fa-solid fa-arrow-trend-up"></i> Acumulou</span>` : ""}</div><small>Concurso ${esc(data.numero || "—")} • ${esc(data.dataApuracao || "Data não informada")}</small></div></div>
       ${balls(data.listaDezenas, config.slug)}
       <div class="lottery-draw-summary">
       <div class="lottery-prize"><span>${estimated ? "Prêmio estimado do próximo concurso" : "Premiação do concurso"}</span><strong>${esc(label)}</strong></div>
