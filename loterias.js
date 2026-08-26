@@ -1,4 +1,4 @@
-// Loterias publicas - v4
+// Loterias publicas - v5
 (() => {
   "use strict";
 
@@ -6,16 +6,16 @@
   const CACHE_TTL = 15 * 60 * 1000;
   const HOME_TITLE = document.title;
   const GAME_CONFIG = [
-    { slug: "megasena", nome: "Mega-Sena", grupo: "principais", icon: "fa-clover" },
-    { slug: "lotofacil", nome: "Lotofácil", grupo: "principais", icon: "fa-circle-dot" },
-    { slug: "quina", nome: "Quina", grupo: "principais", icon: "fa-dice-five" },
-    { slug: "maismilionaria", nome: "+Milionária", grupo: "outras", icon: "fa-gem" },
-    { slug: "lotomania", nome: "Lotomania", grupo: "outras", icon: "fa-braille" },
-    { slug: "timemania", nome: "Timemania", grupo: "outras", icon: "fa-futbol" },
-    { slug: "duplasena", nome: "Dupla Sena", grupo: "outras", icon: "fa-layer-group" },
-    { slug: "diadesorte", nome: "Dia de Sorte", grupo: "outras", icon: "fa-calendar-day" },
-    { slug: "supersete", nome: "Super Sete", grupo: "outras", icon: "fa-table-cells-large" },
-    { slug: "federal", nome: "Loteria Federal", grupo: "outras", icon: "fa-ticket" }
+    { slug: "megasena", nome: "Mega-Sena", grupo: "principais", icon: "fa-clover", regra: "Escolha de 6 a 20 números entre 60. São sorteados 6 números e há prêmio para quem acerta 4, 5 ou 6." },
+    { slug: "lotofacil", nome: "Lotofácil", grupo: "principais", icon: "fa-circle-dot", regra: "Escolha de 15 a 20 números entre 25. São sorteados 15 números e há prêmio para quem acerta de 11 a 15." },
+    { slug: "quina", nome: "Quina", grupo: "principais", icon: "fa-dice-five", regra: "Escolha de 5 a 15 números entre 80. São sorteados 5 números e há prêmio para quem acerta 2, 3, 4 ou 5." },
+    { slug: "maismilionaria", nome: "+Milionária", grupo: "outras", icon: "fa-gem", regra: "Escolha ao menos 6 números entre 50 e 2 Trevos entre 6. A premiação combina os acertos dos números com os Trevos." },
+    { slug: "lotomania", nome: "Lotomania", grupo: "outras", icon: "fa-braille", regra: "Escolha 50 números entre 100. São sorteados 20 e há prêmio para 15, 16, 17, 18, 19 ou 20 acertos — e também para nenhum acerto." },
+    { slug: "timemania", nome: "Timemania", grupo: "outras", icon: "fa-futbol", regra: "Escolha 10 números entre 80 e um Time do Coração. São sorteados 7 números e um time; há prêmio de 3 a 7 acertos ou pelo time sorteado." },
+    { slug: "duplasena", nome: "Dupla Sena", grupo: "outras", icon: "fa-layer-group", regra: "Escolha de 6 a 15 números entre 50. A mesma aposta participa de dois sorteios no concurso e premia 3, 4, 5 ou 6 acertos." },
+    { slug: "diadesorte", nome: "Dia de Sorte", grupo: "outras", icon: "fa-calendar-day", regra: "Escolha de 7 a 15 números entre 31 e um Mês de Sorte. São sorteados 7 números e um mês, com prêmios a partir de 4 acertos e também para o Mês de Sorte." },
+    { slug: "supersete", nome: "Super Sete", grupo: "outras", icon: "fa-table-cells-large", regra: "O volante tem 7 colunas com dígitos de 0 a 9. Escolha ao menos um por coluna; é sorteado um dígito em cada coluna e há prêmio de 3 a 7 acertos." },
+    { slug: "federal", nome: "Loteria Federal", grupo: "outras", icon: "fa-ticket", regra: "Compre um bilhete inteiro ou uma fração já numerada. Você pode ganhar pelos cinco prêmios principais e também por aproximações e combinações do número." }
   ];
   const state = { resultados: [], consultadoEm: "", stale: false, loading: false, open: false, filter: "todas", query: "", savedNodes: null, previousHash: "", lastTrigger: null };
   let originalDescription = "";
@@ -149,6 +149,7 @@
       </div>
       ${specialMarkup(data, config.slug)}
       ${item.stale ? `<p class="lottery-card-stale"><i class="fa-solid fa-clock-rotate-left"></i> Último resultado disponível</p>` : ""}
+      <details class="lottery-rules"><summary><span><i class="fa-solid fa-circle-question"></i> Regras do jogo</span><i class="fa-solid fa-chevron-down lottery-rules-chevron"></i></summary><div><p>${esc(config.regra || "Consulte as regras oficiais desta modalidade nos canais das Loterias CAIXA.")}</p></div></details>
       <button type="button" class="lottery-details-button" data-lottery-details="${config.slug}">Ver detalhes <i class="fa-solid fa-arrow-right"></i></button>
     </article>`;
   }

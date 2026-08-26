@@ -1,4 +1,4 @@
-/* Loterias publicas - v3 */
+/* Loterias publicas - v4 */
 :root {
   --lottery-blue: #1267ad;
   --lottery-ink: #17324a;
@@ -100,7 +100,34 @@ body.lottery-modal-open { overflow: hidden; }
 .lottery-special .lottery-balls { margin-bottom: 0; }
 .lottery-extra-line { display: flex; justify-content: space-between; gap: 10px; margin: 0 0 12px; padding: 9px 10px; border-radius: 10px; background: #f7f9fb; font-size: 12px; }
 .lottery-extra-line strong { color: var(--game-color); }
-.lottery-card-stale { display: flex; align-items: center; gap: 6px; margin: auto 0 8px; color: #8b6500; font-size: 11px; }
+.lottery-card-stale { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; color: #8b6500; font-size: 11px; }
+.lottery-rules {
+  margin: auto 0 9px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--game-color) 24%, #dbe5ee);
+  border-radius: 11px;
+  background: #f8fafc;
+}
+.lottery-rules summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 12px;
+  color: var(--game-color);
+  font-size: 12px;
+  font-weight: 850;
+  cursor: pointer;
+  list-style: none;
+}
+.lottery-rules summary::-webkit-details-marker { display: none; }
+.lottery-rules summary span { display: inline-flex; align-items: center; gap: 7px; }
+.lottery-rules-chevron { transition: transform .2s ease; }
+.lottery-rules[open] .lottery-rules-chevron { transform: rotate(180deg); }
+.lottery-rules > div { padding: 11px 12px 12px; border-top: 1px solid var(--lottery-line); background: #fff; }
+.lottery-rules p { margin: 0; color: #52687a; font-size: 12px; line-height: 1.5; }
+.lottery-rules + .lottery-details-button { margin-top: 0; }
 .lottery-details-button, .lottery-card.is-unavailable button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 42px; margin-top: auto; border: 0; border-radius: 11px; color: #fff; background: var(--game-color); font-weight: 850; cursor: pointer; }
 .lottery-card.is-unavailable { justify-content: center; min-height: 240px; }
 .lottery-card.is-unavailable > p { margin: 22px 0; color: var(--lottery-muted); text-align: center; }
