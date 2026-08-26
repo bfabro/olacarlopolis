@@ -1,4 +1,4 @@
-// Loterias publicas - v2
+// Loterias publicas - v3
 (() => {
   "use strict";
 
@@ -250,6 +250,7 @@
   function bindPageEvents(area) {
     area.querySelector("#lotteryBack")?.addEventListener("click", closePage);
     area.querySelector("#lotteryShare")?.addEventListener("click", share);
+    area.querySelector("#lotteryShare")?.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); share(); } });
     area.querySelector("#lotteryRetry")?.addEventListener("click", () => loadResults(true));
     area.querySelectorAll("[data-lottery-filter]").forEach((button) => button.addEventListener("click", () => {
       state.filter = button.dataset.lotteryFilter || "todas";
@@ -273,7 +274,6 @@
       state.stale = Boolean(payload.stale);
       renderStatus();
       renderCards();
-      renderHomeSummary();
       const selected = routeSlug();
       if (selected) setTimeout(() => document.querySelector(`[data-lottery-card="${selected}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 80);
     } catch (error) {
@@ -284,7 +284,8 @@
 
   function pageMarkup() {
     return `<main class="lottery-page">
-      <header class="lottery-hero"><div class="lottery-hero-actions"><button id="lotteryBack" type="button"><i class="fa-solid fa-arrow-left"></i><span>Voltar</span></button><button id="lotteryShare" type="button"><i class="fa-solid fa-share-nodes"></i><span>Compartilhar</span></button></div><div class="lottery-hero-copy"><span class="lottery-hero-icon"><i class="fa-solid fa-clover"></i></span><div><span class="lottery-kicker">Informação oficial</span><h1>Resultados das Loterias</h1><p>Confira os últimos resultados e os prêmios estimados das Loterias CAIXA.</p></div></div><div id="lotteryStatus" class="lottery-status" aria-live="polite"><span><i class="fa-solid fa-spinner fa-spin"></i> Atualizando resultados...</span></div></header>
+      <div class="page-header lottery-page-header"><h2><i class="fa-solid fa-clover"></i> Resultados das Loterias</h2><div class="lottery-page-header-actions"><button id="lotteryBack" class="lottery-page-back" type="button"><i class="fa-solid fa-arrow-left"></i><span>Voltar</span></button><i id="lotteryShare" class="fa-solid fa-share-nodes share-btn" role="button" tabindex="0" aria-label="Compartilhar resultados das loterias"></i></div></div>
+      <section class="lottery-intro"><span class="lottery-intro-icon"><i class="fa-solid fa-clover"></i></span><div class="lottery-intro-copy"><span class="lottery-kicker">Informação oficial</span><p>Confira os últimos resultados e os prêmios estimados das Loterias CAIXA.</p></div><div id="lotteryStatus" class="lottery-status" aria-live="polite"><span><i class="fa-solid fa-spinner fa-spin"></i> Atualizando resultados...</span></div></section>
       <section class="lottery-tools" aria-label="Filtros de loterias"><div class="lottery-filter-chips"><button type="button" class="is-active" data-lottery-filter="todas">Todas</button><button type="button" data-lottery-filter="megasena">Mega-Sena</button><button type="button" data-lottery-filter="lotofacil">Lotofácil</button><button type="button" data-lottery-filter="quina">Quina</button><button type="button" data-lottery-filter="outras">Outras</button></div><label class="lottery-search"><i class="fa-solid fa-magnifying-glass"></i><span class="sr-only">Buscar loteria</span><input id="lotterySearch" type="search" placeholder="Buscar loteria" autocomplete="off"></label><button id="lotteryRetry" class="lottery-refresh" type="button" title="Atualizar resultados"><i class="fa-solid fa-rotate"></i><span>Atualizar</span></button></section>
       <div id="lotteryResults" class="lottery-results" aria-live="polite">${skeleton()}</div>
       <footer class="lottery-disclaimer"><i class="fa-solid fa-circle-info"></i><div><p>Dados informativos obtidos das Loterias CAIXA. Confira sempre o resultado nos canais oficiais.</p><a href="https://loterias.caixa.gov.br/" target="_blank" rel="noopener noreferrer">Consultar resultados oficiais nas Loterias CAIXA <i class="fa-solid fa-arrow-up-right-from-square"></i></a><small>O Olá Carlópolis apenas divulga informações de caráter informativo e não realiza apostas. Os resultados e valores devem ser confirmados nos canais oficiais das Loterias CAIXA. Aposte com responsabilidade. Proibido para menores de 18 anos.</small></div></footer>
@@ -326,17 +327,6 @@
     state.previousHash = "";
   }
 
-  function renderHomeSummary() {
-    const section = document.getElementById("lotteryHomeSummary");
-    if (!section || !state.resultados.length) return;
-    const available = GAME_CONFIG.map((config) => ({ config, item: resultFor(config.slug) })).filter(({ item }) => item?.ok && item.data);
-    if (!available.length) return;
-    const chosen = available.sort((a, b) => number(b.item.data.valorEstimadoProximoConcurso) - number(a.item.data.valorEstimadoProximoConcurso))[0];
-    const data = chosen.item.data;
-    section.classList.remove("hidden");
-    section.innerHTML = `<div class="lottery-home-icon"><i class="fa-solid fa-clover"></i></div><div class="lottery-home-copy"><span>Loterias</span><strong>${esc(chosen.config.nome)}${data.acumulado ? " acumulada" : ""}</strong><small>${number(data.valorEstimadoProximoConcurso) ? `Prêmio estimado: ${esc(compactMoney(data.valorEstimadoProximoConcurso))}` : "Confira o último resultado"}${data.dataProximoConcurso ? ` • ${esc(dateFull(data.dataProximoConcurso))}` : ""}</small></div><button type="button" data-lottery-home-open>Ver resultados <i class="fa-solid fa-arrow-right"></i></button>`;
-    section.querySelector("[data-lottery-home-open]")?.addEventListener("click", () => openRoute(""));
-  }
 
   function openRoute(slug = "", trigger = null) {
     state.previousHash = location.hash && !location.hash.startsWith("#loterias") ? location.hash : "";
@@ -378,18 +368,8 @@
       state.resultados = cached.resultados || [];
       state.consultadoEm = cached.consultadoEm || "";
       state.stale = Date.now() - number(cached.savedAt) >= CACHE_TTL;
-      renderHomeSummary();
     }
-    const lotteryRoute = (location.hash || "").toLowerCase().startsWith("#loterias");
     handleHash();
-    if (!lotteryRoute) {
-      fetchPayload(false).then((payload) => {
-        state.resultados = payload.resultados || [];
-        state.consultadoEm = payload.consultadoEm || "";
-        state.stale = Boolean(payload.stale);
-        renderHomeSummary();
-      }).catch(() => { });
-    }
   });
   window.addEventListener("hashchange", handleHash);
 
