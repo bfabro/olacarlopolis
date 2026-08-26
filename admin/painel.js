@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 654,
-  label: "v661",
-  data: "2026-08-23",
-  nota: "Promocoes de combustiveis com descricao, recorrencia semanal e desconto."
+  numero: 655,
+  label: "v662",
+  data: "2026-08-26",
+  nota: "Gerador unificado de postagens para produtos, promocoes e servicos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -761,7 +761,7 @@ const views = {
 
 const viewCopy = {
   dashboard: ["Visao geral", "Resumo do ambiente administrativo."],
-  artesPostagem: ["Arte para Postagem", "Crie artes de produtos e promocoes com previa antes de baixar."],
+  artesPostagem: ["Gerar postagem", "Crie postagens de produtos, promocoes e servicos com previa antes de baixar."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
@@ -17857,12 +17857,12 @@ function renderFuelClientPrices(preserveDraft = false) {
     <div class="fuel-client-products">${products.map(([productId, product]) => `<article class="fuel-client-product" data-fuel-client-product="${escapeAttr(productId)}">
       <div><strong>${escapeHtml(product.nome || productId)}</strong><small>Ultima data informada: ${escapeHtml(product.atualizadoEm || "Ainda nao atualizado")}</small>${fuelClientPromotionSummary(productId)}</div>
       <label>Preco por litro (R$)<input data-fuel-client-price type="number" min="0.001" max="99.999" step="0.001" inputmode="decimal" required value="${escapeAttr(draftPrices[productId] ?? (Number(product.preco || 0) || ""))}" placeholder="0,000"></label>
-      <div class="fuel-client-promo-control"><label><input data-fuel-client-promo-toggle type="checkbox" ${fuelClientPromotions[productId] ? "checked" : ""}> Preco promocional</label>${fuelClientPromotions[productId] ? '<button data-fuel-client-promo-edit type="button"><i class="fa-solid fa-pen"></i> Editar</button>' : ""}</div>
+      <div class="fuel-client-promo-control"><label><input data-fuel-client-promo-toggle type="checkbox" ${fuelClientPromotions[productId] ? "checked" : ""}> Preço promocional</label>${fuelClientPromotions[productId] ? '<button data-fuel-client-promo-edit type="button"><i class="fa-solid fa-pen"></i> Editar</button>' : ""}</div>
     </article>`).join("")}</div>
     <label class="check-row"><input id="fuelClientConfirmPrices" type="checkbox" required> Confirmo que conferi os valores nas bombas.</label>
     <div class="fuel-client-actions"><button type="submit"><i class="fa-solid fa-check"></i> Salvar e publicar precos</button></div>
   </form>
-  <div id="fuelClientPromoModal" class="fuel-client-promo-modal hidden" role="dialog" aria-modal="true"><div class="fuel-client-promo-dialog"><button data-fuel-client-promo-close class="fuel-client-promo-close" type="button"><i class="fa-solid fa-xmark"></i></button><span><i class="fa-solid fa-tag"></i> Preco promocional</span><h3 id="fuelClientPromoTitle">Configurar promocao</h3><p>O site usara este valor apenas durante o periodo informado.</p><label>Preco promocional (R$)<input id="fuelClientPromoPrice" type="number" min="0.001" max="99.999" step="0.001"></label><label>Inicio<input id="fuelClientPromoStart" type="datetime-local"></label><label>Validade<input id="fuelClientPromoEnd" type="datetime-local"></label><div><button data-fuel-client-promo-cancel type="button">Cancelar</button><button data-fuel-client-promo-save type="button"><i class="fa-solid fa-check"></i> Aplicar</button></div></div></div>`;
+  <div id="fuelClientPromoModal" class="fuel-client-promo-modal hidden" role="dialog" aria-modal="true"><div class="fuel-client-promo-dialog"><button data-fuel-client-promo-close class="fuel-client-promo-close" type="button"><i class="fa-solid fa-xmark"></i></button><span><i class="fa-solid fa-tag"></i> Preço promocional</span><h3 id="fuelClientPromoTitle">Configurar promocao</h3><p>O site usara este valor apenas durante o periodo informado.</p><label>Preço promocional (R$)<input id="fuelClientPromoPrice" type="number" min="0.001" max="99.999" step="0.001"></label><label>Inicio<input id="fuelClientPromoStart" type="datetime-local"></label><label>Validade<input id="fuelClientPromoEnd" type="datetime-local"></label><div><button data-fuel-client-promo-cancel type="button">Cancelar</button><button data-fuel-client-promo-save type="button"><i class="fa-solid fa-check"></i> Aplicar</button></div></div></div>`;
   $("fuelClientPriceForm")?.addEventListener("submit", saveFuelClientPrices);
   box.querySelectorAll("[data-fuel-client-promo-toggle]").forEach((input) => input.addEventListener("change", () => {
     const productId = input.closest("[data-fuel-client-product]")?.dataset.fuelClientProduct || "";
@@ -19396,7 +19396,7 @@ async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classi
   if (!hasPermission("gerar_imagens_promocoes")) return showToast("A geracao de imagens de promocoes nao esta liberada para este usuario.");
   const client = state.clientes.find((item) => item.id === clientId);
   const promo = normalizePromocoes(client?.promocoes).find((item) => item.id === promoId);
-  if (!client || !promo) return showToast("Selecione uma promocao para gerar a arte.");
+  if (!client || !promo) return showToast("Selecione uma promoção para gerar a arte.");
   const layout = PROMO_ARTE_LAYOUTS[layoutKey] || PROMO_ARTE_LAYOUTS.classico;
   const button = $("generatePromoArtButton") || $("coGeneratePromoArtButton");
   if (button) button.disabled = true;
@@ -19432,9 +19432,15 @@ const POST_ART_LAYOUTS = {
   ],
   promocao: [
     { key: "promocao-impacto", nome: "Impacto vermelho", descricao: "Preco e desconto como protagonistas", variant: 0, bg: "#8f1024", panel: "#ffffff", primary: "#e7193f", accent: "#ffd43b", ink: "#ffffff" },
-    { key: "promocao-varejo", nome: "Varejo laranja", descricao: "Composicao comercial e direta", variant: 1, bg: "#ff6a00", panel: "#fff8ed", primary: "#ef4d00", accent: "#ffe057", ink: "#33150a" },
+    { key: "promocao-varejo", nome: "Varejo laranja", descricao: "Composição comercial e direta", variant: 1, bg: "#ff6a00", panel: "#fff8ed", primary: "#ef4d00", accent: "#ffe057", ink: "#33150a" },
     { key: "promocao-premium", nome: "Oferta premium", descricao: "Fundo escuro e acabamento dourado", variant: 2, bg: "#111111", panel: "#1d1d1d", primary: "#d5a940", accent: "#f6dc8b", ink: "#ffffff" },
     { key: "promocao-festival", nome: "Festival de ofertas", descricao: "Layout dinamico para campanhas especiais", variant: 3, bg: "#3d1677", panel: "#ffffff", primary: "#8b3ffc", accent: "#ffcf3e", ink: "#ffffff" }
+  ],
+  servico: [
+    { key: "servico-profissional", nome: "Profissional azul", descricao: "Apresentação clara para serviços e atendimento", variant: 0, bg: "#eaf4ff", panel: "#ffffff", primary: "#1264a3", accent: "#63d5c3", ink: "#12304a" },
+    { key: "servico-elegante", nome: "Elegante escuro", descricao: "Visual sofisticado para destacar sua especialidade", variant: 1, bg: "#111827", panel: "#172033", primary: "#2f9eaa", accent: "#8be0d0", ink: "#ffffff" },
+    { key: "servico-confianca", nome: "Confiança moderna", descricao: "Composição organizada e acolhedora", variant: 2, bg: "#f1f7f4", panel: "#ffffff", primary: "#27745f", accent: "#e4b85a", ink: "#173d32" },
+    { key: "servico-impacto", nome: "Impacto local", descricao: "Chamada forte para conquistar novos clientes", variant: 3, bg: "#173d62", panel: "#ffffff", primary: "#18a999", accent: "#ffd166", ink: "#ffffff" }
   ]
 };
 
@@ -19454,7 +19460,20 @@ function postArtCurrentClient() {
 }
 
 function postArtItems(client, type = state.postArtType) {
-  return type === "promocao" ? normalizePromocoes(client?.promocoes) : normalizeProdutos(client?.produtos);
+  if (type === "promocao") return normalizePromocoes(client?.promocoes);
+  if (type === "servico") {
+    if (!client) return [];
+    return [{
+      id: `servico-${client.id || "empresa"}`,
+      titulo: client.servicoTitulo || client.nome || "Serviço em destaque",
+      descricao: client.servicoDescricao || client.descricaoCurta || client.descricao || client.infoAdicional || "Conheça nossos serviços e solicite mais informações.",
+      preco: client.servicoPreco || "",
+      imagem: client.servicoImagem || client.imagem || client.imagens?.[0] || client.logo || "",
+      categoria: client.servicoEspecialidade || client.categoria || "SERVIÇO EM DESTAQUE",
+      atendimento: client.servicoAtendimento || client.cidade || ""
+    }];
+  }
+  return normalizeProdutos(client?.produtos);
 }
 
 function postArtCurrentItem(client = postArtCurrentClient()) {
@@ -19546,7 +19565,11 @@ function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout)
   ctx.fillRect(0, 0, width, height);
 
   const isPromo = data.type === "promocao";
-  const eyebrow = data.callout || (isPromo ? "PROMOÇÃO EM DESTAQUE" : "PRODUTO EM DESTAQUE");
+  const isService = data.type === "servico";
+  const eyebrow = data.callout || (isPromo ? "PROMOÇÃO EM DESTAQUE" : isService ? "SERVIÇO EM DESTAQUE" : "PRODUTO EM DESTAQUE");
+  const detailLine = isPromo && data.validity
+    ? `VÁLIDA ATÉ ${formatDateBR(data.validity)}`
+    : (isService && data.serviceMode ? data.serviceMode.toUpperCase() : "");
   const fit = data.imageFit || "cover";
 
   if (layout.variant === 0) {
@@ -19563,7 +19586,7 @@ function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout)
     postArtDrawText(ctx, data.title, 58, 645, 650, 2, 48, isPromo ? "#251a1d" : layout.ink, { min: 27, lineHeight: 50 });
     postArtDrawText(ctx, data.description, 58, 770, 640, 3, 23, "#637083", { min: 15, weight: 600, lineHeight: 28 });
     postArtDrawPrice(ctx, data, 730, 650, 300, layout, { color: layout.primary, height: 160, size: 45 });
-    if (data.validity) postArtDrawText(ctx, `Válida até ${formatDateBR(data.validity)}`, 880, 830, 290, 1, 18, "#5d6874", { align: "center", min: 13 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 880, 830, 290, 1, 18, "#5d6874", { align: "center", min: 13 });
     postArtDrawFooter(ctx, client, layout, true);
   } else if (layout.variant === 1) {
     ctx.fillStyle = layout.panel;
@@ -19579,7 +19602,7 @@ function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout)
     postArtDrawText(ctx, data.title, 58, 286, 355, 4, 51, layout.ink, { min: 27, lineHeight: 52 });
     postArtDrawText(ctx, data.description, 58, 530, 340, 4, 22, layout.ink === "#ffffff" ? "#cbd5e1" : "#6b5b4d", { min: 14, weight: 600, lineHeight: 28 });
     postArtDrawPrice(ctx, data, 58, 710, 350, layout, { color: layout.primary, height: 150, size: 43 });
-    if (data.validity) postArtDrawText(ctx, `ATÉ ${formatDateBR(data.validity)}`, 233, 884, 330, 1, 18, layout.accent, { align: "center" });
+    if (detailLine) postArtDrawText(ctx, detailLine, 233, 884, 330, 1, 18, layout.accent, { align: "center" });
     if (data.showSiteLogo && siteLogo) desenharImagemContain(ctx, siteLogo, 92, 940, 280, 92, 0, "rgba(255,255,255,0)");
   } else if (layout.variant === 2) {
     postArtDrawBrand(ctx, client, logo, siteLogo, layout, { showSiteLogo: data.showSiteLogo });
@@ -19590,6 +19613,7 @@ function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout)
     postArtDrawText(ctx, data.title, 110, 808, 560, 2, 39, layout.ink, { min: 23, lineHeight: 41 });
     postArtDrawText(ctx, data.description, 110, 897, 560, 2, 19, "#6b756f", { min: 13, weight: 600, lineHeight: 23 });
     postArtDrawPrice(ctx, data, 700, 800, 270, layout, { color: layout.primary, height: 120, size: 38 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 835, 938, 250, 1, 15, layout.primary, { align: "center", min: 11 });
     postArtDrawFooter(ctx, client, layout, true);
   } else {
     ctx.fillStyle = "rgba(255,255,255,.08)";
@@ -19603,7 +19627,7 @@ function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout)
     postArtDrawPhoto(ctx, image, { x: 520, y: 185, w: 505, h: 635 }, fit, 42, "#ffffff");
     desenharBordaRoundRect(ctx, 520, 185, 505, 635, 42, "rgba(255,255,255,.9)", 8);
     postArtDrawPrice(ctx, data, 585, 760, 375, layout, { color: layout.primary, height: 150, size: 45 });
-    if (data.validity) postArtDrawText(ctx, `VÁLIDA ATÉ ${formatDateBR(data.validity)}`, 263, 858, 400, 1, 18, layout.accent, { align: "center", min: 13 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 263, 858, 400, 1, 18, layout.accent, { align: "center", min: 13 });
     postArtDrawFooter(ctx, client, layout, true);
   }
 }
@@ -19617,6 +19641,7 @@ function postArtFormData() {
     oldPrice: $("postArtOldPrice")?.value.trim() || "",
     callout: $("postArtCallout")?.value.trim() || "",
     validity: $("postArtValidity")?.value || "",
+    serviceMode: $("postArtServiceMode")?.value.trim() || "",
     imageFit: $("postArtImageFit")?.value || "cover",
     showSiteLogo: $("postArtShowSiteLogo")?.checked !== false
   };
@@ -19627,20 +19652,28 @@ function preencherFormularioPostArt() {
   const item = postArtCurrentItem(client);
   if (!item) return;
   const isPromo = state.postArtType === "promocao";
+  const isService = state.postArtType === "servico";
   $("postArtTitle").value = item.titulo || item.nome || "";
   $("postArtDescription").value = isPromo
     ? (item.obs || item.instagramMensagem || "Oferta especial por tempo limitado.")
-    : (item.descricao || [item.marca, item.modelo, item.tamanho].filter(Boolean).join(" • ") || "Produto disponível. Consulte detalhes e disponibilidade.");
+    : isService
+      ? (item.descricao || "Conheça este serviço e solicite mais informações.")
+      : (item.descricao || [item.marca, item.modelo, item.tamanho].filter(Boolean).join(" • ") || "Produto disponível. Consulte detalhes e disponibilidade.");
   $("postArtPrice").value = item.preco || "";
   $("postArtOldPrice").value = isPromo ? (item.precoAntigo || "") : "";
-  $("postArtCallout").value = isPromo ? (item.desconto || "PROMOÇÃO EM DESTAQUE") : (item.categoria || item.setor || "PRODUTO EM DESTAQUE");
+  $("postArtCallout").value = isPromo
+    ? (item.desconto || "PROMOÇÃO EM DESTAQUE")
+    : isService
+      ? (item.categoria || "SERVIÇO EM DESTAQUE")
+      : (item.categoria || item.setor || "PRODUTO EM DESTAQUE");
   $("postArtValidity").value = isPromo ? (item.validadeFim || "") : "";
+  $("postArtServiceMode").value = isService ? (item.atendimento || "") : "";
   $("postArtImage").value = item.imagem || item.imagens?.[0] || "";
   state.postArtCustomImage = "";
   $("postArtOldPriceLabel")?.classList.toggle("hidden", !isPromo);
   $("postArtValidityLabel")?.classList.toggle("hidden", !isPromo);
+  $("postArtServiceModeLabel")?.classList.toggle("hidden", !isService);
 }
-
 async function atualizarPreviaPostArt() {
   const canvas = $("postArtCanvas");
   const client = postArtCurrentClient();
@@ -19696,8 +19729,14 @@ function renderPostArtView() {
   }
   const client = postArtCurrentClient();
   state.postArtClientId = client.id;
-  const type = state.postArtType === "promocao" ? "promocao" : "produto";
+  const allowedTypes = ["produto", "promocao", "servico"];
+  const type = allowedTypes.includes(state.postArtType) ? state.postArtType : "produto";
   state.postArtType = type;
+  const typeCopy = {
+    produto: { plural: "produtos", title: "Título do produto", price: "Preço", callout: "Categoria ou chamada" },
+    promocao: { plural: "promoções", title: "Título da promoção", price: "Preço promocional", callout: "Desconto ou chamada" },
+    servico: { plural: "serviços", title: "Nome do serviço", price: "Valor ou a partir de", callout: "Especialidade ou chamada" }
+  }[type];
   const items = postArtItems(client, type);
   if (!items.some((item) => item.id === state.postArtItemId)) state.postArtItemId = items[0]?.id || "";
   const layouts = POST_ART_LAYOUTS[type];
@@ -19706,7 +19745,7 @@ function renderPostArtView() {
   mount.innerHTML = `
     <section class="panel-card post-art-intro">
       <div class="section-head">
-        <div><span class="feature-kicker">Conteúdo para redes sociais</span><h2>Arte para Postagem</h2><p>Escolha um item cadastrado, ajuste os textos e compare os modelos antes de baixar.</p></div>
+        <div><span class="feature-kicker">Conteúdo para redes sociais</span><h2>Gerar postagem</h2><p>Crie em um só lugar postagens de produtos, promoções e serviços, com prévia antes de baixar.</p></div>
         <span class="badge"><i class="fa-solid fa-image"></i> PNG 1080 × 1080</span>
       </div>
       ${canManageClients() ? `<label class="post-art-client-select">Cliente<select id="postArtClient">${clients.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === client.id ? "selected" : ""}>${escapeHtml(item.nome || item.id)}</option>`).join("")}</select></label>` : `<div class="post-art-client-identity"><img src="${escapeAttr(displayImageUrl(logoClienteImovelAdmin(client)) || "../images/img_padrao_site/logo_1.png")}" alt=""><div><span>Empresa selecionada</span><strong>${escapeHtml(client.nome || client.id)}</strong></div></div>`}
@@ -19714,31 +19753,33 @@ function renderPostArtView() {
     <section class="post-art-workspace">
       <div class="post-art-editor-column">
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>1</span><div><strong>Tipo da arte</strong><small>Produto para vitrine ou promoção em destaque.</small></div></div>
+          <div class="post-art-step-title"><span>1</span><div><strong>Tipo da postagem</strong><small>Selecione o conteúdo que deseja divulgar.</small></div></div>
           <div class="post-art-type-toggle">
             <button type="button" data-post-art-type="produto" class="${type === "produto" ? "active" : ""}"><i class="fa-solid fa-box-open"></i><strong>Produto</strong><span>Apresentação e detalhes</span></button>
-            <button type="button" data-post-art-type="promocao" class="${type === "promocao" ? "active" : ""}"><i class="fa-solid fa-tags"></i><strong>Promoção</strong><span>Preço e chamada em destaque</span></button>
+            <button type="button" data-post-art-type="promocao" class="${type === "promocao" ? "active" : ""}"><i class="fa-solid fa-tags"></i><strong>Promoção</strong><span>Preço e oferta em destaque</span></button>
+            <button type="button" data-post-art-type="servico" class="${type === "servico" ? "active" : ""}"><i class="fa-solid fa-screwdriver-wrench"></i><strong>Serviço</strong><span>Especialidade e atendimento</span></button>
           </div>
-          ${items.length ? `<label>Item cadastrado<select id="postArtItem">${items.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === state.postArtItemId ? "selected" : ""}>${escapeHtml(item.titulo || item.nome)}</option>`).join("")}</select></label>` : `<div class="post-art-empty"><i class="fa-solid fa-circle-info"></i> Cadastre ao menos ${type === "produto" ? "um produto" : "uma promoção"} para criar a arte.</div>`}
+          ${items.length ? `<label>${type === "servico" ? "Empresa usada como base" : "Item cadastrado"}<select id="postArtItem">${items.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === state.postArtItemId ? "selected" : ""}>${escapeHtml(item.titulo || item.nome)}</option>`).join("")}</select></label>` : `<div class="post-art-empty"><i class="fa-solid fa-circle-info"></i> Cadastre ao menos ${type === "produto" ? "um produto" : "uma promoção"} para criar a postagem.</div>`}
         </section>
         ${items.length ? `
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>2</span><div><strong>Modelo visual</strong><small>Quatro composições criadas especialmente para ${type === "produto" ? "produtos" : "promoções"}.</small></div></div>
+          <div class="post-art-step-title"><span>2</span><div><strong>Modelo visual</strong><small>Quatro composições criadas especialmente para ${typeCopy.plural}.</small></div></div>
           <div class="post-art-layout-grid">
             ${layouts.map((layout) => `<button type="button" data-post-art-layout="${layout.key}" class="post-art-layout-card variant-${layout.variant} ${layout.key === state.postArtLayout ? "active" : ""}" style="--art-bg:${layout.bg};--art-primary:${layout.primary};--art-accent:${layout.accent};--art-panel:${layout.panel}"><span class="post-art-layout-mini"><i></i><b></b><em></em></span><strong>${escapeHtml(layout.nome)}</strong><small>${escapeHtml(layout.descricao)}</small><i class="fa-solid fa-circle-check"></i></button>`).join("")}
           </div>
         </section>
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>3</span><div><strong>Textos e imagem</strong><small>Os dados vieram do cadastro, mas podem ser ajustados somente para esta arte.</small></div></div>
+          <div class="post-art-step-title"><span>3</span><div><strong>Textos e imagem</strong><small>Os dados iniciais vieram do cadastro, mas podem ser ajustados somente para esta postagem.</small></div></div>
           <div class="post-art-fields">
-            <label class="wide">Título<input id="postArtTitle" maxlength="80"></label>
+            <label class="wide">${typeCopy.title}<input id="postArtTitle" maxlength="80"></label>
             <label class="wide">Descrição<textarea id="postArtDescription" rows="3" maxlength="220"></textarea></label>
-            <label>Preço<input id="postArtPrice" placeholder="Ex.: 89,90"></label>
-            <label id="postArtOldPriceLabel">Preço anterior<input id="postArtOldPrice" placeholder="Ex.: 119,90"></label>
-            <label>Chamada<input id="postArtCallout" maxlength="48" placeholder="Ex.: Novidade ou 20% OFF"></label>
-            <label id="postArtValidityLabel">Validade<input id="postArtValidity" type="date"></label>
+            <label>${typeCopy.price}<input id="postArtPrice" placeholder="${type === "servico" ? "Ex.: A partir de 89,90 ou Sob consulta" : "Ex.: 89,90"}"></label>
+            <label id="postArtOldPriceLabel" class="${type === "promocao" ? "" : "hidden"}">Preço anterior<input id="postArtOldPrice" placeholder="Ex.: 119,90"></label>
+            <label>${typeCopy.callout}<input id="postArtCallout" maxlength="48" placeholder="${type === "servico" ? "Ex.: Atendimento especializado" : "Ex.: Novidade ou 20% OFF"}"></label>
+            <label id="postArtValidityLabel" class="${type === "promocao" ? "" : "hidden"}">Validade<input id="postArtValidity" type="date"></label>
+            <label id="postArtServiceModeLabel" class="${type === "servico" ? "" : "hidden"}">Forma de atendimento<input id="postArtServiceMode" maxlength="52" placeholder="Ex.: Presencial, online ou a domicílio"></label>
             <label class="wide">Imagem usada<input id="postArtImage" placeholder="URL da imagem"></label>
-            <label>Nova imagem para esta arte<input id="postArtImageUpload" type="file" accept="image/*"></label>
+            <label>Nova imagem para esta postagem<input id="postArtImageUpload" type="file" accept="image/*"></label>
             <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
             <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
           </div>
@@ -19746,7 +19787,7 @@ function renderPostArtView() {
       </div>
       <aside class="panel-card post-art-preview-card">
         <div class="section-head compact"><div><strong>Pré-visualização</strong><span id="postArtPreviewMeta">Confira o resultado antes de baixar</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>
-        ${items.length ? `<div class="post-art-canvas-shell"><canvas id="postArtCanvas" width="1080" height="1080"></canvas></div><button id="postArtDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar arte em PNG</button><p class="post-art-preview-note"><i class="fa-solid fa-circle-info"></i> As edições feitas aqui não alteram o cadastro do produto ou da promoção.</p>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-image"></i><span>A prévia aparecerá quando houver um item cadastrado.</span></div>`}
+        ${items.length ? `<div class="post-art-canvas-shell"><canvas id="postArtCanvas" width="1080" height="1080"></canvas></div><button id="postArtDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar postagem em PNG</button><p class="post-art-preview-note"><i class="fa-solid fa-circle-info"></i> As edições feitas aqui não alteram os dados cadastrados.</p>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-image"></i><span>A prévia aparecerá quando houver um item cadastrado.</span></div>`}
       </aside>
     </section>
   `;
@@ -19775,7 +19816,7 @@ function renderPostArtView() {
     mount.querySelectorAll("[data-post-art-layout]").forEach((item) => item.classList.toggle("active", item === button));
     atualizarPreviaPostArt();
   }));
-  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtImage", "postArtImageFit", "postArtShowSiteLogo"].forEach((id) => {
+  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImage", "postArtImageFit", "postArtShowSiteLogo"].forEach((id) => {
     $(id)?.addEventListener("input", agendarPreviaPostArt);
     $(id)?.addEventListener("change", agendarPreviaPostArt);
   });
@@ -19785,7 +19826,7 @@ function renderPostArtView() {
     const reader = new FileReader();
     reader.onload = () => {
       state.postArtCustomImage = String(reader.result || "");
-      if ($("postArtImage")) $("postArtImage").value = "Imagem enviada para esta arte";
+      if ($("postArtImage")) $("postArtImage").value = "Imagem enviada para esta postagem";
       atualizarPreviaPostArt();
     };
     reader.readAsDataURL(file);
@@ -19794,7 +19835,6 @@ function renderPostArtView() {
   preencherFormularioPostArt();
   atualizarPreviaPostArt();
 }
-
 function renderStaffPromocoesView() {
   const mount = $("staffPromocoesMount");
   if (!mount) return;
@@ -19900,7 +19940,7 @@ function renderStaffPromocoesView() {
             <textarea id="promoArtBenefit3Text" rows="2" aria-label="Texto do beneficio 3">Mais agilidade e seguranca para voce.</textarea>
           </div>
         </div>
-      ` : `<div class="list-meta">Cadastre uma promocao para liberar a geracao da arte.</div>`}
+      ` : `<div class="list-meta">Cadastre uma promoção para liberar a geracao da arte.</div>`}
     </section>
     <section class="panel-card staff-promos-panel">
       <div class="section-head compact">
@@ -19910,7 +19950,7 @@ function renderStaffPromocoesView() {
         </div>
       </div>
       <div class="promo-admin-form">
-        <label>Titulo da promocao<input id="staffPromoTitle" placeholder="Ex.: Pizza grande"></label>
+        <label>Título da promoção<input id="staffPromoTitle" placeholder="Ex.: Pizza grande"></label>
         <label>Preco atual<input id="staffPromoPrice" placeholder="Ex.: 49,90"></label>
         <label>Desconto / chamada<input id="staffPromoDiscount" placeholder="Ex.: 20% OFF ou ATE 30% OFF"></label>
         <label>Preco antigo<input id="staffPromoOldPrice" placeholder="Opcional"></label>
@@ -20413,7 +20453,7 @@ function renderClientOnlyEditor() {
             <div class="section-head compact">
               <div>
                 <h3>Arte para Instagram</h3>
-                <p>Escolha uma promocao e gere a imagem quadrada para postagem.</p>
+                <p>Escolha uma promoção e gere a imagem quadrada para postagem.</p>
               </div>
               <span class="badge">1080 x 1080</span>
             </div>
@@ -20462,12 +20502,12 @@ function renderClientOnlyEditor() {
                   </div>
                 `).join("")}
               </div>
-            ` : `<div class="list-meta">Cadastre uma promocao para liberar a geracao da arte.</div>`}
+            ` : `<div class="list-meta">Cadastre uma promoção para liberar a geracao da arte.</div>`}
           </section>
           ` : ""}
           ${canEditPromocoes ? `
           <div class="promo-admin-form">
-            <label>Titulo da promocao<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
+            <label>Título da promoção<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
             <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
             <label>Desconto / chamada<input id="coPromoDiscount" placeholder="Ex.: 20% OFF ou ATE 30% OFF"></label>
             <label>Preco antigo<input id="coPromoOldPrice" placeholder="Opcional"></label>
@@ -20928,6 +20968,7 @@ function renderClientOnlyEditor() {
     clearPromoFields("co", mount);
     setCoPromoEditMode(-1);
     await loadAllData();
+    state.pendingClientModuleTarget = "client-module-promocoes";
     renderClientOnlyEditor();
   });
 
@@ -21241,6 +21282,7 @@ function renderClientOnlyEditor() {
       await removerNovidadesPorDestino("promocao", client.nomeNormalizado || normalizeName(client.nome || client.id), promo.id || "");
       showToast("Promocao removida.");
       await loadAllData();
+      state.pendingClientModuleTarget = "client-module-promocoes";
       renderClientOnlyEditor();
     });
   });
@@ -21458,7 +21500,7 @@ function renderMenuImagesMarkup(images, prefix) {
 
 function renderPromocoesMarkup(promocoes, removeAttr = "promo-remove", editAttr = "promo-edit") {
   const list = normalizePromocoes(promocoes);
-  if (!list.length) return `<div class="list-meta">Nenhuma promocao cadastrada ainda.</div>`;
+  if (!list.length) return `<div class="list-meta">Nenhuma promoção cadastrada ainda.</div>`;
   return list.map((promo, index) => `
     <article class="promo-admin-item">
       ${promo.imagem ? `<img src="${escapeAttr(displayImageUrl(promo.imagem))}" alt="${escapeAttr(promo.titulo)}" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : `<div class="promo-admin-empty">sem imagem</div>`}

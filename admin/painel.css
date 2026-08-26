@@ -8573,7 +8573,7 @@ button.admin-button-loading::after {
   }
 }
 
-/* ===== Arte para Postagem v375 ===== */
+/* ===== Gerar postagem v397 ===== */
 .post-art-intro {
   overflow: hidden;
   border-color: #cbdcf8;
@@ -8669,7 +8669,7 @@ button.admin-button-loading::after {
 
 .post-art-type-toggle {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 15px;
 }

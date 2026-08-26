@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=396">
+  <link rel="stylesheet" href="painel.css?v=397">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -59,8 +59,8 @@
       </div>
 
       <nav class="nav-admin">
-        <button data-view="dashboard" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
-        <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-palette"></i> Arte para Postagem</button>
+        <button data-view="dashboard" data-role="staff" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
+        <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar postagem</button>
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-database"></i> Cadastros</span>
           <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
@@ -1831,7 +1831,7 @@
                     <label><input type="checkbox" value="destaque" checked> Destaque da semana</label>
                     <label><input type="checkbox" value="faturas" checked> Faturas</label>
                     <label><input type="checkbox" value="imagens" checked> Imagens</label>
-                    <label><input type="checkbox" value="gerar_imagens_promocoes"> Arte para Postagem</label>
+                    <label><input type="checkbox" value="gerar_imagens_promocoes"> Gerar postagem</label>
                     <label><input type="checkbox" value="relatorios"> Relat&oacute;rios do cliente</label>
                     <label><input type="checkbox" value="origem_acessos"> Origem dos acessos / QR Code</label>
                     <label><input type="checkbox" value="vagas" checked> Vagas de trabalho</label>
@@ -2165,6 +2165,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=591"></script>
+  <script type="module" src="painel.js?v=592"></script>
 </body>
 </html>
