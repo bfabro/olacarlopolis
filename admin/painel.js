@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 655,
-  label: "v662",
+  numero: 656,
+  label: "v663",
   data: "2026-08-26",
-  nota: "Gerador unificado de postagens para produtos, promocoes e servicos."
+  nota: "Modelos profissionais de postagens com foco em valor, conversão e contato."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -236,11 +236,10 @@ let state = {
   clientPromoEditIndex: null,
   clientProductEditIndex: null,
   staffPromoEditIndex: null,
-  selectedPromoArtId: "",
   postArtType: "produto",
   postArtClientId: "",
   postArtItemId: "",
-  postArtLayout: "produto-vitrine",
+  postArtLayout: "produto-conversao",
   postArtCustomImage: "",
   selectedAutomovelArtId: "",
   selectedAutomovelArtIds: new Set(),
@@ -18699,751 +18698,26 @@ async function baixarStoryComercial() {
   }
 }
 
-const PROMO_ARTE_LAYOUTS = {
-  classico: { nome: "Classico", primary: "#e7192d", primaryDark: "#a90d1d", secondary: "#fde9ec", dark: "#202124", variant: 0 },
-  elegante: { nome: "Elegante", primary: "#b58a21", primaryDark: "#71520b", secondary: "#f7efd7", dark: "#171717", variant: 1 },
-  moderno: { nome: "Moderno", primary: "#2166d1", primaryDark: "#123b82", secondary: "#e4edff", dark: "#162033", variant: 2 },
-  comercial: { nome: "Comercial", primary: "#f05a18", primaryDark: "#aa3105", secondary: "#ffeadf", dark: "#201815", variant: 3 },
-  suave: { nome: "Suave", primary: "#138a72", primaryDark: "#075848", secondary: "#def5ef", dark: "#15332c", variant: 4 },
-  destaque: { nome: "Destaque", primary: "#7c3aed", primaryDark: "#4c1d95", secondary: "#eee5ff", dark: "#25143d", variant: 5 }
-};
-
-function promoImagemPrincipalAdmin(promo = {}, client = {}) {
-  return normalizarImagemArteAdmin(promo.imagem || "");
-}
-
-function promoPrecoArte(valor) {
-  const raw = String(valor || "").trim();
-  if (!raw) return "CONSULTE";
-  const numeric = numberFromMoney(raw);
-  return numeric > 0
-    ? numeric.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-    : raw.replace(/^R\$\s*/i, "");
-}
-
-function promoValidadeArte(promo = {}, validadeEditada = "") {
-  if (validadeEditada) return `VALIDA ATE ${formatDateBR(validadeEditada)}`;
-  if (promo.validadeFim) return `VALIDA ATE ${formatDateBR(promo.validadeFim)}`;
-  if (promo.validadeInicio) return `A PARTIR DE ${formatDateBR(promo.validadeInicio)}`;
-  return "OFERTA POR TEMPO LIMITADO";
-}
-
-function desenharTextoPromoCanvas(ctx, text, x, y, maxWidth, maxLines, options = {}) {
-  return desenharTextoInteiroCanvas(ctx, String(text || "").toUpperCase(), x, y, maxWidth, maxLines, {
-    peso: options.peso || 900,
-    tamanho: options.tamanho || 54,
-    minimo: options.minimo || 22,
-    lineHeight: options.lineHeight || 58,
-    familia: options.familia || "Arial",
-    align: options.align || "left",
-    blockHeight: options.blockHeight || 0
-  });
-}
-
-function desenharLogoClientePromo(ctx, logo, client, layout, x, y, w, h, inverted = false) {
-  const cardColor = inverted ? "rgba(17,19,24,.9)" : "rgba(255,255,255,.94)";
-  preencherRoundRect(ctx, x, y, w, h, 22, cardColor);
-  desenharBordaRoundRect(ctx, x, y, w, h, 22, inverted ? "rgba(255,255,255,.25)" : "rgba(17,19,24,.1)", 2);
-  if (logo) desenharImagemContain(ctx, logo, x + 16, y + 14, 96, h - 28, 14, "rgba(255,255,255,0)");
-  ctx.fillStyle = inverted ? "#fff" : layout.dark;
-  desenharTextoPromoCanvas(ctx, client.nome || "ANUNCIANTE", x + 128, y + 28, w - 150, 2, {
-    tamanho: 27,
-    minimo: 15,
-    lineHeight: 28,
-    blockHeight: h - 48
-  });
-}
-
-function desenharRodapePromo(ctx, promo, client, layout, siteLogo) {
-  ctx.fillStyle = layout.dark;
-  ctx.fillRect(0, 970, 1080, 110);
-  ctx.fillStyle = "#fff";
-  ctx.textAlign = "left";
-  const contact = telefoneArteAdmin(client.whatsapp || client.contato || "");
-  const detail = [promo.unidade, promo.volume, promo.embalagem].filter(Boolean).join(" • ");
-  ctx.font = "800 20px Arial";
-  ctx.fillText(detail || promoValidadeArte(promo), 42, 1014, 650);
-  ctx.font = "900 25px Arial";
-  ctx.fillText(contact ? `WHATSAPP ${contact}` : promoValidadeArte(promo), 42, 1052, 650);
-  if (siteLogo) desenharImagemContain(ctx, siteLogo, 875, 986, 165, 72, 0, "rgba(255,255,255,0)");
-}
-
-function desenharArtePromocao(ctx, promo, client, foto, logo, siteLogo, layout) {
-  const price = promoPrecoArte(promo.preco);
-  const oldPrice = promo.precoAntigo ? promoPrecoArte(promo.precoAntigo) : "";
-  const callout = promo.desconto || promo.instagramMensagem || "OFERTA ESPECIAL";
-  const description = promo.obs || [promo.volume, promo.embalagem, promo.unidade].filter(Boolean).join(" • ") || "Aproveite esta promocao";
-  ctx.fillStyle = layout.light;
-  ctx.fillRect(0, 0, 1080, 1080);
-
-  if (layout.variant === 0 || layout.variant === 3) {
-    desenharImagemCover(ctx, foto, 0, 230, 1080, 740, 0);
-    const shade = ctx.createLinearGradient(0, 490, 0, 970);
-    shade.addColorStop(0, "rgba(0,0,0,0)");
-    shade.addColorStop(1, "rgba(0,0,0,.82)");
-    ctx.fillStyle = shade;
-    ctx.fillRect(0, 430, 1080, 540);
-    ctx.fillStyle = layout.dark;
-    ctx.fillRect(0, 0, 1080, 230);
-    ctx.fillStyle = layout.primary;
-    ctx.fillRect(0, 0, layout.variant === 0 ? 32 : 1080, layout.variant === 0 ? 230 : 18);
-    desenharLogoClientePromo(ctx, logo, client, layout, 650, 42, 390, 142, true);
-    ctx.fillStyle = layout.variant === 3 ? layout.secondary : layout.primary;
-    desenharTextoPromoCanvas(ctx, callout, 48, 62, 550, 2, { tamanho: 52, minimo: 24, lineHeight: 52 });
-    ctx.fillStyle = "#fff";
-    desenharTextoPromoCanvas(ctx, promo.titulo, 54, 610, 670, 3, { tamanho: 66, minimo: 32, lineHeight: 67 });
-    preencherRoundRect(ctx, 655, 710, 385, 210, 28, layout.primary);
-    ctx.fillStyle = layout.variant === 3 ? layout.dark : "#fff";
-    ctx.font = "800 20px Arial";
-    ctx.fillText("POR APENAS", 690, 758);
-    ctx.font = "900 34px Arial";
-    ctx.fillText("R$", 690, 838);
-    ctx.textAlign = "right";
-    fonteQueCabeCanvas(ctx, price, 900, 72, 38, 275);
-    ctx.fillText(price, 1010, 850);
-  } else if (layout.variant === 1 || layout.variant === 5) {
-    ctx.fillStyle = layout.dark;
-    ctx.fillRect(0, 0, 1080, 1080);
-    desenharImagemCover(ctx, foto, 340, 180, 740, 790, 0);
-    const shade = ctx.createLinearGradient(300, 0, 760, 0);
-    shade.addColorStop(0, layout.dark);
-    shade.addColorStop(1, "rgba(17,17,17,0)");
-    ctx.fillStyle = shade;
-    ctx.fillRect(260, 180, 580, 790);
-    desenharLogoClientePromo(ctx, logo, client, layout, 610, 34, 430, 132, false);
-    ctx.fillStyle = layout.primary;
-    preencherRoundRect(ctx, 42, 42, 300, 54, 24, layout.primary);
-    ctx.fillStyle = layout.variant === 1 ? layout.dark : "#fff";
-    ctx.textAlign = "center";
-    ctx.font = "900 24px Arial";
-    ctx.fillText(callout.toUpperCase(), 192, 78, 260);
-    ctx.textAlign = "left";
-    ctx.fillStyle = "#fff";
-    desenharTextoPromoCanvas(ctx, promo.titulo, 48, 238, 490, 4, { tamanho: 69, minimo: 32, lineHeight: 68 });
-    ctx.fillStyle = layout.secondary;
-    desenharTextoPromoCanvas(ctx, description, 50, 560, 400, 3, { tamanho: 27, minimo: 17, lineHeight: 30, peso: 700 });
-    preencherRoundRect(ctx, 45, 730, 500, 190, 26, layout.primary);
-    ctx.fillStyle = layout.variant === 1 ? layout.dark : "#fff";
-    ctx.font = "800 19px Arial";
-    ctx.fillText("OFERTA", 78, 775);
-    ctx.font = "900 31px Arial";
-    ctx.fillText("R$", 78, 856);
-    ctx.textAlign = "right";
-    fonteQueCabeCanvas(ctx, price, 900, 72, 38, 350);
-    ctx.fillText(price, 512, 866);
-  } else {
-    const topColor = layout.variant === 2 ? layout.secondary : layout.dark;
-    ctx.fillStyle = topColor;
-    ctx.fillRect(0, 0, 1080, 290);
-    desenharLogoClientePromo(ctx, logo, client, layout, 600, 34, 440, 134, layout.variant === 4);
-    ctx.fillStyle = layout.primary;
-    preencherRoundRect(ctx, 42, 42, 310, 52, 22, layout.primary);
-    ctx.fillStyle = "#fff";
-    ctx.textAlign = "center";
-    ctx.font = "900 23px Arial";
-    ctx.fillText(callout.toUpperCase(), 197, 77, 280);
-    ctx.textAlign = "left";
-    ctx.fillStyle = layout.variant === 2 ? layout.dark : "#fff";
-    desenharTextoPromoCanvas(ctx, promo.titulo, 48, 135, 520, 2, { tamanho: 55, minimo: 28, lineHeight: 55 });
-    desenharImagemCover(ctx, foto, 40, 320, 1000, 500, 28);
-    desenharBordaRoundRect(ctx, 40, 320, 1000, 500, 28, layout.primary, 5);
-    preencherRoundRect(ctx, 555, 690, 455, 220, 30, layout.primary);
-    ctx.fillStyle = "#fff";
-    ctx.font = "800 20px Arial";
-    ctx.fillText("PRECO PROMOCIONAL", 590, 738);
-    ctx.font = "900 34px Arial";
-    ctx.fillText("R$", 590, 838);
-    ctx.textAlign = "right";
-    fonteQueCabeCanvas(ctx, price, 900, 74, 38, 330);
-    ctx.fillText(price, 974, 850);
-    ctx.fillStyle = layout.dark;
-    preencherRoundRect(ctx, 70, 835, 430, 92, 20, layout.secondary);
-    ctx.fillStyle = layout.dark;
-    desenharTextoPromoCanvas(ctx, description, 95, 852, 380, 2, { tamanho: 24, minimo: 15, lineHeight: 26, blockHeight: 58 });
-  }
-
-  if (oldPrice) {
-    ctx.fillStyle = layout.secondary;
-    preencherRoundRect(ctx, 730, 650, 280, 44, 18, layout.secondary);
-    ctx.fillStyle = layout.dark;
-    ctx.textAlign = "center";
-    ctx.font = "800 18px Arial";
-    ctx.fillText(`DE R$ ${oldPrice}`, 870, 679, 250);
-  }
-  ctx.fillStyle = "#fff";
-  ctx.textAlign = "left";
-  ctx.font = "800 18px Arial";
-  ctx.fillText(promoValidadeArte(promo), 50, 950, 510);
-  desenharRodapePromo(ctx, promo, client, layout, siteLogo);
-}
-
-function promoPrecoPartes(valor) {
-  const formatted = promoPrecoArte(valor);
-  if (formatted === "CONSULTE") return { inteiro: "CONSULTE", centavos: "", consulta: true };
-  const [inteiro, centavos = "00"] = formatted.split(",");
-  return { inteiro, centavos: `,${centavos}`, consulta: false };
-}
-
-function desenharBordaTracejadaPromo(ctx, x, y, w, h, radius, color, width = 3) {
-  ctx.save();
-  canvasRoundRect(ctx, x, y, w, h, radius);
-  ctx.strokeStyle = color;
-  ctx.lineWidth = width;
-  ctx.setLineDash([10, 8]);
-  ctx.stroke();
-  ctx.restore();
-}
-
-function desenharDecoracaoPromoNova(ctx, layout) {
-  const bg = ctx.createLinearGradient(0, 0, 1080, 1080);
-  bg.addColorStop(0, "#ffffff");
-  bg.addColorStop(1, "#f1f2f4");
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, 1080, 1080);
-  ctx.fillStyle = layout.primary;
-  ctx.beginPath();
-  ctx.moveTo(840, 0);
-  ctx.quadraticCurveTo(1060, 25, 1080, 250);
-  ctx.lineTo(1080, 0);
-  ctx.closePath();
-  ctx.fill();
-  ctx.beginPath();
-  ctx.moveTo(0, 780);
-  ctx.quadraticCurveTo(135, 920, 310, 1080);
-  ctx.lineTo(0, 1080);
-  ctx.closePath();
-  ctx.fill();
-  ctx.fillStyle = layout.dark;
-  ctx.beginPath();
-  ctx.moveTo(925, 1080);
-  ctx.lineTo(1080, 900);
-  ctx.lineTo(1080, 1080);
-  ctx.closePath();
-  ctx.fill();
-  [[48, 42], [72, 42], [96, 42], [992, 68], [1016, 68]].forEach(([x, y]) => {
-    ctx.beginPath();
-    ctx.arc(x, y, 4, 0, Math.PI * 2);
-    ctx.fill();
-  });
-}
-
-function desenharLogoPromoNova(ctx, logo, client, layout) {
-  ctx.save();
-  ctx.shadowColor = "rgba(17,24,39,.34)";
-  ctx.shadowBlur = 28;
-  ctx.shadowOffsetY = 10;
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.arc(245, 125, 84, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-  ctx.strokeStyle = layout.primary;
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.arc(245, 125, 84, 0, Math.PI * 2);
-  ctx.stroke();
-  if (logo) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(245, 125, 74, 0, Math.PI * 2);
-    ctx.clip();
-    desenharImagemContain(ctx, logo, 171, 51, 148, 148, 0, "#fff");
-    ctx.restore();
-  } else {
-    ctx.strokeStyle = layout.primary;
-    ctx.lineWidth = 4;
-    ctx.strokeRect(215, 108, 60, 44);
-    ctx.beginPath();
-    ctx.arc(245, 108, 17, Math.PI, 0);
-    ctx.stroke();
-    ctx.fillStyle = layout.dark;
-    ctx.textAlign = "center";
-    ctx.font = "800 11px Arial";
-    ctx.fillText("SUA LOGO AQUI", 245, 184);
-  }
-  ctx.fillStyle = layout.dark;
-  ctx.textAlign = "center";
-  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 245, 215, 380, 2, {
-    tamanho: 31,
-    minimo: 17,
-    lineHeight: 31,
-    align: "center",
-    blockHeight: 72
-  });
-  ctx.strokeStyle = layout.primary;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(130, 305);
-  ctx.lineTo(220, 305);
-  ctx.moveTo(270, 305);
-  ctx.lineTo(360, 305);
-  ctx.stroke();
-  ctx.fillStyle = layout.primary;
-  ctx.beginPath();
-  ctx.arc(245, 305, 6, 0, Math.PI * 2);
-  ctx.fill();
-}
-
-function desenharImagemPromoNova(ctx, foto, layout, fit = "cover") {
-  const geometries = [
-    [535, 120, 500, 625],
-    [45, 120, 500, 625],
-    [575, 82, 450, 665],
-    [22, 165, 525, 580],
-    [515, 155, 520, 590],
-    [72, 88, 455, 660]
-  ];
-  const [x, y, w, h] = geometries[layout.variant] || geometries[0];
-  ctx.save();
-  ctx.shadowColor = "rgba(17,24,39,.22)";
-  ctx.shadowBlur = layout.variant % 2 ? 30 : 22;
-  ctx.shadowOffsetY = 14;
-  preencherRoundRect(ctx, x, y, w, h, 42, "#fff");
-  ctx.restore();
-  desenharBordaRoundRect(ctx, x, y, w, h, 42, "rgba(255,255,255,.9)", 3);
-  desenharBordaTracejadaPromo(ctx, x + 18, y + 18, w - 36, h - 36, 30, layout.primary, 3);
-  if (foto) {
-    const imageX = x + 34;
-    const imageY = y + 34;
-    const imageW = w - 68;
-    const imageH = h - 68;
-    if (fit === "contain") desenharImagemContain(ctx, foto, imageX, imageY, imageW, imageH, 24, "#f5f5f5");
-    else desenharImagemCover(ctx, foto, imageX, imageY, imageW, imageH, 24);
-    return;
-  }
-  ctx.strokeStyle = layout.primary;
-  ctx.lineWidth = 5;
-  const centerX = x + w / 2;
-  const centerY = y + h / 2;
-  ctx.strokeRect(centerX - 75, centerY - 75, 150, 118);
-  ctx.beginPath();
-  ctx.arc(centerX + 37, centerY - 40, 18, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(centerX - 63, centerY + 25);
-  ctx.lineTo(centerX - 19, centerY - 20);
-  ctx.lineTo(centerX + 17, centerY + 12);
-  ctx.lineTo(centerX + 50, centerY - 18);
-  ctx.lineTo(centerX + 65, centerY + 25);
-  ctx.stroke();
-  ctx.fillStyle = layout.dark;
-  ctx.textAlign = "center";
-  ctx.font = "800 21px Arial";
-  ctx.fillText("SUA IMAGEM AQUI", centerX, centerY + 90);
-}
-
-function desenharIconeBeneficioPromo(ctx, type, cx, cy, color) {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 3;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-  if (type === 0) {
-    ctx.beginPath();
-    ctx.arc(cx, cy - 4, 12, 0, Math.PI * 2);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx - 7, cy + 7);
-    ctx.lineTo(cx - 10, cy + 21);
-    ctx.lineTo(cx, cy + 16);
-    ctx.lineTo(cx + 10, cy + 21);
-    ctx.lineTo(cx + 7, cy + 7);
-    ctx.stroke();
-  } else if (type === 1) {
-    ctx.beginPath();
-    ctx.arc(cx, cy, 15, Math.PI, 0);
-    ctx.stroke();
-    ctx.beginPath();
-    ctx.moveTo(cx - 15, cy);
-    ctx.lineTo(cx - 15, cy + 13);
-    ctx.moveTo(cx + 15, cy);
-    ctx.lineTo(cx + 15, cy + 13);
-    ctx.lineTo(cx + 7, cy + 13);
-    ctx.stroke();
-  } else {
-    ctx.strokeRect(cx - 18, cy - 11, 25, 19);
-    ctx.beginPath();
-    ctx.moveTo(cx + 7, cy - 6);
-    ctx.lineTo(cx + 17, cy - 6);
-    ctx.lineTo(cx + 22, cy + 2);
-    ctx.lineTo(cx + 22, cy + 8);
-    ctx.lineTo(cx + 7, cy + 8);
-    ctx.stroke();
-    [cx - 10, cx + 15].forEach((wheelX) => {
-      ctx.beginPath();
-      ctx.arc(wheelX, cy + 12, 5, 0, Math.PI * 2);
-      ctx.stroke();
-    });
-  }
-  ctx.restore();
-}
-
-function desenharBeneficiosPromoNova(ctx, layout, benefits = []) {
-  const visible = benefits.filter((item) => item?.enabled !== false && String(item?.title || item?.text || "").trim());
-  if (!visible.length) return;
-  preencherRoundRect(ctx, 34, 805, 1012, 135, 22, "rgba(255,255,255,.94)");
-  const blockWidth = 980 / visible.length;
-  visible.forEach((benefit, index) => {
-    const x = 50 + index * blockWidth;
-    if (index) {
-      ctx.strokeStyle = "#d5d7db";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x, 820);
-      ctx.lineTo(x, 922);
-      ctx.stroke();
-    }
-    ctx.fillStyle = layout.secondary;
-    ctx.beginPath();
-    ctx.arc(x + 48, 874, 34, 0, Math.PI * 2);
-    ctx.fill();
-    desenharIconeBeneficioPromo(ctx, benefit.icon ?? index, x + 48, 874, layout.primary);
-    ctx.fillStyle = layout.dark;
-    desenharTextoPromoCanvas(ctx, benefit.title, x + 94, 838, blockWidth - 110, 1, {
-      tamanho: 23,
-      minimo: 15,
-      lineHeight: 24
-    });
-    ctx.fillStyle = "#5f6368";
-    desenharTextoInteiroCanvas(ctx, benefit.text, x + 94, 872, blockWidth - 110, 3, {
-      peso: 600,
-      tamanho: 17,
-      minimo: 12,
-      lineHeight: 19,
-      align: "left"
-    });
-  });
-}
-
-function promocaoTeveReducao(promo = {}) {
-  const atual = numberFromMoney(promo.preco || "");
-  const antigo = numberFromMoney(promo.precoAntigo || "");
-  return atual > 0 && antigo > atual;
-}
-
-function desenharIconeInstagramPromo(ctx, cx, cy, color) {
-  ctx.save();
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 3;
-  canvasRoundRect(ctx, cx - 15, cy - 15, 30, 30, 8);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.arc(cx, cy, 7, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.arc(cx + 9, cy - 9, 2.5, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-}
-
-function desenharRodapeContatosPromo(ctx, client, layout, siteLogo, showSiteLogo = true) {
-  const instagramRaw = String(client.instagram || "@seuinstagram").trim();
-  const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
-  const instagramLabel = instagram.startsWith("@") ? instagram : `@${instagram}`;
-  const phone = telefoneArteAdmin(client.whatsapp || client.contato || "") || "(00) 00000-0000";
-  const cards = showSiteLogo
-    ? [
-      { x: 34, w: 330, label: instagramLabel, type: "instagram" },
-      { x: 375, w: 360, label: phone, type: "whatsapp" }
-    ]
-    : [
-      { x: 34, w: 496, label: instagramLabel, type: "instagram" },
-      { x: 550, w: 496, label: phone, type: "whatsapp" }
-    ];
-  cards.forEach((card) => {
-    ctx.save();
-    ctx.shadowColor = "rgba(17,24,39,.12)";
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetY = 5;
-    preencherRoundRect(ctx, card.x, 958, card.w, 88, 20, "rgba(255,255,255,.97)");
-    ctx.restore();
-    desenharBordaRoundRect(ctx, card.x, 958, card.w, 88, 20, "rgba(17,24,39,.1)", 2);
-    ctx.fillStyle = layout.secondary;
-    ctx.beginPath();
-    ctx.arc(card.x + 46, 1002, 27, 0, Math.PI * 2);
-    ctx.fill();
-    if (card.type === "instagram") desenharIconeInstagramPromo(ctx, card.x + 46, 1002, layout.primary);
-    else desenharIconeWhatsappCanvas(ctx, card.x + 46, 1002, layout.primary);
-    ctx.fillStyle = layout.dark;
-    ctx.textAlign = "left";
-    fonteQueCabeCanvas(ctx, card.label, 900, 21, 14, card.w - 100);
-    ctx.fillText(card.label, card.x + 88, 1010);
-  });
-
-  if (showSiteLogo) {
-    ctx.save();
-    ctx.shadowColor = "rgba(17,24,39,.12)";
-    ctx.shadowBlur = 12;
-    ctx.shadowOffsetY = 5;
-    preencherRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(255,255,255,.97)");
-    ctx.restore();
-    desenharBordaRoundRect(ctx, 746, 958, 300, 88, 20, "rgba(17,24,39,.1)", 2);
-    if (siteLogo) desenharImagemContain(ctx, siteLogo, 768, 966, 256, 72, 0, "rgba(255,255,255,0)");
-  }
-}
-
-function desenharLogoPromoDireita(ctx, logo, client, layout) {
-  ctx.save();
-  ctx.shadowColor = "rgba(17,24,39,.34)";
-  ctx.shadowBlur = 28;
-  ctx.shadowOffsetY = 10;
-  ctx.fillStyle = "#fff";
-  ctx.beginPath();
-  ctx.arc(815, 130, 84, 0, Math.PI * 2);
-  ctx.fill();
-  ctx.restore();
-  ctx.strokeStyle = layout.primary;
-  ctx.lineWidth = 5;
-  ctx.beginPath();
-  ctx.arc(815, 130, 84, 0, Math.PI * 2);
-  ctx.stroke();
-  if (logo) {
-    ctx.save();
-    ctx.beginPath();
-    ctx.arc(815, 130, 74, 0, Math.PI * 2);
-    ctx.clip();
-    desenharImagemContain(ctx, logo, 741, 56, 148, 148, 0, "#fff");
-    ctx.restore();
-  }
-  ctx.fillStyle = layout.dark;
-  ctx.textAlign = "center";
-  desenharTextoPromoCanvas(ctx, client.nome || "EMPRESA", 815, 220, 400, 2, {
-    tamanho: 31,
-    minimo: 17,
-    lineHeight: 31,
-    align: "center",
-    blockHeight: 72
-  });
-}
-
-function desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo, layout, options = {}) {
-  const price = promoPrecoPartes(promo.preco);
-  const oldPrice = promo.precoAntigo ? promoPrecoArte(promo.precoAntigo) : "";
-  desenharDecoracaoPromoNova(ctx, layout);
-  desenharImagemPromoNova(ctx, foto, layout, options.imageFit || "cover");
-  desenharLogoPromoDireita(ctx, logo, client, layout);
-
-  ctx.fillStyle = layout.primary;
-  desenharTextoPromoCanvas(ctx, "PROMO\u00c7\u00c3O", 810, 330, 420, 2, {
-    tamanho: 59,
-    minimo: 35,
-    lineHeight: 59,
-    align: "center",
-    blockHeight: 102,
-    familia: '"Arial Narrow", Arial, sans-serif'
-  });
-  ctx.fillStyle = layout.dark;
-  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 810, 425, 330, 2, {
-    tamanho: 29,
-    minimo: 17,
-    lineHeight: 29,
-    align: "center",
-    blockHeight: 62,
-    peso: 800
-  });
-
-  const priceGradient = ctx.createLinearGradient(625, 510, 1010, 670);
-  priceGradient.addColorStop(0, layout.primary);
-  priceGradient.addColorStop(1, layout.primaryDark);
-  preencherRoundRect(ctx, 625, 510, 385, 160, 40, priceGradient);
-  desenharBordaTracejadaPromo(ctx, 640, 525, 355, 130, 29, "rgba(255,255,255,.92)", 3);
-  ctx.fillStyle = "#fff";
-  if (price.consulta) {
-    ctx.textAlign = "center";
-    fonteQueCabeCanvas(ctx, "CONSULTE", 900, 52, 30, 310);
-    ctx.fillText("CONSULTE", 817, 612);
-  } else {
-    ctx.textAlign = "left";
-    ctx.font = "900 32px Arial";
-    ctx.fillText("R$", 660, 610);
-    ctx.textAlign = "right";
-    fonteQueCabeCanvas(ctx, price.inteiro, 900, 70, 40, 230);
-    ctx.fillText(price.inteiro, 910, 623);
-    ctx.textAlign = "left";
-    ctx.font = "900 29px Arial";
-    ctx.fillText(price.centavos, 914, 598);
-  }
-  if (oldPrice) {
-    const reduced = promocaoTeveReducao(promo);
-    ctx.fillStyle = layout.dark;
-    ctx.textAlign = "center";
-    ctx.font = `${reduced ? 900 : 700} ${reduced ? 28 : 21}px Arial`;
-    const oldText = `DE R$ ${oldPrice}`;
-    ctx.fillText(oldText, 817, 714);
-    const oldWidth = ctx.measureText(oldText).width;
-    ctx.strokeStyle = layout.primary;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(817 - oldWidth / 2, 705);
-    ctx.lineTo(817 + oldWidth / 2, 705);
-    ctx.stroke();
-  }
-  ctx.fillStyle = "#5f6368";
-  ctx.textAlign = "center";
-  ctx.font = "800 17px Arial";
-  ctx.fillText(promoValidadeArte(promo, options.validityDate), 817, oldPrice ? 758 : 720, 350);
-
-  desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
-  desenharRodapeContatosPromo(ctx, client, layout, siteLogo, options.showSiteLogo);
-}
-
-function desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, options = {}) {
-  if (layout.variant % 2 === 1) {
-    desenharArtePromocaoInvertida(ctx, promo, client, foto, logo, siteLogo, layout, options);
-    return;
-  }
-  const price = promoPrecoPartes(promo.preco);
-  const oldPrice = promo.precoAntigo ? promoPrecoArte(promo.precoAntigo) : "";
-  desenharDecoracaoPromoNova(ctx, layout);
-  desenharLogoPromoNova(ctx, logo, client, layout);
-  desenharImagemPromoNova(ctx, foto, layout, options.imageFit || "cover");
-
-  ctx.fillStyle = layout.primary;
-  desenharTextoPromoCanvas(ctx, "PROMO\u00c7\u00c3O", 245, 330, 420, 2, {
-    tamanho: 61,
-    minimo: 36,
-    lineHeight: 60,
-    align: "center",
-    blockHeight: 105,
-    familia: '"Arial Narrow", Arial, sans-serif'
-  });
-  ctx.strokeStyle = layout.primary;
-  ctx.lineWidth = 3;
-  ctx.beginPath();
-  ctx.moveTo(105, 478);
-  ctx.lineTo(165, 478);
-  ctx.moveTo(325, 478);
-  ctx.lineTo(385, 478);
-  ctx.stroke();
-  ctx.fillStyle = layout.dark;
-  desenharTextoPromoCanvas(ctx, promo.titulo || promo.desconto || "OFERTA ESPECIAL", 245, 430, 280, 2, {
-    tamanho: 28,
-    minimo: 17,
-    lineHeight: 28,
-    align: "center",
-    blockHeight: 62,
-    peso: 800
-  });
-
-  const priceGradient = ctx.createLinearGradient(60, 525, 430, 698);
-  priceGradient.addColorStop(0, layout.primary);
-  priceGradient.addColorStop(1, layout.primaryDark);
-  ctx.save();
-  ctx.shadowColor = "rgba(183,13,37,.28)";
-  ctx.shadowBlur = 22;
-  ctx.shadowOffsetY = 10;
-  preencherRoundRect(ctx, 60, 525, 370, 170, 40, priceGradient);
-  ctx.restore();
-  desenharBordaTracejadaPromo(ctx, 75, 540, 340, 140, 29, "rgba(255,255,255,.92)", 3);
-  ctx.fillStyle = "#fff";
-  if (price.consulta) {
-    ctx.textAlign = "center";
-    fonteQueCabeCanvas(ctx, "CONSULTE", 900, 52, 30, 300);
-    ctx.fillText("CONSULTE", 245, 628);
-  } else {
-    ctx.textAlign = "left";
-    ctx.font = "900 32px Arial";
-    ctx.fillText("R$", 92, 626);
-    ctx.textAlign = "right";
-    fonteQueCabeCanvas(ctx, price.inteiro, 900, 70, 40, 220);
-    ctx.fillText(price.inteiro, 340, 639);
-    ctx.textAlign = "left";
-    ctx.font = "900 29px Arial";
-    ctx.fillText(price.centavos, 342, 614);
-  }
-  if (oldPrice) {
-    const reduced = promocaoTeveReducao(promo);
-    ctx.fillStyle = "#55585d";
-    ctx.textAlign = "center";
-    ctx.font = `${reduced ? 900 : 700} ${reduced ? 28 : 21}px Arial`;
-    const oldText = `DE R$ ${oldPrice}`;
-    ctx.fillText(oldText, 245, 739);
-    const oldWidth = ctx.measureText(oldText).width;
-    ctx.strokeStyle = layout.primary;
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(245 - oldWidth / 2, 730);
-    ctx.lineTo(245 + oldWidth / 2, 730);
-    ctx.stroke();
-  }
-  ctx.fillStyle = "#606369";
-  ctx.textAlign = "center";
-  ctx.font = "800 17px Arial";
-  ctx.fillText(promoValidadeArte(promo, options.validityDate), 245, oldPrice ? 779 : 744, 390);
-
-  desenharBeneficiosPromoNova(ctx, layout, options.benefits || []);
-  desenharRodapeContatosPromo(ctx, client, layout, siteLogo, options.showSiteLogo);
-}
-
-function opcoesArtePromocao(prefix = "promoArt", scope = document) {
-  const field = (suffix) => scope.querySelector(`#${prefix}${suffix}`);
-  const benefits = [1, 2, 3].map((index) => ({
-    enabled: Boolean(field(`Benefit${index}Enabled`)?.checked),
-    title: field(`Benefit${index}Title`)?.value.trim() || "",
-    text: field(`Benefit${index}Text`)?.value.trim() || "",
-    icon: index - 1
-  }));
-  return {
-    imageFit: field("ImageFit")?.value || "cover",
-    validityDate: field("ValidityDate")?.value || "",
-    showSiteLogo: Boolean(field("ShowSiteLogo")?.checked),
-    benefits
-  };
-}
-
-async function gerarArteInstagramPromocao(clientId, promoId, layoutKey = "classico", options = null) {
-  if (!hasPermission("gerar_imagens_promocoes")) return showToast("A geracao de imagens de promocoes nao esta liberada para este usuario.");
-  const client = state.clientes.find((item) => item.id === clientId);
-  const promo = normalizePromocoes(client?.promocoes).find((item) => item.id === promoId);
-  if (!client || !promo) return showToast("Selecione uma promoção para gerar a arte.");
-  const layout = PROMO_ARTE_LAYOUTS[layoutKey] || PROMO_ARTE_LAYOUTS.classico;
-  const button = $("generatePromoArtButton") || $("coGeneratePromoArtButton");
-  if (button) button.disabled = true;
-  showToast("Gerando arte da promocao...");
-  try {
-    const [foto, logo, siteLogo] = await Promise.all([
-      carregarImagemCanvas(promoImagemPrincipalAdmin(promo, client)),
-      carregarImagemCanvas(logoClienteImovelAdmin(client)),
-      carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
-    ]);
-    const canvas = document.createElement("canvas");
-    canvas.width = 1080;
-    canvas.height = 1080;
-    const ctx = canvas.getContext("2d");
-    desenharArtePromocaoNova(ctx, promo, client, foto, logo, siteLogo, layout, options || opcoesArtePromocao());
-    const blob = await canvasParaBlob(canvas);
-    baixarBlobCanvas(blob, `arte-promocao-${slugify(client.nome || client.id)}-${slugify(promo.titulo)}-${layoutKey}.png`);
-    showToast("Arte da promocao gerada.");
-  } catch (error) {
-    console.error("Erro ao gerar arte da promocao.", error);
-    showToast("Nao foi possivel gerar a arte da promocao.");
-  } finally {
-    if (button) button.disabled = false;
-  }
-}
-
 const POST_ART_LAYOUTS = {
   produto: [
-    { key: "produto-vitrine", nome: "Vitrine clara", descricao: "Imagem ampla e informacoes objetivas", variant: 0, bg: "#eef6ff", panel: "#ffffff", primary: "#1769e0", accent: "#f5b82e", ink: "#10253f" },
-    { key: "produto-editorial", nome: "Editorial escuro", descricao: "Visual sofisticado com divisao lateral", variant: 1, bg: "#101827", panel: "#182338", primary: "#5fd3ff", accent: "#f8cf5b", ink: "#ffffff" },
-    { key: "produto-catalogo", nome: "Catalogo moderno", descricao: "Produto central e detalhes organizados", variant: 2, bg: "#f6f3ed", panel: "#ffffff", primary: "#19735a", accent: "#e8aa47", ink: "#18342c" },
-    { key: "produto-social", nome: "Social vibrante", descricao: "Cores fortes para chamar atencao no feed", variant: 3, bg: "#4c1d95", panel: "#ffffff", primary: "#ff5f7e", accent: "#ffd84a", ink: "#ffffff" }
+    { key: "produto-conversao", nome: "Destaque que vende", descricao: "Produto, benefício e preço com leitura imediata", variant: 0, bg: "#f4f7fb", panel: "#ffffff", primary: "#155eef", accent: "#ffd54a", ink: "#10233f" },
+    { key: "produto-premium", nome: "Vitrine premium", descricao: "Composição elegante para aumentar o valor percebido", variant: 1, bg: "#101828", panel: "#182230", primary: "#38bdf8", accent: "#facc15", ink: "#ffffff" },
+    { key: "produto-desejo", nome: "Desejo imediato", descricao: "Imagem imersiva com oferta central e chamada forte", variant: 2, bg: "#172554", panel: "#ffffff", primary: "#2563eb", accent: "#fde047", ink: "#ffffff" },
+    { key: "produto-social", nome: "Oferta moderna", descricao: "Visual dinâmico para produtos de alto giro", variant: 3, bg: "#312e81", panel: "#ffffff", primary: "#7c3aed", accent: "#fbbf24", ink: "#ffffff" }
   ],
   promocao: [
-    { key: "promocao-impacto", nome: "Impacto vermelho", descricao: "Preco e desconto como protagonistas", variant: 0, bg: "#8f1024", panel: "#ffffff", primary: "#e7193f", accent: "#ffd43b", ink: "#ffffff" },
-    { key: "promocao-varejo", nome: "Varejo laranja", descricao: "Composição comercial e direta", variant: 1, bg: "#ff6a00", panel: "#fff8ed", primary: "#ef4d00", accent: "#ffe057", ink: "#33150a" },
-    { key: "promocao-premium", nome: "Oferta premium", descricao: "Fundo escuro e acabamento dourado", variant: 2, bg: "#111111", panel: "#1d1d1d", primary: "#d5a940", accent: "#f6dc8b", ink: "#ffffff" },
-    { key: "promocao-festival", nome: "Festival de ofertas", descricao: "Layout dinamico para campanhas especiais", variant: 3, bg: "#3d1677", panel: "#ffffff", primary: "#8b3ffc", accent: "#ffcf3e", ink: "#ffffff" }
+    { key: "promocao-irresistivel", nome: "Oferta irresistível", descricao: "Preço promocional como protagonista da campanha", variant: 0, bg: "#fff5f5", panel: "#ffffff", primary: "#e11d48", accent: "#fde047", ink: "#27151a" },
+    { key: "promocao-urgencia", nome: "Urgência premium", descricao: "Contraste sofisticado com senso de oportunidade", variant: 1, bg: "#18181b", panel: "#27272a", primary: "#f43f5e", accent: "#fbbf24", ink: "#ffffff" },
+    { key: "promocao-direta", nome: "Campanha direta", descricao: "Foto forte, preco gigante e chamada para comprar", variant: 2, bg: "#7f1d1d", panel: "#ffffff", primary: "#dc2626", accent: "#fde047", ink: "#ffffff" },
+    { key: "promocao-ultima-chance", nome: "Última chance", descricao: "Composição vibrante para ofertas de curta duração", variant: 3, bg: "#4c1d95", panel: "#ffffff", primary: "#db2777", accent: "#facc15", ink: "#ffffff" }
   ],
   servico: [
-    { key: "servico-profissional", nome: "Profissional azul", descricao: "Apresentação clara para serviços e atendimento", variant: 0, bg: "#eaf4ff", panel: "#ffffff", primary: "#1264a3", accent: "#63d5c3", ink: "#12304a" },
-    { key: "servico-elegante", nome: "Elegante escuro", descricao: "Visual sofisticado para destacar sua especialidade", variant: 1, bg: "#111827", panel: "#172033", primary: "#2f9eaa", accent: "#8be0d0", ink: "#ffffff" },
-    { key: "servico-confianca", nome: "Confiança moderna", descricao: "Composição organizada e acolhedora", variant: 2, bg: "#f1f7f4", panel: "#ffffff", primary: "#27745f", accent: "#e4b85a", ink: "#173d32" },
-    { key: "servico-impacto", nome: "Impacto local", descricao: "Chamada forte para conquistar novos clientes", variant: 3, bg: "#173d62", panel: "#ffffff", primary: "#18a999", accent: "#ffd166", ink: "#ffffff" }
+    { key: "servico-autoridade", nome: "Autoridade profissional", descricao: "Serviço, especialidade e valor com credibilidade", variant: 0, bg: "#f0fdfa", panel: "#ffffff", primary: "#0f766e", accent: "#fbbf24", ink: "#153d3a" },
+    { key: "servico-agenda", nome: "Agenda premium", descricao: "Apresentação refinada para serviços especializados", variant: 1, bg: "#0f172a", panel: "#172033", primary: "#14b8a6", accent: "#fbbf24", ink: "#ffffff" },
+    { key: "servico-confianca", nome: "Confiança local", descricao: "Imagem humana, proposta clara e contato destacado", variant: 2, bg: "#134e4a", panel: "#ffffff", primary: "#0d9488", accent: "#fde047", ink: "#ffffff" },
+    { key: "servico-acao", nome: "Chamada para ação", descricao: "Visual moderno para gerar pedidos e agendamentos", variant: 3, bg: "#164e63", panel: "#ffffff", primary: "#0891b2", accent: "#fbbf24", ink: "#ffffff" }
   ]
 };
-
 let postArtPreviewTimer = null;
 let postArtPreviewRequest = 0;
 
@@ -19531,29 +18805,65 @@ function postArtDrawPhoto(ctx, image, rect, fit = "cover", radius = 32, fill = "
 }
 
 function postArtDrawBrand(ctx, client, logo, siteLogo, layout, options = {}) {
-  const light = options.light !== false;
-  preencherRoundRect(ctx, 48, 42, 400, 94, 24, light ? "rgba(255,255,255,.94)" : "rgba(12,20,34,.76)");
-  if (logo) desenharImagemContain(ctx, logo, 62, 52, 74, 74, 16, "rgba(255,255,255,0)");
-  postArtDrawText(ctx, client?.nome || "SUA EMPRESA", 150, 68, 275, 2, 25, light ? "#15273a" : "#ffffff", { min: 14, lineHeight: 25 });
-  if (options.showSiteLogo !== false && siteLogo) desenharImagemContain(ctx, siteLogo, 858, 46, 174, 80, 0, "rgba(255,255,255,0)");
+  const dark = Boolean(options.dark);
+  const x = options.x || 48;
+  const y = options.y || 38;
+  const width = options.width || 560;
+  const textColor = dark ? "#ffffff" : "#142033";
+  const mutedColor = dark ? "rgba(255,255,255,.72)" : "#64748b";
+  preencherRoundRect(ctx, x, y, width, 104, 28, dark ? "rgba(8,15,29,.78)" : "rgba(255,255,255,.94)");
+  if (logo) desenharImagemContain(ctx, logo, x + 12, y + 12, 80, 80, 18, "rgba(255,255,255,0)");
+  postArtDrawText(ctx, client?.nome || "SUA EMPRESA", x + 108, y + 23, width - 130, 1, 27, textColor, { min: 16, lineHeight: 28 });
+  const companyDetail = [client?.categoria, client?.cidade].filter(Boolean).join(" • ") || "COMÉRCIO LOCAL";
+  postArtDrawText(ctx, companyDetail.toUpperCase(), x + 108, y + 62, width - 130, 1, 15, mutedColor, { min: 11, weight: 800 });
+  if (options.showSiteLogo !== false && siteLogo) {
+    preencherRoundRect(ctx, 842, y + 4, 190, 92, 24, "rgba(255,255,255,.94)");
+    desenharImagemContain(ctx, siteLogo, 858, y + 13, 158, 72, 0, "rgba(255,255,255,0)");
+  }
 }
 
 function postArtDrawFooter(ctx, client, layout, dark = true) {
   const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte pelo WhatsApp";
   const instagramRaw = String(client?.instagram || "").trim();
   const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "") || "@olacarlopolis";
-  preencherRoundRect(ctx, 48, 974, 984, 68, 22, dark ? "rgba(11,21,34,.92)" : "rgba(255,255,255,.92)");
-  postArtDrawText(ctx, `WHATSAPP  ${phone}`, 78, 998, 480, 1, 20, dark ? "#ffffff" : layout.ink, { min: 14 });
-  postArtDrawText(ctx, instagram, 1000, 998, 400, 1, 20, dark ? layout.accent : layout.primary, { min: 14, align: "right" });
+  preencherRoundRect(ctx, 48, 974, 984, 68, 24, dark ? "rgba(8,15,29,.94)" : "rgba(255,255,255,.96)");
+  postArtDrawText(ctx, `FALE AGORA  •  ${phone}`, 78, 997, 520, 1, 19, dark ? "#ffffff" : layout.ink, { min: 13 });
+  postArtDrawText(ctx, instagram, 1000, 997, 360, 1, 19, dark ? layout.accent : layout.primary, { min: 13, align: "right" });
+}
+
+function postArtPriceLabel(data = {}) {
+  if (data.type === "promocao") return "PREÇO PROMOCIONAL";
+  if (data.type === "servico") return "VALOR DO SERVIÇO";
+  return "POR APENAS";
+}
+
+function postArtCta(data = {}) {
+  if (data.type === "promocao") return "APROVEITE AGORA";
+  if (data.type === "servico") return "AGENDE PELO WHATSAPP";
+  return "PEÇA PELO WHATSAPP";
 }
 
 function postArtDrawPrice(ctx, data, x, y, w, layout, options = {}) {
   const color = options.color || layout.primary;
-  preencherRoundRect(ctx, x, y, w, options.height || 145, 34, color);
+  const height = options.height || 170;
+  preencherRoundRect(ctx, x, y, w, height, 34, color);
+  postArtDrawText(ctx, postArtPriceLabel(data), x + w / 2, y + 20, w - 42, 1, 16, "rgba(255,255,255,.84)", { min: 11, align: "center", weight: 800 });
   if (data.oldPrice && data.type === "promocao") {
-    postArtDrawText(ctx, `DE ${postArtMoney(data.oldPrice)}`, x + 28, y + 22, w - 56, 1, 19, "rgba(255,255,255,.82)", { min: 13 });
+    const oldText = `DE ${postArtMoney(data.oldPrice)}`;
+    postArtDrawText(ctx, oldText, x + w / 2, y + 48, w - 48, 1, 17, "rgba(255,255,255,.8)", { min: 12, align: "center", weight: 700 });
+    ctx.strokeStyle = "rgba(255,255,255,.92)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(x + w * .27, y + 60);
+    ctx.lineTo(x + w * .73, y + 60);
+    ctx.stroke();
   }
-  postArtDrawText(ctx, postArtMoney(data.price), x + w / 2, y + (data.oldPrice && data.type === "promocao" ? 60 : 43), w - 44, 1, options.size || 48, "#ffffff", { min: 25, align: "center" });
+  postArtDrawText(ctx, postArtMoney(data.price), x + w / 2, y + (data.oldPrice && data.type === "promocao" ? 82 : 66), w - 40, 1, options.size || 48, "#ffffff", { min: 25, align: "center", blockHeight: height - 74 });
+}
+
+function postArtDrawCta(ctx, data, x, y, w, layout, options = {}) {
+  preencherRoundRect(ctx, x, y, w, options.height || 66, 28, options.dark ? layout.primary : layout.accent);
+  postArtDrawText(ctx, postArtCta(data), x + w / 2, y + 21, w - 36, 1, 18, options.dark ? "#ffffff" : "#211b08", { min: 12, align: "center", weight: 900 });
 }
 
 function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout) {
@@ -19566,72 +18876,84 @@ function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout)
 
   const isPromo = data.type === "promocao";
   const isService = data.type === "servico";
-  const eyebrow = data.callout || (isPromo ? "PROMOÇÃO EM DESTAQUE" : isService ? "SERVIÇO EM DESTAQUE" : "PRODUTO EM DESTAQUE");
+  const eyebrow = data.callout || (isPromo ? "OFERTA ESPECIAL" : isService ? "SERVIÇO EM DESTAQUE" : "PRODUTO EM DESTAQUE");
   const detailLine = isPromo && data.validity
-    ? `VÁLIDA ATÉ ${formatDateBR(data.validity)}`
+    ? `OFERTA VÁLIDA ATÉ ${formatDateBR(data.validity)}`
     : (isService && data.serviceMode ? data.serviceMode.toUpperCase() : "");
   const fit = data.imageFit || "cover";
 
   if (layout.variant === 0) {
-    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 610 }, fit, 0, "#edf2f7");
-    const overlay = ctx.createLinearGradient(0, 250, 0, 620);
-    overlay.addColorStop(0, "rgba(8,20,36,0)");
-    overlay.addColorStop(1, "rgba(8,20,36,.88)");
+    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 570 }, fit, 0, "#e8edf5");
+    const overlay = ctx.createLinearGradient(0, 220, 0, 580);
+    overlay.addColorStop(0, "rgba(8,15,29,0)");
+    overlay.addColorStop(1, "rgba(8,15,29,.88)");
     ctx.fillStyle = overlay;
-    ctx.fillRect(0, 240, 1080, 380);
+    ctx.fillRect(0, 190, 1080, 390);
     postArtDrawBrand(ctx, client, logo, siteLogo, layout, { showSiteLogo: data.showSiteLogo });
-    preencherRoundRect(ctx, 54, 500, 430, 52, 26, layout.accent);
-    postArtDrawText(ctx, eyebrow, 269, 516, 390, 1, 20, "#202020", { min: 13, align: "center" });
-    preencherRoundRect(ctx, 0, 590, 1080, 490, 0, layout.panel);
-    postArtDrawText(ctx, data.title, 58, 645, 650, 2, 48, isPromo ? "#251a1d" : layout.ink, { min: 27, lineHeight: 50 });
-    postArtDrawText(ctx, data.description, 58, 770, 640, 3, 23, "#637083", { min: 15, weight: 600, lineHeight: 28 });
-    postArtDrawPrice(ctx, data, 730, 650, 300, layout, { color: layout.primary, height: 160, size: 45 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 880, 830, 290, 1, 18, "#5d6874", { align: "center", min: 13 });
+    preencherRoundRect(ctx, 54, 485, 420, 54, 27, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 264, 502, 380, 1, 18, "#201b08", { min: 12, align: "center" });
+    preencherRoundRect(ctx, 0, 548, 1080, 532, 0, layout.panel);
+    postArtDrawText(ctx, data.title, 58, 616, 630, 2, 48, layout.ink, { min: 28, lineHeight: 51 });
+    postArtDrawText(ctx, data.description, 58, 748, 625, 3, 22, "#64748b", { min: 15, weight: 600, lineHeight: 28 });
+    postArtDrawPrice(ctx, data, 720, 622, 312, layout, { height: 178, size: 45 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 876, 822, 300, 1, 16, "#64748b", { align: "center", min: 11 });
+    postArtDrawCta(ctx, data, 720, 858, 312, layout);
     postArtDrawFooter(ctx, client, layout, true);
   } else if (layout.variant === 1) {
     ctx.fillStyle = layout.panel;
-    ctx.fillRect(0, 0, 465, 1080);
-    postArtDrawPhoto(ctx, image, { x: 465, y: 0, w: 615, h: 1080 }, fit, 0, "#edf2f7");
-    const sideShade = ctx.createLinearGradient(440, 0, 760, 0);
+    ctx.fillRect(0, 0, 520, 1080);
+    postArtDrawPhoto(ctx, image, { x: 520, y: 0, w: 560, h: 1080 }, fit, 0, "#e8edf5");
+    const sideShade = ctx.createLinearGradient(490, 0, 760, 0);
     sideShade.addColorStop(0, layout.panel);
     sideShade.addColorStop(1, "rgba(0,0,0,0)");
     ctx.fillStyle = sideShade;
-    ctx.fillRect(430, 0, 360, 1080);
-    postArtDrawBrand(ctx, client, logo, null, layout, { light: false, showSiteLogo: false });
-    postArtDrawText(ctx, eyebrow, 58, 200, 350, 2, 22, layout.accent, { min: 14, lineHeight: 24 });
-    postArtDrawText(ctx, data.title, 58, 286, 355, 4, 51, layout.ink, { min: 27, lineHeight: 52 });
-    postArtDrawText(ctx, data.description, 58, 530, 340, 4, 22, layout.ink === "#ffffff" ? "#cbd5e1" : "#6b5b4d", { min: 14, weight: 600, lineHeight: 28 });
-    postArtDrawPrice(ctx, data, 58, 710, 350, layout, { color: layout.primary, height: 150, size: 43 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 233, 884, 330, 1, 18, layout.accent, { align: "center" });
-    if (data.showSiteLogo && siteLogo) desenharImagemContain(ctx, siteLogo, 92, 940, 280, 92, 0, "rgba(255,255,255,0)");
+    ctx.fillRect(475, 0, 330, 1080);
+    postArtDrawBrand(ctx, client, logo, null, layout, { dark: true, width: 420, showSiteLogo: false });
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 58, 188, 390, 2, 20, layout.accent, { min: 13, lineHeight: 23 });
+    postArtDrawText(ctx, data.title, 58, 258, 390, 4, 48, layout.ink, { min: 27, lineHeight: 50 });
+    postArtDrawText(ctx, data.description, 58, 495, 385, 4, 21, "#cbd5e1", { min: 14, weight: 600, lineHeight: 27 });
+    postArtDrawPrice(ctx, data, 58, 680, 390, layout, { height: 166, size: 46 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 253, 862, 370, 1, 15, layout.accent, { align: "center", min: 11 });
+    postArtDrawCta(ctx, data, 58, 898, 390, layout);
+    if (data.showSiteLogo && siteLogo) {
+      preencherRoundRect(ctx, 790, 858, 242, 92, 24, "rgba(255,255,255,.92)");
+      desenharImagemContain(ctx, siteLogo, 810, 870, 202, 68, 0, "rgba(255,255,255,0)");
+    }
+    postArtDrawFooter(ctx, client, layout, true);
   } else if (layout.variant === 2) {
-    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { showSiteLogo: data.showSiteLogo });
-    postArtDrawText(ctx, eyebrow, 540, 160, 760, 1, 21, layout.primary, { align: "center", min: 14 });
-    postArtDrawPhoto(ctx, image, { x: 75, y: 205, w: 930, h: 540 }, fit, 38, "#ffffff");
-    desenharBordaRoundRect(ctx, 75, 205, 930, 540, 38, layout.primary, 5);
-    preencherRoundRect(ctx, 75, 775, 930, 175, 30, layout.panel);
-    postArtDrawText(ctx, data.title, 110, 808, 560, 2, 39, layout.ink, { min: 23, lineHeight: 41 });
-    postArtDrawText(ctx, data.description, 110, 897, 560, 2, 19, "#6b756f", { min: 13, weight: 600, lineHeight: 23 });
-    postArtDrawPrice(ctx, data, 700, 800, 270, layout, { color: layout.primary, height: 120, size: 38 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 835, 938, 250, 1, 15, layout.primary, { align: "center", min: 11 });
+    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 1080 }, fit, 0, "#18233a");
+    const shade = ctx.createLinearGradient(0, 0, 0, 1080);
+    shade.addColorStop(0, "rgba(8,15,29,.45)");
+    shade.addColorStop(.45, "rgba(8,15,29,.58)");
+    shade.addColorStop(1, "rgba(8,15,29,.94)");
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, 1080, 1080);
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { dark: true, showSiteLogo: data.showSiteLogo });
+    preencherRoundRect(ctx, 330, 184, 420, 54, 27, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 540, 201, 380, 1, 18, "#201b08", { min: 12, align: "center" });
+    postArtDrawText(ctx, data.title, 540, 280, 850, 3, 58, "#ffffff", { min: 32, lineHeight: 60, align: "center" });
+    postArtDrawText(ctx, data.description, 540, 482, 730, 3, 22, "rgba(255,255,255,.82)", { min: 15, weight: 600, lineHeight: 28, align: "center" });
+    postArtDrawPrice(ctx, data, 300, 635, 480, layout, { height: 184, size: 58 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 540, 838, 520, 1, 16, layout.accent, { align: "center", min: 11 });
+    postArtDrawCta(ctx, data, 340, 878, 400, layout);
     postArtDrawFooter(ctx, client, layout, true);
   } else {
     ctx.fillStyle = "rgba(255,255,255,.08)";
-    ctx.beginPath(); ctx.arc(980, 100, 250, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(90, 930, 210, 0, Math.PI * 2); ctx.fill();
-    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { light: true, showSiteLogo: data.showSiteLogo });
-    preencherRoundRect(ctx, 58, 190, 390, 55, 27, layout.accent);
-    postArtDrawText(ctx, eyebrow, 253, 208, 350, 1, 20, "#241a06", { align: "center", min: 13 });
-    postArtDrawText(ctx, data.title, 58, 290, 420, 4, 55, "#ffffff", { min: 29, lineHeight: 56 });
-    postArtDrawText(ctx, data.description, 58, 555, 410, 4, 23, "rgba(255,255,255,.83)", { min: 15, weight: 600, lineHeight: 29 });
-    postArtDrawPhoto(ctx, image, { x: 520, y: 185, w: 505, h: 635 }, fit, 42, "#ffffff");
-    desenharBordaRoundRect(ctx, 520, 185, 505, 635, 42, "rgba(255,255,255,.9)", 8);
-    postArtDrawPrice(ctx, data, 585, 760, 375, layout, { color: layout.primary, height: 150, size: 45 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 263, 858, 400, 1, 18, layout.accent, { align: "center", min: 13 });
+    ctx.beginPath(); ctx.arc(975, 85, 240, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(80, 900, 230, 0, Math.PI * 2); ctx.fill();
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { dark: true, showSiteLogo: data.showSiteLogo });
+    preencherRoundRect(ctx, 58, 186, 390, 54, 27, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 253, 203, 350, 1, 18, "#211b08", { align: "center", min: 12 });
+    postArtDrawText(ctx, data.title, 58, 286, 420, 4, 52, "#ffffff", { min: 29, lineHeight: 54 });
+    postArtDrawText(ctx, data.description, 58, 520, 415, 4, 21, "rgba(255,255,255,.82)", { min: 14, weight: 600, lineHeight: 27 });
+    postArtDrawPhoto(ctx, image, { x: 520, y: 172, w: 512, h: 598 }, fit, 42, "#ffffff");
+    desenharBordaRoundRect(ctx, 520, 172, 512, 598, 42, "rgba(255,255,255,.9)", 7);
+    postArtDrawPrice(ctx, data, 610, 700, 350, layout, { height: 166, size: 47 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 260, 760, 400, 1, 15, layout.accent, { align: "center", min: 11 });
+    postArtDrawCta(ctx, data, 58, 818, 404, layout);
     postArtDrawFooter(ctx, client, layout, true);
   }
 }
-
 function postArtFormData() {
   return {
     type: state.postArtType,
@@ -19763,7 +19085,7 @@ function renderPostArtView() {
         </section>
         ${items.length ? `
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>2</span><div><strong>Modelo visual</strong><small>Quatro composições criadas especialmente para ${typeCopy.plural}.</small></div></div>
+          <div class="post-art-step-title"><span>2</span><div><strong>Modelo visual</strong><small>Quatro composições profissionais focadas em atenção, valor e conversão para ${typeCopy.plural}.</small></div></div>
           <div class="post-art-layout-grid">
             ${layouts.map((layout) => `<button type="button" data-post-art-layout="${layout.key}" class="post-art-layout-card variant-${layout.variant} ${layout.key === state.postArtLayout ? "active" : ""}" style="--art-bg:${layout.bg};--art-primary:${layout.primary};--art-accent:${layout.accent};--art-panel:${layout.panel}"><span class="post-art-layout-mini"><i></i><b></b><em></em></span><strong>${escapeHtml(layout.nome)}</strong><small>${escapeHtml(layout.descricao)}</small><i class="fa-solid fa-circle-check"></i></button>`).join("")}
           </div>
@@ -19856,9 +19178,6 @@ function renderStaffPromocoesView() {
   const client = clientes.find((item) => item.id === state.selectedPromoClientId) || clientes[0];
   const promocoes = normalizePromocoes(client.promocoes);
   const selectedId = client.id;
-  if (!state.selectedPromoArtId || !promocoes.some((promo) => promo.id === state.selectedPromoArtId)) {
-    state.selectedPromoArtId = promocoes[0]?.id || "";
-  }
   const editing = Number.isInteger(state.staffPromoEditIndex) && state.staffPromoEditIndex >= 0;
 
   mount.innerHTML = `
@@ -19882,65 +19201,6 @@ function renderStaffPromocoesView() {
           <span>${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || client.whatsapp || "Sem contato")}</span>
         </div>
       </div>
-    </section>
-    <section class="panel-card promo-art-generator">
-      <div class="section-head">
-        <div>
-          <h3>Arte para Instagram</h3>
-          <p>Gere uma imagem quadrada usando os dados do cliente e da promocao selecionada.</p>
-        </div>
-        <span class="badge">1080 x 1080</span>
-      </div>
-      ${promocoes.length ? `
-        <div class="promo-art-controls">
-          <label>Promocao
-            <select id="promoArtItem">
-              ${promocoes.map((promo) => `<option value="${escapeAttr(promo.id)}" ${promo.id === state.selectedPromoArtId ? "selected" : ""}>${escapeHtml(promo.titulo)}</option>`).join("")}
-            </select>
-          </label>
-          <label>Modelo
-            <select id="promoArtLayout">
-              ${Object.entries(PROMO_ARTE_LAYOUTS).map(([key, layout]) => `<option value="${key}">${escapeHtml(layout.nome)}</option>`).join("")}
-            </select>
-          </label>
-          <button id="generatePromoArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
-        </div>
-        <div class="promo-layout-swatches">
-          ${Object.entries(PROMO_ARTE_LAYOUTS).map(([key, layout]) => `
-            <button type="button" data-promo-layout="${key}" title="Usar modelo ${escapeAttr(layout.nome)}">
-              <span style="--promo-main:${layout.primary};--promo-dark:${layout.dark};--promo-light:${layout.secondary}"></span>
-              ${escapeHtml(layout.nome)}
-            </button>
-          `).join("")}
-        </div>
-        <div class="promo-art-editor">
-          <label>Ajuste da imagem
-            <select id="promoArtImageFit">
-              <option value="cover">Preencher a moldura</option>
-              <option value="contain">Mostrar imagem inteira</option>
-            </select>
-          </label>
-          <label>Validade da promocao
-            <input id="promoArtValidityDate" type="date" value="${escapeAttr(promocoes.find((promo) => promo.id === state.selectedPromoArtId)?.validadeFim || "")}">
-          </label>
-          <label class="check-row"><input id="promoArtShowSiteLogo" type="checkbox" checked> Exibir logo Ola Carlopolis</label>
-          <div class="promo-art-benefit">
-            <label class="check-row"><input id="promoArtBenefit1Enabled" type="checkbox" checked> Exibir beneficio 1</label>
-            <input id="promoArtBenefit1Title" value="QUALIDADE" aria-label="Titulo do beneficio 1">
-            <textarea id="promoArtBenefit1Text" rows="2" aria-label="Texto do beneficio 1">Produtos de qualidade que voce confia.</textarea>
-          </div>
-          <div class="promo-art-benefit">
-            <label class="check-row"><input id="promoArtBenefit2Enabled" type="checkbox" checked> Exibir beneficio 2</label>
-            <input id="promoArtBenefit2Title" value="ATENDIMENTO" aria-label="Titulo do beneficio 2">
-            <textarea id="promoArtBenefit2Text" rows="2" aria-label="Texto do beneficio 2">Atendimento proximo e personalizado.</textarea>
-          </div>
-          <div class="promo-art-benefit">
-            <label class="check-row"><input id="promoArtBenefit3Enabled" type="checkbox" checked> Exibir beneficio 3</label>
-            <input id="promoArtBenefit3Title" value="ENTREGA RAPIDA" aria-label="Titulo do beneficio 3">
-            <textarea id="promoArtBenefit3Text" rows="2" aria-label="Texto do beneficio 3">Mais agilidade e seguranca para voce.</textarea>
-          </div>
-        </div>
-      ` : `<div class="list-meta">Cadastre uma promoção para liberar a geracao da arte.</div>`}
     </section>
     <section class="panel-card staff-promos-panel">
       <div class="section-head compact">
@@ -19996,36 +19256,7 @@ function renderStaffPromocoesView() {
   mount.querySelector("#staffPromoClientSelect")?.addEventListener("change", (event) => {
     state.selectedPromoClientId = event.target.value;
     state.staffPromoEditIndex = null;
-    state.selectedPromoArtId = "";
     renderStaffPromocoesView();
-  });
-
-  mount.querySelector("#promoArtItem")?.addEventListener("change", (event) => {
-    state.selectedPromoArtId = event.target.value;
-    const promo = promocoes.find((item) => item.id === event.target.value);
-    const validityField = mount.querySelector("#promoArtValidityDate");
-    if (validityField) validityField.value = promo?.validadeFim || "";
-  });
-
-  mount.querySelectorAll("[data-promo-layout]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const select = mount.querySelector("#promoArtLayout");
-      if (select) select.value = button.dataset.promoLayout;
-      mount.querySelectorAll("[data-promo-layout]").forEach((item) => item.classList.toggle("active", item === button));
-    });
-  });
-
-  mount.querySelector("[data-promo-layout='classico']")?.classList.add("active");
-  mount.querySelector("#promoArtLayout")?.addEventListener("change", (event) => {
-    mount.querySelectorAll("[data-promo-layout]").forEach((item) => {
-      item.classList.toggle("active", item.dataset.promoLayout === event.target.value);
-    });
-  });
-
-  mount.querySelector("#generatePromoArtButton")?.addEventListener("click", () => {
-    const promoId = mount.querySelector("#promoArtItem")?.value || state.selectedPromoArtId;
-    const layoutKey = mount.querySelector("#promoArtLayout")?.value || "classico";
-    gerarArteInstagramPromocao(selectedId, promoId, layoutKey);
   });
 
   mount.querySelector("#staffPromoImageUpload")?.addEventListener("change", async (event) => {
@@ -20202,7 +19433,7 @@ function renderClientOnlyEditor() {
         { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque },
         { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: canEditWhatsappGroups },
         { id: "client-module-produtos", icon: "fa-solid fa-box-open", label: "Produtos", show: canEditProdutos },
-        { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes || canGeneratePromoImages },
+        { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes },
         { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas }
       ]
     },
@@ -20438,7 +19669,7 @@ function renderClientOnlyEditor() {
           </div>
         </section>
       ` : ""}
-      ${canEditPromocoes || canGeneratePromoImages ? `
+      ${canEditPromocoes ? `
         <section id="client-module-promocoes" class="wide upload-panel client-feature-card feature-promocoes client-module-panel">
           <div class="section-head compact feature-card-head">
             <div>
@@ -20448,63 +19679,6 @@ function renderClientOnlyEditor() {
             </div>
             <span id="coPromosCount" class="badge">${promocoes.length} ativa${promocoes.length === 1 ? "" : "s"}</span>
           </div>
-          ${canGeneratePromoImages ? `
-          <section class="promo-art-generator client-promo-art-generator">
-            <div class="section-head compact">
-              <div>
-                <h3>Arte para Instagram</h3>
-                <p>Escolha uma promoção e gere a imagem quadrada para postagem.</p>
-              </div>
-              <span class="badge">1080 x 1080</span>
-            </div>
-            ${promocoes.length ? `
-              <div class="promo-art-controls">
-                <label>Promocao
-                  <select id="coPromoArtItem">
-                    ${promocoes.map((promo) => `<option value="${escapeAttr(promo.id)}">${escapeHtml(promo.titulo)}</option>`).join("")}
-                  </select>
-                </label>
-                <label>Modelo
-                  <select id="coPromoArtLayout">
-                    ${Object.entries(PROMO_ARTE_LAYOUTS).map(([key, layout]) => `<option value="${key}">${escapeHtml(layout.nome)}</option>`).join("")}
-                  </select>
-                </label>
-                <button id="coGeneratePromoArtButton" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar imagem</button>
-              </div>
-              <div class="promo-layout-swatches">
-                ${Object.entries(PROMO_ARTE_LAYOUTS).map(([key, layout]) => `
-                  <button type="button" data-co-promo-layout="${key}">
-                    <span style="--promo-main:${layout.primary};--promo-dark:${layout.dark};--promo-light:${layout.secondary}"></span>
-                    ${escapeHtml(layout.nome)}
-                  </button>
-                `).join("")}
-              </div>
-              <div class="promo-art-editor">
-                <label>Ajuste da imagem
-                  <select id="coPromoArtImageFit">
-                    <option value="cover">Preencher a moldura</option>
-                    <option value="contain">Mostrar imagem inteira</option>
-                  </select>
-                </label>
-                <label>Validade da promocao
-                  <input id="coPromoArtValidityDate" type="date" value="${escapeAttr(promocoes[0]?.validadeFim || "")}">
-                </label>
-                <label class="check-row"><input id="coPromoArtShowSiteLogo" type="checkbox" checked> Exibir logo Ola Carlopolis</label>
-                ${[
-                  ["QUALIDADE", "Produtos de qualidade que voce confia."],
-                  ["ATENDIMENTO", "Atendimento proximo e personalizado."],
-                  ["ENTREGA RAPIDA", "Mais agilidade e seguranca para voce."]
-                ].map((benefit, index) => `
-                  <div class="promo-art-benefit">
-                    <label class="check-row"><input id="coPromoArtBenefit${index + 1}Enabled" type="checkbox" checked> Exibir beneficio ${index + 1}</label>
-                    <input id="coPromoArtBenefit${index + 1}Title" value="${benefit[0]}">
-                    <textarea id="coPromoArtBenefit${index + 1}Text" rows="2">${benefit[1]}</textarea>
-                  </div>
-                `).join("")}
-              </div>
-            ` : `<div class="list-meta">Cadastre uma promoção para liberar a geracao da arte.</div>`}
-          </section>
-          ` : ""}
           ${canEditPromocoes ? `
           <div class="promo-admin-form">
             <label>Título da promoção<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
@@ -20853,33 +20027,6 @@ function renderClientOnlyEditor() {
     showToast("Imagem adicionada.");
     await loadAllData();
     renderClientOnlyEditor();
-  });
-
-  mount.querySelectorAll("[data-co-promo-layout]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const select = mount.querySelector("#coPromoArtLayout");
-      if (select) select.value = button.dataset.coPromoLayout;
-      mount.querySelectorAll("[data-co-promo-layout]").forEach((item) => item.classList.toggle("active", item === button));
-    });
-  });
-  mount.querySelector("[data-co-promo-layout='classico']")?.classList.add("active");
-  mount.querySelector("#coPromoArtLayout")?.addEventListener("change", (event) => {
-    mount.querySelectorAll("[data-co-promo-layout]").forEach((item) => {
-      item.classList.toggle("active", item.dataset.coPromoLayout === event.target.value);
-    });
-  });
-  mount.querySelector("#coPromoArtItem")?.addEventListener("change", (event) => {
-    const promo = promocoes.find((item) => item.id === event.target.value);
-    const validityField = mount.querySelector("#coPromoArtValidityDate");
-    if (validityField) validityField.value = promo?.validadeFim || "";
-  });
-  mount.querySelector("#coGeneratePromoArtButton")?.addEventListener("click", () => {
-    gerarArteInstagramPromocao(
-      client.id,
-      mount.querySelector("#coPromoArtItem")?.value || "",
-      mount.querySelector("#coPromoArtLayout")?.value || "classico",
-      opcoesArtePromocao("coPromoArt", mount)
-    );
   });
 
   mount.querySelector("#coAddProductButton")?.addEventListener("click", async () => {
