@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=398">
+  <link rel="stylesheet" href="painel.css?v=399">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -60,7 +60,10 @@
 
       <nav class="nav-admin">
         <button data-view="dashboard" data-role="staff" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
-        <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar postagem</button>
+        <section class="nav-admin-group" data-post-art-nav-group="true">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-pen-ruler"></i> Criar conteúdo</span>
+          <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar postagem</button>
+        </section>
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-database"></i> Cadastros</span>
           <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
@@ -99,13 +102,20 @@
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
-        <button data-view="beneficios" data-benefits-client-nav="true"><i class="fa-solid fa-gift"></i> Benefícios</button>
+        <button data-view="beneficios" data-role="staff"><i class="fa-solid fa-gift"></i> Benefícios</button>
         <button data-view="areaParceiro" data-role="parceiro"><i class="fa-solid fa-handshake"></i> Área do Parceiro</button>
-        <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
-        <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
-        <button data-view="faturas" data-role="cliente" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
-        <button data-view="eventos" data-role="cliente" data-permission="eventos"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
-        <button data-view="combustiveisPrecos" data-role="cliente" data-permission="combustiveis_precos"><i class="fa-solid fa-gas-pump"></i> Ajustar pre&ccedil;os</button>
+        <section class="nav-admin-group" data-role="cliente">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-store"></i> Minha empresa</span>
+          <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
+          <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
+        </section>
+        <section class="nav-admin-group" data-role="cliente">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-layer-group"></i> Conta e recursos</span>
+          <button data-view="beneficios" data-benefits-client-nav="true"><i class="fa-solid fa-gift"></i> Benefícios</button>
+          <button data-view="faturas" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
+          <button data-view="eventos" data-permission="eventos"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
+          <button data-view="combustiveisPrecos" data-permission="combustiveis_precos"><i class="fa-solid fa-gas-pump"></i> Ajustar preços</button>
+        </section>
       </nav>
 
       <div class="sidebar-footer">
@@ -2165,6 +2175,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=593"></script>
+  <script type="module" src="painel.js?v=594"></script>
 </body>
 </html>

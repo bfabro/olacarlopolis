@@ -6567,7 +6567,7 @@ button.admin-button-loading::after {
     white-space: nowrap;
   }
 }
-/* ===== Itens diretos do cliente no sidebar v229 ===== */
+/* ===== Itens agrupados do cliente no sidebar v230 ===== */
 .client-module-sidebar {
   display: grid;
   gap: 10px;
@@ -8453,7 +8453,7 @@ button.admin-button-loading::after {
   }
 }
 
-/* ===== Gerar postagem v398 ===== */
+/* ===== Gerar postagem v399 ===== */
 .post-art-intro {
   overflow: hidden;
   border-color: #cbdcf8;
@@ -8547,6 +8547,44 @@ button.admin-button-loading::after {
 .post-art-step-title strong { color: #172033; font-size: 15px; }
 .post-art-step-title small { margin-top: 3px; color: #718096; font-size: 12px; }
 
+.post-art-format-toggle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.post-art-format-toggle button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 3px 11px;
+  align-items: center;
+  min-height: 74px;
+  padding: 13px 15px;
+  border: 1px solid #dbe3ef;
+  border-radius: 14px;
+  background: #fff;
+  color: #34445a;
+  text-align: left;
+  transition: .2s ease;
+}
+
+.post-art-format-toggle button > i {
+  grid-row: 1 / 3;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 13px;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-size: 18px;
+}
+
+.post-art-format-toggle button strong { font-size: 14px; }
+.post-art-format-toggle button span { color: #7b8797; font-size: 11px; }
+.post-art-format-toggle button:hover { transform: translateY(-1px); border-color: #9fbae8; }
+.post-art-format-toggle button.active { border-color: #4f46e5; background: #f5f5ff; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
+.post-art-format-toggle button.active > i { background: #4f46e5; color: #fff; }
 .post-art-type-toggle {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -8731,6 +8769,15 @@ button.admin-button-loading::after {
   aspect-ratio: 1;
 }
 
+.post-art-canvas-shell.is-reels {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.post-art-canvas-shell.is-reels canvas {
+  aspect-ratio: 9 / 16;
+}
+
 .post-art-download {
   display: flex;
   width: 100%;
@@ -8761,6 +8808,7 @@ button.admin-button-loading::after {
 @media (max-width: 680px) {
   .post-art-workspace { gap: 12px; margin-top: 12px; }
   .post-art-editor-column { gap: 12px; }
+  .post-art-format-toggle,
   .post-art-type-toggle,
   .post-art-layout-grid,
   .post-art-fields { grid-template-columns: 1fr; }

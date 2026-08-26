@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 656,
-  label: "v663",
+  numero: 657,
+  label: "v664",
   data: "2026-08-26",
-  nota: "Modelos profissionais de postagens com foco em valor, conversão e contato."
+  nota: "Menu do cliente reorganizado e postagens em formatos Feed e Reels."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -239,7 +239,8 @@ let state = {
   postArtType: "produto",
   postArtClientId: "",
   postArtItemId: "",
-  postArtLayout: "produto-conversao",
+  postArtLayout: "produto-minimal",
+  postArtFormat: "feed",
   postArtCustomImage: "",
   selectedAutomovelArtId: "",
   selectedAutomovelArtIds: new Set(),
@@ -3086,6 +3087,9 @@ function updateChrome() {
   document.querySelectorAll("[data-post-art-nav='true']").forEach((el) => {
     el.classList.toggle("hidden", !canAccessView("artesPostagem"));
   });
+  document.querySelectorAll("[data-post-art-nav-group='true']").forEach((el) => {
+    el.classList.toggle("hidden", !canAccessView("artesPostagem"));
+  });
   document.querySelectorAll("[data-client-root-nav='true']").forEach((el) => {
     el.classList.add("hidden");
   });
@@ -3393,7 +3397,7 @@ function onlinePresencePageInfo(rawPage = "") {
     return { key: hash, label, icon, route: page };
   }
 
-  if (hash.startsWith("promocoes")) return { key: "promocoes", label: "Promocoes", icon: "fa-tags", route: page };
+  if (hash.startsWith("promocoes")) return { key: "promocoes", label: "Promoções", icon: "fa-tags", route: page };
   if (hash.startsWith("comercios")) {
     const categoryRaw = hashRaw.replace(/^comercios[-_]?/i, "");
     const categoryKey = normalizeName(categoryRaw);
@@ -18700,24 +18704,32 @@ async function baixarStoryComercial() {
 
 const POST_ART_LAYOUTS = {
   produto: [
-    { key: "produto-conversao", nome: "Destaque que vende", descricao: "Produto, benefício e preço com leitura imediata", variant: 0, bg: "#f4f7fb", panel: "#ffffff", primary: "#155eef", accent: "#ffd54a", ink: "#10233f" },
-    { key: "produto-premium", nome: "Vitrine premium", descricao: "Composição elegante para aumentar o valor percebido", variant: 1, bg: "#101828", panel: "#182230", primary: "#38bdf8", accent: "#facc15", ink: "#ffffff" },
-    { key: "produto-desejo", nome: "Desejo imediato", descricao: "Imagem imersiva com oferta central e chamada forte", variant: 2, bg: "#172554", panel: "#ffffff", primary: "#2563eb", accent: "#fde047", ink: "#ffffff" },
-    { key: "produto-social", nome: "Oferta moderna", descricao: "Visual dinâmico para produtos de alto giro", variant: 3, bg: "#312e81", panel: "#ffffff", primary: "#7c3aed", accent: "#fbbf24", ink: "#ffffff" }
+    { key: "produto-minimal", nome: "Minimal Shop", descricao: "Estilo clean de e-commerce com foco no produto", variant: 0, bg: "#f8fafc", panel: "#ffffff", primary: "#111827", accent: "#bef264", ink: "#111827" },
+    { key: "produto-gradient", nome: "Gradient Commerce", descricao: "Gradiente atual, contraste alto e preço evidente", variant: 1, bg: "#0f172a", panel: "#172554", primary: "#06b6d4", accent: "#facc15", ink: "#ffffff" },
+    { key: "produto-editorial", nome: "Foto Editorial", descricao: "Imagem dominante com tipografia de campanha", variant: 2, bg: "#111111", panel: "#fff7ed", primary: "#ea580c", accent: "#fed7aa", ink: "#ffffff" },
+    { key: "produto-pop", nome: "Pop Social", descricao: "Cores vivas e composição dinâmica para o feed", variant: 3, bg: "#581c87", panel: "#ffffff", primary: "#f43f5e", accent: "#fde047", ink: "#ffffff" }
   ],
   promocao: [
-    { key: "promocao-irresistivel", nome: "Oferta irresistível", descricao: "Preço promocional como protagonista da campanha", variant: 0, bg: "#fff5f5", panel: "#ffffff", primary: "#e11d48", accent: "#fde047", ink: "#27151a" },
-    { key: "promocao-urgencia", nome: "Urgência premium", descricao: "Contraste sofisticado com senso de oportunidade", variant: 1, bg: "#18181b", panel: "#27272a", primary: "#f43f5e", accent: "#fbbf24", ink: "#ffffff" },
-    { key: "promocao-direta", nome: "Campanha direta", descricao: "Foto forte, preco gigante e chamada para comprar", variant: 2, bg: "#7f1d1d", panel: "#ffffff", primary: "#dc2626", accent: "#fde047", ink: "#ffffff" },
-    { key: "promocao-ultima-chance", nome: "Última chance", descricao: "Composição vibrante para ofertas de curta duração", variant: 3, bg: "#4c1d95", panel: "#ffffff", primary: "#db2777", accent: "#facc15", ink: "#ffffff" }
+    { key: "promocao-flash", nome: "Flash Sale", descricao: "Oferta limpa com preço grande e urgência visual", variant: 0, bg: "#fff7ed", panel: "#ffffff", primary: "#dc2626", accent: "#fde047", ink: "#2b1717" },
+    { key: "promocao-black", nome: "Black Neon", descricao: "Visual escuro usado em campanhas de alta conversão", variant: 1, bg: "#09090b", panel: "#18181b", primary: "#f43f5e", accent: "#a3e635", ink: "#ffffff" },
+    { key: "promocao-fullscreen", nome: "Oferta Fullscreen", descricao: "Foto em tela cheia com preço central dominante", variant: 2, bg: "#7c2d12", panel: "#ffffff", primary: "#f97316", accent: "#fef08a", ink: "#ffffff" },
+    { key: "promocao-cupom", nome: "Cupom Pop", descricao: "Composição jovem para descontos e tempo limitado", variant: 3, bg: "#4c1d95", panel: "#ffffff", primary: "#ec4899", accent: "#facc15", ink: "#ffffff" }
   ],
   servico: [
-    { key: "servico-autoridade", nome: "Autoridade profissional", descricao: "Serviço, especialidade e valor com credibilidade", variant: 0, bg: "#f0fdfa", panel: "#ffffff", primary: "#0f766e", accent: "#fbbf24", ink: "#153d3a" },
-    { key: "servico-agenda", nome: "Agenda premium", descricao: "Apresentação refinada para serviços especializados", variant: 1, bg: "#0f172a", panel: "#172033", primary: "#14b8a6", accent: "#fbbf24", ink: "#ffffff" },
-    { key: "servico-confianca", nome: "Confiança local", descricao: "Imagem humana, proposta clara e contato destacado", variant: 2, bg: "#134e4a", panel: "#ffffff", primary: "#0d9488", accent: "#fde047", ink: "#ffffff" },
-    { key: "servico-acao", nome: "Chamada para ação", descricao: "Visual moderno para gerar pedidos e agendamentos", variant: 3, bg: "#164e63", panel: "#ffffff", primary: "#0891b2", accent: "#fbbf24", ink: "#ffffff" }
+    { key: "servico-clean", nome: "Clean Professional", descricao: "Apresentação clara, confiável e objetiva", variant: 0, bg: "#eff6ff", panel: "#ffffff", primary: "#1d4ed8", accent: "#bfdbfe", ink: "#172554" },
+    { key: "servico-personal", nome: "Personal Brand", descricao: "Estilo sofisticado para especialistas e consultores", variant: 1, bg: "#111827", panel: "#1f2937", primary: "#14b8a6", accent: "#fbbf24", ink: "#ffffff" },
+    { key: "servico-humano", nome: "Conexão Humana", descricao: "Imagem ampla para transmitir proximidade e confiança", variant: 2, bg: "#172554", panel: "#ffffff", primary: "#2563eb", accent: "#fde68a", ink: "#ffffff" },
+    { key: "servico-agenda", nome: "Agenda Digital", descricao: "Chamada moderna focada em pedidos e agendamentos", variant: 3, bg: "#164e63", panel: "#ffffff", primary: "#06b6d4", accent: "#fef08a", ink: "#ffffff" }
   ]
 };
+const POST_ART_FORMATS = {
+  feed: { key: "feed", nome: "Feed", descricao: "Post quadrado", width: 1080, height: 1080, icon: "fa-solid fa-table-cells-large" },
+  reels: { key: "reels", nome: "Reels / Stories", descricao: "Tela vertical", width: 1080, height: 1920, icon: "fa-solid fa-mobile-screen-button" }
+};
+
+function postArtFormat(key = state.postArtFormat) {
+  return POST_ART_FORMATS[key] || POST_ART_FORMATS.feed;
+}
 let postArtPreviewTimer = null;
 let postArtPreviewRequest = 0;
 
@@ -18826,11 +18838,11 @@ function postArtDrawFooter(ctx, client, layout, dark = true) {
   const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte pelo WhatsApp";
   const instagramRaw = String(client?.instagram || "").trim();
   const instagram = instagramRaw.replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "") || "@olacarlopolis";
-  preencherRoundRect(ctx, 48, 974, 984, 68, 24, dark ? "rgba(8,15,29,.94)" : "rgba(255,255,255,.96)");
-  postArtDrawText(ctx, `FALE AGORA  •  ${phone}`, 78, 997, 520, 1, 19, dark ? "#ffffff" : layout.ink, { min: 13 });
-  postArtDrawText(ctx, instagram, 1000, 997, 360, 1, 19, dark ? layout.accent : layout.primary, { min: 13, align: "right" });
+  const footerY = Math.max(0, ctx.canvas.height - 106);
+  preencherRoundRect(ctx, 48, footerY, 984, 68, 24, dark ? "rgba(8,15,29,.94)" : "rgba(255,255,255,.96)");
+  postArtDrawText(ctx, `FALE AGORA  •  ${phone}`, 78, footerY + 23, 520, 1, 19, dark ? "#ffffff" : layout.ink, { min: 13 });
+  postArtDrawText(ctx, instagram, 1000, footerY + 23, 360, 1, 19, dark ? layout.accent : layout.primary, { min: 13, align: "right" });
 }
-
 function postArtPriceLabel(data = {}) {
   if (data.type === "promocao") return "PREÇO PROMOCIONAL";
   if (data.type === "servico") return "VALOR DO SERVIÇO";
@@ -18866,7 +18878,7 @@ function postArtDrawCta(ctx, data, x, y, w, layout, options = {}) {
   postArtDrawText(ctx, postArtCta(data), x + w / 2, y + 21, w - 36, 1, 18, options.dark ? "#ffffff" : "#211b08", { min: 12, align: "center", weight: 900 });
 }
 
-function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout) {
+function desenharPostArtFeedCanvas(ctx, data, client, image, logo, siteLogo, layout) {
   const { width, height } = ctx.canvas;
   const gradient = ctx.createLinearGradient(0, 0, width, height);
   gradient.addColorStop(0, layout.bg);
@@ -18883,80 +18895,165 @@ function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout)
   const fit = data.imageFit || "cover";
 
   if (layout.variant === 0) {
-    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 570 }, fit, 0, "#e8edf5");
-    const overlay = ctx.createLinearGradient(0, 220, 0, 580);
-    overlay.addColorStop(0, "rgba(8,15,29,0)");
-    overlay.addColorStop(1, "rgba(8,15,29,.88)");
-    ctx.fillStyle = overlay;
-    ctx.fillRect(0, 190, 1080, 390);
     postArtDrawBrand(ctx, client, logo, siteLogo, layout, { showSiteLogo: data.showSiteLogo });
-    preencherRoundRect(ctx, 54, 485, 420, 54, 27, layout.accent);
-    postArtDrawText(ctx, eyebrow.toUpperCase(), 264, 502, 380, 1, 18, "#201b08", { min: 12, align: "center" });
-    preencherRoundRect(ctx, 0, 548, 1080, 532, 0, layout.panel);
-    postArtDrawText(ctx, data.title, 58, 616, 630, 2, 48, layout.ink, { min: 28, lineHeight: 51 });
-    postArtDrawText(ctx, data.description, 58, 748, 625, 3, 22, "#64748b", { min: 15, weight: 600, lineHeight: 28 });
-    postArtDrawPrice(ctx, data, 720, 622, 312, layout, { height: 178, size: 45 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 876, 822, 300, 1, 16, "#64748b", { align: "center", min: 11 });
-    postArtDrawCta(ctx, data, 720, 858, 312, layout);
+    postArtDrawPhoto(ctx, image, { x: 54, y: 180, w: 600, h: 700 }, fit, 38, "#eef2f7");
+    desenharBordaRoundRect(ctx, 54, 180, 600, 700, 38, "#e2e8f0", 3);
+    preencherRoundRect(ctx, 700, 190, 330, 52, 26, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 865, 207, 300, 1, 17, "#1f2937", { min: 11, align: "center" });
+    postArtDrawText(ctx, data.title, 700, 286, 330, 4, 43, layout.ink, { min: 24, lineHeight: 45 });
+    postArtDrawPrice(ctx, data, 700, 515, 330, layout, { height: 174, size: 46 });
+    postArtDrawText(ctx, data.description, 700, 724, 330, 4, 19, "#64748b", { min: 13, weight: 600, lineHeight: 24 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 865, 838, 320, 1, 14, layout.primary, { align: "center", min: 10 });
+    postArtDrawCta(ctx, data, 700, 876, 330, layout);
     postArtDrawFooter(ctx, client, layout, true);
   } else if (layout.variant === 1) {
+    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 545, h: 1080 }, fit, 0, "#111827");
     ctx.fillStyle = layout.panel;
-    ctx.fillRect(0, 0, 520, 1080);
-    postArtDrawPhoto(ctx, image, { x: 520, y: 0, w: 560, h: 1080 }, fit, 0, "#e8edf5");
-    const sideShade = ctx.createLinearGradient(490, 0, 760, 0);
-    sideShade.addColorStop(0, layout.panel);
-    sideShade.addColorStop(1, "rgba(0,0,0,0)");
-    ctx.fillStyle = sideShade;
-    ctx.fillRect(475, 0, 330, 1080);
-    postArtDrawBrand(ctx, client, logo, null, layout, { dark: true, width: 420, showSiteLogo: false });
-    postArtDrawText(ctx, eyebrow.toUpperCase(), 58, 188, 390, 2, 20, layout.accent, { min: 13, lineHeight: 23 });
-    postArtDrawText(ctx, data.title, 58, 258, 390, 4, 48, layout.ink, { min: 27, lineHeight: 50 });
-    postArtDrawText(ctx, data.description, 58, 495, 385, 4, 21, "#cbd5e1", { min: 14, weight: 600, lineHeight: 27 });
-    postArtDrawPrice(ctx, data, 58, 680, 390, layout, { height: 166, size: 46 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 253, 862, 370, 1, 15, layout.accent, { align: "center", min: 11 });
-    postArtDrawCta(ctx, data, 58, 898, 390, layout);
-    if (data.showSiteLogo && siteLogo) {
-      preencherRoundRect(ctx, 790, 858, 242, 92, 24, "rgba(255,255,255,.92)");
-      desenharImagemContain(ctx, siteLogo, 810, 870, 202, 68, 0, "rgba(255,255,255,0)");
-    }
+    ctx.fillRect(545, 0, 535, 1080);
+    const shade = ctx.createLinearGradient(500, 0, 680, 0);
+    shade.addColorStop(0, "rgba(0,0,0,0)");
+    shade.addColorStop(1, layout.panel);
+    ctx.fillStyle = shade;
+    ctx.fillRect(480, 0, 230, 1080);
+    postArtDrawBrand(ctx, client, logo, null, layout, { x: 590, y: 42, width: 442, dark: true, showSiteLogo: false });
+    preencherRoundRect(ctx, 600, 180, 390, 52, 26, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 795, 197, 350, 1, 17, "#201b08", { min: 11, align: "center" });
+    postArtDrawText(ctx, data.title, 600, 278, 390, 4, 47, layout.ink, { min: 26, lineHeight: 49 });
+    postArtDrawText(ctx, data.description, 600, 510, 390, 4, 20, "#cbd5e1", { min: 13, weight: 600, lineHeight: 25 });
+    postArtDrawPrice(ctx, data, 600, 700, 390, layout, { height: 168, size: 47 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 795, 884, 370, 1, 14, layout.accent, { align: "center", min: 10 });
+    postArtDrawCta(ctx, data, 600, 916, 390, layout, { height: 50 });
     postArtDrawFooter(ctx, client, layout, true);
   } else if (layout.variant === 2) {
     postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 1080 }, fit, 0, "#18233a");
-    const shade = ctx.createLinearGradient(0, 0, 0, 1080);
-    shade.addColorStop(0, "rgba(8,15,29,.45)");
-    shade.addColorStop(.45, "rgba(8,15,29,.58)");
+    const shade = ctx.createLinearGradient(0, 160, 0, 1080);
+    shade.addColorStop(0, "rgba(8,15,29,.2)");
+    shade.addColorStop(.55, "rgba(8,15,29,.28)");
     shade.addColorStop(1, "rgba(8,15,29,.94)");
     ctx.fillStyle = shade;
     ctx.fillRect(0, 0, 1080, 1080);
     postArtDrawBrand(ctx, client, logo, siteLogo, layout, { dark: true, showSiteLogo: data.showSiteLogo });
-    preencherRoundRect(ctx, 330, 184, 420, 54, 27, layout.accent);
-    postArtDrawText(ctx, eyebrow.toUpperCase(), 540, 201, 380, 1, 18, "#201b08", { min: 12, align: "center" });
-    postArtDrawText(ctx, data.title, 540, 280, 850, 3, 58, "#ffffff", { min: 32, lineHeight: 60, align: "center" });
-    postArtDrawText(ctx, data.description, 540, 482, 730, 3, 22, "rgba(255,255,255,.82)", { min: 15, weight: 600, lineHeight: 28, align: "center" });
-    postArtDrawPrice(ctx, data, 300, 635, 480, layout, { height: 184, size: 58 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 540, 838, 520, 1, 16, layout.accent, { align: "center", min: 11 });
-    postArtDrawCta(ctx, data, 340, 878, 400, layout);
+    preencherRoundRect(ctx, 58, 520, 430, 54, 27, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 273, 537, 390, 1, 18, "#201b08", { min: 12, align: "center" });
+    postArtDrawText(ctx, data.title, 58, 620, 610, 3, 55, "#ffffff", { min: 30, lineHeight: 58 });
+    postArtDrawText(ctx, data.description, 58, 810, 590, 3, 20, "rgba(255,255,255,.84)", { min: 13, weight: 600, lineHeight: 25 });
+    postArtDrawPrice(ctx, data, 700, 650, 330, layout, { height: 186, size: 49 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 865, 856, 320, 1, 14, layout.accent, { align: "center", min: 10 });
+    postArtDrawCta(ctx, data, 700, 890, 330, layout);
     postArtDrawFooter(ctx, client, layout, true);
   } else {
     ctx.fillStyle = "rgba(255,255,255,.08)";
-    ctx.beginPath(); ctx.arc(975, 85, 240, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(80, 900, 230, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(970, 80, 250, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(90, 930, 220, 0, Math.PI * 2); ctx.fill();
     postArtDrawBrand(ctx, client, logo, siteLogo, layout, { dark: true, showSiteLogo: data.showSiteLogo });
-    preencherRoundRect(ctx, 58, 186, 390, 54, 27, layout.accent);
-    postArtDrawText(ctx, eyebrow.toUpperCase(), 253, 203, 350, 1, 18, "#211b08", { align: "center", min: 12 });
-    postArtDrawText(ctx, data.title, 58, 286, 420, 4, 52, "#ffffff", { min: 29, lineHeight: 54 });
-    postArtDrawText(ctx, data.description, 58, 520, 415, 4, 21, "rgba(255,255,255,.82)", { min: 14, weight: 600, lineHeight: 27 });
-    postArtDrawPhoto(ctx, image, { x: 520, y: 172, w: 512, h: 598 }, fit, 42, "#ffffff");
-    desenharBordaRoundRect(ctx, 520, 172, 512, 598, 42, "rgba(255,255,255,.9)", 7);
-    postArtDrawPrice(ctx, data, 610, 700, 350, layout, { height: 166, size: 47 });
-    if (detailLine) postArtDrawText(ctx, detailLine, 260, 760, 400, 1, 15, layout.accent, { align: "center", min: 11 });
-    postArtDrawCta(ctx, data, 58, 818, 404, layout);
+    postArtDrawPhoto(ctx, image, { x: 58, y: 190, w: 540, h: 680 }, fit, 42, "#ffffff");
+    desenharBordaRoundRect(ctx, 58, 190, 540, 680, 42, "rgba(255,255,255,.9)", 7);
+    preencherRoundRect(ctx, 640, 190, 390, 54, 27, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 835, 207, 350, 1, 17, "#211b08", { align: "center", min: 11 });
+    postArtDrawText(ctx, data.title, 640, 294, 390, 4, 48, "#ffffff", { min: 27, lineHeight: 50 });
+    postArtDrawPrice(ctx, data, 640, 560, 390, layout, { height: 170, size: 47 });
+    postArtDrawText(ctx, data.description, 640, 758, 390, 3, 19, "rgba(255,255,255,.82)", { min: 13, weight: 600, lineHeight: 24 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 835, 856, 380, 1, 14, layout.accent, { align: "center", min: 10 });
+    postArtDrawCta(ctx, data, 640, 892, 390, layout, { height: 70 });
     postArtDrawFooter(ctx, client, layout, true);
   }
+}
+function desenharPostArtReelsCanvas(ctx, data, client, image, logo, siteLogo, layout) {
+  const { width, height } = ctx.canvas;
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  gradient.addColorStop(0, layout.bg);
+  gradient.addColorStop(1, layout.variant === 3 ? layout.primary : layout.bg);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, width, height);
+
+  const isPromo = data.type === "promocao";
+  const isService = data.type === "servico";
+  const eyebrow = data.callout || (isPromo ? "OFERTA ESPECIAL" : isService ? "SERVIÇO EM DESTAQUE" : "PRODUTO EM DESTAQUE");
+  const detailLine = isPromo && data.validity
+    ? `OFERTA VÁLIDA ATÉ ${formatDateBR(data.validity)}`
+    : (isService && data.serviceMode ? data.serviceMode.toUpperCase() : "");
+  const fit = data.imageFit || "cover";
+
+  if (layout.variant === 0) {
+    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 940 }, fit, 0, "#e8edf5");
+    const overlay = ctx.createLinearGradient(0, 500, 0, 960);
+    overlay.addColorStop(0, "rgba(8,15,29,0)");
+    overlay.addColorStop(1, "rgba(8,15,29,.9)");
+    ctx.fillStyle = overlay;
+    ctx.fillRect(0, 460, 1080, 500);
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { y: 70, showSiteLogo: data.showSiteLogo });
+    preencherRoundRect(ctx, 70, 824, 470, 62, 31, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 305, 844, 430, 1, 21, "#201b08", { min: 13, align: "center" });
+    preencherRoundRect(ctx, 0, 900, 1080, 1020, 0, layout.panel);
+    postArtDrawText(ctx, data.title, 70, 1000, 940, 3, 66, layout.ink, { min: 34, lineHeight: 69, align: "center" });
+    postArtDrawText(ctx, data.description, 140, 1210, 800, 4, 27, "#64748b", { min: 17, weight: 600, lineHeight: 34, align: "center" });
+    postArtDrawPrice(ctx, data, 250, 1390, 580, layout, { height: 224, size: 66 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 540, 1640, 620, 1, 19, "#64748b", { align: "center", min: 13 });
+    postArtDrawCta(ctx, data, 270, 1690, 540, layout, { height: 82 });
+    postArtDrawFooter(ctx, client, layout, true);
+  } else if (layout.variant === 1) {
+    ctx.fillStyle = layout.panel;
+    ctx.fillRect(0, 0, 1080, 1920);
+    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 880 }, fit, 0, "#111827");
+    const shade = ctx.createLinearGradient(0, 500, 0, 930);
+    shade.addColorStop(0, "rgba(8,15,29,0)");
+    shade.addColorStop(1, layout.panel);
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 470, 1080, 480);
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { y: 70, dark: true, showSiteLogo: data.showSiteLogo });
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 540, 790, 820, 2, 24, layout.accent, { min: 15, align: "center", lineHeight: 28 });
+    postArtDrawText(ctx, data.title, 540, 920, 900, 3, 65, layout.ink, { min: 34, lineHeight: 68, align: "center" });
+    postArtDrawText(ctx, data.description, 540, 1140, 760, 4, 26, "#cbd5e1", { min: 17, weight: 600, lineHeight: 33, align: "center" });
+    postArtDrawPrice(ctx, data, 250, 1390, 580, layout, { height: 220, size: 65 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 540, 1640, 620, 1, 18, layout.accent, { align: "center", min: 12 });
+    postArtDrawCta(ctx, data, 270, 1690, 540, layout, { height: 82 });
+    postArtDrawFooter(ctx, client, layout, true);
+  } else if (layout.variant === 2) {
+    postArtDrawPhoto(ctx, image, { x: 0, y: 0, w: 1080, h: 1920 }, fit, 0, "#18233a");
+    const shade = ctx.createLinearGradient(0, 0, 0, 1920);
+    shade.addColorStop(0, "rgba(8,15,29,.34)");
+    shade.addColorStop(.45, "rgba(8,15,29,.52)");
+    shade.addColorStop(1, "rgba(8,15,29,.96)");
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, 0, 1080, 1920);
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { y: 70, dark: true, showSiteLogo: data.showSiteLogo });
+    preencherRoundRect(ctx, 300, 350, 480, 64, 32, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 540, 370, 440, 1, 21, "#201b08", { min: 13, align: "center" });
+    postArtDrawText(ctx, data.title, 540, 500, 900, 4, 72, "#ffffff", { min: 38, lineHeight: 75, align: "center" });
+    postArtDrawText(ctx, data.description, 540, 820, 760, 4, 28, "rgba(255,255,255,.84)", { min: 18, weight: 600, lineHeight: 35, align: "center" });
+    postArtDrawPrice(ctx, data, 230, 1160, 620, layout, { height: 240, size: 72 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 540, 1440, 650, 1, 19, layout.accent, { align: "center", min: 13 });
+    postArtDrawCta(ctx, data, 260, 1510, 560, layout, { height: 86 });
+    postArtDrawFooter(ctx, client, layout, true);
+  } else {
+    ctx.fillStyle = "rgba(255,255,255,.08)";
+    ctx.beginPath(); ctx.arc(950, 120, 300, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(90, 1700, 310, 0, Math.PI * 2); ctx.fill();
+    postArtDrawBrand(ctx, client, logo, siteLogo, layout, { y: 70, dark: true, showSiteLogo: data.showSiteLogo });
+    postArtDrawPhoto(ctx, image, { x: 80, y: 270, w: 920, h: 720 }, fit, 48, "#ffffff");
+    desenharBordaRoundRect(ctx, 80, 270, 920, 720, 48, "rgba(255,255,255,.9)", 8);
+    preencherRoundRect(ctx, 280, 1025, 520, 62, 31, layout.accent);
+    postArtDrawText(ctx, eyebrow.toUpperCase(), 540, 1045, 480, 1, 20, "#211b08", { align: "center", min: 13 });
+    postArtDrawText(ctx, data.title, 540, 1135, 900, 3, 59, "#ffffff", { min: 32, lineHeight: 62, align: "center" });
+    postArtDrawText(ctx, data.description, 540, 1325, 780, 3, 25, "rgba(255,255,255,.82)", { min: 16, weight: 600, lineHeight: 31, align: "center" });
+    postArtDrawPrice(ctx, data, 300, 1470, 480, layout, { height: 190, size: 57 });
+    if (detailLine) postArtDrawText(ctx, detailLine, 540, 1682, 620, 1, 17, layout.accent, { align: "center", min: 12 });
+    postArtDrawCta(ctx, data, 300, 1720, 480, layout, { height: 72 });
+    postArtDrawFooter(ctx, client, layout, true);
+  }
+}
+
+function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout) {
+  if (data.format === "reels") {
+    desenharPostArtReelsCanvas(ctx, data, client, image, logo, siteLogo, layout);
+    return;
+  }
+  desenharPostArtFeedCanvas(ctx, data, client, image, logo, siteLogo, layout);
 }
 function postArtFormData() {
   return {
     type: state.postArtType,
+    format: state.postArtFormat,
     title: $("postArtTitle")?.value.trim() || "Item em destaque",
     description: $("postArtDescription")?.value.trim() || "Conheça esta novidade e fale com a empresa para saber mais.",
     price: $("postArtPrice")?.value.trim() || "",
@@ -19009,10 +19106,13 @@ async function atualizarPreviaPostArt() {
     carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
   ]);
   if (requestId !== postArtPreviewRequest) return;
+  const format = postArtFormat();
+  if (canvas.width !== format.width) canvas.width = format.width;
+  if (canvas.height !== format.height) canvas.height = format.height;
   const ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   desenharPostArtCanvas(ctx, postArtFormData(), client, image, logo, siteLogo, layout);
-  if ($("postArtPreviewMeta")) $("postArtPreviewMeta").textContent = `${layout.nome} • 1080 × 1080 px`;
+  if ($("postArtPreviewMeta")) $("postArtPreviewMeta").textContent = `${layout.nome} • ${format.width} × ${format.height} px`;
 }
 
 function agendarPreviaPostArt() {
@@ -19031,7 +19131,7 @@ async function baixarPostArt() {
     window.clearTimeout(postArtPreviewTimer);
     await atualizarPreviaPostArt();
     const blob = await canvasParaBlob(canvas);
-    baixarBlobCanvas(blob, `arte-${state.postArtType}-${slugify(client.nome || client.id)}-${slugify($("postArtTitle")?.value || item.titulo)}-${postArtLayout().key}.png`);
+    baixarBlobCanvas(blob, `postagem-${state.postArtFormat}-${state.postArtType}-${slugify(client.nome || client.id)}-${slugify($("postArtTitle")?.value || item.titulo)}-${postArtLayout().key}.png`);
     showToast("Arte pronta para postagem.");
   } catch (error) {
     console.error("Falha ao gerar arte para postagem.", error);
@@ -19054,6 +19154,8 @@ function renderPostArtView() {
   const allowedTypes = ["produto", "promocao", "servico"];
   const type = allowedTypes.includes(state.postArtType) ? state.postArtType : "produto";
   state.postArtType = type;
+  if (!POST_ART_FORMATS[state.postArtFormat]) state.postArtFormat = "feed";
+  const format = postArtFormat();
   const typeCopy = {
     produto: { plural: "produtos", title: "Título do produto", price: "Preço", callout: "Categoria ou chamada" },
     promocao: { plural: "promoções", title: "Título da promoção", price: "Preço promocional", callout: "Desconto ou chamada" },
@@ -19067,15 +19169,21 @@ function renderPostArtView() {
   mount.innerHTML = `
     <section class="panel-card post-art-intro">
       <div class="section-head">
-        <div><span class="feature-kicker">Conteúdo para redes sociais</span><h2>Gerar postagem</h2><p>Crie em um só lugar postagens de produtos, promoções e serviços, com prévia antes de baixar.</p></div>
-        <span class="badge"><i class="fa-solid fa-image"></i> PNG 1080 × 1080</span>
+        <div><span class="feature-kicker">Conteúdo para Instagram</span><h2>Gerar postagem</h2><p>Crie posts para Feed ou artes verticais para capas de Reels e Stories.</p></div>
+        <span class="badge"><i class="${format.icon}"></i> ${format.width} × ${format.height}</span>
       </div>
       ${canManageClients() ? `<label class="post-art-client-select">Cliente<select id="postArtClient">${clients.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === client.id ? "selected" : ""}>${escapeHtml(item.nome || item.id)}</option>`).join("")}</select></label>` : `<div class="post-art-client-identity"><img src="${escapeAttr(displayImageUrl(logoClienteImovelAdmin(client)) || "../images/img_padrao_site/logo_1.png")}" alt=""><div><span>Empresa selecionada</span><strong>${escapeHtml(client.nome || client.id)}</strong></div></div>`}
     </section>
     <section class="post-art-workspace">
       <div class="post-art-editor-column">
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>1</span><div><strong>Tipo da postagem</strong><small>Selecione o conteúdo que deseja divulgar.</small></div></div>
+          <div class="post-art-step-title"><span>1</span><div><strong>Formato do Instagram</strong><small>Escolha onde a postagem será publicada.</small></div></div>
+          <div class="post-art-format-toggle">
+            ${Object.values(POST_ART_FORMATS).map((item) => `<button type="button" data-post-art-format="${item.key}" class="${format.key === item.key ? "active" : ""}"><i class="${item.icon}"></i><strong>${item.nome}</strong><span>${item.descricao} • ${item.width} × ${item.height}</span></button>`).join("")}
+          </div>
+        </section>
+        <section class="panel-card post-art-step">
+          <div class="post-art-step-title"><span>2</span><div><strong>Tipo da postagem</strong><small>Selecione o conteúdo que deseja divulgar.</small></div></div>
           <div class="post-art-type-toggle">
             <button type="button" data-post-art-type="produto" class="${type === "produto" ? "active" : ""}"><i class="fa-solid fa-box-open"></i><strong>Produto</strong><span>Apresentação e detalhes</span></button>
             <button type="button" data-post-art-type="promocao" class="${type === "promocao" ? "active" : ""}"><i class="fa-solid fa-tags"></i><strong>Promoção</strong><span>Preço e oferta em destaque</span></button>
@@ -19085,13 +19193,13 @@ function renderPostArtView() {
         </section>
         ${items.length ? `
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>2</span><div><strong>Modelo visual</strong><small>Quatro composições profissionais focadas em atenção, valor e conversão para ${typeCopy.plural}.</small></div></div>
+          <div class="post-art-step-title"><span>3</span><div><strong>Modelo visual</strong><small>Quatro estilos atuais adaptados para ${format.nome} e focados em ${typeCopy.plural}.</small></div></div>
           <div class="post-art-layout-grid">
             ${layouts.map((layout) => `<button type="button" data-post-art-layout="${layout.key}" class="post-art-layout-card variant-${layout.variant} ${layout.key === state.postArtLayout ? "active" : ""}" style="--art-bg:${layout.bg};--art-primary:${layout.primary};--art-accent:${layout.accent};--art-panel:${layout.panel}"><span class="post-art-layout-mini"><i></i><b></b><em></em></span><strong>${escapeHtml(layout.nome)}</strong><small>${escapeHtml(layout.descricao)}</small><i class="fa-solid fa-circle-check"></i></button>`).join("")}
           </div>
         </section>
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>3</span><div><strong>Textos e imagem</strong><small>Os dados iniciais vieram do cadastro, mas podem ser ajustados somente para esta postagem.</small></div></div>
+          <div class="post-art-step-title"><span>4</span><div><strong>Textos e imagem</strong><small>Os dados iniciais vieram do cadastro e podem ser ajustados somente para esta postagem.</small></div></div>
           <div class="post-art-fields">
             <label class="wide">${typeCopy.title}<input id="postArtTitle" maxlength="80"></label>
             <label class="wide">Descrição<textarea id="postArtDescription" rows="3" maxlength="220"></textarea></label>
@@ -19109,7 +19217,7 @@ function renderPostArtView() {
       </div>
       <aside class="panel-card post-art-preview-card">
         <div class="section-head compact"><div><strong>Pré-visualização</strong><span id="postArtPreviewMeta">Confira o resultado antes de baixar</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>
-        ${items.length ? `<div class="post-art-canvas-shell"><canvas id="postArtCanvas" width="1080" height="1080"></canvas></div><button id="postArtDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar postagem em PNG</button><p class="post-art-preview-note"><i class="fa-solid fa-circle-info"></i> As edições feitas aqui não alteram os dados cadastrados.</p>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-image"></i><span>A prévia aparecerá quando houver um item cadastrado.</span></div>`}
+        ${items.length ? `<div class="post-art-canvas-shell is-${format.key}"><canvas id="postArtCanvas" width="${format.width}" height="${format.height}"></canvas></div><button id="postArtDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar ${format.nome} em PNG</button><p class="post-art-preview-note"><i class="fa-solid fa-circle-info"></i> ${format.key === "reels" ? "O formato vertical usa a proporção 9:16 de Reels e Stories." : "O formato quadrado é otimizado para o Feed do Instagram."} As edições não alteram os dados cadastrados.</p>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-image"></i><span>A prévia aparecerá quando houver um item cadastrado.</span></div>`}
       </aside>
     </section>
   `;
@@ -19120,6 +19228,10 @@ function renderPostArtView() {
     state.postArtCustomImage = "";
     renderPostArtView();
   });
+  mount.querySelectorAll("[data-post-art-format]").forEach((button) => button.addEventListener("click", () => {
+    state.postArtFormat = button.dataset.postArtFormat;
+    renderPostArtView();
+  }));
   mount.querySelectorAll("[data-post-art-type]").forEach((button) => button.addEventListener("click", () => {
     state.postArtType = button.dataset.postArtType;
     state.postArtLayout = POST_ART_LAYOUTS[state.postArtType][0].key;
@@ -19420,27 +19532,32 @@ function renderClientOnlyEditor() {
   };
   const clientModuleGroups = [
     {
-      label: "Cadastro",
+      label: "Perfil e aparência",
       items: [
-        { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardapio", show: canEditCardapio },
         { id: "client-module-dados", icon: "fa-solid fa-building", label: "Dados da empresa", show: canEditDados },
-        { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages }
+        { id: "client-module-imagens", icon: "fa-solid fa-images", label: "Fotos e imagens", show: canEditImages },
+        { id: "client-module-cardapio", icon: "fa-solid fa-utensils", label: "Cardápio", show: canEditCardapio }
       ]
     },
     {
-      label: "Negocio",
+      label: "Vendas e divulgação",
       items: [
-        { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque },
-        { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: canEditWhatsappGroups },
         { id: "client-module-produtos", icon: "fa-solid fa-box-open", label: "Produtos", show: canEditProdutos },
-        { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promocoes", show: canEditPromocoes },
+        { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promoções", show: canEditPromocoes },
+        { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque }
+      ]
+    },
+    {
+      label: "Relacionamento",
+      items: [
+        { id: "client-module-grupo-whatsapp", icon: "fa-brands fa-whatsapp", label: "Grupos WhatsApp", show: canEditWhatsappGroups },
         { id: "client-module-vagas", icon: "fa-solid fa-briefcase", label: "Vagas de trabalho", show: canEditVagas }
       ]
     },
     {
-      label: "Gestao",
+      label: "Resultados",
       items: [
-        { id: "client-module-relatorios", icon: "fa-solid fa-chart-line", label: "Relatorios", show: canViewRelatorios }
+        { id: "client-module-relatorios", icon: "fa-solid fa-chart-line", label: "Relatórios", show: canViewRelatorios }
       ]
     }
   ].map((group) => ({
