@@ -5043,6 +5043,60 @@ body.admin-auto-image-dragging {
   margin: 0;
 }
 
+.promo-required-note {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+.required-mark {
+  color: #dc2626;
+  font-weight: 900;
+}
+
+.promo-validity-group {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid #bfdbfe;
+  border-radius: 12px;
+  background: #f5f9ff;
+}
+
+.promo-validity-group-head {
+  display: flex;
+  grid-column: 1 / -1;
+  align-items: center;
+  gap: 10px;
+}
+
+.promo-validity-group-head > i {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  place-items: center;
+}
+
+.promo-validity-group-head div {
+  display: grid;
+  gap: 2px;
+}
+
+.promo-validity-group-head strong {
+  color: var(--text);
+}
+
+.promo-validity-group-head span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .promo-weekdays {
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -6085,6 +6139,8 @@ button.admin-button-loading::after {
   .client-list-filters,
   .client-feature-card,
   .manual-image-form,
+  .promo-admin-form,
+  .promo-validity-group,
   .section-fields,
   .profile-upload-row {
     grid-template-columns: 1fr;

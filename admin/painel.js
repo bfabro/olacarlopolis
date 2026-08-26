@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 657,
-  label: "v664",
+  numero: 658,
+  label: "v665",
   data: "2026-08-26",
-  nota: "Menu do cliente reorganizado e postagens em formatos Feed e Reels."
+  nota: "Validade das promoções agrupada e campos obrigatórios destacados no Admin Cliente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -19798,19 +19798,29 @@ function renderClientOnlyEditor() {
           </div>
           ${canEditPromocoes ? `
           <div class="promo-admin-form">
-            <label>Título da promoção<input id="coPromoTitle" placeholder="Ex.: Pizza grande"></label>
+            <p class="promo-required-note wide"><span class="required-mark" aria-hidden="true">*</span> Campo obrigatório</p>
+            <label>Título da promoção <span class="required-mark" aria-hidden="true">*</span><input id="coPromoTitle" placeholder="Ex.: Pizza grande" required aria-required="true"></label>
             <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
             <label>Desconto / chamada<input id="coPromoDiscount" placeholder="Ex.: 20% OFF ou ATE 30% OFF"></label>
             <label>Preco antigo<input id="coPromoOldPrice" placeholder="Opcional"></label>
             <label>Unidade<input id="coPromoUnit" placeholder="Ex.: A unidade"></label>
             <label>Volume<input id="coPromoVolume" placeholder="Opcional"></label>
             <label>Embalagem<input id="coPromoPack" placeholder="Opcional"></label>
-            <label>Validade inicio<input id="coPromoStart" type="date"></label>
-            <label>Validade fim<input id="coPromoEnd" type="date"></label>
             <label>Tipo de oferta<select id="coPromoOfferType"><option value="">Selecione</option><option value="produto">Produto</option><option value="servico">Servico</option><option value="combo">Combo</option><option value="cupom">Cupom</option><option value="dia-especial">Dia especial</option></select></label>
             <label>Entrega / retirada<select id="coPromoFulfillment"><option value="">Nao informar</option><option value="entrega">Entrega</option><option value="retirada">Retirada</option><option value="ambos">Entrega e retirada</option></select></label>
             <label>Faixa de preco<select id="coPromoPriceRange"><option value="">Automatico</option><option value="ate-50">Ate R$ 50</option><option value="50-100">R$ 50 a R$ 100</option><option value="100-200">R$ 100 a R$ 200</option><option value="acima-200">Acima de R$ 200</option></select></label>
             <label>Com preco?<select id="coPromoPriceMode"><option value="">Automatico</option><option value="com-preco">Com preco</option><option value="sem-preco">Sem preco</option></select></label>
+            <section class="promo-validity-group wide" aria-labelledby="coPromoValidityTitle">
+              <div class="promo-validity-group-head">
+                <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+                <div>
+                  <strong id="coPromoValidityTitle">Validade da promoção</strong>
+                  <span>Defina quando a oferta começa e termina.</span>
+                </div>
+              </div>
+              <label>Data de início<input id="coPromoStart" type="date"></label>
+              <label>Data de término<input id="coPromoEnd" type="date"></label>
+            </section>
             <fieldset class="promo-weekdays wide">
               <legend>Dias que fica disponivel</legend>
               <p>Para promocoes recorrentes, marque os dias. Se nao marcar nenhum, aparece todos os dias dentro da validade.</p>
