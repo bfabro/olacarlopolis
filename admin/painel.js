@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 672,
-  label: "v679",
+  numero: 673,
+  label: "v680",
   data: "2026-08-27",
-  nota: "Cadastro e exibição pública de Serviços oferecidos, com busca, contato e compartilhamento."
+  nota: "Correção de carregamento da área administrativa e renderização da lista de serviços."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -7197,11 +7197,11 @@ function servicePriceLabel(service = {}) {
 function renderServicosAdminMarkup(items, prefix = "service") {
   const list = normalizeServicos(items); if (!list.length) return `<div class="list-meta">Nenhum servi\u00e7o cadastrado ainda.</div>`;
   return list.map((service, index) => `<article class="promo-admin-item service-admin-item ${service.status === "inativo" ? "is-inactive" : ""}">
-    + `${service.imagem ? `<img src="${escapeAttr(displayImageUrl(service.imagem))}" alt="" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : `<div class="promo-admin-empty"><i class="${escapeAttr(service.icone || "fa-solid fa-screwdriver-wrench")}"></i></div>`}
-    + `<div><strong>${escapeHtml(service.nome)}</strong><span>${escapeHtml([service.categoria, servicePriceLabel(service)].filter(Boolean).join(" &bull; "))}</span><small>${service.status === "inativo" ? "Inativo" : "Ativo"}${service.destaque ? " ? Destaque" : ""} ? Ordem ${service.ordem}</small></div>
-    + `<div class="promo-admin-actions"><button type="button" data-${prefix}-preview="${index}" class="ghost-mini"><i class="fa-solid fa-eye"></i></button><button type="button" data-${prefix}-up="${index}" class="ghost-mini" aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-${prefix}-down="${index}" class="ghost-mini" aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button><button type="button" data-${prefix}-toggle="${index}" class="ghost-mini">${service.status === "inativo" ? "Ativar" : "Inativar"}</button><button type="button" data-${prefix}-duplicate="${index}" class="ghost-mini"><i class="fa-solid fa-copy"></i></button><button type="button" data-${prefix}-edit="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" data-${prefix}-remove="${index}" class="danger-mini"><i class="fa-solid fa-trash"></i></button></div></article>`).join("");
+    ${service.imagem ? `<img src="${escapeAttr(displayImageUrl(service.imagem))}" alt="" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : `<div class="promo-admin-empty"><i class="${escapeAttr(service.icone || "fa-solid fa-screwdriver-wrench")}"></i></div>`}
+    <div><strong>${escapeHtml(service.nome)}</strong><span>${escapeHtml([service.categoria, servicePriceLabel(service)].filter(Boolean).join(" \u2022 "))}</span><small>${service.status === "inativo" ? "Inativo" : "Ativo"}${service.destaque ? " \u2022 Destaque" : ""} \u2022 Ordem ${service.ordem}</small></div>
+    <div class="promo-admin-actions"><button type="button" data-${prefix}-preview="${index}" class="ghost-mini"><i class="fa-solid fa-eye"></i></button><button type="button" data-${prefix}-up="${index}" class="ghost-mini" aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-${prefix}-down="${index}" class="ghost-mini" aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button><button type="button" data-${prefix}-toggle="${index}" class="ghost-mini">${service.status === "inativo" ? "Ativar" : "Inativar"}</button><button type="button" data-${prefix}-duplicate="${index}" class="ghost-mini"><i class="fa-solid fa-copy"></i></button><button type="button" data-${prefix}-edit="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" data-${prefix}-remove="${index}" class="danger-mini"><i class="fa-solid fa-trash"></i></button></div>
+  </article>`).join("");
 }
-
 function previewServiceAdmin(service = {}) {
   document.querySelector(".service-preview-modal")?.remove(); const modal = document.createElement("div"); modal.className = "confirm-modal service-preview-modal";
   modal.innerHTML = `<div class="confirm-dialog"><button type="button" class="service-preview-close" aria-label="Fechar">&times;</button>${service.imagem ? `<img class="service-preview-hero" src="${escapeAttr(displayImageUrl(service.imagem))}" alt="">` : ""}<span class="feature-kicker">${escapeHtml(service.categoria || "Servi\u00e7o")}</span><h3>${escapeHtml(service.nome || "Pr\u00e9via do servi\u00e7o")}</h3><strong class="service-preview-price">${escapeHtml(servicePriceLabel(service))}</strong><p>${escapeHtml(service.descricaoCurta || service.descricaoCompleta || "Sem descri\u00e7\u00e3o informada.")}</p></div>`;
