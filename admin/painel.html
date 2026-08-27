@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=414">
+  <link rel="stylesheet" href="painel.css?v=415">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -504,14 +504,14 @@
                 <div class="promo-admin-form service-admin-form">
                   <p class="promo-required-note wide"><span class="required-mark">*</span> Campo obrigat&eacute;rio</p>
                   <div class="form-section-title wide"><i class="fa-solid fa-screwdriver-wrench"></i><div><strong>1. Identifica&ccedil;&atilde;o</strong><span>Informa&ccedil;&otilde;es usadas no card e na busca p&uacute;blica.</span></div></div>
-                  <label>Nome do servi&ccedil;o <span class="required-mark">*</span><input id="clientServiceName" maxlength="120" placeholder="Ex.: Instala&ccedil;&atilde;o de ar-condicionado"></label>
+                  <label><span class="service-field-label">Nome do servi&ccedil;o <span class="required-mark">*</span></span><input id="clientServiceName" maxlength="120" placeholder="Ex.: Instala&ccedil;&atilde;o de ar-condicionado"></label>
                   <label>Categoria<input id="clientServiceCategory" maxlength="80" placeholder="Ex.: Manuten&ccedil;&atilde;o residencial"></label>
                   <label class="wide">Descri&ccedil;&atilde;o curta<textarea id="clientServiceShortDescription" rows="2" maxlength="220" placeholder="Resumo objetivo para o card"></textarea></label>
                   <label class="wide">Descri&ccedil;&atilde;o completa<textarea id="clientServiceFullDescription" rows="4" maxlength="3000" placeholder="Explique diferenciais, etapas e condi&ccedil;&otilde;es"></textarea></label>
                   <label>&Iacute;cone (Font Awesome)<input id="clientServiceIcon" placeholder="fa-solid fa-screwdriver-wrench"></label>
                   <label>Tags para busca<input id="clientServiceTags" placeholder="Ex.: instala&ccedil;&atilde;o, limpeza, urgente"></label>
-                  <label>Imagem do servi&ccedil;o<input id="clientServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
-                  <label>URL da imagem<input id="clientServiceImageUrl" type="url" placeholder="https://..."></label>
+                  <label>Imagens do servi&ccedil;o<input id="clientServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>Selecione at&eacute; 6 imagens. A primeira ser&aacute; usada como capa.</small></label>
+                  <label>URLs das imagens<textarea id="clientServiceImageUrl" rows="3" placeholder="Uma URL por linha. M&aacute;ximo de 6 imagens."></textarea></label>
                   <div id="clientServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
                   <div class="form-section-title wide"><i class="fa-solid fa-money-bill-wave"></i><div><strong>2. Pre&ccedil;o</strong><span>Escolha como o valor ser&aacute; apresentado.</span></div></div>
                   <label>Forma de pre&ccedil;o<select id="clientServicePriceType"><option value="sob_consulta">Sob consulta</option><option value="fixo">Pre&ccedil;o fixo</option><option value="a_partir">A partir de</option><option value="faixa">Faixa de pre&ccedil;o</option><option value="gratuito">Gratuito</option></select></label>
@@ -542,11 +542,12 @@
                   <label class="checkbox-line"><input id="clientServiceFeatured" type="checkbox"> Servi&ccedil;o em destaque</label>
                   <label>Ordem de exibi&ccedil;&atilde;o<input id="clientServiceOrder" type="number" min="0" step="1" placeholder="Ex.: 1"></label>
                   <div class="promo-form-actions wide">
-                    <button id="addClientServiceButton" type="button"><i class="fa-solid fa-plus"></i> Adicionar servi&ccedil;o</button>
+                    <button id="addClientServiceButton" type="button" class="service-add-button"><i class="fa-solid fa-plus"></i> Adicionar servi&ccedil;o</button>
                     <button id="previewClientServiceButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Pr&eacute;-visualizar</button>
                     <button id="cancelClientServiceEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edi&ccedil;&atilde;o</button>
                   </div>
                 </div>
+                <div class="service-list-heading"><div><span>Servi&ccedil;os cadastrados</span><small>Confira e gerencie os servi&ccedil;os adicionados abaixo.</small></div><i class="fa-solid fa-list-check"></i></div>
                 <div id="clientServicesPreview" class="promo-admin-list service-admin-list"></div>
               </section>
               <div class="form-section-title wide">
@@ -2230,6 +2231,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=610"></script>
+  <script type="module" src="painel.js?v=611"></script>
 </body>
 </html>

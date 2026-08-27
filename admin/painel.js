@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 673,
-  label: "v680",
+  numero: 674,
+  label: "v681",
   data: "2026-08-27",
-  nota: "Correção de carregamento da área administrativa e renderização da lista de serviços."
+  nota: "Galeria de serviços, pré-visualização em modal e melhorias de organização no painel."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1376,8 +1376,8 @@ function normalizeServicos(items, clienteId = "") {
     : Object.entries(items || {}).map(([id, value]) => (value && typeof value === "object" ? { id, ...value } : { id, nome: value }));
   return source.map((item, index) => {
     const nome = String(item?.nome || item?.titulo || item?.name || "").trim();
-    const imagens = [item?.imagem, item?.image, ...(Array.isArray(item?.imagens) ? item.imagens : [])]
-      .map((value) => String(value || "").trim()).filter(Boolean).slice(0, 4);
+    const imagens = [...new Set([item?.imagem, item?.image, ...(Array.isArray(item?.imagens) ? item.imagens : [])]
+      .map((value) => String(value || "").trim()).filter(Boolean))].slice(0, 6);
     return {
       id: String(item?.id || `servico-${slugify(nome || `item-${index}`)}-${index}`),
       clienteId: String(item?.clienteId || clienteId || ""),
@@ -7144,6 +7144,11 @@ function validarProdutoVitrine(prefix, scope = document) {
 }
 
 
+function normalizeServiceImagesInput(value = "") {
+  const source = Array.isArray(value) ? value : String(value || "").split(/[\n,]+/);
+  return [...new Set(source.map((url) => String(url || "").trim()).filter(Boolean))].slice(0, 6);
+}
+
 const SERVICE_FIELD_SUFFIXES = ["Name","Category","ShortDescription","FullDescription","Icon","Tags","ImageUrl","PriceType","Price","PriceTo","BillingUnit","PriceNote","Location","Areas","TravelFee","Duration","Deadline","Schedule","Included","Excluded","Materials","ClientProvides","Warranty","Notes","Link","Whatsapp","WhatsappMessage","Status","Order"];
 
 function clearServiceFields(prefix, scope = document) {
@@ -7155,7 +7160,7 @@ function clearServiceFields(prefix, scope = document) {
 }
 
 function fillServiceFields(prefix, service = {}, scope = document) {
-  const values = { Name: service.nome, Category: service.categoria, ShortDescription: service.descricaoCurta, FullDescription: service.descricaoCompleta, Icon: service.icone, Tags: service.tags, ImageUrl: service.imagem, PriceType: service.tipoPreco || "sob_consulta", Price: service.preco, PriceTo: service.precoAte, BillingUnit: service.unidadeCobranca, PriceNote: service.observacaoPreco, Location: service.localAtendimento, Areas: service.areasAtendidas, TravelFee: service.taxaDeslocamento, Duration: service.duracao, Deadline: service.prazoExecucao, Schedule: service.horarios, Included: service.itensInclusos, Excluded: service.itensNaoInclusos, Materials: service.materiais, ClientProvides: service.clienteFornece, Warranty: service.garantia, Notes: service.observacoes, Link: service.link, Whatsapp: service.whatsapp, WhatsappMessage: service.mensagemWhatsapp, Status: service.status || "ativo", Order: service.ordem };
+  const values = { Name: service.nome, Category: service.categoria, ShortDescription: service.descricaoCurta, FullDescription: service.descricaoCompleta, Icon: service.icone, Tags: service.tags, ImageUrl: normalizeServiceImagesInput([service.imagem, ...(Array.isArray(service.imagens) ? service.imagens : [])]).join("\n"), PriceType: service.tipoPreco || "sob_consulta", Price: service.preco, PriceTo: service.precoAte, BillingUnit: service.unidadeCobranca, PriceNote: service.observacaoPreco, Location: service.localAtendimento, Areas: service.areasAtendidas, TravelFee: service.taxaDeslocamento, Duration: service.duracao, Deadline: service.prazoExecucao, Schedule: service.horarios, Included: service.itensInclusos, Excluded: service.itensNaoInclusos, Materials: service.materiais, ClientProvides: service.clienteFornece, Warranty: service.garantia, Notes: service.observacoes, Link: service.link, Whatsapp: service.whatsapp, WhatsappMessage: service.mensagemWhatsapp, Status: service.status || "ativo", Order: service.ordem };
   Object.entries(values).forEach(([suffix, value]) => { const field = scope.querySelector(`#${prefix}Service${suffix}`); if (field) field.value = value ?? ""; });
   const appointment = scope.querySelector(`#${prefix}ServiceAppointment`); if (appointment) appointment.checked = service.precisaAgendamento === true;
   const featured = scope.querySelector(`#${prefix}ServiceFeatured`); if (featured) featured.checked = service.destaque === true;
@@ -7165,7 +7170,7 @@ function fillServiceFields(prefix, service = {}, scope = document) {
 function readServiceFields(prefix, scope = document, fallbackId = "", clienteId = "") {
   const get = (suffix) => scope.querySelector(`#${prefix}Service${suffix}`)?.value.trim() || "";
   const tipoPreco = get("PriceType") || "sob_consulta";
-  return { id: fallbackId || `servico-${Date.now()}`, clienteId, nome: get("Name"), categoria: get("Category"), descricaoCurta: get("ShortDescription"), descricaoCompleta: get("FullDescription"), imagem: get("ImageUrl"), imagens: get("ImageUrl") ? [get("ImageUrl")] : [], icone: get("Icon"), tags: get("Tags"), tipoPreco, preco: ["fixo","a_partir","faixa"].includes(tipoPreco) ? get("Price") : "", precoAte: tipoPreco === "faixa" ? get("PriceTo") : "", unidadeCobranca: get("BillingUnit"), observacaoPreco: get("PriceNote"), localAtendimento: get("Location"), areasAtendidas: get("Areas"), taxaDeslocamento: get("TravelFee"), precisaAgendamento: Boolean(scope.querySelector(`#${prefix}ServiceAppointment`)?.checked), duracao: get("Duration"), prazoExecucao: get("Deadline"), horarios: get("Schedule"), itensInclusos: get("Included"), itensNaoInclusos: get("Excluded"), materiais: get("Materials"), clienteFornece: get("ClientProvides"), garantia: get("Warranty"), observacoes: get("Notes"), link: get("Link"), whatsapp: get("Whatsapp"), mensagemWhatsapp: get("WhatsappMessage"), status: get("Status") || "ativo", ativo: (get("Status") || "ativo") !== "inativo", destaque: Boolean(scope.querySelector(`#${prefix}ServiceFeatured`)?.checked), ordem: Number(get("Order") || 0) };
+  return { id: fallbackId || `servico-${Date.now()}`, clienteId, nome: get("Name"), categoria: get("Category"), descricaoCurta: get("ShortDescription"), descricaoCompleta: get("FullDescription"), imagem: normalizeServiceImagesInput(get("ImageUrl"))[0] || "", imagens: normalizeServiceImagesInput(get("ImageUrl")), icone: get("Icon"), tags: get("Tags"), tipoPreco, preco: ["fixo","a_partir","faixa"].includes(tipoPreco) ? get("Price") : "", precoAte: tipoPreco === "faixa" ? get("PriceTo") : "", unidadeCobranca: get("BillingUnit"), observacaoPreco: get("PriceNote"), localAtendimento: get("Location"), areasAtendidas: get("Areas"), taxaDeslocamento: get("TravelFee"), precisaAgendamento: Boolean(scope.querySelector(`#${prefix}ServiceAppointment`)?.checked), duracao: get("Duration"), prazoExecucao: get("Deadline"), horarios: get("Schedule"), itensInclusos: get("Included"), itensNaoInclusos: get("Excluded"), materiais: get("Materials"), clienteFornece: get("ClientProvides"), garantia: get("Warranty"), observacoes: get("Notes"), link: get("Link"), whatsapp: get("Whatsapp"), mensagemWhatsapp: get("WhatsappMessage"), status: get("Status") || "ativo", ativo: (get("Status") || "ativo") !== "inativo", destaque: Boolean(scope.querySelector(`#${prefix}ServiceFeatured`)?.checked), ordem: Number(get("Order") || 0) };
 }
 
 function validateServiceFields(prefix, scope = document) {
@@ -7173,7 +7178,9 @@ function validateServiceFields(prefix, scope = document) {
   const tipo = scope.querySelector(`#${prefix}ServicePriceType`)?.value || "sob_consulta";
   const price = scope.querySelector(`#${prefix}ServicePrice`); if (["fixo","a_partir","faixa"].includes(tipo) && !price?.value.trim()) { showToast("Informe o valor do servi\u00e7o."); price?.focus(); return false; }
   const priceTo = scope.querySelector(`#${prefix}ServicePriceTo`); if (tipo === "faixa" && !priceTo?.value.trim()) { showToast("Informe o valor final da faixa."); priceTo?.focus(); return false; }
-  for (const suffix of ["ImageUrl","Link"]) { const field = scope.querySelector(`#${prefix}Service${suffix}`); const value = field?.value.trim() || ""; if (value && !/^https?:\/\//i.test(value)) { showToast("Informe uma URL v\u00e1lida iniciando com http:// ou https://."); field.focus(); return false; } }
+  const imageField = scope.querySelector("#" + prefix + "ServiceImageUrl"); const invalidImage = normalizeServiceImagesInput(imageField?.value || "").find((url) => !/^https?:\/\//i.test(url));
+  if (invalidImage) { showToast("Confira as URLs das imagens. Todas devem iniciar com http:// ou https://."); imageField?.focus(); return false; }
+  const linkField = scope.querySelector("#" + prefix + "ServiceLink"); if (linkField?.value.trim() && !/^https?:\/\//i.test(linkField.value.trim())) { showToast("Informe uma URL v\u00e1lida iniciando com http:// ou https://."); linkField.focus(); return false; }
   const whatsapp = scope.querySelector(`#${prefix}ServiceWhatsapp`); if (whatsapp?.value.trim() && whatsapp.value.replace(/\D/g, "").length < 10) { showToast("Informe um WhatsApp v\u00e1lido com DDD."); whatsapp.focus(); return false; }
   return true;
 }
@@ -7186,8 +7193,11 @@ function updateServicePriceFields(prefix, scope = document) {
 
 function updateServiceImagePreview(prefix, scope = document) {
   const box = scope.querySelector(`#${prefix}ServiceImagePreview`); if (!box) return;
-  const url = scope.querySelector(`#${prefix}ServiceImageUrl`)?.value.trim() || "";
-  box.innerHTML = url ? `<img src="${escapeAttr(displayImageUrl(url))}" alt="Pr\u00e9via da imagem do servi\u00e7o" ${imageFallbackAttr()}>` : `<span>Nenhuma imagem selecionada</span>`;
+  const imagens = normalizeServiceImagesInput(scope.querySelector("#" + prefix + "ServiceImageUrl")?.value || "");
+  box.classList.toggle("has-images", Boolean(imagens.length));
+  box.innerHTML = imagens.length
+    ? '<span><i class="fa-solid fa-images"></i> ' + imagens.length + ' imagem' + (imagens.length === 1 ? '' : 's') + ' adicionada' + (imagens.length === 1 ? '' : 's') + '. Use Pr\u00e9-visualizar para conferir.</span>'
+    : '<span><i class="fa-regular fa-images"></i> Nenhuma imagem adicionada</span>';
 }
 
 function servicePriceLabel(service = {}) {
@@ -7203,16 +7213,66 @@ function renderServicosAdminMarkup(items, prefix = "service") {
   </article>`).join("");
 }
 function previewServiceAdmin(service = {}) {
-  document.querySelector(".service-preview-modal")?.remove(); const modal = document.createElement("div"); modal.className = "confirm-modal service-preview-modal";
-  modal.innerHTML = `<div class="confirm-dialog"><button type="button" class="service-preview-close" aria-label="Fechar">&times;</button>${service.imagem ? `<img class="service-preview-hero" src="${escapeAttr(displayImageUrl(service.imagem))}" alt="">` : ""}<span class="feature-kicker">${escapeHtml(service.categoria || "Servi\u00e7o")}</span><h3>${escapeHtml(service.nome || "Pr\u00e9via do servi\u00e7o")}</h3><strong class="service-preview-price">${escapeHtml(servicePriceLabel(service))}</strong><p>${escapeHtml(service.descricaoCurta || service.descricaoCompleta || "Sem descri\u00e7\u00e3o informada.")}</p></div>`;
-  const close = () => modal.remove(); modal.addEventListener("click", (event) => { if (event.target === modal || event.target.closest(".service-preview-close")) close(); }); document.body.appendChild(modal);
+  document.querySelector(".service-preview-modal")?.remove();
+  const modal = document.createElement("div");
+  const imagens = normalizeServiceImagesInput([service.imagem, ...(Array.isArray(service.imagens) ? service.imagens : [])]);
+  const imageMarkup = imagens.length
+    ? '<div class="service-preview-gallery"><img class="service-preview-hero" data-service-preview-image src="' + escapeAttr(displayImageUrl(imagens[0])) + '" alt="' + escapeAttr(service.nome || "Servi\u00e7o") + '">' + (imagens.length > 1 ? '<button type="button" class="service-preview-gallery-nav previous" data-service-preview-previous aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="service-preview-gallery-nav next" data-service-preview-next aria-label="Pr\u00f3xima imagem"><i class="fa-solid fa-chevron-right"></i></button><span class="service-preview-gallery-count" data-service-preview-count>1/' + imagens.length + '</span>' : '') + '</div>'
+    : '';
+  modal.className = "confirm-modal service-preview-modal";
+  modal.innerHTML = '<div class="confirm-dialog"><button type="button" class="service-preview-close" aria-label="Fechar">&times;</button>' + imageMarkup + '<span class="feature-kicker">' + escapeHtml(service.categoria || "Servi\u00e7o") + '</span><h3>' + escapeHtml(service.nome || "Pr\u00e9via do servi\u00e7o") + '</h3><strong class="service-preview-price">' + escapeHtml(servicePriceLabel(service)) + '</strong><p>' + escapeHtml(service.descricaoCurta || service.descricaoCompleta || "Sem descri\u00e7\u00e3o informada.") + '</p></div>';
+  let imageIndex = 0;
+  const showImage = (nextIndex) => {
+    if (!imagens.length) return;
+    imageIndex = (nextIndex + imagens.length) % imagens.length;
+    const image = modal.querySelector("[data-service-preview-image]");
+    if (image) image.src = displayImageUrl(imagens[imageIndex]);
+    const count = modal.querySelector("[data-service-preview-count]");
+    if (count) count.textContent = (imageIndex + 1) + "/" + imagens.length;
+  };
+  modal.querySelector("[data-service-preview-previous]")?.addEventListener("click", () => showImage(imageIndex - 1));
+  modal.querySelector("[data-service-preview-next]")?.addEventListener("click", () => showImage(imageIndex + 1));
+  const close = () => modal.remove();
+  modal.addEventListener("click", (event) => { if (event.target === modal || event.target.closest(".service-preview-close")) close(); });
+  document.body.appendChild(modal);
 }
-
 async function uploadSelectedServiceImage(prefix, scope, clientId) {
-  const input = scope.querySelector(`#${prefix}ServiceImageUpload`); const target = scope.querySelector(`#${prefix}ServiceImageUrl`); const file = input?.files?.[0]; if (!file || !target) return target?.value || "";
-  if (!/^image\/(jpeg|png|webp|gif)$/i.test(file.type || "") || file.size > 8 * 1024 * 1024) { showToast("Use imagem JPG, PNG, WEBP ou GIF de at? 8 MB."); input.value = ""; return target.value; }
-  const id = clientId || `cliente-${Date.now()}`; const path = `clientes/${id}/servicos/${Date.now()}-${slugify(file.name || "servico")}`;
-  setBusy(input, true); try { const url = await uploadFileWithProgress(storageRef(storage, path), file, "Enviando imagem do servi\u00e7o", file.name || "imagem"); target.value = url; updateServiceImagePreview(prefix, scope); return url; } finally { input.value = ""; setBusy(input, false); }
+  const input = scope.querySelector("#" + prefix + "ServiceImageUpload");
+  const target = scope.querySelector("#" + prefix + "ServiceImageUrl");
+  const files = Array.from(input?.files || []);
+  if (!files.length || !target) return normalizeServiceImagesInput(target?.value || "");
+  const atuais = normalizeServiceImagesInput(target.value);
+  const disponiveis = Math.max(0, 6 - atuais.length);
+  if (!disponiveis) {
+    showToast("Limite de 6 imagens por servi\u00e7o atingido.");
+    input.value = "";
+    return atuais;
+  }
+  const validos = files.filter((file) => /^image\/(jpeg|png|webp|gif)$/i.test(file.type || "") && file.size <= 8 * 1024 * 1024).slice(0, disponiveis);
+  if (!validos.length) {
+    showToast("Use imagens JPG, PNG, WEBP ou GIF de at\u00e9 8 MB cada.");
+    input.value = "";
+    return atuais;
+  }
+  if (validos.length < files.length) showToast("Ser\u00e3o enviadas " + validos.length + " de " + files.length + " imagens, respeitando formato, tamanho e limite.");
+  const id = clientId || ("cliente-" + Date.now());
+  const urls = [];
+  setBusy(input, true);
+  try {
+    for (let index = 0; index < validos.length; index += 1) {
+      const file = validos[index];
+      const path = "clientes/" + id + "/servicos/" + Date.now() + "-" + index + "-" + slugify(file.name || "servico");
+      urls.push(await uploadFileWithProgress(storageRef(storage, path), file, "Enviando imagem " + (index + 1) + " de " + validos.length, file.name || "imagem"));
+    }
+    const todas = normalizeServiceImagesInput([...atuais, ...urls]);
+    target.value = todas.join("\n");
+    updateServiceImagePreview(prefix, scope);
+    showToast(urls.length + " imagem" + (urls.length === 1 ? "" : "s") + " adicionada" + (urls.length === 1 ? "" : "s") + " ao servi\u00e7o.");
+    return todas;
+  } finally {
+    input.value = "";
+    setBusy(input, false);
+  }
 }
 function clearJobFields(prefix, scope = document) {
   ["Title", "Salary", "Schedule", "ValidUntil", "Place", "Contact", "Description", "Requirements", "Apply"].forEach((suffix) => {
@@ -19777,17 +19837,17 @@ function renderStaffPromocoesView() {
 function serviceAdminFormHtml(prefix) {
   return `<div class="promo-admin-form service-admin-form">
     <p class="promo-required-note wide"><span class="required-mark">*</span> Campo obrigat\u00f3rio</p>
-    <label>Nome do servi\u00e7o <span class="required-mark">*</span><input id="${prefix}ServiceName" maxlength="120"></label><label>Categoria<input id="${prefix}ServiceCategory" maxlength="80"></label>
+    <label><span class="service-field-label">Nome do servi\u00e7o <span class="required-mark">*</span></span><input id="${prefix}ServiceName" maxlength="120"></label><label>Categoria<input id="${prefix}ServiceCategory" maxlength="80"></label>
     <label class="wide">Descri\u00e7\u00e3o curta<textarea id="${prefix}ServiceShortDescription" rows="2" maxlength="220"></textarea></label><label class="wide">Descri\u00e7\u00e3o completa<textarea id="${prefix}ServiceFullDescription" rows="4" maxlength="3000"></textarea></label>
     <label>\u00cdcone<input id="${prefix}ServiceIcon" placeholder="fa-solid fa-screwdriver-wrench"></label><label>Tags para busca<input id="${prefix}ServiceTags" placeholder="instala\u00e7\u00e3o, limpeza"></label>
-    <label>Imagem<input id="${prefix}ServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><label>URL da imagem<input id="${prefix}ServiceImageUrl" type="url" placeholder="https://..."></label><div id="${prefix}ServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
+    <label>Imagens<input id="${prefix}ServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>Selecione at\u00e9 6 imagens. A primeira ser\u00e1 a capa.</small></label><label>URLs das imagens<textarea id="${prefix}ServiceImageUrl" rows="3" placeholder="Uma URL por linha. M\u00e1ximo de 6 imagens."></textarea></label><div id="${prefix}ServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
     <div class="form-section-title wide"><i class="fa-solid fa-money-bill-wave"></i><div><strong>Pre\u00e7o e cobran\u00e7a</strong><span>Como o valor ser\u00e1 exibido.</span></div></div>
     <label>Forma de pre\u00e7o<select id="${prefix}ServicePriceType"><option value="sob_consulta">Sob consulta</option><option value="fixo">Pre\u00e7o fixo</option><option value="a_partir">A partir de</option><option value="faixa">Faixa de pre\u00e7o</option><option value="gratuito">Gratuito</option></select></label><label>Valor inicial<input id="${prefix}ServicePrice" inputmode="decimal"></label><label>Valor final<input id="${prefix}ServicePriceTo" inputmode="decimal"></label><label>Unidade<input id="${prefix}ServiceBillingUnit" placeholder="por hora"></label><label class="wide">Observa\u00e7\u00e3o do pre\u00e7o<input id="${prefix}ServicePriceNote"></label>
     <div class="form-section-title wide"><i class="fa-solid fa-location-dot"></i><div><strong>Atendimento</strong><span>Onde, quando e como o servi\u00e7o \u00e9 realizado.</span></div></div>
     <label>Local<select id="${prefix}ServiceLocation"><option value="">N\u00e3o informar</option><option>No estabelecimento</option><option>No endere\u00e7o do cliente</option><option>Online</option><option>Estabelecimento e domic\u00edlio</option></select></label><label>\u00c1reas atendidas<input id="${prefix}ServiceAreas"></label><label>Taxa de deslocamento<input id="${prefix}ServiceTravelFee"></label><label class="checkbox-line"><input id="${prefix}ServiceAppointment" type="checkbox"> Precisa de agendamento</label><label>Dura\u00e7\u00e3o<input id="${prefix}ServiceDuration"></label><label>Prazo<input id="${prefix}ServiceDeadline"></label><label class="wide">Hor\u00e1rios<input id="${prefix}ServiceSchedule"></label>
     <label class="wide">Itens inclusos<textarea id="${prefix}ServiceIncluded" rows="3"></textarea></label><label class="wide">Itens n\u00e3o inclusos<textarea id="${prefix}ServiceExcluded" rows="3"></textarea></label><label class="wide">Materiais utilizados<textarea id="${prefix}ServiceMaterials" rows="2"></textarea></label><label class="wide">O cliente precisa fornecer<textarea id="${prefix}ServiceClientProvides" rows="2"></textarea></label><label>Garantia<input id="${prefix}ServiceWarranty"></label><label class="wide">Observa\u00e7\u00f5es<textarea id="${prefix}ServiceNotes" rows="3"></textarea></label>
     <label>Link externo<input id="${prefix}ServiceLink" type="url"></label><label>WhatsApp espec\u00edfico<input id="${prefix}ServiceWhatsapp" inputmode="tel"></label><label class="wide">Mensagem do WhatsApp<textarea id="${prefix}ServiceWhatsappMessage" rows="2"></textarea></label><label>Status<select id="${prefix}ServiceStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label><label class="checkbox-line"><input id="${prefix}ServiceFeatured" type="checkbox"> Servi\u00e7o em destaque</label><label>Ordem<input id="${prefix}ServiceOrder" type="number" min="0"></label>
-    <div class="promo-form-actions wide"><button id="${prefix}AddServiceButton" type="button"><i class="fa-solid fa-plus"></i> Adicionar servi\u00e7o</button><button id="${prefix}PreviewServiceButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Pr\u00e9-visualizar</button><button id="${prefix}CancelServiceEditButton" type="button" class="ghost-button hidden">Cancelar edi\u00e7\u00e3o</button></div>
+    <div class="promo-form-actions wide"><button id="${prefix}AddServiceButton" type="button" class="service-add-button"><i class="fa-solid fa-plus"></i> Adicionar servi\u00e7o</button><button id="${prefix}PreviewServiceButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Pr\u00e9-visualizar</button><button id="${prefix}CancelServiceEditButton" type="button" class="ghost-button hidden">Cancelar edi\u00e7\u00e3o</button></div>
   </div>`;
 }
 
@@ -20131,6 +20191,7 @@ function renderClientOnlyEditor() {
         <section id="client-module-servicos" class="wide upload-panel client-feature-card feature-servicos client-module-panel">
           <div class="section-head compact feature-card-head"><div><span class="feature-kicker">Atendimentos</span><h3>Servi\u00e7os oferecidos</h3><p>Cadastre e organize os servi\u00e7os exibidos no perfil p\u00fablico.</p></div><span class="badge">${servicos.length} servi\u00e7o${servicos.length === 1 ? "" : "s"}</span></div>
           ${serviceAdminFormHtml("co")}
+          <div class="service-list-heading"><div><span>Servi\u00e7os cadastrados</span><small>Confira e gerencie os servi\u00e7os adicionados abaixo.</small></div><i class="fa-solid fa-list-check"></i></div>
           <div id="coServicesPreview" class="promo-admin-list service-admin-list">${renderServicosAdminMarkup(servicos, "co-service")}</div>
         </section>
       ` : ""}

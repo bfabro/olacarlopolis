@@ -1,4 +1,4 @@
-﻿
+
 // Painel administrativo legado desativado.
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
@@ -10132,11 +10132,15 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       });
   }
 
+  function imagensServicoPublico(item = {}) {
+    return [...new Set([item.imagem, item.image, ...(Array.isArray(item.imagens) ? item.imagens : [])].map((url) => String(url || "").trim()).filter(Boolean))].slice(0, 6);
+  }
+
   function servicosDoEstabelecimentoPublico(est = {}) {
     const cliente = clientePublicoDoEstabelecimento(est) || {};
     if (cliente.servicosHabilitados !== true && est.servicosHabilitados !== true) return [];
     const origem = cliente.servicos || est.servicos || []; const lista = Array.isArray(origem) ? origem : Object.entries(origem || {}).map(([id, value]) => ({ id, ...(value || {}) }));
-    return lista.map((item, index) => ({ ...item, id: item.id || `servico-${normalizeName(item.nome || "item")}-${index}`, nome: item.nome || item.titulo || "Servi\u00e7o", imagem: item.imagem || item.image || "", descricaoCurta: item.descricaoCurta || item.resumo || "", descricaoCompleta: item.descricaoCompleta || item.descricao || "", categoria: item.categoria || "", tags: item.tags || "", tipoPreco: item.tipoPreco || "sob_consulta", preco: item.preco || "", precoAte: item.precoAte || "", status: item.status || "ativo", ativo: item.ativo !== false, destaque: item.destaque === true, ordem: Number.isFinite(Number(item.ordem)) ? Number(item.ordem) : index, estabelecimento: est.name || est.nome || cliente.nome || "", estabelecimentoId: normalizeName(est.nomeNormalizado || est.id || est.clienteId || est.name || cliente.id || ""), clienteId: cliente.id || est.clienteId || "", contatoEmpresa: cliente.whatsapp || est.whatsapp || est.contact || cliente.contato || est.contato || "" }))
+    return lista.map((item, index) => ({ ...item, id: item.id || `servico-${normalizeName(item.nome || "item")}-${index}`, nome: item.nome || item.titulo || "Servi\u00e7o", imagens: imagensServicoPublico(item), imagem: imagensServicoPublico(item)[0] || "", descricaoCurta: item.descricaoCurta || item.resumo || "", descricaoCompleta: item.descricaoCompleta || item.descricao || "", categoria: item.categoria || "", tags: item.tags || "", tipoPreco: item.tipoPreco || "sob_consulta", preco: item.preco || "", precoAte: item.precoAte || "", status: item.status || "ativo", ativo: item.ativo !== false, destaque: item.destaque === true, ordem: Number.isFinite(Number(item.ordem)) ? Number(item.ordem) : index, estabelecimento: est.name || est.nome || cliente.nome || "", estabelecimentoId: normalizeName(est.nomeNormalizado || est.id || est.clienteId || est.name || cliente.id || ""), clienteId: cliente.id || est.clienteId || "", contatoEmpresa: cliente.whatsapp || est.whatsapp || est.contact || cliente.contato || est.contato || "" }))
       .filter((item) => item.status !== "inativo" && item.ativo !== false && item.nome)
       .sort((a, b) => Boolean(a.destaque) !== Boolean(b.destaque) ? (a.destaque ? -1 : 1) : (a.ordem - b.ordem || a.nome.localeCompare(b.nome, "pt-BR")));
   }
@@ -10160,9 +10164,24 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
 
   function abrirModalServicoPublico(item = {}) {
     document.querySelector(".loja-servico-modal")?.remove(); registrarInteracaoServico(item, "visualizacao");
+    const imagens = imagensServicoPublico(item);
     const details = [["Local de atendimento", item.localAtendimento],["\u00c1reas atendidas", item.areasAtendidas],["Taxa de deslocamento", item.taxaDeslocamento],["Agendamento", item.precisaAgendamento ? "Necess\u00e1rio" : ""],["Dura\u00e7\u00e3o", item.duracao],["Prazo de execu\u00e7\u00e3o", item.prazoExecucao],["Hor\u00e1rios", item.horarios],["Itens inclusos", item.itensInclusos],["Itens n\u00e3o inclusos", item.itensNaoInclusos],["Materiais", item.materiais],["O cliente fornece", item.clienteFornece],["Garantia", item.garantia]].filter(([, value]) => value);
     const whatsapp = whatsappServicoPublico(item); const modal = document.createElement("div"); modal.className = "imovel-detalhes-modal loja-servico-modal";
     modal.innerHTML = `<section class="imovel-detalhes-dialog loja-servico-dialog" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.nome)}"><div class="loja-servico-modal-media">${item.imagem ? `<img src="${escapePromoHtml(item.imagem)}" alt="${escapePromoHtml(item.nome)}">` : `<i class="${escapePromoHtml(item.icone || "fa-solid fa-screwdriver-wrench")}"></i>`}</div><div class="imovel-detalhes-conteudo"><div class="loja-produto-modal-actions"><button type="button" class="item-modal-share" data-item-modal-share aria-label="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button><button type="button" class="imovel-detalhes-fechar" aria-label="Fechar">&times;</button></div><span class="feature-kicker">${escapePromoHtml(item.categoria || "Servi\u00e7o")}</span><h2>${escapePromoHtml(item.nome)}</h2><strong class="loja-servico-modal-price">${escapePromoHtml(precoServicoPublico(item))}${item.unidadeCobranca ? ` <small>${escapePromoHtml(item.unidadeCobranca)}</small>` : ""}</strong>${item.observacaoPreco ? `<p class="loja-servico-price-note">${escapePromoHtml(item.observacaoPreco)}</p>` : ""}${item.descricaoCompleta || item.descricaoCurta ? `<section class="imovel-detalhes-descricao"><p>${escapePromoHtml(item.descricaoCompleta || item.descricaoCurta)}</p></section>` : ""}${details.length ? `<div class="loja-servico-details">${details.map(([label,value]) => `<div><span>${escapePromoHtml(label)}</span><strong>${escapePromoHtml(value)}</strong></div>`).join("")}</div>` : ""}${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}<div class="loja-servico-modal-actions-bottom">${whatsapp ? `<a class="auto-whatsapp-button" data-service-whatsapp href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Solicitar or\u00e7amento</a>` : ""}${item.link ? `<a class="loja-servico-link" href="${escapePromoHtml(item.link)}" target="_blank" rel="noopener noreferrer">Abrir link <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ""}</div></div></section>`;
+    if (imagens.length > 1) {
+      const media = modal.querySelector(".loja-servico-modal-media");
+      const image = media?.querySelector("img");
+      let imageIndex = 0;
+      media?.insertAdjacentHTML("beforeend", '<button type="button" class="loja-servico-gallery-nav previous" data-service-gallery-previous aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="loja-servico-gallery-nav next" data-service-gallery-next aria-label="Pr\u00f3xima imagem"><i class="fa-solid fa-chevron-right"></i></button><span class="loja-servico-gallery-count" data-service-gallery-count>1/' + imagens.length + '</span>');
+      const showImage = (nextIndex) => {
+        imageIndex = (nextIndex + imagens.length) % imagens.length;
+        if (image) { image.src = imagens[imageIndex]; image.alt = (item.nome || "Servi\u00e7o") + " - imagem " + (imageIndex + 1); }
+        const count = media?.querySelector("[data-service-gallery-count]");
+        if (count) count.textContent = (imageIndex + 1) + "/" + imagens.length;
+      };
+      media?.querySelector("[data-service-gallery-previous]")?.addEventListener("click", () => showImage(imageIndex - 1));
+      media?.querySelector("[data-service-gallery-next]")?.addEventListener("click", () => showImage(imageIndex + 1));
+    }
     const close = () => modal.remove(); modal.querySelector(".imovel-detalhes-fechar")?.addEventListener("click", close); modal.addEventListener("click", (event) => { if (event.target === modal) close(); }); modal.querySelector("[data-service-whatsapp]")?.addEventListener("click", () => registrarInteracaoServico(item, "whatsapp")); modal.querySelector(".loja-servico-link")?.addEventListener("click", () => registrarInteracaoServico(item, "link")); document.body.appendChild(modal);
     window.ItemShare?.configureModal(modal, { type: "servico", id: item.id || "", title: "servi\u00e7o", route: normalizeName(item.estabelecimentoId || item.estabelecimento || item.clienteId || "") });
   }
@@ -24925,7 +24944,6 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
      
      
   <span class="locais_nomes">${establishment.name}</span>
-${servicosIniciaisLoja.length ? `<div class="cliente-servicos-resumo"><span><i class="fa-solid fa-screwdriver-wrench"></i> ${servicosIniciaisLoja.slice(0, 3).map((item) => escapePromoHtml(item.nome)).join(" &bull; ")}${servicosIniciaisLoja.length > 3 ? ` +${servicosIniciaisLoja.length - 3}` : ""}</span><button type="button" data-open-services="servicos-${slugEstabelecimentoPublico}">Ver servi\u00e7os</button></div>` : ""}
 ${!establishment.descricaoFalecido ? `
   <button 
     class="share-btn" 
@@ -25322,10 +25340,6 @@ ${servicosIniciaisLoja.length ? `
 
 
 
-
-    contentArea.querySelectorAll("[data-open-services]").forEach((button) => button.addEventListener("click", (event) => {
-      event.preventDefault(); event.stopPropagation(); const target = button.dataset.openServices; const tab = contentArea.querySelector(`[data-target="${CSS.escape(target)}"]`); tab?.click(); const card = button.closest("li[data-id]"); registrarCliqueBotao("servicos_resumo", card?.dataset.id || "", "servicos-oferecidos").catch(() => {});
-    }));
 
     let lastClickedButton = null;
     contentArea.querySelectorAll("li[data-id]").forEach((clientCard) => {
