@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 676,
-  label: "v683",
+  numero: 677,
+  label: "v684",
   data: "2026-08-27",
-  nota: "Serviços adicionados integrados à área pública de novidades."
+  nota: "URLs manuais ocultas no portal do cliente e serviços incluídos nos relatórios."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -15739,6 +15739,7 @@ function aggregateButtonTypesForClient(details = new Map(), keys = []) {
 function clientReportCategory(row = {}) {
   const text = normalizeName(`${row.area || ""} ${row.tipo || ""}`);
   if (/novidade|novidades/.test(text)) return "Novidades";
+  if (/servico/.test(text)) return "Servicos";
   if (/imovel/.test(text)) return "Imoveis";
   if (/veiculo|automovel/.test(text)) return "Veiculos";
   if (/perfil/.test(text)) return "Visualizacao do perfil";
@@ -15793,6 +15794,7 @@ function clientReportResourceAllowed(category = "") {
   if (/cardapio/.test(normalized)) return hasPermission("cardapio") || clientReportMenuEnabled();
   if (/novidade/.test(normalized)) return true;
   if (/promoc/.test(normalized)) return hasPermission("promocoes");
+  if (/servico/.test(normalized)) return hasPermission("servicos") || hasPermission("produtos");
   if (/foto|divulgacao|imagem/.test(normalized)) return hasPermission("imagens") || hasPermission("destaque");
   return true;
 }
@@ -15942,6 +15944,7 @@ function clientReportAvailability(client = {}, counts = {}) {
     perfil: true,
     imoveis: hasImoveis,
     veiculos: hasVeiculos,
+    servicos: client.servicosHabilitados === true || normalizeServicos(client.servicos, client.id).length > 0 || Number(counts.servicos || 0) > 0,
     destaques: Boolean(client.destaqueSemanal),
     promocoes: hasPermission("promocoes") && hasPromotions,
     gruposWhatsapp: hasWhatsappGroup,
@@ -16010,6 +16013,19 @@ function renderClientMetricReportContent(client = {}) {
   const produtosInteracoes = produtoVisualizacoes + produtoWhatsapp + produtoFotos + produtoCompartilhamentos + produtoOutros;
   const produtosTotal = produtosAberturas + produtosInteracoes;
 
+  const servicosAberturas = Number(tiposPermitidos.get("servicos") || 0);
+  const servicoVisualizacoes = Number(tiposPermitidos.get("servico_visualizacao") || 0);
+  const servicoWhatsapp = Number(tiposPermitidos.get("servico_whatsapp") || 0);
+  const servicoFotos = Number(tiposPermitidos.get("servico_fotos") || 0);
+  const servicoCompartilhamentos = Number(tiposPermitidos.get("servico_compartilhamento") || 0);
+  const servicoLinks = Number(tiposPermitidos.get("servico_link") || 0);
+  const servicoTiposConhecidos = new Set(["servicos", "servico_visualizacao", "servico_whatsapp", "servico_fotos", "servico_compartilhamento", "servico_link"]);
+  const servicoOutros = [...tiposPermitidos.entries()]
+    .filter(([type]) => /^servico/.test(type) && !servicoTiposConhecidos.has(type))
+    .reduce((sum, [, count]) => sum + Number(count || 0), 0);
+  const servicosInteracoes = servicoVisualizacoes + servicoWhatsapp + servicoFotos + servicoCompartilhamentos + servicoLinks + servicoOutros;
+  const servicosTotal = servicosAberturas + servicosInteracoes;
+
   const promocoesAgregado = aggregateCliquesPorBotao(filtered.promocoesBotoes, filtered.cliquesPromocoesDetalhado);
   const promocoesTipos = aggregateButtonTypesForClient(promocoesAgregado.detalhes, keys);
   const promocaoCount = (...types) => types.reduce((sum, type) => sum + Number(promocoesTipos.get(type) || 0), 0);
@@ -16058,7 +16074,7 @@ function renderClientMetricReportContent(client = {}) {
   const totalBotoes = [...tiposPermitidos.values()].reduce((sum, count) => sum + Number(count || 0), 0);
   const promocoesBotoesGenericos = Number(tiposPermitidos.get("promocao_visualizacao") || 0)
     + Number(tiposPermitidos.get("promocao_fotos") || 0) + Number(tiposPermitidos.get("promocao_compartilhamento") || 0);
-  const categorizedTotal = cardapios + produtosTotal + promocoesAberturas + whatsappPromocao + instagramPromocao + promocoesBotoesGenericos
+  const categorizedTotal = cardapios + produtosTotal + servicosTotal + promocoesAberturas + whatsappPromocao + instagramPromocao + promocoesBotoesGenericos
     + whats + fotos + novidades + perfil + imoveis + veiculos + destaques + gruposWhatsapp
     + compartilhamentos + redes + ondeComerInstagramHistorico;
   const outros = Math.max(0, totalBotoes - categorizedTotal);
@@ -16069,6 +16085,7 @@ function renderClientMetricReportContent(client = {}) {
     historicoPromocoes,
     imoveis,
     veiculos,
+    servicos: servicosTotal,
     novidades,
     outrasRedes,
     outros
@@ -16098,6 +16115,16 @@ function renderClientMetricReportContent(client = {}) {
     { label: "Compartilhamentos", count: produtoCompartilhamentos, note: "Cliques para compartilhar produto" },
     { label: "Outras interacoes", count: produtoOutros, note: "Outros controles de Produtos" }
   ].filter((entry) => entry.count > 0 || (produtosAtivo && entry.label !== "Outras interacoes"));
+  const servicosAtivo = hasPermission("servicos") || client.servicosHabilitados === true || normalizeServicos(client.servicos, client.id).length > 0 || servicosTotal > 0;
+  const servicosEntries = [
+    { label: "Aberturas de Servicos", count: servicosAberturas, note: "Cliques para abrir a aba" },
+    { label: "Servicos visualizados", count: servicoVisualizacoes, note: "Aberturas dos detalhes" },
+    { label: "WhatsApp dos servicos", count: servicoWhatsapp, note: "Cliques para solicitar orcamento" },
+    { label: "Fotos dos servicos", count: servicoFotos, note: "Navegacao entre as imagens" },
+    { label: "Compartilhamentos", count: servicoCompartilhamentos, note: "Cliques para compartilhar servico" },
+    { label: "Links externos", count: servicoLinks, note: "Cliques nos links do servico" },
+    { label: "Outras interacoes", count: servicoOutros, note: "Outros controles de Servicos" }
+  ].filter((entry) => entry.count > 0 || (servicosAtivo && entry.label !== "Outras interacoes"));
   const promocoesAtivo = hasPermission("promocoes") || normalizePromocoes(client.promocoes).length > 0 || promocoesTotal > 0;
   const promocoesEntries = [
     { label: "Aberturas de Promocoes", count: promocoesAberturas, note: "Cliques para abrir a aba" },
@@ -16169,15 +16196,18 @@ function renderClientMetricReportContent(client = {}) {
   const isOndeComerTimelineRow = (row = {}) => normalizeName(row.area).includes("ondecomer");
   const isCardapioTimelineRow = (row = {}) => !isOndeComerTimelineRow(row) && /cardapio/.test(timelineIdentity(row));
   const isProdutosTimelineRow = (row = {}) => /produto/.test(timelineIdentity(row));
+  const isServicosTimelineRow = (row = {}) => /servico/.test(timelineIdentity(row));
   const isPromocoesTimelineRow = (row = {}) => /promoc/.test(timelineIdentity(row));
   const ondeComerTimeline = timeline.filter(isOndeComerTimelineRow);
   const cardapioTimeline = timeline.filter(isCardapioTimelineRow);
   const produtosTimeline = timeline.filter(isProdutosTimelineRow);
+  const servicosTimeline = timeline.filter(isServicosTimelineRow);
   const promocoesTimeline = timeline.filter(isPromocoesTimelineRow);
   const commonTimeline = timeline.filter((row) => (
     !isOndeComerTimelineRow(row)
     && !isCardapioTimelineRow(row)
     && !isProdutosTimelineRow(row)
+    && !isServicosTimelineRow(row)
     && !isPromocoesTimelineRow(row)
     && !moduleTypes.imoveis(row)
     && !moduleTypes.veiculos(row)
@@ -16194,7 +16224,7 @@ function renderClientMetricReportContent(client = {}) {
       ? { ...entry, count: Number(detailedPageCounts.get(entry.key) || 0) }
       : entry);
   }
-  const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...promocoesEntries];
+  const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...servicosEntries, ...promocoesEntries];
   const total = allResourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const paginaClienteTotal = resourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const itemAccessRows = buildItemAccessRows(state.metricas, range, keys);
@@ -16255,6 +16285,16 @@ function renderClientMetricReportContent(client = {}) {
           rangeLabel: range.label,
           timeline: produtosTimeline,
           timelineTitle: "Cliques detalhados de Produtos"
+        }) : ""}
+        ${servicosAtivo ? renderClientReportMonitorSection({
+          title: "Servicos",
+          icon: "fa-screwdriver-wrench",
+          description: "Aberturas, visualizacoes, fotos, WhatsApp, links e compartilhamentos dos servicos.",
+          entries: servicosEntries,
+          total: servicosTotal,
+          rangeLabel: range.label,
+          timeline: servicosTimeline,
+          timelineTitle: "Cliques detalhados de Servicos"
         }) : ""}
         ${promocoesAtivo ? renderClientReportMonitorSection({
           title: "Promocoes",
@@ -19675,7 +19715,7 @@ function renderPostArtView() {
             <label>${typeCopy.callout}<input id="postArtCallout" maxlength="48" placeholder="${type === "servico" ? "Ex.: Atendimento especializado" : "Ex.: Novidade ou 20% OFF"}"></label>
             <label id="postArtValidityLabel" class="${type === "promocao" ? "" : "hidden"}">Validade<input id="postArtValidity" type="date"></label>
             <label id="postArtServiceModeLabel" class="${type === "servico" ? "" : "hidden"}">Forma de atendimento<input id="postArtServiceMode" maxlength="52" placeholder="Ex.: Presencial, online ou a domicílio"></label>
-            <label class="wide">Imagem usada<input id="postArtImage" placeholder="URL da imagem"></label>
+            <label class="wide ${canManageClients() ? "" : "hidden"}">Imagem usada<input id="postArtImage" placeholder="URL da imagem"></label>
             <label>Nova imagem para esta postagem<input id="postArtImageUpload" type="file" accept="image/*"></label>
             <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
             <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
@@ -19927,12 +19967,15 @@ function renderStaffPromocoesView() {
   });
 }
 function serviceAdminFormHtml(prefix) {
+  const imageUrlField = prefix === "co"
+    ? '<input id="' + prefix + 'ServiceImageUrl" type="hidden">'
+    : '<label>URLs das imagens<textarea id="' + prefix + 'ServiceImageUrl" rows="3" placeholder="Uma URL por linha. Máximo de 6 imagens."></textarea></label>';
   return `<div class="promo-admin-form service-admin-form">
     <p class="promo-required-note wide"><span class="required-mark">*</span> Campo obrigat\u00f3rio</p>
     <label><span class="service-field-label">Nome do servi\u00e7o <span class="required-mark">*</span></span><input id="${prefix}ServiceName" maxlength="120"></label><label>Categoria<input id="${prefix}ServiceCategory" maxlength="80"></label>
     <label class="wide">Descri\u00e7\u00e3o curta<textarea id="${prefix}ServiceShortDescription" rows="2" maxlength="220"></textarea></label><label class="wide">Descri\u00e7\u00e3o completa<textarea id="${prefix}ServiceFullDescription" rows="4" maxlength="3000"></textarea></label>
     <label>\u00cdcone<input id="${prefix}ServiceIcon" placeholder="fa-solid fa-screwdriver-wrench"></label><label>Tags para busca<input id="${prefix}ServiceTags" placeholder="instala\u00e7\u00e3o, limpeza"></label>
-    <label>Imagens<input id="${prefix}ServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>Selecione at\u00e9 6 imagens. A primeira ser\u00e1 a capa.</small></label><label>URLs das imagens<textarea id="${prefix}ServiceImageUrl" rows="3" placeholder="Uma URL por linha. M\u00e1ximo de 6 imagens."></textarea></label><div id="${prefix}ServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
+    <label>Imagens<input id="${prefix}ServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>Selecione at\u00e9 6 imagens. A primeira ser\u00e1 a capa.</small></label>${imageUrlField}<div id="${prefix}ServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
     <div class="form-section-title wide"><i class="fa-solid fa-money-bill-wave"></i><div><strong>Pre\u00e7o e cobran\u00e7a</strong><span>Como o valor ser\u00e1 exibido.</span></div></div>
     <label>Forma de pre\u00e7o<select id="${prefix}ServicePriceType"><option value="sob_consulta">Sob consulta</option><option value="fixo">Pre\u00e7o fixo</option><option value="a_partir">A partir de</option><option value="faixa">Faixa de pre\u00e7o</option><option value="gratuito">Gratuito</option></select></label><label>Valor inicial<input id="${prefix}ServicePrice" inputmode="decimal"></label><label>Valor final<input id="${prefix}ServicePriceTo" inputmode="decimal"></label><label>Unidade<input id="${prefix}ServiceBillingUnit" placeholder="por hora"></label><label class="wide">Observa\u00e7\u00e3o do pre\u00e7o<input id="${prefix}ServicePriceNote"></label>
     <div class="form-section-title wide"><i class="fa-solid fa-location-dot"></i><div><strong>Atendimento</strong><span>Onde, quando e como o servi\u00e7o \u00e9 realizado.</span></div></div>
@@ -20216,18 +20259,6 @@ function renderClientOnlyEditor() {
             <span id="coImagesCount" class="badge">${imagens.length}/10</span>
           </div>
           <input id="coImagesUpload" type="file" accept="image/*" multiple>
-          <div class="manual-image-form">
-            <label>URL da imagem
-              <input id="coImageUrl" placeholder="https://... ou images/...">
-            </label>
-            <label>Título da imagem
-              <input id="coImageTitle" maxlength="80" placeholder="Ex.: Ambiente interno">
-            </label>
-            <label>Breve descrição
-              <textarea id="coImageText" rows="4" maxlength="600" placeholder="Texto opcional que aparece junto da imagem no site"></textarea>
-            </label>
-            <button id="coAddImageUrlButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar imagem</button>
-          </div>
           <div id="coImagesPreview" class="image-grid">
             ${renderImagesMarkup(imagens, "co")}
           </div>
@@ -20253,7 +20284,7 @@ function renderClientOnlyEditor() {
             <label>Produto ativo<select id="coProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
             <label class="wide">Descricao curta<textarea id="coProductDescription" rows="3" placeholder="Produto disponivel na loja. Consulte cores, tamanhos e disponibilidade pelo WhatsApp."></textarea></label>
             <label>Imagens do produto<input id="coProductImageUpload" type="file" accept="image/*" multiple></label>
-            <label>URLs das imagens<textarea id="coProductImageUrl" rows="3" placeholder="Uma URL por linha. Maximo 4 imagens."></textarea></label>
+            <input id="coProductImageUrl" type="hidden">
             <div class="form-section-title wide"><i class="fa-solid fa-circle-info"></i><div><strong>2. Mais informacoes - opcional</strong><span>Campos genericos para varios tipos de comercio.</span></div></div>
             <label>Marca<input id="coProductBrand" placeholder="Ex.: Nike, JBL, Mondial"></label>
             <label>Modelo<input id="coProductModel" placeholder="Ex.: Bluetooth 5.0, 220V"></label>
@@ -20332,7 +20363,7 @@ function renderClientOnlyEditor() {
             <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
             <label class="wide">Mensagem abaixo do cliente / Instagram<textarea id="coPromoInstagramMsg" rows="2" placeholder="Ex.: Siga no Instagram e fique por dentro das novidades!"></textarea></label>
             <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
-            <label>Ou URL da imagem<input id="coPromoImageUrl" placeholder="https://..."></label>
+            <input id="coPromoImageUrl" type="hidden">
             <div class="promo-form-actions wide">
               <button id="coAddPromoButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
               <button id="coCancelPromoEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edicao</button>

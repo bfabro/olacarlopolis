@@ -10269,10 +10269,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         const count = media?.querySelector("[data-service-gallery-count]");
         if (count) count.textContent = (imageIndex + 1) + "/" + imagens.length;
       };
-      media?.querySelector("[data-service-gallery-previous]")?.addEventListener("click", () => showImage(imageIndex - 1));
-      media?.querySelector("[data-service-gallery-next]")?.addEventListener("click", () => showImage(imageIndex + 1));
+      media?.querySelector("[data-service-gallery-previous]")?.addEventListener("click", () => { registrarInteracaoServico(item, "fotos"); showImage(imageIndex - 1); });
+      media?.querySelector("[data-service-gallery-next]")?.addEventListener("click", () => { registrarInteracaoServico(item, "fotos"); showImage(imageIndex + 1); });
     }
-    const close = () => modal.remove(); modal.querySelector(".imovel-detalhes-fechar")?.addEventListener("click", close); modal.addEventListener("click", (event) => { if (event.target === modal) close(); }); modal.querySelector("[data-service-whatsapp]")?.addEventListener("click", () => registrarInteracaoServico(item, "whatsapp")); modal.querySelector(".loja-servico-link")?.addEventListener("click", () => registrarInteracaoServico(item, "link")); document.body.appendChild(modal);
+    const close = () => modal.remove(); modal.querySelector(".imovel-detalhes-fechar")?.addEventListener("click", close); modal.addEventListener("click", (event) => { if (event.target === modal) close(); }); modal.querySelector("[data-service-whatsapp]")?.addEventListener("click", () => registrarInteracaoServico(item, "whatsapp")); modal.querySelector(".loja-servico-link")?.addEventListener("click", () => registrarInteracaoServico(item, "link")); modal.querySelector("[data-item-modal-share]")?.addEventListener("click", () => registrarInteracaoServico(item, "compartilhamento")); document.body.appendChild(modal);
     window.ItemShare?.configureModal(modal, { type: "servico", id: item.id || "", title: "servi\u00e7o", route: normalizeName(item.estabelecimentoId || item.estabelecimento || item.clienteId || "") });
   }
 
@@ -27134,7 +27134,7 @@ document.addEventListener('click', function (e) {
   container.querySelectorAll('.aba').forEach(sec => { sec.style.display = 'none'; sec.classList.remove('visible'); });
 
   const targetId = tab.dataset.target || tab.getAttribute('data-target') || '';
-  const nome = targetId.replace(/^(info-|fotos-|cardapio-|veiculos-|imoveis-|produtos-|promocoes-)/, '');
+  const nome = targetId.replace(/^(info-|fotos-|cardapio-|veiculos-|imoveis-|produtos-|servicos-|promocoes-)/, '');
 
   // 🔢 CONTAGEM
   if (targetId.startsWith('fotos-')) window.registrarCliqueBotao?.('fotos', nome);
@@ -27142,6 +27142,7 @@ document.addEventListener('click', function (e) {
   if (targetId.startsWith('veiculos-')) window.registrarCliqueBotao?.('veiculos', nome);
   if (targetId.startsWith('imoveis-')) window.registrarCliqueBotao?.('imoveis', nome);
   if (targetId.startsWith('produtos-')) window.registrarCliqueBotao?.('produtos', nome);
+  if (targetId.startsWith('servicos-')) window.registrarCliqueBotao?.('servicos', nome, "servicos-oferecidos");
   if (targetId.startsWith('promocoes-')) window.registrarCliqueBotao?.('promocoes', nome);
 
   // abre a seção alvo
