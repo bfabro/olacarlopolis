@@ -1,9 +1,10 @@
-// Loterias publicas - v7
+// Loterias publicas - v8
 (() => {
   "use strict";
 
-  const CACHE_KEY = "ola_carlopolis_loterias_cache_v2";
-  const CACHE_TTL = 15 * 60 * 1000;
+  const CACHE_KEY = "ola_carlopolis_loterias_cache_v3";
+  const CACHE_TTL = 2 * 60 * 1000;
+  const AUTO_REFRESH_MS = 60 * 1000;
   const HOME_TITLE = document.title;
   const GAME_CONFIG = [
     { slug: "megasena", nome: "Mega-Sena", grupo: "principais", icon: "fa-clover", regra: "Escolha de 6 a 20 números entre 60. São sorteados 6 números e há prêmio para quem acerta 4, 5 ou 6." },
@@ -60,7 +61,7 @@
       rows: [["1 fração — extração regular", "R$ 4,00"], ["Bilhete inteiro — extração regular", "R$ 40,00"], ["1 fração — Enricou ou Natal", "R$ 10,00"], ["Bilhete inteiro — Enricou ou Natal", "R$ 100,00"]]
     }
   };
-  const state = { resultados: [], consultadoEm: "", stale: false, loading: false, open: false, filter: "todas", query: "", savedNodes: null, previousHash: "", lastTrigger: null };
+  const state = { resultados: [], consultadoEm: "", stale: false, loading: false, open: false, filter: "todas", query: "", savedNodes: null, previousHash: "", lastTrigger: null, refreshTimer: null };
   let originalDescription = "";
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
@@ -311,12 +312,12 @@
     area.querySelector("#lotterySearch")?.addEventListener("input", (event) => { state.query = event.target.value; renderCards(); });
   }
 
-  async function loadResults(force = false) {
+  async function loadResults(force = false, silent = false) {
     if (state.loading) return;
     state.loading = true;
     const results = document.getElementById("lotteryResults");
     const retry = document.getElementById("lotteryRetry");
-    if (results) results.innerHTML = skeleton();
+    if (results && (!silent || !state.resultados.length)) results.innerHTML = skeleton();
     retry?.classList.add("is-loading");
     try {
       const payload = await fetchPayload(force);
@@ -328,6 +329,11 @@
       const selected = routeSlug();
       if (selected) setTimeout(() => document.querySelector(`[data-lottery-card="${selected}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 80);
     } catch (error) {
+      if (silent && state.resultados.length) {
+        state.stale = true;
+        renderStatus();
+        return;
+      }
       if (results) results.innerHTML = `<div class="lottery-load-error"><i class="fa-solid fa-triangle-exclamation"></i><h2>Não foi possível carregar os resultados neste momento.</h2><p>Você pode tentar novamente em alguns instantes.</p><button id="lotteryErrorRetry" type="button"><i class="fa-solid fa-rotate"></i> Tentar novamente</button></div>`;
       document.getElementById("lotteryErrorRetry")?.addEventListener("click", () => loadResults(true));
     } finally { state.loading = false; retry?.classList.remove("is-loading"); }
@@ -343,6 +349,18 @@
     </main>`;
   }
 
+  function stopAutoRefresh() {
+    if (state.refreshTimer) clearInterval(state.refreshTimer);
+    state.refreshTimer = null;
+  }
+
+  function startAutoRefresh() {
+    stopAutoRefresh();
+    state.refreshTimer = setInterval(() => {
+      if (state.open && document.visibilityState === "visible") loadResults(true, true);
+    }, AUTO_REFRESH_MS);
+  }
+
   async function showPage(selectedSlug = "") {
     const area = captureContentArea();
     if (!area) return;
@@ -356,12 +374,15 @@
       page.dataset.eventsBound = "true";
     }
     window.scrollTo({ top: 0, behavior: "auto" });
-    if (!state.resultados.length || state.stale) await loadResults(false);
-    else { renderStatus(); renderCards(); }
+    const hadResults = state.resultados.length > 0;
+    if (hadResults) { renderStatus(); renderCards(); }
+    await loadResults(true, hadResults);
+    startAutoRefresh();
     if (selectedSlug) setTimeout(() => document.querySelector(`[data-lottery-card="${selectedSlug}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 100);
   }
 
   function closePage() {
+    stopAutoRefresh();
     closeDetails(false);
     const previous = state.previousHash && !state.previousHash.startsWith("#loterias") ? state.previousHash : "";
     state.open = false;
@@ -392,6 +413,7 @@
     const hash = (location.hash || "").toLowerCase();
     if (hash === "#loterias" || /^#loterias-[a-z0-9]+$/.test(hash)) return showPage(routeSlug());
     if (!state.open) return;
+    stopAutoRefresh();
     closeDetails(false);
     state.open = false;
     document.body.classList.remove("lottery-route-open");
@@ -423,6 +445,9 @@
     handleHash();
   });
   window.addEventListener("hashchange", handleHash);
+  document.addEventListener("visibilitychange", () => {
+    if (state.open && document.visibilityState === "visible") loadResults(true, true);
+  });
 
   window.mostrarLoterias = showPage;
   window.abrirLoterias = openRoute;

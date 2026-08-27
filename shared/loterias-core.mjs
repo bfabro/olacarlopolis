@@ -1,7 +1,8 @@
-// Consulta resiliente dos resultados das Loterias CAIXA - v1
+// Consulta resiliente dos resultados das Loterias CAIXA - v2
 const CAIXA_HOME = "https://servicebus2.caixa.gov.br/portaldeloterias/api/home/ultimos-resultados";
+const CAIXA_MODALIDADE_BASE = "https://servicebus2.caixa.gov.br/portaldeloterias/api";
 const FALLBACK_BASE = "https://loteriascaixa-api.herokuapp.com/api";
-const CACHE_TTL_MS = 15 * 60 * 1000;
+const CACHE_TTL_MS = 60 * 1000;
 const MODALIDADES = ["megasena", "lotofacil", "quina", "lotomania", "timemania", "duplasena", "diadesorte", "supersete", "maismilionaria", "federal"];
 const CHAVES_CAIXA = { megasena: "megasena", lotofacil: "lotofacil", quina: "quina", lotomania: "lotomania", timemania: "timemania", duplasena: "duplasena", diadesorte: "diaDeSorte", supersete: "superSete", maismilionaria: "maisMilionaria", federal: "federal" };
 const cache = new Map();
@@ -68,6 +69,31 @@ async function consultarFallback(slug) {
   catch (error) { return null; }
 }
 
+function dataDisponivelHoje(value) {
+  const match = String(value || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (!match) return false;
+  const dataConcurso = Number(`${match[3]}${match[2]}${match[1]}`);
+  const partesHoje = Object.fromEntries(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(new Date()).map((parte) => [parte.type, parte.value]));
+  const hoje = Number(`${partesHoje.year}${partesHoje.month}${partesHoje.day}`);
+  return dataConcurso <= hoje;
+}
+
+async function consultarCaixaModalidade(slug, referencia) {
+  const atual = concurso(referencia);
+  const dataDoProximoChegou = dataDisponivelHoje(referencia?.dataProximoConcurso);
+  const proximoInformado = Number(referencia?.numeroConcursoProximo) || 0;
+  const proximo = proximoInformado || (atual && dataDoProximoChegou ? atual + 1 : 0);
+  const consultarProximo = proximo > atual && dataDoProximoChegou;
+  const caminho = consultarProximo ? `${slug}/${proximo}` : slug;
+  try {
+    const data = normalizarCaixa(await buscarJson(`${CAIXA_MODALIDADE_BASE}/${caminho}?t=${Date.now()}`));
+    const temResultado = Array.isArray(data?.listaDezenas) && data.listaDezenas.length > 0;
+    return temResultado ? data : null;
+  } catch (error) {
+    return null;
+  }
+}
+
 function concurso(data) { return Number(data?.numero) || 0; }
 
 export async function carregarResultados(force = false) {
@@ -78,12 +104,14 @@ export async function carregarResultados(force = false) {
     return MODALIDADES.map((slug) => ({ slug, ok: true, cache: true, origem: cache.get(slug).origem, data: cache.get(slug).data }));
   }
 
-  const [caixa, fallbackLista] = await Promise.all([
-    consultarCaixa(),
+  const caixa = await consultarCaixa();
+  const [caixaModalidades, fallbackLista] = await Promise.all([
+    Promise.all(MODALIDADES.map((slug) => consultarCaixaModalidade(slug, caixa.get(slug)))),
     Promise.all(MODALIDADES.map((slug) => consultarFallback(slug)))
   ]);
   return MODALIDADES.map((slug, index) => {
     const candidatos = [
+      { data: caixaModalidades[index], origem: "CAIXA/concurso" },
       { data: caixa.get(slug), origem: "CAIXA" },
       { data: fallbackLista[index], origem: "API comunitária/CAIXA" }
     ].filter((item) => item.data?.numero).sort((a, b) => concurso(b.data) - concurso(a.data));

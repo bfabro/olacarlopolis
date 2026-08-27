@@ -1,4 +1,4 @@
-// Agregador publico das Loterias CAIXA - v2
+// Agregador publico das Loterias CAIXA - v3
 import { carregarResultados } from "../shared/loterias-core.mjs";
 
 export const config = { runtime: "edge" };
@@ -12,7 +12,9 @@ export default async function handler(request) {
     "content-type": "application/json; charset=utf-8",
     "access-control-allow-origin": "*",
     "x-content-type-options": "nosniff",
-    "cache-control": force ? "no-store" : "public, max-age=0, s-maxage=900, stale-while-revalidate=3600"
+    "cache-control": "no-store, no-cache, must-revalidate",
+    pragma: "no-cache",
+    expires: "0"
   };
-  return new Response(JSON.stringify({ fonte: "Loterias CAIXA", consultadoEm: new Date().toISOString(), cacheSegundos: 900, resultados }), { status: disponiveis ? 200 : 502, headers });
+  return new Response(JSON.stringify({ fonte: "Loterias CAIXA", consultadoEm: new Date().toISOString(), cacheSegundos: 0, resultados }), { status: disponiveis ? 200 : 502, headers });
 }

@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 666,
-  label: "v673",
+  numero: 667,
+  label: "v674",
   data: "2026-08-26",
-  nota: "Gráfico da represa reposicionado logo abaixo do card de monitoramento oficial."
+  nota: "Loterias com consulta do concurso atual e atualização automática dos resultados."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
