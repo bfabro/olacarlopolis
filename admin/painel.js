@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 669,
-  label: "v676",
+  numero: 670,
+  label: "v677",
   data: "2026-08-27",
-  nota: "Histórico rápido dos sorteios realizados nos últimos 30 dias por modalidade."
+  nota: "Relatório completo de acessos do menu lateral e das ações na tela de Loterias."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1664,6 +1664,7 @@ function scopedClientMetricsFromSnapshot(snapshot, clientKey = "") {
     cliquesOndeComerDetalhado: {},
     cliquesPromocoesDetalhado: {},
     cliquesPorMenuDetalhado: {},
+    loterias: {},
     origemPaginaCliente: {},
     origemPaginaClienteDetalhado: {},
     origemAcessos: {},
@@ -2835,6 +2836,7 @@ async function loadAllData(onProgress = null) {
     cliquesOndeComerDetalhado: cliquesOndeComerDetalhadoSnap.exists() ? cliquesOndeComerDetalhadoSnap.val() : {},
     cliquesPromocoesDetalhado: cliquesPromocoesDetalhadoSnap.exists() ? cliquesPromocoesDetalhadoSnap.val() : {},
     cliquesPorMenuDetalhado: cliquesPorMenuSnap.exists() ? cliquesPorMenuSnap.val() : {},
+    loterias: {},
     origemPaginaCliente: {},
     origemPaginaClienteDetalhado: {},
     origemAcessos: origemAcessosSnap.exists() ? origemAcessosSnap.val() : {},
@@ -14743,6 +14745,91 @@ function aggregateMenuDaily(primary = {}, detailed = {}) {
   return totals;
 }
 
+function menuMetricGroup(value = "", fallback = "") {
+  if (String(fallback || "").trim()) return String(fallback).trim();
+  const identity = menuMetricIdentity(value);
+  if (["ondecomer", "promocoes", "imoveis", "automoveis", "eventos", "jogos"].includes(identity)) return "Destaques";
+  if (["noticiascidade", "gruposwhats", "vagasdetrabalho"].includes(identity)) return "Informações";
+  return "Menu lateral";
+}
+
+function buildMenuAccessRows(primary = {}, detailed = {}) {
+  const rows = new Map();
+  const dates = new Set([...Object.keys(primary || {}), ...Object.keys(detailed || {})]);
+  dates.forEach((date) => {
+    const daily = new Map();
+    Object.entries(primary?.[date] || {}).forEach(([key, count]) => {
+      const identity = menuMetricIdentity(key);
+      daily.set(identity, { identity, label: menuMetricLabel(key), group: "", type: "item", primary: Number(count || 0), detailed: 0 });
+    });
+    Object.entries(detailed?.[date] || {}).forEach(([key, value]) => {
+      const details = Object.values(value?.detalhes || {});
+      const first = details.find((item) => item?.texto || item?.grupo || item?.tipo) || {};
+      const labelSource = first.texto || key;
+      const identity = menuMetricIdentity(labelSource);
+      const current = daily.get(identity) || { identity, label: menuMetricLabel(labelSource), group: "", type: "item", primary: 0, detailed: 0 };
+      current.label = first.texto || current.label;
+      current.group = first.grupo || current.group;
+      current.type = first.tipo || current.type;
+      current.detailed += Number(value?.total || details.length || 0);
+      daily.set(identity, current);
+    });
+    daily.forEach((entry) => {
+      const count = Math.max(entry.primary, entry.detailed);
+      if (!count) return;
+      const current = rows.get(entry.identity) || { identity: entry.identity, label: entry.label, group: menuMetricGroup(entry.label, entry.group), type: entry.type, total: 0 };
+      current.total += count;
+      if (entry.group) current.group = entry.group;
+      if (entry.type) current.type = entry.type;
+      rows.set(entry.identity, current);
+    });
+  });
+  return [...rows.values()].sort((a, b) => b.total - a.total || a.label.localeCompare(b.label, "pt-BR"));
+}
+
+function menuTypeLabel(value = "") {
+  return ({ categoria: "Categoria", grupo: "Grupo", pagina: "Página", item: "Item" })[value] || "Item";
+}
+
+function renderMenuAccessTable(rows = [], total = 0) {
+  if (!rows.length) return '<div class="list-meta">Ainda não há cliques de menu registrados.</div>';
+  return `<div class="report-table-wrap"><table class="report-click-table menu-access-table"><thead><tr><th>#</th><th>Item do menu</th><th>Grupo</th><th>Tipo</th><th>Cliques</th><th>Participação</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td><strong>${escapeHtml(row.label)}</strong></td><td>${escapeHtml(row.group)}</td><td><span class="report-table-tag">${escapeHtml(menuTypeLabel(row.type))}</span></td><td><strong>${row.total}</strong></td><td>${total ? ((row.total / total) * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) : "0"}%</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+const LOTTERY_REPORT_GAMES = [
+  ["megasena", "Mega-Sena"], ["lotofacil", "Lotofácil"], ["quina", "Quina"], ["maismilionaria", "+Milionária"],
+  ["lotomania", "Lotomania"], ["timemania", "Timemania"], ["duplasena", "Dupla Sena"], ["diadesorte", "Dia de Sorte"],
+  ["supersete", "Super Sete"], ["federal", "Loteria Federal"]
+];
+
+function lotteryActionLabel(value = "") {
+  const labels = { abrir_tela: "Abertura da tela", compartilhar: "Compartilhar", atualizar: "Atualizar resultados", detalhes: "Ver detalhes", historico: "Histórico", regras: "Regras do jogo", tentar_novamente: "Tentar novamente", tentar_historico: "Tentar histórico", filtro_todas: "Filtro: Todas", filtro_megasena: "Filtro: Mega-Sena", filtro_lotofacil: "Filtro: Lotofácil", filtro_quina: "Filtro: Quina", filtro_outras: "Filtro: Outras" };
+  return labels[value] || String(value || "Ação").replace(/_/g, " ");
+}
+
+function aggregateLotteryMetrics(data = {}) {
+  const games = new Map(LOTTERY_REPORT_GAMES.map(([slug, name]) => [slug, { slug, name, clicks: {}, total: 0 }]));
+  const actions = new Map();
+  let pageOpens = 0;
+  Object.values(data || {}).forEach((day) => Object.entries(day || {}).forEach(([slug, values]) => {
+    Object.entries(values || {}).forEach(([action, rawCount]) => {
+      const count = Number(rawCount || 0);
+      if (!count) return;
+      if (action !== "abrir_tela") incrementMetric(actions, lotteryActionLabel(action), count);
+      if (slug === "geral") { if (action === "abrir_tela") pageOpens += count; return; }
+      const row = games.get(slug) || { slug, name: menuMetricLabel(slug), clicks: {}, total: 0 };
+      row.clicks[action] = Number(row.clicks[action] || 0) + count;
+      row.total += count;
+      games.set(slug, row);
+    });
+  }));
+  return { rows: [...games.values()].sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, "pt-BR")), actions, pageOpens, gameInteractions: [...games.values()].reduce((sum, row) => sum + row.total, 0) };
+}
+
+function renderLotteryAccessTable(rows = []) {
+  return `<div class="report-table-wrap"><table class="report-click-table lottery-access-table"><thead><tr><th>#</th><th>Loteria</th><th>Detalhes</th><th>Histórico</th><th>Regras</th><th>Total</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td><strong>${escapeHtml(row.name)}</strong></td><td>${Number(row.clicks.detalhes || 0)}</td><td>${Number(row.clicks.historico || 0)}</td><td>${Number(row.clicks.regras || 0)}</td><td><strong>${row.total}</strong></td></tr>`).join("")}</tbody></table></div>`;
+}
+
 function aggregateDailyWithDetails(primary = {}, detailed = {}, predicate = () => true) {
   const totals = new Map();
   const dates = new Set([...Object.keys(primary || {}), ...Object.keys(detailed || {})]);
@@ -16114,6 +16201,7 @@ const ACCESS_METRIC_PATHS = {
   cliquesOndeComerDetalhado: "cliquesOndeComerDetalhado",
   cliquesPromocoesDetalhado: "cliquesPromocoesDetalhado",
   cliquesPorMenuDetalhado: "cliquesPorMenu",
+  loterias: "metricasLoterias",
   origemAcessos: "origemAcessos",
   instalacoesPWA: "instalacoesPWA",
   usoPWA: "usoPWA"
@@ -16558,6 +16646,7 @@ function renderReports(reportType = "") {
     cliquesOndeComerDetalhado: filterDailyMetrics(state.metricas.cliquesOndeComerDetalhado, periodRange),
     cliquesPromocoesDetalhado: filterDailyMetrics(state.metricas.cliquesPromocoesDetalhado, periodRange),
     cliquesPorMenuDetalhado: filterDailyMetrics(state.metricas.cliquesPorMenuDetalhado, periodRange),
+    loterias: filterDailyMetrics(state.metricas.loterias, periodRange),
     origemAcessos: filterDailyMetrics(state.metricas.origemAcessos, periodRange),
     instalacoesPWA: filterDailyMetrics(state.metricas.instalacoesPWA, periodRange),
     usoPWA: filterDailyMetrics(state.metricas.usoPWA, periodRange)
@@ -16638,6 +16727,8 @@ function renderReports(reportType = "") {
   });
 
   const cliquesMenu = aggregateMenuDaily(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
+  const menuAccessRows = buildMenuAccessRows(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
+  const lotteryMetrics = aggregateLotteryMetrics(filteredMetrics.loterias);
   const cliquesOndeComerCardapios = aggregateDailyWithDetails(
     filteredMetrics.ondeComerCardapios,
     filteredMetrics.cliquesOndeComerDetalhado,
@@ -16686,6 +16777,9 @@ function renderReports(reportType = "") {
   );
   const getNewsClickRows = () => newsClickRows ??= buildNewsClickRows(state.metricas, periodRange);
   const totalMenuClicks = totalMetricMap(cliquesMenu);
+  const topMenuItem = menuAccessRows[0];
+  const topLottery = lotteryMetrics.rows.find((row) => row.total > 0);
+  const topLotteryAction = [...lotteryMetrics.actions.entries()].sort((a, b) => b[1] - a[1])[0];
   const totalButtonClicks = totalMetricMap(cliquesBotoes.porTipo);
   const totalOndeComerInteractions = totalMetricMap(cliquesOndeComerCardapios)
     + totalMetricMap(cliquesOndeComerWhats)
@@ -16737,7 +16831,7 @@ function renderReports(reportType = "") {
           <h2>Periodo dos relatorios</h2>
           <p>${isFinanceReport
             ? "Os valores usam as faturas registradas nas competências abrangidas pelo filtro. A competência atual é complementada pela situação financeira vigente quando necessário."
-            : "Filtra acessos, cliques, menu lateral, Onde Comer, Promocoes e acoes dos usuarios."}</p>
+            : "Filtra acessos, cliques, menu lateral, Onde Comer, Promoções, Loterias e ações dos usuários."}</p>
         </div>
         <span class="badge ativo">${escapeHtml(periodRange.label)}</span>
       </div>
@@ -16804,11 +16898,23 @@ function renderReports(reportType = "") {
 
       ${isFinanceReport ? "" : renderFinanceReportSection("menu-lateral", "Navegação pelo menu lateral", periodRange, () => `
         <div class="access-report-kpi-strip">
-          <article><span>Total de cliques</span><strong>${totalMenuClicks}</strong><small>Soma das opções acessadas no menu</small></article>
-          <article><span>Onde Comer</span><strong>${aberturasOndeComer}</strong><small>Aberturas registradas pelo menu</small></article>
-          <article><span>Promoções</span><strong>${aberturasPromocoes}</strong><small>Aberturas registradas pelo menu</small></article>
+          <article><span>Total de cliques</span><strong>${totalMenuClicks}</strong><small>Soma de todas as opções acessadas</small></article>
+          <article><span>Item mais acessado</span><strong>${escapeHtml(topMenuItem?.label || "-")}</strong><small>${topMenuItem ? `${topMenuItem.total} cliques no período` : "Sem acessos no período"}</small></article>
+          <article><span>Itens acessados</span><strong>${menuAccessRows.length}</strong><small>Categorias, grupos e páginas diferentes</small></article>
         </div>
-        ${renderReportList(topFromMap(cliquesMenu, 16), "Ainda não há cliques de menu registrados.")}
+        <div class="access-report-subsection report-wide"><h3><i class="fa-solid fa-table-list"></i> Todos os acessos do menu</h3><p>Tabela completa com cada item acessado, seu grupo e participação no período.</p>${renderMenuAccessTable(menuAccessRows, totalMenuClicks)}</div>
+      `, true)}
+
+      ${isFinanceReport ? "" : renderFinanceReportSection("loterias-acessos", "Cliques na tela de Loterias", periodRange, () => `
+        <div class="access-report-kpi-strip">
+          <article><span>Aberturas da tela</span><strong>${lotteryMetrics.pageOpens}</strong><small>Visitas registradas na página de Loterias</small></article>
+          <article><span>Loteria mais acessada</span><strong>${escapeHtml(topLottery?.name || "-")}</strong><small>${topLottery ? `${topLottery.total} interações` : "Sem interações no período"}</small></article>
+          <article><span>Ação mais clicada</span><strong>${escapeHtml(topLotteryAction?.[0] || "-")}</strong><small>${topLotteryAction ? `${topLotteryAction[1]} cliques` : "Sem cliques no período"}</small></article>
+        </div>
+        <div class="access-report-columns">
+          <section class="access-report-subsection report-wide"><h3><i class="fa-solid fa-clover"></i> Acessos por loteria</h3><p>Compara detalhes, histórico e regras de cada modalidade.</p>${renderLotteryAccessTable(lotteryMetrics.rows)}</section>
+          <section class="access-report-subsection report-wide"><h3><i class="fa-solid fa-arrow-pointer"></i> Ações mais utilizadas</h3><p>Inclui compartilhamento, atualização, filtros e ações dos cards.</p>${renderReportList(topFromMap(lotteryMetrics.actions, 20), "Ainda não há ações de loterias registradas.")}</section>
+        </div>
       `, true)}
 
       ${isFinanceReport ? "" : renderFinanceReportSection("estabelecimentos-servicos", "Estabelecimentos e serviços", periodRange, () => `

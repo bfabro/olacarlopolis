@@ -121,7 +121,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=469" />
+   <link rel="stylesheet" href="style.css?v=470" />
    <link rel="stylesheet" href="loterias.css?v=8" />
    <link rel="stylesheet" href="client-gallery.css?v=3" />
    <link rel="stylesheet" href="resume-builder.css?v=1" />
@@ -1358,7 +1358,7 @@
 
             </ul>
 
-            <div class="sidebar-version">Olá Carlópolis v427</div>
+            <div class="sidebar-version">Olá Carlópolis v428</div>
 
             <!-- Sidebar Open / Close -->
             <div class="bottom_content">
@@ -1697,8 +1697,8 @@
    </script>
 
    <!--  JavaScript -->
-   <script defer src="script.js?v=631"></script>
-   <script defer src="loterias.js?v=10"></script>
+   <script defer src="script.js?v=632"></script>
+   <script defer src="loterias.js?v=11"></script>
    <script defer src="item-share.js?v=2"></script>
    <script defer src="eventos-page.js?v=7"></script>
    <script defer src="client-gallery.js?v=3"></script>
@@ -1773,9 +1773,9 @@
             .replace(/\s+/g, "");                            // remove espaços
       }
 
-      function registrarCliqueMenu(menuId, texto) {
+      function registrarCliqueMenu(menuId, texto, metadados = {}) {
          try {
-            const dataHoje = getHojeBR(); // já existe no seu código
+            const dataHoje = getHojeBR();
             const horaAgora = new Date().toLocaleTimeString("pt-BR");
 
             const contadorRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/total`);
@@ -1784,24 +1784,38 @@
             const detalhesRef = db.ref(`cliquesPorMenu/${dataHoje}/${menuId}/detalhes`);
             detalhesRef.push({
                horario: horaAgora,
-               texto: texto || ""
+               texto: texto || "",
+               grupo: metadados.grupo || "",
+               tipo: metadados.tipo || "item",
+               destino: metadados.destino || ""
             });
          } catch (e) {
             console.error("Erro ao registrar clique no menu:", e);
          }
       }
 
-      // ✅ Event Delegation (pega itens criados depois e qualquer clique no menu)
+      // Registra qualquer item atual ou futuro do menu lateral.
       document.addEventListener("click", (ev) => {
-         const el = ev.target.closest(".nav_link, [id^='menu']");
+         const el = ev.target.closest(".sidebar .nav_link");
          if (!el) return;
 
-         const textoMenu = (el.innerText || el.textContent || "").trim();
+         const textoMenu = (el.querySelector(".navlink")?.textContent || el.getAttribute("aria-label") || el.textContent || "").trim();
+         const idInterno = el.querySelector("[id^='menu']")?.id || "";
          const menuId = (el.id && el.id.trim())
             ? el.id.trim()
-            : `menu${slugMenu(textoMenu)}`;
+            : idInterno
+               ? idInterno
+               : `menu${slugMenu(textoMenu)}`;
+         const grupoItem = el.closest("li.item");
+         const tituloGrupo = grupoItem?.querySelector(":scope > .submenu_item .navlink")?.textContent?.trim() || "";
+         const tipo = el.classList.contains("sublink") ? "categoria" : el.classList.contains("submenu_item") ? "grupo" : "pagina";
+         const destino = el.getAttribute("href") || el.dataset.categoria || el.id || idInterno || "";
 
-         registrarCliqueMenu(menuId, textoMenu);
+         registrarCliqueMenu(menuId, textoMenu, {
+            grupo: tituloGrupo || (tipo === "grupo" ? textoMenu : "Acesso rapido"),
+            tipo,
+            destino
+         });
       }, true); // true = capture (pega mesmo se algum código mexer no bubble)
    </script>
 

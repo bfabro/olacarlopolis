@@ -204,6 +204,18 @@
       ".write": true
     },
 
+    "metricasLoterias": {
+      ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
+      "$data": {
+        "$jogo": {
+          "$acao": {
+            ".write": "newData.isNumber() && ((!data.exists() && newData.val() === 1) || (data.isNumber() && newData.val() === data.val() + 1))",
+            ".validate": "newData.val() >= 1 && newData.val() <= 1000000000"
+          }
+        }
+      }
+    },
+
     "origemAcessos": {
       ".read": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
       ".write": true

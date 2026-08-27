@@ -9159,3 +9159,13 @@ button.admin-button-loading::after {
   .fuel-admin-station-expanded-head { align-items: stretch; flex-direction: column; }
   .fuel-admin-station-expanded-head .danger-mini { width: 100%; }
 }
+
+/* Tabelas completas de acessos do menu e das loterias - v412 */
+.menu-access-table { min-width: 720px; }
+.lottery-access-table { min-width: 620px; }
+.menu-access-table th:nth-child(-n+4),
+.menu-access-table td:nth-child(-n+4),
+.lottery-access-table th:nth-child(-n+2),
+.lottery-access-table td:nth-child(-n+2) { text-align: left !important; }
+.report-table-tag { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 999px; color: #1767aa; background: #eaf4ff; font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
+.menu-access-table tbody tr:hover, .lottery-access-table tbody tr:hover { background: #f8fbff; }

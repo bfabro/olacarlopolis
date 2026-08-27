@@ -14148,6 +14148,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   document.getElementById("menuVagasTrabalho")?.addEventListener("click", function (event) {
     event.preventDefault();
+    event.__menuClickTracked = true;
     registrarCliqueMenuLateral("Vagas de Trabalho");
     prepararNavegacaoMenuEspecial();
     location.hash = "#vagas-trabalho";

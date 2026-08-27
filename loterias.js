@@ -75,6 +75,18 @@
   const normalize = (value) => String(value || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9+]+/g, " ").trim();
   const gameConfig = (slug) => GAME_CONFIG.find((item) => item.slug === slug) || { slug, nome: slug, grupo: "outras", icon: "fa-ticket" };
   const number = (value) => Number.isFinite(Number(value)) ? Number(value) : 0;
+  const metricKey = (value) => normalize(value).replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "geral";
+  const brazilDateKey = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date());
+  function trackLotteryAction(action, slug = "geral") {
+    try {
+      if (!window.firebase?.database) return;
+      window.firebase.database().ref(`metricasLoterias/${brazilDateKey()}/${metricKey(slug)}/${metricKey(action)}`)
+        .transaction((current) => Number(current || 0) + 1)
+        .catch((error) => console.warn("Nao foi possivel registrar a acao da loteria.", error));
+    } catch (error) {
+      console.warn("Nao foi possivel registrar a acao da loteria.", error);
+    }
+  }
   const money = (value) => number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 2 });
   const compactMoney = (value) => {
     const amount = number(value);
@@ -298,7 +310,7 @@
       </div>
       ${specialMarkup(data, config.slug)}
       ${item.stale ? `<p class="lottery-card-stale"><i class="fa-solid fa-clock-rotate-left"></i> Último resultado disponível</p>` : ""}
-      <details class="lottery-rules"><summary><span><i class="fa-solid fa-circle-question"></i> Regras do jogo</span><i class="fa-solid fa-chevron-down lottery-rules-chevron"></i></summary><div><p>${esc(config.regra || "Consulte as regras oficiais desta modalidade nos canais das Loterias CAIXA.")}</p>${betPricesMarkup(config.slug)}</div></details>
+      <details class="lottery-rules" data-lottery-rules="${config.slug}"><summary><span><i class="fa-solid fa-circle-question"></i> Regras do jogo</span><i class="fa-solid fa-chevron-down lottery-rules-chevron"></i></summary><div><p>${esc(config.regra || "Consulte as regras oficiais desta modalidade nos canais das Loterias CAIXA.")}</p>${betPricesMarkup(config.slug)}</div></details>
       <div class="lottery-card-actions"><button type="button" class="lottery-history-button" data-lottery-history="${config.slug}"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button><button type="button" class="lottery-details-button" data-lottery-details="${config.slug}">Ver detalhes <i class="fa-solid fa-arrow-right"></i></button></div>
     </article>`;
   }
@@ -328,9 +340,21 @@
   }
 
   function bindCardEvents(root) {
-    root.querySelectorAll("[data-lottery-history]").forEach((button) => button.addEventListener("click", () => openHistory(button.dataset.lotteryHistory, button)));
-    root.querySelectorAll("[data-lottery-details]").forEach((button) => button.addEventListener("click", () => openDetails(button.dataset.lotteryDetails, button)));
-    root.querySelectorAll("[data-lottery-retry]").forEach((button) => button.addEventListener("click", () => loadResults(true)));
+    root.querySelectorAll("[data-lottery-history]").forEach((button) => button.addEventListener("click", () => {
+      trackLotteryAction("historico", button.dataset.lotteryHistory);
+      openHistory(button.dataset.lotteryHistory, button);
+    }));
+    root.querySelectorAll("[data-lottery-details]").forEach((button) => button.addEventListener("click", () => {
+      trackLotteryAction("detalhes", button.dataset.lotteryDetails);
+      openDetails(button.dataset.lotteryDetails, button);
+    }));
+    root.querySelectorAll("[data-lottery-rules]").forEach((details) => details.addEventListener("toggle", () => {
+      if (details.open) trackLotteryAction("regras", details.dataset.lotteryRules);
+    }));
+    root.querySelectorAll("[data-lottery-retry]").forEach((button) => button.addEventListener("click", () => {
+      trackLotteryAction("tentar_novamente");
+      loadResults(true);
+    }));
   }
 
   function detailRows(data) {
@@ -417,7 +441,10 @@
     } catch (error) {
       const body = document.querySelector(`[data-lottery-history-modal="${slug}"] .lottery-dialog-body`);
       if (body) body.innerHTML = `<div class="lottery-history-empty is-error"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar o histórico agora.</p><button type="button" data-lottery-history-retry>Tentar novamente</button></div>`;
-      body?.querySelector("[data-lottery-history-retry]")?.addEventListener("click", () => openHistory(slug, trigger));
+      body?.querySelector("[data-lottery-history-retry]")?.addEventListener("click", () => {
+        trackLotteryAction("tentar_historico", slug);
+        openHistory(slug, trigger);
+      });
     }
   }
 
@@ -472,11 +499,12 @@
   }
 
   function bindPageEvents(area) {
-    area.querySelector("#lotteryShare")?.addEventListener("click", share);
-    area.querySelector("#lotteryShare")?.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); share(); } });
-    area.querySelector("#lotteryRetry")?.addEventListener("click", () => loadResults(true));
+    area.querySelector("#lotteryShare")?.addEventListener("click", () => { trackLotteryAction("compartilhar"); share(); });
+    area.querySelector("#lotteryShare")?.addEventListener("keydown", (event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); trackLotteryAction("compartilhar"); share(); } });
+    area.querySelector("#lotteryRetry")?.addEventListener("click", () => { trackLotteryAction("atualizar"); loadResults(true); });
     area.querySelectorAll("[data-lottery-filter]").forEach((button) => button.addEventListener("click", () => {
       state.filter = button.dataset.lotteryFilter || "todas";
+      trackLotteryAction(`filtro_${state.filter}`);
       area.querySelectorAll("[data-lottery-filter]").forEach((item) => item.classList.toggle("is-active", item === button));
       renderCards();
     }));
@@ -510,7 +538,7 @@
         return;
       }
       if (results) results.innerHTML = `<div class="lottery-load-error"><i class="fa-solid fa-triangle-exclamation"></i><h2>Não foi possível carregar os resultados neste momento.</h2><p>Você pode tentar novamente em alguns instantes.</p><button id="lotteryErrorRetry" type="button"><i class="fa-solid fa-rotate"></i> Tentar novamente</button></div>`;
-      document.getElementById("lotteryErrorRetry")?.addEventListener("click", () => loadResults(true));
+      document.getElementById("lotteryErrorRetry")?.addEventListener("click", () => { trackLotteryAction("tentar_novamente"); loadResults(true); });
     } finally { state.loading = false; retry?.classList.remove("is-loading"); }
   }
 
@@ -539,7 +567,9 @@
   async function showPage(selectedSlug = "") {
     const area = captureContentArea();
     if (!area) return;
+    const wasOpen = state.open;
     state.open = true;
+    if (!wasOpen) trackLotteryAction("abrir_tela");
     document.body.classList.add("lottery-route-open");
     setMetadata(true);
     if (!area.querySelector(".lottery-page")) area.innerHTML = pageMarkup();
