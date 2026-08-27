@@ -1,10 +1,12 @@
-// Loterias publicas - v8
+// Loterias publicas - v9
 (() => {
   "use strict";
 
-  const CACHE_KEY = "ola_carlopolis_loterias_cache_v3";
+  const CACHE_KEY = "ola_carlopolis_loterias_cache_v4";
   const CACHE_TTL = 2 * 60 * 1000;
   const AUTO_REFRESH_MS = 60 * 1000;
+  const CAIXA_DIRECT_BASE = "https://servicebus2.caixa.gov.br/portaldeloterias/api";
+  const EXPECTED_NUMBERS = { megasena: 6, lotofacil: 15, quina: 5, lotomania: 20, timemania: 7, duplasena: 6, diadesorte: 7, supersete: 7, maismilionaria: 6, federal: 5 };
   const HOME_TITLE = document.title;
   const GAME_CONFIG = [
     { slug: "megasena", nome: "Mega-Sena", grupo: "principais", icon: "fa-clover", regra: "Escolha de 6 a 20 números entre 60. São sorteados 6 números e há prêmio para quem acerta 4, 5 ou 6." },
@@ -92,6 +94,66 @@
   };
   const resultFor = (slug) => state.resultados.find((item) => item.slug === slug);
 
+  function brazilDateNumber(value = new Date()) {
+    const parts = Object.fromEntries(new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(value).map((part) => [part.type, part.value]));
+    return Number(`${parts.year}${parts.month}${parts.day}`);
+  }
+
+  function resultDateNumber(value) {
+    const match = String(value || "").match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    return match ? Number(`${match[3]}${match[2]}${match[1]}`) : 0;
+  }
+
+  function normalizeDirectResult(data) {
+    if (!data || typeof data !== "object") return null;
+    return {
+      ...data,
+      numero: data.numero ?? data.numeroDoConcurso,
+      listaDezenas: data.listaDezenas ?? data.dezenas ?? [],
+      listaDezenasSegundoSorteio: data.listaDezenasSegundoSorteio ?? data.dezenasSegundoSorteio ?? []
+    };
+  }
+
+  function validDirectResult(data, slug) {
+    const expected = EXPECTED_NUMBERS[slug] || 1;
+    const resultDate = resultDateNumber(data?.dataApuracao);
+    return number(data?.numero) > 0 && Array.isArray(data?.listaDezenas) && data.listaDezenas.length >= expected && resultDate > 0 && resultDate <= brazilDateNumber();
+  }
+
+  async function fetchCaixaDirect(path) {
+    const response = await fetch(`${CAIXA_DIRECT_BASE}/${path}?t=${Date.now()}`, { cache: "no-store", mode: "cors", headers: { accept: "application/json" }, signal: AbortSignal.timeout(10000) });
+    const data = await response.json().catch(() => null);
+    if (!response.ok || !data) throw new Error(`CAIXA HTTP ${response.status}`);
+    return normalizeDirectResult(data);
+  }
+
+  async function fetchLatestValidDirect(slug, currentItem) {
+    let latest = null;
+    let specific = null;
+    try { latest = await fetchCaixaDirect(slug); } catch (error) { }
+    const reference = latest || currentItem?.data;
+    const currentContest = number(reference?.numero);
+    const today = brazilDateNumber();
+    const nextDateReached = resultDateNumber(reference?.dataProximoConcurso) > 0 && resultDateNumber(reference?.dataProximoConcurso) <= today;
+    const federalLatestIsOlder = slug === "federal" && resultDateNumber(reference?.dataApuracao) > 0 && resultDateNumber(reference?.dataApuracao) < today;
+    const informedNext = number(reference?.numeroConcursoProximo);
+    const nextContest = informedNext || (currentContest && (nextDateReached || federalLatestIsOlder) ? currentContest + 1 : 0);
+    if ((nextDateReached || federalLatestIsOlder) && nextContest > currentContest) {
+      try { specific = await fetchCaixaDirect(`${slug}/${nextContest}`); } catch (error) { }
+    }
+    const candidates = [specific, latest, currentItem?.data]
+      .filter((data) => validDirectResult(data, slug))
+      .sort((a, b) => number(b.numero) - number(a.numero));
+    const chosen = candidates[0];
+    if (!chosen || chosen === currentItem?.data) return currentItem || { slug, ok: false, message: "Resultado temporariamente indisponível." };
+    return { ...(currentItem || {}), slug, ok: true, cache: false, stale: false, localFallback: false, origem: "CAIXA/direto", data: chosen };
+  }
+
+  async function enrichWithDirectResults(resultados = []) {
+    const bySlug = new Map(resultados.map((item) => [item.slug, item]));
+    return Promise.all(GAME_CONFIG.map((config) => fetchLatestValidDirect(config.slug, bySlug.get(config.slug))));
+  }
+
   function readCache() {
     try {
       const parsed = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
@@ -115,15 +177,22 @@
         const payload = await response.json().catch(() => null);
         if (!response.ok || !payload || !Array.isArray(payload.resultados)) throw new Error("Serviço indisponível");
         const cachedMap = new Map((cached?.resultados || []).map((item) => [item.slug, item]));
-        const resultados = payload.resultados.map((item) => {
+        let resultados = payload.resultados.map((item) => {
           if (item.ok && item.data) return item;
           const fallback = cachedMap.get(item.slug);
           return fallback?.data ? { ...fallback, stale: true, localFallback: true } : item;
         });
+        resultados = await enrichWithDirectResults(resultados);
         const normalized = { resultados, consultadoEm: payload.consultadoEm || new Date().toISOString(), stale: resultados.some((item) => item.stale || item.localFallback) };
         if (resultados.some((item) => item.ok && item.data)) saveCache(normalized);
         return normalized;
       } catch (error) { lastError = error; }
+    }
+    const directResults = await enrichWithDirectResults(cached?.resultados || []);
+    if (directResults.some((item) => item.ok && item.data)) {
+      const normalized = { resultados: directResults, consultadoEm: new Date().toISOString(), stale: directResults.some((item) => item.stale || item.localFallback) };
+      saveCache(normalized);
+      return normalized;
     }
     if (cached) return { ...cached, stale: true, fromCache: true };
     throw lastError || new Error("Não foi possível carregar os resultados.");
