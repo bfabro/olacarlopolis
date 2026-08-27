@@ -10132,6 +10132,45 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
       });
   }
 
+  function servicosDoEstabelecimentoPublico(est = {}) {
+    const cliente = clientePublicoDoEstabelecimento(est) || {};
+    if (cliente.servicosHabilitados !== true && est.servicosHabilitados !== true) return [];
+    const origem = cliente.servicos || est.servicos || []; const lista = Array.isArray(origem) ? origem : Object.entries(origem || {}).map(([id, value]) => ({ id, ...(value || {}) }));
+    return lista.map((item, index) => ({ ...item, id: item.id || `servico-${normalizeName(item.nome || "item")}-${index}`, nome: item.nome || item.titulo || "Servi\u00e7o", imagem: item.imagem || item.image || "", descricaoCurta: item.descricaoCurta || item.resumo || "", descricaoCompleta: item.descricaoCompleta || item.descricao || "", categoria: item.categoria || "", tags: item.tags || "", tipoPreco: item.tipoPreco || "sob_consulta", preco: item.preco || "", precoAte: item.precoAte || "", status: item.status || "ativo", ativo: item.ativo !== false, destaque: item.destaque === true, ordem: Number.isFinite(Number(item.ordem)) ? Number(item.ordem) : index, estabelecimento: est.name || est.nome || cliente.nome || "", estabelecimentoId: normalizeName(est.nomeNormalizado || est.id || est.clienteId || est.name || cliente.id || ""), clienteId: cliente.id || est.clienteId || "", contatoEmpresa: cliente.whatsapp || est.whatsapp || est.contact || cliente.contato || est.contato || "" }))
+      .filter((item) => item.status !== "inativo" && item.ativo !== false && item.nome)
+      .sort((a, b) => Boolean(a.destaque) !== Boolean(b.destaque) ? (a.destaque ? -1 : 1) : (a.ordem - b.ordem || a.nome.localeCompare(b.nome, "pt-BR")));
+  }
+
+  function precoServicoPublico(item = {}) {
+    const valor = (v) => String(v || "").replace(/^R\$\s*/i, "").trim();
+    if (item.tipoPreco === "gratuito") return "Gratuito"; if (item.tipoPreco === "fixo") return item.preco ? `R$ ${valor(item.preco)}` : "Pre\u00e7o fixo"; if (item.tipoPreco === "a_partir") return item.preco ? `A partir de R$ ${valor(item.preco)}` : "A partir de"; if (item.tipoPreco === "faixa") return item.preco && item.precoAte ? `R$ ${valor(item.preco)} a R$ ${valor(item.precoAte)}` : "Faixa de pre\u00e7o"; return "Sob consulta";
+  }
+
+  function whatsappServicoPublico(item = {}) {
+    const numero = numeroWhatsAppBrasil(item.whatsapp || item.contatoEmpresa || ""); if (!numero) return ""; const mensagem = String(item.mensagemWhatsapp || `Ol\u00e1! Encontrei o servi\u00e7o ${item.nome} no site Ol\u00e1 Carl\u00f3polis e gostaria de mais informa\u00e7\u00f5es.`).replace(/\{servico\}/gi, item.nome || ""); return `https://api.whatsapp.com/send?phone=${numero}&text=${encodeURIComponent(mensagem)}`;
+  }
+
+  function registrarInteracaoServico(item, acao) {
+    return registrarCliqueBotao(`servico_${acao}`, item.clienteId || item.estabelecimentoId || item.estabelecimento, "servicos-oferecidos", { servicoId: item.id || "", tituloConteudo: item.nome || "", estabelecimento: item.estabelecimento || "" }).catch(() => {});
+  }
+
+  function renderServicoCardPublico(item = {}) {
+    return `<article class="loja-servico-card${item.destaque ? " is-featured" : ""}" data-loja-servico="${escapePromoHtml(item.id)}">${item.imagem ? `<img src="${escapePromoHtml(item.imagem)}" alt="${escapePromoHtml(item.nome)}" loading="lazy" decoding="async">` : `<div class="loja-servico-icon"><i class="${escapePromoHtml(item.icone || "fa-solid fa-screwdriver-wrench")}"></i></div>`}<div class="loja-servico-card-body">${item.destaque ? `<span class="loja-servico-featured"><i class="fa-solid fa-star"></i> Destaque</span>` : ""}<small>${escapePromoHtml(item.categoria || "Servi\u00e7o")}</small><h3>${escapePromoHtml(item.nome)}</h3>${item.descricaoCurta ? `<p>${escapePromoHtml(item.descricaoCurta)}</p>` : ""}<strong>${escapePromoHtml(precoServicoPublico(item))}</strong><button type="button" data-service-details="${escapePromoHtml(item.id)}">Ver detalhes</button></div></article>`;
+  }
+
+  function abrirModalServicoPublico(item = {}) {
+    document.querySelector(".loja-servico-modal")?.remove(); registrarInteracaoServico(item, "visualizacao");
+    const details = [["Local de atendimento", item.localAtendimento],["\u00c1reas atendidas", item.areasAtendidas],["Taxa de deslocamento", item.taxaDeslocamento],["Agendamento", item.precisaAgendamento ? "Necess\u00e1rio" : ""],["Dura\u00e7\u00e3o", item.duracao],["Prazo de execu\u00e7\u00e3o", item.prazoExecucao],["Hor\u00e1rios", item.horarios],["Itens inclusos", item.itensInclusos],["Itens n\u00e3o inclusos", item.itensNaoInclusos],["Materiais", item.materiais],["O cliente fornece", item.clienteFornece],["Garantia", item.garantia]].filter(([, value]) => value);
+    const whatsapp = whatsappServicoPublico(item); const modal = document.createElement("div"); modal.className = "imovel-detalhes-modal loja-servico-modal";
+    modal.innerHTML = `<section class="imovel-detalhes-dialog loja-servico-dialog" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.nome)}"><div class="loja-servico-modal-media">${item.imagem ? `<img src="${escapePromoHtml(item.imagem)}" alt="${escapePromoHtml(item.nome)}">` : `<i class="${escapePromoHtml(item.icone || "fa-solid fa-screwdriver-wrench")}"></i>`}</div><div class="imovel-detalhes-conteudo"><div class="loja-produto-modal-actions"><button type="button" class="item-modal-share" data-item-modal-share aria-label="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button><button type="button" class="imovel-detalhes-fechar" aria-label="Fechar">&times;</button></div><span class="feature-kicker">${escapePromoHtml(item.categoria || "Servi\u00e7o")}</span><h2>${escapePromoHtml(item.nome)}</h2><strong class="loja-servico-modal-price">${escapePromoHtml(precoServicoPublico(item))}${item.unidadeCobranca ? ` <small>${escapePromoHtml(item.unidadeCobranca)}</small>` : ""}</strong>${item.observacaoPreco ? `<p class="loja-servico-price-note">${escapePromoHtml(item.observacaoPreco)}</p>` : ""}${item.descricaoCompleta || item.descricaoCurta ? `<section class="imovel-detalhes-descricao"><p>${escapePromoHtml(item.descricaoCompleta || item.descricaoCurta)}</p></section>` : ""}${details.length ? `<div class="loja-servico-details">${details.map(([label,value]) => `<div><span>${escapePromoHtml(label)}</span><strong>${escapePromoHtml(value)}</strong></div>`).join("")}</div>` : ""}${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}<div class="loja-servico-modal-actions-bottom">${whatsapp ? `<a class="auto-whatsapp-button" data-service-whatsapp href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Solicitar or\u00e7amento</a>` : ""}${item.link ? `<a class="loja-servico-link" href="${escapePromoHtml(item.link)}" target="_blank" rel="noopener noreferrer">Abrir link <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ""}</div></div></section>`;
+    const close = () => modal.remove(); modal.querySelector(".imovel-detalhes-fechar")?.addEventListener("click", close); modal.addEventListener("click", (event) => { if (event.target === modal) close(); }); modal.querySelector("[data-service-whatsapp]")?.addEventListener("click", () => registrarInteracaoServico(item, "whatsapp")); modal.querySelector(".loja-servico-link")?.addEventListener("click", () => registrarInteracaoServico(item, "link")); document.body.appendChild(modal);
+    window.ItemShare?.configureModal(modal, { type: "servico", id: item.id || "", title: "servi\u00e7o", route: normalizeName(item.estabelecimentoId || item.estabelecimento || item.clienteId || "") });
+  }
+
+  function bindServicosPublicos(pane, items) {
+    pane.querySelectorAll("[data-service-details]").forEach((button) => button.addEventListener("click", () => { const item = items.find((entry) => String(entry.id) === String(button.dataset.serviceDetails)); if (item) abrirModalServicoPublico(item); }));
+  }
+
   function normalizarPromocoesPublicas(origem = [], contexto = {}) {
     const lista = Array.isArray(origem)
       ? origem
@@ -13380,6 +13419,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     getStoreAutos: automoveisDoEstabelecimentoPublico,
     loadProperties: montarListaImoveisPublica,
     openProduct: abrirModalProdutoEstabelecimento,
+    getServices: servicosDoEstabelecimentoPublico,
+    openService: abrirModalServicoPublico,
     openProperty: abrirModalDetalhesImovel,
     openAuto: abrirModalDetalhesAutomovel
   };
@@ -23018,6 +23059,8 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
     if (Array.isArray(cliente.promocoes)) est.promocoes = cliente.promocoes;
     if (Array.isArray(cliente.produtos)) est.produtos = cliente.produtos;
+    if (campoExiste(cliente, "servicosHabilitados")) est.servicosHabilitados = cliente.servicosHabilitados === true;
+    if (Array.isArray(cliente.servicos)) est.servicos = cliente.servicos;
     if (Array.isArray(cliente.vagasTrabalho)) est.vagasTrabalho = cliente.vagasTrabalho;
     ["vagaAtiva", "vagaTitulo", "vagaCargo", "infoVagaTrabalho", "vagaDescricao", "vagaPreRequisito", "vagaRequisitos", "vagaSalario", "vagaJornada", "vagaLocal", "vagaContato", "vagaComoCandidatar", "vagaValidade"].forEach((campo) => {
       if (campoExiste(cliente, campo)) est[campo] = cliente[campo] || (campo === "vagaAtiva" ? false : "");
@@ -23082,6 +23125,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       menuImages: cardapioAtivo ? (cliente.menuImages || []) : [],
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : [],
       produtos: Array.isArray(cliente.produtos) ? cliente.produtos : [],
+      servicosHabilitados: cliente.servicosHabilitados === true,
+      servicos: Array.isArray(cliente.servicos) ? cliente.servicos : [],
       vagasTrabalho: Array.isArray(cliente.vagasTrabalho) ? cliente.vagasTrabalho : [],
       vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao),
       vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || "",
@@ -23148,6 +23193,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         : Boolean(cliente.cardapioLink || (Array.isArray(cliente.menuImages) && cliente.menuImages.length) || base.cardapioLink || (Array.isArray(base.menuImages) && base.menuImages.length)),
       promocoes: Array.isArray(cliente.promocoes) ? cliente.promocoes : (base.promocoes || base.promotions || []),
       produtos: Array.isArray(cliente.produtos) ? cliente.produtos : (base.produtos || base.products || []),
+      servicosHabilitados: cliente.servicosHabilitados === true,
+      servicos: Array.isArray(cliente.servicos) ? cliente.servicos : (base.servicos || []),
       vagaAtiva: cliente.vagaAtiva !== false && Boolean(cliente.infoVagaTrabalho || cliente.vagaTitulo || cliente.vagaCargo || cliente.vagaDescricao || (Array.isArray(cliente.vagasTrabalho) && cliente.vagasTrabalho.length)),
       vagaTitulo: cliente.vagaTitulo || cliente.vagaCargo || "",
       vagaCargo: cliente.vagaCargo || cliente.vagaTitulo || "",
@@ -24828,6 +24875,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
       businessArtClients.set(businessArtToken, { establishment, categoria: title });
       let veiculosIniciaisLoja = [];
       let produtosIniciaisLoja = [];
+      let servicosIniciaisLoja = [];
       let mostrarAbaVeiculosInicial = false;
       try {
         veiculosIniciaisLoja = automoveisDoEstabelecimentoPublico(establishment, window.__automoveisCache || []);
@@ -24841,6 +24889,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
       } catch (error) {
         console.warn("Nao foi possivel preparar aba inicial de produtos.", error);
       }
+      servicosIniciaisLoja = servicosDoEstabelecimentoPublico(establishment);
       let statusAberto = "";
       if (establishment.funcionamento24Horas || establishment.horarios) {
         const aberto = establishment.funcionamento24Horas || estaAbertoAgora(establishment.horarios);
@@ -24876,6 +24925,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
      
      
   <span class="locais_nomes">${establishment.name}</span>
+${servicosIniciaisLoja.length ? `<div class="cliente-servicos-resumo"><span><i class="fa-solid fa-screwdriver-wrench"></i> ${servicosIniciaisLoja.slice(0, 3).map((item) => escapePromoHtml(item.nome)).join(" &bull; ")}${servicosIniciaisLoja.length > 3 ? ` +${servicosIniciaisLoja.length - 3}` : ""}</span><button type="button" data-open-services="servicos-${slugEstabelecimentoPublico}">Ver servi\u00e7os</button></div>` : ""}
 ${!establishment.descricaoFalecido ? `
   <button 
     class="share-btn" 
@@ -24916,6 +24966,9 @@ ${!establishment.descricaoFalecido ? `
 
   ${produtosIniciaisLoja.length ? `
     ${renderAbaClientePublica({ target: `produtos-${slugEstabelecimentoPublico}`, label: "Produtos", icon: "fa-solid fa-box-open", count: produtosIniciaisLoja.length, tone: "purple" })}
+  ` : ''}
+  ${servicosIniciaisLoja.length ? `
+    ${renderAbaClientePublica({ target: `servicos-${slugEstabelecimentoPublico}`, label: "Servi&ccedil;os", icon: "fa-solid fa-screwdriver-wrench", count: servicosIniciaisLoja.length, tone: "blue" })}
   ` : ''}
 
   ${cardapioVisivel(establishment) ? `
@@ -25175,6 +25228,9 @@ ${produtosIniciaisLoja.length ? `
   <div class="aba loja-itens-aba" id="produtos-${slugEstabelecimentoPublico}" style="display:none"></div>
 ` : ``}
 
+${servicosIniciaisLoja.length ? `
+  <div class="aba loja-itens-aba" id="servicos-${slugEstabelecimentoPublico}" style="display:none"></div>
+` : ``}
 </div>
 
 
@@ -25254,6 +25310,11 @@ ${produtosIniciaisLoja.length ? `
       prepararAbaSobDemanda(contentArea.querySelector(`#${CSS.escape(`produtos-${slug}`)}`), (pane) => {
         pane.innerHTML = `<section class="loja-itens-wrap loja-produtos-wrap auto-cards-mode"><div class="loja-produtos-grid loja-cards-grid loja-itens-grid">${produtosIniciais.map((item) => renderProdutoCardEstabelecimento(item, "produto")).join("")}</div></section>`;
       });
+      const servicosIniciais = servicosDoEstabelecimentoPublico(establishment);
+      prepararAbaSobDemanda(contentArea.querySelector(`#${CSS.escape(`servicos-${slug}`)}`), (pane) => {
+        pane.innerHTML = `<section class="loja-itens-wrap loja-servicos-wrap"><div class="loja-servicos-grid">${servicosIniciais.map(renderServicoCardPublico).join("")}</div></section>`;
+        bindServicosPublicos(pane, servicosIniciais);
+      });
     });
     window.__lojaItensUltimosEstabelecimentos = paidEstablishments;
     agendarHidratacaoAbasItensPublicas(contentArea, 80);
@@ -25261,6 +25322,10 @@ ${produtosIniciaisLoja.length ? `
 
 
 
+
+    contentArea.querySelectorAll("[data-open-services]").forEach((button) => button.addEventListener("click", (event) => {
+      event.preventDefault(); event.stopPropagation(); const target = button.dataset.openServices; const tab = contentArea.querySelector(`[data-target="${CSS.escape(target)}"]`); tab?.click(); const card = button.closest("li[data-id]"); registrarCliqueBotao("servicos_resumo", card?.dataset.id || "", "servicos-oferecidos").catch(() => {});
+    }));
 
     let lastClickedButton = null;
     contentArea.querySelectorAll("li[data-id]").forEach((clientCard) => {
@@ -25603,6 +25668,10 @@ ${produtosIniciaisLoja.length ? `
         }
       }, 450);
     }
+    if (item.tipo === "servico" && item.establishment && item.service) {
+      const idEst = item.establishment.nomeNormalizado || normalizeName(item.establishment.name || "");
+      setTimeout(() => { const alvo = document.getElementById(idEst) || document.querySelector(`[data-id="${idEst}"]`); alvo?.scrollIntoView({ behavior: "smooth", block: "start" }); const tab = alvo?.querySelector(`[data-target="servicos-${CSS.escape(idEst)}"]`); tab?.click(); setTimeout(() => { const card = alvo?.querySelector(`[data-loja-servico="${CSS.escape(String(item.service.id))}"]`); card?.classList.add("is-search-highlight"); card?.scrollIntoView({ behavior: "smooth", block: "center" }); abrirModalServicoPublico(item.service); }, 180); }, 450);
+    }
   }
 
   const buscaResultadosGlobais = document.getElementById("buscaResultadosGlobais");
@@ -25661,6 +25730,10 @@ ${produtosIniciaisLoja.length ? `
               establishment: est
             });
           }
+          servicosDoEstabelecimentoPublico(est).forEach((service) => {
+            const textoServico = removerAcentosBusca([service.nome, service.categoria, service.tags, est.name || est.nome, category.title].filter(Boolean).join(" "));
+            if (textoServico.includes(termo)) resultados.push({ tipo: "servico", titulo: service.nome, subtitulo: `Servi&ccedil;o de ${est.name || est.nome}`, category, establishment: est, service });
+          });
         });
       }
     });

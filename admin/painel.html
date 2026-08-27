@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=413">
+  <link rel="stylesheet" href="painel.css?v=414">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -494,6 +494,60 @@
                   </div>
                 </div>
                 <div id="clientProductsPreview" class="promo-admin-list"></div>
+              </section>
+              <section class="wide upload-panel service-admin-panel">
+                <div class="section-head compact">
+                  <div><span class="feature-kicker">Atendimentos</span><h3>Servi&ccedil;os oferecidos</h3><p>Cadastre, ordene e publique os servi&ccedil;os desta empresa no perfil p&uacute;blico.</p></div>
+                  <span id="clientServicesCount" class="badge">0 servi&ccedil;os</span>
+                </div>
+                <label class="service-enable-toggle"><input id="clientServicesEnabled" type="checkbox"> <span><strong>Disponibilizar &aacute;rea de Servi&ccedil;os oferecidos</strong><small>Ao desativar, os servi&ccedil;os ficam salvos, mas deixam de aparecer no site e no painel do cliente.</small></span></label>
+                <div class="promo-admin-form service-admin-form">
+                  <p class="promo-required-note wide"><span class="required-mark">*</span> Campo obrigat&eacute;rio</p>
+                  <div class="form-section-title wide"><i class="fa-solid fa-screwdriver-wrench"></i><div><strong>1. Identifica&ccedil;&atilde;o</strong><span>Informa&ccedil;&otilde;es usadas no card e na busca p&uacute;blica.</span></div></div>
+                  <label>Nome do servi&ccedil;o <span class="required-mark">*</span><input id="clientServiceName" maxlength="120" placeholder="Ex.: Instala&ccedil;&atilde;o de ar-condicionado"></label>
+                  <label>Categoria<input id="clientServiceCategory" maxlength="80" placeholder="Ex.: Manuten&ccedil;&atilde;o residencial"></label>
+                  <label class="wide">Descri&ccedil;&atilde;o curta<textarea id="clientServiceShortDescription" rows="2" maxlength="220" placeholder="Resumo objetivo para o card"></textarea></label>
+                  <label class="wide">Descri&ccedil;&atilde;o completa<textarea id="clientServiceFullDescription" rows="4" maxlength="3000" placeholder="Explique diferenciais, etapas e condi&ccedil;&otilde;es"></textarea></label>
+                  <label>&Iacute;cone (Font Awesome)<input id="clientServiceIcon" placeholder="fa-solid fa-screwdriver-wrench"></label>
+                  <label>Tags para busca<input id="clientServiceTags" placeholder="Ex.: instala&ccedil;&atilde;o, limpeza, urgente"></label>
+                  <label>Imagem do servi&ccedil;o<input id="clientServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label>
+                  <label>URL da imagem<input id="clientServiceImageUrl" type="url" placeholder="https://..."></label>
+                  <div id="clientServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
+                  <div class="form-section-title wide"><i class="fa-solid fa-money-bill-wave"></i><div><strong>2. Pre&ccedil;o</strong><span>Escolha como o valor ser&aacute; apresentado.</span></div></div>
+                  <label>Forma de pre&ccedil;o<select id="clientServicePriceType"><option value="sob_consulta">Sob consulta</option><option value="fixo">Pre&ccedil;o fixo</option><option value="a_partir">A partir de</option><option value="faixa">Faixa de pre&ccedil;o</option><option value="gratuito">Gratuito</option></select></label>
+                  <label data-service-price-field>Valor inicial<input id="clientServicePrice" inputmode="decimal" placeholder="Ex.: 150,00"></label>
+                  <label data-service-price-to-field>Valor final<input id="clientServicePriceTo" inputmode="decimal" placeholder="Ex.: 300,00"></label>
+                  <label>Unidade de cobran&ccedil;a<input id="clientServiceBillingUnit" placeholder="Ex.: por hora, di&aacute;ria, unidade"></label>
+                  <label class="wide">Observa&ccedil;&atilde;o do pre&ccedil;o<input id="clientServicePriceNote" maxlength="180" placeholder="Ex.: materiais cobrados &agrave; parte"></label>
+                  <div class="form-section-title wide"><i class="fa-solid fa-location-dot"></i><div><strong>3. Atendimento</strong><span>Local, prazo e disponibilidade.</span></div></div>
+                  <label>Local de atendimento<select id="clientServiceLocation"><option value="">N&atilde;o informar</option><option>No estabelecimento</option><option>No endere&ccedil;o do cliente</option><option>Online</option><option>Estabelecimento e domic&iacute;lio</option></select></label>
+                  <label>&Aacute;reas atendidas<input id="clientServiceAreas" placeholder="Ex.: Carl&oacute;polis e regi&atilde;o"></label>
+                  <label>Taxa de deslocamento<input id="clientServiceTravelFee" placeholder="Ex.: Consulte conforme o bairro"></label>
+                  <label class="checkbox-line"><input id="clientServiceAppointment" type="checkbox"> Precisa de agendamento</label>
+                  <label>Dura&ccedil;&atilde;o aproximada<input id="clientServiceDuration" placeholder="Ex.: 2 horas"></label>
+                  <label>Prazo de execu&ccedil;&atilde;o<input id="clientServiceDeadline" placeholder="Ex.: at&eacute; 3 dias &uacute;teis"></label>
+                  <label class="wide">Hor&aacute;rios dispon&iacute;veis<input id="clientServiceSchedule" placeholder="Ex.: Segunda a sexta, das 8h &agrave;s 18h"></label>
+                  <div class="form-section-title wide"><i class="fa-solid fa-list-check"></i><div><strong>4. O que est&aacute; incluso</strong><span>Detalhes para reduzir d&uacute;vidas antes do contato.</span></div></div>
+                  <label class="wide">Itens inclusos<textarea id="clientServiceIncluded" rows="3"></textarea></label>
+                  <label class="wide">Itens n&atilde;o inclusos<textarea id="clientServiceExcluded" rows="3"></textarea></label>
+                  <label class="wide">Materiais utilizados<textarea id="clientServiceMaterials" rows="2"></textarea></label>
+                  <label class="wide">O cliente precisa fornecer<textarea id="clientServiceClientProvides" rows="2"></textarea></label>
+                  <label>Garantia<input id="clientServiceWarranty" placeholder="Ex.: 90 dias"></label>
+                  <label class="wide">Observa&ccedil;&otilde;es<textarea id="clientServiceNotes" rows="3"></textarea></label>
+                  <div class="form-section-title wide"><i class="fa-brands fa-whatsapp"></i><div><strong>5. Contato e exibi&ccedil;&atilde;o</strong><span>O WhatsApp espec&iacute;fico tem prioridade sobre o contato da empresa.</span></div></div>
+                  <label>Link externo<input id="clientServiceLink" type="url" placeholder="https://..."></label>
+                  <label>WhatsApp espec&iacute;fico<input id="clientServiceWhatsapp" inputmode="tel" placeholder="(43) 99999-9999"></label>
+                  <label class="wide">Mensagem do WhatsApp<textarea id="clientServiceWhatsappMessage" rows="2" maxlength="500" placeholder="Ol&aacute;, gostaria de saber mais sobre {servico}."></textarea></label>
+                  <label>Status<select id="clientServiceStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
+                  <label class="checkbox-line"><input id="clientServiceFeatured" type="checkbox"> Servi&ccedil;o em destaque</label>
+                  <label>Ordem de exibi&ccedil;&atilde;o<input id="clientServiceOrder" type="number" min="0" step="1" placeholder="Ex.: 1"></label>
+                  <div class="promo-form-actions wide">
+                    <button id="addClientServiceButton" type="button"><i class="fa-solid fa-plus"></i> Adicionar servi&ccedil;o</button>
+                    <button id="previewClientServiceButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Pr&eacute;-visualizar</button>
+                    <button id="cancelClientServiceEditButton" type="button" class="ghost-button hidden"><i class="fa-solid fa-xmark"></i> Cancelar edi&ccedil;&atilde;o</button>
+                  </div>
+                </div>
+                <div id="clientServicesPreview" class="promo-admin-list service-admin-list"></div>
               </section>
               <div class="form-section-title wide">
                 <i class="fa-solid fa-note-sticky"></i>
@@ -1794,6 +1848,7 @@
                       <div class="permission-options">
                         <label><input type="checkbox" value="cardapio" checked> Card&aacute;pio</label>
                         <label><input type="checkbox" value="produtos" checked> Produtos</label>
+                        <label><input type="checkbox" value="servicos" checked> Servi&ccedil;os oferecidos</label>
                         <label><input type="checkbox" value="promocoes" checked> Promo&ccedil;&otilde;es</label>
                       </div>
                     </div>
@@ -2175,6 +2230,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=608"></script>
+  <script type="module" src="painel.js?v=609"></script>
 </body>
 </html>

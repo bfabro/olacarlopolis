@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const VALID_TYPES = new Set(["automovel", "imovel", "produto", "promocao"]);
+  const VALID_TYPES = new Set(["automovel", "imovel", "produto", "promocao", "servico"]);
   let openingKey = "";
 
   const normalize = (value = "") => String(value || "")
@@ -135,6 +135,12 @@
     return item;
   }
 
+  async function findService(api, id) {
+    await prepareClients(api);
+    const search = () => { for (const store of stores(api)) { const item = (api.getServices?.(store) || []).find((entry) => sameId(entry, id)); if (item) return item; } return null; };
+    let item = search(); if (!item) { await prepareClients(api, true); item = search(); } return item;
+  }
+
   async function findPromotion(api, id) {
     await prepareClients(api);
     const search = () => (api.getPromotions?.() || []).find((item) => sameId(item, id)) || null;
@@ -193,6 +199,7 @@
       if (type === "imovel") item = await findProperty(api, id);
       if (type === "produto") item = await findProduct(api, id);
       if (type === "promocao") item = await findPromotion(api, id);
+      if (type === "servico") item = await findService(api, id);
       if (!item) {
         toast("Este item compartilhado não está mais disponível.");
         return false;
@@ -201,6 +208,7 @@
       if (type === "imovel") api.openProperty?.(item);
       if (type === "produto") api.openProduct?.(item, "Produto");
       if (type === "promocao") api.openProduct?.(item, "Promocao");
+      if (type === "servico") api.openService?.(item);
       consumeSharedItemUrl();
       return true;
     } finally {

@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 671,
-  label: "v678",
+  numero: 672,
+  label: "v679",
   data: "2026-08-27",
-  nota: "Atualização em tempo real dos acessos ao menu e das interações na tela de Loterias."
+  nota: "Cadastro e exibição pública de Serviços oferecidos, com busca, contato e compartilhamento."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -232,9 +232,11 @@ let state = {
   clientMenuImages: [],
   clientPromocoes: [],
   clientProdutos: [],
+  clientServicos: [],
   clientVagas: [],
   clientPromoEditIndex: null,
   clientProductEditIndex: null,
+  clientServiceEditIndex: null,
   staffPromoEditIndex: null,
   postArtType: "produto",
   postArtClientId: "",
@@ -1366,6 +1368,40 @@ function normalizeProdutos(items) {
     })
     .filter((item) => item.titulo && item.status !== "excluido")
     .slice(0, 80);
+}
+
+function normalizeServicos(items, clienteId = "") {
+  const source = Array.isArray(items)
+    ? items
+    : Object.entries(items || {}).map(([id, value]) => (value && typeof value === "object" ? { id, ...value } : { id, nome: value }));
+  return source.map((item, index) => {
+    const nome = String(item?.nome || item?.titulo || item?.name || "").trim();
+    const imagens = [item?.imagem, item?.image, ...(Array.isArray(item?.imagens) ? item.imagens : [])]
+      .map((value) => String(value || "").trim()).filter(Boolean).slice(0, 4);
+    return {
+      id: String(item?.id || `servico-${slugify(nome || `item-${index}`)}-${index}`),
+      clienteId: String(item?.clienteId || clienteId || ""),
+      nome,
+      categoria: String(item?.categoria || "").trim(),
+      descricaoCurta: String(item?.descricaoCurta || item?.resumo || "").trim(),
+      descricaoCompleta: String(item?.descricaoCompleta || item?.descricao || "").trim(),
+      imagem: imagens[0] || "", imagens, icone: String(item?.icone || "").trim(), tags: String(item?.tags || "").trim(),
+      tipoPreco: String(item?.tipoPreco || "sob_consulta").trim(),
+      preco: String(item?.preco || item?.valor || "").trim(), precoAte: String(item?.precoAte || "").trim(),
+      unidadeCobranca: String(item?.unidadeCobranca || "").trim(), observacaoPreco: String(item?.observacaoPreco || "").trim(),
+      localAtendimento: String(item?.localAtendimento || "").trim(), areasAtendidas: String(item?.areasAtendidas || "").trim(),
+      taxaDeslocamento: String(item?.taxaDeslocamento || "").trim(), precisaAgendamento: item?.precisaAgendamento === true,
+      duracao: String(item?.duracao || "").trim(), prazoExecucao: String(item?.prazoExecucao || "").trim(), horarios: String(item?.horarios || "").trim(),
+      itensInclusos: String(item?.itensInclusos || "").trim(), itensNaoInclusos: String(item?.itensNaoInclusos || "").trim(),
+      materiais: String(item?.materiais || "").trim(), clienteFornece: String(item?.clienteFornece || "").trim(),
+      garantia: String(item?.garantia || "").trim(), observacoes: String(item?.observacoes || "").trim(),
+      link: String(item?.link || "").trim(), whatsapp: String(item?.whatsapp || "").trim(), mensagemWhatsapp: String(item?.mensagemWhatsapp || "").trim(),
+      status: item?.status === "inativo" || item?.ativo === false ? "inativo" : "ativo",
+      ativo: !(item?.status === "inativo" || item?.ativo === false), destaque: item?.destaque === true,
+      ordem: Number.isFinite(Number(item?.ordem)) ? Number(item.ordem) : index,
+      createdAt: item?.createdAt || "", updatedAt: item?.updatedAt || ""
+    };
+  }).filter((item) => item.nome && item.status !== "excluido");
 }
 
 function normalizeVagasTrabalho(items, legacy = null) {
@@ -2551,7 +2587,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, servicos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -2605,7 +2641,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
+  const masterPermissions = { dados: true, destaque: true, vagas: true, imagens: true, cardapio: true, produtos: true, servicos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -6203,9 +6239,11 @@ function resetClientForm() {
   state.clientMenuImages = [];
   state.clientPromocoes = [];
   state.clientProdutos = [];
+  state.clientServicos = [];
   state.clientVagas = [];
   state.clientPromoEditIndex = null;
   state.clientProductEditIndex = null;
+  state.clientServiceEditIndex = null;
   $("clientForm").reset();
   delete $("clientForm").dataset.originalCategory;
   delete $("clientForm").dataset.originalClientId;
@@ -6238,6 +6276,7 @@ function resetClientForm() {
   renderClientMenuPreview();
   renderClientPromocoesPreview();
   renderClientProdutosPreview();
+  renderClientServicosPreview();
   renderMasterClientJobsPreview();
   setAllClientSectionsExpanded(false);
   setClientFocusMode(false);
@@ -6309,6 +6348,8 @@ function getClientFormData() {
     menuImages: normalizeUrlList(state.clientMenuImages),
     promocoes: normalizePromocoes(state.clientPromocoes),
     produtos: normalizeProdutos(state.clientProdutos),
+    servicosHabilitados: Boolean($("clientServicesEnabled")?.checked),
+    servicos: normalizeServicos(state.clientServicos, id),
     vagaAtiva: Boolean($("clientJobActive")?.checked),
     vagaTitulo: $("clientJobTitle")?.value.trim() || "",
     vagaCargo: $("clientJobTitle")?.value.trim() || "",
@@ -6768,6 +6809,9 @@ function fillClientForm(client) {
   state.clientMenuImages = normalizeUrlList(client.menuImages);
   state.clientPromocoes = normalizePromocoes(client.promocoes);
   state.clientProdutos = normalizeProdutos(client.produtos);
+  state.clientServicos = normalizeServicos(client.servicos, client.id);
+  if ($("clientServicesEnabled")) $("clientServicesEnabled").checked = client.servicosHabilitados === true;
+  state.clientServiceEditIndex = null;
   state.clientVagas = normalizeVagasTrabalho(client.vagasTrabalho, client);
   state.clientPromoEditIndex = null;
   state.clientProductEditIndex = null;
@@ -6788,6 +6832,7 @@ function fillClientForm(client) {
   renderClientMenuPreview();
   renderClientPromocoesPreview();
   renderClientProdutosPreview();
+  renderClientServicosPreview();
   renderMasterClientJobsPreview();
   setClientFocusMode(true);
 }
@@ -7098,6 +7143,77 @@ function validarProdutoVitrine(prefix, scope = document) {
   return true;
 }
 
+
+const SERVICE_FIELD_SUFFIXES = ["Name","Category","ShortDescription","FullDescription","Icon","Tags","ImageUrl","PriceType","Price","PriceTo","BillingUnit","PriceNote","Location","Areas","TravelFee","Duration","Deadline","Schedule","Included","Excluded","Materials","ClientProvides","Warranty","Notes","Link","Whatsapp","WhatsappMessage","Status","Order"];
+
+function clearServiceFields(prefix, scope = document) {
+  SERVICE_FIELD_SUFFIXES.forEach((suffix) => { const field = scope.querySelector(`#${prefix}Service${suffix}`); if (field) field.value = suffix === "PriceType" ? "sob_consulta" : (suffix === "Status" ? "ativo" : ""); });
+  const appointment = scope.querySelector(`#${prefix}ServiceAppointment`); if (appointment) appointment.checked = false;
+  const featured = scope.querySelector(`#${prefix}ServiceFeatured`); if (featured) featured.checked = false;
+  const upload = scope.querySelector(`#${prefix}ServiceImageUpload`); if (upload) upload.value = "";
+  updateServicePriceFields(prefix, scope); updateServiceImagePreview(prefix, scope);
+}
+
+function fillServiceFields(prefix, service = {}, scope = document) {
+  const values = { Name: service.nome, Category: service.categoria, ShortDescription: service.descricaoCurta, FullDescription: service.descricaoCompleta, Icon: service.icone, Tags: service.tags, ImageUrl: service.imagem, PriceType: service.tipoPreco || "sob_consulta", Price: service.preco, PriceTo: service.precoAte, BillingUnit: service.unidadeCobranca, PriceNote: service.observacaoPreco, Location: service.localAtendimento, Areas: service.areasAtendidas, TravelFee: service.taxaDeslocamento, Duration: service.duracao, Deadline: service.prazoExecucao, Schedule: service.horarios, Included: service.itensInclusos, Excluded: service.itensNaoInclusos, Materials: service.materiais, ClientProvides: service.clienteFornece, Warranty: service.garantia, Notes: service.observacoes, Link: service.link, Whatsapp: service.whatsapp, WhatsappMessage: service.mensagemWhatsapp, Status: service.status || "ativo", Order: service.ordem };
+  Object.entries(values).forEach(([suffix, value]) => { const field = scope.querySelector(`#${prefix}Service${suffix}`); if (field) field.value = value ?? ""; });
+  const appointment = scope.querySelector(`#${prefix}ServiceAppointment`); if (appointment) appointment.checked = service.precisaAgendamento === true;
+  const featured = scope.querySelector(`#${prefix}ServiceFeatured`); if (featured) featured.checked = service.destaque === true;
+  updateServicePriceFields(prefix, scope); updateServiceImagePreview(prefix, scope);
+}
+
+function readServiceFields(prefix, scope = document, fallbackId = "", clienteId = "") {
+  const get = (suffix) => scope.querySelector(`#${prefix}Service${suffix}`)?.value.trim() || "";
+  const tipoPreco = get("PriceType") || "sob_consulta";
+  return { id: fallbackId || `servico-${Date.now()}`, clienteId, nome: get("Name"), categoria: get("Category"), descricaoCurta: get("ShortDescription"), descricaoCompleta: get("FullDescription"), imagem: get("ImageUrl"), imagens: get("ImageUrl") ? [get("ImageUrl")] : [], icone: get("Icon"), tags: get("Tags"), tipoPreco, preco: ["fixo","a_partir","faixa"].includes(tipoPreco) ? get("Price") : "", precoAte: tipoPreco === "faixa" ? get("PriceTo") : "", unidadeCobranca: get("BillingUnit"), observacaoPreco: get("PriceNote"), localAtendimento: get("Location"), areasAtendidas: get("Areas"), taxaDeslocamento: get("TravelFee"), precisaAgendamento: Boolean(scope.querySelector(`#${prefix}ServiceAppointment`)?.checked), duracao: get("Duration"), prazoExecucao: get("Deadline"), horarios: get("Schedule"), itensInclusos: get("Included"), itensNaoInclusos: get("Excluded"), materiais: get("Materials"), clienteFornece: get("ClientProvides"), garantia: get("Warranty"), observacoes: get("Notes"), link: get("Link"), whatsapp: get("Whatsapp"), mensagemWhatsapp: get("WhatsappMessage"), status: get("Status") || "ativo", ativo: (get("Status") || "ativo") !== "inativo", destaque: Boolean(scope.querySelector(`#${prefix}ServiceFeatured`)?.checked), ordem: Number(get("Order") || 0) };
+}
+
+function validateServiceFields(prefix, scope = document) {
+  const name = scope.querySelector(`#${prefix}ServiceName`); if (!name?.value.trim()) { showToast("Informe o nome do servi\u00e7o."); name?.focus(); return false; }
+  const tipo = scope.querySelector(`#${prefix}ServicePriceType`)?.value || "sob_consulta";
+  const price = scope.querySelector(`#${prefix}ServicePrice`); if (["fixo","a_partir","faixa"].includes(tipo) && !price?.value.trim()) { showToast("Informe o valor do servi\u00e7o."); price?.focus(); return false; }
+  const priceTo = scope.querySelector(`#${prefix}ServicePriceTo`); if (tipo === "faixa" && !priceTo?.value.trim()) { showToast("Informe o valor final da faixa."); priceTo?.focus(); return false; }
+  for (const suffix of ["ImageUrl","Link"]) { const field = scope.querySelector(`#${prefix}Service${suffix}`); const value = field?.value.trim() || ""; if (value && !/^https?:\/\//i.test(value)) { showToast("Informe uma URL v\u00e1lida iniciando com http:// ou https://."); field.focus(); return false; } }
+  const whatsapp = scope.querySelector(`#${prefix}ServiceWhatsapp`); if (whatsapp?.value.trim() && whatsapp.value.replace(/\D/g, "").length < 10) { showToast("Informe um WhatsApp v\u00e1lido com DDD."); whatsapp.focus(); return false; }
+  return true;
+}
+
+function updateServicePriceFields(prefix, scope = document) {
+  const tipo = scope.querySelector(`#${prefix}ServicePriceType`)?.value || "sob_consulta";
+  scope.querySelector(`[data-${prefix.toLowerCase()}-service-price-field], #${prefix}ServicePrice`)?.closest("label")?.classList.toggle("hidden", !["fixo","a_partir","faixa"].includes(tipo));
+  scope.querySelector(`[data-${prefix.toLowerCase()}-service-price-to-field], #${prefix}ServicePriceTo`)?.closest("label")?.classList.toggle("hidden", tipo !== "faixa");
+}
+
+function updateServiceImagePreview(prefix, scope = document) {
+  const box = scope.querySelector(`#${prefix}ServiceImagePreview`); if (!box) return;
+  const url = scope.querySelector(`#${prefix}ServiceImageUrl`)?.value.trim() || "";
+  box.innerHTML = url ? `<img src="${escapeAttr(displayImageUrl(url))}" alt="Pr\u00e9via da imagem do servi\u00e7o" ${imageFallbackAttr()}>` : `<span>Nenhuma imagem selecionada</span>`;
+}
+
+function servicePriceLabel(service = {}) {
+  if (service.tipoPreco === "gratuito") return "Gratuito"; if (service.tipoPreco === "fixo") return service.preco ? `R$ ${service.preco}` : "Pre\u00e7o fixo"; if (service.tipoPreco === "a_partir") return service.preco ? `A partir de R$ ${service.preco}` : "A partir de"; if (service.tipoPreco === "faixa") return service.preco && service.precoAte ? `R$ ${service.preco} a R$ ${service.precoAte}` : "Faixa de pre\u00e7o"; return "Sob consulta";
+}
+
+function renderServicosAdminMarkup(items, prefix = "service") {
+  const list = normalizeServicos(items); if (!list.length) return `<div class="list-meta">Nenhum servi\u00e7o cadastrado ainda.</div>`;
+  return list.map((service, index) => `<article class="promo-admin-item service-admin-item ${service.status === "inativo" ? "is-inactive" : ""}">
+    + `${service.imagem ? `<img src="${escapeAttr(displayImageUrl(service.imagem))}" alt="" ${lazyImageAttrs()} ${imageFallbackAttr()}>` : `<div class="promo-admin-empty"><i class="${escapeAttr(service.icone || "fa-solid fa-screwdriver-wrench")}"></i></div>`}
+    + `<div><strong>${escapeHtml(service.nome)}</strong><span>${escapeHtml([service.categoria, servicePriceLabel(service)].filter(Boolean).join(" &bull; "))}</span><small>${service.status === "inativo" ? "Inativo" : "Ativo"}${service.destaque ? " ? Destaque" : ""} ? Ordem ${service.ordem}</small></div>
+    + `<div class="promo-admin-actions"><button type="button" data-${prefix}-preview="${index}" class="ghost-mini"><i class="fa-solid fa-eye"></i></button><button type="button" data-${prefix}-up="${index}" class="ghost-mini" aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-${prefix}-down="${index}" class="ghost-mini" aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button><button type="button" data-${prefix}-toggle="${index}" class="ghost-mini">${service.status === "inativo" ? "Ativar" : "Inativar"}</button><button type="button" data-${prefix}-duplicate="${index}" class="ghost-mini"><i class="fa-solid fa-copy"></i></button><button type="button" data-${prefix}-edit="${index}" class="ghost-mini"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" data-${prefix}-remove="${index}" class="danger-mini"><i class="fa-solid fa-trash"></i></button></div></article>`).join("");
+}
+
+function previewServiceAdmin(service = {}) {
+  document.querySelector(".service-preview-modal")?.remove(); const modal = document.createElement("div"); modal.className = "confirm-modal service-preview-modal";
+  modal.innerHTML = `<div class="confirm-dialog"><button type="button" class="service-preview-close" aria-label="Fechar">&times;</button>${service.imagem ? `<img class="service-preview-hero" src="${escapeAttr(displayImageUrl(service.imagem))}" alt="">` : ""}<span class="feature-kicker">${escapeHtml(service.categoria || "Servi\u00e7o")}</span><h3>${escapeHtml(service.nome || "Pr\u00e9via do servi\u00e7o")}</h3><strong class="service-preview-price">${escapeHtml(servicePriceLabel(service))}</strong><p>${escapeHtml(service.descricaoCurta || service.descricaoCompleta || "Sem descri\u00e7\u00e3o informada.")}</p></div>`;
+  const close = () => modal.remove(); modal.addEventListener("click", (event) => { if (event.target === modal || event.target.closest(".service-preview-close")) close(); }); document.body.appendChild(modal);
+}
+
+async function uploadSelectedServiceImage(prefix, scope, clientId) {
+  const input = scope.querySelector(`#${prefix}ServiceImageUpload`); const target = scope.querySelector(`#${prefix}ServiceImageUrl`); const file = input?.files?.[0]; if (!file || !target) return target?.value || "";
+  if (!/^image\/(jpeg|png|webp|gif)$/i.test(file.type || "") || file.size > 8 * 1024 * 1024) { showToast("Use imagem JPG, PNG, WEBP ou GIF de at? 8 MB."); input.value = ""; return target.value; }
+  const id = clientId || `cliente-${Date.now()}`; const path = `clientes/${id}/servicos/${Date.now()}-${slugify(file.name || "servico")}`;
+  setBusy(input, true); try { const url = await uploadFileWithProgress(storageRef(storage, path), file, "Enviando imagem do servi\u00e7o", file.name || "imagem"); target.value = url; updateServiceImagePreview(prefix, scope); return url; } finally { input.value = ""; setBusy(input, false); }
+}
 function clearJobFields(prefix, scope = document) {
   ["Title", "Salary", "Schedule", "ValidUntil", "Place", "Contact", "Description", "Requirements", "Apply"].forEach((suffix) => {
     const field = scope.querySelector(`#${prefix}Job${suffix}`);
@@ -7320,6 +7436,36 @@ function renderClientProdutosPreview() {
   });
 }
 
+
+function bindServiceAdminList(box, items, { prefix = "client-service", onChange, onEdit } = {}) {
+  const persist = async (message) => { if (onChange) await onChange(message); };
+  box.querySelectorAll(`[data-${prefix}-edit]`).forEach((button) => button.addEventListener("click", () => onEdit?.(Number(button.dataset[`${prefix.replace(/-([a-z])/g, (_, c) => c.toUpperCase())}Edit`]))));
+  const indexFor = (button, action) => Number(button.getAttribute(`data-${prefix}-${action}`));
+  box.querySelectorAll(`[data-${prefix}-preview]`).forEach((button) => button.addEventListener("click", () => previewServiceAdmin(items[indexFor(button, "preview")] || {})));
+  box.querySelectorAll(`[data-${prefix}-toggle]`).forEach((button) => button.addEventListener("click", async () => { const item = items[indexFor(button, "toggle")]; if (!item) return; item.status = item.status === "inativo" ? "ativo" : "inativo"; item.ativo = item.status === "ativo"; await persist("Status do servi\u00e7o atualizado."); }));
+  box.querySelectorAll(`[data-${prefix}-duplicate]`).forEach((button) => button.addEventListener("click", async () => { const index = indexFor(button, "duplicate"); const item = items[index]; if (!item) return; const now = Date.now(); items.splice(index + 1, 0, { ...item, id: `servico-${now}`, nome: `${item.nome} (c\u00f3pia)`, destaque: false, createdAt: now, updatedAt: now }); await persist("Servi\u00e7o duplicado."); }));
+  box.querySelectorAll(`[data-${prefix}-remove]`).forEach((button) => button.addEventListener("click", async () => { const index = indexFor(button, "remove"); const item = items[index]; if (!item || !(await confirmarExclusao(item.nome, "servi\u00e7o"))) return; items.splice(index, 1); await persist("Servi\u00e7o removido."); }));
+  ["up","down"].forEach((action) => box.querySelectorAll(`[data-${prefix}-${action}]`).forEach((button) => button.addEventListener("click", async () => { const index = indexFor(button, action); const target = action === "up" ? index - 1 : index + 1; if (index < 0 || target < 0 || target >= items.length) return; [items[index], items[target]] = [items[target], items[index]]; items.forEach((item, order) => { item.ordem = order; }); await persist("Ordem dos servi\u00e7os atualizada."); })));
+}
+
+function renderClientServicosPreview() {
+  const box = $("clientServicesPreview"); const count = $("clientServicesCount"); if (!box || !count) return;
+  state.clientServicos = normalizeServicos(state.clientServicos, $("clientId")?.value || ""); count.textContent = `${state.clientServicos.length} servi\u00e7o${state.clientServicos.length === 1 ? "" : "s"}`;
+  box.innerHTML = renderServicosAdminMarkup(state.clientServicos, "client-service");
+  bindServiceAdminList(box, state.clientServicos, { prefix: "client-service", onChange: async (message) => { renderClientServicosPreview(); const saved = await persistClientServicosIfEditing(message); if (!saved) showToast(`${message} Salve o cliente para gravar.`); }, onEdit: (index) => { const item = state.clientServicos[index]; if (!item) return; state.clientServiceEditIndex = index; fillServiceFields("client", item); $("addClientServiceButton").innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Salvar altera\u00e7\u00f5es`; $("cancelClientServiceEditButton")?.classList.remove("hidden"); $("clientServiceName")?.focus(); } });
+}
+
+async function persistClientServicosIfEditing(message = "Servi\u00e7os salvos.") {
+  if (!canManageClients() || !state.selectedClientId) return false; const client = state.clientes.find((item) => item.id === state.selectedClientId) || {}; const targetId = client.id || state.selectedClientId;
+  const servicos = normalizeServicos(state.clientServicos, targetId); const servicosHabilitados = Boolean($("clientServicesEnabled")?.checked);
+  await update(ref(db, `clientes/${targetId}`), { servicos, servicosHabilitados, origem: "painel", editadoNoPainel: true, updatedAt: serverTimestamp(), updatedBy: state.user?.uid || "" });
+  upsertClientInState(targetId, { ...client, servicos, servicosHabilitados }); showToast(message); return true;
+}
+
+async function addClientService() {
+  if (!validateServiceFields("client", document)) return; const button = $("addClientServiceButton"); if (button?.disabled) return; setBusy(button, true);
+  try { const clientId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`; await uploadSelectedServiceImage("client", document, clientId); const index = Number.isInteger(state.clientServiceEditIndex) ? state.clientServiceEditIndex : -1; const current = index >= 0 ? state.clientServicos[index] : null; const payload = readServiceFields("client", document, current?.id || `servico-${Date.now()}`, clientId); const now = Date.now(); payload.createdAt = current?.createdAt || now; payload.updatedAt = now; if (current) state.clientServicos[index] = payload; else state.clientServicos.push(payload); state.clientServiceEditIndex = null; clearServiceFields("client"); button.innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar servi\u00e7o`; $("cancelClientServiceEditButton")?.classList.add("hidden"); renderClientServicosPreview(); const saved = await persistClientServicosIfEditing(current ? "Servi\u00e7o atualizado e salvo." : "Servi\u00e7o adicionado e salvo."); if (!saved) showToast("Servi\u00e7o preparado. Salve o cliente para gravar."); } finally { setBusy(button, false); }
+}
 async function persistClientProdutosIfEditing(message = "Produtos salvos.") {
   if (!canManageClients() || !state.selectedClientId) return false;
   const client = state.clientes.find((item) => item.id === state.selectedClientId) || null;
@@ -19628,6 +19774,23 @@ function renderStaffPromocoesView() {
     });
   });
 }
+function serviceAdminFormHtml(prefix) {
+  return `<div class="promo-admin-form service-admin-form">
+    <p class="promo-required-note wide"><span class="required-mark">*</span> Campo obrigat\u00f3rio</p>
+    <label>Nome do servi\u00e7o <span class="required-mark">*</span><input id="${prefix}ServiceName" maxlength="120"></label><label>Categoria<input id="${prefix}ServiceCategory" maxlength="80"></label>
+    <label class="wide">Descri\u00e7\u00e3o curta<textarea id="${prefix}ServiceShortDescription" rows="2" maxlength="220"></textarea></label><label class="wide">Descri\u00e7\u00e3o completa<textarea id="${prefix}ServiceFullDescription" rows="4" maxlength="3000"></textarea></label>
+    <label>\u00cdcone<input id="${prefix}ServiceIcon" placeholder="fa-solid fa-screwdriver-wrench"></label><label>Tags para busca<input id="${prefix}ServiceTags" placeholder="instala\u00e7\u00e3o, limpeza"></label>
+    <label>Imagem<input id="${prefix}ServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif"></label><label>URL da imagem<input id="${prefix}ServiceImageUrl" type="url" placeholder="https://..."></label><div id="${prefix}ServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
+    <div class="form-section-title wide"><i class="fa-solid fa-money-bill-wave"></i><div><strong>Pre\u00e7o e cobran\u00e7a</strong><span>Como o valor ser\u00e1 exibido.</span></div></div>
+    <label>Forma de pre\u00e7o<select id="${prefix}ServicePriceType"><option value="sob_consulta">Sob consulta</option><option value="fixo">Pre\u00e7o fixo</option><option value="a_partir">A partir de</option><option value="faixa">Faixa de pre\u00e7o</option><option value="gratuito">Gratuito</option></select></label><label>Valor inicial<input id="${prefix}ServicePrice" inputmode="decimal"></label><label>Valor final<input id="${prefix}ServicePriceTo" inputmode="decimal"></label><label>Unidade<input id="${prefix}ServiceBillingUnit" placeholder="por hora"></label><label class="wide">Observa\u00e7\u00e3o do pre\u00e7o<input id="${prefix}ServicePriceNote"></label>
+    <div class="form-section-title wide"><i class="fa-solid fa-location-dot"></i><div><strong>Atendimento</strong><span>Onde, quando e como o servi\u00e7o \u00e9 realizado.</span></div></div>
+    <label>Local<select id="${prefix}ServiceLocation"><option value="">N\u00e3o informar</option><option>No estabelecimento</option><option>No endere\u00e7o do cliente</option><option>Online</option><option>Estabelecimento e domic\u00edlio</option></select></label><label>\u00c1reas atendidas<input id="${prefix}ServiceAreas"></label><label>Taxa de deslocamento<input id="${prefix}ServiceTravelFee"></label><label class="checkbox-line"><input id="${prefix}ServiceAppointment" type="checkbox"> Precisa de agendamento</label><label>Dura\u00e7\u00e3o<input id="${prefix}ServiceDuration"></label><label>Prazo<input id="${prefix}ServiceDeadline"></label><label class="wide">Hor\u00e1rios<input id="${prefix}ServiceSchedule"></label>
+    <label class="wide">Itens inclusos<textarea id="${prefix}ServiceIncluded" rows="3"></textarea></label><label class="wide">Itens n\u00e3o inclusos<textarea id="${prefix}ServiceExcluded" rows="3"></textarea></label><label class="wide">Materiais utilizados<textarea id="${prefix}ServiceMaterials" rows="2"></textarea></label><label class="wide">O cliente precisa fornecer<textarea id="${prefix}ServiceClientProvides" rows="2"></textarea></label><label>Garantia<input id="${prefix}ServiceWarranty"></label><label class="wide">Observa\u00e7\u00f5es<textarea id="${prefix}ServiceNotes" rows="3"></textarea></label>
+    <label>Link externo<input id="${prefix}ServiceLink" type="url"></label><label>WhatsApp espec\u00edfico<input id="${prefix}ServiceWhatsapp" inputmode="tel"></label><label class="wide">Mensagem do WhatsApp<textarea id="${prefix}ServiceWhatsappMessage" rows="2"></textarea></label><label>Status<select id="${prefix}ServiceStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label><label class="checkbox-line"><input id="${prefix}ServiceFeatured" type="checkbox"> Servi\u00e7o em destaque</label><label>Ordem<input id="${prefix}ServiceOrder" type="number" min="0"></label>
+    <div class="promo-form-actions wide"><button id="${prefix}AddServiceButton" type="button"><i class="fa-solid fa-plus"></i> Adicionar servi\u00e7o</button><button id="${prefix}PreviewServiceButton" type="button" class="ghost-button"><i class="fa-solid fa-eye"></i> Pr\u00e9-visualizar</button><button id="${prefix}CancelServiceEditButton" type="button" class="ghost-button hidden">Cancelar edi\u00e7\u00e3o</button></div>
+  </div>`;
+}
+
 function renderClientOnlyEditor() {
   const mount = $("clientOnlyMount");
   const client = state.clientes.find((item) => item.id === state.profile?.clienteId);
@@ -19644,12 +19807,14 @@ function renderClientOnlyEditor() {
   const menuImages = normalizeUrlList(client.menuImages);
   const promocoes = normalizePromocoes(client.promocoes);
   const produtos = normalizeProdutos(client.produtos);
+  const servicos = normalizeServicos(client.servicos, client.id);
   const vagasTrabalho = normalizeVagasTrabalho(client.vagasTrabalho, client);
   const canEditDados = hasPermission("dados");
   const canEditImages = hasPermission("imagens");
   const canEditVagas = hasPermission("vagas");
   const canEditCardapio = hasPermission("cardapio");
   const canEditProdutos = hasPermission("produtos");
+  const canEditServicos = client.servicosHabilitados === true && (hasPermission("servicos") || hasPermission("produtos"));
   const canEditPromocoes = hasPermission("promocoes");
   const canGeneratePromoImages = hasPermission("gerar_imagens_promocoes");
   const canEditDestaque = hasPermission("destaque") || hasPermission("dados");
@@ -19661,10 +19826,11 @@ function renderClientOnlyEditor() {
     .sort((a, b) => String(a.nome || a.name || "").localeCompare(String(b.nome || b.name || ""), "pt-BR"));
   const clientWhatsappGroup = clientWhatsappGroups.find((item) => item.id === state.selectedClientWhatsappGroupId) || {};
   const clientWhatsappGroupId = clientWhatsappGroup.id || "";
-  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditProdutos || canEditPromocoes || canGeneratePromoImages || canEditDestaque || canEditWhatsappGroups;
+  const hasAnyClientEditPermission = canEditDados || canEditVagas || canEditImages || canEditCardapio || canEditProdutos || canEditServicos || canEditPromocoes || canGeneratePromoImages || canEditDestaque || canEditWhatsappGroups;
   const hasAnyClientModule = true;
   let coPromoEditIndex = -1;
   let coProductEditIndex = -1;
+  let coServiceEditIndex = -1;
   let coJobEditIndex = -1;
   const setCoPromoEditMode = (index = -1) => {
     coPromoEditIndex = index;
@@ -19699,6 +19865,11 @@ function renderClientOnlyEditor() {
     }
     $("coCancelProductEditButton")?.classList.toggle("hidden", !editing);
   };
+  const setCoServiceEditMode = (index = -1) => {
+    coServiceEditIndex = index; const editing = index >= 0; const button = $("coAddServiceButton");
+    if (button) button.innerHTML = editing ? `<i class="fa-solid fa-floppy-disk"></i> Salvar altera\u00e7\u00f5es` : `<i class="fa-solid fa-plus"></i> Adicionar servi\u00e7o`;
+    $("coCancelServiceEditButton")?.classList.toggle("hidden", !editing);
+  };
   const clientModuleGroups = [
     {
       label: "Perfil e aparência",
@@ -19712,6 +19883,7 @@ function renderClientOnlyEditor() {
       label: "Vendas e divulgação",
       items: [
         { id: "client-module-produtos", icon: "fa-solid fa-box-open", label: "Produtos", show: canEditProdutos },
+        { id: "client-module-servicos", icon: "fa-solid fa-screwdriver-wrench", label: "Servi\u00e7os oferecidos", show: canEditServicos },
         { id: "client-module-promocoes", icon: "fa-solid fa-tags", label: "Promoções", show: canEditPromocoes },
         { id: "client-module-destaque", icon: "fa-solid fa-star", label: "Destaque da semana", show: canEditDestaque }
       ]
@@ -19953,6 +20125,13 @@ function renderClientOnlyEditor() {
           <div id="coProductsPreview" class="promo-admin-list">
             ${renderProdutosMarkup(produtos)}
           </div>
+        </section>
+      ` : ""}
+      ${canEditServicos ? `
+        <section id="client-module-servicos" class="wide upload-panel client-feature-card feature-servicos client-module-panel">
+          <div class="section-head compact feature-card-head"><div><span class="feature-kicker">Atendimentos</span><h3>Servi\u00e7os oferecidos</h3><p>Cadastre e organize os servi\u00e7os exibidos no perfil p\u00fablico.</p></div><span class="badge">${servicos.length} servi\u00e7o${servicos.length === 1 ? "" : "s"}</span></div>
+          ${serviceAdminFormHtml("co")}
+          <div id="coServicesPreview" class="promo-admin-list service-admin-list">${renderServicosAdminMarkup(servicos, "co-service")}</div>
         </section>
       ` : ""}
       ${canEditPromocoes ? `
@@ -20363,6 +20542,23 @@ function renderClientOnlyEditor() {
     state.pendingClientModuleTarget = "client-module-produtos";
     renderClientOnlyEditor();
   });
+
+  const persistCoServices = async (message) => {
+    await update(ref(db, `clientes/${client.id}`), { servicos: normalizeServicos(servicos, client.id), servicosHabilitados: true, origem: "painel", editadoNoPainel: true, updatedAt: serverTimestamp(), updatedBy: state.user.uid });
+    showToast(message); await loadAllData(); state.pendingClientModuleTarget = "client-module-servicos"; renderClientOnlyEditor();
+  };
+  mount.querySelector("#coAddServiceButton")?.addEventListener("click", async () => {
+    if (!validateServiceFields("co", mount)) return; const button = mount.querySelector("#coAddServiceButton"); if (button.disabled) return; setBusy(button, true);
+    try { await uploadSelectedServiceImage("co", mount, client.id); const current = coServiceEditIndex >= 0 ? servicos[coServiceEditIndex] : null; const service = readServiceFields("co", mount, current?.id || `servico-${Date.now()}`, client.id); const now = Date.now(); service.createdAt = current?.createdAt || now; service.updatedAt = now; if (current) servicos[coServiceEditIndex] = service; else servicos.push(service); await persistCoServices(current ? "Servi\u00e7o atualizado." : "Servi\u00e7o adicionado."); } finally { setBusy(button, false); }
+  });
+  mount.querySelector("#coPreviewServiceButton")?.addEventListener("click", () => previewServiceAdmin(readServiceFields("co", mount, "", client.id)));
+  mount.querySelector("#coCancelServiceEditButton")?.addEventListener("click", () => { clearServiceFields("co", mount); setCoServiceEditMode(-1); });
+  mount.querySelector("#coServicePriceType")?.addEventListener("change", () => updateServicePriceFields("co", mount));
+  mount.querySelector("#coServiceImageUrl")?.addEventListener("input", () => updateServiceImagePreview("co", mount));
+  mount.querySelector("#coServiceImageUpload")?.addEventListener("change", () => uploadSelectedServiceImage("co", mount, client.id));
+  updateServicePriceFields("co", mount); updateServiceImagePreview("co", mount);
+  const coServicesBox = mount.querySelector("#coServicesPreview");
+  if (coServicesBox) bindServiceAdminList(coServicesBox, servicos, { prefix: "co-service", onChange: persistCoServices, onEdit: (index) => { const item = servicos[index]; if (!item) return; fillServiceFields("co", item, mount); setCoServiceEditMode(index); mount.querySelector("#coServiceName")?.scrollIntoView({ behavior: "smooth", block: "center" }); } });
 
   mount.querySelector("#coAddPromoButton")?.addEventListener("click", async () => {
     const title = $("coPromoTitle").value.trim();
@@ -20882,6 +21078,10 @@ function renderClientOnlyEditor() {
     }
     if (canEditProdutos) {
       payload.produtos = normalizeProdutos(produtos);
+    }
+    if (canEditServicos) {
+      payload.servicosHabilitados = true;
+      payload.servicos = normalizeServicos(servicos, client.id);
     }
     if (canEditDestaque) {
       const destaqueAtivo = Boolean($("coFeaturedWeek")?.checked);
@@ -21994,6 +22194,14 @@ function bindEvents() {
     $("addClientProductButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar produto`;
     $("cancelClientProductEditButton")?.classList.add("hidden");
   });
+  $("addClientServiceButton")?.addEventListener("click", addClientService);
+  $("previewClientServiceButton")?.addEventListener("click", () => previewServiceAdmin(readServiceFields("client", document, "", $("clientId")?.value || "")));
+  $("cancelClientServiceEditButton")?.addEventListener("click", () => { state.clientServiceEditIndex = null; clearServiceFields("client"); $("addClientServiceButton").innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar servi\u00e7o`; $("cancelClientServiceEditButton")?.classList.add("hidden"); });
+  $("clientServicePriceType")?.addEventListener("change", () => updateServicePriceFields("client"));
+  $("clientServiceImageUrl")?.addEventListener("input", () => updateServiceImagePreview("client"));
+  $("clientServiceImageUpload")?.addEventListener("change", async () => {
+    await uploadSelectedServiceImage("client", document, $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`);
+  });
   ["clientFeaturedWeek", "clientFeaturedWeeks", "clientFeaturedBilling"].forEach((id) => {
     $(id)?.addEventListener("input", refreshClientFeaturedSummary);
     $(id)?.addEventListener("change", refreshClientFeaturedSummary);
@@ -22008,6 +22216,7 @@ function bindEvents() {
     const targetId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
     await uploadSelectedProductImages("clientProductImageUpload", "clientProductImageUrl", targetId);
   });
+  updateServicePriceFields("client");
   $("newEventButton").addEventListener("click", () => {
     resetEventForm();
     openFormForEdit("eventForm");

@@ -9176,3 +9176,11 @@ button.admin-button-loading::after {
 .report-live-badge > i { width: 8px; height: 8px; border-radius: 50%; background: #1fb86a; box-shadow: 0 0 0 0 rgba(31, 184, 106, .42); animation: report-live-pulse 1.8s infinite; }
 @keyframes report-live-pulse { 70% { box-shadow: 0 0 0 7px rgba(31, 184, 106, 0); } 100% { box-shadow: 0 0 0 0 rgba(31, 184, 106, 0); } }
 @media (max-width: 560px) { .report-live-actions { width: 100%; justify-content: space-between; } .report-live-actions .ghost-button { flex: 1; } }
+
+/* Servicos oferecidos */
+.service-enable-toggle{display:flex;gap:12px;align-items:flex-start;padding:14px;border:1px solid #bae6fd;border-radius:14px;background:#f0f9ff;margin:8px 0 16px}.service-enable-toggle input{margin-top:4px}.service-enable-toggle span{display:grid;gap:3px}.service-enable-toggle small{color:#475569}
+.service-admin-form{margin-top:12px}.service-image-preview{min-height:112px;border:1px dashed #94a3b8;border-radius:12px;display:grid;place-items:center;background:#f8fafc;overflow:hidden}.service-image-preview img{width:100%;max-height:220px;object-fit:contain;background:#fff}.service-image-preview span{color:#64748b}
+.service-admin-item{grid-template-columns:72px minmax(0,1fr) auto}.service-admin-item>img,.service-admin-item>.promo-admin-empty{width:72px;height:72px;border-radius:12px;object-fit:cover}.service-admin-item.is-inactive{opacity:.68}.service-admin-item .promo-admin-actions{flex-wrap:wrap;justify-content:flex-end}
+.service-preview-modal .confirm-dialog{position:relative;max-width:560px;text-align:left}.service-preview-close{position:absolute;right:12px;top:8px;border:0;background:transparent;color:#334155;font-size:28px}.service-preview-hero{width:100%;max-height:260px;object-fit:contain;border-radius:14px;background:#f8fafc;margin-bottom:14px}.service-preview-price{display:block;color:#0369a1;font-size:1.2rem;margin:8px 0}
+.feature-servicos{border-top:4px solid #0ea5e9}
+@media(max-width:720px){.service-admin-item{grid-template-columns:58px minmax(0,1fr)}.service-admin-item>img,.service-admin-item>.promo-admin-empty{width:58px;height:58px}.service-admin-item .promo-admin-actions{grid-column:1/-1;justify-content:flex-start}.service-admin-form{grid-template-columns:1fr}}
