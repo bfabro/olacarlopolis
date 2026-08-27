@@ -26710,7 +26710,7 @@ body.eventos-image-open { overflow: hidden; }
   }
 }
 
-/* ===== Painel da Represa de Chavantes v419 ===== */
+/* ===== Painel da Represa de Chavantes v420 ===== */
 .represa-dashboard {
   width: 100%;
   max-width: 1080px;
@@ -26945,7 +26945,7 @@ body.eventos-image-open { overflow: hidden; }
 .represa-dashboard .represa-note p + p { margin-top: 2px; color: #688096; }
 
 .represa-dashboard .represa-history-panel {
-  margin: 0 24px;
+  margin: 16px 0 0;
   padding: 20px;
   border-color: #dbe7f3;
   border-radius: 18px;
@@ -27072,7 +27072,7 @@ body.eventos-image-open { overflow: hidden; }
   .represa-dashboard .info-box dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
   .represa-dashboard .info-box dl div { display: block; }
   .represa-dashboard .represa-note { margin: 0 12px 13px; }
-  .represa-dashboard .represa-history-panel { margin: 0 12px; padding: 14px 11px; }
+  .represa-dashboard .represa-history-panel { margin: 12px 0 0; padding: 14px 11px; }
   .represa-history-chart-title { align-items: flex-start; flex-direction: column; }
   .represa-dashboard .represa-history-chart,
   .represa-dashboard .represa-history-chart svg { min-width: 620px; }

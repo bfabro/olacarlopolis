@@ -3002,24 +3002,6 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visu
     </tr>
   `).join('');
   box.innerHTML = `
-    <div class="represa-history-summary">
-      <div><span>Dias monitorados</span><strong>${dadosDiarios.length}</strong></div>
-      <div><span>Cota atual</span><strong>${Number.isFinite(cotaAtual) ? cotaAtual.toFixed(2) + ' m' : '-'}</strong></div>
-      <div><span>Cota média no período</span><strong>${Number.isFinite(cotaMedia) ? cotaMedia.toFixed(2) + ' m' : '-'}</strong></div>
-      <div class="represa-summary-status status-${statusAtual.id}"><span>Situação atual</span><strong><i></i>${statusAtual.nome}</strong><small>${statusAtual.descricao}</small></div>
-      <div><span>Mínima / máxima</span><strong>${cotaMin.toFixed(2)} / ${cotaMax.toFixed(2)} m</strong></div>
-      <div class="represa-history-trend ${tendenciaClasse}"><span>${tendenciaTexto}</span><strong><i class="fa-solid ${tendenciaIcone}"></i> ${Number.isFinite(variacao) ? `${variacao > 0 ? '+' : ''}${variacao.toFixed(2)} m` : '-'}</strong></div>
-    </div>
-    <div class="represa-level-reference">
-      <div class="represa-level-reference-head">
-        <div><strong><i class="fa-solid fa-layer-group"></i> Faixas operacionais da cota</strong><span>Referência para entender se o nível está normal, baixo ou próximo do máximo.</span></div>
-        <a href="https://www.gov.br/ana/pt-br/legislacao/resolucoes/resolucoes-regulatorias/2022/132" target="_blank" rel="noopener noreferrer">Fonte: ANA</a>
-      </div>
-      <div class="represa-level-reference-scroll">
-        <table><thead><tr><th>Situação</th><th>Cota da água</th><th>Interpretação</th></tr></thead><tbody>${legendaFaixas}</tbody></table>
-      </div>
-      <p><i class="fa-solid fa-circle-info"></i> A cota é a altitude da superfície da água. Ela não representa a profundidade da represa, e sua variação não é linear ao volume útil.</p>
-    </div>
     <div class="represa-history-chart-card">
       <div class="represa-history-chart-title">
         <div><strong>${tituloVisualizacao}</strong><span>${descricaoVisualizacao}</span></div>
@@ -3042,6 +3024,24 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visu
         </div>
       </div>
       <div class="represa-chart-foot"><span><i class="fa-solid fa-gauge-high"></i> Volume médio: <strong>${Number.isFinite(volumeMedio) ? volumeMedio.toFixed(2) + '%' : 'não informado'}</strong></span><span><i class="fa-solid fa-calendar-check"></i> Coleta automática diária</span></div>
+    </div>
+    <div class="represa-history-summary">
+      <div><span>Dias monitorados</span><strong>${dadosDiarios.length}</strong></div>
+      <div><span>Cota atual</span><strong>${Number.isFinite(cotaAtual) ? cotaAtual.toFixed(2) + ' m' : '-'}</strong></div>
+      <div><span>Cota média no período</span><strong>${Number.isFinite(cotaMedia) ? cotaMedia.toFixed(2) + ' m' : '-'}</strong></div>
+      <div class="represa-summary-status status-${statusAtual.id}"><span>Situação atual</span><strong><i></i>${statusAtual.nome}</strong><small>${statusAtual.descricao}</small></div>
+      <div><span>Mínima / máxima</span><strong>${cotaMin.toFixed(2)} / ${cotaMax.toFixed(2)} m</strong></div>
+      <div class="represa-history-trend ${tendenciaClasse}"><span>${tendenciaTexto}</span><strong><i class="fa-solid ${tendenciaIcone}"></i> ${Number.isFinite(variacao) ? `${variacao > 0 ? '+' : ''}${variacao.toFixed(2)} m` : '-'}</strong></div>
+    </div>
+    <div class="represa-level-reference">
+      <div class="represa-level-reference-head">
+        <div><strong><i class="fa-solid fa-layer-group"></i> Faixas operacionais da cota</strong><span>Referência para entender se o nível está normal, baixo ou próximo do máximo.</span></div>
+        <a href="https://www.gov.br/ana/pt-br/legislacao/resolucoes/resolucoes-regulatorias/2022/132" target="_blank" rel="noopener noreferrer">Fonte: ANA</a>
+      </div>
+      <div class="represa-level-reference-scroll">
+        <table><thead><tr><th>Situação</th><th>Cota da água</th><th>Interpretação</th></tr></thead><tbody>${legendaFaixas}</tbody></table>
+      </div>
+      <p><i class="fa-solid fa-circle-info"></i> A cota é a altitude da superfície da água. Ela não representa a profundidade da represa, e sua variação não é linear ao volume útil.</p>
     </div>
     <div class="represa-history-table-wrap">
       <table class="represa-history-table">
@@ -28365,7 +28365,7 @@ async function obterDadosHistoricos() {
 // Atualize a função carregarDadosRepresa:
 // Função para carregar dados REAIS da represa (CTG via proxy sem CORS)
 // === NOVO: URL do seu endpoint (troque pelo seu domínio do Vercel) ===
-// Represa de Chavantes v542
+// Represa de Chavantes v543
 const API_REPRESA = 'https://olacarlopolis.vercel.app/api/represa/chavantes';
 const REPRESA_HISTORICO_KEY = 'ola_carlopolis_represa_chavantes_historico_v1';
 const REPRESA_HISTORICO_FIREBASE_REST = 'https://contadoracessos-default-rtdb.firebaseio.com/represas/chavantes/historico';
@@ -28554,6 +28554,16 @@ function mostrarRepresaChavantes() {
 
        
 
+        <div class="represa-actions">
+          <button type="button" class="btn-refresh"><i class="fas fa-rotate"></i> Atualizar dados</button>
+          <a href="https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/"
+             target="_blank"
+             class="btn-external">
+            <i class="fas fa-external-link-alt"></i> Site Oficial
+          </a>
+        </div>
+      </div>
+
         <section class="represa-history-panel">
           <div class="represa-history-head">
             <div>
@@ -28586,16 +28596,6 @@ function mostrarRepresaChavantes() {
             <div class="represa-history-empty">Carregando historico...</div>
           </div>
         </section>
-
-        <div class="represa-actions">
-          <button type="button" class="btn-refresh"><i class="fas fa-rotate"></i> Atualizar dados</button>
-          <a href="https://www.ctgbr.com.br/operacoes/energia-hidreletrica/niveis-de-reservatorios/" 
-             target="_blank" 
-             class="btn-external">
-            <i class="fas fa-external-link-alt"></i> Site Oficial
-          </a>
-        </div>
-      </div>
     </div>
   `;
 
