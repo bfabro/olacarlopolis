@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 674,
-  label: "v681",
+  numero: 675,
+  label: "v682",
   data: "2026-08-27",
-  nota: "Galeria de serviços, pré-visualização em modal e melhorias de organização no painel."
+  nota: "Pré-visualização pública em modal e refinamentos responsivos dos serviços."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -7216,11 +7216,13 @@ function previewServiceAdmin(service = {}) {
   document.querySelector(".service-preview-modal")?.remove();
   const modal = document.createElement("div");
   const imagens = normalizeServiceImagesInput([service.imagem, ...(Array.isArray(service.imagens) ? service.imagens : [])]);
+  const previewDetails = [["Local de atendimento", service.localAtendimento], ["\u00c1reas atendidas", service.areasAtendidas], ["Taxa de deslocamento", service.taxaDeslocamento], ["Agendamento", service.precisaAgendamento ? "Necess\u00e1rio" : ""], ["Dura\u00e7\u00e3o", service.duracao], ["Prazo de execu\u00e7\u00e3o", service.prazoExecucao], ["Hor\u00e1rios", service.horarios], ["Itens inclusos", service.itensInclusos], ["Itens n\u00e3o inclusos", service.itensNaoInclusos], ["Materiais", service.materiais], ["O cliente fornece", service.clienteFornece], ["Garantia", service.garantia]].filter((entry) => entry[1]);
+  const previewDetailsMarkup = previewDetails.length ? '<div class="service-preview-details">' + previewDetails.map((entry) => '<div class="' + ((/Itens|Materiais|cliente fornece/i.test(entry[0]) || String(entry[1]).length > 80) ? "is-wide" : "") + '"><span>' + escapeHtml(entry[0]) + '</span><strong>' + escapeHtml(entry[1]) + '</strong></div>').join("") + '</div>' : "";
   const imageMarkup = imagens.length
     ? '<div class="service-preview-gallery"><img class="service-preview-hero" data-service-preview-image src="' + escapeAttr(displayImageUrl(imagens[0])) + '" alt="' + escapeAttr(service.nome || "Servi\u00e7o") + '">' + (imagens.length > 1 ? '<button type="button" class="service-preview-gallery-nav previous" data-service-preview-previous aria-label="Imagem anterior"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="service-preview-gallery-nav next" data-service-preview-next aria-label="Pr\u00f3xima imagem"><i class="fa-solid fa-chevron-right"></i></button><span class="service-preview-gallery-count" data-service-preview-count>1/' + imagens.length + '</span>' : '') + '</div>'
-    : '';
+    : '<div class="service-preview-empty"><i class="' + escapeAttr(service.icone || "fa-solid fa-screwdriver-wrench") + '"></i><span>Servi\u00e7o sem imagem</span></div>';
   modal.className = "confirm-modal service-preview-modal";
-  modal.innerHTML = '<div class="confirm-dialog"><button type="button" class="service-preview-close" aria-label="Fechar">&times;</button>' + imageMarkup + '<span class="feature-kicker">' + escapeHtml(service.categoria || "Servi\u00e7o") + '</span><h3>' + escapeHtml(service.nome || "Pr\u00e9via do servi\u00e7o") + '</h3><strong class="service-preview-price">' + escapeHtml(servicePriceLabel(service)) + '</strong><p>' + escapeHtml(service.descricaoCurta || service.descricaoCompleta || "Sem descri\u00e7\u00e3o informada.") + '</p></div>';
+  modal.innerHTML = '<section class="service-preview-public-card" role="dialog" aria-modal="true" aria-label="Pr\u00e9-visualiza\u00e7\u00e3o do servi\u00e7o"><button type="button" class="service-preview-close" aria-label="Fechar">&times;</button><div class="service-preview-public-media">' + imageMarkup + '</div><div class="service-preview-public-content"><span class="feature-kicker">' + escapeHtml(service.categoria || "Servi\u00e7o") + '</span><h2>' + escapeHtml(service.nome || "Pr\u00e9via do servi\u00e7o") + '</h2><strong class="service-preview-price">' + escapeHtml(servicePriceLabel(service)) + (service.unidadeCobranca ? ' <small>' + escapeHtml(service.unidadeCobranca) + '</small>' : "") + '</strong>' + (service.observacaoPreco ? '<p class="service-preview-price-note">' + escapeHtml(service.observacaoPreco) + '</p>' : "") + '<p class="service-preview-description">' + escapeHtml(service.descricaoCompleta || service.descricaoCurta || "Sem descri\u00e7\u00e3o informada.") + '</p>' + previewDetailsMarkup + '</div></section>';
   let imageIndex = 0;
   const showImage = (nextIndex) => {
     if (!imagens.length) return;

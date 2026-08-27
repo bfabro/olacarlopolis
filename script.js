@@ -4597,7 +4597,11 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         }
 
         // 👉 MINI CARROSSEL: troca automática das imagens desse estabelecimento
-        if (imagens.length > 1) {
+        modal.querySelectorAll(".loja-servico-details > div").forEach((row) => {
+      const label = row.querySelector("span")?.textContent || ""; const value = row.querySelector("strong")?.textContent || "";
+      if (/Itens|Materiais|cliente fornece/i.test(label) || value.length > 80) row.classList.add("is-wide");
+    });
+    if (imagens.length > 1) {
           const imgTag = card.querySelector(".card-divulgacao-img-wrap img");
           let idx = imagens.indexOf(imagemInicial);
           if (idx < 0) idx = 0;
@@ -10168,6 +10172,10 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
     const details = [["Local de atendimento", item.localAtendimento],["\u00c1reas atendidas", item.areasAtendidas],["Taxa de deslocamento", item.taxaDeslocamento],["Agendamento", item.precisaAgendamento ? "Necess\u00e1rio" : ""],["Dura\u00e7\u00e3o", item.duracao],["Prazo de execu\u00e7\u00e3o", item.prazoExecucao],["Hor\u00e1rios", item.horarios],["Itens inclusos", item.itensInclusos],["Itens n\u00e3o inclusos", item.itensNaoInclusos],["Materiais", item.materiais],["O cliente fornece", item.clienteFornece],["Garantia", item.garantia]].filter(([, value]) => value);
     const whatsapp = whatsappServicoPublico(item); const modal = document.createElement("div"); modal.className = "imovel-detalhes-modal loja-servico-modal";
     modal.innerHTML = `<section class="imovel-detalhes-dialog loja-servico-dialog" role="dialog" aria-modal="true" aria-label="${escapePromoHtml(item.nome)}"><div class="loja-servico-modal-media">${item.imagem ? `<img src="${escapePromoHtml(item.imagem)}" alt="${escapePromoHtml(item.nome)}">` : `<i class="${escapePromoHtml(item.icone || "fa-solid fa-screwdriver-wrench")}"></i>`}</div><div class="imovel-detalhes-conteudo"><div class="loja-produto-modal-actions"><button type="button" class="item-modal-share" data-item-modal-share aria-label="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button><button type="button" class="imovel-detalhes-fechar" aria-label="Fechar">&times;</button></div><span class="feature-kicker">${escapePromoHtml(item.categoria || "Servi\u00e7o")}</span><h2>${escapePromoHtml(item.nome)}</h2><strong class="loja-servico-modal-price">${escapePromoHtml(precoServicoPublico(item))}${item.unidadeCobranca ? ` <small>${escapePromoHtml(item.unidadeCobranca)}</small>` : ""}</strong>${item.observacaoPreco ? `<p class="loja-servico-price-note">${escapePromoHtml(item.observacaoPreco)}</p>` : ""}${item.descricaoCompleta || item.descricaoCurta ? `<section class="imovel-detalhes-descricao"><p>${escapePromoHtml(item.descricaoCompleta || item.descricaoCurta)}</p></section>` : ""}${details.length ? `<div class="loja-servico-details">${details.map(([label,value]) => `<div><span>${escapePromoHtml(label)}</span><strong>${escapePromoHtml(value)}</strong></div>`).join("")}</div>` : ""}${item.observacoes ? `<p>${escapePromoHtml(item.observacoes)}</p>` : ""}<div class="loja-servico-modal-actions-bottom">${whatsapp ? `<a class="auto-whatsapp-button" data-service-whatsapp href="${escapePromoHtml(whatsapp)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Solicitar or\u00e7amento</a>` : ""}${item.link ? `<a class="loja-servico-link" href="${escapePromoHtml(item.link)}" target="_blank" rel="noopener noreferrer">Abrir link <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : ""}</div></div></section>`;
+    modal.querySelectorAll(".loja-servico-details > div").forEach((row) => {
+      const label = row.querySelector("span")?.textContent || ""; const value = row.querySelector("strong")?.textContent || "";
+      if (/Itens|Materiais|cliente fornece/i.test(label) || value.length > 80) row.classList.add("is-wide");
+    });
     if (imagens.length > 1) {
       const media = modal.querySelector(".loja-servico-modal-media");
       const image = media?.querySelector("img");
