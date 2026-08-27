@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 670,
-  label: "v677",
+  numero: 671,
+  label: "v678",
   data: "2026-08-27",
-  nota: "Relatório completo de acessos do menu lateral e das ações na tela de Loterias."
+  nota: "Atualização em tempo real dos acessos ao menu e das interações na tela de Loterias."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -5972,7 +5972,10 @@ function switchView(name) {
     switchView(initialViewForProfile());
     return;
   }
-  if (target !== "relatorioAcessos") cancelAccessReportViewLoading();
+  if (target !== "relatorioAcessos") {
+    cancelAccessReportViewLoading();
+    stopAccessReportRealtime();
+  }
   document.querySelectorAll(".nav-admin button.admin-button-loading").forEach((button) => {
     button.classList.remove("admin-button-loading");
   });
@@ -16210,6 +16213,10 @@ const ACCESS_METRICS_CACHE_TTL_MS = 2 * 60 * 1000;
 const ACCESS_METRICS_CACHE_MAX_PERIODS = 4;
 const accessMetricsRangeCache = new Map();
 const accessMetricsRefreshPromises = new Map();
+const ACCESS_REPORT_REALTIME_KEYS = ["cliquesMenu", "cliquesPorMenuDetalhado", "loterias"];
+let accessReportRealtimeUnsubscribers = [];
+let accessReportRealtimeSignature = "";
+let accessReportRealtimeRenderTimer = null;
 
 function accessMetricsRangeKey(range = getReportDateRange()) {
   return `${range.start}|${range.end}`;
@@ -16218,6 +16225,60 @@ function accessMetricsRangeKey(range = getReportDateRange()) {
 function applyAccessMetrics(metrics = {}) {
   Object.keys(ACCESS_METRIC_PATHS).forEach((key) => {
     state.metricas[key] = metrics[key] || {};
+  });
+}
+
+function stopAccessReportRealtime() {
+  accessReportRealtimeUnsubscribers.forEach((unsubscribe) => {
+    try { unsubscribe(); } catch (error) { console.warn("Nao foi possivel encerrar a atualizacao em tempo real.", error); }
+  });
+  accessReportRealtimeUnsubscribers = [];
+  accessReportRealtimeSignature = "";
+  if (accessReportRealtimeRenderTimer) clearTimeout(accessReportRealtimeRenderTimer);
+  accessReportRealtimeRenderTimer = null;
+}
+
+function scheduleAccessReportRealtimeRender() {
+  if (accessReportRealtimeRenderTimer) clearTimeout(accessReportRealtimeRenderTimer);
+  accessReportRealtimeRenderTimer = setTimeout(() => {
+    accessReportRealtimeRenderTimer = null;
+    const mount = $("reportsAccessMount");
+    if (!mount || $("relatorioAcessosView")?.classList.contains("hidden") || state.reportSection !== "analytics") return;
+    const expandedSections = [...mount.querySelectorAll('[data-finance-report-toggle][aria-expanded="true"]')]
+      .map((button) => button.closest("[data-finance-report-section]")?.dataset.financeReportSection)
+      .filter(Boolean);
+    renderReports("access");
+    requestAnimationFrame(() => {
+      expandedSections.forEach((sectionId) => {
+        const selector = '[data-finance-report-section="' + sectionId + '"] [data-finance-report-toggle]';
+        const button = $("reportsAccessMount")?.querySelector(selector);
+        if (button?.getAttribute("aria-expanded") !== "true") button?.click();
+      });
+    });
+  }, 120);
+}
+
+function startAccessReportRealtime(range = getReportDateRange()) {
+  if (!isMaster() || state.reportSection !== "analytics" || $("relatorioAcessosView")?.classList.contains("hidden")) {
+    stopAccessReportRealtime();
+    return;
+  }
+  const signature = accessMetricsRangeKey(range);
+  if (signature === accessReportRealtimeSignature && accessReportRealtimeUnsubscribers.length) return;
+  stopAccessReportRealtime();
+  accessReportRealtimeSignature = signature;
+  accessReportRealtimeUnsubscribers = ACCESS_REPORT_REALTIME_KEYS.map((key) => {
+    const periodQuery = query(ref(db, ACCESS_METRIC_PATHS[key]), orderByKey(), startAt(range.start), endAt(range.end));
+    return onValue(periodQuery, (snapshot) => {
+      const value = snapshot.exists() ? snapshot.val() : {};
+      state.metricas[key] = value;
+      const cached = accessMetricsRangeCache.get(signature);
+      if (cached) {
+        cached.metrics[key] = value;
+        cached.loadedAt = Date.now();
+      }
+      scheduleAccessReportRealtimeRender();
+    }, (error) => console.warn("Atualizacao em tempo real indisponivel para " + key + ".", error));
   });
 }
 
@@ -16629,6 +16690,7 @@ function renderReports(reportType = "") {
   if (!isMaster()) state.reportSection = "analytics";
   const periodRange = getReportDateRange();
   if (!isFinanceReport && isMaster() && state.reportSection === "actions") {
+    stopAccessReportRealtime();
     renderUserActionReport(mount, periodRange);
     bindReportControls(mount);
     return;
@@ -16822,7 +16884,7 @@ function renderReports(reportType = "") {
             ? "Faturamento, pagamentos, pendências, planos e comprovantes dos clientes."
             : "Indicadores do site, cliques, origem dos acessos e comportamento dos usuarios."}</p>
         </div>
-        ${isFinanceReport ? "" : `<button type="button" class="ghost-button" data-no-loading data-refresh-access-metrics><i class="fa-solid fa-rotate"></i> Atualizar dados</button>`}
+        ${isFinanceReport ? "" : `<div class="report-live-actions"><span class="report-live-badge"><i></i> Tempo real</span><button type="button" class="ghost-button" data-no-loading data-refresh-access-metrics><i class="fa-solid fa-rotate"></i> Atualizar dados</button></div>`}
       </div>
     </section>
     <section class="panel-card report-period-card">
@@ -17024,6 +17086,7 @@ function renderReports(reportType = "") {
     };
     await applyReportFilterWithLoading(event.currentTarget, isFinanceReport ? "finance" : "access", applyRange);
   });
+  if (!isFinanceReport) startAccessReportRealtime(periodRange);
 }
 
 function renderPaymentSettings() {
@@ -22828,6 +22891,7 @@ onAuthStateChanged(auth, async (user) => {
     stopAdminIdleTimer();
     clearAdminIdlePauseReasons();
     stopClientMetricsRealtime();
+    stopAccessReportRealtime();
     stopOnlinePresenceMonitor();
     stopBenefitsRealtime();
     stopAuthenticatedClientPresence();

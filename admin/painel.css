@@ -9169,3 +9169,10 @@ button.admin-button-loading::after {
 .lottery-access-table td:nth-child(-n+2) { text-align: left !important; }
 .report-table-tag { display: inline-flex; align-items: center; min-height: 24px; padding: 3px 8px; border-radius: 999px; color: #1767aa; background: #eaf4ff; font-size: .68rem; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; }
 .menu-access-table tbody tr:hover, .lottery-access-table tbody tr:hover { background: #f8fbff; }
+
+/* Indicador de atualizacao em tempo real dos relatorios - v413 */
+.report-live-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
+.report-live-badge { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 6px 10px; border: 1px solid #bfe7d0; border-radius: 999px; color: #167247; background: #effcf5; font-size: .72rem; font-weight: 850; }
+.report-live-badge > i { width: 8px; height: 8px; border-radius: 50%; background: #1fb86a; box-shadow: 0 0 0 0 rgba(31, 184, 106, .42); animation: report-live-pulse 1.8s infinite; }
+@keyframes report-live-pulse { 70% { box-shadow: 0 0 0 7px rgba(31, 184, 106, 0); } 100% { box-shadow: 0 0 0 0 rgba(31, 184, 106, 0); } }
+@media (max-width: 560px) { .report-live-actions { width: 100%; justify-content: space-between; } .report-live-actions .ghost-button { flex: 1; } }
