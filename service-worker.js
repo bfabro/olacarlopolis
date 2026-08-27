@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-26-loterias-direto-v723'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-27-loterias-historico-v724'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

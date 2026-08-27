@@ -1,11 +1,16 @@
-// Loterias publicas - v9
+// Loterias publicas - v10
 (() => {
   "use strict";
 
   const CACHE_KEY = "ola_carlopolis_loterias_cache_v4";
   const CACHE_TTL = 2 * 60 * 1000;
   const AUTO_REFRESH_MS = 60 * 1000;
+  const HISTORY_CACHE_TTL = 5 * 60 * 1000;
+  const HISTORY_DAYS = 30;
+  const HISTORY_BATCH_SIZE = 6;
+  const HISTORY_MAX_CONTESTS = 36;
   const CAIXA_DIRECT_BASE = "https://servicebus2.caixa.gov.br/portaldeloterias/api";
+  const HISTORY_FALLBACK_BASE = "https://loteriascaixa-api.herokuapp.com/api";
   const EXPECTED_NUMBERS = { megasena: 6, lotofacil: 15, quina: 5, lotomania: 20, timemania: 7, duplasena: 6, diadesorte: 7, supersete: 7, maismilionaria: 6, federal: 5 };
   const HOME_TITLE = document.title;
   const GAME_CONFIG = [
@@ -63,7 +68,7 @@
       rows: [["1 fração — extração regular", "R$ 4,00"], ["Bilhete inteiro — extração regular", "R$ 40,00"], ["1 fração — Enricou ou Natal", "R$ 10,00"], ["Bilhete inteiro — Enricou ou Natal", "R$ 100,00"]]
     }
   };
-  const state = { resultados: [], consultadoEm: "", stale: false, loading: false, open: false, filter: "todas", query: "", savedNodes: null, previousHash: "", lastTrigger: null, refreshTimer: null };
+  const state = { resultados: [], consultadoEm: "", stale: false, loading: false, open: false, filter: "todas", query: "", savedNodes: null, previousHash: "", lastTrigger: null, refreshTimer: null, historyCache: new Map() };
   let originalDescription = "";
 
   const esc = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char]));
@@ -125,6 +130,31 @@
     const data = await response.json().catch(() => null);
     if (!response.ok || !data) throw new Error(`CAIXA HTTP ${response.status}`);
     return normalizeDirectResult(data);
+  }
+
+  function normalizeHistoryFallback(data, slug) {
+    if (!data || typeof data !== "object") return null;
+    const dezenas = Array.isArray(data.dezenas) ? data.dezenas : [];
+    return {
+      ...data,
+      numero: data.numero ?? data.concurso,
+      dataApuracao: data.dataApuracao ?? data.data,
+      listaDezenas: slug === "duplasena" && dezenas.length >= 12 ? dezenas.slice(0, 6) : data.listaDezenas ?? dezenas,
+      listaDezenasSegundoSorteio: slug === "duplasena" && dezenas.length >= 12 ? dezenas.slice(6, 12) : data.listaDezenasSegundoSorteio ?? data.dezenasSegundoSorteio ?? [],
+      nomeTimeCoracaoMesSorte: data.nomeTimeCoracaoMesSorte ?? data.timeCoracao ?? data.mesSorte ?? ""
+    };
+  }
+
+  async function fetchHistoryContest(slug, contest) {
+    try {
+      const official = await fetchCaixaDirect(`${slug}/${contest}`);
+      if (validDirectResult(official, slug)) return official;
+    } catch (error) { }
+    try {
+      const response = await fetch(`${HISTORY_FALLBACK_BASE}/${slug}/${contest}?t=${Date.now()}`, { cache: "no-store", mode: "cors", headers: { accept: "application/json" }, signal: AbortSignal.timeout(10000) });
+      const data = normalizeHistoryFallback(await response.json().catch(() => null), slug);
+      return response.ok && validDirectResult(data, slug) ? data : null;
+    } catch (error) { return null; }
   }
 
   async function fetchLatestValidDirect(slug, currentItem) {
@@ -269,7 +299,7 @@
       ${specialMarkup(data, config.slug)}
       ${item.stale ? `<p class="lottery-card-stale"><i class="fa-solid fa-clock-rotate-left"></i> Último resultado disponível</p>` : ""}
       <details class="lottery-rules"><summary><span><i class="fa-solid fa-circle-question"></i> Regras do jogo</span><i class="fa-solid fa-chevron-down lottery-rules-chevron"></i></summary><div><p>${esc(config.regra || "Consulte as regras oficiais desta modalidade nos canais das Loterias CAIXA.")}</p>${betPricesMarkup(config.slug)}</div></details>
-      <button type="button" class="lottery-details-button" data-lottery-details="${config.slug}">Ver detalhes <i class="fa-solid fa-arrow-right"></i></button>
+      <div class="lottery-card-actions"><button type="button" class="lottery-history-button" data-lottery-history="${config.slug}"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button><button type="button" class="lottery-details-button" data-lottery-details="${config.slug}">Ver detalhes <i class="fa-solid fa-arrow-right"></i></button></div>
     </article>`;
   }
 
@@ -298,6 +328,7 @@
   }
 
   function bindCardEvents(root) {
+    root.querySelectorAll("[data-lottery-history]").forEach((button) => button.addEventListener("click", () => openHistory(button.dataset.lotteryHistory, button)));
     root.querySelectorAll("[data-lottery-details]").forEach((button) => button.addEventListener("click", () => openDetails(button.dataset.lotteryDetails, button)));
     root.querySelectorAll("[data-lottery-retry]").forEach((button) => button.addEventListener("click", () => loadResults(true)));
   }
@@ -317,6 +348,77 @@
     const cities = Array.isArray(data.listaMunicipioUFGanhadores) ? data.listaMunicipioUFGanhadores.filter((item) => item?.municipio || item?.uf) : [];
     if (!cities.length) return "";
     return `<section class="lottery-detail-section"><h3>Cidades dos ganhadores</h3><div class="lottery-winner-cities">${cities.map((item) => `<span><i class="fa-solid fa-location-dot"></i>${esc([item.municipio, item.uf].filter(Boolean).join(" / "))}${item.serie ? ` • Série ${esc(item.serie)}` : ""}</span>`).join("")}</div></section>`;
+  }
+
+  function historyCutoffNumber() {
+    const cutoff = new Date(Date.now() - HISTORY_DAYS * 24 * 60 * 60 * 1000);
+    return brazilDateNumber(cutoff);
+  }
+
+  async function loadHistory(slug) {
+    const cached = state.historyCache.get(slug);
+    if (cached && Date.now() - cached.savedAt < HISTORY_CACHE_TTL) return cached.items;
+    const current = resultFor(slug)?.data;
+    const currentContest = number(current?.numero);
+    if (!currentContest) return [];
+    const cutoff = historyCutoffNumber();
+    const items = validDirectResult(current, slug) && resultDateNumber(current.dataApuracao) >= cutoff ? [current] : [];
+    let nextContest = currentContest - 1;
+    for (let loaded = 0; loaded < HISTORY_MAX_CONTESTS; loaded += HISTORY_BATCH_SIZE) {
+      const contestNumbers = Array.from({ length: HISTORY_BATCH_SIZE }, (_, index) => nextContest - index).filter((contest) => contest > 0);
+      const batch = await Promise.all(contestNumbers.map((contest) => fetchHistoryContest(slug, contest)));
+      let reachedCutoff = false;
+      batch.forEach((data) => {
+        if (!validDirectResult(data, slug)) return;
+        if (resultDateNumber(data.dataApuracao) < cutoff) reachedCutoff = true;
+        else if (!items.some((item) => number(item.numero) === number(data.numero))) items.push(data);
+      });
+      if (reachedCutoff || !contestNumbers.length) break;
+      nextContest -= HISTORY_BATCH_SIZE;
+    }
+    items.sort((a, b) => number(b.numero) - number(a.numero));
+    state.historyCache.set(slug, { savedAt: Date.now(), items });
+    return items;
+  }
+
+  function historyNumbersMarkup(data, slug) {
+    const main = Array.isArray(data.listaDezenas) ? data.listaDezenas : [];
+    const second = Array.isArray(data.listaDezenasSegundoSorteio) ? data.listaDezenasSegundoSorteio : [];
+    const trevos = Array.isArray(data.trevosSorteados) ? data.trevosSorteados : [];
+    const line = (values, extraClass = "") => `<div class="lottery-history-numbers ${slug === "federal" ? "is-federal" : ""} ${extraClass}">${values.map((value) => `<span>${esc(value)}</span>`).join("")}</div>`;
+    return `${line(main)}${second.length ? `<small>Segundo sorteio</small>${line(second, "is-second")}` : ""}${trevos.length ? `<small>Trevos</small>${line(trevos, "is-trevo")}` : ""}`;
+  }
+
+  function historyListMarkup(items, slug) {
+    if (!items.length) return `<div class="lottery-history-empty"><i class="fa-solid fa-calendar-xmark"></i><p>Nenhum sorteio foi encontrado nos últimos 30 dias.</p></div>`;
+    return `<div class="lottery-history-summary"><strong>${items.length}</strong><span>${items.length === 1 ? "sorteio encontrado" : "sorteios encontrados"} nos últimos 30 dias</span></div><div class="lottery-history-list">${items.map((data, index) => `<article class="lottery-history-item ${index === 0 ? "is-latest" : ""}"><div class="lottery-history-meta"><div><span>${index === 0 ? "Mais recente" : "Concurso"}</span><strong>${esc(data.numero)}</strong></div><time>${esc(dateFull(data.dataApuracao))}</time></div>${historyNumbersMarkup(data, slug)}${String(data.nomeTimeCoracaoMesSorte || "").replace(/\0/g, "").trim() ? `<p><i class="fa-solid fa-star"></i> ${esc(String(data.nomeTimeCoracaoMesSorte).replace(/\0/g, "").trim())}</p>` : ""}</article>`).join("")}</div>`;
+  }
+
+  async function openHistory(slug, trigger) {
+    const item = resultFor(slug);
+    if (!item?.data) return;
+    closeDetails(false);
+    state.lastTrigger = trigger || document.activeElement;
+    const config = gameConfig(slug);
+    const modal = document.createElement("div");
+    modal.className = "lottery-modal";
+    modal.dataset.lotteryModal = "true";
+    modal.dataset.lotteryHistoryModal = slug;
+    modal.innerHTML = `<section class="lottery-dialog lottery-history-dialog lottery-${slug}" role="dialog" aria-modal="true" aria-labelledby="lotteryHistoryTitle" tabindex="-1"><header><div><span>${esc(config.nome)}</span><h2 id="lotteryHistoryTitle">Histórico de sorteios</h2><p>Resultados realizados nos últimos 30 dias</p></div><button type="button" data-lottery-modal-close aria-label="Fechar histórico"><i class="fa-solid fa-xmark"></i></button></header><div class="lottery-dialog-body"><div class="lottery-history-loading"><i class="fa-solid fa-spinner fa-spin"></i><strong>Carregando histórico...</strong><span>Consultando os concursos anteriores na Caixa.</span></div></div></section>`;
+    document.body.appendChild(modal);
+    document.body.classList.add("lottery-modal-open");
+    modal.querySelector("[data-lottery-modal-close]")?.focus();
+    modal.querySelector("[data-lottery-modal-close]")?.addEventListener("click", () => closeDetails());
+    modal.addEventListener("click", (event) => { if (event.target === modal) closeDetails(); });
+    try {
+      const items = await loadHistory(slug);
+      const body = document.querySelector(`[data-lottery-history-modal="${slug}"] .lottery-dialog-body`);
+      if (body) body.innerHTML = historyListMarkup(items, slug);
+    } catch (error) {
+      const body = document.querySelector(`[data-lottery-history-modal="${slug}"] .lottery-dialog-body`);
+      if (body) body.innerHTML = `<div class="lottery-history-empty is-error"><i class="fa-solid fa-triangle-exclamation"></i><p>Não foi possível carregar o histórico agora.</p><button type="button" data-lottery-history-retry>Tentar novamente</button></div>`;
+      body?.querySelector("[data-lottery-history-retry]")?.addEventListener("click", () => openHistory(slug, trigger));
+    }
   }
 
   function openDetails(slug, trigger) {
@@ -390,7 +492,11 @@
     retry?.classList.add("is-loading");
     try {
       const payload = await fetchPayload(force);
+      const previousContests = new Map(state.resultados.map((item) => [item.slug, number(item.data?.numero)]));
       state.resultados = payload.resultados || [];
+      state.resultados.forEach((item) => {
+        if (previousContests.has(item.slug) && previousContests.get(item.slug) !== number(item.data?.numero)) state.historyCache.delete(item.slug);
+      });
       state.consultadoEm = payload.consultadoEm || new Date().toISOString();
       state.stale = Boolean(payload.stale);
       renderStatus();

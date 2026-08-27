@@ -1,4 +1,4 @@
-/* Loterias publicas - v6 */
+/* Loterias publicas - v8 */
 :root {
   --lottery-blue: #1267ad;
   --lottery-ink: #17324a;
@@ -147,8 +147,11 @@ body.lottery-modal-open { overflow: hidden; }
 .lottery-bet-prices.is-maismilionaria th:nth-child(4) { width: 45%; text-align: right; }
 .lottery-bet-prices.is-maismilionaria td:last-child { width: auto; text-align: right; }
 .lottery-bet-prices > small { display: block; margin-top: 7px; color: #718497; font-size: 9px; line-height: 1.4; }
-.lottery-rules + .lottery-details-button { margin-top: 0; }
-.lottery-details-button, .lottery-card.is-unavailable button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 42px; margin-top: auto; border: 0; border-radius: 11px; color: #fff; background: var(--game-color); font-weight: 850; cursor: pointer; }
+.lottery-card-actions { display: grid; grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); gap: 8px; margin-top: 0; }
+.lottery-details-button, .lottery-history-button, .lottery-card.is-unavailable button { display: inline-flex; align-items: center; justify-content: center; gap: 7px; width: 100%; min-width: 0; min-height: 42px; border-radius: 11px; font-weight: 850; cursor: pointer; }
+.lottery-details-button, .lottery-card.is-unavailable button { border: 0; color: #fff; background: var(--game-color); }
+.lottery-history-button { border: 1px solid color-mix(in srgb, var(--game-color) 38%, #dbe5ee); color: var(--game-color); background: var(--game-soft); }
+.lottery-history-button:hover { border-color: var(--game-color); }
 .lottery-card.is-unavailable { justify-content: center; min-height: 240px; }
 .lottery-card.is-unavailable > p { margin: 22px 0; color: var(--lottery-muted); text-align: center; }
 
@@ -210,6 +213,30 @@ body.lottery-modal-open { overflow: hidden; }
 .lottery-winner-cities { display: flex; flex-wrap: wrap; gap: 8px; }
 .lottery-winner-cities span { display: inline-flex; align-items: center; gap: 6px; padding: 8px 10px; border-radius: 999px; color: #3f596e; background: #eef4f8; font-size: 11px; }
 .lottery-detail-empty { color: var(--lottery-muted); }
+.lottery-history-dialog { width: min(980px, 100%); }
+.lottery-history-loading, .lottery-history-empty { display: grid; min-height: 280px; padding: 28px; color: var(--lottery-muted); text-align: center; place-items: center; align-content: center; gap: 8px; }
+.lottery-history-loading i, .lottery-history-empty i { color: var(--game-color); font-size: 30px; }
+.lottery-history-loading strong { color: var(--lottery-ink); font-size: 17px; }
+.lottery-history-loading span { font-size: 12px; }
+.lottery-history-summary { display: flex; align-items: center; gap: 10px; margin-bottom: 13px; padding: 11px 13px; border: 1px solid color-mix(in srgb, var(--game-color) 24%, #dbe5ee); border-radius: 12px; color: var(--lottery-muted); background: var(--game-soft); font-size: 12px; }
+.lottery-history-summary strong { display: grid; flex: 0 0 auto; min-width: 34px; height: 34px; border-radius: 10px; color: #fff; background: var(--game-color); font-size: 15px; place-items: center; }
+.lottery-history-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 11px; }
+.lottery-history-item { min-width: 0; padding: 13px; border: 1px solid var(--lottery-line); border-radius: 13px; background: #fff; }
+.lottery-history-item.is-latest { border-color: color-mix(in srgb, var(--game-color) 48%, #dbe5ee); background: color-mix(in srgb, var(--game-soft) 52%, #fff); box-shadow: 0 7px 18px rgba(30, 58, 80, .07); }
+.lottery-history-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.lottery-history-meta > div { display: flex; align-items: baseline; gap: 6px; }
+.lottery-history-meta span { color: var(--lottery-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.lottery-history-meta strong { color: var(--game-color); font-size: 18px; }
+.lottery-history-meta time { color: #4f6578; font-size: 11px; font-weight: 750; text-align: right; }
+.lottery-history-numbers { display: flex; flex-wrap: wrap; gap: 5px; }
+.lottery-history-numbers span { display: inline-grid; min-width: 31px; height: 31px; padding: 0 4px; border: 1px solid var(--game-color); border-radius: 50%; color: var(--game-color); background: #fff; font-size: 11px; font-weight: 900; place-items: center; }
+.lottery-history-numbers.is-federal span { min-width: 72px; border-radius: 8px; letter-spacing: .04em; }
+.lottery-history-item > small { display: block; margin: 9px 0 5px; color: var(--lottery-muted); font-size: 9px; font-weight: 800; text-transform: uppercase; }
+.lottery-history-numbers.is-second span { border-style: dashed; }
+.lottery-history-numbers.is-trevo span { border-radius: 8px; }
+.lottery-history-item > p { margin: 9px 0 0; color: var(--game-color); font-size: 11px; font-weight: 750; }
+.lottery-history-empty p { margin: 0; }
+.lottery-history-empty button { min-height: 40px; margin-top: 5px; padding: 0 14px; border: 0; border-radius: 10px; color: #fff; background: var(--game-color); font-weight: 850; cursor: pointer; }
 
 :where(.lottery-page, .lottery-modal) button:focus-visible,
 :where(.lottery-page, .lottery-modal) a:focus-visible,
@@ -251,6 +278,9 @@ body.lottery-modal-open { overflow: hidden; }
   .lottery-prize-row strong { grid-column: 1 / -1; }
   .lottery-prize-row span::before { display: block; color: var(--lottery-muted); content: attr(data-label); font-size: 9px; font-weight: 700; }
   .lottery-prize-row > span:nth-child(n+2) { text-align: right; }
+  .lottery-history-list { grid-template-columns: 1fr; }
+  .lottery-history-item { padding: 11px; }
+  .lottery-history-meta { align-items: flex-start; }
   .lottery-disclaimer { padding: 13px; }
 }
 
@@ -260,6 +290,8 @@ body.lottery-modal-open { overflow: hidden; }
   .lottery-next { border-top: 1px solid color-mix(in srgb, var(--game-color) 22%, #dbe5ee); border-left: 0; }
   .lottery-ball { min-width: 42px; height: 42px; padding: 0 6px; font-size: 15px; }
   .lottery-section-title h2 { font-size: 19px; }
+  .lottery-card-actions { grid-template-columns: 1fr; }
+  .lottery-history-button { min-height: 40px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
