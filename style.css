@@ -20650,6 +20650,11 @@ body.vaga-modal-open {
   --novidade-color: #7c3aed;
 }
 
+.novidade-feed-card.tipo-servico,
+.novidade-preview-modal.tipo-servico {
+  --novidade-color: #0284c7;
+}
+
 .novidade-feed-card.tipo-promocao,
 .novidade-preview-modal.tipo-promocao {
   --novidade-color: #f97316;

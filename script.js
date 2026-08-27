@@ -4822,6 +4822,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     const key = normalizeName(tipo || "");
     if (key.includes("promoc")) return "promoção";
     if (key.includes("produto")) return "produto";
+    if (key.includes("servico")) return "serviço";
     if (key.includes("imovel")) return "imóvel";
     if (key.includes("veiculo") || key.includes("automovel")) return "veículo";
     if (key.includes("evento")) return "evento";
@@ -4967,6 +4968,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     if (tipo.includes("imovel")) return { key: "imoveis", label: "Imóvel", icon: "fa-house" };
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
     if (tipo.includes("produto")) return { key: "produtos", label: "Produto", icon: "fa-box-open" };
+    if (tipo.includes("servico")) return { key: "servicos", label: "Serviço", icon: "fa-screwdriver-wrench" };
     if (tipo.includes("promoc")) return { key: "promocoes", label: "Promoção", icon: "fa-tag" };
     if (novidadeEhEvento(item)) return { key: "servicos", label: "Evento", icon: "fa-calendar-days" };
     if (tipo.includes("grupo") || tipo.includes("whatsapp")) return { key: "grupo-whatsapp", label: "Grupo WhatsApp", icon: "fa-user-group" };
@@ -5059,6 +5061,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     if (key.includes("imovel")) return "tipo-imovel";
     if (key.includes("veiculo") || key.includes("automovel")) return "tipo-veiculo";
     if (key.includes("produto")) return "tipo-produto";
+    if (key.includes("servico")) return "tipo-servico";
     if (key.includes("promoc")) return "tipo-promocao";
     if (key.includes("evento") || novidadeEhEvento(item || { tipo })) return "tipo-evento";
     if (key.includes("vaga")) return "tipo-veiculo";
@@ -5174,6 +5177,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         const acao = normalizeName(`${item.acao || ""} ${item.titulo || ""}`);
         if (acao.includes("preco")) return "preco";
         if (tipo.includes("produto")) return "produto";
+        if (tipo.includes("servico")) return "servico";
         if (tipo.includes("promoc")) return "promocao";
         if (tipo.includes("imovel")) return "imovel";
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return "automovel";
@@ -5197,6 +5201,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       const livePromoClients = new Set();
       const livePromoTitles = new Set();
       const liveProdutos = new Set();
+      const liveServicos = new Set();
       const liveAutomoveis = new Set();
       const liveImoveis = new Set();
       const liveEventos = new Set();
@@ -5310,6 +5315,55 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       } catch (e) { }
 
       try {
+        const clientesComServicos = window.__clientesPublicosCache || {};
+        Object.entries(clientesComServicos).forEach(([clienteId, cliente]) => {
+          const nomeCliente = cliente?.nome || cliente?.name || cliente?.nomeFantasia || clienteId;
+          const clienteKey = cliente?.nomeNormalizado || normalizeName(nomeCliente || clienteId);
+          if (!clienteEstaPublico(clienteId, clienteKey, nomeCliente)) return;
+          const estabelecimentoServico = {
+            ...(cliente || {}),
+            id: cliente?.id || clienteId,
+            clienteId,
+            nomeNormalizado: clienteKey,
+            name: nomeCliente,
+            nome: nomeCliente
+          };
+          servicosDoEstabelecimentoPublico(estabelecimentoServico).forEach((servico) => {
+            const servicoId = String(servico.id || "");
+            if (!servicoId) return;
+            liveServicos.add(servicoId);
+            liveServicos.add(clienteKey + "|" + servicoId);
+            const criadoMs = novidadeCidadeMs(servico.createdAt || servico.criadoEm || servico.dataCriacao);
+            const atualizadoMs = novidadeCidadeMs(servico.updatedAt || servico.atualizadoEm);
+            const dataMs = atualizadoMs || criadoMs;
+            if (!dataMs) return;
+            const atualizado = Boolean(atualizadoMs && criadoMs && atualizadoMs > criadoMs + 1000);
+            geradas.push(montarNovidadeRecord({
+              ...servico,
+              id: "servico-" + servicoId + "-" + clienteKey,
+              tipo: "servico",
+              titulo: atualizado ? "Serviço atualizado" : "Novo serviço cadastrado",
+              acao: atualizado ? "Serviço atualizado" : "Serviço inserido",
+              descricao: servico.descricaoCurta || servico.descricaoCompleta || (atualizado ? "Serviço atualizado" : "Serviço inserido"),
+              tituloConteudo: servico.nome || "Serviço disponível",
+              estabelecimento: nomeCliente,
+              imagem: servico.imagem || (servico.imagens && servico.imagens[0]) || "",
+              imagens: servico.imagens && servico.imagens.length ? servico.imagens : (servico.imagem ? [servico.imagem] : []),
+              dataCriacao: dataMs,
+              destinoTipo: "servico",
+              destinoId: clienteKey,
+              itemId: servicoId,
+              destinoCardId: novidadeDomId("servico", servicoId + "-" + clienteKey),
+              categoria: servico.categoria || cliente?.categoria || "",
+              valor: precoServicoPublico(servico),
+              clienteId,
+              whatsapp: servico.whatsapp || servico.contatoEmpresa || "",
+              telefone: servico.whatsapp || servico.contatoEmpresa || "",
+              link: servico.link || ""
+            }));
+          });
+        });
+
         const [autos, imoveis] = await Promise.all([carregarAutomoveisFirebase(), carregarImoveisFirebase()]);
         const autosPublicos = (autos || []).filter((auto) => clienteEstaPublico(auto.estabelecimentoId, auto.clienteId, auto.clienteNome, auto.vendedor, auto.loja));
         const imoveisPublicos = (imoveis || []).filter((imovel) => {
@@ -5412,6 +5466,11 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
           const itemId = String(item.raw?.itemId || item.itemId || "");
           if (itemId && liveProdutos.has(`${normalizeName(item.destinoId || "")}|${itemId}`)) return true;
           return itemId ? liveProdutos.has(itemId) : true;
+        }
+        if (tipo.includes("servico")) {
+          const itemId = String(item.raw?.itemId || item.itemId || "");
+          if (itemId && liveServicos.has(normalizeName(item.destinoId || "") + "|" + itemId)) return true;
+          return itemId ? liveServicos.has(itemId) : true;
         }
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return liveAutomoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("imovel")) return liveImoveis.has(String(item.destinoId || item.raw?.itemId || ""));
@@ -5638,6 +5697,10 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       add("fa-store", item.estabelecimento || item.raw?.estabelecimento, "Comércio");
       add("fa-tag", item.categoria || item.raw?.categoria, "Categoria");
       add("fa-clock", novidadeValorCampo(item, ["validade", "dataValidade"]) || "Oferta recente", "Validade");
+    } else if (tipo.includes("servico")) {
+      add("fa-store", item.estabelecimento || item.raw?.estabelecimento, "Responsável");
+      add("fa-screwdriver-wrench", item.categoria || item.raw?.categoria, "Categoria");
+      add("fa-location-dot", novidadeValorCampo(item, ["localAtendimento", "areasAtendidas"]) || "Consulte o atendimento", "Atendimento");
     } else if (tipo.includes("evento") || novidadeEhEvento(item)) {
       add("fa-calendar-days", novidadeValorCampo(item, ["data", "dataEvento", "date"]) || item.tituloConteudo, "Data");
       add("fa-location-dot", novidadeValorCampo(item, ["local", "endereco"]) || item.estabelecimento, "Local");
@@ -5662,6 +5725,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     if (key.includes("imovel")) return "fa-house";
     if (key.includes("veiculo") || key.includes("automovel")) return "fa-car";
     if (key.includes("promoc")) return "fa-tag";
+    if (key.includes("servico")) return "fa-screwdriver-wrench";
     if (key.includes("evento")) return "fa-calendar-days";
     return "fa-arrow-right";
   }
@@ -5830,6 +5894,24 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       if (id) {
         return navegarParaEstabelecimentoPublico(id);
       }
+    }
+    if (tipo.includes("servico")) {
+      const id = resolverClienteDestinoNovidadeProduto(item);
+      if (id) {
+        await Promise.resolve(navegarParaEstabelecimentoPublico(id));
+        window.setTimeout(() => {
+          const serviceId = String(item.itemId || item.raw?.itemId || "");
+          const container = document.getElementById(id) || document.querySelector('[data-id="' + CSS.escape(id) + '"]');
+          const tab = container?.querySelector('[data-target="servicos-' + CSS.escape(id) + '"]');
+          tab?.click();
+          window.setTimeout(() => {
+            const card = container?.querySelector('[data-loja-servico="' + CSS.escape(serviceId) + '"]');
+            destacarElementoNovidade(card);
+            card?.querySelector("[data-service-details]")?.click();
+          }, 180);
+        }, 420);
+      }
+      return;
     }
     if (tipo.includes("imovel")) {
       await Promise.resolve(mostrarImoveisV2());

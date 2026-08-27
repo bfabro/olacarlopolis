@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 675,
-  label: "v682",
+  numero: 676,
+  label: "v683",
   data: "2026-08-27",
-  nota: "Pré-visualização pública em modal e refinamentos responsivos dos serviços."
+  nota: "Serviços adicionados integrados à área pública de novidades."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -268,6 +268,7 @@ let state = {
 const AUDIT_IGNORED_ROOTS = new Set(["auditLogs", "auditoriaExclusoes", "novidades"]);
 const NOVIDADES_TOPICS = {
   produto: ["Produtos", "Novo produto ou atualizacao de item."],
+  servico: ["Serviços", "Novo serviço ou atualização de atendimento."],
   novoCliente: ["Novo cliente", "Cadastro de um novo comércio, serviço ou instituição."],
   nomeCliente: ["Nome do cliente", "Alteração do nome comercial."],
   dadosCliente: ["Informações do cliente", "Alteração de informações públicas do cadastro."],
@@ -6381,6 +6382,7 @@ function tituloConteudoNovidadeAdmin(tipo, payload = {}) {
   if (key.includes("veiculo") || key.includes("automovel")) return [payload.marca, payload.modelo, payload.ano].filter(Boolean).join(" ") || "Veiculo";
   if (key.includes("imovel")) return payload.titulo || payload.endereco || "Imovel";
   if (key.includes("produto")) return payload.titulo || payload.nome || "Produto";
+  if (key.includes("servico")) return payload.nome || payload.titulo || "Serviço";
   if (key.includes("promoc")) return payload.titulo || "Promocao";
   if (key.includes("evento")) return payload.titulo || payload.nome || "Evento";
   if (key.includes("vaga")) return payload.titulo || payload.vagaTitulo || payload.vagaCargo || "Vaga de trabalho";
@@ -6421,6 +6423,13 @@ function acaoNovidadeAdmin(tipo, isNew, payload = {}, original = {}) {
     if (antes > 0 && agora > 0 && agora !== antes) return "Preco do produto atualizado";
     return "Produto atualizado";
   }
+  if (key.includes("servico")) {
+    if (isNew) return "Serviço inserido";
+    const antes = numberFromMoney(original.preco || original.valor || "");
+    const agora = numberFromMoney(payload.preco || payload.valor || "");
+    if (antes > 0 && agora > 0 && agora !== antes) return "Preço do serviço atualizado";
+    return "Serviço atualizado";
+  }
   if (key.includes("vaga")) return isNew ? "Vaga de trabalho inserida" : "Vaga de trabalho atualizada";
   if (key.includes("evento")) return isNew ? "Evento inserido" : "Evento atualizado";
   if (key.includes("grupo")) return isNew ? "Novo grupo de WhatsApp criado" : "Grupo de WhatsApp atualizado";
@@ -6432,6 +6441,7 @@ function novidadeTopicFromPayload(payload = {}) {
   const tipo = normalizeName(payload.destinoTipo || payload.tipo || "");
   const acao = normalizeName(`${payload.acao || ""} ${payload.titulo || ""}`);
   if (acao.includes("preco")) return "preco";
+  if (tipo.includes("servico")) return "servico";
   if (tipo.includes("produto")) return "produto";
   if (tipo.includes("promoc")) return "promocao";
   if (tipo.includes("imovel")) return "imovel";
@@ -6533,6 +6543,15 @@ async function registrarNovidadeAdmin(payload = {}) {
       itemId,
       destinoCardId: payload.destinoCardId || "",
       link: payload.link || payload.url || "",
+      whatsapp: payload.whatsapp || "",
+      telefone: payload.telefone || payload.whatsapp || "",
+      localAtendimento: payload.localAtendimento || "",
+      areasAtendidas: payload.areasAtendidas || "",
+      duracao: payload.duracao || "",
+      prazoExecucao: payload.prazoExecucao || "",
+      unidadeCobranca: payload.unidadeCobranca || "",
+      observacaoPreco: payload.observacaoPreco || "",
+      precisaAgendamento: Boolean(payload.precisaAgendamento),
       novidadeTema,
       dataCriacao: serverTimestamp(),
       criadoPor: payload.criadoPor || state.user?.uid || "",
@@ -7525,9 +7544,44 @@ async function persistClientServicosIfEditing(message = "Servi\u00e7os salvos.")
 }
 
 async function addClientService() {
-  if (!validateServiceFields("client", document)) return; const button = $("addClientServiceButton"); if (button?.disabled) return; setBusy(button, true);
-  try { const clientId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`; await uploadSelectedServiceImage("client", document, clientId); const index = Number.isInteger(state.clientServiceEditIndex) ? state.clientServiceEditIndex : -1; const current = index >= 0 ? state.clientServicos[index] : null; const payload = readServiceFields("client", document, current?.id || `servico-${Date.now()}`, clientId); const now = Date.now(); payload.createdAt = current?.createdAt || now; payload.updatedAt = now; if (current) state.clientServicos[index] = payload; else state.clientServicos.push(payload); state.clientServiceEditIndex = null; clearServiceFields("client"); button.innerHTML = `<i class="fa-solid fa-plus"></i> Adicionar servi\u00e7o`; $("cancelClientServiceEditButton")?.classList.add("hidden"); renderClientServicosPreview(); const saved = await persistClientServicosIfEditing(current ? "Servi\u00e7o atualizado e salvo." : "Servi\u00e7o adicionado e salvo."); if (!saved) showToast("Servi\u00e7o preparado. Salve o cliente para gravar."); } finally { setBusy(button, false); }
+  if (!validateServiceFields("client", document)) return;
+  const button = $("addClientServiceButton");
+  if (button?.disabled) return;
+  setBusy(button, true);
+  try {
+    const clientId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || "cliente-" + Date.now();
+    await uploadSelectedServiceImage("client", document, clientId);
+    const index = Number.isInteger(state.clientServiceEditIndex) ? state.clientServiceEditIndex : -1;
+    const current = index >= 0 ? state.clientServicos[index] : null;
+    const payload = readServiceFields("client", document, current?.id || "servico-" + Date.now(), clientId);
+    const now = Date.now();
+    payload.createdAt = current?.createdAt || now;
+    payload.updatedAt = now;
+    if (current) state.clientServicos[index] = payload;
+    else state.clientServicos.push(payload);
+    state.clientServiceEditIndex = null;
+    clearServiceFields("client");
+    button.innerHTML = '<i class="fa-solid fa-plus"></i> Adicionar serviço';
+    $("cancelClientServiceEditButton")?.classList.add("hidden");
+    renderClientServicosPreview();
+    const saved = await persistClientServicosIfEditing(current ? "Serviço atualizado e salvo." : "Serviço adicionado e salvo.");
+    if (saved) {
+      await registrarServicoNovidadeClienteAdmin({
+        clientId,
+        clientName: $("clientName")?.value.trim() || clientId,
+        categoria: $("clientCategory")?.value || "",
+        payload,
+        current,
+        isNew: index < 0
+      });
+    } else {
+      showToast("Serviço preparado. Salve o cliente para gravar.");
+    }
+  } finally {
+    setBusy(button, false);
+  }
 }
+
 async function persistClientProdutosIfEditing(message = "Produtos salvos.") {
   if (!canManageClients() || !state.selectedClientId) return false;
   const client = state.clientes.find((item) => item.id === state.selectedClientId) || null;
@@ -7638,6 +7692,42 @@ async function registrarProdutoNovidadeClienteAdmin({ clientId = "", clientName 
   });
 }
 
+async function registrarServicoNovidadeClienteAdmin({ clientId = "", clientName = "", categoria = "", payload = {}, current = null, isNew = false } = {}) {
+  const destinoId = normalizeName(clientName || clientId);
+  if (payload.status === "inativo" || payload.ativo === false) {
+    await removerNovidadesPorDestino("servico", destinoId, payload.id || "");
+    return;
+  }
+  const acao = acaoNovidadeAdmin("servico", isNew, payload, current || {});
+  await registrarNovidadeAdmin({
+    tipo: "servico",
+    novidadeTema: "servico",
+    titulo: acao,
+    acao,
+    descricao: payload.descricaoCurta || payload.descricaoCompleta || acao,
+    tituloConteudo: tituloConteudoNovidadeAdmin("servico", payload),
+    estabelecimento: clientName || clientId,
+    imagem: payload.imagem,
+    imagens: payload.imagens || (payload.imagem ? [payload.imagem] : []),
+    valor: servicePriceLabel(payload),
+    categoria: payload.categoria || categoria,
+    destinoTipo: "servico",
+    destinoId,
+    itemId: payload.id,
+    destinoCardId: "servico-" + payload.id + "-" + destinoId,
+    clienteId,
+    whatsapp: payload.whatsapp || "",
+    telefone: payload.whatsapp || "",
+    localAtendimento: payload.localAtendimento || "",
+    areasAtendidas: payload.areasAtendidas || "",
+    duracao: payload.duracao || "",
+    prazoExecucao: payload.prazoExecucao || "",
+    unidadeCobranca: payload.unidadeCobranca || "",
+    observacaoPreco: payload.observacaoPreco || "",
+    precisaAgendamento: Boolean(payload.precisaAgendamento),
+    link: payload.link || ""
+  });
+}
 async function addClientProduct() {
   if (!validarProdutoVitrine("client", document)) return;
   const currentId = $("clientId")?.value || slugify($("clientName")?.value.trim()) || `cliente-${Date.now()}`;
@@ -20611,8 +20701,31 @@ function renderClientOnlyEditor() {
     showToast(message); await loadAllData(); state.pendingClientModuleTarget = "client-module-servicos"; renderClientOnlyEditor();
   };
   mount.querySelector("#coAddServiceButton")?.addEventListener("click", async () => {
-    if (!validateServiceFields("co", mount)) return; const button = mount.querySelector("#coAddServiceButton"); if (button.disabled) return; setBusy(button, true);
-    try { await uploadSelectedServiceImage("co", mount, client.id); const current = coServiceEditIndex >= 0 ? servicos[coServiceEditIndex] : null; const service = readServiceFields("co", mount, current?.id || `servico-${Date.now()}`, client.id); const now = Date.now(); service.createdAt = current?.createdAt || now; service.updatedAt = now; if (current) servicos[coServiceEditIndex] = service; else servicos.push(service); await persistCoServices(current ? "Servi\u00e7o atualizado." : "Servi\u00e7o adicionado."); } finally { setBusy(button, false); }
+    if (!validateServiceFields("co", mount)) return;
+    const button = mount.querySelector("#coAddServiceButton");
+    if (button.disabled) return;
+    setBusy(button, true);
+    try {
+      await uploadSelectedServiceImage("co", mount, client.id);
+      const current = coServiceEditIndex >= 0 ? servicos[coServiceEditIndex] : null;
+      const service = readServiceFields("co", mount, current?.id || "servico-" + Date.now(), client.id);
+      const now = Date.now();
+      service.createdAt = current?.createdAt || now;
+      service.updatedAt = now;
+      if (current) servicos[coServiceEditIndex] = service;
+      else servicos.push(service);
+      await persistCoServices(current ? "Serviço atualizado." : "Serviço adicionado.");
+      await registrarServicoNovidadeClienteAdmin({
+        clientId: client.id,
+        clientName: client.nome || client.name || client.id,
+        categoria: client.categoria || "",
+        payload: service,
+        current,
+        isNew: !current
+      });
+    } finally {
+      setBusy(button, false);
+    }
   });
   mount.querySelector("#coPreviewServiceButton")?.addEventListener("click", () => previewServiceAdmin(readServiceFields("co", mount, "", client.id)));
   mount.querySelector("#coCancelServiceEditButton")?.addEventListener("click", () => { clearServiceFields("co", mount); setCoServiceEditMode(-1); });
