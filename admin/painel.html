@@ -337,24 +337,6 @@
               <label>TikTok<input id="clientTiktok" placeholder="https://www.tiktok.com/@usuario"></label>
               <label>YouTube<input id="clientYoutube" placeholder="https://www.youtube.com/@canal"></label>
               <label>Site<input id="clientSite" placeholder="https://site.com.br"></label>
-              <section class="wide upload-panel">
-                <div class="section-head compact">
-                  <div>
-                    <h3>Destaque da semana</h3>
-                    <p>Cliente entra na fila semanal da tela inicial. O site mostra ate 20 destaques por semana.</p>
-                  </div>
-                </div>
-                <label class="check-row"><input id="clientFeaturedWeek" type="checkbox"> Manter este cliente em destaque na tela inicial</label>
-                <label>Quantidade de semanas<input id="clientFeaturedWeeks" type="number" min="1" max="52" value="1"></label>
-                <label>Cobranca do destaque
-                  <select id="clientFeaturedBilling">
-                    <option value="mensalidade">Junto da mensalidade</option>
-                    <option value="pix_separado">Pix separado</option>
-                  </select>
-                </label>
-                <label>Valor do destaque<input id="clientFeaturedValue" placeholder="R$" readonly></label>
-                <div id="clientFeaturedSummary" class="list-meta wide">Valor definido pelo admin master. Quando houver mais de 20 destaques ativos, a exibicao alterna por semana conforme a ordem de contratacao.</div>
-              </section>
               <section class="wide upload-panel client-jobs-panel">
                 <div class="section-head compact">
                   <div>
@@ -1151,9 +1133,6 @@
             <label>Mensalidade mensal<input id="paymentPlanMonthly" placeholder="R$"></label>
             <label>Mensalidade semestral<input id="paymentPlanSemiannual" placeholder="R$"></label>
             <label>Mensalidade anual<input id="paymentPlanAnnual" placeholder="R$"></label>
-            <label>Destaque semanal<input id="paymentFeaturedWeekly" placeholder="R$"></label>
-            <label>Destaque fim de semana<input id="paymentFeaturedWeekend" placeholder="R$"></label>
-            <label>Destaque mensal<input id="paymentFeaturedMonthly" placeholder="R$"></label>
             <label>Novidades visiveis por dias<input id="paymentNewsVisibleDays" type="number" min="1" max="30" placeholder="5"></label>
             <label class="wide">Observacao para a fatura<textarea id="paymentInvoiceNote" rows="3" placeholder="Texto opcional que aparece para o cliente"></textarea></label>
             <label class="wide">Mensagem no rodapé do boleto
@@ -1894,7 +1873,6 @@
                   </div>
                   <div class="permission-options">
                     <label><input type="checkbox" value="dados" checked> Dados do cliente</label>
-                    <label><input type="checkbox" value="destaque" checked> Destaque da semana</label>
                     <label><input type="checkbox" value="faturas" checked> Faturas</label>
                     <label><input type="checkbox" value="imagens" checked> Imagens</label>
                     <label><input type="checkbox" value="gerar_imagens_promocoes"> Gerar postagem</label>
@@ -2245,6 +2223,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=616"></script>
+  <script type="module" src="painel.js?v=617"></script>
 </body>
 </html>

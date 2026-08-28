@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v604.
+// Release do site v605.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -4454,51 +4454,9 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
     const listaUnica = [...new Map(listaTodos.map((est) => [est.nomeNormalizado, est])).values()];
     const LIMITE_DESTAQUES_HOME = 20;
-    const inicioSemana = (date = new Date()) => {
-      const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-      const dia = d.getDay() || 7;
-      d.setDate(d.getDate() - dia + 1);
-      d.setHours(0, 0, 0, 0);
-      return d;
-    };
-    const numeroSemana = (date = new Date()) => Math.floor(inicioSemana(date).getTime() / 604800000);
-    const valorOrdemDestaque = (est) => {
-      const raw = est?.destaqueInicio || est?.createdAt || est?.updatedAt || "";
-      if (typeof raw === "number") return raw;
-      const time = raw ? new Date(`${String(raw).slice(0, 10)}T12:00:00`).getTime() : 0;
-      return Number.isFinite(time) ? time : 0;
-    };
-    const destaqueEstaAtivo = (est) => {
-      if (!est?.destaqueSemanal) return false;
-      const fim = est.destaqueFim || "";
-      if (!fim) return true;
-      const hoje = new Date().toISOString().slice(0, 10);
-      return String(fim) >= hoje;
-    };
-    const selecionarDestaquesDaSemana = (itens) => {
-      const unicos = [...new Map(itens.map(item => [item.nomeNormalizado, item])).values()]
-        .sort((a, b) => valorOrdemDestaque(a) - valorOrdemDestaque(b) || String(a.name || "").localeCompare(String(b.name || "")));
-      if (unicos.length <= LIMITE_DESTAQUES_HOME) return unicos;
-      const semana = numeroSemana();
-      const grupo = semana % Math.ceil(unicos.length / LIMITE_DESTAQUES_HOME);
-      const inicio = grupo * LIMITE_DESTAQUES_HOME;
-      const selecionados = unicos.slice(inicio, inicio + LIMITE_DESTAQUES_HOME);
-      return selecionados.length === LIMITE_DESTAQUES_HOME
-        ? selecionados
-        : [...selecionados, ...unicos.slice(0, LIMITE_DESTAQUES_HOME - selecionados.length)];
-    };
-
-    const destaquesContratados = listaUnica.filter(e => destaqueEstaAtivo(e));
-    const fixos = selecionarDestaquesDaSemana(destaquesContratados);
-    const nomesFixos = fixos.map(e => e.nomeNormalizado);
-
-    const restantes = listaUnica.filter(e => !nomesFixos.includes(e.nomeNormalizado));
-    const sorteados = restantes
+    const totalExibir = [...listaUnica]
       .sort(() => Math.random() - 0.5)
-      .slice(0, Math.max(0, LIMITE_DESTAQUES_HOME - fixos.length));
-
-    const totalExibir = [...fixos, ...sorteados].slice(0, LIMITE_DESTAQUES_HOME);
-
+      .slice(0, LIMITE_DESTAQUES_HOME);
     const swiperWrapper = document.querySelector(".swiper-novidades .swiper-wrapper");
     const gradeDivulgacao = document.getElementById("grade-divulgacao");
 
@@ -4556,7 +4514,6 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         registrarCliqueBotao("destaque", idEst, "destaques-home", {
           estabelecimento: est.name || "",
           categoria,
-          destaqueContratado: destaqueEstaAtivo(est),
           formato: "slide"
         }).catch(() => { });
         abrirEstabelecimentoDaHome(idEst);
@@ -4596,7 +4553,6 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
           registrarCliqueBotao("destaque", idEst, "destaques-home", {
             estabelecimento: est.name || "",
             categoria,
-            destaqueContratado: destaqueEstaAtivo(est),
             formato: "card"
           }).catch(() => { });
           abrirEstabelecimentoDaHome(idEst);
@@ -5206,7 +5162,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         if (tipo.includes("categoria")) return "categoria";
         return "novoCliente";
       };
-      const temaAtivo = (item) => temasNovidades[temaNovidade(item)] !== false;
+      const temaAtivo = (item) => temaNovidade(item) !== "destaque" && temasNovidades[temaNovidade(item)] !== false;
       const geradas = [];
       const livePromoCards = new Set();
       const livePromoClients = new Set();
@@ -23158,10 +23114,6 @@ plotarPinsImoveis(stateImoveis.filtered);
     ["grupoWhatsappId", "grupoWhatsappNome", "grupoWhatsappLink", "grupoWhatsappDescricao", "grupoWhatsappImagem", "grupoWhatsappAtivo"].forEach((campo) => {
       if (campoExiste(cliente, campo)) est[campo] = cliente[campo];
     });
-    if (campoExiste(cliente, "destaqueSemanal")) est.destaqueSemanal = Boolean(cliente.destaqueSemanal);
-    ["destaqueSemanas", "destaqueDias", "destaqueInicio", "destaqueFim", "destaqueCobranca", "destaqueValor"].forEach((campo) => {
-      if (campoExiste(cliente, campo)) est[campo] = cliente[campo] || "";
-    });
     const temControleCardapio = campoExiste(cliente, "cardapioAtivo")
       || campoExiste(cliente, "menuAtivo")
       || campoExiste(cliente, "exibirCardapio");
@@ -23233,13 +23185,6 @@ plotarPinsImoveis(stateImoveis.filtered);
       grupoWhatsappDescricao: cliente.grupoWhatsappDescricao || "",
       grupoWhatsappImagem: cliente.grupoWhatsappImagem || "",
       grupoWhatsappAtivo: cliente.grupoWhatsappAtivo !== false && Boolean(cliente.grupoWhatsappLink),
-      destaqueSemanal: Boolean(cliente.destaqueSemanal),
-      destaqueSemanas: cliente.destaqueSemanas || 1,
-      destaqueDias: cliente.destaqueDias || 7,
-      destaqueInicio: cliente.destaqueInicio || "",
-      destaqueFim: cliente.destaqueFim || "",
-      destaqueCobranca: cliente.destaqueCobranca || "mensalidade",
-      destaqueValor: cliente.destaqueValor || 0,
       cardapioAtivo,
       cardapioLink: cardapioAtivo ? (cliente.cardapioLink || "") : "",
       menuImages: cardapioAtivo ? (cliente.menuImages || []) : [],
