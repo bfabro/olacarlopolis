@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 681,
-  label: "v688",
+  numero: 682,
+  label: "v689",
   data: "2026-08-28",
-  nota: "Novo relatorio completo por cliente no Admin Master, com dados em tempo real e tabelas ordenaveis."
+  nota: "Relatorio por cliente otimizado com consulta individual por periodo, cache e tempo real isolado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -102,6 +102,11 @@ let adminIdleTimer = null;
 const adminIdlePauseReasons = new Set();
 let clientMetricsRealtimeUnsubscribers = [];
 let clientMetricsRealtimeSignature = "";
+const masterClientMetricsCache = new Map();
+let masterClientMetricsRealtimeUnsubscribers = [];
+let masterClientMetricsRealtimeSignature = "";
+let masterClientMetricsRealtimeRenderTimer = null;
+let masterClientMetricsLoadToken = 0;
 const ONLINE_PRESENCE_RECENT_MS = 2 * 60 * 1000;
 let onlinePresenceUnsubscribe = null;
 let onlinePresenceTicker = null;
@@ -2974,7 +2979,7 @@ async function loadAllData(onProgress = null) {
     const accessReportVisible = !$("relatorioAcessosView")?.classList.contains("hidden");
     const financeReportVisible = !$("relatorioFinanceiroView")?.classList.contains("hidden");
     if (accessReportVisible || financeReportVisible) {
-      if (accessReportVisible && isMaster() && state.reportSection !== "actions") {
+      if (accessReportVisible && isMaster() && state.reportSection === "analytics") {
         await refreshMasterAccessMetrics({ render: false });
       }
       renderReports(accessReportVisible ? "access" : "finance");
@@ -6012,6 +6017,7 @@ function switchView(name) {
   if (target !== "relatorioAcessos") {
     cancelAccessReportViewLoading();
     stopAccessReportRealtime();
+    stopMasterClientMetricsRealtime();
   }
   document.querySelectorAll(".nav-admin button.admin-button-loading").forEach((button) => {
     button.classList.remove("admin-button-loading");
@@ -6044,7 +6050,7 @@ function switchView(name) {
   if (target === "relatorioExclusoes") renderDeletionReport();
   if (target === "relatorioFinanceiro") renderReports("finance");
   if (target === "relatorioAcessos") {
-    if (isMaster() && state.reportSection === "actions") {
+    if (isMaster() && ["actions", "client"].includes(state.reportSection)) {
       cancelAccessReportViewLoading();
       renderReports("access");
     } else {
@@ -15820,20 +15826,20 @@ function clientReportAvailability(client = {}, counts = {}) {
   };
 }
 
-function renderClientMetricReportContent(client = {}) {
+function renderClientMetricReportContent(client = {}, metricsSource = state.metricas) {
   const range = getReportDateRange();
   const keys = clientMetricKeys(client);
   const filtered = {
-    cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, range),
-    acessosClientes: filterDailyMetrics(state.metricas.acessosClientes, range),
-    ondeComerBotoes: filterDailyMetrics(state.metricas.ondeComerBotoes, range),
-    cliquesOndeComerDetalhado: filterDailyMetrics(state.metricas.cliquesOndeComerDetalhado, range),
-    ondeComerCardapios: filterDailyMetrics(state.metricas.ondeComerCardapios, range),
-    ondeComerWhats: filterDailyMetrics(state.metricas.ondeComerWhats, range),
-    ondeComerFotos: filterDailyMetrics(state.metricas.ondeComerFotos, range),
-    promocoesBotoes: filterDailyMetrics(state.metricas.promocoesBotoes, range),
-    cliquesPromocoesDetalhado: filterDailyMetrics(state.metricas.cliquesPromocoesDetalhado, range),
-    promocoes: filterDailyMetrics(state.metricas.promocoes, range)
+    cliquesBotoes: filterDailyMetrics(metricsSource.cliquesBotoes, range),
+    acessosClientes: filterDailyMetrics(metricsSource.acessosClientes, range),
+    ondeComerBotoes: filterDailyMetrics(metricsSource.ondeComerBotoes, range),
+    cliquesOndeComerDetalhado: filterDailyMetrics(metricsSource.cliquesOndeComerDetalhado, range),
+    ondeComerCardapios: filterDailyMetrics(metricsSource.ondeComerCardapios, range),
+    ondeComerWhats: filterDailyMetrics(metricsSource.ondeComerWhats, range),
+    ondeComerFotos: filterDailyMetrics(metricsSource.ondeComerFotos, range),
+    promocoesBotoes: filterDailyMetrics(metricsSource.promocoesBotoes, range),
+    cliquesPromocoesDetalhado: filterDailyMetrics(metricsSource.cliquesPromocoesDetalhado, range),
+    promocoes: filterDailyMetrics(metricsSource.promocoes, range)
   };
   const botoes = aggregateCliquesPorBotao(filtered.cliquesBotoes);
   const tipos = aggregateButtonTypesForClient(botoes.detalhes, keys);
@@ -15939,7 +15945,7 @@ function renderClientMetricReportContent(client = {}) {
     + whats + fotos + novidades + perfil + imoveis + veiculos + destaques + gruposWhatsapp
     + compartilhamentos + redes + ondeComerInstagramHistorico;
   const outros = Math.max(0, totalBotoes - categorizedTotal);
-  const historicoPromocoes = sumMetricMapForClient(aggregateSimpleDaily(state.metricas.promocoes), keys) > 0;
+  const historicoPromocoes = sumMetricMapForClient(aggregateSimpleDaily(metricsSource.promocoes), keys) > 0;
   const availability = clientReportAvailability(client, {
     promocoes: promocoesInteracoes,
     whatsappPromocao,
@@ -16020,7 +16026,7 @@ function renderClientMetricReportContent(client = {}) {
     { key: "compartilhamentos", label: "Compartilhamentos", count: compartilhamentos, note: "Botao de compartilhar cliente" },
     { key: "outros", label: "Outros botoes", count: outros, note: "Demais interacoes" }
   ].filter((entry) => availability[entry.key]);
-  const timeline = buildClickTimeline(state.metricas, range)
+  const timeline = buildClickTimeline(metricsSource, range)
     .filter((row) => metricKeyBelongsToClient(row.cliente, keys) || normalizeName(row.cliente) === normalizeName(client.nome || client.name || ""))
     .filter((row) => normalizeName(row.tipo) !== "gerarcard")
     .map((row) => ({ ...row, categoria: clientReportCategory(row) }))
@@ -16088,16 +16094,16 @@ function renderClientMetricReportContent(client = {}) {
   const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...servicosEntries, ...promocoesEntries];
   const total = allResourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const paginaClienteTotal = resourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
-  const itemAccessRows = buildItemAccessRows(state.metricas, range, keys);
+  const itemAccessRows = buildItemAccessRows(metricsSource, range, keys);
   const imovelAccessRows = itemAccessRows.filter((row) => row.kind === "imovel");
   const veiculoAccessRows = itemAccessRows.filter((row) => row.kind === "veiculo");
   const cidadesClique = aggregateClickCities(timeline);
   const canShowOrigemAcessos = hasPermission("origem_acessos");
   const origemPaginaResumo = canShowOrigemAcessos
-    ? aggregateClientPageOrigins(filterDailyMetrics(state.metricas.origemPaginaCliente, range), keys)
+    ? aggregateClientPageOrigins(filterDailyMetrics(metricsSource.origemPaginaCliente, range), keys)
     : [];
   const origemPaginaTimeline = canShowOrigemAcessos
-    ? buildClientPageOriginTimeline(state.metricas.origemPaginaClienteDetalhado, range, keys)
+    ? buildClientPageOriginTimeline(metricsSource.origemPaginaClienteDetalhado, range, keys)
     : [];
 
   return `
@@ -16215,25 +16221,21 @@ function bindClientMetricReportControls(client = {}, rootId = "clientMetricRepor
   const root = $(rootId);
   if (!root) return;
   enhanceReportTables(root);
-  const refresh = async () => {
-    if (rootId === "masterClientMetricReportMount" && isMaster()) {
-      await refreshMasterAccessMetrics({ render: false, force: true, range: getReportDateRange() });
-    }
+  const refresh = () => {
     root.innerHTML = renderClientMetricReportContent(client);
     bindClientMetricReportControls(client, rootId);
-    if (rootId === "masterClientMetricReportMount") startAccessReportRealtime(getReportDateRange());
   };
   root.querySelectorAll("[data-client-report-period]").forEach((button) => {
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", () => {
       state.reportPeriod.type = button.dataset.clientReportPeriod;
-      await refresh();
+      refresh();
     });
   });
-  root.querySelector("#applyClientReportRangeButton")?.addEventListener("click", async () => {
+  root.querySelector("#applyClientReportRangeButton")?.addEventListener("click", () => {
     state.reportPeriod.type = "personalizado";
     state.reportPeriod.start = root.querySelector("#clientReportStartDate")?.value || "";
     state.reportPeriod.end = root.querySelector("#clientReportEndDate")?.value || state.reportPeriod.start;
-    await refresh();
+    refresh();
   });
 }
 
@@ -16297,13 +16299,122 @@ function masterReportClients() {
     .sort((a, b) => String(a.nome || a.name || a.id || "").localeCompare(String(b.nome || b.name || b.id || ""), "pt-BR"));
 }
 
+function masterClientMetricsCacheKey(client = {}, range = getReportDateRange()) {
+  return `${client.id || clientCanonicalId(client) || normalizeName(client.nome || client.name || "")}|${range.start}|${range.end}`;
+}
+
+function masterClientMetricScopeKeys(client = {}) {
+  return [...new Set([
+    client.id,
+    client.nomeNormalizado,
+    clientCanonicalId(client),
+    normalizeName(client.nome || client.name || ""),
+    ...Object.keys(client.aliases || {})
+  ].flatMap(aliasKeyVariants).map((value) => String(value || "").trim()).filter(Boolean))];
+}
+
+function stopMasterClientMetricsRealtime() {
+  masterClientMetricsRealtimeUnsubscribers.forEach((unsubscribe) => {
+    try { unsubscribe(); } catch (error) { console.warn("Nao foi possivel encerrar a atualizacao do cliente.", error); }
+  });
+  masterClientMetricsRealtimeUnsubscribers = [];
+  masterClientMetricsRealtimeSignature = "";
+  if (masterClientMetricsRealtimeRenderTimer) clearTimeout(masterClientMetricsRealtimeRenderTimer);
+  masterClientMetricsRealtimeRenderTimer = null;
+}
+
+async function loadMasterClientMetrics(client = {}, range = getReportDateRange(), force = false) {
+  const cacheKey = masterClientMetricsCacheKey(client, range);
+  const cached = masterClientMetricsCache.get(cacheKey);
+  if (!force && cached && Date.now() - cached.loadedAt < ACCESS_METRICS_CACHE_TTL_MS) return cached.metrics;
+
+  const results = await Promise.allSettled(masterClientMetricScopeKeys(client).map(async (clientKey) => {
+    const periodQuery = query(ref(db, `metricasClientes/${clientKey}`), orderByKey(), startAt(range.start), endAt(range.end));
+    const snapshot = await get(periodQuery);
+    return [clientKey, snapshot];
+  }));
+  const metrics = {};
+  results.forEach((result) => {
+    if (result.status !== "fulfilled") {
+      console.warn("Nao foi possivel carregar uma parte das metricas deste cliente.", result.reason);
+      return;
+    }
+    const [clientKey, snapshot] = result.value;
+    mergeMetricTrees(metrics, scopedClientMetricsFromSnapshot(snapshot, clientKey));
+  });
+  masterClientMetricsCache.set(cacheKey, { loadedAt: Date.now(), metrics });
+  while (masterClientMetricsCache.size > 12) masterClientMetricsCache.delete(masterClientMetricsCache.keys().next().value);
+  return metrics;
+}
+
+function bindMasterClientMetricReportControls(client = {}) {
+  const root = $("masterClientMetricReportMount");
+  if (!root) return;
+  enhanceReportTables(root);
+  root.querySelectorAll("[data-client-report-period]").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.reportPeriod.type = button.dataset.clientReportPeriod;
+      renderMasterClientReport($("reportsAccessMount"));
+    });
+  });
+  root.querySelector("#applyClientReportRangeButton")?.addEventListener("click", () => {
+    state.reportPeriod.type = "personalizado";
+    state.reportPeriod.start = root.querySelector("#clientReportStartDate")?.value || "";
+    state.reportPeriod.end = root.querySelector("#clientReportEndDate")?.value || state.reportPeriod.start;
+    renderMasterClientReport($("reportsAccessMount"));
+  });
+}
+
+function applyMasterClientMetricReport(client = {}, metrics = {}) {
+  const root = $("masterClientMetricReportMount");
+  if (!root || state.reportSection !== "client" || String(state.masterReportClientId) !== String(client.id)) return;
+  root.innerHTML = renderClientMetricReportContent(client, metrics);
+  bindMasterClientMetricReportControls(client);
+}
+
+function startMasterClientMetricsRealtime(client = {}, range = getReportDateRange()) {
+  const keys = masterClientMetricScopeKeys(client);
+  const signature = `${masterClientMetricsCacheKey(client, range)}|${keys.slice().sort().join("|")}`;
+  if (signature === masterClientMetricsRealtimeSignature && masterClientMetricsRealtimeUnsubscribers.length) return;
+  stopMasterClientMetricsRealtime();
+  masterClientMetricsRealtimeSignature = signature;
+  const snapshotsByKey = new Map();
+
+  const scheduleRender = () => {
+    if (masterClientMetricsRealtimeRenderTimer) clearTimeout(masterClientMetricsRealtimeRenderTimer);
+    masterClientMetricsRealtimeRenderTimer = setTimeout(() => {
+      masterClientMetricsRealtimeRenderTimer = null;
+      const metrics = {};
+      snapshotsByKey.forEach((snapshot, clientKey) => {
+        mergeMetricTrees(metrics, scopedClientMetricsFromSnapshot(snapshot, clientKey));
+      });
+      masterClientMetricsCache.set(masterClientMetricsCacheKey(client, range), { loadedAt: Date.now(), metrics });
+      applyMasterClientMetricReport(client, metrics);
+    }, 120);
+  };
+
+  masterClientMetricsRealtimeUnsubscribers = keys.map((clientKey) => {
+    const periodQuery = query(ref(db, `metricasClientes/${clientKey}`), orderByKey(), startAt(range.start), endAt(range.end));
+    return onValue(periodQuery, (snapshot) => {
+      snapshotsByKey.set(clientKey, snapshot);
+      scheduleRender();
+    }, (error) => console.warn(`Metricas do cliente indisponiveis para ${clientKey}.`, error));
+  });
+}
+
 function renderMasterClientReport(mount) {
+  if (!mount) return;
+  stopAccessReportRealtime();
+  stopMasterClientMetricsRealtime();
+  const loadToken = ++masterClientMetricsLoadToken;
   const clients = masterReportClients();
   const selectedClient = clients.find((client) => String(client.id) === String(state.masterReportClientId)) || clients[0] || null;
   state.masterReportClientId = selectedClient?.id || "";
   const clientName = selectedClient?.nome || selectedClient?.name || "Cliente";
   const clientCategory = selectedClient?.categoria || selectedClient?.category || "Categoria nao informada";
   const clientStatus = selectedClient?.status || "sem status";
+  const range = getReportDateRange();
+  const cached = selectedClient ? masterClientMetricsCache.get(masterClientMetricsCacheKey(selectedClient, range)) : null;
 
   mount.innerHTML = `
     ${renderReportSectionTabs()}
@@ -16311,9 +16422,9 @@ function renderMasterClientReport(mount) {
       <div class="section-head compact">
         <div>
           <h2>Relatorio completo por cliente</h2>
-          <p>Selecione uma empresa para consultar tudo o que foi acessado ou clicado em seus recursos.</p>
+          <p>Selecione uma empresa para carregar somente os acessos e cliques relacionados a ela.</p>
         </div>
-        <span class="badge ativo"><i class="fa-solid fa-bolt"></i> Atualizacao em tempo real</span>
+        <span class="badge ativo"><i class="fa-solid fa-bolt"></i> Consulta otimizada</span>
       </div>
       ${clients.length ? `
         <label class="master-client-report-field">
@@ -16332,18 +16443,36 @@ function renderMasterClientReport(mount) {
         </div>
       ` : `<div class="list-meta">Nenhum cliente cadastrado para exibir no relatorio.</div>`}
     </section>
-    ${selectedClient ? `<div id="masterClientMetricReportMount" class="client-metric-report-mount master-client-metric-report">${renderClientMetricReportContent(selectedClient)}</div>` : ""}
+    ${selectedClient ? `<div id="masterClientMetricReportMount" class="client-metric-report-mount master-client-metric-report">${cached
+      ? renderClientMetricReportContent(selectedClient, cached.metrics)
+      : `<section class="panel-card master-client-report-loading"><i class="fa-solid fa-spinner fa-spin"></i><strong>Carregando somente os dados de ${escapeHtml(clientName)}...</strong><small>Consultando o periodo ${escapeHtml(range.label)}.</small></section>`
+    }</div>` : ""}
   `;
 
   bindReportControls(mount);
   mount.querySelector("#masterClientReportSelect")?.addEventListener("change", (event) => {
     state.masterReportClientId = event.currentTarget.value;
-    renderReports("access");
+    renderMasterClientReport(mount);
   });
-  if (selectedClient) bindClientMetricReportControls(selectedClient, "masterClientMetricReportMount");
-  startAccessReportRealtime(getReportDateRange());
-}
+  if (!selectedClient) return;
+  if (cached) {
+    bindMasterClientMetricReportControls(selectedClient);
+    startMasterClientMetricsRealtime(selectedClient, range);
+    return;
+  }
 
+  loadMasterClientMetrics(selectedClient, range).then((metrics) => {
+    if (loadToken !== masterClientMetricsLoadToken) return;
+    applyMasterClientMetricReport(selectedClient, metrics);
+    startMasterClientMetricsRealtime(selectedClient, range);
+  }).catch((error) => {
+    console.error("Falha ao carregar o relatorio individual do cliente.", error);
+    const root = $("masterClientMetricReportMount");
+    if (root && loadToken === masterClientMetricsLoadToken) {
+      root.innerHTML = '<section class="panel-card"><div class="list-meta">Nao foi possivel carregar este relatorio. Tente selecionar o cliente novamente.</div></section>';
+    }
+  });
+}
 function auditLogDateKey(log = {}) {
   const date = new Date(Number(log.createdAt || 0));
   return Number.isNaN(date.getTime()) ? "" : dateKeyFromDate(date);
@@ -16478,7 +16607,7 @@ const ACCESS_METRICS_CACHE_TTL_MS = 2 * 60 * 1000;
 const ACCESS_METRICS_CACHE_MAX_PERIODS = 4;
 const accessMetricsRangeCache = new Map();
 const accessMetricsRefreshPromises = new Map();
-const ACCESS_REPORT_REALTIME_KEYS = Object.keys(ACCESS_METRIC_PATHS);
+const ACCESS_REPORT_REALTIME_KEYS = ["cliquesMenu", "cliquesPorMenuDetalhado", "loterias"];
 let accessReportRealtimeUnsubscribers = [];
 let accessReportRealtimeSignature = "";
 let accessReportRealtimeRenderTimer = null;
@@ -16508,7 +16637,7 @@ function scheduleAccessReportRealtimeRender() {
   accessReportRealtimeRenderTimer = setTimeout(() => {
     accessReportRealtimeRenderTimer = null;
     const mount = $("reportsAccessMount");
-    if (!mount || $("relatorioAcessosView")?.classList.contains("hidden") || !["analytics", "client"].includes(state.reportSection)) return;
+    if (!mount || $("relatorioAcessosView")?.classList.contains("hidden") || state.reportSection !== "analytics") return;
     const expandedSections = [...mount.querySelectorAll('[data-finance-report-toggle][aria-expanded="true"]')]
       .map((button) => button.closest("[data-finance-report-section]")?.dataset.financeReportSection)
       .filter(Boolean);
@@ -16524,7 +16653,7 @@ function scheduleAccessReportRealtimeRender() {
 }
 
 function startAccessReportRealtime(range = getReportDateRange()) {
-  if (!isMaster() || !["analytics", "client"].includes(state.reportSection) || $("relatorioAcessosView")?.classList.contains("hidden")) {
+  if (!isMaster() || state.reportSection !== "analytics" || $("relatorioAcessosView")?.classList.contains("hidden")) {
     stopAccessReportRealtime();
     return;
   }
@@ -16780,7 +16909,7 @@ function bindReportControls(mount) {
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
     button.addEventListener("click", async () => {
       state.reportSection = button.dataset.reportSection;
-      if (!isFinanceReport && isMaster() && ["analytics", "client"].includes(state.reportSection)) {
+      if (!isFinanceReport && isMaster() && state.reportSection === "analytics") {
         await applyReportFilterWithLoading(button, "access", () => {});
         return;
       }
@@ -16956,6 +17085,7 @@ function renderReports(reportType = "") {
   const periodRange = getReportDateRange();
   if (!isFinanceReport && isMaster() && state.reportSection === "actions") {
     stopAccessReportRealtime();
+    stopMasterClientMetricsRealtime();
     renderUserActionReport(mount, periodRange);
     bindReportControls(mount);
     return;
@@ -16964,6 +17094,7 @@ function renderReports(reportType = "") {
     renderMasterClientReport(mount);
     return;
   }
+  stopMasterClientMetricsRealtime();
   const filteredMetrics = {
     cliquesBotoes: filterDailyMetrics(state.metricas.cliquesBotoes, periodRange),
     cliquesBotoesDetalhado: filterDailyMetrics(state.metricas.cliquesBotoesDetalhado, periodRange),

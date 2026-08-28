@@ -2162,6 +2162,24 @@ button[type="submit"]:hover,
   gap: 14px;
 }
 
+.master-client-report-loading {
+  min-height: 180px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 9px;
+  color: #1d4ed8;
+  text-align: center;
+}
+
+.master-client-report-loading i {
+  font-size: 1.8rem;
+}
+
+.master-client-report-loading small {
+  color: #64748b;
+}
+
 @media (max-width: 720px) {
   .master-client-report-identity { align-items: flex-start; flex-wrap: wrap; }
   .master-client-report-sort-hint { width: 100%; margin-left: 54px; }
