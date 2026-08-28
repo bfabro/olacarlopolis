@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 678,
-  label: "v685",
+  numero: 679,
+  label: "v686",
   data: "2026-08-28",
-  nota: "Destaques da página inicial restaurados e novas fotos integradas às Novidades."
+  nota: "Filtro por tipo de cliente adicionado à gestão de usuários."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -9094,10 +9094,17 @@ function renderUsersList() {
   const box = $("usersList");
   if (!box) return;
   const query = normalizeName($("userSearch")?.value || "");
-  const users = state.usuarios.filter((user) => {
-    if (isFuelTechnicalUser(user)) return false;
-    if (!query) return true;
+  const typeFilter = $("userClientTypeFilter")?.value || "todos";
+  const validClientTypes = new Set(["comercio", "servico", "institucional", "outro"]);
+  const users = state.usuarios.map((user) => {
     const client = state.clientes.find((item) => item.id === user.clienteId);
+    const rawType = String(client?.tipoCliente || client?.tipo || "").trim().toLowerCase();
+    const clientType = client ? (validClientTypes.has(rawType) ? rawType : "outro") : "sem_cliente";
+    return { user, client, clientType };
+  }).filter(({ user, client, clientType }) => {
+    if (isFuelTechnicalUser(user)) return false;
+    if (typeFilter !== "todos" && clientType !== typeFilter) return false;
+    if (!query) return true;
     return normalizeName([
       client?.nome,
       client?.name,
@@ -9106,22 +9113,25 @@ function renderUsersList() {
       user.email,
       user.uid,
       roleLabel(user.role),
-      statusLabel(user.status)
+      statusLabel(user.status),
+      clientType === "sem_cliente" ? "sem cliente vinculado" : clientDisclosureTypeLabel(clientType)
     ].filter(Boolean).join(" ")).includes(query);
   });
 
   if (!users.length) {
-    box.innerHTML = `<div class="list-meta">${query ? "Nenhum usuario encontrado para esta pesquisa." : "Nenhum usuario encontrado."}</div>`;
+    const hasFilter = Boolean(query || typeFilter !== "todos");
+    box.innerHTML = `<div class="list-meta">${hasFilter ? "Nenhum usuario encontrado para os filtros selecionados." : "Nenhum usuario encontrado."}</div>`;
     return;
   }
 
-  box.innerHTML = users.map((user) => {
-    const client = state.clientes.find((item) => item.id === user.clienteId);
+  box.innerHTML = users.map(({ user, client, clientType }) => {
     const partner = state.beneficios.find((item) => item.id === user.parceiroId);
+    const clientTypeText = clientType === "sem_cliente" ? "Sem cliente vinculado" : clientDisclosureTypeLabel(clientType);
     return `
       <article class="list-card">
         <div class="list-title">${escapeHtml(user.email || user.uid)}</div>
         <div class="list-meta">${roleLabel(user.role)}${client ? ` - ${escapeHtml(client.nome)}` : ""}${partner ? ` - ${escapeHtml(partner.parceiro || partner.titulo)}` : ""}</div>
+        <div class="list-meta">Tipo de cliente: ${escapeHtml(clientTypeText)}</div>
         <div class="list-meta">Permissoes: ${Object.entries(user.permissoes || {}).filter(([, value]) => value).map(([key]) => escapeHtml(key)).join(", ") || "nenhuma"}</div>
         <span class="badge ${escapeAttr(user.status || "ativo")}">${statusLabel(user.status)}</span>
         <button type="button" data-edit-user="${escapeAttr(user.uid)}">Editar</button>
@@ -22835,6 +22845,7 @@ function bindEvents() {
   $("userForm").addEventListener("submit", createPanelUser);
   $("deleteUserButton")?.addEventListener("click", deletePanelUser);
   $("userSearch")?.addEventListener("input", renderUsersList);
+  $("userClientTypeFilter")?.addEventListener("change", renderUsersList);
   $("newUserRole")?.addEventListener("change", syncUserLinkFields);
   $("newUserPartnerPermission")?.addEventListener("change", syncUserLinkFields);
   $("newUserFuelPermission")?.addEventListener("change", syncUserLinkFields);

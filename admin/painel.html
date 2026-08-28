@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=416">
+  <link rel="stylesheet" href="painel.css?v=417">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1913,7 +1913,21 @@
 
           <section class="panel-card">
             <h2>Usuarios</h2>
-            <input id="userSearch" class="search-input" type="search" placeholder="Pesquisar pelo nome do cliente..." autocomplete="off">
+            <div class="user-list-filters">
+              <label>Buscar usuario ou cliente
+                <input id="userSearch" class="search-input" type="search" placeholder="Nome, e-mail ou cliente..." autocomplete="off">
+              </label>
+              <label>Tipo de cliente
+                <select id="userClientTypeFilter">
+                  <option value="todos">Todos os tipos</option>
+                  <option value="comercio">Comercio</option>
+                  <option value="servico">Servico</option>
+                  <option value="institucional">Institucional</option>
+                  <option value="outro">Outro</option>
+                  <option value="sem_cliente">Sem cliente vinculado</option>
+                </select>
+              </label>
+            </div>
             <div id="usersList" class="list-area"></div>
           </section>
         </div>
@@ -2231,6 +2245,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=615"></script>
+  <script type="module" src="painel.js?v=616"></script>
 </body>
 </html>
