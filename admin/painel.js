@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 677,
-  label: "v684",
-  data: "2026-08-27",
-  nota: "URLs manuais ocultas no portal do cliente e serviços incluídos nos relatórios."
+  numero: 678,
+  label: "v685",
+  data: "2026-08-28",
+  nota: "Destaques da página inicial restaurados e novas fotos integradas às Novidades."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -6647,7 +6647,16 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     if (hasHours) add("horario", "cliente-horario", "Horário de atendimento atualizado");
     else remove("cliente-horario", "horario");
   }
-  if (normalizeImageItems(effective.imagens).length > normalizeImageItems(original.imagens).length) add("imagens", "cliente-imagens", "Novas fotos adicionadas");
+  const originalImageUrls = new Set(normalizeImageItems(original.imagens).map((item) => item.url));
+  const addedImages = normalizeImageItems(effective.imagens)
+    .map((item) => item.url)
+    .filter((url) => !originalImageUrls.has(url));
+  if (addedImages.length) {
+    add("imagens", "cliente-imagens", "Novas fotos adicionadas");
+    const imagesUpdate = updates[updates.length - 1];
+    imagesUpdate.imagem = addedImages[0];
+    imagesUpdate.imagens = addedImages;
+  }
   if (String(original.categoria || "") !== String(effective.categoria || "")) add("categoria", "cliente-categoria", "Categoria atualizada");
   const socialFingerprint = (client = {}) => JSON.stringify([
     String(client.instagram || "").trim(),

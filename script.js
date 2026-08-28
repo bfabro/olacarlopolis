@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v603.
+// Release do site v604.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -4424,20 +4424,35 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
   function montarCarrosselDivulgacao() {
     const listaTodos = [];
 
+    const estabelecimentoEstaPublicado = (est = {}) => {
+      const chaves = [
+        est.nomeNormalizado,
+        est.clienteId,
+        est.id,
+        est.name,
+        est.nome,
+        est.clienteNome
+      ].map((valor) => normalizeName(valor || "")).filter(Boolean);
+      const statuses = chaves.map((chave) => statusEstabelecimentos[chave]).filter(Boolean);
+      if (statuses.includes("n")) return false;
+      return statuses.length === 0 || statuses.includes("s");
+    };
+
     // monta lista com todos os estabelecimentos que têm novidades ativas
     categories.forEach(cat => {
       if (!categoriaPodeAparecerNaDivulgacao(cat)) return;
       cat.establishments?.forEach(est => {
-        const nomeNormalizado = normalizeName(est.name);
+        const nomeNormalizado = normalizeName(est.nomeNormalizado || est.clienteId || est.id || est.name || est.nome || "");
         const imagens = est.novidadesImages || [];
         const temImagemHome = imagens.length > 0 || Boolean(est.image || est.logo);
 
-        if (statusEstabelecimentos[nomeNormalizado] === "s" && temImagemHome) {
+        if (nomeNormalizado && estabelecimentoEstaPublicado(est) && temImagemHome) {
           listaTodos.push({ ...est, nomeNormalizado });
         }
       });
     });
 
+    const listaUnica = [...new Map(listaTodos.map((est) => [est.nomeNormalizado, est])).values()];
     const LIMITE_DESTAQUES_HOME = 20;
     const inicioSemana = (date = new Date()) => {
       const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
@@ -4473,11 +4488,11 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         : [...selecionados, ...unicos.slice(0, LIMITE_DESTAQUES_HOME - selecionados.length)];
     };
 
-    const destaquesContratados = listaTodos.filter(e => destaqueEstaAtivo(e));
+    const destaquesContratados = listaUnica.filter(e => destaqueEstaAtivo(e));
     const fixos = selecionarDestaquesDaSemana(destaquesContratados);
     const nomesFixos = fixos.map(e => e.nomeNormalizado);
 
-    const restantes = listaTodos.filter(e => !nomesFixos.includes(e.nomeNormalizado));
+    const restantes = listaUnica.filter(e => !nomesFixos.includes(e.nomeNormalizado));
     const sorteados = restantes
       .sort(() => Math.random() - 0.5)
       .slice(0, Math.max(0, LIMITE_DESTAQUES_HOME - fixos.length));
@@ -4597,11 +4612,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         }
 
         // 👉 MINI CARROSSEL: troca automática das imagens desse estabelecimento
-        modal.querySelectorAll(".loja-servico-details > div").forEach((row) => {
-      const label = row.querySelector("span")?.textContent || ""; const value = row.querySelector("strong")?.textContent || "";
-      if (/Itens|Materiais|cliente fornece/i.test(label) || value.length > 80) row.classList.add("is-wide");
-    });
-    if (imagens.length > 1) {
+        if (imagens.length > 1) {
           const imgTag = card.querySelector(".card-divulgacao-img-wrap img");
           let idx = imagens.indexOf(imagemInicial);
           if (idx < 0) idx = 0;
@@ -24373,11 +24384,9 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function renderizarTelaAtualComDadosAdmin() {
-    try {
-      montarCarrosselDivulgacao();
-      montarGradeEventos();
-      montarNovidadesCidade();
-    } catch (e) { }
+    try { montarCarrosselDivulgacao(); } catch (e) { console.warn("Nao foi possivel montar os destaques da home.", e); }
+    try { montarGradeEventos(); } catch (e) { console.warn("Nao foi possivel montar os eventos da home.", e); }
+    try { montarNovidadesCidade(); } catch (e) { console.warn("Nao foi possivel montar as novidades da home.", e); }
 
     const h = (location.hash || "").toLowerCase();
     if (!h) return;
