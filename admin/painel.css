@@ -2090,6 +2090,83 @@ button[type="submit"]:hover,
   color: #fff;
 }
 
+.master-client-report-selector {
+  gap: 16px;
+  background: linear-gradient(135deg, #f8fbff 0%, #ffffff 68%);
+  border-color: #bfdbfe;
+}
+
+.master-client-report-field {
+  display: grid;
+  gap: 7px;
+  max-width: 620px;
+}
+
+.master-client-report-field > span {
+  color: #334155;
+  font-size: .82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.master-client-report-field select {
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid #93c5fd;
+  border-radius: 12px;
+  background: #fff;
+  color: #0f172a;
+  font-weight: 700;
+  padding: 0 14px;
+}
+
+.master-client-report-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+  border: 1px solid #dbeafe;
+  border-radius: 14px;
+  background: #eff6ff;
+}
+
+.master-client-report-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: #2563eb;
+  color: #fff;
+}
+
+.master-client-report-identity div {
+  display: grid;
+  gap: 3px;
+}
+
+.master-client-report-identity strong { color: #0f172a; }
+.master-client-report-identity small { color: #64748b; }
+
+.master-client-report-sort-hint {
+  margin-left: auto;
+  color: #1d4ed8;
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.master-client-metric-report {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 720px) {
+  .master-client-report-identity { align-items: flex-start; flex-wrap: wrap; }
+  .master-client-report-sort-hint { width: 100%; margin-left: 54px; }
+}
+
 .audit-log-filters {
   display: grid;
   grid-template-columns: minmax(240px, 1fr) minmax(180px, 280px);

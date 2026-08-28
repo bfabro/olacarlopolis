@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 680,
-  label: "v687",
+  numero: 681,
+  label: "v688",
   data: "2026-08-28",
-  nota: "Destaque semanal e cobranças associadas removidos do sistema."
+  nota: "Novo relatorio completo por cliente no Admin Master, com dados em tempo real e tabelas ordenaveis."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -214,6 +214,7 @@ let state = {
   metricas: {},
   auditLogs: [],
   reportSection: "analytics",
+  masterReportClientId: "",
   reportPeriod: {
     type: "mensal",
     start: "",
@@ -15701,7 +15702,7 @@ function renderClientTimelineTable(rows, emptyMessage) {
           </tr>
         </thead>
         <tbody>
-          ${rows.slice(0, 200).map((row) => {
+          ${rows.map((row) => {
             const details = [
               row.promocao ? `Promocao: ${row.promocao}` : "",
               row.tituloConteudo || "",
@@ -15750,9 +15751,9 @@ function renderClientModuleTimelineTable(rows, moduleLabel, emptyMessage) {
   `;
 }
 
-function renderClientReportDisclosure(title, content, description = "Clique para visualizar") {
+function renderClientReportDisclosure(title, content, description = "Clique para visualizar", expanded = false) {
   return `
-    <details class="client-report-disclosure">
+    <details class="client-report-disclosure" ${expanded ? "open" : ""}>
       <summary>
         <span class="client-report-disclosure-title">
           <i class="fa-solid fa-table-list"></i>
@@ -16105,6 +16106,12 @@ function renderClientMetricReportContent(client = {}) {
       <div class="stats-grid client-report-overall">
         <article class="stat-card"><span>Total de interacoes monitoradas</span><strong>${total}</strong><small>${escapeHtml(range.label)}</small></article>
       </div>
+      ${renderClientReportDisclosure(
+        "Todos os cliques do cliente",
+        renderClientTimelineTable(timeline, "Ainda nao ha cliques detalhados para este cliente no periodo."),
+        "Tabela completa: clique nos titulos das colunas para ordenar",
+        true
+      )}
       <div class="client-report-monitored-screens">
         ${renderClientReportMonitorSection({
           title: "Pagina do cliente",
@@ -16204,25 +16211,29 @@ function renderClientMetricReport(client = {}) {
   return `<div id="clientMetricReportMount" class="client-metric-report-mount wide">${renderClientMetricReportContent(client)}</div>`;
 }
 
-function bindClientMetricReportControls(client = {}) {
-  const root = $("clientMetricReportMount");
+function bindClientMetricReportControls(client = {}, rootId = "clientMetricReportMount") {
+  const root = $(rootId);
   if (!root) return;
   enhanceReportTables(root);
-  const refresh = () => {
+  const refresh = async () => {
+    if (rootId === "masterClientMetricReportMount" && isMaster()) {
+      await refreshMasterAccessMetrics({ render: false, force: true, range: getReportDateRange() });
+    }
     root.innerHTML = renderClientMetricReportContent(client);
-    bindClientMetricReportControls(client);
+    bindClientMetricReportControls(client, rootId);
+    if (rootId === "masterClientMetricReportMount") startAccessReportRealtime(getReportDateRange());
   };
   root.querySelectorAll("[data-client-report-period]").forEach((button) => {
-    button.addEventListener("click", () => {
+    button.addEventListener("click", async () => {
       state.reportPeriod.type = button.dataset.clientReportPeriod;
-      refresh();
+      await refresh();
     });
   });
-  root.querySelector("#applyClientReportRangeButton")?.addEventListener("click", () => {
+  root.querySelector("#applyClientReportRangeButton")?.addEventListener("click", async () => {
     state.reportPeriod.type = "personalizado";
     state.reportPeriod.start = root.querySelector("#clientReportStartDate")?.value || "";
     state.reportPeriod.end = root.querySelector("#clientReportEndDate")?.value || state.reportPeriod.start;
-    refresh();
+    await refresh();
   });
 }
 
@@ -16272,9 +16283,65 @@ function renderReportSectionTabs() {
         <button type="button" data-no-loading data-report-section="actions" class="${state.reportSection === "actions" ? "active" : ""}">
           <i class="fa-solid fa-list-check"></i> Acoes dos usuarios
         </button>
+        <button type="button" data-no-loading data-report-section="client" class="${state.reportSection === "client" ? "active" : ""}">
+          <i class="fa-solid fa-store"></i> Por cliente
+        </button>
       </div>
     </section>
   `;
+}
+
+function masterReportClients() {
+  return state.clientes
+    .filter(isReportClient)
+    .sort((a, b) => String(a.nome || a.name || a.id || "").localeCompare(String(b.nome || b.name || b.id || ""), "pt-BR"));
+}
+
+function renderMasterClientReport(mount) {
+  const clients = masterReportClients();
+  const selectedClient = clients.find((client) => String(client.id) === String(state.masterReportClientId)) || clients[0] || null;
+  state.masterReportClientId = selectedClient?.id || "";
+  const clientName = selectedClient?.nome || selectedClient?.name || "Cliente";
+  const clientCategory = selectedClient?.categoria || selectedClient?.category || "Categoria nao informada";
+  const clientStatus = selectedClient?.status || "sem status";
+
+  mount.innerHTML = `
+    ${renderReportSectionTabs()}
+    <section class="panel-card master-client-report-selector">
+      <div class="section-head compact">
+        <div>
+          <h2>Relatorio completo por cliente</h2>
+          <p>Selecione uma empresa para consultar tudo o que foi acessado ou clicado em seus recursos.</p>
+        </div>
+        <span class="badge ativo"><i class="fa-solid fa-bolt"></i> Atualizacao em tempo real</span>
+      </div>
+      ${clients.length ? `
+        <label class="master-client-report-field">
+          <span>Cliente</span>
+          <select id="masterClientReportSelect" aria-label="Selecionar cliente do relatorio">
+            ${clients.map((client) => {
+              const name = client.nome || client.name || client.id;
+              return `<option value="${escapeAttr(client.id)}" ${String(client.id) === String(state.masterReportClientId) ? "selected" : ""}>${escapeHtml(name)}</option>`;
+            }).join("")}
+          </select>
+        </label>
+        <div class="master-client-report-identity">
+          <span class="master-client-report-avatar"><i class="fa-solid fa-store"></i></span>
+          <div><strong>${escapeHtml(clientName)}</strong><small>${escapeHtml(clientCategory)} · ${escapeHtml(clientStatus)}</small></div>
+          <span class="master-client-report-sort-hint"><i class="fa-solid fa-arrow-down-a-z"></i> Clique no titulo de qualquer coluna para ordenar</span>
+        </div>
+      ` : `<div class="list-meta">Nenhum cliente cadastrado para exibir no relatorio.</div>`}
+    </section>
+    ${selectedClient ? `<div id="masterClientMetricReportMount" class="client-metric-report-mount master-client-metric-report">${renderClientMetricReportContent(selectedClient)}</div>` : ""}
+  `;
+
+  bindReportControls(mount);
+  mount.querySelector("#masterClientReportSelect")?.addEventListener("change", (event) => {
+    state.masterReportClientId = event.currentTarget.value;
+    renderReports("access");
+  });
+  if (selectedClient) bindClientMetricReportControls(selectedClient, "masterClientMetricReportMount");
+  startAccessReportRealtime(getReportDateRange());
 }
 
 function auditLogDateKey(log = {}) {
@@ -16411,7 +16478,7 @@ const ACCESS_METRICS_CACHE_TTL_MS = 2 * 60 * 1000;
 const ACCESS_METRICS_CACHE_MAX_PERIODS = 4;
 const accessMetricsRangeCache = new Map();
 const accessMetricsRefreshPromises = new Map();
-const ACCESS_REPORT_REALTIME_KEYS = ["cliquesMenu", "cliquesPorMenuDetalhado", "loterias"];
+const ACCESS_REPORT_REALTIME_KEYS = Object.keys(ACCESS_METRIC_PATHS);
 let accessReportRealtimeUnsubscribers = [];
 let accessReportRealtimeSignature = "";
 let accessReportRealtimeRenderTimer = null;
@@ -16441,7 +16508,7 @@ function scheduleAccessReportRealtimeRender() {
   accessReportRealtimeRenderTimer = setTimeout(() => {
     accessReportRealtimeRenderTimer = null;
     const mount = $("reportsAccessMount");
-    if (!mount || $("relatorioAcessosView")?.classList.contains("hidden") || state.reportSection !== "analytics") return;
+    if (!mount || $("relatorioAcessosView")?.classList.contains("hidden") || !["analytics", "client"].includes(state.reportSection)) return;
     const expandedSections = [...mount.querySelectorAll('[data-finance-report-toggle][aria-expanded="true"]')]
       .map((button) => button.closest("[data-finance-report-section]")?.dataset.financeReportSection)
       .filter(Boolean);
@@ -16457,7 +16524,7 @@ function scheduleAccessReportRealtimeRender() {
 }
 
 function startAccessReportRealtime(range = getReportDateRange()) {
-  if (!isMaster() || state.reportSection !== "analytics" || $("relatorioAcessosView")?.classList.contains("hidden")) {
+  if (!isMaster() || !["analytics", "client"].includes(state.reportSection) || $("relatorioAcessosView")?.classList.contains("hidden")) {
     stopAccessReportRealtime();
     return;
   }
@@ -16713,7 +16780,7 @@ function bindReportControls(mount) {
   mount.querySelectorAll("[data-report-section]").forEach((button) => {
     button.addEventListener("click", async () => {
       state.reportSection = button.dataset.reportSection;
-      if (!isFinanceReport && isMaster() && state.reportSection === "analytics") {
+      if (!isFinanceReport && isMaster() && ["analytics", "client"].includes(state.reportSection)) {
         await applyReportFilterWithLoading(button, "access", () => {});
         return;
       }
@@ -16891,6 +16958,10 @@ function renderReports(reportType = "") {
     stopAccessReportRealtime();
     renderUserActionReport(mount, periodRange);
     bindReportControls(mount);
+    return;
+  }
+  if (!isFinanceReport && isMaster() && state.reportSection === "client") {
+    renderMasterClientReport(mount);
     return;
   }
   const filteredMetrics = {
