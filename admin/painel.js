@@ -32,6 +32,10 @@ import {
   getDownloadURL,
   getBlob
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import {
+  TERRAIN_MANAGEMENT_ENTITIES,
+  TERRAIN_MANAGEMENT_SCHEMA_VERSION
+} from "./gestao-terrenos-schema.js?v=1";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -46,10 +50,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 683,
-  label: "v690",
+  numero: 684,
+  label: "v691",
   data: "2026-08-31",
-  nota: "Integracao automatica de pagamentos com PIX dinamico, webhook e conciliacao por cliente."
+  nota: "Estrutura base do modulo Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -196,6 +200,7 @@ let state = {
   combustiveisLinks: {},
   combustiveisHistorico: {},
   combustiveisBusca: [],
+  terrainManagement: { owners: {}, terrains: {}, developments: {} },
   sobreNos: {},
   xadrezConfig: {},
   beneficios: [],
@@ -751,6 +756,7 @@ const views = {
   automoveisArtes: $("automoveisArtesView"),
   informacoes: $("informacoesView"),
   financeiro: $("financeiroView"),
+  gestaoTerrenos: $("gestaoTerrenosView"),
   relatorioAcessos: $("relatorioAcessosView"),
   relatorioFinanceiro: $("relatorioFinanceiroView"),
   relatorioExclusoes: $("relatorioExclusoesView"),
@@ -785,6 +791,7 @@ const viewCopy = {
   automoveisArtes: ["Artes de veiculos", "Gere imagens para Instagram de um ou varios veiculos."],
   informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
+  gestaoTerrenos: ["Gestão de Terrenos", "Proprietários, terrenos e loteamentos."],
   relatorioAcessos: ["Relatorio Acessos", "Acessos, cliques, origens e acoes realizadas pelos usuarios."],
   relatorioFinanceiro: ["Relatorio Financeiro", "Receitas, valores em aberto, planos e comprovantes dos clientes."],
   relatorioExclusoes: ["Relatorio Exclusoes", "Historico dos itens removidos pelos administradores e clientes."],
@@ -1070,6 +1077,7 @@ function canAccessView(viewName) {
     return !isBenefitPartner() && (canManageClients() || hasPermission("gerar_imagens_promocoes"));
   }
   if (viewName === "relatorioExclusoes") return isMaster();
+  if (viewName === "gestaoTerrenos") return isMaster();
   if (viewName === "dashboard") return canManageClients();
   if (viewName === "eventos") return canManageClients() || hasPermission("eventos");
   if (viewName === "combustiveisPrecos") return canManageClients() || hasPermission("combustiveis_precos");
@@ -2738,6 +2746,9 @@ async function loadAllData(onProgress = null) {
     combustiveisSnap,
     combustiveisLinksSnap,
     combustiveisHistoricoSnap,
+    terrainOwnersSnap,
+    terrainsSnap,
+    terrainDevelopmentsSnap,
     novidadesConfigSnap,
     sobreNosSnap,
     xadrezConfigSnap,
@@ -2771,6 +2782,9 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("configuracoes/combustiveis"),
     getPanelSnapshot("combustiveisLinks", { enabled: isMaster() }),
     getPanelSnapshot(isMaster() ? "combustiveisHistorico" : `combustiveisHistorico/${state.profile?.postoCombustivelId || "__sem_posto__"}`, { enabled: isMaster() || hasPermission("combustiveis_precos") }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.owners.path, { enabled: isMaster() }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.terrains.path, { enabled: isMaster() }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.developments.path, { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -2858,6 +2872,11 @@ async function loadAllData(onProgress = null) {
   state.combustiveisConfig = combustiveisSnap.exists() ? combustiveisSnap.val() : {};
   state.combustiveisLinks = combustiveisLinksSnap.exists() ? combustiveisLinksSnap.val() : {};
   state.combustiveisHistorico = combustiveisHistoricoSnap.exists() ? (isMaster() ? combustiveisHistoricoSnap.val() : { [state.profile?.postoCombustivelId || ""]: combustiveisHistoricoSnap.val() }) : {};
+  state.terrainManagement = {
+    owners: terrainOwnersSnap.exists() ? terrainOwnersSnap.val() : {},
+    terrains: terrainsSnap.exists() ? terrainsSnap.val() : {},
+    developments: terrainDevelopmentsSnap.exists() ? terrainDevelopmentsSnap.val() : {}
+  };
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
@@ -2961,6 +2980,7 @@ async function loadAllData(onProgress = null) {
 
   progress(86, "Montando telas e indicadores...");
   renderStats();
+  renderTerrainManagement();
   renderClientsList();
   renderUsersList();
   renderCategoriesList();
@@ -3111,6 +3131,32 @@ function renderStats() {
   if ($("statPromocoesAtivas")) $("statPromocoesAtivas").textContent = String(promocoesAtivas);
   if ($("statImoveis")) $("statImoveis").textContent = String(state.imoveis.filter(itemCadastrado).length);
   if ($("statAutomoveis")) $("statAutomoveis").textContent = String(state.automoveis.filter(itemCadastrado).length);
+}
+
+function terrainRecordCount(records) {
+  return records && typeof records === "object" ? Object.keys(records).length : 0;
+}
+
+function renderTerrainManagement() {
+  const terrainData = state.terrainManagement || {};
+  if ($("terrainOwnersCount")) $("terrainOwnersCount").textContent = String(terrainRecordCount(terrainData.owners));
+  if ($("terrainTerrainsCount")) $("terrainTerrainsCount").textContent = String(terrainRecordCount(terrainData.terrains));
+  if ($("terrainDevelopmentsCount")) $("terrainDevelopmentsCount").textContent = String(terrainRecordCount(terrainData.developments));
+  $("gestaoTerrenosView")?.setAttribute("data-schema-version", TERRAIN_MANAGEMENT_SCHEMA_VERSION);
+}
+
+function switchTerrainManagementTab(tabName = "dashboard") {
+  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments"]);
+  const target = allowedTabs.has(tabName) ? tabName : "dashboard";
+  document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
+    const isActive = button.dataset.terrainTab === target;
+    button.classList.toggle("active", isActive);
+    if (isActive) button.setAttribute("aria-current", "page");
+    else button.removeAttribute("aria-current");
+  });
+  document.querySelectorAll("[data-terrain-section]").forEach((section) => {
+    section.classList.toggle("hidden", section.dataset.terrainSection !== target);
+  });
 }
 
 function updateChrome() {
@@ -6044,6 +6090,7 @@ function switchView(name) {
   if (target === "artesPostagem") renderPostArtView();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
+  if (target === "gestaoTerrenos") renderTerrainManagement();
   if (target === "integracaoPagamento") loadPaymentIntegration();
   if (target === "paginaInicialSite") renderHomePageSettings();
   if (target === "combustiveisConfig") renderFuelAdminSettings();
@@ -23014,6 +23061,9 @@ function bindEvents() {
       switchView(button.dataset.view);
       closeAdminMenuOnMobile();
     });
+  });
+  document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
+    button.addEventListener("click", () => switchTerrainManagementTab(button.dataset.terrainTab));
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);

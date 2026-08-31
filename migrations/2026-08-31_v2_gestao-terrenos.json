@@ -1,0 +1,79 @@
+{
+  "version": "31_08_26_v2",
+  "created_at": "2026-08-31",
+  "database": "firebase-realtime-database",
+  "module": "gestao_terrenos",
+  "operation": "define_schema",
+  "nodes": {
+    "terrenosProprietarios": {
+      "primary_key": "id",
+      "fields": {
+        "id": "string",
+        "nome": "string",
+        "cpf_cnpj": "string|null",
+        "telefone": "string",
+        "whatsapp": "string",
+        "email": "string|null",
+        "endereco": "string",
+        "numero": "string",
+        "bairro": "string",
+        "cidade": "string",
+        "estado": "string",
+        "cep": "string",
+        "observacoes": "string",
+        "origem_cliente": "string",
+        "status": "potencial_cliente|cliente|aguardando_resposta|ativo|nao_interessado|inativo",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      }
+    },
+    "terrenos": {
+      "primary_key": "id",
+      "fields": {
+        "id": "string",
+        "owner_id": "string|null",
+        "development_id": "string|null",
+        "apelido": "string",
+        "bairro": "string",
+        "rua": "string",
+        "numero": "string",
+        "quadra": "string",
+        "lote": "string",
+        "area_m2": "number",
+        "frente_m": "number",
+        "fundo_m": "number",
+        "matricula": "string|null",
+        "inscricao_imobiliaria": "string|null",
+        "latitude": "number|null",
+        "longitude": "number|null",
+        "google_maps_url": "string|null",
+        "observacoes": "string",
+        "status": "sem_informacao|limpo|monitorar|pode_precisar_limpeza|precisa_limpeza|servico_agendado|proprietario_desconhecido|inativo",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      },
+      "foreign_keys": {
+        "owner_id": "terrenosProprietarios.id",
+        "development_id": "terrenosLoteamentos.id"
+      }
+    },
+    "terrenosLoteamentos": {
+      "primary_key": "id",
+      "fields": {
+        "id": "string",
+        "nome": "string",
+        "bairro": "string",
+        "cidade": "string",
+        "descricao": "string",
+        "observacoes": "string",
+        "created_at": "timestamp",
+        "updated_at": "timestamp"
+      }
+    }
+  },
+  "relationships": [
+    "terrenosProprietarios 1:N terrenos via owner_id",
+    "terrenosLoteamentos 1:N terrenos via development_id"
+  ],
+  "notes": "Realtime Database nao persiste colecoes vazias; os nos passam a existir no primeiro cadastro validado pelas regras."
+}

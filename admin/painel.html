@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=420">
+  <link rel="stylesheet" href="painel.css?v=421">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -87,6 +87,7 @@
         <section class="nav-admin-group" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestao</span>
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
+          <button data-view="gestaoTerrenos" data-master="true"><i class="fa-solid fa-map-location-dot"></i> Gestão de Terrenos</button>
           <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatorio Acessos</button>
           <button data-view="relatorioExclusoes" data-master="true"><i class="fa-solid fa-trash-can-arrow-up"></i> Relatorio Exclusoes</button>
           <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorio Financeiro</button>
@@ -199,6 +200,59 @@
           <strong id="dashboardVersion">Versao -</strong>
           <span id="dashboardVersionDate">Atualizacao registrada no codigo do painel.</span>
         </div>
+      </section>
+
+      <section id="gestaoTerrenosView" class="panel-view hidden">
+        <nav class="terrain-module-nav" aria-label="Navegação da Gestão de Terrenos">
+          <button type="button" class="active" data-terrain-tab="dashboard" aria-current="page"><i class="fa-solid fa-chart-column"></i> Painel</button>
+          <button type="button" data-terrain-tab="owners"><i class="fa-solid fa-user-group"></i> Proprietários</button>
+          <button type="button" data-terrain-tab="terrains"><i class="fa-solid fa-vector-square"></i> Terrenos</button>
+          <button type="button" data-terrain-tab="developments"><i class="fa-solid fa-map"></i> Loteamentos</button>
+        </nav>
+
+        <section class="terrain-module-section" data-terrain-section="dashboard">
+          <div class="stats-grid terrain-stats-grid">
+            <article class="stat-card">
+              <span>Proprietários</span>
+              <strong id="terrainOwnersCount">0</strong>
+              <small>Cadastros no módulo</small>
+            </article>
+            <article class="stat-card">
+              <span>Terrenos</span>
+              <strong id="terrainTerrainsCount">0</strong>
+              <small>Cadastros no módulo</small>
+            </article>
+            <article class="stat-card">
+              <span>Loteamentos</span>
+              <strong id="terrainDevelopmentsCount">0</strong>
+              <small>Cadastros no módulo</small>
+            </article>
+          </div>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="owners">
+          <div class="terrain-module-empty">
+            <i class="fa-solid fa-user-group"></i>
+            <strong>Proprietários</strong>
+            <span>Nenhum proprietário cadastrado.</span>
+          </div>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="terrains">
+          <div class="terrain-module-empty">
+            <i class="fa-solid fa-vector-square"></i>
+            <strong>Terrenos</strong>
+            <span>Nenhum terreno cadastrado.</span>
+          </div>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="developments">
+          <div class="terrain-module-empty">
+            <i class="fa-solid fa-map"></i>
+            <strong>Loteamentos</strong>
+            <span>Nenhum loteamento cadastrado.</span>
+          </div>
+        </section>
       </section>
 
       <section id="clientesView" class="panel-view hidden">
@@ -2330,6 +2384,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=620"></script>
+  <script type="module" src="painel.js?v=621"></script>
 </body>
 </html>
