@@ -13,6 +13,8 @@ import {
   get,
   query,
   orderByKey,
+  orderByChild,
+  equalTo,
   startAt,
   endAt,
   limitToLast,
@@ -33,9 +35,18 @@ import {
   getBlob
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import {
+  buildTerrainOwnerRecord,
+  canDeleteTerrainOwner,
+  filterTerrainOwners,
+  formatTerrainOwnerCep,
+  formatTerrainOwnerDocument,
+  terrainOwnerLinkedTerrains,
+  terrainOwnerOriginLabel,
+  terrainOwnerStatusMeta,
+  terrainOwnerWhatsappUrl,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=1";
+} from "./gestao-terrenos-schema.js?v=2";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -50,10 +61,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 684,
-  label: "v691",
+  numero: 685,
+  label: "v692",
   data: "2026-08-31",
-  nota: "Estrutura base do modulo Gestao de Terrenos."
+  nota: "CRUD completo de proprietarios na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -234,6 +245,7 @@ let state = {
     end: ""
   },
   selectedClientId: null,
+  selectedTerrainOwnerId: null,
   selectedEventId: null,
   selectedImovelId: null,
   selectedAutomovelId: null,
@@ -3143,6 +3155,263 @@ function renderTerrainManagement() {
   if ($("terrainTerrainsCount")) $("terrainTerrainsCount").textContent = String(terrainRecordCount(terrainData.terrains));
   if ($("terrainDevelopmentsCount")) $("terrainDevelopmentsCount").textContent = String(terrainRecordCount(terrainData.developments));
   $("gestaoTerrenosView")?.setAttribute("data-schema-version", TERRAIN_MANAGEMENT_SCHEMA_VERSION);
+  renderTerrainOwnerList();
+}
+
+function terrainOwnerById(ownerId) {
+  return state.terrainManagement?.owners?.[ownerId] || null;
+}
+
+function terrainOwnerFormValues() {
+  return {
+    nome: $("terrainOwnerName")?.value,
+    cpf_cnpj: $("terrainOwnerDocument")?.value,
+    telefone: $("terrainOwnerPhone")?.value,
+    whatsapp: $("terrainOwnerWhatsapp")?.value,
+    telefone_secundario: $("terrainOwnerSecondaryPhone")?.value,
+    email: $("terrainOwnerEmail")?.value,
+    endereco: $("terrainOwnerAddress")?.value,
+    numero: $("terrainOwnerAddressNumber")?.value,
+    bairro: $("terrainOwnerNeighborhood")?.value,
+    cidade: $("terrainOwnerCity")?.value,
+    estado: $("terrainOwnerState")?.value,
+    cep: $("terrainOwnerCep")?.value,
+    observacoes: $("terrainOwnerNotes")?.value,
+    origem_cliente: $("terrainOwnerOrigin")?.value,
+    status: $("terrainOwnerStatus")?.value
+  };
+}
+
+function resetTerrainOwnerForm() {
+  state.selectedTerrainOwnerId = null;
+  $("terrainOwnerForm")?.reset();
+  if ($("terrainOwnerId")) $("terrainOwnerId").value = "";
+  if ($("terrainOwnerFormTitle")) $("terrainOwnerFormTitle").textContent = "Novo proprietário";
+  $("terrainOwnerFormCard")?.classList.add("hidden");
+}
+
+function openTerrainOwnerForm(ownerId = "") {
+  const owner = ownerId ? terrainOwnerById(ownerId) : null;
+  state.selectedTerrainOwnerId = owner?.id || null;
+  $("terrainOwnerForm")?.reset();
+  if ($("terrainOwnerId")) $("terrainOwnerId").value = owner?.id || "";
+  if ($("terrainOwnerFormTitle")) $("terrainOwnerFormTitle").textContent = owner ? "Editar proprietário" : "Novo proprietário";
+  const values = {
+    terrainOwnerName: owner?.nome || "",
+    terrainOwnerDocument: owner?.cpf_cnpj || "",
+    terrainOwnerPhone: owner?.telefone || "",
+    terrainOwnerWhatsapp: owner?.whatsapp || "",
+    terrainOwnerSecondaryPhone: owner?.telefone_secundario || "",
+    terrainOwnerEmail: owner?.email || "",
+    terrainOwnerAddress: owner?.endereco || "",
+    terrainOwnerAddressNumber: owner?.numero || "",
+    terrainOwnerNeighborhood: owner?.bairro || "",
+    terrainOwnerCity: owner?.cidade || "Carlópolis",
+    terrainOwnerState: owner?.estado || "PR",
+    terrainOwnerCep: owner?.cep || "",
+    terrainOwnerNotes: owner?.observacoes || "",
+    terrainOwnerOrigin: owner?.origem_cliente || "prospeccao",
+    terrainOwnerStatus: owner?.status || "potencial_cliente"
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    if ($(id)) $(id).value = value;
+  });
+  $("terrainOwnerFormCard")?.classList.remove("hidden");
+  $("terrainOwnerName")?.focus({ preventScroll: true });
+  $("terrainOwnerFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function terrainOwnerDateLabel(value) {
+  const timestamp = Number(value || 0);
+  if (!timestamp) return "-";
+  return new Date(timestamp).toLocaleString("pt-BR");
+}
+
+function renderTerrainOwnerList() {
+  const mount = $("terrainOwnerList");
+  if (!mount) return;
+  const owners = filterTerrainOwners(state.terrainManagement?.owners || {}, {
+    name: $("terrainOwnerNameSearch")?.value || "",
+    phone: $("terrainOwnerPhoneSearch")?.value || "",
+    status: $("terrainOwnerStatusFilter")?.value || ""
+  });
+  const total = owners.length;
+  if ($("terrainOwnerListSummary")) {
+    $("terrainOwnerListSummary").textContent = `${total} ${total === 1 ? "proprietário encontrado" : "proprietários encontrados"}.`;
+  }
+  if (!owners.length) {
+    mount.innerHTML = `
+      <div class="terrain-owner-list-empty">
+        <i class="fa-solid fa-user-group"></i>
+        <strong>Nenhum proprietário encontrado</strong>
+        <span>Ajuste os filtros ou cadastre um novo proprietário.</span>
+      </div>`;
+    return;
+  }
+  const terrains = state.terrainManagement?.terrains || {};
+  mount.innerHTML = owners.map((owner) => {
+    const linkedCount = terrainOwnerLinkedTerrains(owner.id, terrains).length;
+    const status = terrainOwnerStatusMeta(owner.status);
+    const whatsappUrl = terrainOwnerWhatsappUrl(owner);
+    const canDelete = canDeleteTerrainOwner(owner.id, terrains);
+    return `
+      <article class="terrain-owner-row" data-terrain-owner-id="${escapeAttr(owner.id)}">
+        <div class="terrain-owner-primary" data-label="Proprietário">
+          <strong>${escapeHtml(owner.nome || "Sem nome")}</strong>
+          <small>${escapeHtml(owner.telefone || owner.email || "")}</small>
+        </div>
+        <div data-label="WhatsApp">
+          ${whatsappUrl ? `<a class="terrain-owner-contact-link" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${escapeHtml(formatPhoneMask(owner.whatsapp))}</a>` : "<span>-</span>"}
+        </div>
+        <div data-label="Cidade"><span>${escapeHtml(owner.cidade || "-")}</span></div>
+        <div data-label="Terrenos"><strong class="terrain-owner-linked-count">${linkedCount}</strong></div>
+        <div data-label="Status"><span class="terrain-owner-status ${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></div>
+        <div class="terrain-owner-actions" data-label="Ações">
+          ${whatsappUrl ? `<a class="terrain-owner-icon-button whatsapp" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir WhatsApp" aria-label="Abrir WhatsApp de ${escapeAttr(owner.nome)}"><i class="fa-brands fa-whatsapp"></i></a>` : ""}
+          <button type="button" class="terrain-owner-icon-button" data-terrain-owner-view="${escapeAttr(owner.id)}" data-no-loading title="Ver detalhes" aria-label="Ver detalhes de ${escapeAttr(owner.nome)}"><i class="fa-solid fa-eye"></i></button>
+          <button type="button" class="terrain-owner-icon-button" data-terrain-owner-edit="${escapeAttr(owner.id)}" data-no-loading title="Editar" aria-label="Editar ${escapeAttr(owner.nome)}"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="terrain-owner-icon-button warning" data-terrain-owner-inactivate="${escapeAttr(owner.id)}" ${owner.status === "inativo" ? "disabled" : ""} title="${owner.status === "inativo" ? "Proprietário já inativo" : "Inativar"}" aria-label="Inativar ${escapeAttr(owner.nome)}"><i class="fa-solid fa-user-slash"></i></button>
+          <button type="button" class="terrain-owner-icon-button danger" data-terrain-owner-delete="${escapeAttr(owner.id)}" ${canDelete ? "" : "disabled"} title="${canDelete ? "Excluir" : "Exclusão bloqueada: existem terrenos vinculados"}" aria-label="Excluir ${escapeAttr(owner.nome)}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function closeTerrainOwnerDetail() {
+  const modal = $("terrainOwnerDetailModal");
+  modal?.classList.add("hidden");
+  modal?.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("terrain-owner-detail-open");
+}
+
+function openTerrainOwnerDetail(ownerId) {
+  const owner = terrainOwnerById(ownerId);
+  if (!owner) return;
+  const status = terrainOwnerStatusMeta(owner.status);
+  const linkedTerrains = terrainOwnerLinkedTerrains(owner.id, state.terrainManagement?.terrains || {});
+  const whatsappUrl = terrainOwnerWhatsappUrl(owner);
+  $("terrainOwnerDetailTitle").textContent = owner.nome || "Detalhes";
+  $("terrainOwnerDetailContent").innerHTML = `
+    <div class="terrain-owner-detail-grid">
+      <div><span>CPF/CNPJ</span><strong>${escapeHtml(owner.cpf_cnpj || "-")}</strong></div>
+      <div><span>Status</span><strong><span class="terrain-owner-status ${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></strong></div>
+      <div><span>Telefone</span><strong>${escapeHtml(formatPhoneMask(owner.telefone) || "-")}</strong></div>
+      <div><span>WhatsApp</span><strong>${whatsappUrl ? `<a href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(formatPhoneMask(owner.whatsapp))}</a>` : "-"}</strong></div>
+      <div><span>Telefone secundário</span><strong>${escapeHtml(formatPhoneMask(owner.telefone_secundario) || "-")}</strong></div>
+      <div><span>E-mail</span><strong>${owner.email ? `<a href="mailto:${escapeAttr(owner.email)}">${escapeHtml(owner.email)}</a>` : "-"}</strong></div>
+      <div class="wide"><span>Endereço</span><strong>${escapeHtml([owner.endereco, owner.numero, owner.bairro, owner.cidade, owner.estado, owner.cep].filter(Boolean).join(", "))}</strong></div>
+      <div><span>Origem do cliente</span><strong>${escapeHtml(terrainOwnerOriginLabel(owner.origem_cliente))}</strong></div>
+      <div><span>Atualizado em</span><strong>${escapeHtml(terrainOwnerDateLabel(owner.updated_at))}</strong></div>
+      <div class="wide"><span>Observações</span><strong>${escapeHtml(owner.observacoes || "Sem observações.")}</strong></div>
+    </div>
+    <section class="terrain-owner-detail-terrains">
+      <div class="section-head compact">
+        <div>
+          <h3>Terrenos deste proprietário</h3>
+          <p>${linkedTerrains.length} ${linkedTerrains.length === 1 ? "terreno vinculado" : "terrenos vinculados"}.</p>
+        </div>
+      </div>
+      ${linkedTerrains.length ? `
+        <div class="terrain-owner-linked-list">
+          ${linkedTerrains.map((terrain) => `
+            <div>
+              <i class="fa-solid fa-vector-square"></i>
+              <span><strong>${escapeHtml(terrain.apelido || `Terreno ${terrain.id}`)}</strong><small>${escapeHtml([terrain.rua, terrain.numero, terrain.bairro, terrain.quadra ? `Quadra ${terrain.quadra}` : "", terrain.lote ? `Lote ${terrain.lote}` : ""].filter(Boolean).join(" · "))}</small></span>
+            </div>`).join("")}
+        </div>` : `
+        <div class="terrain-owner-linked-empty">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <strong>Nenhum terreno vinculado</strong>
+          <span>Este proprietário ainda não possui terrenos associados.</span>
+        </div>`}
+    </section>`;
+  const modal = $("terrainOwnerDetailModal");
+  modal?.classList.remove("hidden");
+  modal?.setAttribute("aria-hidden", "false");
+  document.body.classList.add("terrain-owner-detail-open");
+  $("closeTerrainOwnerDetail")?.focus();
+}
+
+async function refreshTerrainOwnerRecord(ownerId) {
+  const snapshot = await get(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}`));
+  if (snapshot.exists()) state.terrainManagement.owners[ownerId] = snapshot.val();
+  else delete state.terrainManagement.owners[ownerId];
+}
+
+async function saveTerrainOwner(event) {
+  event.preventDefault();
+  if (!isMaster()) return showToast("Somente o Admin Master pode salvar proprietários.");
+  const existing = state.selectedTerrainOwnerId ? terrainOwnerById(state.selectedTerrainOwnerId) : null;
+  const ownerId = existing?.id || push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.owners.path)).key;
+  try {
+    const payload = buildTerrainOwnerRecord(terrainOwnerFormValues(), {
+      id: ownerId,
+      existing: existing || {},
+      timestamp: serverTimestamp()
+    });
+    await firebaseSet(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}`), payload);
+    await refreshTerrainOwnerRecord(ownerId);
+    renderTerrainManagement();
+    resetTerrainOwnerForm();
+    showToast(existing ? "Proprietário atualizado com sucesso." : "Proprietário criado com sucesso.", { prominent: true });
+  } catch (error) {
+    console.error("Falha ao salvar proprietário.", error);
+    showToast(error?.message || "Não foi possível salvar o proprietário.");
+  }
+}
+
+async function inactivateTerrainOwner(ownerId) {
+  const owner = terrainOwnerById(ownerId);
+  if (!owner || owner.status === "inativo") return;
+  if (!window.confirm(`Inativar o proprietário ${owner.nome}?`)) return;
+  try {
+    await firebaseUpdate(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}`), {
+      status: "inativo",
+      updated_at: serverTimestamp()
+    });
+    await refreshTerrainOwnerRecord(ownerId);
+    renderTerrainManagement();
+    showToast("Proprietário inativado.");
+  } catch (error) {
+    console.error("Falha ao inativar proprietário.", error);
+    showToast("Não foi possível inativar o proprietário.");
+  }
+}
+
+async function deleteTerrainOwner(ownerId) {
+  const owner = terrainOwnerById(ownerId);
+  if (!owner) return;
+  if (!canDeleteTerrainOwner(ownerId, state.terrainManagement?.terrains || {})) {
+    showToast("Exclusão bloqueada: remova os vínculos com terrenos antes de excluir.");
+    return;
+  }
+  if (!(await confirmarExclusao(owner.nome || ownerId, "proprietário"))) return;
+  try {
+    const linkedQuery = query(
+      ref(db, TERRAIN_MANAGEMENT_ENTITIES.terrains.path),
+      orderByChild("owner_id"),
+      equalTo(ownerId)
+    );
+    const linkedSnapshot = await get(linkedQuery);
+    if (linkedSnapshot.exists()) {
+      showToast("Exclusão bloqueada: este proprietário possui terrenos vinculados.");
+      state.terrainManagement.terrains = {
+        ...(state.terrainManagement.terrains || {}),
+        ...(linkedSnapshot.val() || {})
+      };
+      renderTerrainManagement();
+      return;
+    }
+    await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}`));
+    delete state.terrainManagement.owners[ownerId];
+    if (state.selectedTerrainOwnerId === ownerId) resetTerrainOwnerForm();
+    closeTerrainOwnerDetail();
+    renderTerrainManagement();
+    showToast("Proprietário excluído.");
+  } catch (error) {
+    console.error("Falha ao excluir proprietário.", error);
+    showToast("Não foi possível excluir o proprietário.");
+  }
 }
 
 function switchTerrainManagementTab(tabName = "dashboard") {
@@ -3157,6 +3426,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
   document.querySelectorAll("[data-terrain-section]").forEach((section) => {
     section.classList.toggle("hidden", section.dataset.terrainSection !== target);
   });
+  if (target === "owners") renderTerrainOwnerList();
 }
 
 function updateChrome() {
@@ -23064,6 +23334,40 @@ function bindEvents() {
   });
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     button.addEventListener("click", () => switchTerrainManagementTab(button.dataset.terrainTab));
+  });
+  $("newTerrainOwner")?.addEventListener("click", () => openTerrainOwnerForm());
+  $("closeTerrainOwnerForm")?.addEventListener("click", resetTerrainOwnerForm);
+  $("cancelTerrainOwnerForm")?.addEventListener("click", resetTerrainOwnerForm);
+  $("terrainOwnerForm")?.addEventListener("submit", saveTerrainOwner);
+  $("terrainOwnerNameSearch")?.addEventListener("input", renderTerrainOwnerList);
+  $("terrainOwnerPhoneSearch")?.addEventListener("input", renderTerrainOwnerList);
+  $("terrainOwnerStatusFilter")?.addEventListener("change", renderTerrainOwnerList);
+  $("terrainOwnerList")?.addEventListener("click", async (event) => {
+    const viewButton = event.target.closest("[data-terrain-owner-view]");
+    if (viewButton) return openTerrainOwnerDetail(viewButton.dataset.terrainOwnerView);
+    const editButton = event.target.closest("[data-terrain-owner-edit]");
+    if (editButton) return openTerrainOwnerForm(editButton.dataset.terrainOwnerEdit);
+    const inactiveButton = event.target.closest("[data-terrain-owner-inactivate]");
+    if (inactiveButton) return inactivateTerrainOwner(inactiveButton.dataset.terrainOwnerInactivate);
+    const deleteButton = event.target.closest("[data-terrain-owner-delete]");
+    if (deleteButton) return deleteTerrainOwner(deleteButton.dataset.terrainOwnerDelete);
+  });
+  ["terrainOwnerPhone", "terrainOwnerWhatsapp", "terrainOwnerSecondaryPhone"].forEach(bindPhoneMask);
+  $("terrainOwnerDocument")?.addEventListener("input", (event) => {
+    event.target.value = formatTerrainOwnerDocument(event.target.value);
+  });
+  $("terrainOwnerCep")?.addEventListener("input", (event) => {
+    event.target.value = formatTerrainOwnerCep(event.target.value);
+  });
+  $("terrainOwnerState")?.addEventListener("input", (event) => {
+    event.target.value = String(event.target.value || "").replace(/[^a-z]/gi, "").toUpperCase().slice(0, 2);
+  });
+  $("closeTerrainOwnerDetail")?.addEventListener("click", closeTerrainOwnerDetail);
+  $("terrainOwnerDetailModal")?.addEventListener("click", (event) => {
+    if (event.target === $("terrainOwnerDetailModal")) closeTerrainOwnerDetail();
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !$("terrainOwnerDetailModal")?.classList.contains("hidden")) closeTerrainOwnerDetail();
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);

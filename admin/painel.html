@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=421">
+  <link rel="stylesheet" href="painel.css?v=422">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -231,11 +231,120 @@
         </section>
 
         <section class="terrain-module-section hidden" data-terrain-section="owners">
-          <div class="terrain-module-empty">
-            <i class="fa-solid fa-user-group"></i>
-            <strong>Proprietários</strong>
-            <span>Nenhum proprietário cadastrado.</span>
-          </div>
+          <section id="terrainOwnerFormCard" class="panel-card terrain-owner-form-card hidden">
+            <div class="section-head">
+              <div>
+                <h2 id="terrainOwnerFormTitle">Novo proprietário</h2>
+                <p>Dados de contato e relacionamento do proprietário.</p>
+              </div>
+              <button id="closeTerrainOwnerForm" class="ghost-button" type="button" data-no-loading title="Fechar formulário" aria-label="Fechar formulário"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="terrainOwnerForm" class="grid-form">
+              <input id="terrainOwnerId" type="hidden">
+              <label class="wide">Nome completo
+                <input id="terrainOwnerName" maxlength="140" autocomplete="name" required>
+              </label>
+              <label>CPF/CNPJ
+                <input id="terrainOwnerDocument" maxlength="18" inputmode="numeric" placeholder="Opcional">
+              </label>
+              <label>Telefone
+                <input id="terrainOwnerPhone" maxlength="16" inputmode="tel" autocomplete="tel" required>
+              </label>
+              <label>WhatsApp
+                <input id="terrainOwnerWhatsapp" maxlength="16" inputmode="tel" required>
+              </label>
+              <label>Telefone secundário
+                <input id="terrainOwnerSecondaryPhone" maxlength="16" inputmode="tel" placeholder="Opcional">
+              </label>
+              <label class="wide">E-mail
+                <input id="terrainOwnerEmail" type="email" maxlength="160" autocomplete="email" placeholder="Opcional">
+              </label>
+              <label class="wide">Endereço
+                <input id="terrainOwnerAddress" maxlength="180" autocomplete="street-address" required>
+              </label>
+              <label>Número
+                <input id="terrainOwnerAddressNumber" maxlength="20" required>
+              </label>
+              <label>Bairro
+                <input id="terrainOwnerNeighborhood" maxlength="100" required>
+              </label>
+              <label>Cidade
+                <input id="terrainOwnerCity" maxlength="100" value="Carlópolis" autocomplete="address-level2" required>
+              </label>
+              <label>Estado
+                <input id="terrainOwnerState" maxlength="2" value="PR" autocomplete="address-level1" required>
+              </label>
+              <label>CEP
+                <input id="terrainOwnerCep" maxlength="9" inputmode="numeric" autocomplete="postal-code" required>
+              </label>
+              <label>Origem do cliente
+                <select id="terrainOwnerOrigin" required>
+                  <option value="indicacao">Indicação</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="instagram">Instagram</option>
+                  <option value="ola_carlopolis">Olá Carlópolis</option>
+                  <option value="cliente_antigo">Cliente antigo</option>
+                  <option value="prospeccao" selected>Prospecção</option>
+                  <option value="outro">Outro</option>
+                </select>
+              </label>
+              <label>Status
+                <select id="terrainOwnerStatus" required>
+                  <option value="potencial_cliente" selected>Potencial cliente</option>
+                  <option value="cliente">Cliente</option>
+                  <option value="aguardando_resposta">Aguardando resposta</option>
+                  <option value="ativo">Cliente ativo</option>
+                  <option value="nao_interessado">Não interessado</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </label>
+              <label class="wide">Observações
+                <textarea id="terrainOwnerNotes" rows="4" maxlength="1500"></textarea>
+              </label>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar proprietário</button>
+                <button id="cancelTerrainOwnerForm" class="ghost-button" type="button" data-no-loading>Cancelar</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card terrain-owner-list-card">
+            <div class="section-head">
+              <div>
+                <h2>Proprietários</h2>
+                <p id="terrainOwnerListSummary">0 proprietários encontrados.</p>
+              </div>
+              <button id="newTerrainOwner" class="ghost-button new-entry-button" type="button" data-no-loading><i class="fa-solid fa-plus"></i> Novo proprietário</button>
+            </div>
+            <div class="terrain-owner-filters">
+              <label>Buscar por nome
+                <span class="terrain-owner-search-field"><i class="fa-solid fa-magnifying-glass"></i><input id="terrainOwnerNameSearch" type="search" placeholder="Nome do proprietário"></span>
+              </label>
+              <label>Telefone ou WhatsApp
+                <span class="terrain-owner-search-field"><i class="fa-solid fa-phone"></i><input id="terrainOwnerPhoneSearch" type="search" inputmode="tel" placeholder="Número do contato"></span>
+              </label>
+              <label>Status
+                <select id="terrainOwnerStatusFilter">
+                  <option value="">Todos os status</option>
+                  <option value="potencial_cliente">Potencial cliente</option>
+                  <option value="cliente">Cliente</option>
+                  <option value="aguardando_resposta">Aguardando resposta</option>
+                  <option value="ativo">Cliente ativo</option>
+                  <option value="nao_interessado">Não interessado</option>
+                  <option value="inativo">Inativo</option>
+                </select>
+              </label>
+            </div>
+            <div class="terrain-owner-list-head" aria-hidden="true">
+              <span>Proprietário</span>
+              <span>WhatsApp</span>
+              <span>Cidade</span>
+              <span>Terrenos</span>
+              <span>Status</span>
+              <span>Ações</span>
+            </div>
+            <div id="terrainOwnerList" class="terrain-owner-list"></div>
+          </section>
         </section>
 
         <section class="terrain-module-section hidden" data-terrain-section="terrains">
@@ -2374,6 +2483,19 @@
     </section>
   </main>
 
+  <div id="terrainOwnerDetailModal" class="terrain-owner-detail-overlay hidden" aria-hidden="true">
+    <section class="terrain-owner-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="terrainOwnerDetailTitle">
+      <header>
+        <div>
+          <span>Proprietário</span>
+          <h2 id="terrainOwnerDetailTitle">Detalhes</h2>
+        </div>
+        <button id="closeTerrainOwnerDetail" class="ghost-button" type="button" data-no-loading title="Fechar detalhes" aria-label="Fechar detalhes"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div id="terrainOwnerDetailContent"></div>
+    </section>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
   <div id="adminActionLoading" class="admin-action-loading hidden" aria-live="polite">
     <div class="admin-action-loading-card">
@@ -2384,6 +2506,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=621"></script>
+  <script type="module" src="painel.js?v=622"></script>
 </body>
 </html>

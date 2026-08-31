@@ -1,0 +1,14 @@
+{
+  "version": "31_08_26_v3",
+  "created_at": "2026-08-31",
+  "database": "firebase-realtime-database",
+  "module": "gestao_terrenos",
+  "operation": "add_optional_field",
+  "node": "terrenosProprietarios",
+  "field": {
+    "name": "telefone_secundario",
+    "type": "string|null",
+    "required": false
+  },
+  "notes": "Alteracao incremental; nenhum no ou registro existente e recriado."
+}
