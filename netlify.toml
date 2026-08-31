@@ -27,6 +27,21 @@
   status = 200
 
 [[redirects]]
+  from = "/api/payment-integration"
+  to = "/.netlify/functions/payment-integration"
+  status = 200
+
+[[redirects]]
+  from = "/api/payment-charge"
+  to = "/.netlify/functions/payment-charge"
+  status = 200
+
+[[redirects]]
+  from = "/api/payment-webhook"
+  to = "/.netlify/functions/payment-webhook"
+  status = 200
+
+[[redirects]]
   from = "/old/*"
   to = "/"
   status = 301

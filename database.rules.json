@@ -35,6 +35,16 @@
       }
     },
 
+    "integracoesPagamento": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": false
+    },
+
+    "pagamentosIntegracao": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": false
+    },
+
     "auditLogs": {
       ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
       "$logId": {

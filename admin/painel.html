@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=419">
+  <link rel="stylesheet" href="painel.css?v=420">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -96,6 +96,7 @@
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
           <button data-view="novidadesConfig" data-master="true"><i class="fa-solid fa-bell"></i> Novidades do site</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
+          <button data-view="integracaoPagamento" data-master="true"><i class="fa-solid fa-building-columns"></i> Integração de pagamentos</button>
           <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
           <button data-view="sobreNos" data-master="true"><i class="fa-solid fa-circle-info"></i> Sobre nós</button>
           <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</button>
@@ -1142,6 +1143,112 @@
               <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar pagamento</button>
             </div>
           </form>
+        </section>
+      </section>
+
+      <section id="integracaoPagamentoView" class="panel-view hidden">
+        <div class="payment-integration-status-grid">
+          <article class="stat-card">
+            <span>Situação da integração</span>
+            <strong id="paymentIntegrationStatus">Desativada</strong>
+            <small id="paymentIntegrationStatusDetail">Carregando configuração...</small>
+          </article>
+          <article class="stat-card">
+            <span>Pagamentos confirmados</span>
+            <strong id="paymentIntegrationPaidCount">0</strong>
+            <small>Baixas automáticas registradas</small>
+          </article>
+          <article class="stat-card">
+            <span>Aguardando pagamento</span>
+            <strong id="paymentIntegrationPendingCount">0</strong>
+            <small>Cobranças com PIX gerado</small>
+          </article>
+          <article class="stat-card">
+            <span>Eventos com erro</span>
+            <strong id="paymentIntegrationErrorCount">0</strong>
+            <small>Notificações que precisam de atenção</small>
+          </article>
+        </div>
+
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Integração automática de pagamentos</h2>
+              <p>Esta área é independente dos dados do PIX atual. Quando ativada, registra a cobrança, recebe a confirmação do provedor e atualiza o financeiro do cliente.</p>
+            </div>
+          </div>
+          <form id="paymentIntegrationForm" class="grid-form">
+            <label class="check-row wide">
+              <input id="paymentIntegrationEnabled" type="checkbox">
+              Ativar confirmação automática
+            </label>
+            <label>Provedor
+              <select id="paymentIntegrationProvider">
+                <option value="mercadopago">Mercado Pago</option>
+                <option value="asaas">Asaas</option>
+                <option value="generic">Outro provedor / webhook personalizado</option>
+              </select>
+            </label>
+            <label>Ambiente
+              <select id="paymentIntegrationEnvironment">
+                <option value="sandbox">Teste / Sandbox</option>
+                <option value="production">Produção</option>
+              </select>
+            </label>
+            <label class="wide">Token de acesso da API
+              <input id="paymentIntegrationAccessToken" type="password" autocomplete="new-password" placeholder="Deixe vazio para manter o token já salvo">
+              <small id="paymentIntegrationAccessTokenState">Nenhum token salvo.</small>
+            </label>
+            <label class="wide">Segredo ou token de validação do webhook
+              <input id="paymentIntegrationWebhookSecret" type="password" autocomplete="new-password" placeholder="Deixe vazio para manter o segredo já salvo">
+              <small id="paymentIntegrationWebhookSecretState">Nenhum segredo salvo.</small>
+            </label>
+            <label class="wide">Endereço do webhook
+              <div class="payment-webhook-copy">
+                <input id="paymentIntegrationWebhookUrl" readonly>
+                <button id="copyPaymentIntegrationWebhook" class="ghost-button" type="button"><i class="fa-solid fa-copy"></i> Copiar</button>
+              </div>
+              <small>Cadastre este endereço no painel do provedor escolhido.</small>
+            </label>
+
+            <details id="paymentIntegrationAdvanced" class="wide payment-integration-advanced">
+              <summary><i class="fa-solid fa-sliders"></i> Mapeamento para provedor personalizado</summary>
+              <div class="grid-form">
+                <label>Cabeçalho do token<input id="paymentIntegrationTokenHeader" placeholder="x-payment-token"></label>
+                <label>Campo do TXID<input id="paymentIntegrationTxidField" placeholder="txid"></label>
+                <label>Campo do status<input id="paymentIntegrationStatusField" placeholder="status"></label>
+                <label>Campo da transação<input id="paymentIntegrationTransactionField" placeholder="transactionId"></label>
+                <label>Campo do valor<input id="paymentIntegrationAmountField" placeholder="amount"></label>
+                <label>Status que significam pago<input id="paymentIntegrationPaidStatuses" placeholder="paid,approved,confirmed,received"></label>
+              </div>
+            </details>
+
+            <div class="form-actions wide">
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar integração</button>
+              <button id="testPaymentIntegration" class="ghost-button" type="button"><i class="fa-solid fa-plug-circle-check"></i> Testar conexão</button>
+              <button id="refreshPaymentIntegration" class="ghost-button" type="button"><i class="fa-solid fa-rotate"></i> Atualizar relatório</button>
+            </div>
+          </form>
+          <div id="paymentIntegrationNotice" class="payment-integration-notice">
+            O PIX e o QR Code atuais continuam disponíveis. Com Mercado Pago ou Asaas ativos, o sistema usa o QR dinâmico retornado pelo provedor; com webhook personalizado, mantém o PIX atual e faz a conciliação pelo TXID.
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Quem pagou e quem ainda não pagou</h2>
+              <p>Histórico das cobranças registradas pela integração automática.</p>
+            </div>
+            <select id="paymentIntegrationReportFilter" class="compact-select">
+              <option value="all">Todos</option>
+              <option value="paid">Pagos</option>
+              <option value="pending">Pendentes</option>
+            </select>
+          </div>
+          <div id="paymentIntegrationReport" class="payment-integration-report">
+            <div class="list-meta">Carregando cobranças...</div>
+          </div>
         </section>
       </section>
 
@@ -2223,6 +2330,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=619"></script>
+  <script type="module" src="painel.js?v=620"></script>
 </body>
 </html>

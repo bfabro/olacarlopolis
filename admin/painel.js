@@ -46,10 +46,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 682,
-  label: "v689",
-  data: "2026-08-28",
-  nota: "Relatorio por cliente otimizado com consulta individual por periodo, cache e tempo real isolado."
+  numero: 683,
+  label: "v690",
+  data: "2026-08-31",
+  nota: "Integracao automatica de pagamentos com PIX dinamico, webhook e conciliacao por cliente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -107,6 +107,8 @@ let masterClientMetricsRealtimeUnsubscribers = [];
 let masterClientMetricsRealtimeSignature = "";
 let masterClientMetricsRealtimeRenderTimer = null;
 let masterClientMetricsLoadToken = 0;
+let clientFinanceRealtimeUnsubscribe = null;
+let paymentIntegrationRealtimeUnsubscribe = null;
 const ONLINE_PRESENCE_RECENT_MS = 2 * 60 * 1000;
 let onlinePresenceUnsubscribe = null;
 let onlinePresenceTicker = null;
@@ -187,6 +189,7 @@ let state = {
   gruposWhatsapp: [],
   categorias: [],
   pagamentoSistema: {},
+  integracaoPagamento: { config: {}, charges: [], events: [], loaded: false },
   paginaInicialSite: {},
   novidadesConfig: {},
   combustiveisConfig: {},
@@ -755,6 +758,7 @@ const views = {
   areaParceiro: $("areaParceiroView"),
   usuariosOnline: $("usuariosOnlineView"),
   pagamentoSistema: $("pagamentoSistemaView"),
+  integracaoPagamento: $("integracaoPagamentoView"),
   paginaInicialSite: $("paginaInicialSiteView"),
   novidadesConfig: $("novidadesConfigView"),
   combustiveisConfig: $("combustiveisConfigView"),
@@ -788,6 +792,7 @@ const viewCopy = {
   areaParceiro: ["Área do Parceiro", "Solicitações, dúvidas e clientes vinculados aos seus benefícios."],
   usuariosOnline: ["Usuarios online", "Acompanhe em tempo real quais telas do site publico estao sendo acessadas."],
   pagamentoSistema: ["Pagamento", "Configure a chave Pix usada nas faturas."],
+  integracaoPagamento: ["Integração de pagamentos", "Confirmação automática, conciliação e relatório de pagamentos."],
   storiesComerciais: ["Stories comerciais", "Crie artes premium para clientes e conquiste novos anunciantes."],
   paginaInicialSite: ["Página Inicial Site", "Configure o banner principal de acessos rapidos."],
   novidadesConfig: ["Novidades do site", "Defina quais atualizações aparecem na tela principal pública."],
@@ -1070,7 +1075,7 @@ function canAccessView(viewName) {
   if (viewName === "combustiveisPrecos") return canManageClients() || hasPermission("combustiveis_precos");
   if (canManageClients()) {
     if (viewName === "usuariosOnline") return isMaster();
-    if (viewName === "pagamentoSistema") return isMaster();
+    if (viewName === "pagamentoSistema" || viewName === "integracaoPagamento") return isMaster();
     if (viewName === "paginaInicialSite") return isMaster();
     if (viewName === "combustiveisConfig") return isMaster();
     if (viewName === "novidadesConfig") return isMaster();
@@ -6019,6 +6024,7 @@ function switchView(name) {
     stopAccessReportRealtime();
     stopMasterClientMetricsRealtime();
   }
+  if (target !== "integracaoPagamento") stopPaymentIntegrationRealtime();
   document.querySelectorAll(".nav-admin button.admin-button-loading").forEach((button) => {
     button.classList.remove("admin-button-loading");
   });
@@ -6038,6 +6044,7 @@ function switchView(name) {
   if (target === "artesPostagem") renderPostArtView();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
+  if (target === "integracaoPagamento") loadPaymentIntegration();
   if (target === "paginaInicialSite") renderHomePageSettings();
   if (target === "combustiveisConfig") renderFuelAdminSettings();
   if (target === "combustiveisPrecos") renderFuelClientPrices();
@@ -9464,6 +9471,26 @@ function effectivePaymentStatus(client) {
   return client?.pagamentoStatus || "em_aberto";
 }
 
+function stopClientFinanceRealtime() {
+  if (clientFinanceRealtimeUnsubscribe) clientFinanceRealtimeUnsubscribe();
+  clientFinanceRealtimeUnsubscribe = null;
+}
+
+function startClientFinanceRealtime() {
+  stopClientFinanceRealtime();
+  if (canManageClients()) return;
+  const clientId = currentClientId();
+  if (!clientId) return;
+  clientFinanceRealtimeUnsubscribe = onValue(ref(db, `clientesFinanceiro/${clientId}`), (snapshot) => {
+    const finance = snapshot.exists() ? snapshot.val() : {};
+    state.clientesFinanceiro[clientId] = finance;
+    const current = state.clientes.find((item) => item.id === clientId);
+    if (current) upsertClientInState(clientId, mergeClientFinanceData(current, finance));
+    renderClientBillingAlert();
+    if (!$("faturasView")?.classList.contains("hidden")) renderClientInvoices();
+  }, (error) => console.warn("Falha ao acompanhar confirmação do pagamento.", error));
+}
+
 function financePaidReferenceMonth(client = {}) {
   const configuredMonth = [
     client?.competenciaPagamento,
@@ -9664,6 +9691,7 @@ function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = nul
   });
   return {
     mes,
+    txid,
     saved,
     dueDate: saved.vencimento || saved.dataVencimento || options.dueDateOverride || planDueDate || invoiceDueDateForMonth(client, mes),
     valorPlano,
@@ -17507,6 +17535,198 @@ function renderPaymentSettings() {
   $("paymentInvoiceFooterMessage").value = config.mensagemRodapeBoleto || "";
 }
 
+async function paymentIntegrationRequest(path = "/api/payment-integration", payload = null) {
+  if (!state.user) throw new Error("Sessão não identificada.");
+  const token = await state.user.getIdToken();
+  const response = await fetch(path, {
+    method: payload ? "POST" : "GET",
+    headers: { accept: "application/json", authorization: `Bearer ${token}`, ...(payload ? { "content-type": "application/json" } : {}) },
+    body: payload ? JSON.stringify(payload) : undefined,
+    cache: "no-store"
+  });
+  const result = await response.json().catch(() => ({}));
+  if (!response.ok || result.success === false) throw new Error(result.message || `Falha no servidor (HTTP ${response.status}).`);
+  return result;
+}
+
+function paymentProviderLabel(provider) {
+  return { mercadopago: "Mercado Pago", asaas: "Asaas", generic: "Webhook personalizado", finance: "Financeiro atual" }[provider] || "Não configurado";
+}
+
+function renderPaymentIntegrationReport() {
+  const integration = state.integracaoPagamento || {};
+  const config = integration.config || {};
+  const integrationCharges = Array.isArray(integration.charges) ? integration.charges : [];
+  const chargedClients = new Set(integrationCharges.map((item) => item.clientId).filter(Boolean));
+  const financeRows = state.clientes
+    .filter((client) => isBillableClientType(client) && effectivePaymentStatus(client) !== "isento" && !chargedClients.has(client.id))
+    .map((client) => {
+      const status = effectivePaymentStatus(client) === "pago" ? "paid" : "pending";
+      return {
+        clientId: client.id,
+        clientName: client.nome || client.id,
+        months: status === "paid" ? [financePaidReferenceMonth(client)].filter(Boolean) : pendingMonthsForClient(client),
+        amount: valorTotalFaturaCliente(client),
+        provider: "finance",
+        status,
+        updatedAt: client.updatedAt || 0
+      };
+    });
+  const charges = [...integrationCharges, ...financeRows];
+  const events = Array.isArray(integration.events) ? integration.events : [];
+  const paid = charges.filter((item) => item.status === "paid");
+  const pending = charges.filter((item) => item.status !== "paid");
+  const errors = events.filter((item) => item.status === "error" || item.status === "unmatched");
+  if ($("paymentIntegrationStatus")) $("paymentIntegrationStatus").textContent = config.enabled ? "Ativa" : "Desativada";
+  if ($("paymentIntegrationStatusDetail")) $("paymentIntegrationStatusDetail").textContent = config.enabled
+    ? `${paymentProviderLabel(config.provider)} · ${config.environment === "sandbox" ? "Teste" : "Produção"}`
+    : "O PIX atual continua funcionando normalmente.";
+  if ($("paymentIntegrationPaidCount")) $("paymentIntegrationPaidCount").textContent = String(paid.length);
+  if ($("paymentIntegrationPendingCount")) $("paymentIntegrationPendingCount").textContent = String(pending.length);
+  if ($("paymentIntegrationErrorCount")) $("paymentIntegrationErrorCount").textContent = String(errors.length);
+  const filter = $("paymentIntegrationReportFilter")?.value || "all";
+  const visible = charges.filter((item) => filter === "all" || (filter === "paid" ? item.status === "paid" : item.status !== "paid"));
+  const mount = $("paymentIntegrationReport");
+  if (!mount) return;
+  if (!visible.length) {
+    mount.innerHTML = `<div class="payment-integration-empty"><i class="fa-solid fa-receipt"></i><strong>Nenhuma cobrança neste filtro</strong><span>As cobranças aparecerão aqui quando um cliente gerar o PIX.</span></div>`;
+    return;
+  }
+  mount.innerHTML = `
+    <div class="payment-integration-table-wrap">
+      <table class="payment-integration-table">
+        <thead><tr><th>Cliente</th><th>Referência</th><th>Valor</th><th>Provedor</th><th>Situação</th><th>Atualização</th></tr></thead>
+        <tbody>${visible.map((item) => `
+          <tr>
+            <td><strong>${escapeHtml(item.clientName || item.clientId || "Cliente")}</strong><small>${escapeHtml((item.months || []).map(monthLabel).join(", "))}</small></td>
+            <td><code>${escapeHtml(item.txid || "-")}</code><small>${escapeHtml(item.providerPaymentId || "")}</small></td>
+            <td>${moneyBR(item.amount)}</td>
+            <td>${escapeHtml(paymentProviderLabel(item.provider))}</td>
+            <td><span class="badge ${item.status === "paid" ? "pago" : "em_aberto"}">${item.status === "paid" ? "Pago" : "Pendente"}</span></td>
+            <td>${item.updatedAt ? escapeHtml(new Date(item.updatedAt).toLocaleString("pt-BR")) : "-"}</td>
+          </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function fillPaymentIntegrationForm() {
+  const config = state.integracaoPagamento?.config || {};
+  if (!$("paymentIntegrationForm")) return;
+  $("paymentIntegrationEnabled").checked = config.enabled === true;
+  $("paymentIntegrationProvider").value = config.provider || "mercadopago";
+  $("paymentIntegrationEnvironment").value = config.environment || "sandbox";
+  $("paymentIntegrationAccessToken").value = "";
+  $("paymentIntegrationWebhookSecret").value = "";
+  $("paymentIntegrationAccessTokenState").textContent = config.accessTokenConfigured ? "Token protegido já salvo no servidor." : "Nenhum token salvo.";
+  $("paymentIntegrationWebhookSecretState").textContent = config.webhookSecretConfigured ? "Segredo protegido já salvo no servidor." : "Nenhum segredo salvo.";
+  $("paymentIntegrationWebhookUrl").value = `${window.location.origin}/api/payment-webhook`;
+  $("paymentIntegrationTokenHeader").value = config.webhookTokenHeader || "x-payment-token";
+  $("paymentIntegrationTxidField").value = config.txidField || "txid";
+  $("paymentIntegrationStatusField").value = config.statusField || "status";
+  $("paymentIntegrationTransactionField").value = config.transactionIdField || "transactionId";
+  $("paymentIntegrationAmountField").value = config.amountField || "amount";
+  $("paymentIntegrationPaidStatuses").value = config.paidStatuses || "paid,approved,confirmed,received";
+  $("paymentIntegrationAdvanced").classList.toggle("hidden", $("paymentIntegrationProvider").value !== "generic");
+}
+
+async function loadPaymentIntegration(force = false) {
+  if (!isMaster() || (!force && state.integracaoPagamento?.loading)) return;
+  state.integracaoPagamento.loading = true;
+  if ($("paymentIntegrationReport")) $("paymentIntegrationReport").innerHTML = `<div class="list-meta">Carregando integração e relatório...</div>`;
+  try {
+    const result = await paymentIntegrationRequest();
+    state.integracaoPagamento = { config: result.config || {}, charges: result.charges || [], events: result.events || [], loaded: true, loading: false };
+    fillPaymentIntegrationForm();
+    renderPaymentIntegrationReport();
+    startPaymentIntegrationRealtime();
+  } catch (error) {
+    state.integracaoPagamento.loading = false;
+    if ($("paymentIntegrationReport")) $("paymentIntegrationReport").innerHTML = `<div class="payment-integration-error">${escapeHtml(error.message)}</div>`;
+    showToast(error.message || "Não foi possível carregar a integração.");
+  }
+}
+
+function stopPaymentIntegrationRealtime() {
+  if (paymentIntegrationRealtimeUnsubscribe) paymentIntegrationRealtimeUnsubscribe();
+  paymentIntegrationRealtimeUnsubscribe = null;
+}
+
+function startPaymentIntegrationRealtime() {
+  stopPaymentIntegrationRealtime();
+  if (!isMaster()) return;
+  paymentIntegrationRealtimeUnsubscribe = onValue(ref(db, "pagamentosIntegracao"), (snapshot) => {
+    const value = snapshot.exists() ? snapshot.val() : {};
+    state.integracaoPagamento.charges = Object.values(value.cobrancas || {}).sort((a, b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0));
+    state.integracaoPagamento.events = Object.entries(value.eventos || {}).map(([id, item]) => ({ id, ...item })).sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+    renderPaymentIntegrationReport();
+  }, (error) => console.warn("Falha ao acompanhar pagamentos em tempo real.", error));
+}
+
+async function savePaymentIntegration(event) {
+  event.preventDefault();
+  if (!isMaster()) return;
+  const button = event.submitter;
+  setBusy(button, true, "Salvando...");
+  try {
+    const result = await paymentIntegrationRequest("/api/payment-integration", {
+      action: "save",
+      config: {
+        enabled: $("paymentIntegrationEnabled").checked,
+        provider: $("paymentIntegrationProvider").value,
+        environment: $("paymentIntegrationEnvironment").value,
+        webhookTokenHeader: $("paymentIntegrationTokenHeader").value,
+        txidField: $("paymentIntegrationTxidField").value,
+        statusField: $("paymentIntegrationStatusField").value,
+        transactionIdField: $("paymentIntegrationTransactionField").value,
+        amountField: $("paymentIntegrationAmountField").value,
+        paidStatuses: $("paymentIntegrationPaidStatuses").value
+      },
+      secrets: {
+        accessToken: $("paymentIntegrationAccessToken").value,
+        webhookSecret: $("paymentIntegrationWebhookSecret").value
+      }
+    });
+    state.integracaoPagamento.config = result.config || {};
+    fillPaymentIntegrationForm();
+    renderPaymentIntegrationReport();
+    showToast(result.message || "Integração salva.");
+  } catch (error) {
+    showToast(error.message || "Falha ao salvar a integração.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+async function testPaymentIntegration(button) {
+  setBusy(button, true, "Testando...");
+  try {
+    const result = await paymentIntegrationRequest("/api/payment-integration", { action: "test" });
+    showToast(result.message || "Conexão confirmada.");
+  } catch (error) {
+    showToast(error.message || "A conexão não foi confirmada.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+async function createIntegratedPaymentCharge(client, invoice, months = [], planType = "mensal") {
+  if (!client?.id || !invoice?.txid || !invoice?.valorTotal || !months.length) return { mode: "static" };
+  try {
+    return await paymentIntegrationRequest("/api/payment-charge", {
+      clientId: client.id,
+      txid: invoice.txid,
+      amount: invoice.valorTotal,
+      months,
+      planType
+    });
+  } catch (error) {
+    console.error("Integração automática indisponível; mantendo o PIX atual.", error);
+    showToast("PIX atual gerado. A confirmação automática não respondeu e deve ser conferida.");
+    return { mode: "static", integrationError: true };
+  }
+}
+
 async function uploadPaymentInvoiceLogo(file) {
   if (!file || !isMaster()) return;
   const extension = String(file.name || "logo.png").split(".").pop() || "png";
@@ -20527,6 +20747,8 @@ function renderClientOnlyEditor() {
     startClientMetricsRealtime(client);
   } else {
     stopClientMetricsRealtime();
+    stopClientFinanceRealtime();
+    stopPaymentIntegrationRealtime();
   }
   const moduleNavButtons = [...document.querySelectorAll("#clientModuleSidebar [data-client-module-target]")];
   const activateClientModule = (targetId, registrarAcesso = false) => {
@@ -21619,17 +21841,28 @@ function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
     if (selection.valorTotal <= 0 || !selection.invoice.pixCode) return showToast("Este plano ainda não possui um valor configurado.");
     try {
       await saveClientPlanRequest(client, selection, "aguardando_pagamento", { pixCodigo: selection.invoice.pixCode });
-      if (pixCode) pixCode.value = selection.invoice.pixCode;
+      const integrated = await createIntegratedPaymentCharge(client, selection.invoice, [selection.invoice.mes], selection.tipoPlano);
+      const finalPixCode = integrated.pixCode || selection.invoice.pixCode;
+      const finalQrUrl = integrated.qrUrl || selection.invoice.qrUrl;
+      if (integrated.pixCode) {
+        await saveClientPlanRequest(client, selection, "aguardando_pagamento", {
+          pixCodigo: finalPixCode,
+          txid: selection.invoice.txid,
+          provedorPagamento: integrated.provider || "",
+          provedorPagamentoId: integrated.providerPaymentId || ""
+        });
+      }
+      if (pixCode) pixCode.value = finalPixCode;
       if (mount.querySelector("[data-plan-pix-total]")) mount.querySelector("[data-plan-pix-total]").textContent = moneyBR(selection.valorTotal);
       if (pixQr) {
         pixQr.onerror = () => {
           pixQr.onerror = null;
-          pixQr.src = qrCodeUrl(selection.invoice.pixCode, "quickchart");
+          pixQr.src = qrCodeUrl(finalPixCode, "quickchart");
         };
-        pixQr.src = selection.invoice.qrUrl;
+        pixQr.src = finalQrUrl;
       }
       pixBox?.classList.remove("hidden");
-      showToast(`Pix do plano ${planLabel(selection.tipoPlano)} gerado.`);
+      showToast(`Pix do plano ${planLabel(selection.tipoPlano)} gerado${integrated.integrationEnabled ? " e registrado para confirmação automática" : ""}.`);
     } catch (error) {
       console.error("Falha ao registrar a escolha do plano.", error);
       showToast("Não foi possível registrar a escolha do plano.");
@@ -21842,23 +22075,31 @@ function renderClientInvoices() {
   });
   refreshSelectedInvoicePayment();
 
-  $("generateSelectedInvoicePix")?.addEventListener("click", () => {
-    const { selectedTotal, unified } = selectedInvoiceData();
+  $("generateSelectedInvoicePix")?.addEventListener("click", async (event) => {
+    const { selected, selectedPlan, selectedTotal, unified } = selectedInvoiceData();
     if (selectedTotal <= 0 || !unified.pixCode) {
       showToast("Selecione pelo menos um mes para gerar o Pix.");
       return;
     }
-    if (selectedPixCode) selectedPixCode.value = unified.pixCode;
-    if ($("selectedInvoicePixTotalGenerated")) $("selectedInvoicePixTotalGenerated").textContent = moneyBR(selectedTotal);
-    if (selectedQr) {
-      selectedQr.onerror = () => {
-        selectedQr.onerror = null;
-        selectedQr.src = qrCodeUrl(unified.pixCode, "quickchart");
-      };
-      selectedQr.src = unified.qrUrl;
+    setBusy(event.currentTarget, true, "Gerando...");
+    try {
+      const integrated = await createIntegratedPaymentCharge(client, unified, selected, selectedPlan);
+      const finalPixCode = integrated.pixCode || unified.pixCode;
+      const finalQrUrl = integrated.qrUrl || unified.qrUrl;
+      if (selectedPixCode) selectedPixCode.value = finalPixCode;
+      if ($("selectedInvoicePixTotalGenerated")) $("selectedInvoicePixTotalGenerated").textContent = moneyBR(selectedTotal);
+      if (selectedQr) {
+        selectedQr.onerror = () => {
+          selectedQr.onerror = null;
+          selectedQr.src = qrCodeUrl(finalPixCode, "quickchart");
+        };
+        selectedQr.src = finalQrUrl;
+      }
+      selectedPixBox?.classList.remove("hidden");
+      showToast(`QR Code/Pix gerado${integrated.integrationEnabled ? " e aguardando confirmação automática" : ""}.`);
+    } finally {
+      setBusy(event.currentTarget, false);
     }
-    selectedPixBox?.classList.remove("hidden");
-    showToast("QR Code/Pix gerado.");
   });
 
   $("generateClientBoletos")?.addEventListener("click", () => {
@@ -22543,6 +22784,17 @@ function bindEvents() {
     renderClientInvoices();
     renderClientBillingAlert();
   });
+  $("paymentIntegrationForm")?.addEventListener("submit", savePaymentIntegration);
+  $("paymentIntegrationProvider")?.addEventListener("change", () => {
+    $("paymentIntegrationAdvanced")?.classList.toggle("hidden", $("paymentIntegrationProvider").value !== "generic");
+  });
+  $("copyPaymentIntegrationWebhook")?.addEventListener("click", async () => {
+    await navigator.clipboard?.writeText($("paymentIntegrationWebhookUrl")?.value || "");
+    showToast("Endereço do webhook copiado.");
+  });
+  $("testPaymentIntegration")?.addEventListener("click", (event) => testPaymentIntegration(event.currentTarget));
+  $("refreshPaymentIntegration")?.addEventListener("click", () => loadPaymentIntegration(true));
+  $("paymentIntegrationReportFilter")?.addEventListener("change", renderPaymentIntegrationReport);
   $("paymentInvoiceLogoUpload")?.addEventListener("change", async (event) => {
     if (!isMaster()) {
       showToast("Somente master pode alterar a logo dos boletos.");
@@ -23213,6 +23465,8 @@ onAuthStateChanged(auth, async (user) => {
     stopAdminIdleTimer();
     clearAdminIdlePauseReasons();
     stopClientMetricsRealtime();
+    stopClientFinanceRealtime();
+    stopPaymentIntegrationRealtime();
     stopAccessReportRealtime();
     stopOnlinePresenceMonitor();
     stopBenefitsRealtime();
@@ -23243,6 +23497,7 @@ onAuthStateChanged(auth, async (user) => {
     prepareInitialView(initialView);
     updateChrome();
     await loadAllData(setPanelLoadingProgress);
+    startClientFinanceRealtime();
     startAuthenticatedClientPresence();
     renderClientBillingAlert();
     if (!canManageClients()) renderClientOnlyEditor();
