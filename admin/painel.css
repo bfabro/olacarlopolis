@@ -2026,6 +2026,306 @@ body.terrain-owner-detail-open {
   min-width: 0;
 }
 
+.terrain-general-photo-fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.terrain-general-photo-fieldset legend {
+  padding: 0 6px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.terrain-general-photo-controls {
+  display: grid;
+  grid-template-columns: minmax(160px, .6fr) minmax(220px, 1.4fr);
+  gap: 12px;
+}
+
+.terrain-general-photo-controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.terrain-photo-selection-preview {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: 8px;
+  margin-top: 11px;
+}
+
+.terrain-photo-selection-preview:empty {
+  display: none;
+}
+
+.terrain-photo-selection-preview figure {
+  margin: 0;
+}
+
+.terrain-photo-selection-preview img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.terrain-photo-selection-preview figcaption {
+  margin-top: 4px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terrain-detail-gallery-section,
+.terrain-inspection-history-section {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 2px solid var(--line);
+}
+
+.terrain-detail-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.terrain-detail-section-head span,
+.terrain-detail-section-head h3 {
+  display: block;
+  margin: 0;
+}
+
+.terrain-detail-section-head span {
+  margin-bottom: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.terrain-detail-section-head h3 {
+  font-size: 16px;
+}
+
+.terrain-detail-upload-bar {
+  display: grid;
+  grid-template-columns: minmax(130px, .55fr) minmax(200px, 1.3fr) auto;
+  gap: 9px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.terrain-detail-upload-bar > select,
+.terrain-detail-upload-bar > input {
+  width: 100%;
+  min-width: 0;
+}
+
+.terrain-detail-upload-bar label {
+  display: grid;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-photo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  gap: 10px;
+}
+
+.terrain-photo-card {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-photo-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.terrain-photo-card figcaption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  padding: 8px;
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-photo-card-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.terrain-photo-card-actions button {
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+}
+
+.terrain-inspection-dialog {
+  width: min(900px, 100%);
+}
+
+.terrain-inspection-form {
+  padding: 18px;
+}
+
+.terrain-inspection-history {
+  display: grid;
+  gap: 10px;
+}
+
+.terrain-inspection-item {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-inspection-item > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 11px;
+}
+
+.terrain-inspection-item > header strong,
+.terrain-inspection-item > header small {
+  display: block;
+}
+
+.terrain-inspection-item > header small {
+  margin-top: 3px;
+  color: var(--muted);
+}
+
+.terrain-inspection-flags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.terrain-inspection-flag {
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-inspection-flag.yes {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.terrain-inspection-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.terrain-inspection-details > div {
+  min-width: 0;
+  padding-top: 8px;
+  border-top: 1px solid #edf1f6;
+}
+
+.terrain-inspection-details span,
+.terrain-inspection-details strong {
+  display: block;
+}
+
+.terrain-inspection-details span {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.terrain-inspection-details .wide {
+  grid-column: 1 / -1;
+}
+
+.terrain-inspection-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.terrain-inspection-photos button {
+  width: 82px;
+  height: 62px;
+  min-height: 62px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+}
+
+.terrain-inspection-photos img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.terrain-photo-viewer-dialog {
+  width: min(1100px, 100%);
+  max-height: calc(100vh - 36px);
+  overflow: hidden;
+  border-radius: 8px;
+  background: #111827;
+}
+
+.terrain-photo-viewer-dialog > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  color: #fff;
+}
+
+.terrain-photo-viewer-dialog > header h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.terrain-photo-viewer-dialog > img {
+  display: block;
+  width: 100%;
+  max-height: calc(100vh - 98px);
+  object-fit: contain;
+  background: #0f172a;
+}
+
 @media (max-width: 1180px) {
   .terrain-owner-list-head {
     display: none;
@@ -2117,7 +2417,10 @@ body.terrain-owner-detail-open {
   .terrain-development-upload-grid,
   .terrain-development-row,
   .terrain-development-summary,
-  .terrain-development-terrain-row {
+  .terrain-development-terrain-row,
+  .terrain-general-photo-controls,
+  .terrain-detail-upload-bar,
+  .terrain-inspection-details {
     grid-template-columns: 1fr;
   }
 
@@ -2165,6 +2468,23 @@ body.terrain-owner-detail-open {
 
   .terrain-development-summary > div.wide {
     grid-column: auto;
+  }
+
+  .terrain-detail-upload-bar button {
+    width: 100%;
+  }
+
+  .terrain-inspection-details .wide {
+    grid-column: auto;
+  }
+
+  .terrain-inspection-item > header {
+    display: grid;
+  }
+
+  .terrain-detail-section-head {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .terrain-owner-row > div {

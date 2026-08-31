@@ -47,6 +47,29 @@
       }
     },
 
+    "terrenosFotos": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".indexOn": ["terrain_id", "categoria"],
+      "$photoId": {
+        ".validate": "!newData.exists() || (newData.hasChildren(['id', 'terrain_id', 'categoria', 'url', 'path', 'created_by_uid', 'created_by_name', 'created_at', 'updated_at']) && newData.child('id').val() === $photoId && newData.child('terrain_id').isString() && (newData.child('categoria').val() === 'frente' || newData.child('categoria').val() === 'lateral' || newData.child('categoria').val() === 'rua' || newData.child('categoria').val() === 'ponto_referencia' || newData.child('categoria').val() === 'geral' || newData.child('categoria').val() === 'outra') && newData.child('url').isString() && newData.child('path').isString() && newData.child('created_by_uid').isString() && newData.child('created_by_name').isString() && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())"
+      }
+    },
+
+    "terrenosVistorias": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".indexOn": ["terrain_id", "data"],
+      "$inspectionId": {
+        ".validate": "!newData.exists() || (newData.hasChildren(['id', 'terrain_id', 'data', 'hora', 'responsavel_uid', 'responsavel_nome', 'responsavel_email', 'situacao_atual', 'altura_mato', 'grau_dificuldade', 'observacoes', 'precisa_limpeza', 'recomendar_contato', 'created_at', 'updated_at']) && newData.child('id').val() === $inspectionId && newData.child('terrain_id').isString() && root.child('terrenos').child(newData.child('terrain_id').val()).exists() && newData.child('data').isString() && newData.child('hora').isString() && newData.child('responsavel_uid').isString() && newData.child('responsavel_nome').isString() && newData.child('responsavel_email').isString() && (newData.child('situacao_atual').val() === 'sem_informacao' || newData.child('situacao_atual').val() === 'limpo' || newData.child('situacao_atual').val() === 'monitorar' || newData.child('situacao_atual').val() === 'pode_precisar_limpeza' || newData.child('situacao_atual').val() === 'precisa_limpeza' || newData.child('situacao_atual').val() === 'servico_agendado' || newData.child('situacao_atual').val() === 'proprietario_desconhecido' || newData.child('situacao_atual').val() === 'inativo') && (newData.child('altura_mato').val() === 'ate_30_cm' || newData.child('altura_mato').val() === 'de_30_a_60_cm' || newData.child('altura_mato').val() === 'de_60_cm_a_1_m' || newData.child('altura_mato').val() === 'acima_1_m') && (newData.child('grau_dificuldade').val() === 'facil' || newData.child('grau_dificuldade').val() === 'medio' || newData.child('grau_dificuldade').val() === 'dificil' || newData.child('grau_dificuldade').val() === 'muito_dificil') && newData.child('observacoes').isString() && newData.child('precisa_limpeza').isBoolean() && newData.child('recomendar_contato').isBoolean() && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())",
+        "fotos": {
+          "$photoId": {
+            ".validate": "newData.hasChildren(['url', 'path']) && newData.child('url').isString() && newData.child('path').isString()"
+          }
+        }
+      }
+    },
+
     "terrenosLoteamentos": {
       ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
       ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",

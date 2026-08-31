@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-08-31_v5";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-08-31_v6";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -78,6 +78,15 @@ export const TERRAIN_CHARACTERISTIC_OPTIONS = Object.freeze([
   Object.freeze({ value: "outro", label: "Outro" })
 ]);
 
+export const TERRAIN_PHOTO_CATEGORY_OPTIONS = Object.freeze([
+  Object.freeze({ value: "frente", label: "Frente" }),
+  Object.freeze({ value: "lateral", label: "Lateral" }),
+  Object.freeze({ value: "rua", label: "Rua" }),
+  Object.freeze({ value: "ponto_referencia", label: "Ponto de refer\u00eancia" }),
+  Object.freeze({ value: "geral", label: "Geral" }),
+  Object.freeze({ value: "outra", label: "Outra" })
+]);
+
 export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
   owners: Object.freeze({
     path: "terrenosProprietarios",
@@ -112,6 +121,24 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
     optionalFields: Object.freeze([
       "planta_imagem_url", "planta_imagem_path", "planta_pdf_url", "planta_pdf_path"
     ])
+  }),
+  photos: Object.freeze({
+    path: "terrenosFotos",
+    fields: Object.freeze([
+      "id", "terrain_id", "categoria", "url", "path", "created_by_uid",
+      "created_by_name", "created_at", "updated_at"
+    ]),
+    optionalFields: Object.freeze([])
+  }),
+  inspections: Object.freeze({
+    path: "terrenosVistorias",
+    fields: Object.freeze([
+      "id", "terrain_id", "data", "hora", "responsavel_uid", "responsavel_nome",
+      "responsavel_email", "situacao_atual", "altura_mato", "grau_dificuldade",
+      "observacoes", "precisa_limpeza", "recomendar_contato", "fotos",
+      "created_at", "updated_at"
+    ]),
+    optionalFields: Object.freeze(["fotos"])
   })
 });
 
@@ -121,6 +148,7 @@ const TERRAIN_STATUS_VALUES = new Set(TERRAIN_STATUS_OPTIONS.map((item) => item.
 const TERRAIN_DIFFICULTY_VALUES = new Set(TERRAIN_DIFFICULTY_OPTIONS.map((item) => item.value));
 const TERRAIN_GRASS_HEIGHT_VALUES = new Set(TERRAIN_GRASS_HEIGHT_OPTIONS.map((item) => item.value));
 const TERRAIN_CHARACTERISTIC_VALUES = new Set(TERRAIN_CHARACTERISTIC_OPTIONS.map((item) => item.value));
+const TERRAIN_PHOTO_CATEGORY_VALUES = new Set(TERRAIN_PHOTO_CATEGORY_OPTIONS.map((item) => item.value));
 
 export function normalizeTerrainOwnerInput(input = {}) {
   const value = (key) => String(input[key] ?? "").trim();
@@ -480,4 +508,126 @@ export function terrainDevelopmentPlanStoragePath(developmentId, file = {}, kind
 
 export function clampTerrainPlanZoom(value) {
   return Math.min(4, Math.max(1, Number(value) || 1));
+}
+
+export function validateTerrainImageFile(file = {}) {
+  const type = String(file.type || "").toLowerCase();
+  const name = String(file.name || "");
+  const size = Number(file.size || 0);
+  const isImage = type.startsWith("image/") || /\.(png|jpe?g|webp|gif|heic|heif|avif)$/i.test(name);
+  if (!isImage) throw new Error("Selecione somente arquivos de imagem.");
+  if (!size || size > 8 * 1024 * 1024) throw new Error("Cada imagem deve ter no m\u00e1ximo 8 MB.");
+  return true;
+}
+
+function terrainImageFilename(file = {}) {
+  return String(file.name || "foto")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "foto";
+}
+
+export function terrainGeneralPhotoStoragePath(terrainId, file = {}, timestamp = Date.now(), index = 0) {
+  if (!terrainId) throw new Error("O terreno precisa de um id para receber fotos.");
+  validateTerrainImageFile(file);
+  return `gestao-terrenos/terrenos/${terrainId}/fotos-gerais/${timestamp}-${index}-${terrainImageFilename(file)}`;
+}
+
+export function terrainInspectionPhotoStoragePath(terrainId, inspectionId, file = {}, timestamp = Date.now(), index = 0) {
+  if (!terrainId || !inspectionId) throw new Error("A vistoria precisa estar vinculada a um terreno.");
+  validateTerrainImageFile(file);
+  return `gestao-terrenos/terrenos/${terrainId}/vistorias/${inspectionId}/${timestamp}-${index}-${terrainImageFilename(file)}`;
+}
+
+export function buildTerrainPhotoRecord(input = {}, { id, timestamp = Date.now() } = {}) {
+  if (!id) throw new Error("A foto precisa de um id.");
+  const value = (key) => String(input[key] ?? "").trim();
+  const category = TERRAIN_PHOTO_CATEGORY_VALUES.has(value("categoria")) ? value("categoria") : "geral";
+  const record = {
+    id,
+    terrain_id: value("terrain_id"),
+    categoria: category,
+    url: value("url"),
+    path: value("path"),
+    created_by_uid: value("created_by_uid"),
+    created_by_name: value("created_by_name"),
+    created_at: timestamp,
+    updated_at: timestamp
+  };
+  const missing = ["terrain_id", "url", "path", "created_by_uid", "created_by_name"].filter((key) => !record[key]);
+  if (missing.length) throw new Error(`Campos obrigatorios ausentes: ${missing.join(", ")}`);
+  return record;
+}
+
+export function terrainPhotoRecords(records = {}, terrainId = "") {
+  const list = Array.isArray(records)
+    ? records
+    : Object.entries(records || {}).map(([id, photo]) => ({ id, ...(photo || {}) }));
+  return list
+    .filter((photo) => photo?.id && (!terrainId || photo.terrain_id === terrainId))
+    .sort((a, b) => Number(b.created_at || 0) - Number(a.created_at || 0));
+}
+
+export function terrainPhotoCategoryLabel(category) {
+  return TERRAIN_PHOTO_CATEGORY_OPTIONS.find((item) => item.value === category)?.label || "Geral";
+}
+
+export function normalizeTerrainInspectionInput(input = {}) {
+  const value = (key) => String(input[key] ?? "").trim();
+  const inspection = {
+    terrain_id: value("terrain_id"),
+    data: value("data"),
+    hora: value("hora"),
+    responsavel_uid: value("responsavel_uid"),
+    responsavel_nome: value("responsavel_nome"),
+    responsavel_email: value("responsavel_email").toLowerCase(),
+    situacao_atual: TERRAIN_STATUS_VALUES.has(value("situacao_atual")) ? value("situacao_atual") : "sem_informacao",
+    altura_mato: TERRAIN_GRASS_HEIGHT_VALUES.has(value("altura_mato")) ? value("altura_mato") : "",
+    grau_dificuldade: TERRAIN_DIFFICULTY_VALUES.has(value("grau_dificuldade")) ? value("grau_dificuldade") : "",
+    observacoes: value("observacoes"),
+    precisa_limpeza: input.precisa_limpeza === true || input.precisa_limpeza === "true",
+    recomendar_contato: input.recomendar_contato === true || input.recomendar_contato === "true",
+    fotos: input.fotos && typeof input.fotos === "object" && Object.keys(input.fotos).length ? input.fotos : null
+  };
+  const required = [
+    "terrain_id", "data", "hora", "responsavel_uid", "responsavel_nome", "responsavel_email",
+    "situacao_atual", "altura_mato", "grau_dificuldade", "observacoes"
+  ];
+  const missing = required.filter((key) => !inspection[key]);
+  if (missing.length) throw new Error(`Campos obrigatorios ausentes: ${missing.join(", ")}`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(inspection.data)) throw new Error("Data da vistoria inv\u00e1lida.");
+  if (!/^\d{2}:\d{2}$/.test(inspection.hora)) throw new Error("Hora da vistoria inv\u00e1lida.");
+  return inspection;
+}
+
+export function buildTerrainInspectionRecord(input, { id, timestamp = Date.now() } = {}) {
+  if (!id) throw new Error("A vistoria precisa de um id.");
+  return {
+    id,
+    ...normalizeTerrainInspectionInput(input),
+    created_at: timestamp,
+    updated_at: timestamp
+  };
+}
+
+export function terrainInspectionRecords(records = {}, terrainId = "") {
+  const list = Array.isArray(records)
+    ? records
+    : Object.entries(records || {}).map(([id, inspection]) => ({ id, ...(inspection || {}) }));
+  return list
+    .filter((inspection) => inspection?.id && (!terrainId || inspection.terrain_id === terrainId))
+    .sort((a, b) => {
+      const dateCompare = `${b.data || ""}T${b.hora || ""}`.localeCompare(`${a.data || ""}T${a.hora || ""}`);
+      return dateCompare || Number(b.created_at || 0) - Number(a.created_at || 0);
+    });
+}
+
+export function terrainStatusAfterInspection(currentStatus, inspection = {}) {
+  if (currentStatus === "inativo") return "inativo";
+  if (inspection.precisa_limpeza === true) return "precisa_limpeza";
+  return TERRAIN_STATUS_VALUES.has(inspection.situacao_atual)
+    ? inspection.situacao_atual
+    : (TERRAIN_STATUS_VALUES.has(currentStatus) ? currentStatus : "sem_informacao");
 }

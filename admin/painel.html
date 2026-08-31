@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=424">
+  <link rel="stylesheet" href="painel.css?v=425">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -436,6 +436,25 @@
                   <option value="inativo">Inativo</option>
                 </select>
               </label>
+              <fieldset class="wide terrain-general-photo-fieldset">
+                <legend>Fotos gerais do terreno</legend>
+                <div class="terrain-general-photo-controls">
+                  <label>Categoria
+                    <select id="terrainGeneralPhotoCategory">
+                      <option value="frente">Frente</option>
+                      <option value="lateral">Lateral</option>
+                      <option value="rua">Rua</option>
+                      <option value="ponto_referencia">Ponto de referência</option>
+                      <option value="geral" selected>Geral</option>
+                      <option value="outra">Outra</option>
+                    </select>
+                  </label>
+                  <label>Adicionar imagens
+                    <input id="terrainGeneralPhotoFiles" type="file" accept="image/*" multiple>
+                  </label>
+                </div>
+                <div id="terrainGeneralPhotoSelectionPreview" class="terrain-photo-selection-preview"></div>
+              </fieldset>
               <div class="form-actions wide">
                 <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar terreno</button>
                 <button id="cancelTerrainForm" class="ghost-button" type="button" data-no-loading>Cancelar</button>
@@ -2685,6 +2704,79 @@
     </section>
   </div>
 
+  <div id="terrainInspectionModal" class="terrain-owner-detail-overlay hidden" aria-hidden="true">
+    <section class="terrain-owner-detail-dialog terrain-inspection-dialog" role="dialog" aria-modal="true" aria-labelledby="terrainInspectionTitle">
+      <header>
+        <div><span>Vistoria</span><h2 id="terrainInspectionTitle">Nova vistoria</h2></div>
+        <button id="closeTerrainInspection" class="ghost-button" type="button" data-no-loading title="Fechar vistoria" aria-label="Fechar vistoria"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <form id="terrainInspectionForm" class="grid-form terrain-inspection-form">
+        <input id="terrainInspectionTerrainId" type="hidden">
+        <label class="wide">Terreno<input id="terrainInspectionTerrainName" readonly></label>
+        <label>Data<input id="terrainInspectionDate" type="date" required></label>
+        <label>Hora<input id="terrainInspectionTime" type="time" required></label>
+        <label class="wide">Usuário responsável<select id="terrainInspectionResponsible" required></select></label>
+        <label>Situação atual
+          <select id="terrainInspectionSituation" required>
+            <option value="sem_informacao">Sem informação</option>
+            <option value="limpo">Limpo</option>
+            <option value="monitorar">Monitorar</option>
+            <option value="pode_precisar_limpeza">Pode precisar de limpeza</option>
+            <option value="precisa_limpeza">Precisa de limpeza</option>
+            <option value="servico_agendado">Serviço agendado</option>
+            <option value="proprietario_desconhecido">Proprietário desconhecido</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </label>
+        <label>Altura aproximada do mato
+          <select id="terrainInspectionGrassHeight" required>
+            <option value="ate_30_cm">Até 30 cm</option>
+            <option value="de_30_a_60_cm">30 a 60 cm</option>
+            <option value="de_60_cm_a_1_m">60 cm a 1 metro</option>
+            <option value="acima_1_m">Acima de 1 metro</option>
+          </select>
+        </label>
+        <label>Grau de dificuldade
+          <select id="terrainInspectionDifficulty" required>
+            <option value="facil">Fácil</option>
+            <option value="medio">Médio</option>
+            <option value="dificil">Difícil</option>
+            <option value="muito_dificil">Muito difícil</option>
+          </select>
+        </label>
+        <label>Precisa de limpeza?
+          <select id="terrainInspectionNeedsCleaning" required>
+            <option value="false">Não</option>
+            <option value="true">Sim</option>
+          </select>
+        </label>
+        <label>Recomendar contato?
+          <select id="terrainInspectionRecommendContact" required>
+            <option value="false">Não</option>
+            <option value="true">Sim</option>
+          </select>
+        </label>
+        <label class="wide">Observações<textarea id="terrainInspectionNotes" rows="5" maxlength="2000" required></textarea></label>
+        <label class="wide">Fotos da vistoria<input id="terrainInspectionPhotos" type="file" accept="image/*" multiple></label>
+        <div id="terrainInspectionPhotoPreview" class="wide terrain-photo-selection-preview"></div>
+        <div class="form-actions wide">
+          <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Finalizar vistoria</button>
+          <button id="cancelTerrainInspection" class="ghost-button" type="button" data-no-loading>Cancelar</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div id="terrainPhotoViewerModal" class="terrain-owner-detail-overlay hidden" aria-hidden="true">
+    <section class="terrain-photo-viewer-dialog" role="dialog" aria-modal="true" aria-labelledby="terrainPhotoViewerTitle">
+      <header>
+        <h2 id="terrainPhotoViewerTitle">Foto do terreno</h2>
+        <button id="closeTerrainPhotoViewer" class="ghost-button" type="button" data-no-loading title="Fechar imagem" aria-label="Fechar imagem"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <img id="terrainPhotoViewerImage" src="" alt="">
+    </section>
+  </div>
+
   <div id="toast" class="toast hidden"></div>
   <div id="adminActionLoading" class="admin-action-loading hidden" aria-live="polite">
     <div class="admin-action-loading-card">
@@ -2695,6 +2787,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=624"></script>
+  <script type="module" src="painel.js?v=625"></script>
 </body>
 </html>

@@ -1,0 +1,18 @@
+{
+  "version": "2026-08-31_v6",
+  "operation": "create_related_entities",
+  "recreates_existing_data": false,
+  "entities": {
+    "terrenosFotos": {
+      "relation": "terrain_id -> terrenos/{id}",
+      "index": ["terrain_id", "categoria"],
+      "storage": "gestao-terrenos/terrenos/{terrainId}/fotos-gerais"
+    },
+    "terrenosVistorias": {
+      "relation": "terrain_id -> terrenos/{id}",
+      "index": ["terrain_id", "data"],
+      "photos_storage": "gestao-terrenos/terrenos/{terrainId}/vistorias/{inspectionId}"
+    }
+  },
+  "notes": "Adiciona somente fotos gerais e vistorias. Nao inclui orcamentos ou servicos."
+}

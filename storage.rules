@@ -122,6 +122,14 @@ service firebase.storage {
       allow delete: if request.auth != null && request.auth.token.email == 'bruno.4and@gmail.com';
     }
 
+    match /gestao-terrenos/terrenos/{terrainId}/{allPaths=**} {
+      allow read: if request.auth != null && request.auth.token.email == 'bruno.4and@gmail.com';
+      allow create, update: if request.auth != null
+        && request.auth.token.email == 'bruno.4and@gmail.com'
+        && isNewImage();
+      allow delete: if request.auth != null && request.auth.token.email == 'bruno.4and@gmail.com';
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

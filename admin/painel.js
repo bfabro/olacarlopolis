@@ -37,6 +37,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import {
   buildTerrainDevelopmentRecord,
+  buildTerrainInspectionRecord,
+  buildTerrainPhotoRecord,
   buildTerrainRecord,
   buildTerrainOwnerRecord,
   canDeleteTerrainDevelopment,
@@ -60,13 +62,20 @@ import {
   terrainDifficultyLabel,
   terrainGrassHeightLabel,
   terrainMapsUrl,
+  terrainGeneralPhotoStoragePath,
+  terrainInspectionPhotoStoragePath,
+  terrainInspectionRecords,
   terrainOwnerName,
   terrainOwnerRecords,
+  terrainPhotoCategoryLabel,
+  terrainPhotoRecords,
+  terrainStatusAfterInspection,
   terrainStatusMeta,
+  validateTerrainImageFile,
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=5";
+} from "./gestao-terrenos-schema.js?v=6";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -81,10 +90,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 687,
-  label: "v694",
+  numero: 688,
+  label: "v695",
   data: "2026-08-31",
-  nota: "CRUD de loteamentos e visualizacao de plantas na Gestao de Terrenos."
+  nota: "Fotos gerais e vistorias na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -231,7 +240,7 @@ let state = {
   combustiveisLinks: {},
   combustiveisHistorico: {},
   combustiveisBusca: [],
-  terrainManagement: { owners: {}, terrains: {}, developments: {} },
+  terrainManagement: { owners: {}, terrains: {}, developments: {}, photos: {}, inspections: {} },
   sobreNos: {},
   xadrezConfig: {},
   beneficios: [],
@@ -2795,6 +2804,8 @@ async function loadAllData(onProgress = null) {
     terrainOwnersSnap,
     terrainsSnap,
     terrainDevelopmentsSnap,
+    terrainPhotosSnap,
+    terrainInspectionsSnap,
     novidadesConfigSnap,
     sobreNosSnap,
     xadrezConfigSnap,
@@ -2831,6 +2842,8 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.owners.path, { enabled: isMaster() }),
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.terrains.path, { enabled: isMaster() }),
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.developments.path, { enabled: isMaster() }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.photos.path, { enabled: isMaster() }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.inspections.path, { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -2921,7 +2934,9 @@ async function loadAllData(onProgress = null) {
   state.terrainManagement = {
     owners: terrainOwnersSnap.exists() ? terrainOwnersSnap.val() : {},
     terrains: terrainsSnap.exists() ? terrainsSnap.val() : {},
-    developments: terrainDevelopmentsSnap.exists() ? terrainDevelopmentsSnap.val() : {}
+    developments: terrainDevelopmentsSnap.exists() ? terrainDevelopmentsSnap.val() : {},
+    photos: terrainPhotosSnap.exists() ? terrainPhotosSnap.val() : {},
+    inspections: terrainInspectionsSnap.exists() ? terrainInspectionsSnap.val() : {}
   };
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
@@ -3555,6 +3570,7 @@ function resetTerrainForm() {
   if ($("terrainId")) $("terrainId").value = "";
   if ($("terrainFormTitle")) $("terrainFormTitle").textContent = "Novo terreno";
   document.querySelectorAll("[data-terrain-characteristic]").forEach((input) => { input.checked = false; });
+  if ($("terrainGeneralPhotoSelectionPreview")) $("terrainGeneralPhotoSelectionPreview").innerHTML = "";
   $("terrainFormCard")?.classList.add("hidden");
   updateTerrainMapsButton();
 }
@@ -3592,6 +3608,7 @@ function openTerrainForm(terrainId = "", { focusOwner = false } = {}) {
   document.querySelectorAll("[data-terrain-characteristic]").forEach((input) => {
     input.checked = terrain?.caracteristicas?.[input.value] === true;
   });
+  if ($("terrainGeneralPhotoSelectionPreview")) $("terrainGeneralPhotoSelectionPreview").innerHTML = "";
   $("terrainFormCard")?.classList.remove("hidden");
   updateTerrainMapsButton();
   (focusOwner ? $("terrainOwner") : $("terrainNickname"))?.focus({ preventScroll: true });
@@ -3603,6 +3620,122 @@ function formatTerrainMeasure(value, suffix) {
   return Number.isFinite(number)
     ? `${number.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${suffix}`
     : "-";
+}
+
+function terrainCurrentUserIdentity() {
+  return {
+    uid: state.user?.uid || "",
+    name: state.profile?.nome || state.profile?.name || state.user?.displayName || state.user?.email || "Admin Master",
+    email: state.user?.email || state.profile?.email || ""
+  };
+}
+
+function renderTerrainSelectedPhotoPreview(inputId, mountId) {
+  const mount = $(mountId);
+  const files = [...($(inputId)?.files || [])];
+  if (!mount) return;
+  mount.innerHTML = files.map((file) => {
+    try {
+      validateTerrainImageFile(file);
+      const url = URL.createObjectURL(file);
+      return `<figure><img src="${escapeAttr(url)}" alt="Prévia de ${escapeAttr(file.name)}" onload="URL.revokeObjectURL(this.src)"><figcaption>${escapeHtml(file.name)}</figcaption></figure>`;
+    } catch (error) {
+      return `<figure><figcaption>${escapeHtml(error.message)}</figcaption></figure>`;
+    }
+  }).join("");
+}
+
+async function uploadTerrainGeneralPhotos(terrainId, files, category) {
+  const identity = terrainCurrentUserIdentity();
+  const uploaded = [];
+  const timestamp = Date.now();
+  for (const [index, file] of [...files].entries()) {
+    const path = terrainGeneralPhotoStoragePath(terrainId, file, timestamp, index);
+    const url = await uploadFileWithProgress(
+      storageRef(storage, path),
+      file,
+      `Enviando foto ${index + 1} de ${files.length}`,
+      file.name || "foto"
+    );
+    const photoId = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.photos.path)).key;
+    uploaded.push({
+      id: photoId,
+      path,
+      record: buildTerrainPhotoRecord({
+        terrain_id: terrainId,
+        categoria: category,
+        url,
+        path,
+        created_by_uid: identity.uid,
+        created_by_name: identity.name
+      }, { id: photoId, timestamp: serverTimestamp() })
+    });
+  }
+  return uploaded;
+}
+
+async function refreshTerrainPhotos(terrainId) {
+  const snapshot = await get(query(
+    ref(db, TERRAIN_MANAGEMENT_ENTITIES.photos.path),
+    orderByChild("terrain_id"),
+    equalTo(terrainId)
+  ));
+  Object.entries(state.terrainManagement.photos || {}).forEach(([id, photo]) => {
+    if (photo?.terrain_id === terrainId) delete state.terrainManagement.photos[id];
+  });
+  if (snapshot.exists()) {
+    state.terrainManagement.photos = {
+      ...(state.terrainManagement.photos || {}),
+      ...(snapshot.val() || {})
+    };
+  }
+}
+
+function terrainGeneralPhotoGalleryHtml(terrainId) {
+  const photos = terrainPhotoRecords(state.terrainManagement?.photos || {}, terrainId);
+  if (!photos.length) {
+    return `<div class="terrain-owner-linked-empty"><i class="fa-solid fa-images"></i><strong>Nenhuma foto cadastrada</strong><span>Adicione imagens gerais deste terreno.</span></div>`;
+  }
+  return `<div class="terrain-photo-gallery">${photos.map((photo) => `
+    <figure class="terrain-photo-card" data-terrain-photo-id="${escapeAttr(photo.id)}">
+      <img src="${escapeAttr(photo.url)}" alt="${escapeAttr(terrainPhotoCategoryLabel(photo.categoria))}" loading="lazy" decoding="async">
+      <figcaption>
+        <span>${escapeHtml(terrainPhotoCategoryLabel(photo.categoria))}</span>
+        <span class="terrain-photo-card-actions">
+          <button type="button" class="terrain-owner-icon-button" data-terrain-photo-view="${escapeAttr(photo.id)}" data-no-loading title="Ampliar imagem" aria-label="Ampliar imagem"><i class="fa-solid fa-expand"></i></button>
+          <button type="button" class="terrain-owner-icon-button danger" data-terrain-photo-delete="${escapeAttr(photo.id)}" title="Excluir foto" aria-label="Excluir foto"><i class="fa-solid fa-trash"></i></button>
+        </span>
+      </figcaption>
+    </figure>`).join("")}</div>`;
+}
+
+function terrainInspectionHistoryHtml(terrainId) {
+  const inspections = terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrainId);
+  if (!inspections.length) {
+    return `<div class="terrain-owner-linked-empty"><i class="fa-solid fa-clipboard-check"></i><strong>Nenhuma vistoria registrada</strong><span>O histórico das vistorias aparecerá aqui.</span></div>`;
+  }
+  return `<div class="terrain-inspection-history">${inspections.map((inspection) => {
+    const status = terrainStatusMeta(inspection.situacao_atual);
+    const photos = Object.entries(inspection.fotos || {});
+    return `
+      <article class="terrain-inspection-item" data-inspection-id="${escapeAttr(inspection.id)}">
+        <header>
+          <div><strong>${escapeHtml(`${inspection.data?.split("-").reverse().join("/") || "-"} às ${inspection.hora || "-"}`)}</strong><small>${escapeHtml(inspection.responsavel_nome || inspection.responsavel_email || "-")}</small></div>
+          <div class="terrain-inspection-flags">
+            <span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span>
+            <span class="terrain-inspection-flag ${inspection.precisa_limpeza ? "yes" : ""}">${inspection.precisa_limpeza ? "Precisa de limpeza" : "Não precisa de limpeza"}</span>
+            <span class="terrain-inspection-flag ${inspection.recomendar_contato ? "yes" : ""}">${inspection.recomendar_contato ? "Recomendar contato" : "Sem recomendação de contato"}</span>
+          </div>
+        </header>
+        <div class="terrain-inspection-details">
+          <div><span>Altura do mato</span><strong>${escapeHtml(terrainGrassHeightLabel(inspection.altura_mato))}</strong></div>
+          <div><span>Dificuldade</span><strong>${escapeHtml(terrainDifficultyLabel(inspection.grau_dificuldade))}</strong></div>
+          <div><span>Responsável</span><strong>${escapeHtml(inspection.responsavel_nome || "-")}</strong></div>
+          <div class="wide"><span>Observações</span><strong>${escapeHtml(inspection.observacoes || "-")}</strong></div>
+        </div>
+        ${photos.length ? `<div class="terrain-inspection-photos">${photos.map(([photoId, photo]) => `<button type="button" data-inspection-photo-view="${escapeAttr(inspection.id)}:${escapeAttr(photoId)}" data-no-loading title="Ampliar foto da vistoria"><img src="${escapeAttr(photo.url)}" alt="Foto da vistoria" loading="lazy" decoding="async"></button>`).join("")}</div>` : ""}
+      </article>`;
+  }).join("")}</div>`;
 }
 
 function renderTerrainList() {
@@ -3651,7 +3784,7 @@ function renderTerrainList() {
           <button type="button" class="terrain-owner-icon-button" data-terrain-view="${escapeAttr(terrain.id)}" data-no-loading title="Ver detalhes" aria-label="Ver detalhes de ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-eye"></i></button>
           <button type="button" class="terrain-owner-icon-button" data-terrain-edit="${escapeAttr(terrain.id)}" data-no-loading title="Editar" aria-label="Editar ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-pen"></i></button>
           <button type="button" class="terrain-owner-icon-button warning" data-terrain-inactivate="${escapeAttr(terrain.id)}" ${terrain.status === "inativo" ? "disabled" : ""} title="${terrain.status === "inativo" ? "Terreno já inativo" : "Inativar"}" aria-label="Inativar ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-ban"></i></button>
-          <button type="button" class="terrain-owner-icon-button danger" data-terrain-delete="${escapeAttr(terrain.id)}" title="Excluir" aria-label="Excluir ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-trash"></i></button>
+          <button type="button" class="terrain-owner-icon-button danger" data-terrain-delete="${escapeAttr(terrain.id)}" ${(terrainPhotoRecords(state.terrainManagement?.photos || {}, terrain.id).length || terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrain.id).length) ? "disabled" : ""} title="${(terrainPhotoRecords(state.terrainManagement?.photos || {}, terrain.id).length || terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrain.id).length) ? "Exclusão bloqueada: existem fotos ou vistorias" : "Excluir"}" aria-label="Excluir ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-trash"></i></button>
         </div>
       </article>`;
   }).join("");
@@ -3675,6 +3808,7 @@ function openTerrainDetail(terrainId) {
   $("terrainDetailTitle").textContent = terrain.apelido || "Detalhes";
   $("terrainDetailContent").innerHTML = `
     <div class="terrain-detail-actions">
+      <button type="button" data-terrain-new-inspection="${escapeAttr(terrain.id)}"><i class="fa-solid fa-clipboard-check"></i> Nova vistoria</button>
       ${!terrain.owner_id ? `<button type="button" data-terrain-link-owner="${escapeAttr(terrain.id)}"><i class="fa-solid fa-link"></i> Vincular proprietário</button>` : ""}
       ${mapsUrl ? `<a class="ghost-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Abrir no Google Maps</a>` : ""}
       ${terrain.development_id ? `<button type="button" class="ghost-button" data-terrain-view-development="${escapeAttr(terrain.development_id)}"><i class="fa-solid fa-map"></i> Ver planta do loteamento</button>` : ""}
@@ -3696,12 +3830,219 @@ function openTerrainDetail(terrainId) {
       <div class="wide"><span>Localização</span><strong>${escapeHtml(Number.isFinite(Number(terrain.latitude)) && Number.isFinite(Number(terrain.longitude)) ? `${terrain.latitude}, ${terrain.longitude}` : "Não informada")}</strong></div>
       <div class="wide"><span>Características</span><strong class="terrain-detail-tags">${characteristics.length ? characteristics.map((label) => `<span>${escapeHtml(label)}</span>`).join("") : "<span>Nenhuma informada</span>"}</strong></div>
       <div class="wide"><span>Observações</span><strong>${escapeHtml(terrain.observacoes || "Sem observações.")}</strong></div>
-    </div>`;
+    </div>
+    <section class="terrain-detail-gallery-section">
+      <div class="terrain-detail-section-head"><div><span>Galeria</span><h3>Fotos do terreno</h3></div></div>
+      <div class="terrain-detail-upload-bar">
+        <select id="terrainDetailPhotoCategory" aria-label="Categoria da foto">
+          <option value="frente">Frente</option><option value="lateral">Lateral</option><option value="rua">Rua</option>
+          <option value="ponto_referencia">Ponto de referência</option><option value="geral" selected>Geral</option><option value="outra">Outra</option>
+        </select>
+        <input id="terrainDetailPhotoFiles" type="file" accept="image/*" multiple aria-label="Selecionar fotos do terreno">
+        <button type="button" data-terrain-upload-photos="${escapeAttr(terrain.id)}"><i class="fa-solid fa-cloud-arrow-up"></i> Enviar fotos</button>
+      </div>
+      <div id="terrainDetailPhotoSelectionPreview" class="terrain-photo-selection-preview"></div>
+      ${terrainGeneralPhotoGalleryHtml(terrain.id)}
+    </section>
+    <section class="terrain-inspection-history-section">
+      <div class="terrain-detail-section-head"><div><span>Histórico</span><h3>Vistorias</h3></div><button type="button" class="ghost-button" data-terrain-new-inspection="${escapeAttr(terrain.id)}"><i class="fa-solid fa-plus"></i> Nova vistoria</button></div>
+      ${terrainInspectionHistoryHtml(terrain.id)}
+    </section>`;
   const modal = $("terrainDetailModal");
   modal?.classList.remove("hidden");
   modal?.setAttribute("aria-hidden", "false");
   document.body.classList.add("terrain-owner-detail-open");
   $("closeTerrainDetail")?.focus();
+}
+
+async function uploadTerrainDetailGeneralPhotos(terrainId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode enviar fotos.");
+  const files = [...($("terrainDetailPhotoFiles")?.files || [])];
+  if (!files.length) return showToast("Selecione ao menos uma imagem.");
+  const uploaded = [];
+  let databaseSaved = false;
+  try {
+    files.forEach(validateTerrainImageFile);
+    uploaded.push(...await uploadTerrainGeneralPhotos(
+      terrainId,
+      files,
+      $("terrainDetailPhotoCategory")?.value || "geral"
+    ));
+    const updates = {};
+    uploaded.forEach((item) => {
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${item.id}`] = item.record;
+    });
+    await firebaseUpdate(ref(db), updates);
+    databaseSaved = true;
+    await refreshTerrainPhotos(terrainId);
+    openTerrainDetail(terrainId);
+    renderTerrainList();
+    showToast(`${uploaded.length} ${uploaded.length === 1 ? "foto adicionada" : "fotos adicionadas"}.`, { prominent: true });
+  } catch (error) {
+    if (!databaseSaved) await Promise.allSettled(uploaded.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
+    console.error("Falha ao enviar fotos do terreno.", error);
+    showToast(error?.message || "Não foi possível enviar as fotos.");
+  }
+}
+
+async function deleteTerrainPhoto(photoId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode excluir fotos.");
+  const photo = state.terrainManagement?.photos?.[photoId];
+  if (!photo) return;
+  if (!window.confirm("Excluir esta foto do terreno? Esta ação não pode ser desfeita.")) return;
+  try {
+    await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${photoId}`));
+    await deleteTerrainDevelopmentStoragePath(photo.path);
+    delete state.terrainManagement.photos[photoId];
+    openTerrainDetail(photo.terrain_id);
+    renderTerrainList();
+    showToast("Foto excluída.");
+  } catch (error) {
+    console.error("Falha ao excluir foto do terreno.", error);
+    showToast("Não foi possível excluir a foto.");
+  }
+}
+
+function openTerrainPhotoViewer(url, title = "Foto do terreno") {
+  if (!url) return;
+  $("terrainPhotoViewerTitle").textContent = title;
+  $("terrainPhotoViewerImage").src = url;
+  $("terrainPhotoViewerImage").alt = title;
+  $("terrainPhotoViewerModal")?.classList.remove("hidden");
+  $("terrainPhotoViewerModal")?.setAttribute("aria-hidden", "false");
+  $("closeTerrainPhotoViewer")?.focus();
+}
+
+function closeTerrainPhotoViewer() {
+  $("terrainPhotoViewerModal")?.classList.add("hidden");
+  $("terrainPhotoViewerModal")?.setAttribute("aria-hidden", "true");
+  if ($("terrainPhotoViewerImage")) $("terrainPhotoViewerImage").src = "";
+}
+
+function terrainInspectionResponsibleUsers() {
+  const current = terrainCurrentUserIdentity();
+  const users = (state.usuarios || [])
+    .map((user) => ({ uid: user.uid || "", name: user.nome || user.name || user.email || "Usuário", email: user.email || "" }))
+    .filter((user) => user.uid && user.email);
+  if (current.uid && current.email && !users.some((user) => user.uid === current.uid)) users.unshift(current);
+  return users;
+}
+
+function openTerrainInspectionForm(terrainId) {
+  const terrain = terrainById(terrainId);
+  if (!terrain) return;
+  const current = terrainCurrentUserIdentity();
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  $("terrainInspectionForm")?.reset();
+  $("terrainInspectionTerrainId").value = terrain.id;
+  $("terrainInspectionTerrainName").value = terrain.apelido || `Quadra ${terrain.quadra || "-"}, lote ${terrain.lote || "-"}`;
+  $("terrainInspectionDate").value = local.toISOString().slice(0, 10);
+  $("terrainInspectionTime").value = local.toISOString().slice(11, 16);
+  $("terrainInspectionSituation").value = terrain.status === "inativo" ? "sem_informacao" : (terrain.status || "sem_informacao");
+  if (terrain.altura_mato) $("terrainInspectionGrassHeight").value = terrain.altura_mato;
+  if (terrain.grau_dificuldade) $("terrainInspectionDifficulty").value = terrain.grau_dificuldade;
+  const users = terrainInspectionResponsibleUsers();
+  $("terrainInspectionResponsible").innerHTML = users.map((user) => `<option value="${escapeAttr(user.uid)}" ${user.uid === current.uid ? "selected" : ""}>${escapeHtml(user.name)} (${escapeHtml(user.email)})</option>`).join("");
+  if ($("terrainInspectionPhotoPreview")) $("terrainInspectionPhotoPreview").innerHTML = "";
+  $("terrainInspectionModal")?.classList.remove("hidden");
+  $("terrainInspectionModal")?.setAttribute("aria-hidden", "false");
+  $("terrainInspectionDate")?.focus();
+}
+
+function closeTerrainInspectionForm() {
+  $("terrainInspectionModal")?.classList.add("hidden");
+  $("terrainInspectionModal")?.setAttribute("aria-hidden", "true");
+  $("terrainInspectionForm")?.reset();
+  if ($("terrainInspectionPhotoPreview")) $("terrainInspectionPhotoPreview").innerHTML = "";
+}
+
+async function refreshTerrainInspections(terrainId) {
+  const snapshot = await get(query(
+    ref(db, TERRAIN_MANAGEMENT_ENTITIES.inspections.path),
+    orderByChild("terrain_id"),
+    equalTo(terrainId)
+  ));
+  Object.entries(state.terrainManagement.inspections || {}).forEach(([id, inspection]) => {
+    if (inspection?.terrain_id === terrainId) delete state.terrainManagement.inspections[id];
+  });
+  if (snapshot.exists()) {
+    state.terrainManagement.inspections = {
+      ...(state.terrainManagement.inspections || {}),
+      ...(snapshot.val() || {})
+    };
+  }
+}
+
+async function saveTerrainInspection(event) {
+  event.preventDefault();
+  if (!isMaster()) return showToast("Somente o Admin Master pode registrar vistorias.");
+  const terrainId = $("terrainInspectionTerrainId")?.value || "";
+  const terrain = terrainById(terrainId);
+  if (!terrain) return showToast("Terreno não encontrado.");
+  const responsible = terrainInspectionResponsibleUsers().find((user) => user.uid === $("terrainInspectionResponsible")?.value);
+  if (!responsible) return showToast("Selecione um usuário responsável válido.");
+  const inspectionId = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.inspections.path)).key;
+  const files = [...($("terrainInspectionPhotos")?.files || [])];
+  const uploaded = [];
+  let databaseSaved = false;
+  try {
+    files.forEach(validateTerrainImageFile);
+    const timestamp = Date.now();
+    for (const [index, file] of files.entries()) {
+      const path = terrainInspectionPhotoStoragePath(terrainId, inspectionId, file, timestamp, index);
+      const url = await uploadFileWithProgress(
+        storageRef(storage, path),
+        file,
+        `Enviando foto ${index + 1} de ${files.length}`,
+        file.name || "foto da vistoria"
+      );
+      const photoId = push(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.inspections.path}/${inspectionId}/fotos`)).key;
+      uploaded.push({ id: photoId, path, url });
+    }
+    const photos = uploaded.reduce((records, photo) => {
+      records[photo.id] = { url: photo.url, path: photo.path };
+      return records;
+    }, {});
+    const inspection = buildTerrainInspectionRecord({
+      terrain_id: terrainId,
+      data: $("terrainInspectionDate").value,
+      hora: $("terrainInspectionTime").value,
+      responsavel_uid: responsible.uid,
+      responsavel_nome: responsible.name,
+      responsavel_email: responsible.email,
+      situacao_atual: $("terrainInspectionSituation").value,
+      altura_mato: $("terrainInspectionGrassHeight").value,
+      grau_dificuldade: $("terrainInspectionDifficulty").value,
+      observacoes: $("terrainInspectionNotes").value,
+      precisa_limpeza: $("terrainInspectionNeedsCleaning").value === "true",
+      recomendar_contato: $("terrainInspectionRecommendContact").value === "true",
+      fotos: photos
+    }, { id: inspectionId, timestamp: serverTimestamp() });
+    const nextStatus = terrainStatusAfterInspection(terrain.status, inspection);
+    await firebaseUpdate(ref(db), {
+      [`${TERRAIN_MANAGEMENT_ENTITIES.inspections.path}/${inspectionId}`]: inspection,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/status`]: nextStatus,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/altura_mato`]: inspection.altura_mato,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/grau_dificuldade`]: inspection.grau_dificuldade,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`]: serverTimestamp()
+    });
+    databaseSaved = true;
+    await Promise.all([refreshTerrainRecord(terrainId), refreshTerrainInspections(terrainId)]);
+    closeTerrainInspectionForm();
+    openTerrainDetail(terrainId);
+    renderTerrainList();
+    showToast(
+      nextStatus === "precisa_limpeza"
+        ? "Vistoria salva e terreno marcado como Precisa de limpeza."
+        : "Vistoria salva no histórico.",
+      { prominent: true }
+    );
+  } catch (error) {
+    if (!databaseSaved) await Promise.allSettled(uploaded.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
+    console.error("Falha ao salvar vistoria.", error);
+    showToast(error?.message || "Não foi possível salvar a vistoria.");
+  }
 }
 
 async function refreshTerrainRecord(terrainId) {
@@ -3715,18 +4056,36 @@ async function saveTerrain(event) {
   if (!isMaster()) return showToast("Somente o Admin Master pode salvar terrenos.");
   const existing = state.selectedTerrainId ? terrainById(state.selectedTerrainId) : null;
   const terrainId = existing?.id || push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.terrains.path)).key;
+  const files = [...($("terrainGeneralPhotoFiles")?.files || [])];
+  const uploaded = [];
+  let databaseSaved = false;
   try {
     const payload = buildTerrainRecord(terrainFormValues(), {
       id: terrainId,
       existing: existing || {},
       timestamp: serverTimestamp()
     });
-    await firebaseSet(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`), payload);
+    files.forEach(validateTerrainImageFile);
+    uploaded.push(...await uploadTerrainGeneralPhotos(
+      terrainId,
+      files,
+      $("terrainGeneralPhotoCategory")?.value || "geral"
+    ));
+    const updates = {
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`]: payload
+    };
+    uploaded.forEach((item) => {
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${item.id}`] = item.record;
+    });
+    await firebaseUpdate(ref(db), updates);
+    databaseSaved = true;
     await refreshTerrainRecord(terrainId);
+    if (uploaded.length) await refreshTerrainPhotos(terrainId);
     renderTerrainManagement();
     resetTerrainForm();
     showToast(existing ? "Terreno atualizado com sucesso." : "Terreno criado com sucesso.", { prominent: true });
   } catch (error) {
+    if (!databaseSaved) await Promise.allSettled(uploaded.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
     console.error("Falha ao salvar terreno.", error);
     showToast(error?.message || "Não foi possível salvar o terreno.");
   }
@@ -3753,6 +4112,11 @@ async function inactivateTerrain(terrainId) {
 async function deleteTerrain(terrainId) {
   const terrain = terrainById(terrainId);
   if (!terrain) return;
+  if (terrainPhotoRecords(state.terrainManagement?.photos || {}, terrainId).length
+    || terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrainId).length) {
+    showToast("Exclusão bloqueada: remova as fotos e preserve ou trate o histórico de vistorias.");
+    return;
+  }
   if (!(await confirmarExclusao(terrain.apelido || terrainId, "terreno"))) return;
   try {
     await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`));
@@ -24104,6 +24468,9 @@ function bindEvents() {
   $("closeTerrainForm")?.addEventListener("click", resetTerrainForm);
   $("cancelTerrainForm")?.addEventListener("click", resetTerrainForm);
   $("terrainForm")?.addEventListener("submit", saveTerrain);
+  $("terrainGeneralPhotoFiles")?.addEventListener("change", () => {
+    renderTerrainSelectedPhotoPreview("terrainGeneralPhotoFiles", "terrainGeneralPhotoSelectionPreview");
+  });
   ["terrainSearch", "terrainBlockFilter", "terrainLotFilter"].forEach((id) => {
     $(id)?.addEventListener("input", renderTerrainList);
   });
@@ -24128,7 +24495,40 @@ function bindEvents() {
   $("terrainDetailModal")?.addEventListener("click", (event) => {
     if (event.target === $("terrainDetailModal")) closeTerrainDetail();
   });
+  $("terrainDetailContent")?.addEventListener("change", (event) => {
+    if (event.target.matches("#terrainDetailPhotoFiles")) {
+      renderTerrainSelectedPhotoPreview("terrainDetailPhotoFiles", "terrainDetailPhotoSelectionPreview");
+    }
+  });
   $("terrainDetailContent")?.addEventListener("click", (event) => {
+    const inspectionButton = event.target.closest("[data-terrain-new-inspection]");
+    if (inspectionButton) {
+      openTerrainInspectionForm(inspectionButton.dataset.terrainNewInspection);
+      return;
+    }
+    const uploadButton = event.target.closest("[data-terrain-upload-photos]");
+    if (uploadButton) {
+      uploadTerrainDetailGeneralPhotos(uploadButton.dataset.terrainUploadPhotos);
+      return;
+    }
+    const photoViewButton = event.target.closest("[data-terrain-photo-view]");
+    if (photoViewButton) {
+      const photo = state.terrainManagement?.photos?.[photoViewButton.dataset.terrainPhotoView];
+      if (photo) openTerrainPhotoViewer(photo.url, terrainPhotoCategoryLabel(photo.categoria));
+      return;
+    }
+    const photoDeleteButton = event.target.closest("[data-terrain-photo-delete]");
+    if (photoDeleteButton) {
+      deleteTerrainPhoto(photoDeleteButton.dataset.terrainPhotoDelete);
+      return;
+    }
+    const inspectionPhotoButton = event.target.closest("[data-inspection-photo-view]");
+    if (inspectionPhotoButton) {
+      const [inspectionId, photoId] = inspectionPhotoButton.dataset.inspectionPhotoView.split(":");
+      const photo = state.terrainManagement?.inspections?.[inspectionId]?.fotos?.[photoId];
+      if (photo) openTerrainPhotoViewer(photo.url, "Foto da vistoria");
+      return;
+    }
     const linkButton = event.target.closest("[data-terrain-link-owner]");
     if (linkButton) {
       const terrainId = linkButton.dataset.terrainLinkOwner;
@@ -24142,8 +24542,24 @@ function bindEvents() {
       openTerrainDevelopmentDetail(developmentButton.dataset.terrainViewDevelopment);
     }
   });
+  $("terrainInspectionForm")?.addEventListener("submit", saveTerrainInspection);
+  $("terrainInspectionPhotos")?.addEventListener("change", () => {
+    renderTerrainSelectedPhotoPreview("terrainInspectionPhotos", "terrainInspectionPhotoPreview");
+  });
+  $("closeTerrainInspection")?.addEventListener("click", closeTerrainInspectionForm);
+  $("cancelTerrainInspection")?.addEventListener("click", closeTerrainInspectionForm);
+  $("terrainInspectionModal")?.addEventListener("click", (event) => {
+    if (event.target === $("terrainInspectionModal")) closeTerrainInspectionForm();
+  });
+  $("closeTerrainPhotoViewer")?.addEventListener("click", closeTerrainPhotoViewer);
+  $("terrainPhotoViewerModal")?.addEventListener("click", (event) => {
+    if (event.target === $("terrainPhotoViewerModal")) closeTerrainPhotoViewer();
+  });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !$("terrainDetailModal")?.classList.contains("hidden")) closeTerrainDetail();
+    if (event.key !== "Escape") return;
+    if (!$("terrainPhotoViewerModal")?.classList.contains("hidden")) closeTerrainPhotoViewer();
+    else if (!$("terrainInspectionModal")?.classList.contains("hidden")) closeTerrainInspectionForm();
+    else if (!$("terrainDetailModal")?.classList.contains("hidden")) closeTerrainDetail();
   });
   $("newTerrainDevelopment")?.addEventListener("click", () => openTerrainDevelopmentForm());
   $("closeTerrainDevelopmentForm")?.addEventListener("click", resetTerrainDevelopmentForm);

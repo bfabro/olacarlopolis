@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-08-31-gestao-terrenos-loteamentos-v742'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-08-31-gestao-terrenos-vistorias-v743'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
