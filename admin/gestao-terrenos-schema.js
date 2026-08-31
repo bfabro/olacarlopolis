@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-08-31_v4";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-08-31_v5";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -106,9 +106,12 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
   developments: Object.freeze({
     path: "terrenosLoteamentos",
     fields: Object.freeze([
-      "id", "nome", "bairro", "cidade", "descricao", "observacoes", "created_at", "updated_at"
+      "id", "nome", "bairro", "cidade", "descricao", "observacoes", "planta_imagem_url",
+      "planta_imagem_path", "planta_pdf_url", "planta_pdf_path", "created_at", "updated_at"
     ]),
-    optionalFields: Object.freeze([])
+    optionalFields: Object.freeze([
+      "planta_imagem_url", "planta_imagem_path", "planta_pdf_url", "planta_pdf_path"
+    ])
   })
 });
 
@@ -376,4 +379,105 @@ export function terrainMapsUrl(terrain = {}) {
   if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return "";
   if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) return "";
   return `https://www.google.com/maps?q=${latitude},${longitude}`;
+}
+
+export function normalizeTerrainDevelopmentInput(input = {}) {
+  const value = (key) => String(input[key] ?? "").trim();
+  const development = {
+    nome: value("nome"),
+    bairro: value("bairro"),
+    cidade: value("cidade"),
+    descricao: value("descricao"),
+    observacoes: value("observacoes"),
+    planta_imagem_url: value("planta_imagem_url") || null,
+    planta_imagem_path: value("planta_imagem_path") || null,
+    planta_pdf_url: value("planta_pdf_url") || null,
+    planta_pdf_path: value("planta_pdf_path") || null
+  };
+  const required = ["nome", "bairro", "cidade", "descricao", "observacoes"];
+  const missing = required.filter((key) => !development[key]);
+  if (missing.length) throw new Error(`Campos obrigatorios ausentes: ${missing.join(", ")}`);
+  return development;
+}
+
+export function buildTerrainDevelopmentRecord(input, { id, existing = {}, timestamp = Date.now() } = {}) {
+  if (!id) throw new Error("O loteamento precisa de um id.");
+  return {
+    id,
+    ...normalizeTerrainDevelopmentInput(input),
+    created_at: existing.created_at || timestamp,
+    updated_at: timestamp
+  };
+}
+
+export function terrainDevelopmentRecords(records = {}) {
+  const list = Array.isArray(records)
+    ? records
+    : Object.entries(records || {}).map(([id, development]) => ({ id, ...(development || {}) }));
+  return list
+    .filter((development) => development?.id)
+    .sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+}
+
+export function filterTerrainDevelopments(records, search = "") {
+  const term = normalizeTerrainOwnerSearch(search);
+  return terrainDevelopmentRecords(records).filter((development) => {
+    if (!term) return true;
+    return normalizeTerrainOwnerSearch([
+      development.nome, development.bairro, development.cidade, development.descricao
+    ].filter(Boolean).join(" ")).includes(term);
+  });
+}
+
+export function terrainDevelopmentLinkedTerrains(developmentId, terrains = {}) {
+  return terrainRecords(terrains).filter(
+    (terrain) => String(terrain.development_id || "") === String(developmentId || "")
+  );
+}
+
+export function canDeleteTerrainDevelopment(developmentId, terrains = {}) {
+  return terrainDevelopmentLinkedTerrains(developmentId, terrains).length === 0;
+}
+
+export function terrainDevelopmentPlanContext(developmentId, terrains = {}, owners = {}) {
+  return terrainDevelopmentLinkedTerrains(developmentId, terrains).map((terrain) => ({
+    development_id: developmentId,
+    terrain_id: terrain.id,
+    quadra: terrain.quadra || "",
+    lote: terrain.lote || "",
+    owner_id: terrain.owner_id || null,
+    owner_name: terrainOwnerName(terrain, owners)
+  }));
+}
+
+export function validateTerrainDevelopmentPlanFile(file = {}, kind = "image") {
+  const type = String(file.type || "").toLowerCase();
+  const name = String(file.name || "");
+  const size = Number(file.size || 0);
+  const isImage = type.startsWith("image/") || /\.(png|jpe?g|webp|gif)$/i.test(name);
+  const isPdf = type === "application/pdf" || /\.pdf$/i.test(name);
+  if (kind === "image" && !isImage) throw new Error("Selecione uma imagem válida para a planta.");
+  if (kind === "pdf" && !isPdf) throw new Error("Selecione um arquivo PDF válido para a planta.");
+  const maxSize = kind === "pdf" ? 15 * 1024 * 1024 : 8 * 1024 * 1024;
+  if (!size || size > maxSize) {
+    throw new Error(kind === "pdf" ? "O PDF deve ter no máximo 15 MB." : "A imagem deve ter no máximo 8 MB.");
+  }
+  return true;
+}
+
+export function terrainDevelopmentPlanStoragePath(developmentId, file = {}, kind = "image", timestamp = Date.now()) {
+  if (!developmentId) throw new Error("O loteamento precisa de um id para receber a planta.");
+  validateTerrainDevelopmentPlanFile(file, kind);
+  const folder = kind === "pdf" ? "pdf" : "imagem";
+  const filename = String(file.name || `planta-${folder}`)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || `planta-${folder}`;
+  return `gestao-terrenos/loteamentos/${developmentId}/${folder}/${timestamp}-${filename}`;
+}
+
+export function clampTerrainPlanZoom(value) {
+  return Math.min(4, Math.max(1, Number(value) || 1));
 }

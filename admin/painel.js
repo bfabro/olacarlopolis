@@ -32,12 +32,17 @@ import {
   ref as storageRef,
   uploadBytesResumable,
   getDownloadURL,
-  getBlob
+  getBlob,
+  deleteObject
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import {
+  buildTerrainDevelopmentRecord,
   buildTerrainRecord,
   buildTerrainOwnerRecord,
+  canDeleteTerrainDevelopment,
   canDeleteTerrainOwner,
+  clampTerrainPlanZoom,
+  filterTerrainDevelopments,
   filterTerrains,
   filterTerrainOwners,
   formatTerrainOwnerCep,
@@ -48,15 +53,20 @@ import {
   terrainOwnerWhatsappUrl,
   terrainCharacteristicLabels,
   terrainDevelopmentName,
+  terrainDevelopmentLinkedTerrains,
+  terrainDevelopmentPlanContext,
+  terrainDevelopmentPlanStoragePath,
+  terrainDevelopmentRecords,
   terrainDifficultyLabel,
   terrainGrassHeightLabel,
   terrainMapsUrl,
   terrainOwnerName,
   terrainOwnerRecords,
   terrainStatusMeta,
+  validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=4";
+} from "./gestao-terrenos-schema.js?v=5";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -71,10 +81,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 686,
-  label: "v693",
+  numero: 687,
+  label: "v694",
   data: "2026-08-31",
-  nota: "CRUD completo de terrenos na Gestao de Terrenos."
+  nota: "CRUD de loteamentos e visualizacao de plantas na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -257,6 +267,18 @@ let state = {
   selectedClientId: null,
   selectedTerrainOwnerId: null,
   selectedTerrainId: null,
+  selectedTerrainDevelopmentId: null,
+  terrainDevelopmentPlanView: {
+    scale: 1,
+    x: 0,
+    y: 0,
+    dragging: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0
+  },
   selectedEventId: null,
   selectedImovelId: null,
   selectedAutomovelId: null,
@@ -863,7 +885,8 @@ function inferFileContentType(file) {
     heif: "image/heif",
     avif: "image/avif",
     svg: "image/svg+xml",
-    bmp: "image/bmp"
+    bmp: "image/bmp",
+    pdf: "application/pdf"
   }[extension] || "";
 }
 
@@ -3168,6 +3191,7 @@ function renderTerrainManagement() {
   $("gestaoTerrenosView")?.setAttribute("data-schema-version", TERRAIN_MANAGEMENT_SCHEMA_VERSION);
   renderTerrainOwnerList();
   renderTerrainList();
+  renderTerrainDevelopmentList();
 }
 
 function terrainOwnerById(ownerId) {
@@ -3430,13 +3454,6 @@ function terrainById(terrainId) {
   return state.terrainManagement?.terrains?.[terrainId] || null;
 }
 
-function terrainDevelopmentRecords(records = {}) {
-  return Object.entries(records || {})
-    .map(([id, development]) => ({ id, ...(development || {}) }))
-    .filter((development) => development.id)
-    .sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
-}
-
 function terrainSelectOptions(items, selectedValue, emptyLabel, labelBuilder) {
   return [
     `<option value="">${escapeHtml(emptyLabel)}</option>`,
@@ -3660,6 +3677,7 @@ function openTerrainDetail(terrainId) {
     <div class="terrain-detail-actions">
       ${!terrain.owner_id ? `<button type="button" data-terrain-link-owner="${escapeAttr(terrain.id)}"><i class="fa-solid fa-link"></i> Vincular proprietário</button>` : ""}
       ${mapsUrl ? `<a class="ghost-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Abrir no Google Maps</a>` : ""}
+      ${terrain.development_id ? `<button type="button" class="ghost-button" data-terrain-view-development="${escapeAttr(terrain.development_id)}"><i class="fa-solid fa-map"></i> Ver planta do loteamento</button>` : ""}
     </div>
     <div class="terrain-owner-detail-grid">
       <div><span>Proprietário</span><strong>${escapeHtml(terrainOwnerName(terrain, owners))}</strong></div>
@@ -3772,6 +3790,359 @@ function useCurrentTerrainLocation() {
   }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
 }
 
+function terrainDevelopmentById(developmentId) {
+  return state.terrainManagement?.developments?.[developmentId] || null;
+}
+
+function renderTerrainDevelopmentCurrentFiles(development = null) {
+  const imageMount = $("terrainDevelopmentCurrentImage");
+  const pdfMount = $("terrainDevelopmentCurrentPdf");
+  const imageUrl = development?.planta_imagem_url || "";
+  const pdfUrl = development?.planta_pdf_url || "";
+  if (imageMount) {
+    imageMount.classList.toggle("hidden", !imageUrl);
+    imageMount.innerHTML = imageUrl
+      ? `<i class="fa-solid fa-image"></i><a href="${escapeAttr(imageUrl)}" target="_blank" rel="noopener noreferrer">Imagem atual da planta</a>`
+      : "";
+  }
+  if (pdfMount) {
+    pdfMount.classList.toggle("hidden", !pdfUrl);
+    pdfMount.innerHTML = pdfUrl
+      ? `<i class="fa-solid fa-file-pdf"></i><a href="${escapeAttr(pdfUrl)}" target="_blank" rel="noopener noreferrer">PDF atual da planta</a>`
+      : "";
+  }
+  $("terrainDevelopmentRemoveImageLabel")?.classList.toggle("hidden", !imageUrl);
+  $("terrainDevelopmentRemovePdfLabel")?.classList.toggle("hidden", !pdfUrl);
+}
+
+function resetTerrainDevelopmentForm() {
+  state.selectedTerrainDevelopmentId = null;
+  $("terrainDevelopmentForm")?.reset();
+  if ($("terrainDevelopmentId")) $("terrainDevelopmentId").value = "";
+  if ($("terrainDevelopmentFormTitle")) $("terrainDevelopmentFormTitle").textContent = "Novo loteamento";
+  if ($("terrainDevelopmentCity")) $("terrainDevelopmentCity").value = "Carlópolis";
+  renderTerrainDevelopmentCurrentFiles();
+  $("terrainDevelopmentFormCard")?.classList.add("hidden");
+}
+
+function openTerrainDevelopmentForm(developmentId = "") {
+  const development = developmentId ? terrainDevelopmentById(developmentId) : null;
+  state.selectedTerrainDevelopmentId = development?.id || null;
+  $("terrainDevelopmentForm")?.reset();
+  if ($("terrainDevelopmentId")) $("terrainDevelopmentId").value = development?.id || "";
+  if ($("terrainDevelopmentFormTitle")) {
+    $("terrainDevelopmentFormTitle").textContent = development ? "Editar loteamento" : "Novo loteamento";
+  }
+  const values = {
+    terrainDevelopmentName: development?.nome || "",
+    terrainDevelopmentNeighborhood: development?.bairro || "",
+    terrainDevelopmentCity: development?.cidade || "Carlópolis",
+    terrainDevelopmentDescription: development?.descricao || "",
+    terrainDevelopmentNotes: development?.observacoes || ""
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    if ($(id)) $(id).value = value;
+  });
+  renderTerrainDevelopmentCurrentFiles(development);
+  $("terrainDevelopmentFormCard")?.classList.remove("hidden");
+  $("terrainDevelopmentName")?.focus({ preventScroll: true });
+  $("terrainDevelopmentFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function renderTerrainDevelopmentList() {
+  const mount = $("terrainDevelopmentList");
+  if (!mount) return;
+  const developments = filterTerrainDevelopments(
+    state.terrainManagement?.developments || {},
+    $("terrainDevelopmentSearch")?.value || ""
+  );
+  const terrains = state.terrainManagement?.terrains || {};
+  if ($("terrainDevelopmentListSummary")) {
+    $("terrainDevelopmentListSummary").textContent = `${developments.length} ${developments.length === 1 ? "loteamento encontrado" : "loteamentos encontrados"}.`;
+  }
+  if (!developments.length) {
+    mount.innerHTML = `
+      <div class="terrain-owner-list-empty">
+        <i class="fa-solid fa-map"></i>
+        <strong>Nenhum loteamento encontrado</strong>
+        <span>Ajuste a busca ou cadastre um novo loteamento.</span>
+      </div>`;
+    return;
+  }
+  mount.innerHTML = developments.map((development) => {
+    const linkedTerrains = terrainDevelopmentLinkedTerrains(development.id, terrains);
+    const canDelete = canDeleteTerrainDevelopment(development.id, terrains);
+    const badges = [
+      development.planta_imagem_url ? '<span><i class="fa-solid fa-image"></i> Imagem</span>' : "",
+      development.planta_pdf_url ? '<span><i class="fa-solid fa-file-pdf"></i> PDF</span>' : ""
+    ].filter(Boolean).join("");
+    return `
+      <article class="terrain-development-row" data-development-id="${escapeAttr(development.id)}">
+        <div data-label="Loteamento"><strong>${escapeHtml(development.nome || "Sem nome")}</strong><small>${escapeHtml(development.descricao || "")}</small></div>
+        <div data-label="Localização"><strong>${escapeHtml(development.bairro || "-")}</strong><small>${escapeHtml(development.cidade || "-")}</small></div>
+        <div data-label="Terrenos"><strong class="terrain-owner-linked-count">${linkedTerrains.length}</strong></div>
+        <div data-label="Planta"><div class="terrain-development-plan-badges">${badges || "<span>Sem arquivo</span>"}</div></div>
+        <div class="terrain-owner-actions" data-label="Ações">
+          <button type="button" class="terrain-owner-icon-button" data-development-view="${escapeAttr(development.id)}" data-no-loading title="Ver loteamento e planta" aria-label="Ver ${escapeAttr(development.nome)}"><i class="fa-solid fa-eye"></i></button>
+          <button type="button" class="terrain-owner-icon-button" data-development-edit="${escapeAttr(development.id)}" data-no-loading title="Editar" aria-label="Editar ${escapeAttr(development.nome)}"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="terrain-owner-icon-button danger" data-development-delete="${escapeAttr(development.id)}" ${canDelete ? "" : "disabled"} title="${canDelete ? "Excluir" : "Exclusão bloqueada: existem terrenos vinculados"}" aria-label="Excluir ${escapeAttr(development.nome)}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+async function uploadTerrainDevelopmentPlan(developmentId, file, kind) {
+  const folder = kind === "pdf" ? "pdf" : "imagem";
+  const path = terrainDevelopmentPlanStoragePath(developmentId, file, kind);
+  const url = await uploadFileWithProgress(
+    storageRef(storage, path),
+    file,
+    kind === "pdf" ? "Enviando PDF da planta" : "Enviando imagem da planta",
+    file.name || `planta-${folder}`
+  );
+  return { url, path };
+}
+
+async function deleteTerrainDevelopmentStoragePath(path) {
+  if (!path) return;
+  try {
+    await deleteObject(storageRef(storage, path));
+  } catch (error) {
+    if (error?.code !== "storage/object-not-found") throw error;
+  }
+}
+
+async function refreshTerrainDevelopmentRecord(developmentId) {
+  const snapshot = await get(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.developments.path}/${developmentId}`));
+  if (snapshot.exists()) state.terrainManagement.developments[developmentId] = snapshot.val();
+  else delete state.terrainManagement.developments[developmentId];
+}
+
+async function saveTerrainDevelopment(event) {
+  event.preventDefault();
+  if (!isMaster()) return showToast("Somente o Admin Master pode salvar loteamentos.");
+  const existing = state.selectedTerrainDevelopmentId
+    ? terrainDevelopmentById(state.selectedTerrainDevelopmentId)
+    : null;
+  const developmentId = existing?.id || push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.developments.path)).key;
+  const imageFile = $("terrainDevelopmentPlanImage")?.files?.[0] || null;
+  const pdfFile = $("terrainDevelopmentPlanPdf")?.files?.[0] || null;
+  const removeImage = $("terrainDevelopmentRemoveImage")?.checked === true;
+  const removePdf = $("terrainDevelopmentRemovePdf")?.checked === true;
+  const uploadedPaths = [];
+  let databaseSaved = false;
+  try {
+    if (imageFile) validateTerrainDevelopmentPlanFile(imageFile, "image");
+    if (pdfFile) validateTerrainDevelopmentPlanFile(pdfFile, "pdf");
+    let imageAsset = removeImage
+      ? { url: null, path: null }
+      : { url: existing?.planta_imagem_url || null, path: existing?.planta_imagem_path || null };
+    let pdfAsset = removePdf
+      ? { url: null, path: null }
+      : { url: existing?.planta_pdf_url || null, path: existing?.planta_pdf_path || null };
+    if (imageFile) {
+      imageAsset = await uploadTerrainDevelopmentPlan(developmentId, imageFile, "image");
+      uploadedPaths.push(imageAsset.path);
+    }
+    if (pdfFile) {
+      pdfAsset = await uploadTerrainDevelopmentPlan(developmentId, pdfFile, "pdf");
+      uploadedPaths.push(pdfAsset.path);
+    }
+    const payload = buildTerrainDevelopmentRecord({
+      nome: $("terrainDevelopmentName")?.value,
+      bairro: $("terrainDevelopmentNeighborhood")?.value,
+      cidade: $("terrainDevelopmentCity")?.value,
+      descricao: $("terrainDevelopmentDescription")?.value,
+      observacoes: $("terrainDevelopmentNotes")?.value,
+      planta_imagem_url: imageAsset.url,
+      planta_imagem_path: imageAsset.path,
+      planta_pdf_url: pdfAsset.url,
+      planta_pdf_path: pdfAsset.path
+    }, {
+      id: developmentId,
+      existing: existing || {},
+      timestamp: serverTimestamp()
+    });
+    await firebaseSet(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.developments.path}/${developmentId}`), payload);
+    databaseSaved = true;
+    const obsoletePaths = [
+      existing?.planta_imagem_path && existing.planta_imagem_path !== imageAsset.path ? existing.planta_imagem_path : "",
+      existing?.planta_pdf_path && existing.planta_pdf_path !== pdfAsset.path ? existing.planta_pdf_path : ""
+    ].filter(Boolean);
+    await Promise.allSettled(obsoletePaths.map(deleteTerrainDevelopmentStoragePath));
+    await refreshTerrainDevelopmentRecord(developmentId);
+    renderTerrainManagement();
+    resetTerrainDevelopmentForm();
+    showToast(existing ? "Loteamento atualizado com sucesso." : "Loteamento criado com sucesso.", { prominent: true });
+  } catch (error) {
+    if (!databaseSaved) {
+      await Promise.allSettled(uploadedPaths.map(deleteTerrainDevelopmentStoragePath));
+    }
+    console.error("Falha ao salvar loteamento.", error);
+    showToast(error?.message || "Não foi possível salvar o loteamento.");
+  }
+}
+
+async function deleteTerrainDevelopment(developmentId) {
+  const development = terrainDevelopmentById(developmentId);
+  if (!development) return;
+  if (!canDeleteTerrainDevelopment(developmentId, state.terrainManagement?.terrains || {})) {
+    showToast("Exclusão bloqueada: este loteamento possui terrenos vinculados.");
+    return;
+  }
+  if (!(await confirmarExclusao(development.nome || developmentId, "loteamento"))) return;
+  try {
+    const linkedQuery = query(
+      ref(db, TERRAIN_MANAGEMENT_ENTITIES.terrains.path),
+      orderByChild("development_id"),
+      equalTo(developmentId)
+    );
+    const linkedSnapshot = await get(linkedQuery);
+    if (linkedSnapshot.exists()) {
+      state.terrainManagement.terrains = {
+        ...(state.terrainManagement.terrains || {}),
+        ...(linkedSnapshot.val() || {})
+      };
+      renderTerrainManagement();
+      showToast("Exclusão bloqueada: este loteamento possui terrenos vinculados.");
+      return;
+    }
+    await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.developments.path}/${developmentId}`));
+    await Promise.allSettled([
+      deleteTerrainDevelopmentStoragePath(development.planta_imagem_path),
+      deleteTerrainDevelopmentStoragePath(development.planta_pdf_path)
+    ]);
+    delete state.terrainManagement.developments[developmentId];
+    if (state.selectedTerrainDevelopmentId === developmentId) resetTerrainDevelopmentForm();
+    closeTerrainDevelopmentDetail();
+    renderTerrainManagement();
+    showToast("Loteamento excluído.");
+  } catch (error) {
+    console.error("Falha ao excluir loteamento.", error);
+    showToast("Não foi possível excluir o loteamento.");
+  }
+}
+
+function resetTerrainDevelopmentPlanView() {
+  Object.assign(state.terrainDevelopmentPlanView, {
+    scale: 1,
+    x: 0,
+    y: 0,
+    dragging: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0
+  });
+  applyTerrainDevelopmentPlanTransform();
+}
+
+function applyTerrainDevelopmentPlanTransform() {
+  const image = $("terrainDevelopmentPlanImageViewer");
+  const viewport = $("terrainDevelopmentPlanViewport");
+  const output = $("terrainDevelopmentPlanZoomValue");
+  const view = state.terrainDevelopmentPlanView;
+  if (image) image.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.scale})`;
+  if (viewport) viewport.classList.toggle("is-dragging", view.dragging);
+  if (output) output.value = `${Math.round(view.scale * 100)}%`;
+}
+
+function setTerrainDevelopmentPlanZoom(nextScale) {
+  const view = state.terrainDevelopmentPlanView;
+  view.scale = clampTerrainPlanZoom(nextScale);
+  if (view.scale === 1) {
+    view.x = 0;
+    view.y = 0;
+  }
+  applyTerrainDevelopmentPlanTransform();
+}
+
+function closeTerrainDevelopmentDetail() {
+  const modal = $("terrainDevelopmentDetailModal");
+  modal?.classList.add("hidden");
+  modal?.setAttribute("aria-hidden", "true");
+  state.terrainDevelopmentPlanView.dragging = false;
+  state.terrainDevelopmentPlanView.pointerId = null;
+  document.body.classList.remove("terrain-owner-detail-open");
+}
+
+function openTerrainDevelopmentDetail(developmentId) {
+  const development = terrainDevelopmentById(developmentId);
+  if (!development) return;
+  const owners = state.terrainManagement?.owners || {};
+  const linkedTerrains = terrainDevelopmentLinkedTerrains(
+    development.id,
+    state.terrainManagement?.terrains || {}
+  );
+  const planContext = terrainDevelopmentPlanContext(
+    development.id,
+    state.terrainManagement?.terrains || {},
+    owners
+  );
+  $("terrainDevelopmentDetailTitle").textContent = development.nome || "Detalhes";
+  $("terrainDevelopmentDetailContent").innerHTML = `
+    <div class="terrain-development-summary">
+      <div class="wide"><span>Nome</span><strong>${escapeHtml(development.nome || "-")}</strong></div>
+      <div><span>Bairro</span><strong>${escapeHtml(development.bairro || "-")}</strong></div>
+      <div><span>Cidade</span><strong>${escapeHtml(development.cidade || "-")}</strong></div>
+      <div><span>Terrenos cadastrados</span><strong>${linkedTerrains.length}</strong></div>
+      <div class="wide"><span>Descrição</span><strong>${escapeHtml(development.descricao || "-")}</strong></div>
+      <div class="wide"><span>Observações</span><strong>${escapeHtml(development.observacoes || "-")}</strong></div>
+    </div>
+    <section class="terrain-development-plan-section" data-development-plan-id="${escapeAttr(development.id)}">
+      <div class="section-head compact">
+        <div><h3>Planta do loteamento</h3><p>Visualização da planta cadastrada.</p></div>
+      </div>
+      ${development.planta_imagem_url ? `
+        <div class="terrain-plan-toolbar">
+          <button type="button" class="terrain-owner-icon-button" data-plan-zoom-out data-no-loading title="Diminuir zoom" aria-label="Diminuir zoom"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+          <output id="terrainDevelopmentPlanZoomValue">100%</output>
+          <button type="button" class="terrain-owner-icon-button" data-plan-zoom-in data-no-loading title="Aumentar zoom" aria-label="Aumentar zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+          <button type="button" class="terrain-owner-icon-button" data-plan-reset data-no-loading title="Restaurar visualização" aria-label="Restaurar visualização"><i class="fa-solid fa-rotate-left"></i></button>
+          <button type="button" class="terrain-owner-icon-button" data-plan-fullscreen data-no-loading title="Abrir em tela cheia" aria-label="Abrir planta em tela cheia"><i class="fa-solid fa-expand"></i></button>
+        </div>
+        <div id="terrainDevelopmentPlanViewport" class="terrain-plan-viewport" tabindex="0" aria-label="Planta de ${escapeAttr(development.nome)}. Use o zoom e arraste para movimentar.">
+          <img id="terrainDevelopmentPlanImageViewer" src="${escapeAttr(development.planta_imagem_url)}" alt="Planta do loteamento ${escapeAttr(development.nome)}" draggable="false">
+        </div>` : `
+        <div class="terrain-development-plan-empty">
+          <i class="fa-solid fa-map"></i>
+          <strong>Imagem da planta não cadastrada</strong>
+          <span>Edite o loteamento para enviar a imagem.</span>
+        </div>`}
+      ${development.planta_pdf_url ? `<a class="ghost-button terrain-development-pdf-link" href="${escapeAttr(development.planta_pdf_url)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-file-pdf"></i> Abrir PDF da planta</a>` : ""}
+    </section>
+    <section class="terrain-development-terrains-section">
+      <div class="section-head compact">
+        <div><h3>Terrenos vinculados</h3><p>${linkedTerrains.length} ${linkedTerrains.length === 1 ? "terreno cadastrado" : "terrenos cadastrados"} neste loteamento.</p></div>
+      </div>
+      ${planContext.length ? `
+        <div class="terrain-development-terrain-list">
+          ${planContext.map((item) => {
+            const terrain = terrainById(item.terrain_id) || {};
+            return `
+              <div class="terrain-development-terrain-row" data-development-id="${escapeAttr(item.development_id)}" data-terrain-id="${escapeAttr(item.terrain_id)}" data-owner-id="${escapeAttr(item.owner_id || "")}" data-block="${escapeAttr(item.quadra)}" data-lot="${escapeAttr(item.lote)}">
+                <strong>${escapeHtml(terrain.apelido || item.terrain_id)}</strong>
+                <span>Q. ${escapeHtml(item.quadra || "-")} · L. ${escapeHtml(item.lote || "-")}</span>
+                <span>${escapeHtml(item.owner_name)}</span>
+                <button type="button" class="terrain-owner-icon-button" data-development-terrain-view="${escapeAttr(item.terrain_id)}" data-no-loading title="Ver terreno" aria-label="Ver terreno ${escapeAttr(terrain.apelido || item.terrain_id)}"><i class="fa-solid fa-eye"></i></button>
+              </div>`;
+          }).join("")}
+        </div>` : `
+        <div class="terrain-owner-linked-empty">
+          <i class="fa-solid fa-vector-square"></i>
+          <strong>Nenhum terreno vinculado</strong>
+          <span>Os terrenos associados a este loteamento aparecerão aqui.</span>
+        </div>`}
+    </section>`;
+  const modal = $("terrainDevelopmentDetailModal");
+  modal?.classList.remove("hidden");
+  modal?.setAttribute("aria-hidden", "false");
+  document.body.classList.add("terrain-owner-detail-open");
+  resetTerrainDevelopmentPlanView();
+  $("closeTerrainDevelopmentDetail")?.focus();
+}
+
 function switchTerrainManagementTab(tabName = "dashboard") {
   const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments"]);
   const target = allowedTabs.has(tabName) ? tabName : "dashboard";
@@ -3786,6 +4157,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
   });
   if (target === "owners") renderTerrainOwnerList();
   if (target === "terrains") renderTerrainList();
+  if (target === "developments") renderTerrainDevelopmentList();
 }
 
 function updateChrome() {
@@ -23758,13 +24130,127 @@ function bindEvents() {
   });
   $("terrainDetailContent")?.addEventListener("click", (event) => {
     const linkButton = event.target.closest("[data-terrain-link-owner]");
-    if (!linkButton) return;
-    const terrainId = linkButton.dataset.terrainLinkOwner;
-    closeTerrainDetail();
-    openTerrainForm(terrainId, { focusOwner: true });
+    if (linkButton) {
+      const terrainId = linkButton.dataset.terrainLinkOwner;
+      closeTerrainDetail();
+      openTerrainForm(terrainId, { focusOwner: true });
+      return;
+    }
+    const developmentButton = event.target.closest("[data-terrain-view-development]");
+    if (developmentButton) {
+      closeTerrainDetail();
+      openTerrainDevelopmentDetail(developmentButton.dataset.terrainViewDevelopment);
+    }
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !$("terrainDetailModal")?.classList.contains("hidden")) closeTerrainDetail();
+  });
+  $("newTerrainDevelopment")?.addEventListener("click", () => openTerrainDevelopmentForm());
+  $("closeTerrainDevelopmentForm")?.addEventListener("click", resetTerrainDevelopmentForm);
+  $("cancelTerrainDevelopmentForm")?.addEventListener("click", resetTerrainDevelopmentForm);
+  $("terrainDevelopmentForm")?.addEventListener("submit", saveTerrainDevelopment);
+  $("terrainDevelopmentSearch")?.addEventListener("input", renderTerrainDevelopmentList);
+  $("terrainDevelopmentPlanImage")?.addEventListener("change", (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      validateTerrainDevelopmentPlanFile(file, "image");
+    } catch (error) {
+      event.target.value = "";
+      showToast(error.message);
+    }
+  });
+  $("terrainDevelopmentPlanPdf")?.addEventListener("change", (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      validateTerrainDevelopmentPlanFile(file, "pdf");
+    } catch (error) {
+      event.target.value = "";
+      showToast(error.message);
+    }
+  });
+  $("terrainDevelopmentList")?.addEventListener("click", (event) => {
+    const viewButton = event.target.closest("[data-development-view]");
+    if (viewButton) return openTerrainDevelopmentDetail(viewButton.dataset.developmentView);
+    const editButton = event.target.closest("[data-development-edit]");
+    if (editButton) return openTerrainDevelopmentForm(editButton.dataset.developmentEdit);
+    const deleteButton = event.target.closest("[data-development-delete]");
+    if (deleteButton) return deleteTerrainDevelopment(deleteButton.dataset.developmentDelete);
+  });
+  $("closeTerrainDevelopmentDetail")?.addEventListener("click", closeTerrainDevelopmentDetail);
+  $("terrainDevelopmentDetailModal")?.addEventListener("click", (event) => {
+    if (event.target === $("terrainDevelopmentDetailModal")) closeTerrainDevelopmentDetail();
+  });
+  $("terrainDevelopmentDetailContent")?.addEventListener("click", async (event) => {
+    if (event.target.closest("[data-plan-zoom-in]")) {
+      setTerrainDevelopmentPlanZoom(state.terrainDevelopmentPlanView.scale + 0.25);
+      return;
+    }
+    if (event.target.closest("[data-plan-zoom-out]")) {
+      setTerrainDevelopmentPlanZoom(state.terrainDevelopmentPlanView.scale - 0.25);
+      return;
+    }
+    if (event.target.closest("[data-plan-reset]")) {
+      resetTerrainDevelopmentPlanView();
+      return;
+    }
+    if (event.target.closest("[data-plan-fullscreen]")) {
+      const viewport = $("terrainDevelopmentPlanViewport");
+      if (!viewport?.requestFullscreen) return showToast("Tela cheia não está disponível neste navegador.");
+      try {
+        await viewport.requestFullscreen();
+      } catch {
+        showToast("Não foi possível abrir a planta em tela cheia.");
+      }
+      return;
+    }
+    const terrainButton = event.target.closest("[data-development-terrain-view]");
+    if (terrainButton) {
+      closeTerrainDevelopmentDetail();
+      openTerrainDetail(terrainButton.dataset.developmentTerrainView);
+    }
+  });
+  $("terrainDevelopmentDetailContent")?.addEventListener("wheel", (event) => {
+    if (!event.target.closest("#terrainDevelopmentPlanViewport")) return;
+    event.preventDefault();
+    const direction = event.deltaY < 0 ? 0.2 : -0.2;
+    setTerrainDevelopmentPlanZoom(state.terrainDevelopmentPlanView.scale + direction);
+  }, { passive: false });
+  $("terrainDevelopmentDetailContent")?.addEventListener("pointerdown", (event) => {
+    const viewport = event.target.closest("#terrainDevelopmentPlanViewport");
+    if (!viewport || state.terrainDevelopmentPlanView.scale <= 1) return;
+    const view = state.terrainDevelopmentPlanView;
+    view.dragging = true;
+    view.pointerId = event.pointerId;
+    view.startX = event.clientX;
+    view.startY = event.clientY;
+    view.originX = view.x;
+    view.originY = view.y;
+    viewport.setPointerCapture?.(event.pointerId);
+    applyTerrainDevelopmentPlanTransform();
+    event.preventDefault();
+  });
+  document.addEventListener("pointermove", (event) => {
+    const view = state.terrainDevelopmentPlanView;
+    if (!view.dragging || event.pointerId !== view.pointerId) return;
+    view.x = view.originX + event.clientX - view.startX;
+    view.y = view.originY + event.clientY - view.startY;
+    applyTerrainDevelopmentPlanTransform();
+  });
+  const finishTerrainDevelopmentPlanDrag = (event) => {
+    const view = state.terrainDevelopmentPlanView;
+    if (!view.dragging || (event.pointerId !== undefined && event.pointerId !== view.pointerId)) return;
+    view.dragging = false;
+    view.pointerId = null;
+    applyTerrainDevelopmentPlanTransform();
+  };
+  document.addEventListener("pointerup", finishTerrainDevelopmentPlanDrag);
+  document.addEventListener("pointercancel", finishTerrainDevelopmentPlanDrag);
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !$("terrainDevelopmentDetailModal")?.classList.contains("hidden")) {
+      closeTerrainDevelopmentDetail();
+    }
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);

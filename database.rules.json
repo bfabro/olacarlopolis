@@ -52,7 +52,7 @@
       ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
       ".indexOn": ["nome"],
       "$developmentId": {
-        ".validate": "!newData.exists() || (newData.hasChildren(['id', 'nome', 'bairro', 'cidade', 'descricao', 'observacoes', 'created_at', 'updated_at']) && newData.child('id').val() === $developmentId && newData.child('nome').isString() && newData.child('bairro').isString() && newData.child('cidade').isString() && newData.child('descricao').isString() && newData.child('observacoes').isString() && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())"
+        ".validate": "!newData.exists() || (newData.hasChildren(['id', 'nome', 'bairro', 'cidade', 'descricao', 'observacoes', 'created_at', 'updated_at']) && newData.child('id').val() === $developmentId && newData.child('nome').isString() && newData.child('bairro').isString() && newData.child('cidade').isString() && newData.child('descricao').isString() && newData.child('observacoes').isString() && (!newData.child('planta_imagem_url').exists() || newData.child('planta_imagem_url').isString()) && (!newData.child('planta_imagem_path').exists() || newData.child('planta_imagem_path').isString()) && (!newData.child('planta_pdf_url').exists() || newData.child('planta_pdf_url').isString()) && (!newData.child('planta_pdf_path').exists() || newData.child('planta_pdf_path').isString()) && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())"
       }
     },
 

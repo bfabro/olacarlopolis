@@ -114,6 +114,14 @@ service firebase.storage {
       allow delete: if signedIn();
     }
 
+    match /gestao-terrenos/loteamentos/{developmentId}/{allPaths=**} {
+      allow read: if request.auth != null && request.auth.token.email == 'bruno.4and@gmail.com';
+      allow create, update: if request.auth != null
+        && request.auth.token.email == 'bruno.4and@gmail.com'
+        && isNewImageOrPdf();
+      allow delete: if request.auth != null && request.auth.token.email == 'bruno.4and@gmail.com';
+    }
+
     match /{allPaths=**} {
       allow read, write: if false;
     }

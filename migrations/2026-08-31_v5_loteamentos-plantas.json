@@ -1,0 +1,25 @@
+{
+  "version": "2026-08-31_v5",
+  "entity": "terrenosLoteamentos",
+  "operation": "add_optional_fields",
+  "recreates_existing_data": false,
+  "fields": {
+    "planta_imagem_url": "string",
+    "planta_imagem_path": "string",
+    "planta_pdf_url": "string",
+    "planta_pdf_path": "string"
+  },
+  "storage": {
+    "path": "gestao-terrenos/loteamentos/{developmentId}/{kind}/{timestamp}-{filename}",
+    "image_max_bytes": 8388608,
+    "pdf_max_bytes": 15728640
+  },
+  "future_visual_relationship": [
+    "development_id",
+    "quadra",
+    "lote",
+    "terrain_id",
+    "owner_id"
+  ],
+  "notes": "Extensao incremental do loteamento para plantas. Nenhuma marcacao interativa de lotes foi implementada."
+}
