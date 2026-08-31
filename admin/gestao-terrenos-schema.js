@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-08-31_v6";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-08-31_v7";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -87,6 +87,15 @@ export const TERRAIN_PHOTO_CATEGORY_OPTIONS = Object.freeze([
   Object.freeze({ value: "outra", label: "Outra" })
 ]);
 
+export const TERRAIN_BUDGET_STATUS_OPTIONS = Object.freeze([
+  Object.freeze({ value: "rascunho", label: "Rascunho", tone: "muted" }),
+  Object.freeze({ value: "enviado", label: "Enviado", tone: "info" }),
+  Object.freeze({ value: "visualizado", label: "Visualizado", tone: "warning" }),
+  Object.freeze({ value: "aprovado", label: "Aprovado", tone: "success" }),
+  Object.freeze({ value: "recusado", label: "Recusado", tone: "danger" }),
+  Object.freeze({ value: "expirado", label: "Expirado", tone: "muted" })
+]);
+
 export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
   owners: Object.freeze({
     path: "terrenosProprietarios",
@@ -139,6 +148,15 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
       "created_at", "updated_at"
     ]),
     optionalFields: Object.freeze(["fotos"])
+  }),
+  budgets: Object.freeze({
+    path: "terrenosOrcamentos",
+    fields: Object.freeze([
+      "id", "numero", "owner_id", "terrain_id", "development_id", "data",
+      "validade", "area_m2", "tipo_servico", "descricao", "valor",
+      "observacoes", "status", "created_at", "updated_at"
+    ]),
+    optionalFields: Object.freeze(["development_id"])
   })
 });
 
@@ -149,6 +167,7 @@ const TERRAIN_DIFFICULTY_VALUES = new Set(TERRAIN_DIFFICULTY_OPTIONS.map((item) 
 const TERRAIN_GRASS_HEIGHT_VALUES = new Set(TERRAIN_GRASS_HEIGHT_OPTIONS.map((item) => item.value));
 const TERRAIN_CHARACTERISTIC_VALUES = new Set(TERRAIN_CHARACTERISTIC_OPTIONS.map((item) => item.value));
 const TERRAIN_PHOTO_CATEGORY_VALUES = new Set(TERRAIN_PHOTO_CATEGORY_OPTIONS.map((item) => item.value));
+const TERRAIN_BUDGET_STATUS_VALUES = new Set(TERRAIN_BUDGET_STATUS_OPTIONS.map((item) => item.value));
 
 export function normalizeTerrainOwnerInput(input = {}) {
   const value = (key) => String(input[key] ?? "").trim();
@@ -630,4 +649,98 @@ export function terrainStatusAfterInspection(currentStatus, inspection = {}) {
   return TERRAIN_STATUS_VALUES.has(inspection.situacao_atual)
     ? inspection.situacao_atual
     : (TERRAIN_STATUS_VALUES.has(currentStatus) ? currentStatus : "sem_informacao");
+}
+
+export function formatTerrainBudgetNumber(sequence, year = new Date().getFullYear()) {
+  const number = Math.max(1, Math.trunc(Number(sequence) || 1));
+  const normalizedYear = Math.trunc(Number(year) || new Date().getFullYear());
+  return `ORC-${normalizedYear}-${String(number).padStart(4, "0")}`;
+}
+
+export function normalizeTerrainBudgetInput(input = {}) {
+  const value = (key) => String(input[key] ?? "").trim();
+  const budget = {
+    numero: value("numero"),
+    owner_id: value("owner_id"),
+    terrain_id: value("terrain_id"),
+    development_id: value("development_id") || null,
+    data: value("data"),
+    validade: value("validade"),
+    area_m2: terrainNumber(input.area_m2, "\u00e1rea"),
+    tipo_servico: value("tipo_servico"),
+    descricao: value("descricao"),
+    valor: terrainNumber(input.valor, "valor"),
+    observacoes: value("observacoes"),
+    status: TERRAIN_BUDGET_STATUS_VALUES.has(value("status")) ? value("status") : "rascunho"
+  };
+  const required = [
+    "numero", "owner_id", "terrain_id", "data", "validade", "tipo_servico", "descricao"
+  ];
+  const missing = required.filter((key) => !budget[key]);
+  if (missing.length) throw new Error(`Campos obrigatorios ausentes: ${missing.join(", ")}`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(budget.data) || !/^\d{4}-\d{2}-\d{2}$/.test(budget.validade)) {
+    throw new Error("Data ou validade do or\u00e7amento inv\u00e1lida.");
+  }
+  if (budget.validade < budget.data) throw new Error("A validade não pode ser anterior à data do orçamento.");
+  return budget;
+}
+
+export function buildTerrainBudgetRecord(input, { id, existing = {}, timestamp = Date.now() } = {}) {
+  if (!id) throw new Error("O or\u00e7amento precisa de um id.");
+  return {
+    id,
+    ...normalizeTerrainBudgetInput(input),
+    created_at: existing.created_at || timestamp,
+    updated_at: timestamp
+  };
+}
+
+export function terrainBudgetRecords(records = {}) {
+  const list = Array.isArray(records)
+    ? records
+    : Object.entries(records || {}).map(([id, budget]) => ({ id, ...(budget || {}) }));
+  return list
+    .filter((budget) => budget?.id)
+    .sort((a, b) => {
+      const byDate = String(b.data || "").localeCompare(String(a.data || ""));
+      return byDate || String(b.numero || "").localeCompare(String(a.numero || ""), "pt-BR", { numeric: true });
+    });
+}
+
+export function filterTerrainBudgets(records, filters = {}, terrains = {}) {
+  const from = String(filters.date_from || "");
+  const to = String(filters.date_to || "");
+  return terrainBudgetRecords(records).filter((budget) => {
+    const developmentId = budget.development_id || terrains?.[budget.terrain_id]?.development_id || "";
+    if (filters.status && budget.status !== filters.status) return false;
+    if (filters.owner_id && budget.owner_id !== filters.owner_id) return false;
+    if (filters.development_id && developmentId !== filters.development_id) return false;
+    if (from && String(budget.data || "") < from) return false;
+    if (to && String(budget.data || "") > to) return false;
+    return true;
+  });
+}
+
+export function terrainBudgetStatusMeta(status) {
+  return TERRAIN_BUDGET_STATUS_OPTIONS.find((item) => item.value === status)
+    || TERRAIN_BUDGET_STATUS_OPTIONS[0];
+}
+
+export function terrainBudgetWhatsappUrl(budget = {}, owner = {}, terrain = {}) {
+  let digits = String(owner.whatsapp || owner.telefone || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (!digits.startsWith("55")) digits = `55${digits}`;
+  const amount = Number(budget.valor || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL"
+  }).replace(/\u00a0/g, " ");
+  const validity = String(budget.validade || "").split("-").reverse().join("/");
+  const message = [
+    `Olá, ${owner.nome || "tudo bem"}!`,
+    `Segue o orçamento ${budget.numero || ""} para o terreno ${terrain.apelido || ""}.`,
+    `Serviço: ${budget.tipo_servico || "-"}.`,
+    `Valor: ${amount}.`,
+    `Validade: ${validity || "-"}.`
+  ].join("\n");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
 }

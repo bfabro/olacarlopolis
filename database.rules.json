@@ -70,6 +70,25 @@
       }
     },
 
+    "terrenosOrcamentos": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".indexOn": ["owner_id", "terrain_id", "development_id", "status", "data"],
+      "$budgetId": {
+        ".validate": "!newData.exists() || (newData.hasChildren(['id', 'numero', 'owner_id', 'terrain_id', 'data', 'validade', 'area_m2', 'tipo_servico', 'descricao', 'valor', 'observacoes', 'status', 'created_at', 'updated_at']) && newData.child('id').val() === $budgetId && newData.child('numero').isString() && newData.child('owner_id').isString() && root.child('terrenosProprietarios').child(newData.child('owner_id').val()).exists() && newData.child('terrain_id').isString() && root.child('terrenos').child(newData.child('terrain_id').val()).exists() && (!newData.child('development_id').exists() || (newData.child('development_id').isString() && root.child('terrenosLoteamentos').child(newData.child('development_id').val()).exists())) && newData.child('data').isString() && newData.child('validade').isString() && newData.child('area_m2').isNumber() && newData.child('area_m2').val() >= 0 && newData.child('tipo_servico').isString() && newData.child('descricao').isString() && newData.child('valor').isNumber() && newData.child('valor').val() >= 0 && newData.child('observacoes').isString() && (newData.child('status').val() === 'rascunho' || newData.child('status').val() === 'enviado' || newData.child('status').val() === 'visualizado' || newData.child('status').val() === 'aprovado' || newData.child('status').val() === 'recusado' || newData.child('status').val() === 'expirado') && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())"
+      }
+    },
+
+    "terrenosConfiguracoes": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "orcamentosSequencia": {
+        "$year": {
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        }
+      }
+    },
+
     "terrenosLoteamentos": {
       ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
       ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",

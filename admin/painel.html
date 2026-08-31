@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=425">
+  <link rel="stylesheet" href="painel.css?v=426">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -208,6 +208,7 @@
           <button type="button" data-terrain-tab="owners"><i class="fa-solid fa-user-group"></i> Proprietários</button>
           <button type="button" data-terrain-tab="terrains"><i class="fa-solid fa-vector-square"></i> Terrenos</button>
           <button type="button" data-terrain-tab="developments"><i class="fa-solid fa-map"></i> Loteamentos</button>
+          <button type="button" data-terrain-tab="budgets"><i class="fa-solid fa-file-invoice-dollar"></i> Orçamentos</button>
         </nav>
 
         <section class="terrain-module-section" data-terrain-section="dashboard">
@@ -225,6 +226,11 @@
             <article class="stat-card">
               <span>Loteamentos</span>
               <strong id="terrainDevelopmentsCount">0</strong>
+              <small>Cadastros no módulo</small>
+            </article>
+            <article class="stat-card">
+              <span>Orçamentos</span>
+              <strong id="terrainBudgetsCount">0</strong>
               <small>Cadastros no módulo</small>
             </article>
           </div>
@@ -548,6 +554,74 @@
               <span>Loteamento</span><span>Localização</span><span>Terrenos</span><span>Planta</span><span>Ações</span>
             </div>
             <div id="terrainDevelopmentList" class="terrain-development-list"></div>
+          </section>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="budgets">
+          <section id="terrainBudgetFormCard" class="panel-card terrain-budget-form-card hidden">
+            <div class="section-head">
+              <div>
+                <h2 id="terrainBudgetFormTitle">Novo orçamento</h2>
+                <p>Proposta comercial vinculada ao proprietário e ao terreno.</p>
+              </div>
+              <button id="closeTerrainBudgetForm" class="ghost-button" type="button" data-no-loading title="Fechar formulário" aria-label="Fechar formulário"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="terrainBudgetForm" class="grid-form">
+              <input id="terrainBudgetId" type="hidden">
+              <label>Número do orçamento<input id="terrainBudgetNumber" readonly placeholder="Gerado ao salvar"></label>
+              <label>Status
+                <select id="terrainBudgetStatus" required>
+                  <option value="rascunho">Rascunho</option>
+                  <option value="enviado">Enviado</option>
+                  <option value="visualizado">Visualizado</option>
+                  <option value="aprovado">Aprovado</option>
+                  <option value="recusado">Recusado</option>
+                  <option value="expirado">Expirado</option>
+                </select>
+              </label>
+              <label>Proprietário<select id="terrainBudgetOwner" required></select></label>
+              <label>Terreno<select id="terrainBudgetTerrain" required></select></label>
+              <label>Data<input id="terrainBudgetDate" type="date" required></label>
+              <label>Validade<input id="terrainBudgetValidity" type="date" required></label>
+              <label>Área do terreno em m²<input id="terrainBudgetArea" type="number" min="0" step="0.01" readonly required></label>
+              <label>Valor<input id="terrainBudgetValue" type="number" min="0" step="0.01" inputmode="decimal" required></label>
+              <label class="wide">Tipo de serviço<input id="terrainBudgetServiceType" maxlength="160" required></label>
+              <label class="wide">Descrição<textarea id="terrainBudgetDescription" rows="5" maxlength="2500" required></textarea></label>
+              <label class="wide">Observações<textarea id="terrainBudgetNotes" rows="4" maxlength="2000"></textarea></label>
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar orçamento</button>
+                <button id="cancelTerrainBudgetForm" class="ghost-button" type="button" data-no-loading>Cancelar</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card terrain-budget-list-card">
+            <div class="section-head">
+              <div><h2>Orçamentos</h2><p id="terrainBudgetListSummary">0 orçamentos encontrados.</p></div>
+              <button id="newTerrainBudget" class="ghost-button new-entry-button" type="button" data-no-loading><i class="fa-solid fa-plus"></i> Novo orçamento</button>
+            </div>
+            <div class="terrain-budget-filters">
+              <label>Status
+                <select id="terrainBudgetStatusFilter">
+                  <option value="">Todos</option>
+                  <option value="rascunho">Rascunho</option>
+                  <option value="enviado">Enviado</option>
+                  <option value="visualizado">Visualizado</option>
+                  <option value="aprovado">Aprovado</option>
+                  <option value="recusado">Recusado</option>
+                  <option value="expirado">Expirado</option>
+                </select>
+              </label>
+              <label>Data inicial<input id="terrainBudgetDateFromFilter" type="date"></label>
+              <label>Data final<input id="terrainBudgetDateToFilter" type="date"></label>
+              <label>Proprietário<select id="terrainBudgetOwnerFilter"><option value="">Todos</option></select></label>
+              <label>Loteamento<select id="terrainBudgetDevelopmentFilter"><option value="">Todos</option></select></label>
+            </div>
+            <div class="terrain-budget-list-head" aria-hidden="true">
+              <span>Número</span><span>Cliente</span><span>Terreno</span><span>Valor</span>
+              <span>Data</span><span>Validade</span><span>Status</span><span>Ações</span>
+            </div>
+            <div id="terrainBudgetList" class="terrain-budget-list"></div>
           </section>
         </section>
       </section>
@@ -2704,6 +2778,16 @@
     </section>
   </div>
 
+  <div id="terrainBudgetDetailModal" class="terrain-owner-detail-overlay hidden" aria-hidden="true">
+    <section class="terrain-owner-detail-dialog terrain-budget-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="terrainBudgetDetailTitle">
+      <header>
+        <div><span>Orçamento</span><h2 id="terrainBudgetDetailTitle">Detalhes</h2></div>
+        <button id="closeTerrainBudgetDetail" class="ghost-button" type="button" data-no-loading title="Fechar orçamento" aria-label="Fechar orçamento"><i class="fa-solid fa-xmark"></i></button>
+      </header>
+      <div id="terrainBudgetDetailContent"></div>
+    </section>
+  </div>
+
   <div id="terrainInspectionModal" class="terrain-owner-detail-overlay hidden" aria-hidden="true">
     <section class="terrain-owner-detail-dialog terrain-inspection-dialog" role="dialog" aria-modal="true" aria-labelledby="terrainInspectionTitle">
       <header>
@@ -2787,6 +2871,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=625"></script>
+  <script type="module" src="painel.js?v=626"></script>
 </body>
 </html>

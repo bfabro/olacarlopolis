@@ -1150,7 +1150,7 @@ button[type="submit"]:hover,
 }
 
 .terrain-stats-grid {
-  grid-template-columns: repeat(3, minmax(170px, 1fr));
+  grid-template-columns: repeat(4, minmax(170px, 1fr));
 }
 
 .terrain-module-empty {
@@ -1185,7 +1185,9 @@ button[type="submit"]:hover,
 .terrain-form-card,
 .terrain-list-card,
 .terrain-development-form-card,
-.terrain-development-list-card {
+.terrain-development-list-card,
+.terrain-budget-form-card,
+.terrain-budget-list-card {
   padding: 18px;
 }
 
@@ -2326,6 +2328,115 @@ body.terrain-owner-detail-open {
   background: #0f172a;
 }
 
+.terrain-budget-filters {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.terrain-budget-filters label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-budget-list-head,
+.terrain-budget-row {
+  display: grid;
+  grid-template-columns: minmax(130px, .8fr) minmax(150px, 1fr) minmax(150px, 1fr) 105px 92px 92px minmax(120px, .8fr) minmax(175px, auto);
+  gap: 10px;
+  align-items: center;
+}
+
+.terrain-budget-list-head {
+  padding: 0 12px 8px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.terrain-budget-list {
+  display: grid;
+  gap: 8px;
+}
+
+.terrain-budget-row {
+  min-height: 76px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-budget-row > div {
+  min-width: 0;
+}
+
+.terrain-budget-row strong,
+.terrain-budget-row small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.terrain-budget-row small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.terrain-budget-status-select {
+  width: 100%;
+  min-width: 0;
+  padding: 7px 26px 7px 8px;
+  border-width: 1px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-budget-status-muted {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.terrain-budget-status-info {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.terrain-budget-status-warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.terrain-budget-status-success {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+  color: #166534;
+}
+
+.terrain-budget-status-danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.terrain-budget-whatsapp-button {
+  border-color: #86efac;
+  color: #15803d;
+}
+
+.terrain-budget-detail-dialog {
+  width: min(820px, 100%);
+}
+
 @media (max-width: 1180px) {
   .terrain-owner-list-head {
     display: none;
@@ -2393,6 +2504,28 @@ body.terrain-owner-detail-open {
   .terrain-development-row .terrain-owner-actions {
     grid-column: 1 / -1;
   }
+
+  .terrain-budget-list-head {
+    display: none;
+  }
+
+  .terrain-budget-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .terrain-budget-row > div::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: var(--muted);
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+
+  .terrain-budget-row .terrain-owner-actions {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 720px) {
@@ -2401,7 +2534,9 @@ body.terrain-owner-detail-open {
   .terrain-form-card,
   .terrain-list-card,
   .terrain-development-form-card,
-  .terrain-development-list-card {
+  .terrain-development-list-card,
+  .terrain-budget-form-card,
+  .terrain-budget-list-card {
     padding: 13px;
   }
 
@@ -2409,6 +2544,24 @@ body.terrain-owner-detail-open {
   .terrain-owner-row,
   .terrain-owner-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .terrain-budget-filters,
+  .terrain-budget-row {
+    grid-template-columns: 1fr;
+  }
+
+  .terrain-budget-row > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .terrain-budget-row .terrain-owner-actions {
+    grid-column: auto;
+    justify-content: flex-start;
+    flex-wrap: wrap;
   }
 
   .terrain-filters,

@@ -1,0 +1,19 @@
+{
+  "version": "2026-08-31_v7",
+  "operation": "create_budget_entity",
+  "recreates_existing_data": false,
+  "entities": {
+    "terrenosOrcamentos": {
+      "relations": [
+        "owner_id -> terrenosProprietarios/{id}",
+        "terrain_id -> terrenos/{id}",
+        "development_id -> terrenosLoteamentos/{id}"
+      ],
+      "indexes": ["owner_id", "terrain_id", "development_id", "status", "data"]
+    },
+    "terrenosConfiguracoes/orcamentosSequencia": {
+      "purpose": "Contador anual para numero automatico do orcamento"
+    }
+  },
+  "notes": "Adiciona somente orcamentos. Nao cria servicos nem conversao de orcamento."
+}
