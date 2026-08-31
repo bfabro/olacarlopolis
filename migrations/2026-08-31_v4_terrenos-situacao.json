@@ -1,0 +1,27 @@
+{
+  "version": "2026-08-31_v4",
+  "entity": "terrenos",
+  "operation": "add_fields",
+  "recreates_existing_data": false,
+  "fields": {
+    "grau_dificuldade": ["facil", "medio", "dificil", "muito_dificil"],
+    "altura_mato": ["ate_30_cm", "de_30_a_60_cm", "de_60_cm_a_1_m", "acima_1_m"],
+    "caracteristicas": {
+      "type": "optional_boolean_map",
+      "keys": [
+        "entulho",
+        "pedras",
+        "arvores",
+        "cerca",
+        "declive",
+        "construcao",
+        "poste",
+        "objetos_abandonados",
+        "possivel_presenca_animais",
+        "acesso_dificil",
+        "outro"
+      ]
+    }
+  },
+  "notes": "Extensao incremental da entidade terrenos para o CRUD de situacao. Nenhuma raiz existente e recriada."
+}

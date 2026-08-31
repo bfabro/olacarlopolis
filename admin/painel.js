@@ -35,8 +35,10 @@ import {
   getBlob
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import {
+  buildTerrainRecord,
   buildTerrainOwnerRecord,
   canDeleteTerrainOwner,
+  filterTerrains,
   filterTerrainOwners,
   formatTerrainOwnerCep,
   formatTerrainOwnerDocument,
@@ -44,9 +46,17 @@ import {
   terrainOwnerOriginLabel,
   terrainOwnerStatusMeta,
   terrainOwnerWhatsappUrl,
+  terrainCharacteristicLabels,
+  terrainDevelopmentName,
+  terrainDifficultyLabel,
+  terrainGrassHeightLabel,
+  terrainMapsUrl,
+  terrainOwnerName,
+  terrainOwnerRecords,
+  terrainStatusMeta,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=2";
+} from "./gestao-terrenos-schema.js?v=4";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -61,10 +71,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 685,
-  label: "v692",
+  numero: 686,
+  label: "v693",
   data: "2026-08-31",
-  nota: "CRUD completo de proprietarios na Gestao de Terrenos."
+  nota: "CRUD completo de terrenos na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -246,6 +256,7 @@ let state = {
   },
   selectedClientId: null,
   selectedTerrainOwnerId: null,
+  selectedTerrainId: null,
   selectedEventId: null,
   selectedImovelId: null,
   selectedAutomovelId: null,
@@ -3156,6 +3167,7 @@ function renderTerrainManagement() {
   if ($("terrainDevelopmentsCount")) $("terrainDevelopmentsCount").textContent = String(terrainRecordCount(terrainData.developments));
   $("gestaoTerrenosView")?.setAttribute("data-schema-version", TERRAIN_MANAGEMENT_SCHEMA_VERSION);
   renderTerrainOwnerList();
+  renderTerrainList();
 }
 
 function terrainOwnerById(ownerId) {
@@ -3414,6 +3426,352 @@ async function deleteTerrainOwner(ownerId) {
   }
 }
 
+function terrainById(terrainId) {
+  return state.terrainManagement?.terrains?.[terrainId] || null;
+}
+
+function terrainDevelopmentRecords(records = {}) {
+  return Object.entries(records || {})
+    .map(([id, development]) => ({ id, ...(development || {}) }))
+    .filter((development) => development.id)
+    .sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+}
+
+function terrainSelectOptions(items, selectedValue, emptyLabel, labelBuilder) {
+  return [
+    `<option value="">${escapeHtml(emptyLabel)}</option>`,
+    ...items.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === selectedValue ? "selected" : ""}>${escapeHtml(labelBuilder(item))}</option>`)
+  ].join("");
+}
+
+function renderTerrainFormOptions(selectedOwnerId = "", selectedDevelopmentId = "") {
+  if ($("terrainOwner")) {
+    $("terrainOwner").innerHTML = terrainSelectOptions(
+      terrainOwnerRecords(state.terrainManagement?.owners || {}),
+      selectedOwnerId,
+      "Sem proprietário",
+      (owner) => owner.nome || owner.id
+    );
+  }
+  if ($("terrainDevelopment")) {
+    $("terrainDevelopment").innerHTML = terrainSelectOptions(
+      terrainDevelopmentRecords(state.terrainManagement?.developments || {}),
+      selectedDevelopmentId,
+      "Sem loteamento",
+      (development) => development.nome || development.id
+    );
+  }
+}
+
+function renderTerrainFilterOptions() {
+  const currentOwner = $("terrainOwnerFilter")?.value || "";
+  const currentDevelopment = $("terrainDevelopmentFilter")?.value || "";
+  const currentNeighborhood = $("terrainNeighborhoodFilter")?.value || "";
+  if ($("terrainOwnerFilter")) {
+    $("terrainOwnerFilter").innerHTML = terrainSelectOptions(
+      terrainOwnerRecords(state.terrainManagement?.owners || {}),
+      currentOwner,
+      "Todos",
+      (owner) => owner.nome || owner.id
+    );
+  }
+  if ($("terrainDevelopmentFilter")) {
+    $("terrainDevelopmentFilter").innerHTML = terrainSelectOptions(
+      terrainDevelopmentRecords(state.terrainManagement?.developments || {}),
+      currentDevelopment,
+      "Todos",
+      (development) => development.nome || development.id
+    );
+  }
+  if ($("terrainNeighborhoodFilter")) {
+    const neighborhoods = [...new Set(
+      Object.values(state.terrainManagement?.terrains || {}).map((terrain) => String(terrain?.bairro || "").trim()).filter(Boolean)
+    )].sort((a, b) => a.localeCompare(b, "pt-BR"));
+    $("terrainNeighborhoodFilter").innerHTML = [
+      '<option value="">Todos</option>',
+      ...neighborhoods.map((neighborhood) => `<option value="${escapeAttr(neighborhood)}" ${neighborhood === currentNeighborhood ? "selected" : ""}>${escapeHtml(neighborhood)}</option>`)
+    ].join("");
+  }
+}
+
+function terrainFormValues() {
+  return {
+    owner_id: $("terrainOwner")?.value,
+    development_id: $("terrainDevelopment")?.value,
+    apelido: $("terrainNickname")?.value,
+    bairro: $("terrainNeighborhood")?.value,
+    rua: $("terrainStreet")?.value,
+    numero: $("terrainNumber")?.value,
+    quadra: $("terrainBlock")?.value,
+    lote: $("terrainLot")?.value,
+    area_m2: $("terrainArea")?.value,
+    frente_m: $("terrainFront")?.value,
+    fundo_m: $("terrainBack")?.value,
+    matricula: $("terrainRegistration")?.value,
+    inscricao_imobiliaria: $("terrainMunicipalRegistration")?.value,
+    latitude: $("terrainLatitude")?.value,
+    longitude: $("terrainLongitude")?.value,
+    google_maps_url: $("terrainMapsLink")?.value,
+    observacoes: $("terrainNotes")?.value,
+    grau_dificuldade: $("terrainDifficulty")?.value,
+    altura_mato: $("terrainGrassHeight")?.value,
+    caracteristicas: [...document.querySelectorAll("[data-terrain-characteristic]:checked")].map((input) => input.value),
+    status: $("terrainStatus")?.value
+  };
+}
+
+function updateTerrainMapsButton() {
+  const link = $("terrainOpenMaps");
+  if (!link) return;
+  const url = terrainMapsUrl({
+    latitude: $("terrainLatitude")?.value,
+    longitude: $("terrainLongitude")?.value,
+    google_maps_url: $("terrainMapsLink")?.value
+  });
+  link.classList.toggle("hidden", !url);
+  link.href = url || "#";
+}
+
+function resetTerrainForm() {
+  state.selectedTerrainId = null;
+  $("terrainForm")?.reset();
+  if ($("terrainId")) $("terrainId").value = "";
+  if ($("terrainFormTitle")) $("terrainFormTitle").textContent = "Novo terreno";
+  document.querySelectorAll("[data-terrain-characteristic]").forEach((input) => { input.checked = false; });
+  $("terrainFormCard")?.classList.add("hidden");
+  updateTerrainMapsButton();
+}
+
+function openTerrainForm(terrainId = "", { focusOwner = false } = {}) {
+  const terrain = terrainId ? terrainById(terrainId) : null;
+  state.selectedTerrainId = terrain?.id || null;
+  $("terrainForm")?.reset();
+  renderTerrainFormOptions(terrain?.owner_id || "", terrain?.development_id || "");
+  if ($("terrainId")) $("terrainId").value = terrain?.id || "";
+  if ($("terrainFormTitle")) $("terrainFormTitle").textContent = terrain ? "Editar terreno" : "Novo terreno";
+  const values = {
+    terrainNickname: terrain?.apelido || "",
+    terrainNeighborhood: terrain?.bairro || "",
+    terrainStreet: terrain?.rua || "",
+    terrainNumber: terrain?.numero || "",
+    terrainBlock: terrain?.quadra || "",
+    terrainLot: terrain?.lote || "",
+    terrainArea: terrain?.area_m2 ?? "",
+    terrainFront: terrain?.frente_m ?? "",
+    terrainBack: terrain?.fundo_m ?? "",
+    terrainRegistration: terrain?.matricula || "",
+    terrainMunicipalRegistration: terrain?.inscricao_imobiliaria || "",
+    terrainLatitude: terrain?.latitude ?? "",
+    terrainLongitude: terrain?.longitude ?? "",
+    terrainMapsLink: terrain?.google_maps_url || "",
+    terrainNotes: terrain?.observacoes || "",
+    terrainDifficulty: terrain?.grau_dificuldade || "",
+    terrainGrassHeight: terrain?.altura_mato || "",
+    terrainStatus: terrain?.status || "sem_informacao"
+  };
+  Object.entries(values).forEach(([id, value]) => {
+    if ($(id)) $(id).value = value;
+  });
+  document.querySelectorAll("[data-terrain-characteristic]").forEach((input) => {
+    input.checked = terrain?.caracteristicas?.[input.value] === true;
+  });
+  $("terrainFormCard")?.classList.remove("hidden");
+  updateTerrainMapsButton();
+  (focusOwner ? $("terrainOwner") : $("terrainNickname"))?.focus({ preventScroll: true });
+  $("terrainFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function formatTerrainMeasure(value, suffix) {
+  const number = Number(value);
+  return Number.isFinite(number)
+    ? `${number.toLocaleString("pt-BR", { maximumFractionDigits: 2 })} ${suffix}`
+    : "-";
+}
+
+function renderTerrainList() {
+  const mount = $("terrainList");
+  if (!mount) return;
+  renderTerrainFilterOptions();
+  const owners = state.terrainManagement?.owners || {};
+  const developments = state.terrainManagement?.developments || {};
+  const terrains = filterTerrains(state.terrainManagement?.terrains || {}, {
+    search: $("terrainSearch")?.value || "",
+    owner_id: $("terrainOwnerFilter")?.value || "",
+    development_id: $("terrainDevelopmentFilter")?.value || "",
+    bairro: $("terrainNeighborhoodFilter")?.value || "",
+    status: $("terrainStatusFilter")?.value || "",
+    quadra: $("terrainBlockFilter")?.value || "",
+    lote: $("terrainLotFilter")?.value || ""
+  }, owners, developments);
+  if ($("terrainListSummary")) {
+    $("terrainListSummary").textContent = `${terrains.length} ${terrains.length === 1 ? "terreno encontrado" : "terrenos encontrados"}.`;
+  }
+  if (!terrains.length) {
+    mount.innerHTML = `
+      <div class="terrain-owner-list-empty">
+        <i class="fa-solid fa-vector-square"></i>
+        <strong>Nenhum terreno encontrado</strong>
+        <span>Ajuste os filtros ou cadastre um novo terreno.</span>
+      </div>`;
+    return;
+  }
+  mount.innerHTML = terrains.map((terrain) => {
+    const owner = terrain.owner_id ? owners[terrain.owner_id] : null;
+    const ownerName = terrainOwnerName(terrain, owners);
+    const developmentName = terrainDevelopmentName(terrain, developments);
+    const status = terrainStatusMeta(terrain.status);
+    const whatsappUrl = owner ? terrainOwnerWhatsappUrl(owner) : "";
+    const mapsUrl = terrainMapsUrl(terrain);
+    return `
+      <article class="terrain-row" data-terrain-id="${escapeAttr(terrain.id)}">
+        <div data-label="Loteamento"><strong>${escapeHtml(developmentName)}</strong><small>${escapeHtml(terrain.bairro || "-")}</small></div>
+        <div data-label="Quadra / lote"><strong>Q. ${escapeHtml(terrain.quadra || "-")} · L. ${escapeHtml(terrain.lote || "-")}</strong><small>${escapeHtml(terrain.apelido || "")}</small></div>
+        <div data-label="Proprietário"><strong>${escapeHtml(ownerName)}</strong>${whatsappUrl ? `<small><a class="terrain-owner-contact-link" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${escapeHtml(formatPhoneMask(owner.whatsapp || owner.telefone))}</a></small>` : ""}</div>
+        <div data-label="Área"><strong class="terrain-area-value">${escapeHtml(formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
+        <div data-label="Status"><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></div>
+        <div class="terrain-owner-actions" data-label="Ações">
+          ${mapsUrl ? `<a class="terrain-owner-icon-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir no Google Maps" aria-label="Abrir ${escapeAttr(terrain.apelido)} no Google Maps"><i class="fa-solid fa-map-location-dot"></i></a>` : ""}
+          <button type="button" class="terrain-owner-icon-button" data-terrain-view="${escapeAttr(terrain.id)}" data-no-loading title="Ver detalhes" aria-label="Ver detalhes de ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-eye"></i></button>
+          <button type="button" class="terrain-owner-icon-button" data-terrain-edit="${escapeAttr(terrain.id)}" data-no-loading title="Editar" aria-label="Editar ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-pen"></i></button>
+          <button type="button" class="terrain-owner-icon-button warning" data-terrain-inactivate="${escapeAttr(terrain.id)}" ${terrain.status === "inativo" ? "disabled" : ""} title="${terrain.status === "inativo" ? "Terreno já inativo" : "Inativar"}" aria-label="Inativar ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-ban"></i></button>
+          <button type="button" class="terrain-owner-icon-button danger" data-terrain-delete="${escapeAttr(terrain.id)}" title="Excluir" aria-label="Excluir ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      </article>`;
+  }).join("");
+}
+
+function closeTerrainDetail() {
+  const modal = $("terrainDetailModal");
+  modal?.classList.add("hidden");
+  modal?.setAttribute("aria-hidden", "true");
+  document.body.classList.remove("terrain-owner-detail-open");
+}
+
+function openTerrainDetail(terrainId) {
+  const terrain = terrainById(terrainId);
+  if (!terrain) return;
+  const owners = state.terrainManagement?.owners || {};
+  const developments = state.terrainManagement?.developments || {};
+  const status = terrainStatusMeta(terrain.status);
+  const mapsUrl = terrainMapsUrl(terrain);
+  const characteristics = terrainCharacteristicLabels(terrain.caracteristicas);
+  $("terrainDetailTitle").textContent = terrain.apelido || "Detalhes";
+  $("terrainDetailContent").innerHTML = `
+    <div class="terrain-detail-actions">
+      ${!terrain.owner_id ? `<button type="button" data-terrain-link-owner="${escapeAttr(terrain.id)}"><i class="fa-solid fa-link"></i> Vincular proprietário</button>` : ""}
+      ${mapsUrl ? `<a class="ghost-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Abrir no Google Maps</a>` : ""}
+    </div>
+    <div class="terrain-owner-detail-grid">
+      <div><span>Proprietário</span><strong>${escapeHtml(terrainOwnerName(terrain, owners))}</strong></div>
+      <div><span>Status</span><strong><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></strong></div>
+      <div class="wide"><span>Endereço</span><strong>${escapeHtml([terrain.rua, terrain.numero, terrain.bairro].filter(Boolean).join(", ") || "-")}</strong></div>
+      <div><span>Loteamento</span><strong>${escapeHtml(terrainDevelopmentName(terrain, developments))}</strong></div>
+      <div><span>Quadra</span><strong>${escapeHtml(terrain.quadra || "-")}</strong></div>
+      <div><span>Lote</span><strong>${escapeHtml(terrain.lote || "-")}</strong></div>
+      <div><span>Área</span><strong>${escapeHtml(formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
+      <div><span>Frente</span><strong>${escapeHtml(formatTerrainMeasure(terrain.frente_m, "m"))}</strong></div>
+      <div><span>Fundo</span><strong>${escapeHtml(formatTerrainMeasure(terrain.fundo_m, "m"))}</strong></div>
+      <div><span>Matrícula</span><strong>${escapeHtml(terrain.matricula || "-")}</strong></div>
+      <div><span>Inscrição imobiliária</span><strong>${escapeHtml(terrain.inscricao_imobiliaria || "-")}</strong></div>
+      <div><span>Grau de dificuldade</span><strong>${escapeHtml(terrainDifficultyLabel(terrain.grau_dificuldade))}</strong></div>
+      <div><span>Altura do mato</span><strong>${escapeHtml(terrainGrassHeightLabel(terrain.altura_mato))}</strong></div>
+      <div class="wide"><span>Localização</span><strong>${escapeHtml(Number.isFinite(Number(terrain.latitude)) && Number.isFinite(Number(terrain.longitude)) ? `${terrain.latitude}, ${terrain.longitude}` : "Não informada")}</strong></div>
+      <div class="wide"><span>Características</span><strong class="terrain-detail-tags">${characteristics.length ? characteristics.map((label) => `<span>${escapeHtml(label)}</span>`).join("") : "<span>Nenhuma informada</span>"}</strong></div>
+      <div class="wide"><span>Observações</span><strong>${escapeHtml(terrain.observacoes || "Sem observações.")}</strong></div>
+    </div>`;
+  const modal = $("terrainDetailModal");
+  modal?.classList.remove("hidden");
+  modal?.setAttribute("aria-hidden", "false");
+  document.body.classList.add("terrain-owner-detail-open");
+  $("closeTerrainDetail")?.focus();
+}
+
+async function refreshTerrainRecord(terrainId) {
+  const snapshot = await get(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`));
+  if (snapshot.exists()) state.terrainManagement.terrains[terrainId] = snapshot.val();
+  else delete state.terrainManagement.terrains[terrainId];
+}
+
+async function saveTerrain(event) {
+  event.preventDefault();
+  if (!isMaster()) return showToast("Somente o Admin Master pode salvar terrenos.");
+  const existing = state.selectedTerrainId ? terrainById(state.selectedTerrainId) : null;
+  const terrainId = existing?.id || push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.terrains.path)).key;
+  try {
+    const payload = buildTerrainRecord(terrainFormValues(), {
+      id: terrainId,
+      existing: existing || {},
+      timestamp: serverTimestamp()
+    });
+    await firebaseSet(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`), payload);
+    await refreshTerrainRecord(terrainId);
+    renderTerrainManagement();
+    resetTerrainForm();
+    showToast(existing ? "Terreno atualizado com sucesso." : "Terreno criado com sucesso.", { prominent: true });
+  } catch (error) {
+    console.error("Falha ao salvar terreno.", error);
+    showToast(error?.message || "Não foi possível salvar o terreno.");
+  }
+}
+
+async function inactivateTerrain(terrainId) {
+  const terrain = terrainById(terrainId);
+  if (!terrain || terrain.status === "inativo") return;
+  if (!window.confirm(`Inativar o terreno ${terrain.apelido}?`)) return;
+  try {
+    await firebaseUpdate(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`), {
+      status: "inativo",
+      updated_at: serverTimestamp()
+    });
+    await refreshTerrainRecord(terrainId);
+    renderTerrainManagement();
+    showToast("Terreno inativado.");
+  } catch (error) {
+    console.error("Falha ao inativar terreno.", error);
+    showToast("Não foi possível inativar o terreno.");
+  }
+}
+
+async function deleteTerrain(terrainId) {
+  const terrain = terrainById(terrainId);
+  if (!terrain) return;
+  if (!(await confirmarExclusao(terrain.apelido || terrainId, "terreno"))) return;
+  try {
+    await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`));
+    delete state.terrainManagement.terrains[terrainId];
+    if (state.selectedTerrainId === terrainId) resetTerrainForm();
+    closeTerrainDetail();
+    renderTerrainManagement();
+    showToast("Terreno excluído.");
+  } catch (error) {
+    console.error("Falha ao excluir terreno.", error);
+    showToast("Não foi possível excluir o terreno.");
+  }
+}
+
+function useCurrentTerrainLocation() {
+  if (!navigator.geolocation) {
+    showToast("A localização não está disponível neste navegador.");
+    return;
+  }
+  const button = $("terrainUseCurrentLocation");
+  if (button) button.disabled = true;
+  navigator.geolocation.getCurrentPosition((position) => {
+    const latitude = Number(position.coords.latitude.toFixed(7));
+    const longitude = Number(position.coords.longitude.toFixed(7));
+    if ($("terrainLatitude")) $("terrainLatitude").value = String(latitude);
+    if ($("terrainLongitude")) $("terrainLongitude").value = String(longitude);
+    if ($("terrainMapsLink")) $("terrainMapsLink").value = `https://www.google.com/maps?q=${latitude},${longitude}`;
+    if (button) button.disabled = false;
+    updateTerrainMapsButton();
+    showToast("Localização atual preenchida.");
+  }, (error) => {
+    if (button) button.disabled = false;
+    const denied = error?.code === 1;
+    showToast(denied ? "Permissão de localização não concedida." : "Não foi possível obter sua localização.");
+  }, { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 });
+}
+
 function switchTerrainManagementTab(tabName = "dashboard") {
   const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments"]);
   const target = allowedTabs.has(tabName) ? tabName : "dashboard";
@@ -3427,6 +3785,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
     section.classList.toggle("hidden", section.dataset.terrainSection !== target);
   });
   if (target === "owners") renderTerrainOwnerList();
+  if (target === "terrains") renderTerrainList();
 }
 
 function updateChrome() {
@@ -23368,6 +23727,44 @@ function bindEvents() {
   });
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !$("terrainOwnerDetailModal")?.classList.contains("hidden")) closeTerrainOwnerDetail();
+  });
+  $("newTerrain")?.addEventListener("click", () => openTerrainForm());
+  $("closeTerrainForm")?.addEventListener("click", resetTerrainForm);
+  $("cancelTerrainForm")?.addEventListener("click", resetTerrainForm);
+  $("terrainForm")?.addEventListener("submit", saveTerrain);
+  ["terrainSearch", "terrainBlockFilter", "terrainLotFilter"].forEach((id) => {
+    $(id)?.addEventListener("input", renderTerrainList);
+  });
+  ["terrainOwnerFilter", "terrainDevelopmentFilter", "terrainNeighborhoodFilter", "terrainStatusFilter"].forEach((id) => {
+    $(id)?.addEventListener("change", renderTerrainList);
+  });
+  ["terrainLatitude", "terrainLongitude", "terrainMapsLink"].forEach((id) => {
+    $(id)?.addEventListener("input", updateTerrainMapsButton);
+  });
+  $("terrainUseCurrentLocation")?.addEventListener("click", useCurrentTerrainLocation);
+  $("terrainList")?.addEventListener("click", (event) => {
+    const viewButton = event.target.closest("[data-terrain-view]");
+    if (viewButton) return openTerrainDetail(viewButton.dataset.terrainView);
+    const editButton = event.target.closest("[data-terrain-edit]");
+    if (editButton) return openTerrainForm(editButton.dataset.terrainEdit);
+    const inactiveButton = event.target.closest("[data-terrain-inactivate]");
+    if (inactiveButton) return inactivateTerrain(inactiveButton.dataset.terrainInactivate);
+    const deleteButton = event.target.closest("[data-terrain-delete]");
+    if (deleteButton) return deleteTerrain(deleteButton.dataset.terrainDelete);
+  });
+  $("closeTerrainDetail")?.addEventListener("click", closeTerrainDetail);
+  $("terrainDetailModal")?.addEventListener("click", (event) => {
+    if (event.target === $("terrainDetailModal")) closeTerrainDetail();
+  });
+  $("terrainDetailContent")?.addEventListener("click", (event) => {
+    const linkButton = event.target.closest("[data-terrain-link-owner]");
+    if (!linkButton) return;
+    const terrainId = linkButton.dataset.terrainLinkOwner;
+    closeTerrainDetail();
+    openTerrainForm(terrainId, { focusOwner: true });
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !$("terrainDetailModal")?.classList.contains("hidden")) closeTerrainDetail();
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);
