@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v6";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v7";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",

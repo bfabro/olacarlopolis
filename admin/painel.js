@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=13";
+} from "./gestao-terrenos-schema.js?v=14";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 695,
-  label: "v702",
+  numero: 696,
+  label: "v703",
   data: "2026-09-01",
-  nota: "Dashboard, relatorios e previsao de receita da Gestao de Terrenos."
+  nota: "Revisao de integridade e fluxo completo da Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3712,6 +3712,7 @@ async function saveTerrainOwner(event) {
 }
 
 async function inactivateTerrainOwner(ownerId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode inativar proprietários.");
   const owner = terrainOwnerById(ownerId);
   if (!owner || owner.status === "inativo") return;
   if (!window.confirm(`Inativar o proprietário ${owner.nome}?`)) return;
@@ -3730,6 +3731,7 @@ async function inactivateTerrainOwner(ownerId) {
 }
 
 async function deleteTerrainOwner(ownerId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode excluir proprietários.");
   const owner = terrainOwnerById(ownerId);
   if (!owner) return;
   if (!canDeleteTerrainOwner(ownerId, state.terrainManagement?.terrains || {})
@@ -3750,9 +3752,16 @@ async function deleteTerrainOwner(ownerId) {
       orderByChild("owner_id"),
       equalTo(ownerId)
     );
-    const [linkedSnapshot, linkedBudgetSnapshot] = await Promise.all([get(linkedQuery), get(linkedBudgetQuery)]);
-    if (linkedSnapshot.exists() || linkedBudgetSnapshot.exists()) {
-      showToast("Exclusão bloqueada: este proprietário possui terrenos ou orçamentos vinculados.");
+    const linkedServiceQuery = query(
+      ref(db, TERRAIN_MANAGEMENT_ENTITIES.services.path),
+      orderByChild("owner_id"),
+      equalTo(ownerId)
+    );
+    const [linkedSnapshot, linkedBudgetSnapshot, linkedServiceSnapshot] = await Promise.all([
+      get(linkedQuery), get(linkedBudgetQuery), get(linkedServiceQuery)
+    ]);
+    if (linkedSnapshot.exists() || linkedBudgetSnapshot.exists() || linkedServiceSnapshot.exists()) {
+      showToast("Exclusão bloqueada: este proprietário possui terrenos, orçamentos ou serviços vinculados.");
       state.terrainManagement.terrains = {
         ...(state.terrainManagement.terrains || {}),
         ...(linkedSnapshot.val() || {})
@@ -3760,6 +3769,10 @@ async function deleteTerrainOwner(ownerId) {
       state.terrainManagement.budgets = {
         ...(state.terrainManagement.budgets || {}),
         ...(linkedBudgetSnapshot.val() || {})
+      };
+      state.terrainManagement.services = {
+        ...(state.terrainManagement.services || {}),
+        ...(linkedServiceSnapshot.val() || {})
       };
       renderTerrainManagement();
       return;
@@ -4218,8 +4231,12 @@ async function deleteTerrainPhoto(photoId) {
   if (!window.confirm("Excluir esta foto do terreno? Esta ação não pode ser desfeita.")) return;
   try {
     await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${photoId}`));
-    await deleteTerrainDevelopmentStoragePath(photo.path);
     delete state.terrainManagement.photos[photoId];
+    try {
+      await deleteTerrainDevelopmentStoragePath(photo.path);
+    } catch (storageError) {
+      console.warn("A foto foi removida do cadastro, mas o arquivo não pôde ser limpo do Storage.", storageError);
+    }
     openTerrainDetail(photo.terrain_id);
     renderTerrainList();
     showToast("Foto excluída.");
@@ -4471,6 +4488,7 @@ async function saveTerrain(event) {
 }
 
 async function inactivateTerrain(terrainId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode inativar terrenos.");
   const terrain = terrainById(terrainId);
   if (!terrain || terrain.status === "inativo") return;
   if (!window.confirm(`Inativar o terreno ${terrain.apelido}?`)) return;
@@ -4495,6 +4513,7 @@ async function inactivateTerrain(terrainId) {
 }
 
 async function deleteTerrain(terrainId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode excluir terrenos.");
   const terrain = terrainById(terrainId);
   if (!terrain) return;
   if (terrainPhotoRecords(state.terrainManagement?.photos || {}, terrainId).length
@@ -4506,7 +4525,28 @@ async function deleteTerrain(terrainId) {
   }
   if (!(await confirmarExclusao(terrain.apelido || terrainId, "terreno"))) return;
   try {
+    const linkedQueries = [
+      ["photos", TERRAIN_MANAGEMENT_ENTITIES.photos.path],
+      ["inspections", TERRAIN_MANAGEMENT_ENTITIES.inspections.path],
+      ["budgets", TERRAIN_MANAGEMENT_ENTITIES.budgets.path],
+      ["services", TERRAIN_MANAGEMENT_ENTITIES.services.path],
+      ["timeline", TERRAIN_MANAGEMENT_ENTITIES.timeline.path]
+    ];
+    const snapshots = await Promise.all(linkedQueries.map(([, path]) => get(query(
+      ref(db, path), orderByChild("terrain_id"), equalTo(terrainId)
+    ))));
+    const blockers = snapshots.slice(0, 4);
+    if (blockers.some((snapshot) => snapshot.exists())) {
+      linkedQueries.slice(0, 4).forEach(([key], index) => {
+        if (snapshots[index].exists()) Object.assign(state.terrainManagement[key], snapshots[index].val() || {});
+      });
+      renderTerrainManagement();
+      showToast("Exclusão bloqueada: o terreno possui fotos, vistorias, orçamentos ou serviços.");
+      return;
+    }
     const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`]: null };
+    const remoteTimeline = snapshots[4].exists() ? snapshots[4].val() || {} : {};
+    Object.assign(state.terrainManagement.timeline, remoteTimeline);
     terrainTimelineRecords(state.terrainManagement?.timeline || {}, terrainId).forEach((item) => {
       updates[`${TERRAIN_MANAGEMENT_ENTITIES.timeline.path}/${item.id}`] = null;
       delete state.terrainManagement.timeline[item.id];
@@ -4740,6 +4780,7 @@ async function saveTerrainDevelopment(event) {
 }
 
 async function deleteTerrainDevelopment(developmentId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode excluir loteamentos.");
   const development = terrainDevelopmentById(developmentId);
   if (!development) return;
   if (!canDeleteTerrainDevelopment(developmentId, state.terrainManagement?.terrains || {})) {
@@ -5134,6 +5175,7 @@ function renderTerrainBudgetList() {
 }
 
 async function updateTerrainBudgetStatus(budgetId, status) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode alterar orçamentos.");
   const budget = terrainBudgetById(budgetId);
   if (!budget || budget.status === status) return;
   try {
@@ -5203,6 +5245,7 @@ function openTerrainBudgetDetail(budgetId) {
 }
 
 async function deleteTerrainBudget(budgetId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode excluir orçamentos.");
   const budget = terrainBudgetById(budgetId);
   if (!budget) return;
   if (terrainServiceRecords(state.terrainManagement?.services || {}).some((service) => service.budget_id === budgetId)) {
@@ -5211,6 +5254,17 @@ async function deleteTerrainBudget(budgetId) {
   }
   if (!(await confirmarExclusao(budget.numero || budgetId, "orçamento"))) return;
   try {
+    const linkedSnapshot = await get(query(
+      ref(db, TERRAIN_MANAGEMENT_ENTITIES.services.path),
+      orderByChild("budget_id"),
+      equalTo(budgetId)
+    ));
+    if (linkedSnapshot.exists()) {
+      Object.assign(state.terrainManagement.services, linkedSnapshot.val() || {});
+      renderTerrainManagement();
+      showToast("Exclusão bloqueada: este orçamento originou um serviço.");
+      return;
+    }
     await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.budgets.path}/${budgetId}`));
     delete state.terrainManagement.budgets[budgetId];
     if (state.selectedTerrainBudgetId === budgetId) resetTerrainBudgetForm();
@@ -5317,28 +5371,54 @@ function terrainServiceFormValues() {
 
 async function uploadTerrainServicePhotos(service, type, files) {
   const uploaded = [];
-  for (const [index, file] of [...files].entries()) {
-    validateTerrainImageFile(file);
-    const path = terrainServicePhotoStoragePath(service.terrain_id, service.id, type, file, Date.now(), index);
-    const url = await uploadFileWithProgress(storageRef(storage, path), file, `Enviando foto ${type}`, file.name);
-    const id = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path)).key;
-    const record = buildTerrainServicePhotoRecord({ service_id: service.id, terrain_id: service.terrain_id, tipo: type, url, path }, { id, timestamp: serverTimestamp() });
-    await firebaseSet(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${id}`), record);
-    state.terrainManagement.servicePhotos[id] = record;
-    uploaded.push(record);
+  try {
+    const uploadTimestamp = Date.now();
+    for (const [index, file] of [...files].entries()) {
+      validateTerrainImageFile(file);
+      const path = terrainServicePhotoStoragePath(service.terrain_id, service.id, type, file, uploadTimestamp, index);
+      const url = await uploadFileWithProgress(storageRef(storage, path), file, `Enviando foto ${type}`, file.name);
+      const id = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path)).key;
+      const record = buildTerrainServicePhotoRecord({ service_id: service.id, terrain_id: service.terrain_id, tipo: type, url, path }, { id, timestamp: serverTimestamp() });
+      uploaded.push({ record, path });
+    }
+    return uploaded;
+  } catch (error) {
+    await Promise.allSettled(uploaded.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
+    throw error;
   }
-  return uploaded;
 }
 
 async function saveTerrainService(event) {
   event.preventDefault();
+  if (!isMaster()) return showToast("Somente o Admin Master pode salvar serviços.");
   const existing = state.selectedTerrainServiceId ? terrainServiceById(state.selectedTerrainServiceId) : null;
   const id = existing?.id || push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.services.path)).key;
   try {
     const today = terrainBudgetLocalDate();
     const service = buildTerrainServiceRecord(terrainServiceFormValues(), { id, existing: existing || {}, timestamp: serverTimestamp(), today });
+    const owner = terrainOwnerById(service.owner_id);
+    const terrain = terrainById(service.terrain_id);
+    if (!owner || !terrain || terrain.owner_id !== owner.id) {
+      throw new Error("O serviço deve usar o proprietário atualmente vinculado ao terreno.");
+    }
+    if (service.budget_id) {
+      const budget = terrainBudgetById(service.budget_id);
+      if (!budget || budget.status !== "aprovado" || budget.owner_id !== service.owner_id || budget.terrain_id !== service.terrain_id) {
+        throw new Error("O orçamento de origem não corresponde ao proprietário e terreno do serviço.");
+      }
+      if (!existing) {
+        const linkedSnapshot = await get(query(
+          ref(db, TERRAIN_MANAGEMENT_ENTITIES.services.path),
+          orderByChild("budget_id"),
+          equalTo(service.budget_id)
+        ));
+        if (linkedSnapshot.exists()) {
+          Object.assign(state.terrainManagement.services, linkedSnapshot.val() || {});
+          throw new Error("Este orçamento já foi transformado em serviço.");
+        }
+      }
+    }
     const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.services.path}/${id}`]: service };
-    const terrain = terrainById(service.terrain_id) || {};
     const becameScheduled = service.status === "agendado" && existing?.status !== "agendado";
     const becameCompleted = service.status === "concluido" && existing?.status !== "concluido";
     const paymentIncreased = Number(service.valor_recebido || 0) > Number(existing?.valor_recebido || 0);
@@ -5385,18 +5465,33 @@ async function saveTerrainService(event) {
     }
     await firebaseUpdate(ref(db), updates);
     state.terrainManagement.services[id] = service;
-    const beforePhotos = await uploadTerrainServicePhotos(service, "antes", $("terrainServiceBeforeFiles").files || []);
-    const afterPhotos = await uploadTerrainServicePhotos(service, "depois", $("terrainServiceAfterFiles").files || []);
-    if (beforePhotos.length || afterPhotos.length) {
-      const photoUpdates = {};
-      const total = beforePhotos.length + afterPhotos.length;
-      const firstPhoto = beforePhotos[0] || afterPhotos[0];
-      addTerrainTimelineUpdate(photoUpdates, {
-        terrainId: service.terrain_id, type: "photo_added",
-        description: `${total} ${total === 1 ? "foto adicionada" : "fotos adicionadas"} ao serviço (antes/depois).`,
-        referenceType: "servico", referenceId: id, qualifier: firstPhoto.id
-      });
-      await firebaseUpdate(ref(db), photoUpdates);
+    let photoWarning = false;
+    const pendingPhotoUploads = [];
+    try {
+      pendingPhotoUploads.push(...await uploadTerrainServicePhotos(service, "antes", $("terrainServiceBeforeFiles").files || []));
+      pendingPhotoUploads.push(...await uploadTerrainServicePhotos(service, "depois", $("terrainServiceAfterFiles").files || []));
+      if (pendingPhotoUploads.length) {
+        const photoUpdates = {};
+        pendingPhotoUploads.forEach(({ record }) => {
+          photoUpdates[`${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${record.id}`] = record;
+        });
+        addTerrainTimelineUpdate(photoUpdates, {
+          terrainId: service.terrain_id, type: "photo_added",
+          description: `${pendingPhotoUploads.length} ${pendingPhotoUploads.length === 1 ? "foto adicionada" : "fotos adicionadas"} ao serviço (antes/depois).`,
+          referenceType: "servico", referenceId: id, qualifier: pendingPhotoUploads[0].record.id
+        });
+        try {
+          await firebaseUpdate(ref(db), photoUpdates);
+          pendingPhotoUploads.forEach(({ record }) => { state.terrainManagement.servicePhotos[record.id] = record; });
+        } catch (error) {
+          await Promise.allSettled(pendingPhotoUploads.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
+          throw error;
+        }
+      }
+    } catch (error) {
+      photoWarning = true;
+      await Promise.allSettled(pendingPhotoUploads.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
+      console.error("Serviço salvo, mas houve falha no envio das fotos.", error);
     }
     await Promise.all([
       refreshTerrainTimeline(service.terrain_id),
@@ -5404,7 +5499,9 @@ async function saveTerrainService(event) {
     ]);
     resetTerrainServiceForm();
     renderTerrainManagement();
-    showToast(service.status === "concluido" ? "Serviço concluído, terreno atualizado e nova vistoria agendada." : "Serviço salvo com sucesso.", { prominent: true });
+    showToast(photoWarning
+      ? "Serviço salvo, mas não foi possível concluir o envio das fotos. Tente adicioná-las novamente."
+      : (service.status === "concluido" ? "Serviço concluído, terreno atualizado e nova vistoria agendada." : "Serviço salvo com sucesso."), { prominent: true });
   } catch (error) {
     console.error("Falha ao salvar serviço.", error);
     showToast(error?.message || "Não foi possível salvar o serviço.");
@@ -5458,12 +5555,31 @@ function openTerrainServiceDetail(id) {
 }
 
 async function deleteTerrainService(id) {
-  const service = terrainServiceById(id); if (!service || !(await confirmarExclusao(terrainServiceTypeLabel(service.tipo_servico), "serviço"))) return;
-  const photos = terrainServicePhotoRecords(state.terrainManagement?.servicePhotos || {}, id);
-  await Promise.allSettled(photos.map((photo) => deleteTerrainDevelopmentStoragePath(photo.path)));
-  const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.services.path}/${id}`]: null };
-  photos.forEach((photo) => { updates[`${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${photo.id}`] = null; delete state.terrainManagement.servicePhotos[photo.id]; });
-  await firebaseUpdate(ref(db), updates); delete state.terrainManagement.services[id]; closeTerrainServiceDetail(); renderTerrainManagement(); showToast("Serviço excluído.");
+  if (!isMaster()) return showToast("Somente o Admin Master pode excluir serviços.");
+  const service = terrainServiceById(id);
+  if (!service || !(await confirmarExclusao(terrainServiceTypeLabel(service.tipo_servico), "serviço"))) return;
+  try {
+    const snapshot = await get(query(
+      ref(db, TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path),
+      orderByChild("service_id"),
+      equalTo(id)
+    ));
+    const remotePhotos = snapshot.exists() ? snapshot.val() || {} : {};
+    Object.assign(state.terrainManagement.servicePhotos, remotePhotos);
+    const photos = terrainServicePhotoRecords(state.terrainManagement?.servicePhotos || {}, id);
+    const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.services.path}/${id}`]: null };
+    photos.forEach((photo) => { updates[`${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${photo.id}`] = null; });
+    await firebaseUpdate(ref(db), updates);
+    await Promise.allSettled(photos.map((photo) => deleteTerrainDevelopmentStoragePath(photo.path)));
+    photos.forEach((photo) => { delete state.terrainManagement.servicePhotos[photo.id]; });
+    delete state.terrainManagement.services[id];
+    closeTerrainServiceDetail();
+    renderTerrainManagement();
+    showToast("Serviço excluído.");
+  } catch (error) {
+    console.error("Falha ao excluir serviço.", error);
+    showToast("Não foi possível excluir o serviço.");
+  }
 }
 
 function terrainReminderEmptyHtml(label) {
@@ -5515,6 +5631,7 @@ function renderTerrainReminders() {
 }
 
 async function delayTerrainReminder(terrainId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode adiar lembretes.");
   const terrain = terrainById(terrainId);
   if (!terrain?.proxima_vistoria_em) return;
   const answer = window.prompt("Adiar o lembrete por quantos dias?", "7");
@@ -5543,6 +5660,7 @@ async function delayTerrainReminder(terrainId) {
 }
 
 async function verifyTerrainReminder(terrainId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode concluir lembretes.");
   const terrain = terrainById(terrainId);
   if (!terrain?.proxima_vistoria_em || !window.confirm("Marcar este terreno como verificado e encerrar o lembrete atual?")) return;
   try {
@@ -5612,6 +5730,7 @@ function renderTerrainOpportunities() {
 }
 
 async function markTerrainOpportunityContact(ownerId, terrainId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode registrar contatos.");
   if (!ownerId || !terrainOwnerById(ownerId)) return showToast("Proprietário não encontrado.");
   if (!terrainId || !terrainById(terrainId)) return showToast("Terreno não encontrado.");
   const update = buildTerrainOpportunityActionUpdate("contact", { today: terrainBudgetLocalDate() });
@@ -5636,6 +5755,7 @@ async function markTerrainOpportunityContact(ownerId, terrainId) {
 }
 
 async function markTerrainOpportunityNotNeeded(terrainId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode alterar oportunidades.");
   const terrain = terrainById(terrainId);
   if (!terrain) return;
   const answer = window.prompt("Por quantos dias este terreno não precisa de nova abordagem?", "30");

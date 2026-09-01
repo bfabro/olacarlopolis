@@ -1,0 +1,24 @@
+{
+  "version": "2026-09-01_v7",
+  "operation": "review_terrain_management_integrity_and_complete_flow",
+  "recreates_existing_data": false,
+  "new_paths": {},
+  "schema_changes": false,
+  "reviewed_paths": [
+    "terrenos",
+    "terrenosProprietarios",
+    "terrenosLoteamentos",
+    "terrenosFotos",
+    "terrenosVistorias",
+    "terrenosOrcamentos",
+    "terrenosServicos",
+    "terrenosServicosFotos",
+    "terrenosTimeline"
+  ],
+  "hardened_relations": [
+    "owner_terrain_budget_service",
+    "budget_service_conversion",
+    "terrain_dependent_records",
+    "service_photo_storage"
+  ]
+}
