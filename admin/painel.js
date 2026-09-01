@@ -47,7 +47,9 @@ import {
   buildTerrainRecord,
   buildTerrainOwnerRecord,
   buildTerrainOpportunityActionUpdate,
+  calculateTerrainDashboard,
   calculateTerrainFinance,
+  calculateTerrainReports,
   canDeleteTerrainDevelopment,
   canDeleteTerrainOwner,
   clampTerrainPlanZoom,
@@ -105,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=12";
+} from "./gestao-terrenos-schema.js?v=13";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -120,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 694,
-  label: "v701",
+  numero: 695,
+  label: "v702",
   data: "2026-09-01",
-  nota: "Timeline completa no detalhe dos terrenos."
+  nota: "Dashboard, relatorios e previsao de receita da Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3376,12 +3378,9 @@ async function syncTerrainReminderStatuses() {
 
 function renderTerrainManagement() {
   const terrainData = state.terrainManagement || {};
-  if ($("terrainOwnersCount")) $("terrainOwnersCount").textContent = String(terrainRecordCount(terrainData.owners));
-  if ($("terrainTerrainsCount")) $("terrainTerrainsCount").textContent = String(terrainRecordCount(terrainData.terrains));
-  if ($("terrainDevelopmentsCount")) $("terrainDevelopmentsCount").textContent = String(terrainRecordCount(terrainData.developments));
-  if ($("terrainBudgetsCount")) $("terrainBudgetsCount").textContent = String(terrainRecordCount(terrainData.budgets));
-  if ($("terrainServicesCount")) $("terrainServicesCount").textContent = String(terrainRecordCount(terrainData.services));
   $("gestaoTerrenosView")?.setAttribute("data-schema-version", TERRAIN_MANAGEMENT_SCHEMA_VERSION);
+  renderTerrainDashboard();
+  renderTerrainReports();
   renderTerrainOwnerList();
   renderTerrainList();
   renderTerrainDevelopmentList();
@@ -3390,6 +3389,122 @@ function renderTerrainManagement() {
   renderTerrainReminders();
   renderTerrainOpportunities();
   renderTerrainFinance();
+}
+
+function terrainDashboardEmptyHtml(message) {
+  return `<div class="terrain-dashboard-empty"><i class="fa-solid fa-circle-check"></i><span>${escapeHtml(message)}</span></div>`;
+}
+
+function renderTerrainDashboard() {
+  const today = terrainBudgetLocalDate();
+  const dashboard = calculateTerrainDashboard(state.terrainManagement || {}, today);
+  const values = {
+    terrainDashboardTerrains: dashboard.total_terrains,
+    terrainDashboardOwners: dashboard.total_owners,
+    terrainDashboardVerify: dashboard.terrains_to_verify,
+    terrainDashboardScheduled: dashboard.scheduled_services,
+    terrainDashboardPendingBudgets: dashboard.pending_budgets,
+    terrainDashboardCompletedMonth: dashboard.completed_services_month,
+    terrainDashboardOpportunities: dashboard.open_opportunities
+  };
+  Object.entries(values).forEach(([id, value]) => { if ($(id)) $(id).textContent = String(value); });
+  const moneyValues = {
+    terrainDashboardMonthlyBilling: dashboard.monthly_billing,
+    terrainDashboardPendingValues: dashboard.pending_values,
+    terrainDashboardPotentialRevenue: dashboard.potential_revenue
+  };
+  Object.entries(moneyValues).forEach(([id, value]) => { if ($(id)) $(id).textContent = moneyBR(value); });
+
+  const todayMount = $("terrainDashboardToday");
+  if (todayMount) todayMount.innerHTML = dashboard.today_terrains.length
+    ? dashboard.today_terrains.slice(0, 5).map((terrain) => `<button type="button" class="terrain-dashboard-row" data-dashboard-terrain="${escapeAttr(terrain.id)}" data-no-loading><span><strong>${escapeHtml(terrain.apelido || `Quadra ${terrain.quadra || "-"}, lote ${terrain.lote || "-"}`)}</strong><small>${escapeHtml(terrainOwnerName(terrain, state.terrainManagement?.owners || {}))}</small></span><i class="fa-solid fa-chevron-right"></i></button>`).join("")
+    : terrainDashboardEmptyHtml("Nenhum terreno para verificar hoje.");
+
+  const serviceMount = $("terrainDashboardServices");
+  if (serviceMount) serviceMount.innerHTML = dashboard.upcoming_services.length
+    ? dashboard.upcoming_services.slice(0, 5).map((service) => `<button type="button" class="terrain-dashboard-row" data-dashboard-service="${escapeAttr(service.id)}" data-no-loading><span><strong>${escapeHtml(terrainServiceTypeLabel(service.tipo_servico))}</strong><small>${escapeHtml(terrainBudgetDateLabel(service.data_prevista))} às ${escapeHtml(service.horario || "-")} · ${escapeHtml(terrainById(service.terrain_id)?.apelido || "Terreno")}</small></span><i class="fa-solid fa-chevron-right"></i></button>`).join("")
+    : terrainDashboardEmptyHtml("Nenhum serviço agendado.");
+
+  const priorityMount = $("terrainDashboardPriority");
+  if (priorityMount) priorityMount.innerHTML = dashboard.priority_opportunities.length
+    ? dashboard.priority_opportunities.slice(0, 5).map((item) => `<button type="button" class="terrain-dashboard-row" data-dashboard-terrain="${escapeAttr(item.terrain_id)}" data-no-loading><span><strong>${escapeHtml(item.proprietario)}</strong><small>${escapeHtml(item.status_label)} · ${item.valor_estimado > 0 ? escapeHtml(moneyBR(item.valor_estimado)) : "Sem estimativa"}</small></span><i class="fa-solid fa-chevron-right"></i></button>`).join("")
+    : terrainDashboardEmptyHtml("Nenhuma oportunidade prioritária.");
+}
+
+function terrainReportBreakdownHtml(records = {}, labelResolver = (value) => value) {
+  const entries = Object.entries(records).sort((a, b) => Number(b[1]) - Number(a[1]) || a[0].localeCompare(b[0], "pt-BR"));
+  if (!entries.length) return `<div class="terrain-report-empty">Sem dados no período.</div>`;
+  return entries.map(([label, count]) => `<div class="terrain-report-breakdown-row"><span>${escapeHtml(labelResolver(label))}</span><strong>${count}</strong></div>`).join("");
+}
+
+function terrainReportDuration(minutes) {
+  const total = Math.max(0, Math.round(Number(minutes || 0)));
+  if (!total) return "0h";
+  const hours = Math.floor(total / 60);
+  const remainder = total % 60;
+  return [hours ? `${hours}h` : "", remainder ? `${remainder}min` : ""].filter(Boolean).join(" ");
+}
+
+function initializeTerrainReportPeriod() {
+  if (!$("terrainReportDateFrom") || $("terrainReportDateFrom").value) return;
+  const today = terrainBudgetLocalDate();
+  $("terrainReportDateFrom").value = `${today.slice(0, 4)}-01-01`;
+  $("terrainReportDateTo").value = today;
+}
+
+function renderTerrainReports() {
+  if (!$("terrainReportDateFrom")) return;
+  initializeTerrainReportPeriod();
+  const from = $("terrainReportDateFrom").value;
+  const to = $("terrainReportDateTo").value;
+  if (from && to && from > to) return;
+  const report = calculateTerrainReports(state.terrainManagement || {}, {
+    date_from: from, date_to: to, today: terrainBudgetLocalDate()
+  });
+  if ($("terrainReportPeriodLabel")) $("terrainReportPeriodLabel").textContent = `Período: ${terrainBudgetDateLabel(from)} a ${terrainBudgetDateLabel(to)}`;
+  const textValues = {
+    terrainReportClientsActive: report.clients.active,
+    terrainReportClientsNew: report.clients.new,
+    terrainReportClientsRecurring: report.clients.recurring,
+    terrainReportClientsInactive: report.clients.inactive,
+    terrainReportTerrainsTotal: report.terrains.total,
+    terrainReportTerrainsWithoutOwner: report.terrains.without_owner,
+    terrainReportServicesCount: report.services.count,
+    terrainReportBudgetsSent: report.budgets.sent,
+    terrainReportBudgetsApproved: report.budgets.approved,
+    terrainReportBudgetsRefused: report.budgets.refused,
+    terrainReportBudgetsPending: report.budgets.pending
+  };
+  Object.entries(textValues).forEach(([id, value]) => { if ($(id)) $(id).textContent = String(value); });
+  if ($("terrainReportTerrainsArea")) $("terrainReportTerrainsArea").textContent = formatTerrainMeasure(report.terrains.total_area, "m²");
+  if ($("terrainReportServicesArea")) $("terrainReportServicesArea").textContent = formatTerrainMeasure(report.services.total_area, "m²");
+  if ($("terrainReportServicesTime")) $("terrainReportServicesTime").textContent = terrainReportDuration(report.services.average_minutes);
+  if ($("terrainReportServicesInterval")) $("terrainReportServicesInterval").textContent = `${Math.round(report.services.average_cleaning_interval_days)} dias`;
+  if ($("terrainReportBudgetsConversion")) $("terrainReportBudgetsConversion").textContent = `${report.budgets.conversion_rate.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
+  const reportMoney = {
+    terrainReportServicesTicket: report.services.average_ticket,
+    terrainReportServicesSquareMeter: report.services.average_per_m2,
+    terrainReportBudgetsQuoted: report.budgets.quoted_value,
+    terrainReportBudgetsApprovedValue: report.budgets.approved_value,
+    terrainReportFinanceBilling: report.finance.billing,
+    terrainReportFinanceCosts: report.finance.costs,
+    terrainReportFinanceProfit: report.finance.profit,
+    terrainReportFinancePending: report.finance.pending,
+    terrainForecast30: report.forecast.next_30_days,
+    terrainForecast60: report.forecast.next_60_days,
+    terrainForecast90: report.forecast.next_90_days
+  };
+  Object.entries(reportMoney).forEach(([id, value]) => { if ($(id)) $(id).textContent = moneyBR(value); });
+  $("terrainReportByNeighborhood").innerHTML = terrainReportBreakdownHtml(report.terrains.by_neighborhood);
+  $("terrainReportByDevelopment").innerHTML = terrainReportBreakdownHtml(report.terrains.by_development);
+  $("terrainReportByStatus").innerHTML = terrainReportBreakdownHtml(report.terrains.by_status, (status) => terrainStatusMeta(status).label);
+  const monthEntries = Object.entries(report.forecast.by_month).sort(([a], [b]) => a.localeCompare(b));
+  $("terrainForecastMonths").innerHTML = monthEntries.length
+    ? monthEntries.map(([month, value]) => {
+      const label = new Intl.DateTimeFormat("pt-BR", { month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(`${month}-01T12:00:00Z`));
+      return `<div class="terrain-forecast-month"><span>${escapeHtml(label)}</span><strong>${escapeHtml(moneyBR(value))}</strong></div>`;
+    }).join("")
+    : `<div class="terrain-report-empty">Sem previsão calculável para os próximos 90 dias.</div>`;
 }
 
 function terrainOwnerById(ownerId) {
@@ -5588,7 +5703,7 @@ function renderTerrainFinance() {
 }
 
 function switchTerrainManagementTab(tabName = "dashboard") {
-  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services", "reminders", "opportunities", "finance"]);
+  const allowedTabs = new Set(["dashboard", "reports", "owners", "terrains", "developments", "budgets", "services", "reminders", "opportunities", "finance"]);
   const target = allowedTabs.has(tabName) ? tabName : "dashboard";
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     const isActive = button.dataset.terrainTab === target;
@@ -5600,6 +5715,8 @@ function switchTerrainManagementTab(tabName = "dashboard") {
     section.classList.toggle("hidden", section.dataset.terrainSection !== target);
   });
   if (target === "owners") renderTerrainOwnerList();
+  if (target === "dashboard") renderTerrainDashboard();
+  if (target === "reports") renderTerrainReports();
   if (target === "terrains") renderTerrainList();
   if (target === "developments") renderTerrainDevelopmentList();
   if (target === "budgets") renderTerrainBudgetList();
@@ -25514,6 +25631,27 @@ function bindEvents() {
   });
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     button.addEventListener("click", () => switchTerrainManagementTab(button.dataset.terrainTab));
+  });
+  $("applyTerrainReportFilters")?.addEventListener("click", () => {
+    const from = $("terrainReportDateFrom")?.value || "";
+    const to = $("terrainReportDateTo")?.value || "";
+    if (from && to && from > to) return showToast("A data inicial não pode ser posterior à data final.");
+    renderTerrainReports();
+  });
+  $("gestaoTerrenosView")?.addEventListener("click", (event) => {
+    const tabButton = event.target.closest("[data-dashboard-open-tab]");
+    if (tabButton) return switchTerrainManagementTab(tabButton.dataset.dashboardOpenTab);
+    const terrainButton = event.target.closest("[data-dashboard-terrain]");
+    if (terrainButton) {
+      switchTerrainManagementTab("terrains");
+      openTerrainDetail(terrainButton.dataset.dashboardTerrain);
+      return;
+    }
+    const serviceButton = event.target.closest("[data-dashboard-service]");
+    if (serviceButton) {
+      switchTerrainManagementTab("services");
+      openTerrainServiceDetail(serviceButton.dataset.dashboardService);
+    }
   });
   $("newTerrainOwner")?.addEventListener("click", () => openTerrainOwnerForm());
   $("closeTerrainOwnerForm")?.addEventListener("click", resetTerrainOwnerForm);

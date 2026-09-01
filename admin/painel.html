@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=431">
+  <link rel="stylesheet" href="painel.css?v=432">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -205,6 +205,7 @@
       <section id="gestaoTerrenosView" class="panel-view hidden">
         <nav class="terrain-module-nav" aria-label="Navegação da Gestão de Terrenos">
           <button type="button" class="active" data-terrain-tab="dashboard" aria-current="page"><i class="fa-solid fa-chart-column"></i> Painel</button>
+          <button type="button" data-terrain-tab="reports"><i class="fa-solid fa-chart-pie"></i> Relatórios</button>
           <button type="button" data-terrain-tab="owners"><i class="fa-solid fa-user-group"></i> Proprietários</button>
           <button type="button" data-terrain-tab="terrains"><i class="fa-solid fa-vector-square"></i> Terrenos</button>
           <button type="button" data-terrain-tab="developments"><i class="fa-solid fa-map"></i> Loteamentos</button>
@@ -216,29 +217,37 @@
         </nav>
 
         <section class="terrain-module-section" data-terrain-section="dashboard">
-          <div class="stats-grid terrain-stats-grid">
-            <article class="stat-card">
-              <span>Proprietários</span>
-              <strong id="terrainOwnersCount">0</strong>
-              <small>Cadastros no módulo</small>
-            </article>
-            <article class="stat-card">
-              <span>Terrenos</span>
-              <strong id="terrainTerrainsCount">0</strong>
-              <small>Cadastros no módulo</small>
-            </article>
-            <article class="stat-card">
-              <span>Loteamentos</span>
-              <strong id="terrainDevelopmentsCount">0</strong>
-              <small>Cadastros no módulo</small>
-            </article>
-            <article class="stat-card">
-              <span>Orçamentos</span>
-              <strong id="terrainBudgetsCount">0</strong>
-              <small>Cadastros no módulo</small>
-            </article>
-            <article class="stat-card"><span>Serviços</span><strong id="terrainServicesCount">0</strong><small>Cadastros no módulo</small></article>
+          <div class="terrain-dashboard-stats">
+            <article><span>Total de terrenos</span><strong id="terrainDashboardTerrains">0</strong><small>Cadastros atuais</small></article>
+            <article><span>Total de proprietários</span><strong id="terrainDashboardOwners">0</strong><small>Cadastros atuais</small></article>
+            <article><span>Terrenos para verificar</span><strong id="terrainDashboardVerify">0</strong><small>Hoje e atrasados</small></article>
+            <article><span>Serviços agendados</span><strong id="terrainDashboardScheduled">0</strong><small>Agenda futura</small></article>
+            <article><span>Orçamentos pendentes</span><strong id="terrainDashboardPendingBudgets">0</strong><small>Sem decisão final</small></article>
+            <article><span>Serviços realizados no mês</span><strong id="terrainDashboardCompletedMonth">0</strong><small>Concluídos</small></article>
+            <article><span>Faturamento do mês</span><strong id="terrainDashboardMonthlyBilling">R$ 0,00</strong><small>Serviços concluídos</small></article>
+            <article><span>Valores pendentes</span><strong id="terrainDashboardPendingValues">R$ 0,00</strong><small>Saldo a receber</small></article>
+            <article><span>Oportunidades abertas</span><strong id="terrainDashboardOpportunities">0</strong><small>Potencial de novos serviços</small></article>
+            <article class="potential"><span>Receita potencial</span><strong id="terrainDashboardPotentialRevenue">R$ 0,00</strong><small>Estimativa, não garantida</small></article>
           </div>
+          <div class="terrain-dashboard-columns">
+            <section class="terrain-dashboard-section"><div class="terrain-dashboard-section-head"><div><span>Prioridade diária</span><h2>Terrenos para verificar hoje</h2></div><button type="button" class="ghost-button" data-dashboard-open-tab="reminders"><i class="fa-solid fa-arrow-right"></i></button></div><div id="terrainDashboardToday" class="terrain-dashboard-list"></div></section>
+            <section class="terrain-dashboard-section"><div class="terrain-dashboard-section-head"><div><span>Agenda operacional</span><h2>Próximos serviços</h2></div><button type="button" class="ghost-button" data-dashboard-open-tab="services"><i class="fa-solid fa-arrow-right"></i></button></div><div id="terrainDashboardServices" class="terrain-dashboard-list"></div></section>
+            <section class="terrain-dashboard-section"><div class="terrain-dashboard-section-head"><div><span>Prioridade comercial</span><h2>Oportunidades prioritárias</h2></div><button type="button" class="ghost-button" data-dashboard-open-tab="opportunities"><i class="fa-solid fa-arrow-right"></i></button></div><div id="terrainDashboardPriority" class="terrain-dashboard-list"></div></section>
+          </div>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="reports">
+          <div class="terrain-report-toolbar">
+            <div><span>Análise consolidada</span><h2>Relatórios</h2></div>
+            <div class="terrain-report-filters"><label>Data inicial<input id="terrainReportDateFrom" type="date"></label><label>Data final<input id="terrainReportDateTo" type="date"></label><button id="applyTerrainReportFilters" type="button" data-no-loading><i class="fa-solid fa-filter"></i> Aplicar</button></div>
+          </div>
+          <p id="terrainReportPeriodLabel" class="terrain-report-period"></p>
+          <section class="terrain-report-block"><div class="terrain-report-heading"><i class="fa-solid fa-user-group"></i><h3>Clientes</h3></div><div class="terrain-report-metrics"><article><span>Ativos</span><strong id="terrainReportClientsActive">0</strong></article><article><span>Novos</span><strong id="terrainReportClientsNew">0</strong></article><article><span>Recorrentes</span><strong id="terrainReportClientsRecurring">0</strong></article><article><span>Inativos</span><strong id="terrainReportClientsInactive">0</strong></article></div></section>
+          <section class="terrain-report-block"><div class="terrain-report-heading"><i class="fa-solid fa-vector-square"></i><h3>Terrenos</h3></div><div class="terrain-report-metrics"><article><span>Total</span><strong id="terrainReportTerrainsTotal">0</strong></article><article><span>Área total</span><strong id="terrainReportTerrainsArea">0 m²</strong></article><article><span>Sem proprietário</span><strong id="terrainReportTerrainsWithoutOwner">0</strong></article></div><div class="terrain-report-breakdowns"><div><h4>Por bairro</h4><div id="terrainReportByNeighborhood"></div></div><div><h4>Por loteamento</h4><div id="terrainReportByDevelopment"></div></div><div><h4>Por status</h4><div id="terrainReportByStatus"></div></div></div></section>
+          <section class="terrain-report-block"><div class="terrain-report-heading"><i class="fa-solid fa-broom"></i><h3>Serviços</h3></div><div class="terrain-report-metrics"><article><span>Quantidade</span><strong id="terrainReportServicesCount">0</strong></article><article><span>Área total limpa</span><strong id="terrainReportServicesArea">0 m²</strong></article><article><span>Ticket médio</span><strong id="terrainReportServicesTicket">R$ 0,00</strong></article><article><span>Valor médio por m²</span><strong id="terrainReportServicesSquareMeter">R$ 0,00</strong></article><article><span>Tempo médio</span><strong id="terrainReportServicesTime">0h</strong></article><article><span>Intervalo médio</span><strong id="terrainReportServicesInterval">0 dias</strong></article></div></section>
+          <section class="terrain-report-block"><div class="terrain-report-heading"><i class="fa-solid fa-file-invoice-dollar"></i><h3>Orçamentos</h3></div><div class="terrain-report-metrics"><article><span>Enviados</span><strong id="terrainReportBudgetsSent">0</strong></article><article><span>Aprovados</span><strong id="terrainReportBudgetsApproved">0</strong></article><article><span>Recusados</span><strong id="terrainReportBudgetsRefused">0</strong></article><article><span>Pendentes</span><strong id="terrainReportBudgetsPending">0</strong></article><article><span>Taxa de conversão</span><strong id="terrainReportBudgetsConversion">0%</strong></article><article><span>Valor orçado</span><strong id="terrainReportBudgetsQuoted">R$ 0,00</strong></article><article><span>Valor aprovado</span><strong id="terrainReportBudgetsApprovedValue">R$ 0,00</strong></article></div></section>
+          <section class="terrain-report-block"><div class="terrain-report-heading"><i class="fa-solid fa-chart-line"></i><h3>Financeiro</h3></div><div class="terrain-report-metrics"><article><span>Faturamento</span><strong id="terrainReportFinanceBilling">R$ 0,00</strong></article><article><span>Custos</span><strong id="terrainReportFinanceCosts">R$ 0,00</strong></article><article><span>Lucro</span><strong id="terrainReportFinanceProfit">R$ 0,00</strong></article><article><span>Pendências</span><strong id="terrainReportFinancePending">R$ 0,00</strong></article></div></section>
+          <section class="terrain-report-block terrain-forecast-block"><div class="terrain-report-heading"><i class="fa-solid fa-wand-magic-sparkles"></i><div><h3>Receita potencial estimada</h3><span>Projeção baseada no histórico; não representa faturamento garantido.</span></div></div><div class="terrain-report-metrics"><article><span>Próximos 30 dias</span><strong id="terrainForecast30">R$ 0,00</strong></article><article><span>Próximos 60 dias</span><strong id="terrainForecast60">R$ 0,00</strong></article><article><span>Próximos 90 dias</span><strong id="terrainForecast90">R$ 0,00</strong></article></div><div><h4>Previsão por mês</h4><div id="terrainForecastMonths" class="terrain-forecast-months"></div></div></section>
         </section>
 
         <section class="terrain-module-section hidden" data-terrain-section="owners">
@@ -2978,6 +2987,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=631"></script>
+  <script type="module" src="painel.js?v=632"></script>
 </body>
 </html>

@@ -11497,3 +11497,239 @@ button.admin-button-loading::after {
   .terrain-timeline-icon { width: 36px; height: 36px; }
   .terrain-timeline-head { align-items: flex-start; flex-direction: column; gap: 2px; }
 }
+
+.terrain-dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.terrain-dashboard-stats article,
+.terrain-report-metrics article {
+  display: grid;
+  align-content: space-between;
+  min-width: 0;
+  min-height: 116px;
+  padding: 16px;
+  border: 1px solid #d9e2dd;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 6px 18px rgba(31, 49, 40, .05);
+}
+
+.terrain-dashboard-stats article:nth-child(3n + 1) { border-top: 3px solid #257259; }
+.terrain-dashboard-stats article:nth-child(3n + 2) { border-top: 3px solid #3568a8; }
+.terrain-dashboard-stats article:nth-child(3n) { border-top: 3px solid #c78a22; }
+.terrain-dashboard-stats article.potential { border-top-color: #8f4b75; background: #fffafd; }
+
+.terrain-dashboard-stats span,
+.terrain-report-metrics span {
+  color: #617169;
+  font-size: .78rem;
+  font-weight: 800;
+}
+
+.terrain-dashboard-stats strong,
+.terrain-report-metrics strong {
+  margin: 9px 0 4px;
+  color: #20382d;
+  font-size: 1.42rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.terrain-dashboard-stats small {
+  color: #7a8881;
+  font-size: .72rem;
+}
+
+.terrain-dashboard-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.terrain-dashboard-section {
+  min-width: 0;
+  border-top: 1px solid #cad7d0;
+  padding-top: 16px;
+}
+
+.terrain-dashboard-section-head,
+.terrain-report-toolbar,
+.terrain-report-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.terrain-dashboard-section-head span,
+.terrain-report-toolbar > div:first-child > span {
+  color: #65756d;
+  font-size: .72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.terrain-dashboard-section-head h2,
+.terrain-report-toolbar h2 {
+  margin: 3px 0 0;
+  color: #22392f;
+  font-size: 1rem;
+}
+
+.terrain-dashboard-section-head button {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.terrain-dashboard-list {
+  display: grid;
+  margin-top: 10px;
+}
+
+.terrain-dashboard-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0;
+  border-bottom: 1px solid #e2e9e5;
+  border-radius: 0;
+  padding: 12px 4px;
+  background: transparent;
+  color: #243d32;
+  text-align: left;
+}
+
+.terrain-dashboard-row:hover { background: #f4f8f6; }
+.terrain-dashboard-row span { display: grid; min-width: 0; gap: 3px; }
+.terrain-dashboard-row strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.terrain-dashboard-row small { color: #697971; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.terrain-dashboard-row > i { color: #668175; }
+
+.terrain-dashboard-empty,
+.terrain-report-empty {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #708078;
+  font-size: .83rem;
+  text-align: center;
+}
+
+.terrain-report-toolbar {
+  align-items: end;
+  border-bottom: 1px solid #d7e1dc;
+  padding-bottom: 16px;
+}
+
+.terrain-report-toolbar h2 { font-size: 1.25rem; }
+
+.terrain-report-filters {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+}
+
+.terrain-report-filters label {
+  display: grid;
+  gap: 5px;
+  color: #617169;
+  font-size: .75rem;
+  font-weight: 800;
+}
+
+.terrain-report-filters input { min-width: 150px; }
+.terrain-report-period { margin: 12px 0 0; color: #697971; font-size: .82rem; }
+
+.terrain-report-block {
+  margin-top: 26px;
+  border-top: 1px solid #d7e1dc;
+  padding-top: 18px;
+}
+
+.terrain-report-heading {
+  justify-content: flex-start;
+  margin-bottom: 13px;
+}
+
+.terrain-report-heading > i {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eaf3ee;
+  color: #276c51;
+}
+
+.terrain-report-heading h3,
+.terrain-report-block h4 { margin: 0; color: #263e33; }
+.terrain-report-heading span { display: block; margin-top: 3px; color: #6e7d76; font-size: .78rem; }
+
+.terrain-report-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 10px;
+}
+
+.terrain-report-metrics article { min-height: 88px; box-shadow: none; }
+.terrain-report-metrics strong { font-size: 1.18rem; }
+
+.terrain-report-breakdowns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 18px;
+}
+
+.terrain-report-breakdowns h4,
+.terrain-forecast-block h4 { margin-bottom: 8px; font-size: .86rem; }
+
+.terrain-report-breakdown-row,
+.terrain-forecast-month {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid #e2e9e5;
+  padding: 8px 2px;
+  color: #56675f;
+  font-size: .82rem;
+}
+
+.terrain-report-breakdown-row strong,
+.terrain-forecast-month strong { color: #283f35; }
+.terrain-forecast-block { border-top-color: #c8b3c1; }
+.terrain-forecast-block .terrain-report-heading > i { background: #f5eaf1; color: #87486f; }
+.terrain-forecast-months { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+
+@media (max-width: 1100px) {
+  .terrain-dashboard-stats { grid-template-columns: repeat(3, minmax(150px, 1fr)); }
+  .terrain-dashboard-columns { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 760px) {
+  .terrain-dashboard-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .terrain-report-toolbar { align-items: stretch; flex-direction: column; }
+  .terrain-report-filters { display: grid; grid-template-columns: 1fr 1fr; }
+  .terrain-report-filters button { grid-column: 1 / -1; }
+  .terrain-report-filters input { min-width: 0; width: 100%; }
+  .terrain-report-breakdowns,
+  .terrain-forecast-months { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 430px) {
+  .terrain-dashboard-stats { grid-template-columns: 1fr; }
+  .terrain-dashboard-stats article { min-height: 100px; }
+  .terrain-report-metrics { grid-template-columns: 1fr 1fr; }
+}

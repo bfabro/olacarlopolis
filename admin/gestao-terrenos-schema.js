@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v5";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v6";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -1264,4 +1264,225 @@ export function terrainTimelineRecords(records = {}, terrainId = "") {
 export function terrainTimelineTypeMeta(type) {
   return TERRAIN_TIMELINE_TYPE_OPTIONS.find((item) => item.value === type)
     || Object.freeze({ value: type || "status_changed", label: "Atualização", icon: "fa-clock-rotate-left", tone: "status" });
+}
+
+function terrainReportDate(value) {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}/.test(value)) return value.slice(0, 10);
+  const timestamp = Number(value || 0);
+  if (!Number.isFinite(timestamp) || timestamp <= 0) return "";
+  const date = new Date(timestamp);
+  return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+}
+
+function terrainRecordInPeriod(value, from, to) {
+  const date = terrainReportDate(value);
+  if (!date) return false;
+  return (!from || date >= from) && (!to || date <= to);
+}
+
+function terrainGroupCount(records, field, emptyLabel) {
+  return records.reduce((groups, record) => {
+    const key = String(record?.[field] || "").trim() || emptyLabel;
+    groups[key] = (groups[key] || 0) + 1;
+    return groups;
+  }, {});
+}
+
+function terrainServiceMinutes(value) {
+  const raw = String(value || "").trim().toLowerCase();
+  if (!raw) return 0;
+  if (/^\d{1,3}:\d{2}$/.test(raw)) {
+    const [hours, minutes] = raw.split(":").map(Number);
+    return hours * 60 + minutes;
+  }
+  const hours = Number(raw.match(/([\d.,]+)\s*h/)?.[1]?.replace(",", ".") || 0);
+  const minutes = Number(raw.match(/([\d.,]+)\s*m/)?.[1]?.replace(",", ".") || 0);
+  if (hours || minutes) return Math.round(hours * 60 + minutes);
+  const numeric = Number(raw.replace(",", "."));
+  return Number.isFinite(numeric) ? Math.round(numeric * 60) : 0;
+}
+
+function terrainDaysBetween(first, second) {
+  const start = Date.parse(`${first}T12:00:00Z`);
+  const end = Date.parse(`${second}T12:00:00Z`);
+  return Number.isFinite(start) && Number.isFinite(end) ? Math.round((end - start) / 86400000) : 0;
+}
+
+export function calculateTerrainRevenueForecast(data = {}, today = new Date().toISOString().slice(0, 10)) {
+  const terrains = terrainRecords(data.terrains || {});
+  const services = terrainServiceRecords(data.services || {}).filter((service) => (
+    service.status === "concluido"
+    && service.status_pagamento !== "cancelado"
+    && terrainReportDate(service.data_realizada || service.data_prevista) <= today
+  ));
+  const predictions = [];
+  terrains.forEach((terrain) => {
+    const history = services.filter((service) => service.terrain_id === terrain.id)
+      .sort((a, b) => String(a.data_realizada || "").localeCompare(String(b.data_realizada || "")));
+    if (!history.length) return;
+    const dates = history.map((service) => terrainReportDate(service.data_realizada)).filter(Boolean);
+    const intervals = dates.slice(1).map((date, index) => terrainDaysBetween(dates[index], date)).filter((days) => days > 0);
+    const configuredInterval = Number.parseInt(terrain.intervalo_vistoria, 10);
+    const averageInterval = intervals.length
+      ? Math.max(1, Math.round(intervals.reduce((sum, days) => sum + days, 0) / intervals.length))
+      : ([30, 45, 60, 90, 120].includes(configuredInterval) ? configuredInterval : 0);
+    const lastCleaning = terrainReportDate(terrain.ultima_limpeza_em) || dates.at(-1);
+    const values = history.map((service) => Number(service.valor_cobrado || 0)).filter((value) => value > 0);
+    const averageValue = values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
+    if (!lastCleaning || !averageInterval || !averageValue) return;
+    let expectedDate = terrainAddDays(lastCleaning, averageInterval);
+    while (expectedDate < today) expectedDate = terrainAddDays(expectedDate, averageInterval);
+    const horizon = terrainAddDays(today, 90);
+    while (expectedDate <= horizon) {
+      predictions.push({
+        terrain_id: terrain.id,
+        owner_id: terrain.owner_id || "",
+        expected_date: expectedDate,
+        estimated_value: averageValue,
+        average_interval_days: averageInterval,
+        last_cleaning: lastCleaning
+      });
+      expectedDate = terrainAddDays(expectedDate, averageInterval);
+    }
+  });
+  predictions.sort((a, b) => a.expected_date.localeCompare(b.expected_date));
+  const sumUntil = (days) => {
+    const limit = terrainAddDays(today, days);
+    return predictions.filter((item) => item.expected_date <= limit).reduce((sum, item) => sum + item.estimated_value, 0);
+  };
+  const byMonth = predictions.reduce((months, item) => {
+    const month = item.expected_date.slice(0, 7);
+    months[month] = (months[month] || 0) + item.estimated_value;
+    return months;
+  }, {});
+  return { predictions, next_30_days: sumUntil(30), next_60_days: sumUntil(60), next_90_days: sumUntil(90), by_month: byMonth };
+}
+
+export function calculateTerrainDashboard(data = {}, today = new Date().toISOString().slice(0, 10)) {
+  const terrains = terrainRecords(data.terrains || {});
+  const owners = terrainOwnerRecords(data.owners || {});
+  const services = terrainServiceRecords(data.services || {});
+  const budgets = terrainBudgetRecords(data.budgets || {});
+  const reminders = terrainReminderGroups(data.terrains || {}, today);
+  const opportunities = terrainOpportunityRecords(data, today);
+  const month = today.slice(0, 7);
+  const completedThisMonth = services.filter((service) => service.status === "concluido" && terrainReportDate(service.data_realizada).startsWith(month));
+  const activeServices = services.filter((service) => service.status === "agendado" && String(service.data_prevista || "") >= today)
+    .sort((a, b) => `${a.data_prevista || ""}T${a.horario || ""}`.localeCompare(`${b.data_prevista || ""}T${b.horario || ""}`));
+  const pendingBudgets = budgets.filter((budget) => ["rascunho", "enviado", "visualizado"].includes(budget.status));
+  const pendingValues = services.filter((service) => service.status_pagamento !== "cancelado")
+    .reduce((sum, service) => sum + Number(service.saldo ?? Math.max(Number(service.valor_cobrado || 0) - Number(service.valor_recebido || 0), 0)), 0);
+  const priorityRank = {
+    precisa_limpeza: 0,
+    vistoria_atrasada: 1,
+    contato_recomendado: 2,
+    longo_periodo: 3,
+    orcamento_pendente: 4,
+    contato_pendente: 5,
+    proxima_vistoria: 6,
+    nunca_limpo: 7,
+    proprietario_desconhecido: 8
+  };
+  const priorityOpportunities = [...opportunities].sort((a, b) =>
+    (priorityRank[a.status] ?? 9) - (priorityRank[b.status] ?? 9)
+    || Number(b.dias_desde_ultima_limpeza || 0) - Number(a.dias_desde_ultima_limpeza || 0));
+  return {
+    total_terrains: terrains.length,
+    total_owners: owners.length,
+    terrains_to_verify: reminders.hoje.length + reminders.atrasados.length,
+    scheduled_services: activeServices.length,
+    pending_budgets: pendingBudgets.length,
+    completed_services_month: completedThisMonth.length,
+    monthly_billing: completedThisMonth.reduce((sum, service) => sum + Number(service.valor_cobrado || 0), 0),
+    pending_values: pendingValues,
+    open_opportunities: opportunities.length,
+    potential_revenue: opportunities.reduce((sum, item) => sum + Number(item.valor_estimado || 0), 0),
+    today_terrains: reminders.hoje,
+    upcoming_services: activeServices,
+    priority_opportunities: priorityOpportunities
+  };
+}
+
+export function calculateTerrainReports(data = {}, filters = {}) {
+  const today = String(filters.today || new Date().toISOString().slice(0, 10));
+  const from = String(filters.date_from || "");
+  const to = String(filters.date_to || "");
+  const owners = terrainOwnerRecords(data.owners || {});
+  const terrains = terrainRecords(data.terrains || {});
+  const services = terrainServiceRecords(data.services || {}).filter((service) => terrainRecordInPeriod(service.data_realizada || service.data_prevista, from, to));
+  const completed = services.filter((service) => service.status === "concluido");
+  const budgets = terrainBudgetRecords(data.budgets || {}).filter((budget) => terrainRecordInPeriod(budget.data, from, to));
+  const periodOwners = owners.filter((owner) => terrainRecordInPeriod(owner.created_at, from, to));
+  const periodTerrains = terrains.filter((terrain) => terrainRecordInPeriod(terrain.created_at, from, to));
+  const completedByOwner = completed.reduce((counts, service) => {
+    counts[service.owner_id] = (counts[service.owner_id] || 0) + 1;
+    return counts;
+  }, {});
+  const serviceIntervals = [];
+  const byTerrain = completed.reduce((groups, service) => {
+    (groups[service.terrain_id] ||= []).push(terrainReportDate(service.data_realizada));
+    return groups;
+  }, {});
+  Object.values(byTerrain).forEach((dates) => {
+    const sortedDates = dates.filter(Boolean).sort();
+    sortedDates.slice(1).forEach((date, index) => {
+      const days = terrainDaysBetween(sortedDates[index], date);
+      if (days > 0) serviceIntervals.push(days);
+    });
+  });
+  const minutes = completed.map((service) => terrainServiceMinutes(service.tempo_gasto)).filter((value) => value > 0);
+  const totalServiceValue = completed.reduce((sum, service) => sum + Number(service.valor_cobrado || 0), 0);
+  const totalServiceArea = completed.reduce((sum, service) => sum + Number(service.area_m2 || 0), 0);
+  const sentIds = new Set(terrainTimelineRecords(data.timeline || {}).filter((event) => event.tipo === "budget_sent").map((event) => event.referencia_id));
+  const sentBudgets = budgets.filter((budget) => sentIds.has(budget.id) || budget.status !== "rascunho");
+  const approved = budgets.filter((budget) => budget.status === "aprovado");
+  const refused = budgets.filter((budget) => budget.status === "recusado");
+  const validServices = services.filter((service) => service.status !== "cancelado" && service.status_pagamento !== "cancelado");
+  const billing = validServices.reduce((sum, service) => sum + Number(service.valor_cobrado || 0), 0);
+  const costs = validServices.reduce((sum, service) => sum + Number(service.custo || 0), 0);
+  return {
+    period: { from, to, today },
+    clients: {
+      active: owners.filter((owner) => owner.status === "ativo").length,
+      new: periodOwners.length,
+      recurring: Object.values(completedByOwner).filter((count) => count >= 2).length,
+      inactive: owners.filter((owner) => owner.status === "inativo").length
+    },
+    terrains: {
+      total: periodTerrains.length,
+      total_area: periodTerrains.reduce((sum, terrain) => sum + Number(terrain.area_m2 || 0), 0),
+      by_neighborhood: terrainGroupCount(periodTerrains, "bairro", "Não informado"),
+      by_development: periodTerrains.reduce((groups, terrain) => {
+        const key = data.developments?.[terrain.development_id]?.nome || "Sem loteamento";
+        groups[key] = (groups[key] || 0) + 1;
+        return groups;
+      }, {}),
+      by_status: terrainGroupCount(periodTerrains, "status", "sem_informacao"),
+      without_owner: periodTerrains.filter((terrain) => !terrain.owner_id).length
+    },
+    services: {
+      count: completed.length,
+      total_area: totalServiceArea,
+      average_ticket: completed.length ? totalServiceValue / completed.length : 0,
+      average_per_m2: totalServiceArea ? totalServiceValue / totalServiceArea : 0,
+      average_minutes: minutes.length ? minutes.reduce((sum, value) => sum + value, 0) / minutes.length : 0,
+      average_cleaning_interval_days: serviceIntervals.length ? serviceIntervals.reduce((sum, value) => sum + value, 0) / serviceIntervals.length : 0
+    },
+    budgets: {
+      sent: sentBudgets.length,
+      approved: approved.length,
+      refused: refused.length,
+      pending: budgets.filter((budget) => ["rascunho", "enviado", "visualizado"].includes(budget.status)).length,
+      conversion_rate: sentBudgets.length ? approved.length / sentBudgets.length * 100 : 0,
+      quoted_value: budgets.reduce((sum, budget) => sum + Number(budget.valor || 0), 0),
+      approved_value: approved.reduce((sum, budget) => sum + Number(budget.valor || 0), 0)
+    },
+    finance: {
+      billing,
+      costs,
+      profit: billing - costs,
+      pending: validServices.reduce((sum, service) => sum + Number(service.saldo ?? Math.max(Number(service.valor_cobrado || 0) - Number(service.valor_recebido || 0), 0)), 0)
+    },
+    forecast: calculateTerrainRevenueForecast(data, today)
+  };
 }

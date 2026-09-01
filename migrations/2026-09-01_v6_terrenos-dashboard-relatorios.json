@@ -1,0 +1,19 @@
+{
+  "version": "2026-09-01_v6",
+  "operation": "finalize_terrain_dashboard_reports_and_revenue_forecast",
+  "recreates_existing_data": false,
+  "new_paths": {},
+  "derived_from": [
+    "terrenos",
+    "terrenosProprietarios",
+    "terrenosLoteamentos",
+    "terrenosVistorias",
+    "terrenosOrcamentos",
+    "terrenosServicos",
+    "terrenosTimeline"
+  ],
+  "period_filters": ["date_from", "date_to"],
+  "forecast_horizons_days": [30, 60, 90],
+  "forecast_label": "Receita potencial estimada",
+  "guaranteed_revenue": false
+}
