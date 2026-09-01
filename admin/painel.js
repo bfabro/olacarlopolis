@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=18";
+} from "./gestao-terrenos-schema.js?v=19";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 700,
-  label: "v707",
+  numero: 701,
+  label: "v708",
   data: "2026-09-01",
-  nota: "Correcao do Pix no plano individual da area de faturas."
+  nota: "Persistencia do quadro Pix durante a atualizacao das faturas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24516,6 +24516,9 @@ async function syncClientsFromScript(options = {}) {
 
 function clientPlanChooserCard(client = {}, paymentConfig = {}) {
   const request = activeClientPlanRequest(client);
+  const requestPixCode = String(request?.pixCodigo || "");
+  const requestPixTotal = Number(request?.valorTotal || request?.valorPlano || 0);
+  const requestPixQrUrl = qrCodeUrl(requestPixCode);
   return `
     <article class="invoice-card invoice-plan-chooser-card">
       <div class="section-head compact">
@@ -24532,10 +24535,10 @@ function clientPlanChooserCard(client = {}, paymentConfig = {}) {
           <button type="button" class="pix-primary-button" data-generate-plan-pix><i class="fa-solid fa-qrcode"></i> Gerar QR Code/Pix</button>
           <button type="button" class="ghost-button" data-generate-plan-boleto><i class="fa-solid fa-file-invoice-dollar"></i> Gerar boleto</button>
         </div>
-        <div class="pix-box invoice-selected-pix hidden" data-plan-pix-box>
-          <div class="pix-generated-total"><span>Valor do plano escolhido</span><strong data-plan-pix-total></strong></div>
-          <img alt="QR Code Pix do plano" data-plan-pix-qr loading="lazy" decoding="async">
-          <label class="wide">Código Pix Copia e Cola<textarea rows="5" readonly data-plan-pix-code></textarea></label>
+        <div class="pix-box invoice-selected-pix${requestPixCode ? "" : " hidden"}" data-plan-pix-box>
+          <div class="pix-generated-total"><span>Valor do plano escolhido</span><strong data-plan-pix-total>${requestPixTotal > 0 ? moneyBR(requestPixTotal) : ""}</strong></div>
+          <img ${requestPixQrUrl ? `src="${escapeAttr(requestPixQrUrl)}"` : ""} alt="QR Code Pix do plano" data-plan-pix-qr loading="lazy" decoding="async">
+          <label class="wide">Código Pix Copia e Cola<textarea rows="5" readonly data-plan-pix-code>${escapeHtml(requestPixCode)}</textarea></label>
           <div class="list-meta wide">Chave Pix: <strong>${escapeHtml(paymentConfig.pixChave || "")}</strong></div>
           <div class="form-actions">
             <button type="button" class="ghost-button" data-copy-plan-pix><i class="fa-solid fa-copy"></i> Copiar código Pix</button>
@@ -24551,12 +24554,29 @@ function clientPlanChooserCard(client = {}, paymentConfig = {}) {
   `;
 }
 
+function presentClientPlanPix(mount, code, qrUrl, total) {
+  const pixBox = mount.querySelector("[data-plan-pix-box]");
+  const pixCode = mount.querySelector("[data-plan-pix-code]");
+  const pixQr = mount.querySelector("[data-plan-pix-qr]");
+  const generatedTotal = mount.querySelector("[data-plan-pix-total]");
+  if (!pixBox || !pixCode || !pixQr) throw new Error("Quadro Pix do plano nao encontrado.");
+  pixCode.value = code;
+  if (generatedTotal) generatedTotal.textContent = moneyBR(total);
+  pixQr.onerror = () => {
+    pixQr.onerror = null;
+    pixQr.src = qrCodeUrl(code, "quickchart");
+  };
+  pixQr.src = qrUrl || qrCodeUrl(code);
+  pixBox.classList.remove("hidden");
+  pixBox.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+}
+
 function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
   const summary = mount.querySelector("[data-plan-choice-summary]");
   const pixBox = mount.querySelector("[data-plan-pix-box]");
   const pixCode = mount.querySelector("[data-plan-pix-code]");
   const pixQr = mount.querySelector("[data-plan-pix-qr]");
-  const renderSelection = () => {
+  const renderSelection = (resetPix = true) => {
     const selection = selectedClientPlanPayment(client, mount);
     const savings = planAnnualSavings(selection.tipoPlano, selection.valorPlano);
     mount.querySelectorAll(".invoice-plan-option").forEach((option) => {
@@ -24571,33 +24591,21 @@ function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
         ${savings > 0 ? `<em><i class="fa-solid fa-piggy-bank"></i> Economia de ${escapeHtml(moneyBR(savings))} em 1 ano comparado ao mensal.</em>` : ""}
       `;
     }
-    if (pixCode) pixCode.value = "";
-    pixQr?.removeAttribute("src");
-    pixBox?.classList.add("hidden");
+    if (resetPix) {
+      if (pixCode) pixCode.value = "";
+      pixQr?.removeAttribute("src");
+      pixBox?.classList.add("hidden");
+    }
     return selection;
   };
-  mount.querySelectorAll('input[name="clientInvoicePlanChoice"]').forEach((input) => input.addEventListener("change", renderSelection));
-  renderSelection();
+  mount.querySelectorAll('input[name="clientInvoicePlanChoice"]').forEach((input) => input.addEventListener("change", () => renderSelection(true)));
+  renderSelection(false);
 
   mount.querySelector("[data-generate-plan-pix]")?.addEventListener("click", async (event) => {
     const selection = selectedClientPlanPayment(client, mount);
     if (selection.valorTotal <= 0 || !selection.invoice.pixCode) return showToast("Este plano ainda não possui um valor configurado.");
     const button = event.currentTarget;
-    const presentPlanPix = (code, qrUrl) => {
-      if (pixCode) pixCode.value = code;
-      const total = mount.querySelector("[data-plan-pix-total]");
-      if (total) total.textContent = moneyBR(selection.valorTotal);
-      if (pixQr) {
-        pixQr.onerror = () => {
-          pixQr.onerror = null;
-          pixQr.src = qrCodeUrl(code, "quickchart");
-        };
-        pixQr.src = qrUrl || qrCodeUrl(code);
-      }
-      pixBox?.classList.remove("hidden");
-    };
-    presentPlanPix(selection.invoice.pixCode, selection.invoice.qrUrl);
-    pixBox?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    presentClientPlanPix(mount, selection.invoice.pixCode, selection.invoice.qrUrl, selection.valorTotal);
     setBusy(button, true, "Gerando...");
     try {
       await saveClientPlanRequest(client, selection, "aguardando_pagamento", { pixCodigo: selection.invoice.pixCode });
@@ -24612,7 +24620,7 @@ function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
           provedorPagamentoId: integrated.providerPaymentId || ""
         });
       }
-      presentPlanPix(finalPixCode, finalQrUrl);
+      presentClientPlanPix(mount, finalPixCode, finalQrUrl, selection.valorTotal);
       showToast(`Pix do plano ${planLabel(selection.tipoPlano)} gerado${integrated.integrationEnabled ? " e registrado para confirmação automática" : ""}.`);
     } catch (error) {
       console.error("Falha ao registrar a escolha do plano.", error);

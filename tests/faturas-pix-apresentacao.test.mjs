@@ -59,7 +59,8 @@ test("escolha de plano tambem apresenta o Pix antes de salvar remotamente", () =
     'mount.querySelector("[data-generate-plan-pix]")?.addEventListener',
     'mount.querySelector("[data-generate-plan-boleto]")?.addEventListener'
   );
-  assert.ok(handler.indexOf("presentPlanPix(selection.invoice.pixCode") < handler.indexOf("await saveClientPlanRequest"));
+  assert.ok(handler.indexOf("presentClientPlanPix(mount, selection.invoice.pixCode") < handler.indexOf("await saveClientPlanRequest"));
+  assert.match(handler, /presentClientPlanPix\(mount, finalPixCode, finalQrUrl, selection\.valorTotal\)/);
   const selectionBuilder = sourceBetween("function selectedClientPlanPayment", "async function saveClientPlanRequest");
   assert.match(selectionBuilder, /const valorPlano = financePlanValue\(client, tipoPlano\)/);
   assert.match(selectionBuilder, /valorTotal: valorPlano/);
@@ -88,6 +89,46 @@ test("escolha de plano tambem apresenta o Pix antes de salvar remotamente", () =
   const selection = selectedClientPlanPayment({ id: "cliente", tipoPlano: "mensal", valorPlano: 87.5 }, mount);
   assert.equal(selection.valorTotal, 87.5);
   assert.equal(selection.invoice.pixCode, "PIX:87.5");
+});
+
+test("quadro Pix do plano usa sempre os elementos atuais apos redesenho", () => {
+  const presenterSource = sourceBetween("function presentClientPlanPix", "function bindClientPlanPaymentControls");
+  const presentClientPlanPix = new Function(
+    "moneyBR",
+    "qrCodeUrl",
+    `${presenterSource}; return presentClientPlanPix;`
+  )((value) => `R$ ${Number(value).toFixed(2)}`, (code) => `QR:${code}`);
+  const staleBox = { classList: { remove() { throw new Error("elemento antigo usado"); } } };
+  const current = {
+    box: { classList: { removed: [], remove(value) { this.removed.push(value); } }, scrollIntoView() {} },
+    code: { value: "" },
+    qr: { src: "", onerror: null },
+    total: { textContent: "" }
+  };
+  const mount = {
+    staleBox,
+    querySelector(selector) {
+      return {
+        "[data-plan-pix-box]": current.box,
+        "[data-plan-pix-code]": current.code,
+        "[data-plan-pix-qr]": current.qr,
+        "[data-plan-pix-total]": current.total
+      }[selector] || null;
+    }
+  };
+  presentClientPlanPix(mount, "PIX-ATUAL", "", 35);
+  assert.equal(current.code.value, "PIX-ATUAL");
+  assert.equal(current.qr.src, "QR:PIX-ATUAL");
+  assert.equal(current.total.textContent, "R$ 35.00");
+  assert.deepEqual(current.box.classList.removed, ["hidden"]);
+});
+
+test("redesenho preserva o Pix salvo e nao esconde o quadro na montagem", () => {
+  const cardSource = sourceBetween("function clientPlanChooserCard", "function presentClientPlanPix");
+  const binderSource = sourceBetween("function bindClientPlanPaymentControls", "function selectedClientInvoicePaymentData");
+  assert.match(cardSource, /const requestPixCode = String\(request\?\.pixCodigo \|\| ""\)/);
+  assert.match(cardSource, /requestPixCode \? "" : " hidden"/);
+  assert.match(binderSource, /renderSelection\(false\)/);
 });
 
 test("botoes de geracao do Pix usam destaque visual especifico", () => {

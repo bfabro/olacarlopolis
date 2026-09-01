@@ -1,0 +1,13 @@
+{
+  "version": "2026-09-01_v12",
+  "operation": "persist_invoice_plan_pix_across_realtime_rerenders",
+  "recreates_existing_data": false,
+  "new_paths": {},
+  "schema_changes": false,
+  "affected_area": "admin_client_invoices",
+  "changes": [
+    "render_saved_pix_request_visible",
+    "preserve_pix_on_initial_bind",
+    "query_current_dom_after_realtime_update"
+  ]
+}
