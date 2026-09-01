@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=14";
+} from "./gestao-terrenos-schema.js?v=15";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 696,
-  label: "v703",
+  numero: 697,
+  label: "v704",
   data: "2026-09-01",
-  nota: "Revisao de integridade e fluxo completo da Gestao de Terrenos."
+  nota: "Correcao da apresentacao do QR Code Pix nas faturas dos clientes."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24520,7 +24520,7 @@ function clientPlanChooserCard(client = {}, paymentConfig = {}) {
       <div class="invoice-plan-choice-summary" data-plan-choice-summary></div>
       ${paymentConfig.pixChave ? `
         <div class="invoice-plan-payment-actions">
-          <button type="button" data-generate-plan-pix><i class="fa-solid fa-qrcode"></i> Gerar QR Code/Pix</button>
+          <button type="button" class="pix-primary-button" data-generate-plan-pix><i class="fa-solid fa-qrcode"></i> Gerar QR Code/Pix</button>
           <button type="button" class="ghost-button" data-generate-plan-boleto><i class="fa-solid fa-file-invoice-dollar"></i> Gerar boleto</button>
         </div>
         <div class="pix-box invoice-selected-pix hidden" data-plan-pix-box>
@@ -24570,9 +24570,26 @@ function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
   mount.querySelectorAll('input[name="clientInvoicePlanChoice"]').forEach((input) => input.addEventListener("change", renderSelection));
   renderSelection();
 
-  mount.querySelector("[data-generate-plan-pix]")?.addEventListener("click", async () => {
+  mount.querySelector("[data-generate-plan-pix]")?.addEventListener("click", async (event) => {
     const selection = selectedClientPlanPayment(client, mount);
     if (selection.valorTotal <= 0 || !selection.invoice.pixCode) return showToast("Este plano ainda não possui um valor configurado.");
+    const button = event.currentTarget;
+    const presentPlanPix = (code, qrUrl) => {
+      if (pixCode) pixCode.value = code;
+      const total = mount.querySelector("[data-plan-pix-total]");
+      if (total) total.textContent = moneyBR(selection.valorTotal);
+      if (pixQr) {
+        pixQr.onerror = () => {
+          pixQr.onerror = null;
+          pixQr.src = qrCodeUrl(code, "quickchart");
+        };
+        pixQr.src = qrUrl || qrCodeUrl(code);
+      }
+      pixBox?.classList.remove("hidden");
+    };
+    presentPlanPix(selection.invoice.pixCode, selection.invoice.qrUrl);
+    pixBox?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    setBusy(button, true, "Gerando...");
     try {
       await saveClientPlanRequest(client, selection, "aguardando_pagamento", { pixCodigo: selection.invoice.pixCode });
       const integrated = await createIntegratedPaymentCharge(client, selection.invoice, [selection.invoice.mes], selection.tipoPlano);
@@ -24586,20 +24603,13 @@ function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
           provedorPagamentoId: integrated.providerPaymentId || ""
         });
       }
-      if (pixCode) pixCode.value = finalPixCode;
-      if (mount.querySelector("[data-plan-pix-total]")) mount.querySelector("[data-plan-pix-total]").textContent = moneyBR(selection.valorTotal);
-      if (pixQr) {
-        pixQr.onerror = () => {
-          pixQr.onerror = null;
-          pixQr.src = qrCodeUrl(finalPixCode, "quickchart");
-        };
-        pixQr.src = finalQrUrl;
-      }
-      pixBox?.classList.remove("hidden");
+      presentPlanPix(finalPixCode, finalQrUrl);
       showToast(`Pix do plano ${planLabel(selection.tipoPlano)} gerado${integrated.integrationEnabled ? " e registrado para confirmação automática" : ""}.`);
     } catch (error) {
       console.error("Falha ao registrar a escolha do plano.", error);
-      showToast("Não foi possível registrar a escolha do plano.");
+      showToast("Pix exibido, mas não foi possível registrar a escolha do plano.");
+    } finally {
+      setBusy(button, false);
     }
   });
 
@@ -24756,7 +24766,7 @@ function renderClientInvoices() {
                 ${Array.from({ length: 12 }, (_, index) => `<option value="${index + 1}" ${index + 1 === Math.min(12, faturas.length) ? "selected" : ""}>${index + 1}</option>`).join("")}
               </select>
             </label>
-            <button id="generateSelectedInvoicePix" type="button"><i class="fa-solid fa-qrcode"></i> Gerar QR Code/Pix</button>
+            <button id="generateSelectedInvoicePix" type="button" class="pix-primary-button"><i class="fa-solid fa-qrcode"></i> Gerar QR Code/Pix</button>
             <button id="generateClientBoletos" type="button" class="ghost-button"><i class="fa-solid fa-print"></i> Gerar boletos A4</button>
           </div>
           <div id="selectedInvoicePixBox" class="pix-box invoice-selected-pix hidden">
@@ -24815,24 +24825,31 @@ function renderClientInvoices() {
       showToast("Selecione pelo menos um mes para gerar o Pix.");
       return;
     }
-    setBusy(event.currentTarget, true, "Gerando...");
+    const button = event.currentTarget;
+    const presentSelectedPix = (code, qrUrl) => {
+      if (selectedPixCode) selectedPixCode.value = code;
+      const generatedTotal = $("selectedInvoicePixTotalGenerated");
+      if (generatedTotal) generatedTotal.textContent = moneyBR(selectedTotal);
+      if (selectedQr) {
+        selectedQr.onerror = () => {
+          selectedQr.onerror = null;
+          selectedQr.src = qrCodeUrl(code, "quickchart");
+        };
+        selectedQr.src = qrUrl || qrCodeUrl(code);
+      }
+      selectedPixBox?.classList.remove("hidden");
+    };
+    presentSelectedPix(unified.pixCode, unified.qrUrl);
+    selectedPixBox?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    setBusy(button, true, "Gerando...");
     try {
       const integrated = await createIntegratedPaymentCharge(client, unified, selected, selectedPlan);
       const finalPixCode = integrated.pixCode || unified.pixCode;
       const finalQrUrl = integrated.qrUrl || unified.qrUrl;
-      if (selectedPixCode) selectedPixCode.value = finalPixCode;
-      if ($("selectedInvoicePixTotalGenerated")) $("selectedInvoicePixTotalGenerated").textContent = moneyBR(selectedTotal);
-      if (selectedQr) {
-        selectedQr.onerror = () => {
-          selectedQr.onerror = null;
-          selectedQr.src = qrCodeUrl(finalPixCode, "quickchart");
-        };
-        selectedQr.src = finalQrUrl;
-      }
-      selectedPixBox?.classList.remove("hidden");
+      presentSelectedPix(finalPixCode, finalQrUrl);
       showToast(`QR Code/Pix gerado${integrated.integrationEnabled ? " e aguardando confirmação automática" : ""}.`);
     } finally {
-      setBusy(event.currentTarget, false);
+      setBusy(button, false);
     }
   });
 

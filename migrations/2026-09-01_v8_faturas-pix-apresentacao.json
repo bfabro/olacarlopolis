@@ -1,0 +1,13 @@
+{
+  "version": "2026-09-01_v8",
+  "operation": "restore_client_invoice_pix_presentation",
+  "recreates_existing_data": false,
+  "new_paths": {},
+  "schema_changes": false,
+  "affected_area": "admin_client_invoices",
+  "changes": [
+    "show_static_pix_before_payment_integration",
+    "preserve_async_button_reference",
+    "highlight_pix_generation_action"
+  ]
+}

@@ -6240,6 +6240,31 @@ body.terrain-owner-detail-open {
   gap: 10px;
 }
 
+.pix-primary-button {
+  min-height: 44px;
+  padding: 11px 18px;
+  border: 1px solid #047857;
+  background: #047857;
+  color: #fff;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(4, 120, 87, .24);
+}
+
+.pix-primary-button:hover,
+.pix-primary-button:focus-visible {
+  background: #065f46;
+  border-color: #064e3b;
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.pix-primary-button:disabled {
+  background: #6b9f8e;
+  border-color: #6b9f8e;
+  transform: none;
+  box-shadow: none;
+}
+
 .invoice-plan-receipt-panel {
   margin: 0;
 }
