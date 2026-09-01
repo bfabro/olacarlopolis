@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=428">
+  <link rel="stylesheet" href="painel.css?v=429">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -210,6 +210,7 @@
           <button type="button" data-terrain-tab="developments"><i class="fa-solid fa-map"></i> Loteamentos</button>
           <button type="button" data-terrain-tab="budgets"><i class="fa-solid fa-file-invoice-dollar"></i> Orçamentos</button>
           <button type="button" data-terrain-tab="services"><i class="fa-solid fa-broom"></i> Serviços</button>
+          <button type="button" data-terrain-tab="reminders"><i class="fa-solid fa-calendar-check"></i> Lembretes</button>
           <button type="button" data-terrain-tab="finance"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
         </nav>
 
@@ -655,6 +656,11 @@
               <label>Data de pagamento<input id="terrainServicePaymentDate" type="date"></label>
               <label class="wide">Observações do pagamento<textarea id="terrainServicePaymentNotes" rows="3" maxlength="1200"></textarea></label>
               <label class="wide">Observações<textarea id="terrainServiceNotes" rows="4" maxlength="2000"></textarea></label>
+              <fieldset id="terrainServiceReminderFields" class="wide terrain-service-reminder-fieldset hidden">
+                <legend>Verificar este terreno novamente em:</legend>
+                <label>Intervalo<select id="terrainServiceReminderInterval"><option value="30">30 dias</option><option value="45">45 dias</option><option value="60">60 dias</option><option value="90">90 dias</option><option value="120">120 dias</option><option value="personalizado">Personalizado</option></select></label>
+                <label id="terrainServiceCustomReminderLabel" class="hidden">Próxima vistoria<input id="terrainServiceCustomReminderDate" type="date"></label>
+              </fieldset>
               <fieldset class="terrain-service-photo-fieldset"><legend>Fotos antes</legend><input id="terrainServiceBeforeFiles" type="file" accept="image/*" multiple><div id="terrainServiceBeforePreview" class="terrain-photo-selection-preview"></div></fieldset>
               <fieldset class="terrain-service-photo-fieldset"><legend>Fotos depois</legend><input id="terrainServiceAfterFiles" type="file" accept="image/*" multiple><div id="terrainServiceAfterPreview" class="terrain-photo-selection-preview"></div></fieldset>
               <div class="form-actions wide"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar serviço</button><button id="cancelTerrainServiceForm" class="ghost-button" type="button" data-no-loading>Cancelar</button></div>
@@ -664,6 +670,18 @@
             <div class="section-head"><div><h2>Serviços</h2><p id="terrainServiceListSummary">0 serviços cadastrados.</p></div><button id="newTerrainService" class="ghost-button new-entry-button" type="button" data-no-loading><i class="fa-solid fa-plus"></i> Novo serviço</button></div>
             <div class="terrain-service-list-head"><span>Data</span><span>Proprietário</span><span>Terreno</span><span>Tipo</span><span>Valor</span><span>Status</span><span>Ações</span></div>
             <div id="terrainServiceList" class="terrain-service-list"></div>
+          </section>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="reminders">
+          <section class="panel-card terrain-reminders-card">
+            <div class="section-head"><div><h2>Lembretes</h2><p id="terrainReminderSummary">Acompanhamento das próximas vistorias.</p></div></div>
+            <div id="terrainReminderGroups" class="terrain-reminder-groups">
+              <section class="terrain-reminder-group terrain-reminder-group-today"><div class="terrain-reminder-group-head"><div><span>Prioridade do dia</span><h3>Hoje</h3></div><strong id="terrainReminderTodayCount">0</strong></div><div id="terrainReminderTodayList" class="terrain-reminder-list"></div></section>
+              <section class="terrain-reminder-group terrain-reminder-group-overdue"><div class="terrain-reminder-group-head"><div><span>Exigem atenção</span><h3>Atrasados</h3></div><strong id="terrainReminderOverdueCount">0</strong></div><div id="terrainReminderOverdueList" class="terrain-reminder-list"></div></section>
+              <section class="terrain-reminder-group"><div class="terrain-reminder-group-head"><div><span>Curto prazo</span><h3>Próximos 7 dias</h3></div><strong id="terrainReminderNext7Count">0</strong></div><div id="terrainReminderNext7List" class="terrain-reminder-list"></div></section>
+              <section class="terrain-reminder-group"><div class="terrain-reminder-group-head"><div><span>Planejamento</span><h3>Próximos 30 dias</h3></div><strong id="terrainReminderNext30Count">0</strong></div><div id="terrainReminderNext30List" class="terrain-reminder-list"></div></section>
+            </div>
           </section>
         </section>
 
@@ -2946,6 +2964,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=628"></script>
+  <script type="module" src="painel.js?v=629"></script>
 </body>
 </html>

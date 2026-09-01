@@ -1,0 +1,16 @@
+{
+  "version": "2026-09-01_v3",
+  "operation": "extend_terrains_with_inspection_reminders",
+  "recreates_existing_data": false,
+  "entity": "terrenos",
+  "added_fields": [
+    "ultima_limpeza_em",
+    "intervalo_vistoria",
+    "proxima_vistoria_em",
+    "proxima_vistoria_personalizada",
+    "lembrete_verificado_em"
+  ],
+  "intervals_days": [30, 45, 60, 90, 120],
+  "custom_date_priority": true,
+  "external_notifications": false
+}

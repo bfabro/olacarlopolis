@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v2";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v3";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -139,11 +139,15 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
       "id", "owner_id", "development_id", "apelido", "bairro", "rua", "numero",
       "quadra", "lote", "area_m2", "frente_m", "fundo_m", "matricula",
       "inscricao_imobiliaria", "latitude", "longitude", "google_maps_url", "observacoes",
-      "grau_dificuldade", "altura_mato", "caracteristicas", "status", "created_at", "updated_at"
+      "grau_dificuldade", "altura_mato", "caracteristicas", "ultima_limpeza_em",
+      "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
+      "lembrete_verificado_em", "status", "created_at", "updated_at"
     ]),
     optionalFields: Object.freeze([
       "owner_id", "development_id", "matricula", "inscricao_imobiliaria", "latitude",
-      "longitude", "google_maps_url", "caracteristicas"
+      "longitude", "google_maps_url", "caracteristicas", "ultima_limpeza_em",
+      "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
+      "lembrete_verificado_em"
     ]),
     statuses: TERRAIN_STATUSES
   }),
@@ -392,7 +396,9 @@ export function buildTerrainRecord(input, { id, existing = {}, timestamp = Date.
     created_at: existing.created_at || timestamp,
     updated_at: timestamp
   };
-  if (existing.ultima_limpeza_em) record.ultima_limpeza_em = existing.ultima_limpeza_em;
+  ["ultima_limpeza_em", "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada", "lembrete_verificado_em"].forEach((key) => {
+    if (existing[key]) record[key] = existing[key];
+  });
   return record;
 }
 
@@ -409,6 +415,99 @@ export function terrainRecords(records = {}) {
       if (byBlock) return byBlock;
       return String(a.lote || "").localeCompare(String(b.lote || ""), "pt-BR", { numeric: true });
     });
+}
+
+const TERRAIN_REMINDER_INTERVALS = new Set(["30", "45", "60", "90", "120", "personalizado"]);
+
+function terrainIsoDate(value, field = "data") {
+  const normalized = String(value || "").trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(normalized)) throw new Error(`Valor inválido para ${field}.`);
+  const [year, month, day] = normalized.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+    throw new Error(`Valor inválido para ${field}.`);
+  }
+  return normalized;
+}
+
+function terrainDateAtUtc(value, field = "data") {
+  return new Date(`${terrainIsoDate(value, field)}T00:00:00.000Z`);
+}
+
+export function terrainAddDays(value, days) {
+  const date = terrainDateAtUtc(value);
+  date.setUTCDate(date.getUTCDate() + Number(days || 0));
+  return date.toISOString().slice(0, 10);
+}
+
+export function buildTerrainReminderSchedule(lastCleaningDate, interval, customDate = "") {
+  const lastCleaning = terrainIsoDate(lastCleaningDate, "última limpeza");
+  const selectedInterval = TERRAIN_REMINDER_INTERVALS.has(String(interval)) ? String(interval) : "";
+  if (!selectedInterval) throw new Error("Selecione quando o terreno deve ser verificado novamente.");
+  if (customDate) {
+    const custom = terrainIsoDate(customDate, "próxima vistoria personalizada");
+    if (custom < lastCleaning) throw new Error("A próxima vistoria não pode ser anterior à última limpeza.");
+    return {
+      ultima_limpeza_em: lastCleaning,
+      intervalo_vistoria: "personalizado",
+      proxima_vistoria_em: custom,
+      proxima_vistoria_personalizada: custom,
+      lembrete_verificado_em: null
+    };
+  }
+  if (selectedInterval === "personalizado") throw new Error("Informe a data personalizada da próxima vistoria.");
+  return {
+    ultima_limpeza_em: lastCleaning,
+    intervalo_vistoria: selectedInterval,
+    proxima_vistoria_em: terrainAddDays(lastCleaning, Number(selectedInterval)),
+    proxima_vistoria_personalizada: null,
+    lembrete_verificado_em: null
+  };
+}
+
+export function terrainReminderClassification(terrain = {}, today = new Date().toISOString().slice(0, 10)) {
+  if (!terrain.ultima_limpeza_em) return null;
+  try {
+    const lastCleaning = terrainDateAtUtc(terrain.ultima_limpeza_em, "última limpeza");
+    const currentDate = terrainDateAtUtc(today, "data atual");
+    const elapsedDays = Math.max(0, Math.floor((currentDate - lastCleaning) / 86400000));
+    if (elapsedDays <= 30) return { key: "recent", label: "Limpo recentemente", status: "limpo", elapsedDays };
+    if (elapsedDays <= 60) return { key: "monitor", label: "Monitorar", status: "monitorar", elapsedDays };
+    if (elapsedDays <= 90) return { key: "attention", label: "Pode precisar de limpeza", status: "pode_precisar_limpeza", elapsedDays };
+    return { key: "overdue", label: "Precisa de atenção", status: "precisa_limpeza", elapsedDays };
+  } catch {
+    return null;
+  }
+}
+
+export function terrainReminderAutomaticStatus(terrain = {}, today = new Date().toISOString().slice(0, 10)) {
+  const statusRank = { sem_informacao: -1, limpo: 0, monitorar: 1, pode_precisar_limpeza: 2, precisa_limpeza: 3 };
+  if (!Object.prototype.hasOwnProperty.call(statusRank, terrain.status)) return terrain.status || "sem_informacao";
+  const classification = terrainReminderClassification(terrain, today);
+  if (!classification || statusRank[classification.status] <= statusRank[terrain.status]) return terrain.status;
+  return classification.status;
+}
+
+export function terrainReminderGroups(records = {}, today = new Date().toISOString().slice(0, 10)) {
+  const currentDate = terrainDateAtUtc(today, "data atual");
+  const groups = { hoje: [], atrasados: [], proximos_7_dias: [], proximos_30_dias: [] };
+  terrainRecords(records).forEach((terrain) => {
+    if (!terrain.proxima_vistoria_em || terrain.status === "inativo") return;
+    let reminderDate;
+    try {
+      reminderDate = terrainDateAtUtc(terrain.proxima_vistoria_em, "próxima vistoria");
+    } catch {
+      return;
+    }
+    const daysUntil = Math.floor((reminderDate - currentDate) / 86400000);
+    const item = { ...terrain, daysUntil, classification: terrainReminderClassification(terrain, today) };
+    if (daysUntil < 0) groups.atrasados.push(item);
+    else if (daysUntil === 0) groups.hoje.push(item);
+    else if (daysUntil <= 7) groups.proximos_7_dias.push(item);
+    else if (daysUntil <= 30) groups.proximos_30_dias.push(item);
+  });
+  Object.values(groups).forEach((items) => items.sort((a, b) => String(a.proxima_vistoria_em).localeCompare(String(b.proxima_vistoria_em))));
+  return groups;
 }
 
 export function terrainOwnerName(terrain = {}, owners = {}) {

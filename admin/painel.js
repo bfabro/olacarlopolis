@@ -38,6 +38,7 @@ import {
 import {
   buildTerrainDevelopmentRecord,
   buildTerrainBudgetRecord,
+  buildTerrainReminderSchedule,
   buildTerrainServiceRecord,
   buildTerrainServicePhotoRecord,
   buildTerrainInspectionRecord,
@@ -59,6 +60,7 @@ import {
   terrainOwnerOriginLabel,
   terrainOwnerStatusMeta,
   terrainOwnerWhatsappUrl,
+  terrainAddDays,
   terrainPaymentMethodLabel,
   terrainPaymentStatusMeta,
   terrainCharacteristicLabels,
@@ -87,12 +89,15 @@ import {
   terrainPhotoCategoryLabel,
   terrainPhotoRecords,
   terrainStatusAfterInspection,
+  terrainReminderClassification,
+  terrainReminderAutomaticStatus,
+  terrainReminderGroups,
   terrainStatusMeta,
   validateTerrainImageFile,
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=9";
+} from "./gestao-terrenos-schema.js?v=10";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -107,10 +112,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 691,
-  label: "v698",
+  numero: 692,
+  label: "v699",
   data: "2026-09-01",
-  nota: "Pagamentos e Financeiro na Gestao de Terrenos."
+  nota: "Lembretes de nova vistoria na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -2966,6 +2971,7 @@ async function loadAllData(onProgress = null) {
     services: terrainServicesSnap.exists() ? terrainServicesSnap.val() : {},
     servicePhotos: terrainServicePhotosSnap.exists() ? terrainServicePhotosSnap.val() : {}
   };
+  await syncTerrainReminderStatuses();
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
@@ -3226,6 +3232,29 @@ function terrainRecordCount(records) {
   return records && typeof records === "object" ? Object.keys(records).length : 0;
 }
 
+async function syncTerrainReminderStatuses() {
+  if (!isMaster()) return;
+  const terrains = state.terrainManagement?.terrains || {};
+  const today = terrainBudgetLocalDate();
+  const updates = {};
+  const changedStatuses = [];
+  Object.entries(terrains).forEach(([terrainId, terrain]) => {
+    if (!terrain?.ultima_limpeza_em) return;
+    const nextStatus = terrainReminderAutomaticStatus(terrain, today);
+    if (nextStatus === terrain.status) return;
+    updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/status`] = nextStatus;
+    updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`] = serverTimestamp();
+    changedStatuses.push([terrainId, nextStatus]);
+  });
+  if (!Object.keys(updates).length) return;
+  try {
+    await firebaseUpdate(ref(db), updates);
+    changedStatuses.forEach(([terrainId, status]) => { terrains[terrainId].status = status; });
+  } catch (error) {
+    console.warn("Não foi possível sincronizar os status dos lembretes.", error);
+  }
+}
+
 function renderTerrainManagement() {
   const terrainData = state.terrainManagement || {};
   if ($("terrainOwnersCount")) $("terrainOwnersCount").textContent = String(terrainRecordCount(terrainData.owners));
@@ -3239,6 +3268,7 @@ function renderTerrainManagement() {
   renderTerrainDevelopmentList();
   renderTerrainBudgetList();
   renderTerrainServiceList();
+  renderTerrainReminders();
   renderTerrainFinance();
 }
 
@@ -3851,6 +3881,7 @@ function openTerrainDetail(terrainId) {
   const status = terrainStatusMeta(terrain.status);
   const mapsUrl = terrainMapsUrl(terrain);
   const characteristics = terrainCharacteristicLabels(terrain.caracteristicas);
+  const reminderClassification = terrainReminderClassification(terrain, terrainBudgetLocalDate());
   $("terrainDetailTitle").textContent = terrain.apelido || "Detalhes";
   $("terrainDetailContent").innerHTML = `
     <div class="terrain-detail-actions">
@@ -3863,6 +3894,9 @@ function openTerrainDetail(terrainId) {
     <div class="terrain-owner-detail-grid">
       <div><span>Proprietário</span><strong>${escapeHtml(terrainOwnerName(terrain, owners))}</strong></div>
       <div><span>Status</span><strong><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></strong></div>
+      <div><span>Última limpeza</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.ultima_limpeza_em))}</strong></div>
+      <div><span>Próxima vistoria</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.proxima_vistoria_em))}</strong></div>
+      <div class="wide"><span>Classificação do acompanhamento</span><strong>${escapeHtml(reminderClassification?.label || "Sem limpeza registrada")}</strong></div>
       <div class="wide"><span>Endereço</span><strong>${escapeHtml([terrain.rua, terrain.numero, terrain.bairro].filter(Boolean).join(", ") || "-")}</strong></div>
       <div><span>Loteamento</span><strong>${escapeHtml(terrainDevelopmentName(terrain, developments))}</strong></div>
       <div><span>Quadra</span><strong>${escapeHtml(terrain.quadra || "-")}</strong></div>
@@ -4072,6 +4106,9 @@ async function saveTerrainInspection(event) {
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/status`]: nextStatus,
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/altura_mato`]: inspection.altura_mato,
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/grau_dificuldade`]: inspection.grau_dificuldade,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/proxima_vistoria_em`]: null,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/proxima_vistoria_personalizada`]: null,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/lembrete_verificado_em`]: inspection.data,
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`]: serverTimestamp()
     });
     databaseSaved = true;
@@ -4878,10 +4915,21 @@ function updateTerrainServicePayment() {
   if (status && status.value !== "cancelado") status.value = received <= 0 ? "pendente" : (received >= charged ? "pago" : "parcial");
 }
 
+function updateTerrainServiceReminderFields() {
+  const completed = $("terrainServiceStatus")?.value === "concluido";
+  const fields = $("terrainServiceReminderFields");
+  fields?.classList.toggle("hidden", !completed);
+  const custom = completed && $("terrainServiceReminderInterval")?.value === "personalizado";
+  $("terrainServiceCustomReminderLabel")?.classList.toggle("hidden", !custom);
+  if ($("terrainServiceReminderInterval")) $("terrainServiceReminderInterval").required = completed;
+  if ($("terrainServiceCustomReminderDate")) $("terrainServiceCustomReminderDate").required = custom;
+}
+
 function resetTerrainServiceForm() {
   state.selectedTerrainServiceId = null;
   $("terrainServiceForm")?.reset();
   $("terrainServiceFormCard")?.classList.add("hidden");
+  $("terrainServiceReminderFields")?.classList.add("hidden");
   ["terrainServiceBeforePreview", "terrainServiceAfterPreview"].forEach((id) => { if ($(id)) $(id).innerHTML = ""; });
 }
 
@@ -4909,10 +4957,13 @@ function openTerrainServiceForm(serviceId = "", { budgetId = "" } = {}) {
     terrainServicePaymentMethod: paymentMethod, terrainServicePaymentStatus: values.status_pagamento || "pendente",
     terrainServiceReceived: values.valor_recebido ?? 0, terrainServiceBalance: values.saldo ?? Math.max(Number(values.valor_cobrado || 0) - Number(values.valor_recebido || 0), 0),
     terrainServicePaymentDate: values.data_pagamento || "", terrainServicePaymentNotes: values.observacoes_pagamento || "",
+    terrainServiceReminderInterval: terrain?.intervalo_vistoria || "30",
+    terrainServiceCustomReminderDate: terrain?.proxima_vistoria_personalizada || "",
     terrainServiceStatus: values.status || "aguardando", terrainServiceNotes: values.observacoes || ""
   };
   Object.entries(fields).forEach(([id, value]) => { if ($(id)) $(id).value = value; });
   updateTerrainServicePayment();
+  updateTerrainServiceReminderFields();
   $("terrainServiceFormTitle").textContent = service ? "Editar serviço" : (budget ? `Serviço do orçamento ${budget.numero}` : "Novo serviço");
   $("terrainServiceFormCard")?.classList.remove("hidden");
   $("terrainServiceExpectedDate")?.focus();
@@ -4959,8 +5010,15 @@ async function saveTerrainService(event) {
     const service = buildTerrainServiceRecord(terrainServiceFormValues(), { id, existing: existing || {}, timestamp: serverTimestamp(), today });
     const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.services.path}/${id}`]: service };
     if (service.status === "concluido") {
+      const reminder = buildTerrainReminderSchedule(
+        service.data_realizada || today,
+        $("terrainServiceReminderInterval").value,
+        $("terrainServiceCustomReminderDate").value
+      );
       updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/status`] = "limpo";
-      updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/ultima_limpeza_em`] = service.data_realizada || today;
+      Object.entries(reminder).forEach(([key, value]) => {
+        updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/${key}`] = value;
+      });
       updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/updated_at`] = serverTimestamp();
     }
     await firebaseUpdate(ref(db), updates);
@@ -4970,7 +5028,7 @@ async function saveTerrainService(event) {
     if (service.status === "concluido") await refreshTerrainRecord(service.terrain_id);
     resetTerrainServiceForm();
     renderTerrainManagement();
-    showToast(service.status === "concluido" ? "Serviço concluído e terreno atualizado para Limpo." : "Serviço salvo com sucesso.", { prominent: true });
+    showToast(service.status === "concluido" ? "Serviço concluído, terreno atualizado e nova vistoria agendada." : "Serviço salvo com sucesso.", { prominent: true });
   } catch (error) {
     console.error("Falha ao salvar serviço.", error);
     showToast(error?.message || "Não foi possível salvar o serviço.");
@@ -5032,6 +5090,101 @@ async function deleteTerrainService(id) {
   await firebaseUpdate(ref(db), updates); delete state.terrainManagement.services[id]; closeTerrainServiceDetail(); renderTerrainManagement(); showToast("Serviço excluído.");
 }
 
+function terrainReminderEmptyHtml(label) {
+  return `<div class="terrain-reminder-empty"><i class="fa-solid fa-calendar-check"></i><span>Nenhum lembrete ${escapeHtml(label)}.</span></div>`;
+}
+
+function terrainReminderItemHtml(terrain) {
+  const owner = terrainOwnerById(terrain.owner_id) || null;
+  const mapsUrl = terrainMapsUrl(terrain);
+  const whatsappUrl = owner ? terrainOwnerWhatsappUrl(owner) : "";
+  const classification = terrain.classification || terrainReminderClassification(terrain, terrainBudgetLocalDate());
+  const timing = terrain.daysUntil < 0
+    ? `${Math.abs(terrain.daysUntil)} ${Math.abs(terrain.daysUntil) === 1 ? "dia atrasado" : "dias atrasados"}`
+    : (terrain.daysUntil === 0 ? "Vistoria prevista para hoje" : `Em ${terrain.daysUntil} ${terrain.daysUntil === 1 ? "dia" : "dias"}`);
+  return `<article class="terrain-reminder-row">
+    <div class="terrain-reminder-main"><span>${escapeHtml(terrainDevelopmentName(terrain, state.terrainManagement?.developments || {}))}</span><strong>${escapeHtml(terrain.apelido || `Quadra ${terrain.quadra || "-"}, lote ${terrain.lote || "-"}`)}</strong><small>${escapeHtml(owner?.nome || "Sem proprietário")}</small></div>
+    <div class="terrain-reminder-date"><span>Próxima vistoria</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.proxima_vistoria_em))}</strong><small>${escapeHtml(timing)}</small></div>
+    <div class="terrain-reminder-classification"><span>Acompanhamento</span><strong class="terrain-reminder-classification-${escapeAttr(classification?.key || "none")}">${escapeHtml(classification?.label || "Sem classificação")}</strong><small>${classification ? `${classification.elapsedDays} dias desde a limpeza` : "Última limpeza não informada"}</small></div>
+    <div class="terrain-reminder-actions">
+      <button type="button" class="ghost-button" data-reminder-open-terrain="${escapeAttr(terrain.id)}" data-no-loading><i class="fa-solid fa-eye"></i> Abrir terreno</button>
+      ${mapsUrl ? `<a class="ghost-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Maps</a>` : `<button type="button" class="ghost-button" disabled title="Localização não cadastrada"><i class="fa-solid fa-map-location-dot"></i> Maps</button>`}
+      ${whatsappUrl ? `<a class="ghost-button terrain-reminder-whatsapp" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>` : `<button type="button" class="ghost-button" disabled title="WhatsApp não cadastrado"><i class="fa-brands fa-whatsapp"></i> WhatsApp</button>`}
+      <button type="button" class="ghost-button" data-reminder-inspection="${escapeAttr(terrain.id)}" data-no-loading><i class="fa-solid fa-clipboard-check"></i> Registrar vistoria</button>
+      <button type="button" class="ghost-button" data-reminder-delay="${escapeAttr(terrain.id)}" data-no-loading><i class="fa-solid fa-clock-rotate-left"></i> Adiar</button>
+      <button type="button" data-reminder-verify="${escapeAttr(terrain.id)}" data-no-loading><i class="fa-solid fa-check"></i> Verificado</button>
+    </div>
+  </article>`;
+}
+
+function renderTerrainReminders() {
+  if (!$("terrainReminderGroups")) return;
+  const groups = terrainReminderGroups(state.terrainManagement?.terrains || {}, terrainBudgetLocalDate());
+  const settings = [
+    ["hoje", "terrainReminderTodayList", "terrainReminderTodayCount", "para hoje"],
+    ["atrasados", "terrainReminderOverdueList", "terrainReminderOverdueCount", "atrasado"],
+    ["proximos_7_dias", "terrainReminderNext7List", "terrainReminderNext7Count", "nos próximos 7 dias"],
+    ["proximos_30_dias", "terrainReminderNext30List", "terrainReminderNext30Count", "nos próximos 30 dias"]
+  ];
+  let total = 0;
+  settings.forEach(([key, listId, countId, emptyLabel]) => {
+    const items = groups[key];
+    total += items.length;
+    if ($(countId)) $(countId).textContent = String(items.length);
+    if ($(listId)) $(listId).innerHTML = items.length ? items.map(terrainReminderItemHtml).join("") : terrainReminderEmptyHtml(emptyLabel);
+  });
+  if ($("terrainReminderSummary")) $("terrainReminderSummary").textContent = total
+    ? `${total} ${total === 1 ? "terreno exige" : "terrenos exigem"} acompanhamento até os próximos 30 dias.`
+    : "Nenhuma vistoria pendente para os próximos 30 dias.";
+}
+
+async function delayTerrainReminder(terrainId) {
+  const terrain = terrainById(terrainId);
+  if (!terrain?.proxima_vistoria_em) return;
+  const answer = window.prompt("Adiar o lembrete por quantos dias?", "7");
+  if (answer === null) return;
+  const days = Number(String(answer).trim());
+  if (!Number.isInteger(days) || days <= 0 || days > 365) return showToast("Informe um período entre 1 e 365 dias.");
+  const today = terrainBudgetLocalDate();
+  const baseDate = terrain.proxima_vistoria_em > today ? terrain.proxima_vistoria_em : today;
+  const nextDate = terrainAddDays(baseDate, days);
+  const updates = {
+    [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/proxima_vistoria_em`]: nextDate,
+    [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`]: serverTimestamp()
+  };
+  if (terrain.proxima_vistoria_personalizada) {
+    updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/proxima_vistoria_personalizada`] = nextDate;
+  }
+  try {
+    await firebaseUpdate(ref(db), updates);
+    await refreshTerrainRecord(terrainId);
+    renderTerrainManagement();
+    showToast(`Lembrete adiado para ${terrainBudgetDateLabel(nextDate)}.`, { prominent: true });
+  } catch (error) {
+    console.error("Falha ao adiar lembrete.", error);
+    showToast("Não foi possível adiar o lembrete.");
+  }
+}
+
+async function verifyTerrainReminder(terrainId) {
+  const terrain = terrainById(terrainId);
+  if (!terrain?.proxima_vistoria_em || !window.confirm("Marcar este terreno como verificado e encerrar o lembrete atual?")) return;
+  try {
+    await firebaseUpdate(ref(db), {
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/proxima_vistoria_em`]: null,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/proxima_vistoria_personalizada`]: null,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/lembrete_verificado_em`]: terrainBudgetLocalDate(),
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`]: serverTimestamp()
+    });
+    await refreshTerrainRecord(terrainId);
+    renderTerrainManagement();
+    showToast("Terreno marcado como verificado.", { prominent: true });
+  } catch (error) {
+    console.error("Falha ao verificar lembrete.", error);
+    showToast("Não foi possível concluir o lembrete.");
+  }
+}
+
 function renderTerrainFinance() {
   const yearSelect = $("terrainFinanceYear");
   const monthSelect = $("terrainFinanceMonth");
@@ -5081,7 +5234,7 @@ function renderTerrainFinance() {
 }
 
 function switchTerrainManagementTab(tabName = "dashboard") {
-  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services", "finance"]);
+  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services", "reminders", "finance"]);
   const target = allowedTabs.has(tabName) ? tabName : "dashboard";
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     const isActive = button.dataset.terrainTab === target;
@@ -5097,6 +5250,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
   if (target === "developments") renderTerrainDevelopmentList();
   if (target === "budgets") renderTerrainBudgetList();
   if (target === "services") renderTerrainServiceList();
+  if (target === "reminders") renderTerrainReminders();
   if (target === "finance") renderTerrainFinance();
 }
 
@@ -25322,6 +25476,11 @@ function bindEvents() {
     }
     updateTerrainServicePayment();
   });
+  $("terrainServiceStatus")?.addEventListener("change", updateTerrainServiceReminderFields);
+  $("terrainServiceReminderInterval")?.addEventListener("change", () => {
+    if ($("terrainServiceReminderInterval").value !== "personalizado") $("terrainServiceCustomReminderDate").value = "";
+    updateTerrainServiceReminderFields();
+  });
   $("terrainServiceBeforeFiles")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainServiceBeforeFiles", "terrainServiceBeforePreview"));
   $("terrainServiceAfterFiles")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainServiceAfterFiles", "terrainServiceAfterPreview"));
   $("terrainServiceList")?.addEventListener("click", (event) => {
@@ -25354,6 +25513,20 @@ function bindEvents() {
     const edit = event.target.closest("[data-finance-service-edit]");
     if (!edit) return;
     openTerrainServiceForm(edit.dataset.financeServiceEdit);
+  });
+  $("terrainReminderGroups")?.addEventListener("click", (event) => {
+    const openButton = event.target.closest("[data-reminder-open-terrain]");
+    if (openButton) {
+      switchTerrainManagementTab("terrains");
+      openTerrainDetail(openButton.dataset.reminderOpenTerrain);
+      return;
+    }
+    const inspectionButton = event.target.closest("[data-reminder-inspection]");
+    if (inspectionButton) return openTerrainInspectionForm(inspectionButton.dataset.reminderInspection);
+    const delayButton = event.target.closest("[data-reminder-delay]");
+    if (delayButton) return delayTerrainReminder(delayButton.dataset.reminderDelay);
+    const verifyButton = event.target.closest("[data-reminder-verify]");
+    if (verifyButton) return verifyTerrainReminder(verifyButton.dataset.reminderVerify);
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);

@@ -1190,6 +1190,7 @@ button[type="submit"]:hover,
 .terrain-budget-list-card,
 .terrain-service-form-card,
 .terrain-service-list-card,
+.terrain-reminders-card,
 .terrain-finance-dashboard,
 .terrain-finance-pending-card {
   padding: 18px;
@@ -2449,6 +2450,27 @@ body.terrain-owner-detail-open {
   border-radius: 8px;
 }
 
+.terrain-service-reminder-fieldset {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  background: #f0fdfa;
+}
+
+.terrain-service-reminder-fieldset legend {
+  padding: 0 6px;
+  color: #115e59;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.terrain-service-reminder-fieldset label { margin: 0; }
+
 .terrain-service-list-head,
 .terrain-service-row {
   display: grid;
@@ -2496,6 +2518,104 @@ body.terrain-owner-detail-open {
 }
 
 .terrain-before-after h3 { margin: 0 0 12px; font-size: 16px; }
+
+.terrain-reminder-groups { display: grid; }
+
+.terrain-reminder-group {
+  min-width: 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+}
+
+.terrain-reminder-group:first-child { border-top: 0; padding-top: 0; }
+.terrain-reminder-group:last-child { padding-bottom: 0; }
+
+.terrain-reminder-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.terrain-reminder-group-head span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.terrain-reminder-group-head h3 { margin: 3px 0 0; font-size: 17px; }
+
+.terrain-reminder-group-head > strong {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #334155;
+  font-size: 13px;
+}
+
+.terrain-reminder-group-today .terrain-reminder-group-head > strong { background: #dcfce7; color: #166534; }
+.terrain-reminder-group-overdue .terrain-reminder-group-head > strong { background: #fee2e2; color: #991b1b; }
+.terrain-reminder-list { display: grid; gap: 9px; }
+
+.terrain-reminder-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.1fr) minmax(150px, .7fr) minmax(190px, .9fr);
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-reminder-row > div { min-width: 0; }
+.terrain-reminder-row span, .terrain-reminder-row strong, .terrain-reminder-row small { display: block; }
+.terrain-reminder-row span { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+.terrain-reminder-row strong { margin-top: 4px; overflow: hidden; font-size: 14px; text-overflow: ellipsis; }
+.terrain-reminder-row small { margin-top: 4px; color: var(--muted); font-size: 11px; }
+
+.terrain-reminder-classification-recent { color: #15803d; }
+.terrain-reminder-classification-monitor { color: #1d4ed8; }
+.terrain-reminder-classification-attention { color: #a16207; }
+.terrain-reminder-classification-overdue { color: #b91c1c; }
+
+.terrain-reminder-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  flex-wrap: wrap;
+  gap: 7px;
+  padding-top: 10px;
+  border-top: 1px solid #eef2f7;
+}
+
+.terrain-reminder-actions button,
+.terrain-reminder-actions a {
+  width: auto;
+  min-height: 34px;
+  padding: 7px 10px;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.terrain-reminder-whatsapp { border-color: #86efac; color: #15803d; }
+
+.terrain-reminder-empty {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 12px;
+}
 
 .terrain-finance-filters {
   display: grid;
@@ -2685,6 +2805,7 @@ body.terrain-owner-detail-open {
   .terrain-budget-list-card,
   .terrain-service-form-card,
   .terrain-service-list-card,
+  .terrain-reminders-card,
   .terrain-finance-dashboard,
   .terrain-finance-pending-card {
     padding: 13px;
@@ -2703,6 +2824,8 @@ body.terrain-owner-detail-open {
 
   .terrain-service-row,
   .terrain-before-after,
+  .terrain-service-reminder-fieldset,
+  .terrain-reminder-row,
   .terrain-finance-filters,
   .terrain-finance-stats,
   .terrain-finance-pending-row {
@@ -2722,6 +2845,9 @@ body.terrain-owner-detail-open {
     justify-content: space-between;
     gap: 12px;
   }
+
+  .terrain-reminder-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .terrain-reminder-actions button, .terrain-reminder-actions a { width: 100%; justify-content: center; }
 
   .terrain-budget-row > div {
     display: flex;
