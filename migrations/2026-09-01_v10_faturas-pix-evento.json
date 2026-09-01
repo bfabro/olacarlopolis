@@ -1,0 +1,13 @@
+{
+  "version": "2026-09-01_v10",
+  "operation": "delegate_invoice_pix_action_and_reveal_result_panel",
+  "recreates_existing_data": false,
+  "new_paths": {},
+  "schema_changes": false,
+  "affected_area": "admin_client_invoices",
+  "changes": [
+    "delegate_click_on_persistent_invoice_mount",
+    "centralize_selected_invoice_data",
+    "test_pix_panel_dom_presentation"
+  ]
+}

@@ -13,17 +13,45 @@ function sourceBetween(start, end) {
 }
 
 test("fatura apresenta o Pix estatico antes de aguardar a integracao", () => {
-  const handler = sourceBetween(
-    '$("generateSelectedInvoicePix")?.addEventListener',
-    '$("generateClientBoletos")?.addEventListener'
-  );
-  assert.ok(handler.indexOf("presentSelectedPix(unified.pixCode") < handler.indexOf("await createIntegratedPaymentCharge"));
-  assert.match(handler, /const button = event\.currentTarget/);
+  const handler = sourceBetween("async function generateSelectedClientInvoicePix", "function renderClientInvoices");
+  assert.ok(handler.indexOf("presentClientInvoicePix(mount, unified.pixCode") < handler.indexOf("await createIntegratedPaymentCharge"));
   assert.match(handler, /setBusy\(button, false\)/);
 
-  const selectionBuilder = sourceBetween("const selectedInvoiceData", "const refreshSelectedInvoicePayment");
+  const selectionBuilder = sourceBetween("function selectedClientInvoicePaymentData", "function presentClientInvoicePix");
   assert.match(selectionBuilder, /buildClientInvoice\(plannedClient, mes, paymentConfig\)/);
   assert.doesNotMatch(selectionBuilder, /buildClientInvoice\(plannedClient, mes, paymentConfig, null, \{ ignoreSaved: true \}\)/);
+});
+
+test("clique do Pix usa delegacao no conteiner permanente de faturas", () => {
+  const setup = sourceBetween("function bindEvents", "bindEvents();");
+  assert.match(setup, /\$\("clientInvoicesMount"\)\?\.addEventListener\("click"/);
+  assert.match(setup, /event\.target\.closest\("#generateSelectedInvoicePix"\)/);
+  assert.match(setup, /generateSelectedClientInvoicePix\(button\)/);
+  assert.doesNotMatch(panelSource, /\$\("generateSelectedInvoicePix"\)\?\.addEventListener/);
+});
+
+test("apresentacao preenche codigo, imagem e revela o quadro Pix", () => {
+  const presenterSource = sourceBetween("function presentClientInvoicePix", "async function generateSelectedClientInvoicePix");
+  const elements = {
+    "#selectedInvoicePixBox": {
+      classList: { removed: [], remove(value) { this.removed.push(value); } },
+      scrollIntoView() {}
+    },
+    "#selectedInvoicePixCode": { value: "" },
+    "#selectedInvoiceQr": { src: "", onerror: null },
+    "#selectedInvoicePixTotalGenerated": { textContent: "" }
+  };
+  const presentClientInvoicePix = new Function(
+    "moneyBR",
+    "qrCodeUrl",
+    `${presenterSource}; return presentClientInvoicePix;`
+  )((value) => `R$ ${Number(value).toFixed(2)}`, (code) => `QR:${code}`);
+  const mount = { querySelector: (selector) => elements[selector] || null };
+  presentClientInvoicePix(mount, "PIX-COPIA-E-COLA", "", 87.5);
+  assert.equal(elements["#selectedInvoicePixCode"].value, "PIX-COPIA-E-COLA");
+  assert.equal(elements["#selectedInvoiceQr"].src, "QR:PIX-COPIA-E-COLA");
+  assert.equal(elements["#selectedInvoicePixTotalGenerated"].textContent, "R$ 87.50");
+  assert.deepEqual(elements["#selectedInvoicePixBox"].classList.removed, ["hidden"]);
 });
 
 test("escolha de plano tambem apresenta o Pix antes de salvar remotamente", () => {

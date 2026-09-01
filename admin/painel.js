@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=16";
+} from "./gestao-terrenos-schema.js?v=17";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 698,
-  label: "v705",
+  numero: 699,
+  label: "v706",
   data: "2026-09-01",
-  nota: "Correcao do valor e payload Pix nas faturas dos clientes."
+  nota: "Correcao definitiva do acionamento e quadro Pix nas faturas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24663,6 +24663,63 @@ function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
   });
 }
 
+function selectedClientInvoicePaymentData(mount, client, paymentConfig = {}) {
+  const selected = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
+  const selectedPlan = client.tipoPlano || "mensal";
+  const plannedClient = clientForInvoicePlan(client, selectedPlan);
+  const selectedInvoices = selected.map((mes) => buildClientInvoice(plannedClient, mes, paymentConfig));
+  const selectedTotal = selectedInvoices.reduce((sum, fatura) => sum + fatura.valorTotal, 0);
+  const selectedLabel = selected.length === 1 ? selected[0] : `${selected[0] || currentMonthKey()}-${selected.length}M`;
+  const unified = buildClientInvoice(plannedClient, selectedLabel, paymentConfig, selectedTotal, { ignoreSaved: true });
+  return { selected, selectedPlan, selectedInvoices, selectedTotal, unified };
+}
+
+function presentClientInvoicePix(mount, code, qrUrl, total) {
+  const pixBox = mount.querySelector("#selectedInvoicePixBox");
+  const pixCode = mount.querySelector("#selectedInvoicePixCode");
+  const pixQr = mount.querySelector("#selectedInvoiceQr");
+  const generatedTotal = mount.querySelector("#selectedInvoicePixTotalGenerated");
+  if (!pixBox || !pixCode || !pixQr) throw new Error("Quadro Pix nao encontrado na tela de faturas.");
+  pixCode.value = code;
+  if (generatedTotal) generatedTotal.textContent = moneyBR(total);
+  pixQr.onerror = () => {
+    pixQr.onerror = null;
+    pixQr.src = qrCodeUrl(code, "quickchart");
+  };
+  pixQr.src = qrUrl || qrCodeUrl(code);
+  pixBox.classList.remove("hidden");
+  pixBox.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+}
+
+async function generateSelectedClientInvoicePix(button) {
+  const mount = $("clientInvoicesMount");
+  const client = currentClientRecord();
+  if (!mount || !client) return showToast("Cliente nao encontrado para gerar o Pix.");
+  const paymentConfig = state.pagamentoSistema || {};
+  const { selected, selectedPlan, selectedTotal, unified } = selectedClientInvoicePaymentData(mount, client, paymentConfig);
+  if (!selected.length) return showToast("Selecione pelo menos um mes para gerar o Pix.");
+  if (selectedTotal <= 0) return showToast("O valor das faturas selecionadas nao esta configurado.");
+  if (!unified.pixCode) return showToast("A chave Pix nao esta configurada corretamente.");
+
+  try {
+    presentClientInvoicePix(mount, unified.pixCode, unified.qrUrl, selectedTotal);
+  } catch (error) {
+    console.error("Falha ao apresentar o quadro Pix.", error);
+    return showToast("Nao foi possivel abrir o quadro Pix desta fatura.");
+  }
+
+  setBusy(button, true, "Gerando...");
+  try {
+    const integrated = await createIntegratedPaymentCharge(client, unified, selected, selectedPlan);
+    const finalPixCode = integrated.pixCode || unified.pixCode;
+    const finalQrUrl = integrated.qrUrl || unified.qrUrl;
+    presentClientInvoicePix(mount, finalPixCode, finalQrUrl, selectedTotal);
+    showToast(`QR Code/Pix gerado${integrated.integrationEnabled ? " e aguardando confirmação automática" : ""}.`);
+  } finally {
+    setBusy(button, false);
+  }
+}
+
 function renderClientInvoices() {
   const mount = $("clientInvoicesMount");
   if (!mount) return;
@@ -24801,22 +24858,14 @@ function renderClientInvoices() {
   `;
   bindClientPlanPaymentControls(mount, client, paymentConfig);
 
-  const selectedPixCode = $("selectedInvoicePixCode");
-  const selectedQr = $("selectedInvoiceQr");
-  const selectedPixBox = $("selectedInvoicePixBox");
-  const selectedInvoiceData = () => {
-    const selected = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
-    const selectedPlan = client.tipoPlano || "mensal";
-    const plannedClient = clientForInvoicePlan(client, selectedPlan);
-    const selectedInvoices = selected.map((mes) => buildClientInvoice(plannedClient, mes, paymentConfig));
-    const selectedTotal = selectedInvoices.reduce((sum, fatura) => sum + fatura.valorTotal, 0);
-    const selectedLabel = selected.length === 1 ? selected[0] : `${selected[0] || currentMonthKey()}-${selected.length}M`;
-    const unified = buildClientInvoice(plannedClient, selectedLabel, paymentConfig, selectedTotal, { ignoreSaved: true });
-    return { selected, selectedPlan, selectedInvoices, selectedTotal, unified };
-  };
+  const selectedInvoiceData = () => selectedClientInvoicePaymentData(mount, client, paymentConfig);
   const refreshSelectedInvoicePayment = () => {
     const { selectedTotal } = selectedInvoiceData();
-    $("selectedInvoiceTotal").textContent = moneyBR(selectedTotal);
+    const selectedTotalOutput = mount.querySelector("#selectedInvoiceTotal");
+    const selectedPixCode = mount.querySelector("#selectedInvoicePixCode");
+    const selectedQr = mount.querySelector("#selectedInvoiceQr");
+    const selectedPixBox = mount.querySelector("#selectedInvoicePixBox");
+    if (selectedTotalOutput) selectedTotalOutput.textContent = moneyBR(selectedTotal);
     if (selectedPixCode) selectedPixCode.value = "";
     if (selectedQr) selectedQr.removeAttribute("src");
     selectedPixBox?.classList.add("hidden");
@@ -24826,48 +24875,6 @@ function renderClientInvoices() {
     input.addEventListener("change", refreshSelectedInvoicePayment);
   });
   refreshSelectedInvoicePayment();
-
-  $("generateSelectedInvoicePix")?.addEventListener("click", async (event) => {
-    const { selected, selectedPlan, selectedTotal, unified } = selectedInvoiceData();
-    if (!selected.length) {
-      showToast("Selecione pelo menos um mes para gerar o Pix.");
-      return;
-    }
-    if (selectedTotal <= 0) {
-      showToast("O valor das faturas selecionadas nao esta configurado.");
-      return;
-    }
-    if (!unified.pixCode) {
-      showToast("A chave Pix nao esta configurada corretamente.");
-      return;
-    }
-    const button = event.currentTarget;
-    const presentSelectedPix = (code, qrUrl) => {
-      if (selectedPixCode) selectedPixCode.value = code;
-      const generatedTotal = $("selectedInvoicePixTotalGenerated");
-      if (generatedTotal) generatedTotal.textContent = moneyBR(selectedTotal);
-      if (selectedQr) {
-        selectedQr.onerror = () => {
-          selectedQr.onerror = null;
-          selectedQr.src = qrCodeUrl(code, "quickchart");
-        };
-        selectedQr.src = qrUrl || qrCodeUrl(code);
-      }
-      selectedPixBox?.classList.remove("hidden");
-    };
-    presentSelectedPix(unified.pixCode, unified.qrUrl);
-    selectedPixBox?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    setBusy(button, true, "Gerando...");
-    try {
-      const integrated = await createIntegratedPaymentCharge(client, unified, selected, selectedPlan);
-      const finalPixCode = integrated.pixCode || unified.pixCode;
-      const finalQrUrl = integrated.qrUrl || unified.qrUrl;
-      presentSelectedPix(finalPixCode, finalQrUrl);
-      showToast(`QR Code/Pix gerado${integrated.integrationEnabled ? " e aguardando confirmação automática" : ""}.`);
-    } finally {
-      setBusy(button, false);
-    }
-  });
 
   $("generateClientBoletos")?.addEventListener("click", () => {
     const { selected } = selectedInvoiceData();
@@ -25238,6 +25245,10 @@ function bindEvents() {
     await signOut(auth);
   });
   $("refreshButton").addEventListener("click", loadAllData);
+  $("clientInvoicesMount")?.addEventListener("click", (event) => {
+    const button = event.target.closest("#generateSelectedInvoicePix");
+    if (button) generateSelectedClientInvoicePix(button);
+  });
   $("newClientButton").addEventListener("click", () => {
     resetClientForm();
     setClientFocusMode(true);
