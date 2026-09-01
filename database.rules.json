@@ -99,6 +99,15 @@
       }
     },
 
+    "terrenosTimeline": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".indexOn": ["terrain_id", "data", "tipo"],
+      "$eventId": {
+        ".validate": "!newData.exists() || (newData.hasChildren(['id','terrain_id','data','hora','tipo','descricao','created_at','updated_at']) && newData.child('id').val() === $eventId && newData.child('terrain_id').isString() && newData.child('data').isString() && newData.child('hora').isString() && (newData.child('tipo').val() === 'terrain_created' || newData.child('tipo').val() === 'owner_linked' || newData.child('tipo').val() === 'owner_changed' || newData.child('tipo').val() === 'inspection_completed' || newData.child('tipo').val() === 'photo_added' || newData.child('tipo').val() === 'budget_created' || newData.child('tipo').val() === 'budget_sent' || newData.child('tipo').val() === 'budget_approved' || newData.child('tipo').val() === 'service_scheduled' || newData.child('tipo').val() === 'service_completed' || newData.child('tipo').val() === 'payment_recorded' || newData.child('tipo').val() === 'reminder_created' || newData.child('tipo').val() === 'contact_recorded' || newData.child('tipo').val() === 'status_changed') && newData.child('descricao').isString() && (!newData.child('referencia_tipo').exists() || newData.child('referencia_tipo').isString()) && (!newData.child('referencia_id').exists() || newData.child('referencia_id').isString()) && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())"
+      }
+    },
+
     "terrenosConfiguracoes": {
       ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
       ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",

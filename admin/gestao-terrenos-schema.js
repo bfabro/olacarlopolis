@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v4";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v5";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -122,6 +122,23 @@ export const TERRAIN_PAYMENT_STATUS_OPTIONS = Object.freeze([
   Object.freeze({ value: "cancelado", label: "Cancelado", tone: "danger" })
 ]);
 
+export const TERRAIN_TIMELINE_TYPE_OPTIONS = Object.freeze([
+  ["terrain_created", "Terreno criado", "fa-vector-square", "created"],
+  ["owner_linked", "Proprietário vinculado", "fa-link", "owner"],
+  ["owner_changed", "Proprietário alterado", "fa-user-pen", "owner"],
+  ["inspection_completed", "Vistoria realizada", "fa-clipboard-check", "inspection"],
+  ["photo_added", "Foto adicionada", "fa-image", "photo"],
+  ["budget_created", "Orçamento criado", "fa-file-invoice-dollar", "budget"],
+  ["budget_sent", "Orçamento enviado", "fa-paper-plane", "budget"],
+  ["budget_approved", "Orçamento aprovado", "fa-circle-check", "approved"],
+  ["service_scheduled", "Serviço agendado", "fa-calendar-check", "service"],
+  ["service_completed", "Serviço concluído", "fa-broom", "completed"],
+  ["payment_recorded", "Pagamento registrado", "fa-money-bill-transfer", "payment"],
+  ["reminder_created", "Lembrete criado", "fa-bell", "reminder"],
+  ["contact_recorded", "Contato realizado", "fa-phone-volume", "contact"],
+  ["status_changed", "Status alterado", "fa-arrows-rotate", "status"]
+].map(([value, label, icon, tone]) => Object.freeze({ value, label, icon, tone })));
+
 export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
   owners: Object.freeze({
     path: "terrenosProprietarios",
@@ -197,6 +214,14 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
     path: "terrenosServicosFotos",
     fields: Object.freeze(["id", "service_id", "terrain_id", "tipo", "url", "path", "created_at", "updated_at"]),
     optionalFields: Object.freeze([])
+  }),
+  timeline: Object.freeze({
+    path: "terrenosTimeline",
+    fields: Object.freeze([
+      "id", "terrain_id", "data", "hora", "tipo", "descricao",
+      "referencia_tipo", "referencia_id", "created_at", "updated_at"
+    ]),
+    optionalFields: Object.freeze(["referencia_tipo", "referencia_id"])
   })
 });
 
@@ -212,6 +237,7 @@ const TERRAIN_SERVICE_TYPE_VALUES = new Set(TERRAIN_SERVICE_TYPE_OPTIONS.map((it
 const TERRAIN_SERVICE_STATUS_VALUES = new Set(TERRAIN_SERVICE_STATUS_OPTIONS.map((item) => item.value));
 const TERRAIN_PAYMENT_METHOD_VALUES = new Set(TERRAIN_PAYMENT_METHOD_OPTIONS.map((item) => item.value));
 const TERRAIN_PAYMENT_STATUS_VALUES = new Set(TERRAIN_PAYMENT_STATUS_OPTIONS.map((item) => item.value));
+const TERRAIN_TIMELINE_TYPE_VALUES = new Set(TERRAIN_TIMELINE_TYPE_OPTIONS.map((item) => item.value));
 
 export function normalizeTerrainOwnerInput(input = {}) {
   const value = (key) => String(input[key] ?? "").trim();
@@ -1179,4 +1205,63 @@ export function buildTerrainServicePhotoRecord(input = {}, { id, timestamp = Dat
 export function terrainServicePhotoRecords(records = {}, serviceId = "", type = "") {
   const list = Array.isArray(records) ? records : Object.entries(records || {}).map(([id, item]) => ({ id, ...(item || {}) }));
   return list.filter((photo) => photo?.id && (!serviceId || photo.service_id === serviceId) && (!type || photo.tipo === type));
+}
+
+function terrainTimelineKeyPart(value, fallback = "registro") {
+  const normalized = String(value || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+  return normalized || fallback;
+}
+
+export function terrainTimelineEventId(terrainId, type, referenceId = "", qualifier = "") {
+  if (!terrainId || !TERRAIN_TIMELINE_TYPE_VALUES.has(String(type || ""))) {
+    throw new Error("Terreno ou tipo inválido para a timeline.");
+  }
+  return [
+    terrainTimelineKeyPart(terrainId, "terreno"),
+    terrainTimelineKeyPart(type, "evento"),
+    terrainTimelineKeyPart(referenceId, "terreno"),
+    qualifier ? terrainTimelineKeyPart(qualifier, "ocorrencia") : ""
+  ].filter(Boolean).join("__").slice(0, 240);
+}
+
+export function buildTerrainTimelineEvent(input = {}, { id, timestamp = Date.now() } = {}) {
+  const terrainId = String(input.terrain_id || "").trim();
+  const type = String(input.tipo || "").trim();
+  const description = String(input.descricao || "").trim();
+  const date = String(input.data || "").trim();
+  const time = String(input.hora || "").trim().slice(0, 5);
+  if (!id || !terrainId || !description || !TERRAIN_TIMELINE_TYPE_VALUES.has(type)) {
+    throw new Error("Dados incompletos do evento da timeline.");
+  }
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) {
+    throw new Error("Data ou hora inválida na timeline.");
+  }
+  return {
+    id,
+    terrain_id: terrainId,
+    data: date,
+    hora: time,
+    tipo: type,
+    descricao: description,
+    referencia_tipo: String(input.referencia_tipo || "").trim() || null,
+    referencia_id: String(input.referencia_id || "").trim() || null,
+    created_at: timestamp,
+    updated_at: timestamp
+  };
+}
+
+export function terrainTimelineRecords(records = {}, terrainId = "") {
+  const list = Array.isArray(records)
+    ? records
+    : Object.entries(records || {}).map(([id, item]) => ({ id, ...(item || {}) }));
+  return list.filter((item) => item?.id && (!terrainId || item.terrain_id === terrainId)).sort((a, b) => {
+    const byMoment = `${b.data || ""}T${b.hora || ""}`.localeCompare(`${a.data || ""}T${a.hora || ""}`);
+    return byMoment || Number(b.created_at || 0) - Number(a.created_at || 0) || String(b.id).localeCompare(String(a.id));
+  });
+}
+
+export function terrainTimelineTypeMeta(type) {
+  return TERRAIN_TIMELINE_TYPE_OPTIONS.find((item) => item.value === type)
+    || Object.freeze({ value: type || "status_changed", label: "Atualização", icon: "fa-clock-rotate-left", tone: "status" });
 }

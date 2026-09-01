@@ -1,0 +1,25 @@
+{
+  "version": "2026-09-01_v5",
+  "operation": "add_terrain_timeline",
+  "recreates_existing_data": false,
+  "new_paths": {
+    "terrenosTimeline": {
+      "primary_key": "id",
+      "relation": "terrain_id -> terrenos/id",
+      "indexes": ["terrain_id", "data", "tipo"],
+      "fields": [
+        "id",
+        "terrain_id",
+        "data",
+        "hora",
+        "tipo",
+        "descricao",
+        "referencia_tipo",
+        "referencia_id",
+        "created_at",
+        "updated_at"
+      ]
+    }
+  },
+  "deduplication": "deterministic event ids by terrain, type, reference and occurrence qualifier"
+}

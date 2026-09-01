@@ -41,6 +41,7 @@ import {
   buildTerrainReminderSchedule,
   buildTerrainServiceRecord,
   buildTerrainServicePhotoRecord,
+  buildTerrainTimelineEvent,
   buildTerrainInspectionRecord,
   buildTerrainPhotoRecord,
   buildTerrainRecord,
@@ -85,6 +86,9 @@ import {
   terrainServiceRecords,
   terrainServiceStatusMeta,
   terrainServiceTypeLabel,
+  terrainTimelineEventId,
+  terrainTimelineRecords,
+  terrainTimelineTypeMeta,
   terrainGeneralPhotoStoragePath,
   terrainInspectionPhotoStoragePath,
   terrainInspectionRecords,
@@ -101,7 +105,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=11";
+} from "./gestao-terrenos-schema.js?v=12";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -116,10 +120,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 693,
-  label: "v700",
+  numero: 694,
+  label: "v701",
   data: "2026-09-01",
-  nota: "Oportunidades de novos servicos na Gestao de Terrenos."
+  nota: "Timeline completa no detalhe dos terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -266,7 +270,7 @@ let state = {
   combustiveisLinks: {},
   combustiveisHistorico: {},
   combustiveisBusca: [],
-  terrainManagement: { owners: {}, terrains: {}, developments: {}, photos: {}, inspections: {}, budgets: {}, services: {}, servicePhotos: {} },
+  terrainManagement: { owners: {}, terrains: {}, developments: {}, photos: {}, inspections: {}, budgets: {}, services: {}, servicePhotos: {}, timeline: {} },
   sobreNos: {},
   xadrezConfig: {},
   beneficios: [],
@@ -2837,6 +2841,7 @@ async function loadAllData(onProgress = null) {
     terrainBudgetsSnap,
     terrainServicesSnap,
     terrainServicePhotosSnap,
+    terrainTimelineSnap,
     novidadesConfigSnap,
     sobreNosSnap,
     xadrezConfigSnap,
@@ -2878,6 +2883,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.budgets.path, { enabled: isMaster() }),
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.services.path, { enabled: isMaster() }),
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path, { enabled: isMaster() }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.timeline.path, { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -2973,8 +2979,10 @@ async function loadAllData(onProgress = null) {
     inspections: terrainInspectionsSnap.exists() ? terrainInspectionsSnap.val() : {},
     budgets: terrainBudgetsSnap.exists() ? terrainBudgetsSnap.val() : {},
     services: terrainServicesSnap.exists() ? terrainServicesSnap.val() : {},
-    servicePhotos: terrainServicePhotosSnap.exists() ? terrainServicePhotosSnap.val() : {}
+    servicePhotos: terrainServicePhotosSnap.exists() ? terrainServicePhotosSnap.val() : {},
+    timeline: terrainTimelineSnap.exists() ? terrainTimelineSnap.val() : {}
   };
+  await syncTerrainTimelineBaselines();
   await syncTerrainReminderStatuses();
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
@@ -3236,6 +3244,107 @@ function terrainRecordCount(records) {
   return records && typeof records === "object" ? Object.keys(records).length : 0;
 }
 
+function terrainTimelineMoment(date = new Date()) {
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString();
+  return { data: local.slice(0, 10), hora: local.slice(11, 16) };
+}
+
+function addTerrainTimelineUpdate(updates, {
+  terrainId, type, description, referenceType = "", referenceId = "", qualifier = "", data = "", hora = ""
+}) {
+  const moment = terrainTimelineMoment();
+  const eventId = terrainTimelineEventId(terrainId, type, referenceId, qualifier);
+  const record = buildTerrainTimelineEvent({
+    terrain_id: terrainId,
+    data: data || moment.data,
+    hora: hora || moment.hora,
+    tipo: type,
+    descricao: description,
+    referencia_tipo: referenceType,
+    referencia_id: referenceId
+  }, { id: eventId, timestamp: serverTimestamp() });
+  updates[`${TERRAIN_MANAGEMENT_ENTITIES.timeline.path}/${eventId}`] = record;
+  return record;
+}
+
+async function refreshTerrainTimeline(terrainId) {
+  const snapshot = await get(query(
+    ref(db, TERRAIN_MANAGEMENT_ENTITIES.timeline.path),
+    orderByChild("terrain_id"),
+    equalTo(terrainId)
+  ));
+  Object.entries(state.terrainManagement.timeline || {}).forEach(([id, item]) => {
+    if (item?.terrain_id === terrainId) delete state.terrainManagement.timeline[id];
+  });
+  if (snapshot.exists()) Object.assign(state.terrainManagement.timeline, snapshot.val() || {});
+}
+
+function terrainTimelineReferenceLabel(event) {
+  if (!event.referencia_id) return "";
+  const references = {
+    terreno: () => terrainById(event.referencia_id)?.apelido,
+    proprietario: () => terrainOwnerById(event.referencia_id)?.nome,
+    vistoria: () => {
+      const inspection = state.terrainManagement?.inspections?.[event.referencia_id];
+      return inspection ? terrainBudgetDateLabel(inspection.data) : "";
+    },
+    foto: () => {
+      const photo = state.terrainManagement?.photos?.[event.referencia_id];
+      return photo ? terrainPhotoCategoryLabel(photo.categoria) : "";
+    },
+    orcamento: () => terrainBudgetById(event.referencia_id)?.numero,
+    servico: () => terrainServiceById(event.referencia_id) ? terrainServiceTypeLabel(terrainServiceById(event.referencia_id).tipo_servico) : "",
+    pagamento: () => terrainServiceById(event.referencia_id) ? terrainServiceTypeLabel(terrainServiceById(event.referencia_id).tipo_servico) : "",
+    lembrete: () => terrainServiceById(event.referencia_id) ? terrainServiceTypeLabel(terrainServiceById(event.referencia_id).tipo_servico) : "",
+    contato: () => terrainOwnerById(event.referencia_id)?.nome
+  };
+  const labels = {
+    terreno: "Terreno", proprietario: "Proprietário", vistoria: "Vistoria",
+    foto: "Foto", orcamento: "Orçamento", servico: "Serviço", pagamento: "Pagamento",
+    lembrete: "Lembrete", contato: "Contato"
+  };
+  const resolved = references[event.referencia_tipo]?.() || event.referencia_id;
+  return `${labels[event.referencia_tipo] || "Registro"}: ${resolved}`;
+}
+
+function terrainTimelineHtml(terrainId) {
+  const events = terrainTimelineRecords(state.terrainManagement?.timeline || {}, terrainId);
+  if (!events.length) return `<div class="terrain-timeline-empty"><i class="fa-solid fa-clock-rotate-left"></i><strong>Nenhum evento registrado</strong><span>As próximas ações neste terreno aparecerão aqui.</span></div>`;
+  return `<div class="terrain-timeline">${events.map((event) => {
+    const meta = terrainTimelineTypeMeta(event.tipo);
+    const reference = terrainTimelineReferenceLabel(event);
+    return `<article class="terrain-timeline-item terrain-timeline-${escapeAttr(meta.tone)}">
+      <div class="terrain-timeline-icon"><i class="fa-solid ${escapeAttr(meta.icon)}"></i></div>
+      <div class="terrain-timeline-body"><div class="terrain-timeline-head"><strong>${escapeHtml(meta.label)}</strong><time datetime="${escapeAttr(`${event.data}T${event.hora}`)}">${escapeHtml(terrainBudgetDateLabel(event.data))} às ${escapeHtml(event.hora)}</time></div>
+      <p>${escapeHtml(event.descricao)}</p>${reference ? `<small>${escapeHtml(reference)}</small>` : ""}</div>
+    </article>`;
+  }).join("")}</div>`;
+}
+
+async function syncTerrainTimelineBaselines() {
+  if (!isMaster()) return;
+  const updates = {};
+  const terrainIds = [];
+  Object.entries(state.terrainManagement?.terrains || {}).forEach(([terrainId, terrain]) => {
+    const eventId = terrainTimelineEventId(terrainId, "terrain_created", terrainId);
+    if (state.terrainManagement?.timeline?.[eventId]) return;
+    const createdDate = Number(terrain.created_at || 0) > 0 ? new Date(Number(terrain.created_at)) : new Date();
+    const moment = terrainTimelineMoment(createdDate);
+    addTerrainTimelineUpdate(updates, {
+      terrainId, type: "terrain_created", description: `Terreno ${terrain.apelido || terrainId} criado.`,
+      referenceType: "terreno", referenceId: terrainId, data: moment.data, hora: moment.hora
+    });
+    terrainIds.push(terrainId);
+  });
+  if (!terrainIds.length) return;
+  try {
+    await firebaseUpdate(ref(db), updates);
+    await Promise.all(terrainIds.map(refreshTerrainTimeline));
+  } catch (error) {
+    console.warn("Não foi possível preparar o histórico inicial dos terrenos.", error);
+  }
+}
+
 async function syncTerrainReminderStatuses() {
   if (!isMaster()) return;
   const terrains = state.terrainManagement?.terrains || {};
@@ -3248,12 +3357,18 @@ async function syncTerrainReminderStatuses() {
     if (nextStatus === terrain.status) return;
     updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/status`] = nextStatus;
     updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`] = serverTimestamp();
+    addTerrainTimelineUpdate(updates, {
+      terrainId, type: "status_changed",
+      description: `Status alterado automaticamente de ${terrainStatusMeta(terrain.status).label} para ${terrainStatusMeta(nextStatus).label}.`,
+      referenceType: "lembrete", referenceId: terrainId, qualifier: `${today}-${nextStatus}`
+    });
     changedStatuses.push([terrainId, nextStatus]);
   });
   if (!Object.keys(updates).length) return;
   try {
     await firebaseUpdate(ref(db), updates);
     changedStatuses.forEach(([terrainId, status]) => { terrains[terrainId].status = status; });
+    await Promise.all(changedStatuses.map(([terrainId]) => refreshTerrainTimeline(terrainId)));
   } catch (error) {
     console.warn("Não foi possível sincronizar os status dos lembretes.", error);
   }
@@ -3933,6 +4048,10 @@ function openTerrainDetail(terrainId) {
     <section class="terrain-inspection-history-section">
       <div class="terrain-detail-section-head"><div><span>Histórico</span><h3>Vistorias</h3></div><button type="button" class="ghost-button" data-terrain-new-inspection="${escapeAttr(terrain.id)}"><i class="fa-solid fa-plus"></i> Nova vistoria</button></div>
       ${terrainInspectionHistoryHtml(terrain.id)}
+    </section>
+    <section class="terrain-timeline-section">
+      <div class="terrain-detail-section-head"><div><span>Histórico completo</span><h3>Timeline do terreno</h3></div></div>
+      ${terrainTimelineHtml(terrain.id)}
     </section>`;
   const modal = $("terrainDetailModal");
   modal?.classList.remove("hidden");
@@ -3958,9 +4077,15 @@ async function uploadTerrainDetailGeneralPhotos(terrainId) {
     uploaded.forEach((item) => {
       updates[`${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${item.id}`] = item.record;
     });
+    addTerrainTimelineUpdate(updates, {
+      terrainId, type: "photo_added",
+      description: `${uploaded.length} ${uploaded.length === 1 ? "foto adicionada" : "fotos adicionadas"} à galeria do terreno.`,
+      referenceType: "foto", referenceId: uploaded[0]?.id || terrainId,
+      qualifier: uploaded[0]?.id || String(Date.now())
+    });
     await firebaseUpdate(ref(db), updates);
     databaseSaved = true;
-    await refreshTerrainPhotos(terrainId);
+    await Promise.all([refreshTerrainPhotos(terrainId), refreshTerrainTimeline(terrainId)]);
     openTerrainDetail(terrainId);
     renderTerrainList();
     showToast(`${uploaded.length} ${uploaded.length === 1 ? "foto adicionada" : "fotos adicionadas"}.`, { prominent: true });
@@ -4106,7 +4231,7 @@ async function saveTerrainInspection(event) {
       fotos: photos
     }, { id: inspectionId, timestamp: serverTimestamp() });
     const nextStatus = terrainStatusAfterInspection(terrain.status, inspection);
-    await firebaseUpdate(ref(db), {
+    const updates = {
       [`${TERRAIN_MANAGEMENT_ENTITIES.inspections.path}/${inspectionId}`]: inspection,
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/status`]: nextStatus,
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/altura_mato`]: inspection.altura_mato,
@@ -4115,9 +4240,28 @@ async function saveTerrainInspection(event) {
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/proxima_vistoria_personalizada`]: null,
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/lembrete_verificado_em`]: inspection.data,
       [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`]: serverTimestamp()
+    };
+    addTerrainTimelineUpdate(updates, {
+      terrainId, type: "inspection_completed",
+      description: `Vistoria realizada por ${responsible.name}. ${inspection.precisa_limpeza ? "Foi indicada necessidade de limpeza." : "Não foi indicada necessidade de limpeza."}`,
+      referenceType: "vistoria", referenceId: inspectionId,
+      data: inspection.data, hora: inspection.hora
     });
+    if (uploaded.length) addTerrainTimelineUpdate(updates, {
+      terrainId, type: "photo_added",
+      description: `${uploaded.length} ${uploaded.length === 1 ? "foto adicionada" : "fotos adicionadas"} na vistoria.`,
+      referenceType: "vistoria", referenceId: inspectionId, qualifier: "fotos",
+      data: inspection.data, hora: inspection.hora
+    });
+    if (nextStatus !== terrain.status) addTerrainTimelineUpdate(updates, {
+      terrainId, type: "status_changed",
+      description: `Status alterado de ${terrainStatusMeta(terrain.status).label} para ${terrainStatusMeta(nextStatus).label} após a vistoria.`,
+      referenceType: "vistoria", referenceId: inspectionId, qualifier: nextStatus,
+      data: inspection.data, hora: inspection.hora
+    });
+    await firebaseUpdate(ref(db), updates);
     databaseSaved = true;
-    await Promise.all([refreshTerrainRecord(terrainId), refreshTerrainInspections(terrainId)]);
+    await Promise.all([refreshTerrainRecord(terrainId), refreshTerrainInspections(terrainId), refreshTerrainTimeline(terrainId)]);
     closeTerrainInspectionForm();
     openTerrainDetail(terrainId);
     renderTerrainList();
@@ -4166,10 +4310,41 @@ async function saveTerrain(event) {
     uploaded.forEach((item) => {
       updates[`${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${item.id}`] = item.record;
     });
+    const operationKey = String(Date.now());
+    if (!existing) addTerrainTimelineUpdate(updates, {
+      terrainId, type: "terrain_created", description: `Terreno ${payload.apelido} criado.`,
+      referenceType: "terreno", referenceId: terrainId
+    });
+    if ((existing?.owner_id || "") !== (payload.owner_id || "")) {
+      const previousOwner = existing?.owner_id ? terrainOwnerById(existing.owner_id)?.nome : "";
+      const nextOwner = payload.owner_id ? terrainOwnerById(payload.owner_id)?.nome : "";
+      const type = !existing?.owner_id && payload.owner_id ? "owner_linked" : "owner_changed";
+      const description = type === "owner_linked"
+        ? `Proprietário ${nextOwner || payload.owner_id} vinculado ao terreno.`
+        : (payload.owner_id
+          ? `Proprietário alterado de ${previousOwner || "não informado"} para ${nextOwner || payload.owner_id}.`
+          : `Proprietário ${previousOwner || "anterior"} removido do terreno.`);
+      addTerrainTimelineUpdate(updates, {
+        terrainId, type, description, referenceType: "proprietario",
+        referenceId: payload.owner_id || existing.owner_id, qualifier: operationKey
+      });
+    }
+    if (existing && existing.status !== payload.status) addTerrainTimelineUpdate(updates, {
+      terrainId, type: "status_changed",
+      description: `Status alterado de ${terrainStatusMeta(existing.status).label} para ${terrainStatusMeta(payload.status).label}.`,
+      referenceType: "terreno", referenceId: terrainId, qualifier: `${operationKey}-${payload.status}`
+    });
+    if (uploaded.length) addTerrainTimelineUpdate(updates, {
+      terrainId, type: "photo_added",
+      description: `${uploaded.length} ${uploaded.length === 1 ? "foto adicionada" : "fotos adicionadas"} no cadastro do terreno.`,
+      referenceType: "foto", referenceId: uploaded[0].id, qualifier: uploaded[0].id
+    });
     await firebaseUpdate(ref(db), updates);
     databaseSaved = true;
-    await refreshTerrainRecord(terrainId);
-    if (uploaded.length) await refreshTerrainPhotos(terrainId);
+    await Promise.all([
+      refreshTerrainRecord(terrainId), refreshTerrainTimeline(terrainId),
+      ...(uploaded.length ? [refreshTerrainPhotos(terrainId)] : [])
+    ]);
     renderTerrainManagement();
     resetTerrainForm();
     showToast(existing ? "Terreno atualizado com sucesso." : "Terreno criado com sucesso.", { prominent: true });
@@ -4185,11 +4360,17 @@ async function inactivateTerrain(terrainId) {
   if (!terrain || terrain.status === "inativo") return;
   if (!window.confirm(`Inativar o terreno ${terrain.apelido}?`)) return;
   try {
-    await firebaseUpdate(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`), {
-      status: "inativo",
-      updated_at: serverTimestamp()
+    const updates = {
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/status`]: "inativo",
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`]: serverTimestamp()
+    };
+    addTerrainTimelineUpdate(updates, {
+      terrainId, type: "status_changed",
+      description: `Status alterado de ${terrainStatusMeta(terrain.status).label} para Inativo.`,
+      referenceType: "terreno", referenceId: terrainId, qualifier: `inativo-${Date.now()}`
     });
-    await refreshTerrainRecord(terrainId);
+    await firebaseUpdate(ref(db), updates);
+    await Promise.all([refreshTerrainRecord(terrainId), refreshTerrainTimeline(terrainId)]);
     renderTerrainManagement();
     showToast("Terreno inativado.");
   } catch (error) {
@@ -4210,7 +4391,12 @@ async function deleteTerrain(terrainId) {
   }
   if (!(await confirmarExclusao(terrain.apelido || terrainId, "terreno"))) return;
   try {
-    await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`));
+    const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`]: null };
+    terrainTimelineRecords(state.terrainManagement?.timeline || {}, terrainId).forEach((item) => {
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.timeline.path}/${item.id}`] = null;
+      delete state.terrainManagement.timeline[item.id];
+    });
+    await firebaseUpdate(ref(db), updates);
     delete state.terrainManagement.terrains[terrainId];
     if (state.selectedTerrainId === terrainId) resetTerrainForm();
     closeTerrainDetail();
@@ -4741,8 +4927,22 @@ async function saveTerrainBudget(event) {
       existing: existing || {},
       timestamp: serverTimestamp()
     });
-    await firebaseSet(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.budgets.path}/${budgetId}`), payload);
-    await refreshTerrainBudgetRecord(budgetId);
+    const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.budgets.path}/${budgetId}`]: payload };
+    if (!existing) addTerrainTimelineUpdate(updates, {
+      terrainId: terrain.id, type: "budget_created",
+      description: `Orçamento ${number} criado no valor de ${moneyBR(payload.valor)}.`,
+      referenceType: "orcamento", referenceId: budgetId
+    });
+    if (payload.status === "enviado" && existing?.status !== "enviado") addTerrainTimelineUpdate(updates, {
+      terrainId: terrain.id, type: "budget_sent", description: `Orçamento ${number} marcado como enviado.`,
+      referenceType: "orcamento", referenceId: budgetId
+    });
+    if (payload.status === "aprovado" && existing?.status !== "aprovado") addTerrainTimelineUpdate(updates, {
+      terrainId: terrain.id, type: "budget_approved", description: `Orçamento ${number} aprovado.`,
+      referenceType: "orcamento", referenceId: budgetId
+    });
+    await firebaseUpdate(ref(db), updates);
+    await Promise.all([refreshTerrainBudgetRecord(budgetId), refreshTerrainTimeline(terrain.id)]);
     renderTerrainManagement();
     resetTerrainBudgetForm();
     showToast(existing ? "Orçamento atualizado com sucesso." : `Orçamento ${number} criado com sucesso.`, { prominent: true });
@@ -4822,11 +5022,20 @@ async function updateTerrainBudgetStatus(budgetId, status) {
   const budget = terrainBudgetById(budgetId);
   if (!budget || budget.status === status) return;
   try {
-    await firebaseUpdate(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.budgets.path}/${budgetId}`), {
-      status,
-      updated_at: serverTimestamp()
+    const updates = {
+      [`${TERRAIN_MANAGEMENT_ENTITIES.budgets.path}/${budgetId}/status`]: status,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.budgets.path}/${budgetId}/updated_at`]: serverTimestamp()
+    };
+    if (status === "enviado") addTerrainTimelineUpdate(updates, {
+      terrainId: budget.terrain_id, type: "budget_sent", description: `Orçamento ${budget.numero} marcado como enviado.`,
+      referenceType: "orcamento", referenceId: budgetId
     });
-    await refreshTerrainBudgetRecord(budgetId);
+    if (status === "aprovado") addTerrainTimelineUpdate(updates, {
+      terrainId: budget.terrain_id, type: "budget_approved", description: `Orçamento ${budget.numero} aprovado.`,
+      referenceType: "orcamento", referenceId: budgetId
+    });
+    await firebaseUpdate(ref(db), updates);
+    await Promise.all([refreshTerrainBudgetRecord(budgetId), refreshTerrainTimeline(budget.terrain_id)]);
     renderTerrainBudgetList();
     showToast("Status do orçamento atualizado.");
   } catch (error) {
@@ -5014,7 +5223,30 @@ async function saveTerrainService(event) {
     const today = terrainBudgetLocalDate();
     const service = buildTerrainServiceRecord(terrainServiceFormValues(), { id, existing: existing || {}, timestamp: serverTimestamp(), today });
     const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.services.path}/${id}`]: service };
-    if (service.status === "concluido") {
+    const terrain = terrainById(service.terrain_id) || {};
+    const becameScheduled = service.status === "agendado" && existing?.status !== "agendado";
+    const becameCompleted = service.status === "concluido" && existing?.status !== "concluido";
+    const paymentIncreased = Number(service.valor_recebido || 0) > Number(existing?.valor_recebido || 0);
+    const paymentRecorded = paymentIncreased
+      || (Boolean(service.data_pagamento) && service.data_pagamento !== existing?.data_pagamento)
+      || (["parcial", "pago"].includes(service.status_pagamento) && service.status_pagamento !== existing?.status_pagamento);
+    if (becameScheduled) addTerrainTimelineUpdate(updates, {
+      terrainId: service.terrain_id, type: "service_scheduled",
+      description: `${terrainServiceTypeLabel(service.tipo_servico)} agendado para ${terrainBudgetDateLabel(service.data_prevista)} às ${service.horario}.`,
+      referenceType: "servico", referenceId: id
+    });
+    if (becameCompleted) addTerrainTimelineUpdate(updates, {
+      terrainId: service.terrain_id, type: "service_completed",
+      description: `${terrainServiceTypeLabel(service.tipo_servico)} concluído em ${terrainBudgetDateLabel(service.data_realizada || today)}.`,
+      referenceType: "servico", referenceId: id
+    });
+    if (paymentRecorded) addTerrainTimelineUpdate(updates, {
+      terrainId: service.terrain_id, type: "payment_recorded",
+      description: `Pagamento atualizado para ${moneyBR(service.valor_recebido)} recebido, com saldo de ${moneyBR(service.saldo)}.`,
+      referenceType: "pagamento", referenceId: id,
+      qualifier: `${Math.round(Number(service.valor_recebido || 0) * 100)}-${service.data_pagamento || "sem-data"}-${service.status_pagamento}`
+    });
+    if (becameCompleted) {
       const reminder = buildTerrainReminderSchedule(
         service.data_realizada || today,
         $("terrainServiceReminderInterval").value,
@@ -5025,12 +5257,36 @@ async function saveTerrainService(event) {
         updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/${key}`] = value;
       });
       updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/updated_at`] = serverTimestamp();
+      addTerrainTimelineUpdate(updates, {
+        terrainId: service.terrain_id, type: "reminder_created",
+        description: `Nova vistoria programada para ${terrainBudgetDateLabel(reminder.proxima_vistoria_em)}.`,
+        referenceType: "lembrete", referenceId: id
+      });
+      if (terrain.status !== "limpo") addTerrainTimelineUpdate(updates, {
+        terrainId: service.terrain_id, type: "status_changed",
+        description: `Status alterado de ${terrainStatusMeta(terrain.status).label} para Limpo após a conclusão do serviço.`,
+        referenceType: "servico", referenceId: id, qualifier: "limpo"
+      });
     }
     await firebaseUpdate(ref(db), updates);
     state.terrainManagement.services[id] = service;
-    await uploadTerrainServicePhotos(service, "antes", $("terrainServiceBeforeFiles").files || []);
-    await uploadTerrainServicePhotos(service, "depois", $("terrainServiceAfterFiles").files || []);
-    if (service.status === "concluido") await refreshTerrainRecord(service.terrain_id);
+    const beforePhotos = await uploadTerrainServicePhotos(service, "antes", $("terrainServiceBeforeFiles").files || []);
+    const afterPhotos = await uploadTerrainServicePhotos(service, "depois", $("terrainServiceAfterFiles").files || []);
+    if (beforePhotos.length || afterPhotos.length) {
+      const photoUpdates = {};
+      const total = beforePhotos.length + afterPhotos.length;
+      const firstPhoto = beforePhotos[0] || afterPhotos[0];
+      addTerrainTimelineUpdate(photoUpdates, {
+        terrainId: service.terrain_id, type: "photo_added",
+        description: `${total} ${total === 1 ? "foto adicionada" : "fotos adicionadas"} ao serviço (antes/depois).`,
+        referenceType: "servico", referenceId: id, qualifier: firstPhoto.id
+      });
+      await firebaseUpdate(ref(db), photoUpdates);
+    }
+    await Promise.all([
+      refreshTerrainTimeline(service.terrain_id),
+      ...(becameCompleted ? [refreshTerrainRecord(service.terrain_id)] : [])
+    ]);
     resetTerrainServiceForm();
     renderTerrainManagement();
     showToast(service.status === "concluido" ? "Serviço concluído, terreno atualizado e nova vistoria agendada." : "Serviço salvo com sucesso.", { prominent: true });
@@ -5233,22 +5489,29 @@ function renderTerrainOpportunities() {
         ${mapsUrl ? `<a class="terrain-owner-icon-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir Maps" aria-label="Abrir Maps"><i class="fa-solid fa-map-location-dot"></i></a>` : `<button type="button" class="terrain-owner-icon-button" disabled title="Localização não cadastrada"><i class="fa-solid fa-map-location-dot"></i></button>`}
         <button type="button" class="terrain-owner-icon-button" data-opportunity-inspection="${escapeAttr(opportunity.terrain_id)}" data-no-loading title="Nova vistoria" aria-label="Nova vistoria"><i class="fa-solid fa-clipboard-check"></i></button>
         <button type="button" class="terrain-owner-icon-button" data-opportunity-budget="${escapeAttr(opportunity.terrain_id)}" data-no-loading ${opportunity.owner_id ? "" : "disabled"} title="${opportunity.owner_id ? "Novo orçamento" : "Vincule um proprietário antes"}" aria-label="Novo orçamento"><i class="fa-solid fa-file-invoice-dollar"></i></button>
-        <button type="button" class="terrain-owner-icon-button success" data-opportunity-contact="${escapeAttr(opportunity.owner_id)}" data-no-loading ${opportunity.owner_id ? "" : "disabled"} title="Marcar contato realizado" aria-label="Marcar contato realizado"><i class="fa-solid fa-phone-volume"></i></button>
+        <button type="button" class="terrain-owner-icon-button success" data-opportunity-contact="${escapeAttr(opportunity.owner_id)}" data-opportunity-contact-terrain="${escapeAttr(opportunity.terrain_id)}" data-no-loading ${opportunity.owner_id ? "" : "disabled"} title="Marcar contato realizado" aria-label="Marcar contato realizado"><i class="fa-solid fa-phone-volume"></i></button>
         <button type="button" class="terrain-owner-icon-button warning" data-opportunity-not-needed="${escapeAttr(opportunity.terrain_id)}" data-no-loading title="Marcar como não precisa ainda" aria-label="Marcar como não precisa ainda"><i class="fa-solid fa-clock"></i></button>
       </div>
     </article>`;
   }).join("");
 }
 
-async function markTerrainOpportunityContact(ownerId) {
+async function markTerrainOpportunityContact(ownerId, terrainId) {
   if (!ownerId || !terrainOwnerById(ownerId)) return showToast("Proprietário não encontrado.");
+  if (!terrainId || !terrainById(terrainId)) return showToast("Terreno não encontrado.");
   const update = buildTerrainOpportunityActionUpdate("contact", { today: terrainBudgetLocalDate() });
   try {
-    await firebaseUpdate(ref(db), {
+    const updates = {
       [`${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}/ultimo_contato_em`]: update.ultimo_contato_em,
       [`${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}/updated_at`]: serverTimestamp()
+    };
+    addTerrainTimelineUpdate(updates, {
+      terrainId, type: "contact_recorded",
+      description: `Contato realizado com ${terrainOwnerById(ownerId)?.nome || "o proprietário"}.`,
+      referenceType: "contato", referenceId: ownerId, qualifier: update.ultimo_contato_em
     });
-    await refreshTerrainOwnerRecord(ownerId);
+    await firebaseUpdate(ref(db), updates);
+    await Promise.all([refreshTerrainOwnerRecord(ownerId), refreshTerrainTimeline(terrainId)]);
     renderTerrainManagement();
     showToast("Contato registrado para o proprietário.", { prominent: true });
   } catch (error) {
@@ -25633,7 +25896,7 @@ function bindEvents() {
     const budgetButton = event.target.closest("[data-opportunity-budget]");
     if (budgetButton) return openTerrainBudgetForm("", { terrainId: budgetButton.dataset.opportunityBudget });
     const contactButton = event.target.closest("[data-opportunity-contact]");
-    if (contactButton) return markTerrainOpportunityContact(contactButton.dataset.opportunityContact);
+    if (contactButton) return markTerrainOpportunityContact(contactButton.dataset.opportunityContact, contactButton.dataset.opportunityContactTerrain);
     const notNeededButton = event.target.closest("[data-opportunity-not-needed]");
     if (notNeededButton) return markTerrainOpportunityNotNeeded(notNeededButton.dataset.opportunityNotNeeded);
   });

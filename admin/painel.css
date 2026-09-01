@@ -11385,3 +11385,115 @@ button.admin-button-loading::after {
     grid-template-columns: 1fr;
   }
 }
+.terrain-timeline-section {
+  margin-top: 24px;
+  border-top: 1px solid #dbe4df;
+  padding-top: 22px;
+}
+
+.terrain-timeline {
+  position: relative;
+  display: grid;
+  gap: 0;
+  margin-top: 14px;
+}
+
+.terrain-timeline::before {
+  content: "";
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  left: 21px;
+  width: 2px;
+  background: #d5dfda;
+}
+
+.terrain-timeline-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 14px;
+  padding: 8px 0 18px;
+}
+
+.terrain-timeline-icon {
+  z-index: 1;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid #cbd8d1;
+  border-radius: 50%;
+  background: #fff;
+  color: #285d46;
+}
+
+.terrain-timeline-approved .terrain-timeline-icon,
+.terrain-timeline-completed .terrain-timeline-icon,
+.terrain-timeline-payment .terrain-timeline-icon {
+  border-color: #a9d7bd;
+  background: #edf9f1;
+  color: #18733f;
+}
+
+.terrain-timeline-reminder .terrain-timeline-icon,
+.terrain-timeline-status .terrain-timeline-icon {
+  border-color: #e5cf91;
+  background: #fff9e8;
+  color: #8a6500;
+}
+
+.terrain-timeline-body {
+  min-width: 0;
+  padding: 4px 0;
+}
+
+.terrain-timeline-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.terrain-timeline-head strong {
+  color: #20382d;
+  font-size: .94rem;
+}
+
+.terrain-timeline-head time,
+.terrain-timeline-body small {
+  color: #66756e;
+  font-size: .78rem;
+}
+
+.terrain-timeline-body p {
+  margin: 5px 0 4px;
+  color: #384a42;
+  line-height: 1.45;
+}
+
+.terrain-timeline-body small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.terrain-timeline-empty {
+  display: grid;
+  justify-items: center;
+  gap: 7px;
+  padding: 30px 16px;
+  color: #66756e;
+  text-align: center;
+}
+
+.terrain-timeline-empty i {
+  font-size: 1.5rem;
+  color: #5b806f;
+}
+
+@media (max-width: 640px) {
+  .terrain-timeline::before { left: 17px; }
+  .terrain-timeline-item { grid-template-columns: 36px minmax(0, 1fr); gap: 10px; }
+  .terrain-timeline-icon { width: 36px; height: 36px; }
+  .terrain-timeline-head { align-items: flex-start; flex-direction: column; gap: 2px; }
+}
