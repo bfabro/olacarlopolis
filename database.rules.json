@@ -79,6 +79,24 @@
       }
     },
 
+    "terrenosServicos": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".indexOn": ["owner_id", "terrain_id", "budget_id", "status", "data_prevista"],
+      "$serviceId": {
+        ".validate": "!newData.exists() || (newData.hasChildren(['id','owner_id','terrain_id','data_prevista','horario','area_m2','tipo_servico','equipamentos','responsaveis','tempo_gasto','valor_cobrado','custo','lucro_estimado','forma_pagamento','status_pagamento','status','observacoes','created_at','updated_at']) && newData.child('id').val() === $serviceId && root.child('terrenosProprietarios').child(newData.child('owner_id').val()).exists() && root.child('terrenos').child(newData.child('terrain_id').val()).exists() && (!newData.child('budget_id').exists() || root.child('terrenosOrcamentos').child(newData.child('budget_id').val()).exists()) && newData.child('area_m2').isNumber() && newData.child('valor_cobrado').isNumber() && newData.child('custo').isNumber() && newData.child('lucro_estimado').isNumber() && (newData.child('status').val() === 'aguardando' || newData.child('status').val() === 'agendado' || newData.child('status').val() === 'em_andamento' || newData.child('status').val() === 'concluido' || newData.child('status').val() === 'cancelado') && (newData.child('status_pagamento').val() === 'pendente' || newData.child('status_pagamento').val() === 'parcial' || newData.child('status_pagamento').val() === 'pago') && (!newData.child('data_realizada').exists() || newData.child('data_realizada').isString()) && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())"
+      }
+    },
+
+    "terrenosServicosFotos": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".indexOn": ["service_id", "terrain_id", "tipo"],
+      "$photoId": {
+        ".validate": "!newData.exists() || (newData.hasChildren(['id','service_id','terrain_id','tipo','url','path','created_at','updated_at']) && newData.child('id').val() === $photoId && root.child('terrenosServicos').child(newData.child('service_id').val()).exists() && (newData.child('tipo').val() === 'antes' || newData.child('tipo').val() === 'depois') && newData.child('url').isString() && newData.child('path').isString() && newData.child('created_at').isNumber() && newData.child('updated_at').isNumber())"
+      }
+    },
+
     "terrenosConfiguracoes": {
       ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
       ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",

@@ -1,0 +1,9 @@
+{
+  "version": "2026-09-01_v1",
+  "operation": "create_services_and_before_after_photos",
+  "recreates_existing_data": false,
+  "entities": {
+    "terrenosServicos": {"relations": ["owner_id", "terrain_id", "budget_id opcional"]},
+    "terrenosServicosFotos": {"types": ["antes", "depois"]}
+  }
+}

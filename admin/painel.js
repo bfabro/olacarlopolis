@@ -38,6 +38,8 @@ import {
 import {
   buildTerrainDevelopmentRecord,
   buildTerrainBudgetRecord,
+  buildTerrainServiceRecord,
+  buildTerrainServicePhotoRecord,
   buildTerrainInspectionRecord,
   buildTerrainPhotoRecord,
   buildTerrainRecord,
@@ -68,6 +70,12 @@ import {
   terrainBudgetRecords,
   terrainBudgetStatusMeta,
   terrainBudgetWhatsappUrl,
+  terrainServiceInputFromBudget,
+  terrainServicePhotoRecords,
+  terrainServicePhotoStoragePath,
+  terrainServiceRecords,
+  terrainServiceStatusMeta,
+  terrainServiceTypeLabel,
   terrainGeneralPhotoStoragePath,
   terrainInspectionPhotoStoragePath,
   terrainInspectionRecords,
@@ -81,7 +89,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=7";
+} from "./gestao-terrenos-schema.js?v=8";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -96,10 +104,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 689,
-  label: "v696",
-  data: "2026-08-31",
-  nota: "Orcamentos na Gestao de Terrenos."
+  numero: 690,
+  label: "v697",
+  data: "2026-09-01",
+  nota: "Servicos e fotos antes/depois na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -246,7 +254,7 @@ let state = {
   combustiveisLinks: {},
   combustiveisHistorico: {},
   combustiveisBusca: [],
-  terrainManagement: { owners: {}, terrains: {}, developments: {}, photos: {}, inspections: {}, budgets: {} },
+  terrainManagement: { owners: {}, terrains: {}, developments: {}, photos: {}, inspections: {}, budgets: {}, services: {}, servicePhotos: {} },
   sobreNos: {},
   xadrezConfig: {},
   beneficios: [],
@@ -284,6 +292,7 @@ let state = {
   selectedTerrainId: null,
   selectedTerrainDevelopmentId: null,
   selectedTerrainBudgetId: null,
+  selectedTerrainServiceId: null,
   terrainDevelopmentPlanView: {
     scale: 1,
     x: 0,
@@ -2814,6 +2823,8 @@ async function loadAllData(onProgress = null) {
     terrainPhotosSnap,
     terrainInspectionsSnap,
     terrainBudgetsSnap,
+    terrainServicesSnap,
+    terrainServicePhotosSnap,
     novidadesConfigSnap,
     sobreNosSnap,
     xadrezConfigSnap,
@@ -2853,6 +2864,8 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.photos.path, { enabled: isMaster() }),
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.inspections.path, { enabled: isMaster() }),
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.budgets.path, { enabled: isMaster() }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.services.path, { enabled: isMaster() }),
+    getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path, { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -2946,7 +2959,9 @@ async function loadAllData(onProgress = null) {
     developments: terrainDevelopmentsSnap.exists() ? terrainDevelopmentsSnap.val() : {},
     photos: terrainPhotosSnap.exists() ? terrainPhotosSnap.val() : {},
     inspections: terrainInspectionsSnap.exists() ? terrainInspectionsSnap.val() : {},
-    budgets: terrainBudgetsSnap.exists() ? terrainBudgetsSnap.val() : {}
+    budgets: terrainBudgetsSnap.exists() ? terrainBudgetsSnap.val() : {},
+    services: terrainServicesSnap.exists() ? terrainServicesSnap.val() : {},
+    servicePhotos: terrainServicePhotosSnap.exists() ? terrainServicePhotosSnap.val() : {}
   };
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
@@ -3214,11 +3229,13 @@ function renderTerrainManagement() {
   if ($("terrainTerrainsCount")) $("terrainTerrainsCount").textContent = String(terrainRecordCount(terrainData.terrains));
   if ($("terrainDevelopmentsCount")) $("terrainDevelopmentsCount").textContent = String(terrainRecordCount(terrainData.developments));
   if ($("terrainBudgetsCount")) $("terrainBudgetsCount").textContent = String(terrainRecordCount(terrainData.budgets));
+  if ($("terrainServicesCount")) $("terrainServicesCount").textContent = String(terrainRecordCount(terrainData.services));
   $("gestaoTerrenosView")?.setAttribute("data-schema-version", TERRAIN_MANAGEMENT_SCHEMA_VERSION);
   renderTerrainOwnerList();
   renderTerrainList();
   renderTerrainDevelopmentList();
   renderTerrainBudgetList();
+  renderTerrainServiceList();
 }
 
 function terrainOwnerById(ownerId) {
@@ -3316,9 +3333,9 @@ function renderTerrainOwnerList() {
     const linkedCount = terrainOwnerLinkedTerrains(owner.id, terrains).length;
     const status = terrainOwnerStatusMeta(owner.status);
     const whatsappUrl = terrainOwnerWhatsappUrl(owner);
-    const hasBudgets = terrainBudgetRecords(state.terrainManagement?.budgets || {})
-      .some((budget) => budget.owner_id === owner.id);
-    const canDelete = canDeleteTerrainOwner(owner.id, terrains) && !hasBudgets;
+    const hasBudgets = terrainBudgetRecords(state.terrainManagement?.budgets || {}).some((budget) => budget.owner_id === owner.id);
+    const hasServices = terrainServiceRecords(state.terrainManagement?.services || {}).some((service) => service.owner_id === owner.id);
+    const canDelete = canDeleteTerrainOwner(owner.id, terrains) && !hasBudgets && !hasServices;
     return `
       <article class="terrain-owner-row" data-terrain-owner-id="${escapeAttr(owner.id)}">
         <div class="terrain-owner-primary" data-label="Proprietário">
@@ -3447,8 +3464,9 @@ async function deleteTerrainOwner(ownerId) {
   const owner = terrainOwnerById(ownerId);
   if (!owner) return;
   if (!canDeleteTerrainOwner(ownerId, state.terrainManagement?.terrains || {})
-    || terrainBudgetRecords(state.terrainManagement?.budgets || {}).some((budget) => budget.owner_id === ownerId)) {
-    showToast("Exclusão bloqueada: existem terrenos ou orçamentos vinculados.");
+    || terrainBudgetRecords(state.terrainManagement?.budgets || {}).some((budget) => budget.owner_id === ownerId)
+    || terrainServiceRecords(state.terrainManagement?.services || {}).some((service) => service.owner_id === ownerId)) {
+    showToast("Exclusão bloqueada: existem terrenos, orçamentos ou serviços vinculados.");
     return;
   }
   if (!(await confirmarExclusao(owner.nome || ownerId, "proprietário"))) return;
@@ -4139,8 +4157,9 @@ async function deleteTerrain(terrainId) {
   if (!terrain) return;
   if (terrainPhotoRecords(state.terrainManagement?.photos || {}, terrainId).length
     || terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrainId).length
-    || terrainBudgetRecords(state.terrainManagement?.budgets || {}).some((budget) => budget.terrain_id === terrainId)) {
-    showToast("Exclusão bloqueada: o terreno possui fotos, vistorias ou orçamentos.");
+    || terrainBudgetRecords(state.terrainManagement?.budgets || {}).some((budget) => budget.terrain_id === terrainId)
+    || terrainServiceRecords(state.terrainManagement?.services || {}).some((service) => service.terrain_id === terrainId)) {
+    showToast("Exclusão bloqueada: o terreno possui fotos, vistorias, orçamentos ou serviços.");
     return;
   }
   if (!(await confirmarExclusao(terrain.apelido || terrainId, "terreno"))) return;
@@ -4785,11 +4804,13 @@ function openTerrainBudgetDetail(budgetId) {
   const development = terrainDevelopmentById(budget.development_id || terrain.development_id) || {};
   const status = terrainBudgetStatusMeta(budget.status);
   const whatsappUrl = terrainBudgetWhatsappUrl(budget, owner, terrain);
+  const convertedService = terrainServiceRecords(state.terrainManagement?.services || {}).find((service) => service.budget_id === budget.id);
   $("terrainBudgetDetailTitle").textContent = budget.numero || "Detalhes";
   $("terrainBudgetDetailContent").innerHTML = `
     <div class="terrain-detail-actions">
       ${whatsappUrl ? `<a class="ghost-button terrain-budget-whatsapp-button" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> Enviar pelo WhatsApp</a>` : ""}
       <button type="button" class="ghost-button" data-terrain-budget-detail-edit="${escapeAttr(budget.id)}"><i class="fa-solid fa-pen"></i> Editar orçamento</button>
+      ${budget.status === "aprovado" ? `<button type="button" data-terrain-budget-convert="${escapeAttr(budget.id)}" ${convertedService ? "disabled" : ""}><i class="fa-solid fa-arrow-right-arrow-left"></i> ${convertedService ? "Serviço já criado" : "Transformar em serviço"}</button>` : ""}
     </div>
     <div class="terrain-owner-detail-grid">
       <div><span>Número</span><strong>${escapeHtml(budget.numero)}</strong></div>
@@ -4814,6 +4835,10 @@ function openTerrainBudgetDetail(budgetId) {
 async function deleteTerrainBudget(budgetId) {
   const budget = terrainBudgetById(budgetId);
   if (!budget) return;
+  if (terrainServiceRecords(state.terrainManagement?.services || {}).some((service) => service.budget_id === budgetId)) {
+    showToast("Exclusão bloqueada: este orçamento originou um serviço.");
+    return;
+  }
   if (!(await confirmarExclusao(budget.numero || budgetId, "orçamento"))) return;
   try {
     await firebaseRemove(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.budgets.path}/${budgetId}`));
@@ -4828,8 +4853,170 @@ async function deleteTerrainBudget(budgetId) {
   }
 }
 
+function terrainServiceById(id) {
+  return state.terrainManagement?.services?.[id] || null;
+}
+
+function renderTerrainServiceOptions(ownerId = "", terrainId = "") {
+  const owners = terrainOwnerRecords(state.terrainManagement?.owners || {});
+  const terrains = Object.values(state.terrainManagement?.terrains || {}).filter((terrain) => terrain?.owner_id && (!ownerId || terrain.owner_id === ownerId));
+  $("terrainServiceOwner").innerHTML = `<option value="">Selecione</option>${owners.map((owner) => `<option value="${escapeAttr(owner.id)}" ${owner.id === ownerId ? "selected" : ""}>${escapeHtml(owner.nome)}</option>`).join("")}`;
+  $("terrainServiceTerrain").innerHTML = `<option value="">Selecione</option>${terrains.map((terrain) => `<option value="${escapeAttr(terrain.id)}" ${terrain.id === terrainId ? "selected" : ""}>${escapeHtml(terrain.apelido)}</option>`).join("")}`;
+}
+
+function updateTerrainServiceProfit() {
+  const charged = Number($("terrainServiceCharged")?.value || 0);
+  const cost = Number($("terrainServiceCost")?.value || 0);
+  if ($("terrainServiceProfit")) $("terrainServiceProfit").value = String(charged - cost);
+}
+
+function resetTerrainServiceForm() {
+  state.selectedTerrainServiceId = null;
+  $("terrainServiceForm")?.reset();
+  $("terrainServiceFormCard")?.classList.add("hidden");
+  ["terrainServiceBeforePreview", "terrainServiceAfterPreview"].forEach((id) => { if ($(id)) $(id).innerHTML = ""; });
+}
+
+function openTerrainServiceForm(serviceId = "", { budgetId = "" } = {}) {
+  const service = serviceId ? terrainServiceById(serviceId) : null;
+  const budget = !service && budgetId ? terrainBudgetById(budgetId) : null;
+  if (budget && budget.status !== "aprovado") return showToast("Somente orçamentos aprovados podem virar serviço.");
+  if (budget && terrainServiceRecords(state.terrainManagement?.services || {}).some((item) => item.budget_id === budget.id)) return showToast("Este orçamento já foi transformado em serviço.");
+  const terrain = terrainById(service?.terrain_id || budget?.terrain_id || "");
+  const values = service || (budget ? terrainServiceInputFromBudget(budget, terrain, terrainBudgetLocalDate()) : {});
+  state.selectedTerrainServiceId = service?.id || null;
+  switchTerrainManagementTab("services");
+  $("terrainServiceForm")?.reset();
+  renderTerrainServiceOptions(values.owner_id || "", values.terrain_id || "");
+  const fields = {
+    terrainServiceId: service?.id || "", terrainServiceBudgetId: values.budget_id || "",
+    terrainServiceBudgetNumber: budget?.numero || (values.budget_id ? terrainBudgetById(values.budget_id)?.numero : "") || "",
+    terrainServiceExpectedDate: values.data_prevista || terrainBudgetLocalDate(), terrainServiceCompletedDate: values.data_realizada || "",
+    terrainServiceTime: values.horario || "", terrainServiceArea: values.area_m2 ?? terrain?.area_m2 ?? "",
+    terrainServiceType: values.tipo_servico || "rocada", terrainServiceEquipment: values.equipamentos || "",
+    terrainServiceResponsible: values.responsaveis || "", terrainServiceDuration: values.tempo_gasto || "",
+    terrainServiceCharged: values.valor_cobrado ?? 0, terrainServiceCost: values.custo ?? 0,
+    terrainServicePaymentMethod: values.forma_pagamento || "", terrainServicePaymentStatus: values.status_pagamento || "pendente",
+    terrainServiceStatus: values.status || "aguardando", terrainServiceNotes: values.observacoes || ""
+  };
+  Object.entries(fields).forEach(([id, value]) => { if ($(id)) $(id).value = value; });
+  updateTerrainServiceProfit();
+  $("terrainServiceFormTitle").textContent = service ? "Editar serviço" : (budget ? `Serviço do orçamento ${budget.numero}` : "Novo serviço");
+  $("terrainServiceFormCard")?.classList.remove("hidden");
+  $("terrainServiceExpectedDate")?.focus();
+  $("terrainServiceFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function terrainServiceFormValues() {
+  return {
+    owner_id: $("terrainServiceOwner").value, terrain_id: $("terrainServiceTerrain").value,
+    budget_id: $("terrainServiceBudgetId").value, data_prevista: $("terrainServiceExpectedDate").value,
+    data_realizada: $("terrainServiceCompletedDate").value, horario: $("terrainServiceTime").value,
+    area_m2: $("terrainServiceArea").value, tipo_servico: $("terrainServiceType").value,
+    equipamentos: $("terrainServiceEquipment").value, responsaveis: $("terrainServiceResponsible").value,
+    tempo_gasto: $("terrainServiceDuration").value, valor_cobrado: $("terrainServiceCharged").value,
+    custo: $("terrainServiceCost").value, forma_pagamento: $("terrainServicePaymentMethod").value,
+    status_pagamento: $("terrainServicePaymentStatus").value, status: $("terrainServiceStatus").value,
+    observacoes: $("terrainServiceNotes").value
+  };
+}
+
+async function uploadTerrainServicePhotos(service, type, files) {
+  const uploaded = [];
+  for (const [index, file] of [...files].entries()) {
+    validateTerrainImageFile(file);
+    const path = terrainServicePhotoStoragePath(service.terrain_id, service.id, type, file, Date.now(), index);
+    const url = await uploadFileWithProgress(storageRef(storage, path), file, `Enviando foto ${type}`, file.name);
+    const id = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path)).key;
+    const record = buildTerrainServicePhotoRecord({ service_id: service.id, terrain_id: service.terrain_id, tipo: type, url, path }, { id, timestamp: serverTimestamp() });
+    await firebaseSet(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${id}`), record);
+    state.terrainManagement.servicePhotos[id] = record;
+    uploaded.push(record);
+  }
+  return uploaded;
+}
+
+async function saveTerrainService(event) {
+  event.preventDefault();
+  const existing = state.selectedTerrainServiceId ? terrainServiceById(state.selectedTerrainServiceId) : null;
+  const id = existing?.id || push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.services.path)).key;
+  try {
+    const today = terrainBudgetLocalDate();
+    const service = buildTerrainServiceRecord(terrainServiceFormValues(), { id, existing: existing || {}, timestamp: serverTimestamp(), today });
+    const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.services.path}/${id}`]: service };
+    if (service.status === "concluido") {
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/status`] = "limpo";
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/ultima_limpeza_em`] = service.data_realizada || today;
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${service.terrain_id}/updated_at`] = serverTimestamp();
+    }
+    await firebaseUpdate(ref(db), updates);
+    state.terrainManagement.services[id] = service;
+    await uploadTerrainServicePhotos(service, "antes", $("terrainServiceBeforeFiles").files || []);
+    await uploadTerrainServicePhotos(service, "depois", $("terrainServiceAfterFiles").files || []);
+    if (service.status === "concluido") await refreshTerrainRecord(service.terrain_id);
+    resetTerrainServiceForm();
+    renderTerrainManagement();
+    showToast(service.status === "concluido" ? "Serviço concluído e terreno atualizado para Limpo." : "Serviço salvo com sucesso.", { prominent: true });
+  } catch (error) {
+    console.error("Falha ao salvar serviço.", error);
+    showToast(error?.message || "Não foi possível salvar o serviço.");
+  }
+}
+
+function terrainServiceGalleryHtml(serviceId, type) {
+  const photos = terrainServicePhotoRecords(state.terrainManagement?.servicePhotos || {}, serviceId, type);
+  if (!photos.length) return `<div class="terrain-owner-linked-empty"><i class="fa-solid fa-image"></i><strong>Sem fotos ${type}</strong></div>`;
+  return `<div class="terrain-photo-gallery">${photos.map((photo) => `<figure class="terrain-photo-card"><img src="${escapeAttr(photo.url)}" alt="Foto ${type}" loading="lazy"><figcaption><span>${type === "antes" ? "Antes" : "Depois"}</span><button type="button" class="terrain-owner-icon-button" data-service-photo-view="${escapeAttr(photo.id)}" data-no-loading><i class="fa-solid fa-expand"></i></button></figcaption></figure>`).join("")}</div>`;
+}
+
+function renderTerrainServiceList() {
+  const mount = $("terrainServiceList");
+  if (!mount) return;
+  const services = terrainServiceRecords(state.terrainManagement?.services || {});
+  $("terrainServiceListSummary").textContent = `${services.length} ${services.length === 1 ? "serviço cadastrado" : "serviços cadastrados"}.`;
+  if (!services.length) { mount.innerHTML = `<div class="terrain-owner-list-empty"><i class="fa-solid fa-broom"></i><strong>Nenhum serviço cadastrado</strong></div>`; return; }
+  mount.innerHTML = services.map((service) => {
+    const owner = terrainOwnerById(service.owner_id) || {}; const terrain = terrainById(service.terrain_id) || {};
+    const status = terrainServiceStatusMeta(service.status);
+    return `<article class="terrain-service-row"><div data-label="Data"><strong>${escapeHtml(terrainBudgetDateLabel(service.data_prevista))}</strong><small>${escapeHtml(service.horario)}</small></div><div data-label="Proprietário"><strong>${escapeHtml(owner.nome || "-")}</strong></div><div data-label="Terreno"><strong>${escapeHtml(terrain.apelido || "-")}</strong></div><div data-label="Tipo"><strong>${escapeHtml(terrainServiceTypeLabel(service.tipo_servico))}</strong></div><div data-label="Valor"><strong>${escapeHtml(moneyBR(service.valor_cobrado))}</strong></div><div data-label="Status"><span class="terrain-owner-status terrain-budget-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></div><div class="terrain-owner-actions" data-label="Ações"><button type="button" class="terrain-owner-icon-button" data-service-view="${escapeAttr(service.id)}" data-no-loading><i class="fa-solid fa-eye"></i></button><button type="button" class="terrain-owner-icon-button" data-service-edit="${escapeAttr(service.id)}" data-no-loading><i class="fa-solid fa-pen"></i></button><button type="button" class="terrain-owner-icon-button danger" data-service-delete="${escapeAttr(service.id)}"><i class="fa-solid fa-trash"></i></button></div></article>`;
+  }).join("");
+}
+
+function closeTerrainServiceDetail() {
+  $("terrainServiceDetailModal")?.classList.add("hidden"); $("terrainServiceDetailModal")?.setAttribute("aria-hidden", "true"); document.body.classList.remove("terrain-owner-detail-open");
+}
+
+function openTerrainServiceDetail(id) {
+  const service = terrainServiceById(id); if (!service) return;
+  const owner = terrainOwnerById(service.owner_id) || {}; const terrain = terrainById(service.terrain_id) || {};
+  $("terrainServiceDetailTitle").textContent = terrainServiceTypeLabel(service.tipo_servico);
+  const status = terrainServiceStatusMeta(service.status);
+  $("terrainServiceDetailContent").innerHTML = `<div class="terrain-detail-actions"><button type="button" data-service-detail-edit="${escapeAttr(id)}"><i class="fa-solid fa-pen"></i> Editar</button></div><div class="terrain-owner-detail-grid">
+    <div><span>Proprietário</span><strong>${escapeHtml(owner.nome || "-")}</strong></div><div><span>Terreno</span><strong>${escapeHtml(terrain.apelido || "-")}</strong></div>
+    <div><span>Status</span><strong><span class="terrain-owner-status terrain-budget-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></strong></div>
+    <div><span>Orçamento de origem</span><strong>${escapeHtml(service.budget_id ? (terrainBudgetById(service.budget_id)?.numero || service.budget_id) : "Sem orçamento")}</strong></div>
+    <div><span>Data prevista</span><strong>${escapeHtml(terrainBudgetDateLabel(service.data_prevista))}</strong></div><div><span>Data realizada</span><strong>${escapeHtml(terrainBudgetDateLabel(service.data_realizada))}</strong></div>
+    <div><span>Horário</span><strong>${escapeHtml(service.horario || "-")}</strong></div><div><span>Área</span><strong>${escapeHtml(formatTerrainMeasure(service.area_m2, "m²"))}</strong></div>
+    <div><span>Tipo</span><strong>${escapeHtml(terrainServiceTypeLabel(service.tipo_servico))}</strong></div><div><span>Tempo gasto</span><strong>${escapeHtml(service.tempo_gasto || "-")}</strong></div>
+    <div class="wide"><span>Equipamentos utilizados</span><strong>${escapeHtml(service.equipamentos || "-")}</strong></div><div class="wide"><span>Funcionários/responsáveis</span><strong>${escapeHtml(service.responsaveis)}</strong></div>
+    <div><span>Valor cobrado</span><strong>${escapeHtml(moneyBR(service.valor_cobrado))}</strong></div><div><span>Custo</span><strong>${escapeHtml(moneyBR(service.custo))}</strong></div>
+    <div><span>Lucro estimado</span><strong>${escapeHtml(moneyBR(service.lucro_estimado))}</strong></div><div><span>Pagamento</span><strong>${escapeHtml(`${service.forma_pagamento} - ${service.status_pagamento}`)}</strong></div>
+    <div class="wide"><span>Observações</span><strong>${escapeHtml(service.observacoes || "-")}</strong></div></div>
+    <div class="terrain-before-after"><section><h3>Antes</h3>${terrainServiceGalleryHtml(id, "antes")}</section><section><h3>Depois</h3>${terrainServiceGalleryHtml(id, "depois")}</section></div>`;
+  $("terrainServiceDetailModal")?.classList.remove("hidden"); $("terrainServiceDetailModal")?.setAttribute("aria-hidden", "false"); document.body.classList.add("terrain-owner-detail-open");
+}
+
+async function deleteTerrainService(id) {
+  const service = terrainServiceById(id); if (!service || !(await confirmarExclusao(terrainServiceTypeLabel(service.tipo_servico), "serviço"))) return;
+  const photos = terrainServicePhotoRecords(state.terrainManagement?.servicePhotos || {}, id);
+  await Promise.allSettled(photos.map((photo) => deleteTerrainDevelopmentStoragePath(photo.path)));
+  const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.services.path}/${id}`]: null };
+  photos.forEach((photo) => { updates[`${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${photo.id}`] = null; delete state.terrainManagement.servicePhotos[photo.id]; });
+  await firebaseUpdate(ref(db), updates); delete state.terrainManagement.services[id]; closeTerrainServiceDetail(); renderTerrainManagement(); showToast("Serviço excluído.");
+}
+
 function switchTerrainManagementTab(tabName = "dashboard") {
-  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets"]);
+  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services"]);
   const target = allowedTabs.has(tabName) ? tabName : "dashboard";
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     const isActive = button.dataset.terrainTab === target;
@@ -4844,6 +5031,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
   if (target === "terrains") renderTerrainList();
   if (target === "developments") renderTerrainDevelopmentList();
   if (target === "budgets") renderTerrainBudgetList();
+  if (target === "services") renderTerrainServiceList();
 }
 
 function updateChrome() {
@@ -24888,6 +25076,7 @@ function bindEvents() {
     if (event.key !== "Escape") return;
     if (!$("terrainPhotoViewerModal")?.classList.contains("hidden")) closeTerrainPhotoViewer();
     else if (!$("terrainInspectionModal")?.classList.contains("hidden")) closeTerrainInspectionForm();
+    else if (!$("terrainServiceDetailModal")?.classList.contains("hidden")) closeTerrainServiceDetail();
     else if (!$("terrainBudgetDetailModal")?.classList.contains("hidden")) closeTerrainBudgetDetail();
     else if (!$("terrainDetailModal")?.classList.contains("hidden")) closeTerrainDetail();
   });
@@ -25031,10 +25220,58 @@ function bindEvents() {
     if (event.target === $("terrainBudgetDetailModal")) closeTerrainBudgetDetail();
   });
   $("terrainBudgetDetailContent")?.addEventListener("click", (event) => {
+    const convertButton = event.target.closest("[data-terrain-budget-convert]");
+    if (convertButton) {
+      closeTerrainBudgetDetail();
+      openTerrainServiceForm("", { budgetId: convertButton.dataset.terrainBudgetConvert });
+      return;
+    }
     const editButton = event.target.closest("[data-terrain-budget-detail-edit]");
     if (!editButton) return;
     closeTerrainBudgetDetail();
     openTerrainBudgetForm(editButton.dataset.terrainBudgetDetailEdit);
+  });
+  $("newTerrainService")?.addEventListener("click", () => openTerrainServiceForm());
+  $("closeTerrainServiceForm")?.addEventListener("click", resetTerrainServiceForm);
+  $("cancelTerrainServiceForm")?.addEventListener("click", resetTerrainServiceForm);
+  $("terrainServiceForm")?.addEventListener("submit", saveTerrainService);
+  $("terrainServiceOwner")?.addEventListener("change", () => {
+    renderTerrainServiceOptions($("terrainServiceOwner").value, "");
+    $("terrainServiceArea").value = "";
+  });
+  $("terrainServiceTerrain")?.addEventListener("change", () => {
+    const terrain = terrainById($("terrainServiceTerrain").value);
+    if (!terrain) return;
+    renderTerrainServiceOptions(terrain.owner_id, terrain.id);
+    $("terrainServiceArea").value = terrain.area_m2 ?? "";
+  });
+  ["terrainServiceCharged", "terrainServiceCost"].forEach((id) => $(id)?.addEventListener("input", updateTerrainServiceProfit));
+  $("terrainServiceBeforeFiles")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainServiceBeforeFiles", "terrainServiceBeforePreview"));
+  $("terrainServiceAfterFiles")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainServiceAfterFiles", "terrainServiceAfterPreview"));
+  $("terrainServiceList")?.addEventListener("click", (event) => {
+    const view = event.target.closest("[data-service-view]");
+    if (view) return openTerrainServiceDetail(view.dataset.serviceView);
+    const edit = event.target.closest("[data-service-edit]");
+    if (edit) return openTerrainServiceForm(edit.dataset.serviceEdit);
+    const remove = event.target.closest("[data-service-delete]");
+    if (remove) return deleteTerrainService(remove.dataset.serviceDelete);
+  });
+  $("closeTerrainServiceDetail")?.addEventListener("click", closeTerrainServiceDetail);
+  $("terrainServiceDetailModal")?.addEventListener("click", (event) => {
+    if (event.target === $("terrainServiceDetailModal")) closeTerrainServiceDetail();
+  });
+  $("terrainServiceDetailContent")?.addEventListener("click", (event) => {
+    const edit = event.target.closest("[data-service-detail-edit]");
+    if (edit) {
+      closeTerrainServiceDetail();
+      openTerrainServiceForm(edit.dataset.serviceDetailEdit);
+      return;
+    }
+    const photoButton = event.target.closest("[data-service-photo-view]");
+    if (photoButton) {
+      const photo = state.terrainManagement?.servicePhotos?.[photoButton.dataset.servicePhotoView];
+      if (photo) openTerrainPhotoViewer(photo.url, photo.tipo === "antes" ? "Antes do serviço" : "Depois do serviço");
+    }
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);

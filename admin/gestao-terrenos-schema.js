@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-08-31_v7";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v1";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -96,6 +96,20 @@ export const TERRAIN_BUDGET_STATUS_OPTIONS = Object.freeze([
   Object.freeze({ value: "expirado", label: "Expirado", tone: "muted" })
 ]);
 
+export const TERRAIN_SERVICE_TYPE_OPTIONS = Object.freeze([
+  ["rocada", "Roçada"], ["limpeza_completa", "Limpeza completa"], ["retirada_entulho", "Retirada de entulho"],
+  ["recolhimento_galhos", "Recolhimento de galhos"], ["poda", "Poda"], ["aplicacao_produto", "Aplicação de produto"],
+  ["limpeza_calcada", "Limpeza de calçada"], ["transporte_residuos", "Transporte de resíduos"], ["outro", "Outro"]
+].map(([value, label]) => Object.freeze({ value, label })));
+
+export const TERRAIN_SERVICE_STATUS_OPTIONS = Object.freeze([
+  Object.freeze({ value: "aguardando", label: "Aguardando", tone: "muted" }),
+  Object.freeze({ value: "agendado", label: "Agendado", tone: "info" }),
+  Object.freeze({ value: "em_andamento", label: "Em andamento", tone: "warning" }),
+  Object.freeze({ value: "concluido", label: "Concluído", tone: "success" }),
+  Object.freeze({ value: "cancelado", label: "Cancelado", tone: "danger" })
+]);
+
 export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
   owners: Object.freeze({
     path: "terrenosProprietarios",
@@ -157,6 +171,16 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
       "observacoes", "status", "created_at", "updated_at"
     ]),
     optionalFields: Object.freeze(["development_id"])
+  }),
+  services: Object.freeze({
+    path: "terrenosServicos",
+    fields: Object.freeze(["id", "owner_id", "terrain_id", "budget_id", "data_prevista", "data_realizada", "horario", "area_m2", "tipo_servico", "equipamentos", "responsaveis", "tempo_gasto", "valor_cobrado", "custo", "lucro_estimado", "forma_pagamento", "status_pagamento", "status", "observacoes", "created_at", "updated_at"]),
+    optionalFields: Object.freeze(["budget_id", "data_realizada"])
+  }),
+  servicePhotos: Object.freeze({
+    path: "terrenosServicosFotos",
+    fields: Object.freeze(["id", "service_id", "terrain_id", "tipo", "url", "path", "created_at", "updated_at"]),
+    optionalFields: Object.freeze([])
   })
 });
 
@@ -168,6 +192,8 @@ const TERRAIN_GRASS_HEIGHT_VALUES = new Set(TERRAIN_GRASS_HEIGHT_OPTIONS.map((it
 const TERRAIN_CHARACTERISTIC_VALUES = new Set(TERRAIN_CHARACTERISTIC_OPTIONS.map((item) => item.value));
 const TERRAIN_PHOTO_CATEGORY_VALUES = new Set(TERRAIN_PHOTO_CATEGORY_OPTIONS.map((item) => item.value));
 const TERRAIN_BUDGET_STATUS_VALUES = new Set(TERRAIN_BUDGET_STATUS_OPTIONS.map((item) => item.value));
+const TERRAIN_SERVICE_TYPE_VALUES = new Set(TERRAIN_SERVICE_TYPE_OPTIONS.map((item) => item.value));
+const TERRAIN_SERVICE_STATUS_VALUES = new Set(TERRAIN_SERVICE_STATUS_OPTIONS.map((item) => item.value));
 
 export function normalizeTerrainOwnerInput(input = {}) {
   const value = (key) => String(input[key] ?? "").trim();
@@ -346,12 +372,14 @@ export function normalizeTerrainInput(input = {}) {
 
 export function buildTerrainRecord(input, { id, existing = {}, timestamp = Date.now() } = {}) {
   if (!id) throw new Error("O terreno precisa de um id.");
-  return {
+  const record = {
     id,
     ...normalizeTerrainInput(input),
     created_at: existing.created_at || timestamp,
     updated_at: timestamp
   };
+  if (existing.ultima_limpeza_em) record.ultima_limpeza_em = existing.ultima_limpeza_em;
+  return record;
 }
 
 export function terrainRecords(records = {}) {
@@ -743,4 +771,86 @@ export function terrainBudgetWhatsappUrl(budget = {}, owner = {}, terrain = {}) 
     `Validade: ${validity || "-"}.`
   ].join("\n");
   return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
+export function terrainServiceTypeLabel(type) {
+  return TERRAIN_SERVICE_TYPE_OPTIONS.find((item) => item.value === type)?.label || "Outro";
+}
+
+export function terrainServiceStatusMeta(status) {
+  return TERRAIN_SERVICE_STATUS_OPTIONS.find((item) => item.value === status) || TERRAIN_SERVICE_STATUS_OPTIONS[0];
+}
+
+export function terrainServiceTypeFromText(text) {
+  const value = String(text || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  if (value.includes("rocada")) return "rocada";
+  if (value.includes("entulho")) return "retirada_entulho";
+  if (value.includes("galho")) return "recolhimento_galhos";
+  if (value.includes("poda")) return "poda";
+  if (value.includes("produto")) return "aplicacao_produto";
+  if (value.includes("calcada")) return "limpeza_calcada";
+  if (value.includes("transporte") || value.includes("residuo")) return "transporte_residuos";
+  if (value.includes("limpeza")) return "limpeza_completa";
+  return "outro";
+}
+
+export function terrainServiceInputFromBudget(budget = {}, terrain = {}, today = "") {
+  return {
+    owner_id: budget.owner_id || terrain.owner_id || "", terrain_id: budget.terrain_id || terrain.id || "",
+    budget_id: budget.id || "", data_prevista: today, data_realizada: "", horario: "",
+    area_m2: budget.area_m2 ?? terrain.area_m2 ?? 0, tipo_servico: terrainServiceTypeFromText(budget.tipo_servico),
+    equipamentos: "", responsaveis: "", tempo_gasto: "", valor_cobrado: budget.valor ?? 0, custo: 0,
+    forma_pagamento: "", status_pagamento: "pendente", status: "aguardando",
+    observacoes: [budget.descricao, budget.observacoes].filter(Boolean).join("\n")
+  };
+}
+
+export function normalizeTerrainServiceInput(input = {}) {
+  const value = (key) => String(input[key] ?? "").trim();
+  const charged = terrainNumber(input.valor_cobrado, "valor cobrado");
+  const cost = terrainNumber(input.custo, "custo");
+  const service = {
+    owner_id: value("owner_id"), terrain_id: value("terrain_id"), budget_id: value("budget_id") || null,
+    data_prevista: value("data_prevista"), data_realizada: value("data_realizada") || null, horario: value("horario"),
+    area_m2: terrainNumber(input.area_m2, "área"),
+    tipo_servico: TERRAIN_SERVICE_TYPE_VALUES.has(value("tipo_servico")) ? value("tipo_servico") : "outro",
+    equipamentos: value("equipamentos"), responsaveis: value("responsaveis"), tempo_gasto: value("tempo_gasto"),
+    valor_cobrado: charged, custo: cost, lucro_estimado: charged - cost, forma_pagamento: value("forma_pagamento"),
+    status_pagamento: ["pendente", "parcial", "pago"].includes(value("status_pagamento")) ? value("status_pagamento") : "pendente",
+    status: TERRAIN_SERVICE_STATUS_VALUES.has(value("status")) ? value("status") : "aguardando",
+    observacoes: value("observacoes")
+  };
+  const missing = ["owner_id", "terrain_id", "data_prevista", "horario", "responsaveis", "forma_pagamento"].filter((key) => !service[key]);
+  if (missing.length) throw new Error(`Campos obrigatorios ausentes: ${missing.join(", ")}`);
+  return service;
+}
+
+export function buildTerrainServiceRecord(input, { id, existing = {}, timestamp = Date.now(), today = "" } = {}) {
+  if (!id) throw new Error("O serviço precisa de um id.");
+  const service = normalizeTerrainServiceInput(input);
+  if (service.status === "concluido" && !service.data_realizada) service.data_realizada = today || service.data_prevista;
+  return { id, ...service, created_at: existing.created_at || timestamp, updated_at: timestamp };
+}
+
+export function terrainServiceRecords(records = {}) {
+  const list = Array.isArray(records) ? records : Object.entries(records || {}).map(([id, item]) => ({ id, ...(item || {}) }));
+  return list.filter((item) => item?.id).sort((a, b) => String(b.data_prevista || "").localeCompare(String(a.data_prevista || "")));
+}
+
+export function terrainServicePhotoStoragePath(terrainId, serviceId, type, file = {}, timestamp = Date.now(), index = 0) {
+  if (!terrainId || !serviceId || !["antes", "depois"].includes(type)) throw new Error("Destino da foto inválido.");
+  validateTerrainImageFile(file);
+  return `gestao-terrenos/terrenos/${terrainId}/servicos/${serviceId}/${type}/${timestamp}-${index}-${terrainImageFilename(file)}`;
+}
+
+export function buildTerrainServicePhotoRecord(input = {}, { id, timestamp = Date.now() } = {}) {
+  if (!id) throw new Error("A foto precisa de um id.");
+  const record = { id, service_id: String(input.service_id || ""), terrain_id: String(input.terrain_id || ""), tipo: ["antes", "depois"].includes(input.tipo) ? input.tipo : "antes", url: String(input.url || ""), path: String(input.path || ""), created_at: timestamp, updated_at: timestamp };
+  if (["service_id", "terrain_id", "url", "path"].some((key) => !record[key])) throw new Error("Dados incompletos da foto.");
+  return record;
+}
+
+export function terrainServicePhotoRecords(records = {}, serviceId = "", type = "") {
+  const list = Array.isArray(records) ? records : Object.entries(records || {}).map(([id, item]) => ({ id, ...(item || {}) }));
+  return list.filter((photo) => photo?.id && (!serviceId || photo.service_id === serviceId) && (!type || photo.tipo === type));
 }

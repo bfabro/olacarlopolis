@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=426">
+  <link rel="stylesheet" href="painel.css?v=427">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -209,6 +209,7 @@
           <button type="button" data-terrain-tab="terrains"><i class="fa-solid fa-vector-square"></i> Terrenos</button>
           <button type="button" data-terrain-tab="developments"><i class="fa-solid fa-map"></i> Loteamentos</button>
           <button type="button" data-terrain-tab="budgets"><i class="fa-solid fa-file-invoice-dollar"></i> Orçamentos</button>
+          <button type="button" data-terrain-tab="services"><i class="fa-solid fa-broom"></i> Serviços</button>
         </nav>
 
         <section class="terrain-module-section" data-terrain-section="dashboard">
@@ -233,6 +234,7 @@
               <strong id="terrainBudgetsCount">0</strong>
               <small>Cadastros no módulo</small>
             </article>
+            <article class="stat-card"><span>Serviços</span><strong id="terrainServicesCount">0</strong><small>Cadastros no módulo</small></article>
           </div>
         </section>
 
@@ -622,6 +624,41 @@
               <span>Data</span><span>Validade</span><span>Status</span><span>Ações</span>
             </div>
             <div id="terrainBudgetList" class="terrain-budget-list"></div>
+          </section>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="services">
+          <section id="terrainServiceFormCard" class="panel-card terrain-service-form-card hidden">
+            <div class="section-head"><div><h2 id="terrainServiceFormTitle">Novo serviço</h2><p>Execução, custos e registro visual do trabalho.</p></div><button id="closeTerrainServiceForm" class="ghost-button" type="button" data-no-loading aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+            <form id="terrainServiceForm" class="grid-form">
+              <input id="terrainServiceId" type="hidden"><input id="terrainServiceBudgetId" type="hidden">
+              <label>Orçamento de origem<input id="terrainServiceBudgetNumber" readonly placeholder="Sem orçamento"></label>
+              <label>Status<select id="terrainServiceStatus" required><option value="aguardando">Aguardando</option><option value="agendado">Agendado</option><option value="em_andamento">Em andamento</option><option value="concluido">Concluído</option><option value="cancelado">Cancelado</option></select></label>
+              <label>Proprietário<select id="terrainServiceOwner" required></select></label>
+              <label>Terreno<select id="terrainServiceTerrain" required></select></label>
+              <label>Data prevista<input id="terrainServiceExpectedDate" type="date" required></label>
+              <label>Data realizada<input id="terrainServiceCompletedDate" type="date"></label>
+              <label>Horário<input id="terrainServiceTime" type="time" required></label>
+              <label>Área em m²<input id="terrainServiceArea" type="number" min="0" step="0.01" readonly required></label>
+              <label>Tipo de serviço<select id="terrainServiceType" required><option value="rocada">Roçada</option><option value="limpeza_completa">Limpeza completa</option><option value="retirada_entulho">Retirada de entulho</option><option value="recolhimento_galhos">Recolhimento de galhos</option><option value="poda">Poda</option><option value="aplicacao_produto">Aplicação de produto</option><option value="limpeza_calcada">Limpeza de calçada</option><option value="transporte_residuos">Transporte de resíduos</option><option value="outro">Outro</option></select></label>
+              <label>Tempo gasto<input id="terrainServiceDuration" maxlength="80" placeholder="Ex.: 4h 30min"></label>
+              <label class="wide">Equipamentos utilizados<textarea id="terrainServiceEquipment" rows="3" maxlength="1200"></textarea></label>
+              <label class="wide">Funcionários/responsáveis<input id="terrainServiceResponsible" maxlength="500" required></label>
+              <label>Valor cobrado<input id="terrainServiceCharged" type="number" min="0" step="0.01" required></label>
+              <label>Custo<input id="terrainServiceCost" type="number" min="0" step="0.01" required></label>
+              <label>Lucro estimado<input id="terrainServiceProfit" type="number" readonly></label>
+              <label>Forma de pagamento<input id="terrainServicePaymentMethod" maxlength="100" required></label>
+              <label>Status do pagamento<select id="terrainServicePaymentStatus"><option value="pendente">Pendente</option><option value="parcial">Parcial</option><option value="pago">Pago</option></select></label>
+              <label class="wide">Observações<textarea id="terrainServiceNotes" rows="4" maxlength="2000"></textarea></label>
+              <fieldset class="terrain-service-photo-fieldset"><legend>Fotos antes</legend><input id="terrainServiceBeforeFiles" type="file" accept="image/*" multiple><div id="terrainServiceBeforePreview" class="terrain-photo-selection-preview"></div></fieldset>
+              <fieldset class="terrain-service-photo-fieldset"><legend>Fotos depois</legend><input id="terrainServiceAfterFiles" type="file" accept="image/*" multiple><div id="terrainServiceAfterPreview" class="terrain-photo-selection-preview"></div></fieldset>
+              <div class="form-actions wide"><button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar serviço</button><button id="cancelTerrainServiceForm" class="ghost-button" type="button" data-no-loading>Cancelar</button></div>
+            </form>
+          </section>
+          <section class="panel-card terrain-service-list-card">
+            <div class="section-head"><div><h2>Serviços</h2><p id="terrainServiceListSummary">0 serviços cadastrados.</p></div><button id="newTerrainService" class="ghost-button new-entry-button" type="button" data-no-loading><i class="fa-solid fa-plus"></i> Novo serviço</button></div>
+            <div class="terrain-service-list-head"><span>Data</span><span>Proprietário</span><span>Terreno</span><span>Tipo</span><span>Valor</span><span>Status</span><span>Ações</span></div>
+            <div id="terrainServiceList" class="terrain-service-list"></div>
           </section>
         </section>
       </section>
@@ -2788,6 +2825,13 @@
     </section>
   </div>
 
+  <div id="terrainServiceDetailModal" class="terrain-owner-detail-overlay hidden" aria-hidden="true">
+    <section class="terrain-owner-detail-dialog terrain-service-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="terrainServiceDetailTitle">
+      <header><div><span>Serviço</span><h2 id="terrainServiceDetailTitle">Detalhes</h2></div><button id="closeTerrainServiceDetail" class="ghost-button" type="button" data-no-loading aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></header>
+      <div id="terrainServiceDetailContent"></div>
+    </section>
+  </div>
+
   <div id="terrainInspectionModal" class="terrain-owner-detail-overlay hidden" aria-hidden="true">
     <section class="terrain-owner-detail-dialog terrain-inspection-dialog" role="dialog" aria-modal="true" aria-labelledby="terrainInspectionTitle">
       <header>
@@ -2871,6 +2915,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=626"></script>
+  <script type="module" src="painel.js?v=627"></script>
 </body>
 </html>
