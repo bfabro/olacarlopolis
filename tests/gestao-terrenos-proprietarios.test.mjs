@@ -40,6 +40,7 @@ test("cria um proprietário normalizado", () => {
 
 test("edita preservando a data de criação", () => {
   const existing = buildTerrainOwnerRecord(baseInput, { id: "owner-1", timestamp: 1000 });
+  existing.ultimo_contato_em = "2026-09-01";
   const edited = buildTerrainOwnerRecord(
     { ...baseInput, nome: "Maria Silva Souza", status: "cliente" },
     { id: "owner-1", existing, timestamp: 2000 }
@@ -48,6 +49,7 @@ test("edita preservando a data de criação", () => {
   assert.equal(edited.status, "cliente");
   assert.equal(edited.created_at, 1000);
   assert.equal(edited.updated_at, 2000);
+  assert.equal(edited.ultimo_contato_em, "2026-09-01");
 });
 
 test("lista em ordem alfabética e pesquisa por nome", () => {

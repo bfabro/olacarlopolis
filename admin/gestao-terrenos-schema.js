@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v3";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v4";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -128,9 +128,9 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
     fields: Object.freeze([
       "id", "nome", "cpf_cnpj", "telefone", "whatsapp", "telefone_secundario", "email", "endereco",
       "numero", "bairro", "cidade", "estado", "cep", "observacoes", "origem_cliente",
-      "status", "created_at", "updated_at"
+      "ultimo_contato_em", "status", "created_at", "updated_at"
     ]),
-    optionalFields: Object.freeze(["cpf_cnpj", "telefone_secundario", "email"]),
+    optionalFields: Object.freeze(["cpf_cnpj", "telefone_secundario", "email", "ultimo_contato_em"]),
     statuses: OWNER_STATUSES
   }),
   terrains: Object.freeze({
@@ -141,13 +141,13 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
       "inscricao_imobiliaria", "latitude", "longitude", "google_maps_url", "observacoes",
       "grau_dificuldade", "altura_mato", "caracteristicas", "ultima_limpeza_em",
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
-      "lembrete_verificado_em", "status", "created_at", "updated_at"
+      "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "status", "created_at", "updated_at"
     ]),
     optionalFields: Object.freeze([
       "owner_id", "development_id", "matricula", "inscricao_imobiliaria", "latitude",
       "longitude", "google_maps_url", "caracteristicas", "ultima_limpeza_em",
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
-      "lembrete_verificado_em"
+      "lembrete_verificado_em", "oportunidade_nao_precisa_ate"
     ]),
     statuses: TERRAIN_STATUSES
   }),
@@ -241,12 +241,14 @@ export function normalizeTerrainOwnerInput(input = {}) {
 export function buildTerrainOwnerRecord(input, { id, existing = {}, timestamp = Date.now() } = {}) {
   if (!id) throw new Error("O proprietario precisa de um id.");
   const normalized = normalizeTerrainOwnerInput(input);
-  return {
+  const record = {
     id,
     ...normalized,
     created_at: existing.created_at || timestamp,
     updated_at: timestamp
   };
+  if (existing.ultimo_contato_em) record.ultimo_contato_em = existing.ultimo_contato_em;
+  return record;
 }
 
 export function normalizeTerrainOwnerSearch(value) {
@@ -396,7 +398,7 @@ export function buildTerrainRecord(input, { id, existing = {}, timestamp = Date.
     created_at: existing.created_at || timestamp,
     updated_at: timestamp
   };
-  ["ultima_limpeza_em", "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada", "lembrete_verificado_em"].forEach((key) => {
+  ["ultima_limpeza_em", "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada", "lembrete_verificado_em", "oportunidade_nao_precisa_ate"].forEach((key) => {
     if (existing[key]) record[key] = existing[key];
   });
   return record;
@@ -508,6 +510,165 @@ export function terrainReminderGroups(records = {}, today = new Date().toISOStri
   });
   Object.values(groups).forEach((items) => items.sort((a, b) => String(a.proxima_vistoria_em).localeCompare(String(b.proxima_vistoria_em))));
   return groups;
+}
+
+function terrainOpportunityDaysBetween(from, to) {
+  try {
+    return Math.floor((terrainDateAtUtc(to) - terrainDateAtUtc(from)) / 86400000);
+  } catch {
+    return null;
+  }
+}
+
+function terrainOpportunityDateLabel(value) {
+  const parts = String(value || "").split("-");
+  return parts.length === 3 ? parts.reverse().join("/") : "";
+}
+
+export function terrainOpportunityRecords(data = {}, today = new Date().toISOString().slice(0, 10)) {
+  terrainIsoDate(today, "data atual");
+  const terrains = data.terrains || {};
+  const owners = data.owners || {};
+  const developments = data.developments || {};
+  const inspections = data.inspections || {};
+  const budgets = terrainBudgetRecords(data.budgets || {});
+  const services = terrainServiceRecords(data.services || {});
+  const completedServices = services.filter((service) => service.status === "concluido" && Number(service.valor_cobrado || 0) > 0);
+  const pricedServices = completedServices.filter((service) => Number(service.area_m2 || 0) > 0);
+  const totalServiceArea = pricedServices.reduce((total, service) => total + Number(service.area_m2 || 0), 0);
+  const averageSquareMeter = totalServiceArea > 0
+    ? pricedServices.reduce((total, service) => total + Number(service.valor_cobrado || 0), 0) / totalServiceArea
+    : 0;
+  return terrainRecords(terrains).flatMap((terrain) => {
+    if (terrain.status === "inativo" || (terrain.oportunidade_nao_precisa_ate && terrain.oportunidade_nao_precisa_ate >= today)) return [];
+    const owner = terrain.owner_id ? owners[terrain.owner_id] || null : null;
+    const development = terrain.development_id ? developments[terrain.development_id] || null : null;
+    const latestInspection = terrainInspectionRecords(inspections, terrain.id)[0] || null;
+    const terrainBudgets = budgets.filter((budget) => budget.terrain_id === terrain.id);
+    const pendingBudget = terrainBudgets.find((budget) => ["rascunho", "enviado", "visualizado"].includes(budget.status)) || null;
+    const terrainServices = completedServices
+      .filter((service) => service.terrain_id === terrain.id)
+      .sort((a, b) => String(b.data_realizada || b.data_prevista || "").localeCompare(String(a.data_realizada || a.data_prevista || "")));
+    const latestService = terrainServices[0] || null;
+    const latestValuedBudget = terrainBudgets.find((budget) => Number(budget.valor || 0) > 0) || null;
+    const priceCandidates = [
+      latestService ? { date: latestService.data_realizada || latestService.data_prevista || "", value: Number(latestService.valor_cobrado || 0) } : null,
+      latestValuedBudget ? { date: latestValuedBudget.data || "", value: Number(latestValuedBudget.valor || 0) } : null
+    ].filter((item) => item && item.value > 0).sort((a, b) => String(b.date).localeCompare(String(a.date)));
+    const lastValue = Number(priceCandidates[0]?.value || 0);
+    const estimatedValue = lastValue > 0 ? lastValue : Number(terrain.area_m2 || 0) * averageSquareMeter;
+    const classification = terrainReminderClassification(terrain, today);
+    const daysSinceCleaning = classification?.elapsedDays ?? null;
+    const daysUntilInspection = terrain.proxima_vistoria_em ? terrainOpportunityDaysBetween(today, terrain.proxima_vistoria_em) : null;
+    const daysSinceContact = owner?.ultimo_contato_em ? terrainOpportunityDaysBetween(owner.ultimo_contato_em, today) : null;
+    const needsCleaning = terrain.status === "precisa_limpeza" || latestInspection?.precisa_limpeza === true || latestInspection?.situacao_atual === "precisa_limpeza";
+    const inspectionRecommendsContact = latestInspection?.recomendar_contato === true;
+    const overdue = daysUntilInspection !== null && daysUntilInspection < 0;
+    const next7Days = daysUntilInspection !== null && daysUntilInspection >= 1 && daysUntilInspection <= 7;
+    const next30Days = daysUntilInspection !== null && daysUntilInspection >= 8 && daysUntilInspection <= 30;
+    const dueToday = daysUntilInspection === 0;
+    const longPeriod = daysSinceCleaning !== null && daysSinceCleaning > 90;
+    const neverCleaned = !terrain.ultima_limpeza_em;
+    const unknownOwner = !owner;
+    const contactDue = Boolean(owner) && (daysSinceContact === null || daysSinceContact >= 30);
+    const hasOpportunity = needsCleaning || inspectionRecommendsContact || overdue || dueToday || next7Days || next30Days || longPeriod || neverCleaned || unknownOwner || Boolean(pendingBudget) || contactDue;
+    if (!hasOpportunity) return [];
+    let statusKey = "proxima_vistoria";
+    let statusLabel = "Próxima vistoria";
+    if (needsCleaning) [statusKey, statusLabel] = ["precisa_limpeza", "Precisa de limpeza"];
+    else if (overdue) [statusKey, statusLabel] = ["vistoria_atrasada", "Vistoria atrasada"];
+    else if (inspectionRecommendsContact) [statusKey, statusLabel] = ["contato_recomendado", "Contato recomendado"];
+    else if (longPeriod) [statusKey, statusLabel] = ["longo_periodo", "Precisa de atenção"];
+    else if (pendingBudget) [statusKey, statusLabel] = ["orcamento_pendente", "Orçamento pendente"];
+    else if (neverCleaned) [statusKey, statusLabel] = ["nunca_limpo", "Nunca limpo"];
+    else if (unknownOwner) [statusKey, statusLabel] = ["proprietario_desconhecido", "Proprietário desconhecido"];
+    else if (contactDue) [statusKey, statusLabel] = ["contato_pendente", "Contato pendente"];
+    const contactToday = needsCleaning || inspectionRecommendsContact || overdue || dueToday || longPeriod || Boolean(pendingBudget) || contactDue;
+    return [{
+      id: terrain.id,
+      terrain_id: terrain.id,
+      owner_id: terrain.owner_id || "",
+      development_id: terrain.development_id || "",
+      proprietario: owner?.nome || "Proprietário desconhecido",
+      whatsapp: owner?.whatsapp || owner?.telefone || "",
+      loteamento: development?.nome || "Sem loteamento",
+      quadra: terrain.quadra || "",
+      lote: terrain.lote || "",
+      apelido: terrain.apelido || "",
+      ultima_limpeza_em: terrain.ultima_limpeza_em || "",
+      dias_desde_ultima_limpeza: daysSinceCleaning,
+      proxima_vistoria_em: terrain.proxima_vistoria_em || "",
+      ultimo_contato_em: owner?.ultimo_contato_em || "",
+      ultimo_valor: lastValue,
+      valor_estimado: estimatedValue,
+      status: statusKey,
+      status_label: statusLabel,
+      pending_budget_id: pendingBudget?.id || "",
+      flags: {
+        contatar_hoje: contactToday,
+        atrasado: overdue,
+        proximos_7_dias: next7Days,
+        proximos_30_dias: next30Days,
+        precisa_limpeza: needsCleaning,
+        nunca_limpo: neverCleaned,
+        proprietario_desconhecido: unknownOwner,
+        orcamento_pendente: Boolean(pendingBudget)
+      }
+    }];
+  }).sort((a, b) => {
+    if (a.flags.contatar_hoje !== b.flags.contatar_hoje) return a.flags.contatar_hoje ? -1 : 1;
+    return String(a.proxima_vistoria_em || "9999-12-31").localeCompare(String(b.proxima_vistoria_em || "9999-12-31"));
+  });
+}
+
+export function filterTerrainOpportunities(records = [], filter = "todos") {
+  const opportunities = Array.isArray(records) ? records : [];
+  const flagByFilter = {
+    contatar_hoje: "contatar_hoje",
+    atrasados: "atrasado",
+    proximos_7_dias: "proximos_7_dias",
+    proximos_30_dias: "proximos_30_dias",
+    precisa_limpeza: "precisa_limpeza",
+    nunca_limpos: "nunca_limpo",
+    proprietario_desconhecido: "proprietario_desconhecido",
+    orcamento_pendente: "orcamento_pendente"
+  };
+  const flag = flagByFilter[filter];
+  return flag ? opportunities.filter((opportunity) => opportunity.flags?.[flag]) : opportunities;
+}
+
+export function terrainOpportunityWhatsappUrl(opportunity = {}) {
+  let digits = String(opportunity.whatsapp || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (!digits.startsWith("55")) digits = `55${digits}`;
+  const location = [
+    opportunity.loteamento && opportunity.loteamento !== "Sem loteamento" ? `no ${opportunity.loteamento}` : "",
+    opportunity.quadra ? `quadra ${opportunity.quadra}` : "",
+    opportunity.lote ? `lote ${opportunity.lote}` : ""
+  ].filter(Boolean).join(", ");
+  const referenceValue = Number(opportunity.ultimo_valor || opportunity.valor_estimado || 0);
+  const message = [
+    `Olá, ${opportunity.proprietario || "tudo bem"}!`,
+    `Estamos acompanhando o terreno ${opportunity.apelido || "cadastrado"}${location ? `, ${location}` : ""}.`,
+    opportunity.ultima_limpeza_em
+      ? `A última limpeza registrada foi em ${terrainOpportunityDateLabel(opportunity.ultima_limpeza_em)}.`
+      : "Ainda não há uma limpeza registrada para este terreno.",
+    `Situação atual: ${opportunity.status_label || "acompanhamento pendente"}.`,
+    referenceValue > 0 ? `A referência registrada é ${referenceValue.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }).replace(/\u00a0/g, " ")}.` : "",
+    "Podemos agendar uma vistoria ou preparar um orçamento atualizado?"
+  ].filter(Boolean).join("\n");
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
+export function buildTerrainOpportunityActionUpdate(action, { today = new Date().toISOString().slice(0, 10), days = 30 } = {}) {
+  const date = terrainIsoDate(today, "data do contato");
+  if (action === "contact") return { ultimo_contato_em: date };
+  if (action === "not_needed") {
+    const delayDays = Number(days);
+    if (!Number.isInteger(delayDays) || delayDays < 1 || delayDays > 365) throw new Error("O adiamento deve ficar entre 1 e 365 dias.");
+    return { oportunidade_nao_precisa_ate: terrainAddDays(date, delayDays) };
+  }
+  throw new Error("Ação de oportunidade inválida.");
 }
 
 export function terrainOwnerName(terrain = {}, owners = {}) {

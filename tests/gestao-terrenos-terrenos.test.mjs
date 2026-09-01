@@ -59,6 +59,7 @@ test("cria terreno com os relacionamentos existentes", () => {
 
 test("edita preservando a data de criação", () => {
   const existing = buildTerrainRecord(baseInput, { id: "terrain-1", timestamp: 1000 });
+  existing.oportunidade_nao_precisa_ate = "2026-10-01";
   const edited = buildTerrainRecord(
     { ...baseInput, lote: "13", status: "precisa_limpeza" },
     { id: "terrain-1", existing, timestamp: 2000 }
@@ -67,6 +68,7 @@ test("edita preservando a data de criação", () => {
   assert.equal(edited.status, "precisa_limpeza");
   assert.equal(edited.created_at, 1000);
   assert.equal(edited.updated_at, 2000);
+  assert.equal(edited.oportunidade_nao_precisa_ate, "2026-10-01");
 });
 
 test("pesquisa e combina todos os filtros da listagem", () => {

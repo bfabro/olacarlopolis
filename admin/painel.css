@@ -1191,6 +1191,7 @@ button[type="submit"]:hover,
 .terrain-service-form-card,
 .terrain-service-list-card,
 .terrain-reminders-card,
+.terrain-opportunities-card,
 .terrain-finance-dashboard,
 .terrain-finance-pending-card {
   padding: 18px;
@@ -2617,6 +2618,80 @@ body.terrain-owner-detail-open {
   font-size: 12px;
 }
 
+.terrain-opportunity-filters {
+  display: grid;
+  grid-template-columns: minmax(190px, 320px);
+  margin-bottom: 16px;
+}
+
+.terrain-opportunity-filters label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-opportunity-table-scroll { overflow-x: auto; }
+
+.terrain-opportunity-list-head,
+.terrain-opportunity-row {
+  display: grid;
+  grid-template-columns: 170px 125px 155px 68px 68px 105px 60px 110px 105px 105px 145px 250px;
+  gap: 9px;
+  align-items: center;
+  min-width: 1545px;
+}
+
+.terrain-opportunity-list-head {
+  padding: 0 12px 8px;
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.terrain-opportunity-list { display: grid; gap: 8px; }
+
+.terrain-opportunity-row {
+  min-height: 76px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-opportunity-row > div { min-width: 0; }
+.terrain-opportunity-row strong, .terrain-opportunity-row small { display: block; overflow: hidden; text-overflow: ellipsis; }
+.terrain-opportunity-row small { margin-top: 4px; color: var(--muted); font-size: 9px; }
+
+.terrain-opportunity-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  background: #eef2f7;
+  color: #334155;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.terrain-opportunity-status-precisa_limpeza,
+.terrain-opportunity-status-vistoria_atrasada { background: #fee2e2; color: #991b1b; }
+.terrain-opportunity-status-contato_recomendado,
+.terrain-opportunity-status-orcamento_pendente { background: #fef3c7; color: #92400e; }
+.terrain-opportunity-status-longo_periodo,
+.terrain-opportunity-status-nunca_limpo { background: #ffedd5; color: #9a3412; }
+.terrain-opportunity-status-contato_pendente,
+.terrain-opportunity-status-proxima_vistoria { background: #dbeafe; color: #1d4ed8; }
+.terrain-opportunity-status-proprietario_desconhecido { background: #e2e8f0; color: #475569; }
+
+.terrain-opportunity-actions { display: flex; flex-wrap: wrap; gap: 5px; }
+.terrain-opportunity-actions .terrain-owner-icon-button { width: 31px; height: 31px; min-height: 31px; }
+.terrain-opportunity-actions .success { border-color: #86efac; color: #15803d; }
+.terrain-opportunity-whatsapp { border-color: #86efac; color: #15803d; }
+
 .terrain-finance-filters {
   display: grid;
   grid-template-columns: repeat(3, minmax(150px, 220px));
@@ -2787,6 +2862,11 @@ body.terrain-owner-detail-open {
   .terrain-service-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .terrain-service-row > div::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
   .terrain-service-row .terrain-owner-actions { grid-column: 1 / -1; }
+  .terrain-opportunity-table-scroll { overflow: visible; }
+  .terrain-opportunity-list-head { display: none; }
+  .terrain-opportunity-row { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+  .terrain-opportunity-row > div::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--muted); font-size: 9px; font-weight: 800; text-transform: uppercase; }
+  .terrain-opportunity-row .terrain-opportunity-actions { grid-column: 1 / -1; }
   .terrain-finance-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .terrain-finance-pending-head { display: none; }
   .terrain-finance-pending-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -2806,6 +2886,7 @@ body.terrain-owner-detail-open {
   .terrain-service-form-card,
   .terrain-service-list-card,
   .terrain-reminders-card,
+  .terrain-opportunities-card,
   .terrain-finance-dashboard,
   .terrain-finance-pending-card {
     padding: 13px;
@@ -2826,6 +2907,7 @@ body.terrain-owner-detail-open {
   .terrain-before-after,
   .terrain-service-reminder-fieldset,
   .terrain-reminder-row,
+  .terrain-opportunity-row,
   .terrain-finance-filters,
   .terrain-finance-stats,
   .terrain-finance-pending-row {
@@ -2848,6 +2930,7 @@ body.terrain-owner-detail-open {
 
   .terrain-reminder-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .terrain-reminder-actions button, .terrain-reminder-actions a { width: 100%; justify-content: center; }
+  .terrain-opportunity-actions { justify-content: flex-start; }
 
   .terrain-budget-row > div {
     display: flex;

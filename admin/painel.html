@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=429">
+  <link rel="stylesheet" href="painel.css?v=430">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -211,6 +211,7 @@
           <button type="button" data-terrain-tab="budgets"><i class="fa-solid fa-file-invoice-dollar"></i> Orçamentos</button>
           <button type="button" data-terrain-tab="services"><i class="fa-solid fa-broom"></i> Serviços</button>
           <button type="button" data-terrain-tab="reminders"><i class="fa-solid fa-calendar-check"></i> Lembretes</button>
+          <button type="button" data-terrain-tab="opportunities"><i class="fa-solid fa-bullseye"></i> Oportunidades</button>
           <button type="button" data-terrain-tab="finance"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
         </nav>
 
@@ -681,6 +682,19 @@
               <section class="terrain-reminder-group terrain-reminder-group-overdue"><div class="terrain-reminder-group-head"><div><span>Exigem atenção</span><h3>Atrasados</h3></div><strong id="terrainReminderOverdueCount">0</strong></div><div id="terrainReminderOverdueList" class="terrain-reminder-list"></div></section>
               <section class="terrain-reminder-group"><div class="terrain-reminder-group-head"><div><span>Curto prazo</span><h3>Próximos 7 dias</h3></div><strong id="terrainReminderNext7Count">0</strong></div><div id="terrainReminderNext7List" class="terrain-reminder-list"></div></section>
               <section class="terrain-reminder-group"><div class="terrain-reminder-group-head"><div><span>Planejamento</span><h3>Próximos 30 dias</h3></div><strong id="terrainReminderNext30Count">0</strong></div><div id="terrainReminderNext30List" class="terrain-reminder-list"></div></section>
+            </div>
+          </section>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="opportunities">
+          <section class="panel-card terrain-opportunities-card">
+            <div class="section-head"><div><h2>Oportunidades</h2><p id="terrainOpportunitySummary">Terrenos com potencial para novo serviço.</p></div></div>
+            <div class="terrain-opportunity-filters">
+              <label>Filtro<select id="terrainOpportunityFilter"><option value="todos">Todas as oportunidades</option><option value="contatar_hoje">Contatar hoje</option><option value="atrasados">Atrasados</option><option value="proximos_7_dias">Próximos 7 dias</option><option value="proximos_30_dias">Próximos 30 dias</option><option value="precisa_limpeza">Precisa limpeza</option><option value="nunca_limpos">Nunca limpos</option><option value="proprietario_desconhecido">Proprietário desconhecido</option><option value="orcamento_pendente">Orçamento pendente</option></select></label>
+            </div>
+            <div class="terrain-opportunity-table-scroll">
+              <div class="terrain-opportunity-list-head" aria-hidden="true"><span>Proprietário</span><span>WhatsApp</span><span>Loteamento</span><span>Quadra</span><span>Lote</span><span>Última limpeza</span><span>Dias</span><span>Próxima vistoria</span><span>Último valor</span><span>Estimado</span><span>Status</span><span>Ações</span></div>
+              <div id="terrainOpportunityList" class="terrain-opportunity-list"></div>
             </div>
           </section>
         </section>
@@ -2964,6 +2978,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=629"></script>
+  <script type="module" src="painel.js?v=630"></script>
 </body>
 </html>

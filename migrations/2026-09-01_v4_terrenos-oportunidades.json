@@ -1,0 +1,17 @@
+{
+  "version": "2026-09-01_v4",
+  "operation": "add_terrain_opportunity_control",
+  "recreates_existing_data": false,
+  "derived_from": [
+    "terrenos",
+    "terrenosProprietarios",
+    "terrenosVistorias",
+    "terrenosOrcamentos",
+    "terrenosServicos"
+  ],
+  "added_fields": {
+    "terrenosProprietarios": ["ultimo_contato_em"],
+    "terrenos": ["oportunidade_nao_precisa_ate"]
+  },
+  "recent_contact_window_days": 30
+}

@@ -45,6 +45,7 @@ import {
   buildTerrainPhotoRecord,
   buildTerrainRecord,
   buildTerrainOwnerRecord,
+  buildTerrainOpportunityActionUpdate,
   calculateTerrainFinance,
   canDeleteTerrainDevelopment,
   canDeleteTerrainOwner,
@@ -53,6 +54,7 @@ import {
   filterTerrainBudgets,
   filterTerrains,
   filterTerrainOwners,
+  filterTerrainOpportunities,
   formatTerrainOwnerCep,
   formatTerrainOwnerDocument,
   formatTerrainBudgetNumber,
@@ -60,6 +62,8 @@ import {
   terrainOwnerOriginLabel,
   terrainOwnerStatusMeta,
   terrainOwnerWhatsappUrl,
+  terrainOpportunityRecords,
+  terrainOpportunityWhatsappUrl,
   terrainAddDays,
   terrainPaymentMethodLabel,
   terrainPaymentStatusMeta,
@@ -97,7 +101,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=10";
+} from "./gestao-terrenos-schema.js?v=11";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -112,10 +116,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 692,
-  label: "v699",
+  numero: 693,
+  label: "v700",
   data: "2026-09-01",
-  nota: "Lembretes de nova vistoria na Gestao de Terrenos."
+  nota: "Oportunidades de novos servicos na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3269,6 +3273,7 @@ function renderTerrainManagement() {
   renderTerrainBudgetList();
   renderTerrainServiceList();
   renderTerrainReminders();
+  renderTerrainOpportunities();
   renderTerrainFinance();
 }
 
@@ -5185,6 +5190,92 @@ async function verifyTerrainReminder(terrainId) {
   }
 }
 
+function terrainOpportunityData() {
+  return terrainOpportunityRecords({
+    terrains: state.terrainManagement?.terrains || {},
+    owners: state.terrainManagement?.owners || {},
+    developments: state.terrainManagement?.developments || {},
+    inspections: state.terrainManagement?.inspections || {},
+    budgets: state.terrainManagement?.budgets || {},
+    services: state.terrainManagement?.services || {}
+  }, terrainBudgetLocalDate());
+}
+
+function renderTerrainOpportunities() {
+  const mount = $("terrainOpportunityList");
+  if (!mount) return;
+  const opportunities = filterTerrainOpportunities(terrainOpportunityData(), $("terrainOpportunityFilter")?.value || "todos");
+  if ($("terrainOpportunitySummary")) $("terrainOpportunitySummary").textContent = `${opportunities.length} ${opportunities.length === 1 ? "oportunidade encontrada" : "oportunidades encontradas"}.`;
+  if (!opportunities.length) {
+    mount.innerHTML = `<div class="terrain-owner-list-empty"><i class="fa-solid fa-bullseye"></i><strong>Nenhuma oportunidade neste filtro</strong><span>Os sinais de vistoria, limpeza, orçamento e contato estão em dia.</span></div>`;
+    return;
+  }
+  mount.innerHTML = opportunities.map((opportunity) => {
+    const terrain = terrainById(opportunity.terrain_id) || {};
+    const mapsUrl = terrainMapsUrl(terrain);
+    const whatsappUrl = terrainOpportunityWhatsappUrl(opportunity);
+    const daysSinceCleaning = opportunity.dias_desde_ultima_limpeza === null ? "Nunca" : String(opportunity.dias_desde_ultima_limpeza);
+    return `<article class="terrain-opportunity-row">
+      <div data-label="Proprietário"><strong>${escapeHtml(opportunity.proprietario)}</strong><small>${opportunity.ultimo_contato_em ? `Contato: ${escapeHtml(terrainBudgetDateLabel(opportunity.ultimo_contato_em))}` : "Sem contato registrado"}</small></div>
+      <div data-label="WhatsApp"><strong>${escapeHtml(formatPhoneMask(opportunity.whatsapp) || "-")}</strong></div>
+      <div data-label="Loteamento"><strong>${escapeHtml(opportunity.loteamento)}</strong></div>
+      <div data-label="Quadra"><strong>${escapeHtml(opportunity.quadra || "-")}</strong></div>
+      <div data-label="Lote"><strong>${escapeHtml(opportunity.lote || "-")}</strong></div>
+      <div data-label="Última limpeza"><strong>${escapeHtml(terrainBudgetDateLabel(opportunity.ultima_limpeza_em))}</strong></div>
+      <div data-label="Dias"><strong>${escapeHtml(daysSinceCleaning)}</strong></div>
+      <div data-label="Próxima vistoria"><strong>${escapeHtml(terrainBudgetDateLabel(opportunity.proxima_vistoria_em))}</strong></div>
+      <div data-label="Último valor"><strong>${opportunity.ultimo_valor > 0 ? escapeHtml(moneyBR(opportunity.ultimo_valor)) : "-"}</strong></div>
+      <div data-label="Valor estimado"><strong>${opportunity.valor_estimado > 0 ? escapeHtml(moneyBR(opportunity.valor_estimado)) : "-"}</strong></div>
+      <div data-label="Status"><span class="terrain-opportunity-status terrain-opportunity-status-${escapeAttr(opportunity.status)}">${escapeHtml(opportunity.status_label)}</span></div>
+      <div class="terrain-opportunity-actions" data-label="Ações">
+        ${whatsappUrl ? `<a class="terrain-owner-icon-button terrain-opportunity-whatsapp" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer" title="Enviar mensagem pronta no WhatsApp" aria-label="WhatsApp de ${escapeAttr(opportunity.proprietario)}"><i class="fa-brands fa-whatsapp"></i></a>` : `<button type="button" class="terrain-owner-icon-button" disabled title="WhatsApp não cadastrado"><i class="fa-brands fa-whatsapp"></i></button>`}
+        <button type="button" class="terrain-owner-icon-button" data-opportunity-open="${escapeAttr(opportunity.terrain_id)}" data-no-loading title="Abrir terreno" aria-label="Abrir terreno"><i class="fa-solid fa-eye"></i></button>
+        ${mapsUrl ? `<a class="terrain-owner-icon-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir Maps" aria-label="Abrir Maps"><i class="fa-solid fa-map-location-dot"></i></a>` : `<button type="button" class="terrain-owner-icon-button" disabled title="Localização não cadastrada"><i class="fa-solid fa-map-location-dot"></i></button>`}
+        <button type="button" class="terrain-owner-icon-button" data-opportunity-inspection="${escapeAttr(opportunity.terrain_id)}" data-no-loading title="Nova vistoria" aria-label="Nova vistoria"><i class="fa-solid fa-clipboard-check"></i></button>
+        <button type="button" class="terrain-owner-icon-button" data-opportunity-budget="${escapeAttr(opportunity.terrain_id)}" data-no-loading ${opportunity.owner_id ? "" : "disabled"} title="${opportunity.owner_id ? "Novo orçamento" : "Vincule um proprietário antes"}" aria-label="Novo orçamento"><i class="fa-solid fa-file-invoice-dollar"></i></button>
+        <button type="button" class="terrain-owner-icon-button success" data-opportunity-contact="${escapeAttr(opportunity.owner_id)}" data-no-loading ${opportunity.owner_id ? "" : "disabled"} title="Marcar contato realizado" aria-label="Marcar contato realizado"><i class="fa-solid fa-phone-volume"></i></button>
+        <button type="button" class="terrain-owner-icon-button warning" data-opportunity-not-needed="${escapeAttr(opportunity.terrain_id)}" data-no-loading title="Marcar como não precisa ainda" aria-label="Marcar como não precisa ainda"><i class="fa-solid fa-clock"></i></button>
+      </div>
+    </article>`;
+  }).join("");
+}
+
+async function markTerrainOpportunityContact(ownerId) {
+  if (!ownerId || !terrainOwnerById(ownerId)) return showToast("Proprietário não encontrado.");
+  const update = buildTerrainOpportunityActionUpdate("contact", { today: terrainBudgetLocalDate() });
+  try {
+    await firebaseUpdate(ref(db), {
+      [`${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}/ultimo_contato_em`]: update.ultimo_contato_em,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.owners.path}/${ownerId}/updated_at`]: serverTimestamp()
+    });
+    await refreshTerrainOwnerRecord(ownerId);
+    renderTerrainManagement();
+    showToast("Contato registrado para o proprietário.", { prominent: true });
+  } catch (error) {
+    console.error("Falha ao registrar contato da oportunidade.", error);
+    showToast("Não foi possível registrar o contato.");
+  }
+}
+
+async function markTerrainOpportunityNotNeeded(terrainId) {
+  const terrain = terrainById(terrainId);
+  if (!terrain) return;
+  const answer = window.prompt("Por quantos dias este terreno não precisa de nova abordagem?", "30");
+  if (answer === null) return;
+  try {
+    const update = buildTerrainOpportunityActionUpdate("not_needed", { today: terrainBudgetLocalDate(), days: Number(String(answer).trim()) });
+    await firebaseUpdate(ref(db), {
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/oportunidade_nao_precisa_ate`]: update.oportunidade_nao_precisa_ate,
+      [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}/updated_at`]: serverTimestamp()
+    });
+    await refreshTerrainRecord(terrainId);
+    renderTerrainManagement();
+    showToast(`Oportunidade adiada até ${terrainBudgetDateLabel(update.oportunidade_nao_precisa_ate)}.`, { prominent: true });
+  } catch (error) {
+    showToast(error?.message || "Não foi possível adiar a oportunidade.");
+  }
+}
+
 function renderTerrainFinance() {
   const yearSelect = $("terrainFinanceYear");
   const monthSelect = $("terrainFinanceMonth");
@@ -5234,7 +5325,7 @@ function renderTerrainFinance() {
 }
 
 function switchTerrainManagementTab(tabName = "dashboard") {
-  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services", "reminders", "finance"]);
+  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services", "reminders", "opportunities", "finance"]);
   const target = allowedTabs.has(tabName) ? tabName : "dashboard";
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     const isActive = button.dataset.terrainTab === target;
@@ -5251,6 +5342,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
   if (target === "budgets") renderTerrainBudgetList();
   if (target === "services") renderTerrainServiceList();
   if (target === "reminders") renderTerrainReminders();
+  if (target === "opportunities") renderTerrainOpportunities();
   if (target === "finance") renderTerrainFinance();
 }
 
@@ -25527,6 +25619,23 @@ function bindEvents() {
     if (delayButton) return delayTerrainReminder(delayButton.dataset.reminderDelay);
     const verifyButton = event.target.closest("[data-reminder-verify]");
     if (verifyButton) return verifyTerrainReminder(verifyButton.dataset.reminderVerify);
+  });
+  $("terrainOpportunityFilter")?.addEventListener("change", renderTerrainOpportunities);
+  $("terrainOpportunityList")?.addEventListener("click", (event) => {
+    const openButton = event.target.closest("[data-opportunity-open]");
+    if (openButton) {
+      switchTerrainManagementTab("terrains");
+      openTerrainDetail(openButton.dataset.opportunityOpen);
+      return;
+    }
+    const inspectionButton = event.target.closest("[data-opportunity-inspection]");
+    if (inspectionButton) return openTerrainInspectionForm(inspectionButton.dataset.opportunityInspection);
+    const budgetButton = event.target.closest("[data-opportunity-budget]");
+    if (budgetButton) return openTerrainBudgetForm("", { terrainId: budgetButton.dataset.opportunityBudget });
+    const contactButton = event.target.closest("[data-opportunity-contact]");
+    if (contactButton) return markTerrainOpportunityContact(contactButton.dataset.opportunityContact);
+    const notNeededButton = event.target.closest("[data-opportunity-not-needed]");
+    if (notNeededButton) return markTerrainOpportunityNotNeeded(notNeededButton.dataset.opportunityNotNeeded);
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);
