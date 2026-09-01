@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=17";
+} from "./gestao-terrenos-schema.js?v=18";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 699,
-  label: "v706",
+  numero: 700,
+  label: "v707",
   data: "2026-09-01",
-  nota: "Correcao definitiva do acionamento e quadro Pix nas faturas."
+  nota: "Correcao do Pix no plano individual da area de faturas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -12041,11 +12041,12 @@ function defaultPlanValue(tipoPlano) {
 
 function financePlanValue(client, tipoPlano) {
   if (!isBillableClientType(client)) return 0;
+  const currentClientValue = Number(client?.valorPlano ?? client?.valorMensal ?? 0);
+  if ((client?.tipoPlano || "mensal") === (tipoPlano || "mensal") && currentClientValue > 0) {
+    return currentClientValue;
+  }
   const configuredValue = defaultPlanValue(tipoPlano);
   if (configuredValue > 0) return configuredValue;
-  if ((client?.tipoPlano || "mensal") === (tipoPlano || "mensal")) {
-    return Number(client?.valorPlano ?? client?.valorMensal ?? 0);
-  }
   return 0;
 }
 
@@ -12117,7 +12118,7 @@ function clientPlanOptionsHtml(client = {}) {
   const requestedPlan = activeClientPlanRequest(client)?.tipoPlano;
   const selectedPlan = requestedPlan || client.tipoPlano || "mensal";
   return ["mensal", "semestral", "anual"].map((tipoPlano) => {
-    const value = defaultPlanValue(tipoPlano);
+    const value = financePlanValue(client, tipoPlano);
     const annualProjection = planAnnualProjection(tipoPlano, value);
     const savings = planAnnualSavings(tipoPlano, value);
     const months = planPeriodMonths(tipoPlano);
@@ -12145,9 +12146,9 @@ function selectedClientPlanPayment(client = {}, mount = document) {
     || activeClientPlanRequest(client)?.tipoPlano
     || client.tipoPlano
     || "mensal";
-  const valorPlano = defaultPlanValue(tipoPlano);
+  const valorPlano = financePlanValue(client, tipoPlano);
   const periodo = clientPlanPeriod(tipoPlano);
-  const plannedClient = clientForInvoicePlan(client, tipoPlano);
+  const plannedClient = { ...clientForInvoicePlan(client, tipoPlano), valorPlano };
   const invoice = buildClientInvoice(plannedClient, currentMonthKey(), state.pagamentoSistema || {}, valorPlano, {
     ignoreSaved: true,
     dueDateOverride: invoiceDueDateForMonth(client, currentMonthKey())

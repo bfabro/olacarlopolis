@@ -1,0 +1,12 @@
+{
+  "version": "2026-09-01_v11",
+  "operation": "use_client_plan_value_for_invoice_pix",
+  "recreates_existing_data": false,
+  "new_paths": {},
+  "schema_changes": false,
+  "affected_area": "admin_client_invoices",
+  "value_priority": [
+    "current_client_plan_value",
+    "global_selected_plan_value"
+  ]
+}

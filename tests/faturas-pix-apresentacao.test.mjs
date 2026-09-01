@@ -60,6 +60,34 @@ test("escolha de plano tambem apresenta o Pix antes de salvar remotamente", () =
     'mount.querySelector("[data-generate-plan-boleto]")?.addEventListener'
   );
   assert.ok(handler.indexOf("presentPlanPix(selection.invoice.pixCode") < handler.indexOf("await saveClientPlanRequest"));
+  const selectionBuilder = sourceBetween("function selectedClientPlanPayment", "async function saveClientPlanRequest");
+  assert.match(selectionBuilder, /const valorPlano = financePlanValue\(client, tipoPlano\)/);
+  assert.match(selectionBuilder, /valorTotal: valorPlano/);
+
+  const selectedClientPlanPayment = new Function(
+    "activeClientPlanRequest",
+    "financePlanValue",
+    "clientPlanPeriod",
+    "clientForInvoicePlan",
+    "buildClientInvoice",
+    "currentMonthKey",
+    "state",
+    "invoiceDueDateForMonth",
+    `${selectionBuilder}; return selectedClientPlanPayment;`
+  )(
+    () => null,
+    () => 87.5,
+    () => ({ inicio: "2026-09-01", fim: "2026-10-01" }),
+    (client) => ({ ...client, valorPlano: 87.5 }),
+    (_client, _month, _config, total) => ({ mes: "2026-09", valorTotal: total, pixCode: `PIX:${total}`, qrUrl: `QR:${total}` }),
+    () => "2026-09",
+    { pagamentoSistema: { pixChave: "pix@example.com" } },
+    () => "2026-09-30"
+  );
+  const mount = { querySelector: () => ({ value: "mensal" }) };
+  const selection = selectedClientPlanPayment({ id: "cliente", tipoPlano: "mensal", valorPlano: 87.5 }, mount);
+  assert.equal(selection.valorTotal, 87.5);
+  assert.equal(selection.invoice.pixCode, "PIX:87.5");
 });
 
 test("botoes de geracao do Pix usam destaque visual especifico", () => {
@@ -103,6 +131,18 @@ test("plano preserva o valor individual do cliente como fallback", () => {
   const builderSource = sourceBetween("function clientForInvoicePlan", "function planPeriodMonths");
   assert.match(builderSource, /isCurrentPlan && currentClientValue > 0/);
   assert.match(builderSource, /valorPlano: planValue/);
+});
+
+test("plano atual prioriza o valor individual do cliente na geracao Pix", () => {
+  const financePlanValueSource = sourceBetween("function financePlanValue", "function syncFinanceRowPlanValue");
+  const financePlanValue = new Function(
+    "isBillableClientType",
+    "defaultPlanValue",
+    `${financePlanValueSource}; return financePlanValue;`
+  )(() => true, () => 0);
+  const client = { tipoCliente: "comercio", tipoPlano: "mensal", valorPlano: 87.5 };
+  assert.equal(financePlanValue(client, "mensal"), 87.5);
+  assert.equal(financePlanValue(client, "anual"), 0);
 });
 
 test("gerador cria payload Pix copia e cola com valor e CRC", () => {
