@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=427">
+  <link rel="stylesheet" href="painel.css?v=428">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -210,6 +210,7 @@
           <button type="button" data-terrain-tab="developments"><i class="fa-solid fa-map"></i> Loteamentos</button>
           <button type="button" data-terrain-tab="budgets"><i class="fa-solid fa-file-invoice-dollar"></i> Orçamentos</button>
           <button type="button" data-terrain-tab="services"><i class="fa-solid fa-broom"></i> Serviços</button>
+          <button type="button" data-terrain-tab="finance"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
         </nav>
 
         <section class="terrain-module-section" data-terrain-section="dashboard">
@@ -644,11 +645,15 @@
               <label>Tempo gasto<input id="terrainServiceDuration" maxlength="80" placeholder="Ex.: 4h 30min"></label>
               <label class="wide">Equipamentos utilizados<textarea id="terrainServiceEquipment" rows="3" maxlength="1200"></textarea></label>
               <label class="wide">Funcionários/responsáveis<input id="terrainServiceResponsible" maxlength="500" required></label>
-              <label>Valor cobrado<input id="terrainServiceCharged" type="number" min="0" step="0.01" required></label>
+              <label>Valor total<input id="terrainServiceCharged" type="number" min="0" step="0.01" required></label>
               <label>Custo<input id="terrainServiceCost" type="number" min="0" step="0.01" required></label>
               <label>Lucro estimado<input id="terrainServiceProfit" type="number" readonly></label>
-              <label>Forma de pagamento<input id="terrainServicePaymentMethod" maxlength="100" required></label>
-              <label>Status do pagamento<select id="terrainServicePaymentStatus"><option value="pendente">Pendente</option><option value="parcial">Parcial</option><option value="pago">Pago</option></select></label>
+              <label>Forma de pagamento<select id="terrainServicePaymentMethod" required><option value="pix">Pix</option><option value="dinheiro">Dinheiro</option><option value="cartao">Cartão</option><option value="transferencia">Transferência</option><option value="outro">Outro</option></select></label>
+              <label>Status do pagamento<select id="terrainServicePaymentStatus"><option value="pendente">Pendente</option><option value="parcial">Parcial</option><option value="pago">Pago</option><option value="cancelado">Cancelado</option></select></label>
+              <label>Valor recebido<input id="terrainServiceReceived" type="number" min="0" step="0.01" value="0" required></label>
+              <label>Saldo<input id="terrainServiceBalance" type="number" min="0" step="0.01" readonly></label>
+              <label>Data de pagamento<input id="terrainServicePaymentDate" type="date"></label>
+              <label class="wide">Observações do pagamento<textarea id="terrainServicePaymentNotes" rows="3" maxlength="1200"></textarea></label>
               <label class="wide">Observações<textarea id="terrainServiceNotes" rows="4" maxlength="2000"></textarea></label>
               <fieldset class="terrain-service-photo-fieldset"><legend>Fotos antes</legend><input id="terrainServiceBeforeFiles" type="file" accept="image/*" multiple><div id="terrainServiceBeforePreview" class="terrain-photo-selection-preview"></div></fieldset>
               <fieldset class="terrain-service-photo-fieldset"><legend>Fotos depois</legend><input id="terrainServiceAfterFiles" type="file" accept="image/*" multiple><div id="terrainServiceAfterPreview" class="terrain-photo-selection-preview"></div></fieldset>
@@ -659,6 +664,32 @@
             <div class="section-head"><div><h2>Serviços</h2><p id="terrainServiceListSummary">0 serviços cadastrados.</p></div><button id="newTerrainService" class="ghost-button new-entry-button" type="button" data-no-loading><i class="fa-solid fa-plus"></i> Novo serviço</button></div>
             <div class="terrain-service-list-head"><span>Data</span><span>Proprietário</span><span>Terreno</span><span>Tipo</span><span>Valor</span><span>Status</span><span>Ações</span></div>
             <div id="terrainServiceList" class="terrain-service-list"></div>
+          </section>
+        </section>
+
+        <section class="terrain-module-section hidden" data-terrain-section="finance">
+          <section class="panel-card terrain-finance-dashboard">
+            <div class="section-head"><div><h2>Financeiro</h2><p>Recebimentos e resultados dos serviços de terrenos.</p></div></div>
+            <div class="terrain-finance-filters" aria-label="Filtros financeiros">
+              <label>Ano<select id="terrainFinanceYear"></select></label>
+              <label>Mês<select id="terrainFinanceMonth"><option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option><option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option><option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option></select></label>
+              <label>Status<select id="terrainFinancePaymentStatus"><option value="todos">Todos</option><option value="pendente">Pendente</option><option value="parcial">Parcial</option><option value="pago">Pago</option></select></label>
+            </div>
+            <div class="terrain-finance-stats">
+              <article><span>Faturamento do mês</span><strong id="terrainFinanceMonthlyBilling">R$ 0,00</strong></article>
+              <article><span>Faturamento anual</span><strong id="terrainFinanceAnnualBilling">R$ 0,00</strong></article>
+              <article><span>Valores pagos</span><strong id="terrainFinancePaid">R$ 0,00</strong></article>
+              <article><span>Valores pendentes</span><strong id="terrainFinancePending">R$ 0,00</strong></article>
+              <article><span>Custos</span><strong id="terrainFinanceCosts">R$ 0,00</strong></article>
+              <article><span>Lucro estimado</span><strong id="terrainFinanceProfit">R$ 0,00</strong></article>
+              <article><span>Ticket médio</span><strong id="terrainFinanceAverageTicket">R$ 0,00</strong></article>
+              <article><span>Valor médio por m²</span><strong id="terrainFinanceAverageSquareMeter">R$ 0,00</strong></article>
+            </div>
+          </section>
+          <section class="panel-card terrain-finance-pending-card">
+            <div class="section-head"><div><h2>Pagamentos pendentes</h2><p id="terrainFinancePendingSummary">Nenhum pagamento pendente no período.</p></div></div>
+            <div class="terrain-finance-pending-head" aria-hidden="true"><span>Cliente</span><span>Terreno</span><span>Data</span><span>Total</span><span>Recebido</span><span>Saldo</span><span>Ação</span></div>
+            <div id="terrainFinancePendingList" class="terrain-finance-pending-list"></div>
           </section>
         </section>
       </section>
@@ -2915,6 +2946,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=627"></script>
+  <script type="module" src="painel.js?v=628"></script>
 </body>
 </html>

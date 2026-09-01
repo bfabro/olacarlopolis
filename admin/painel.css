@@ -1189,7 +1189,9 @@ button[type="submit"]:hover,
 .terrain-budget-form-card,
 .terrain-budget-list-card,
 .terrain-service-form-card,
-.terrain-service-list-card {
+.terrain-service-list-card,
+.terrain-finance-dashboard,
+.terrain-finance-pending-card {
   padding: 18px;
 }
 
@@ -2495,6 +2497,82 @@ body.terrain-owner-detail-open {
 
 .terrain-before-after h3 { margin: 0 0 12px; font-size: 16px; }
 
+.terrain-finance-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 220px));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.terrain-finance-filters label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-finance-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.terrain-finance-stats article {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-left: 4px solid #0f766e;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-finance-stats span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.terrain-finance-stats strong {
+  display: block;
+  margin-top: 7px;
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 20px;
+  text-overflow: ellipsis;
+}
+
+.terrain-finance-pending-card { margin-top: 14px; }
+
+.terrain-finance-pending-head,
+.terrain-finance-pending-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) minmax(140px, 1fr) 100px 110px 110px 110px 70px;
+  gap: 10px;
+  align-items: center;
+}
+
+.terrain-finance-pending-head {
+  padding: 0 12px 8px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.terrain-finance-pending-list { display: grid; gap: 8px; }
+
+.terrain-finance-pending-row {
+  min-height: 70px;
+  padding: 11px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-finance-pending-row > div { min-width: 0; }
+.terrain-finance-pending-row strong { display: block; overflow: hidden; text-overflow: ellipsis; }
+
 @media (max-width: 1180px) {
   .terrain-owner-list-head {
     display: none;
@@ -2589,6 +2667,11 @@ body.terrain-owner-detail-open {
   .terrain-service-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .terrain-service-row > div::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
   .terrain-service-row .terrain-owner-actions { grid-column: 1 / -1; }
+  .terrain-finance-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .terrain-finance-pending-head { display: none; }
+  .terrain-finance-pending-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .terrain-finance-pending-row > div::before { content: attr(data-label); display: block; margin-bottom: 4px; color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+  .terrain-finance-pending-row .terrain-owner-actions { grid-column: 1 / -1; }
 }
 
 @media (max-width: 720px) {
@@ -2601,7 +2684,9 @@ body.terrain-owner-detail-open {
   .terrain-budget-form-card,
   .terrain-budget-list-card,
   .terrain-service-form-card,
-  .terrain-service-list-card {
+  .terrain-service-list-card,
+  .terrain-finance-dashboard,
+  .terrain-finance-pending-card {
     padding: 13px;
   }
 
@@ -2617,11 +2702,21 @@ body.terrain-owner-detail-open {
   }
 
   .terrain-service-row,
-  .terrain-before-after {
+  .terrain-before-after,
+  .terrain-finance-filters,
+  .terrain-finance-stats,
+  .terrain-finance-pending-row {
     grid-template-columns: 1fr;
   }
 
   .terrain-service-row > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .terrain-finance-pending-row > div {
     display: flex;
     align-items: center;
     justify-content: space-between;

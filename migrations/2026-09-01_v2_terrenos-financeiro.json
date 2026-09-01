@@ -1,0 +1,15 @@
+{
+  "version": "2026-09-01_v2",
+  "operation": "extend_services_with_payments_and_finance_dashboard",
+  "recreates_existing_data": false,
+  "entity": "terrenosServicos",
+  "added_fields": [
+    "valor_recebido",
+    "saldo",
+    "data_pagamento",
+    "observacoes_pagamento"
+  ],
+  "payment_methods": ["pix", "dinheiro", "cartao", "transferencia", "outro"],
+  "payment_statuses": ["pendente", "parcial", "pago", "cancelado"],
+  "compatibility": "Servicos existentes recebem valores padrao ao serem editados; nenhuma outra estrutura financeira e alterada."
+}

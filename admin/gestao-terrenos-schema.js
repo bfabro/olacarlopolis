@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v1";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-01_v2";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -110,6 +110,18 @@ export const TERRAIN_SERVICE_STATUS_OPTIONS = Object.freeze([
   Object.freeze({ value: "cancelado", label: "Cancelado", tone: "danger" })
 ]);
 
+export const TERRAIN_PAYMENT_METHOD_OPTIONS = Object.freeze([
+  ["pix", "Pix"], ["dinheiro", "Dinheiro"], ["cartao", "Cartão"],
+  ["transferencia", "Transferência"], ["outro", "Outro"]
+].map(([value, label]) => Object.freeze({ value, label })));
+
+export const TERRAIN_PAYMENT_STATUS_OPTIONS = Object.freeze([
+  Object.freeze({ value: "pendente", label: "Pendente", tone: "warning" }),
+  Object.freeze({ value: "parcial", label: "Parcial", tone: "info" }),
+  Object.freeze({ value: "pago", label: "Pago", tone: "success" }),
+  Object.freeze({ value: "cancelado", label: "Cancelado", tone: "danger" })
+]);
+
 export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
   owners: Object.freeze({
     path: "terrenosProprietarios",
@@ -174,8 +186,8 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
   }),
   services: Object.freeze({
     path: "terrenosServicos",
-    fields: Object.freeze(["id", "owner_id", "terrain_id", "budget_id", "data_prevista", "data_realizada", "horario", "area_m2", "tipo_servico", "equipamentos", "responsaveis", "tempo_gasto", "valor_cobrado", "custo", "lucro_estimado", "forma_pagamento", "status_pagamento", "status", "observacoes", "created_at", "updated_at"]),
-    optionalFields: Object.freeze(["budget_id", "data_realizada"])
+    fields: Object.freeze(["id", "owner_id", "terrain_id", "budget_id", "data_prevista", "data_realizada", "horario", "area_m2", "tipo_servico", "equipamentos", "responsaveis", "tempo_gasto", "valor_cobrado", "valor_recebido", "saldo", "custo", "lucro_estimado", "forma_pagamento", "status_pagamento", "data_pagamento", "observacoes_pagamento", "status", "observacoes", "created_at", "updated_at"]),
+    optionalFields: Object.freeze(["budget_id", "data_realizada", "data_pagamento"])
   }),
   servicePhotos: Object.freeze({
     path: "terrenosServicosFotos",
@@ -194,6 +206,8 @@ const TERRAIN_PHOTO_CATEGORY_VALUES = new Set(TERRAIN_PHOTO_CATEGORY_OPTIONS.map
 const TERRAIN_BUDGET_STATUS_VALUES = new Set(TERRAIN_BUDGET_STATUS_OPTIONS.map((item) => item.value));
 const TERRAIN_SERVICE_TYPE_VALUES = new Set(TERRAIN_SERVICE_TYPE_OPTIONS.map((item) => item.value));
 const TERRAIN_SERVICE_STATUS_VALUES = new Set(TERRAIN_SERVICE_STATUS_OPTIONS.map((item) => item.value));
+const TERRAIN_PAYMENT_METHOD_VALUES = new Set(TERRAIN_PAYMENT_METHOD_OPTIONS.map((item) => item.value));
+const TERRAIN_PAYMENT_STATUS_VALUES = new Set(TERRAIN_PAYMENT_STATUS_OPTIONS.map((item) => item.value));
 
 export function normalizeTerrainOwnerInput(input = {}) {
   const value = (key) => String(input[key] ?? "").trim();
@@ -800,7 +814,8 @@ export function terrainServiceInputFromBudget(budget = {}, terrain = {}, today =
     budget_id: budget.id || "", data_prevista: today, data_realizada: "", horario: "",
     area_m2: budget.area_m2 ?? terrain.area_m2 ?? 0, tipo_servico: terrainServiceTypeFromText(budget.tipo_servico),
     equipamentos: "", responsaveis: "", tempo_gasto: "", valor_cobrado: budget.valor ?? 0, custo: 0,
-    forma_pagamento: "", status_pagamento: "pendente", status: "aguardando",
+    forma_pagamento: "pix", status_pagamento: "pendente", valor_recebido: 0, saldo: Number(budget.valor || 0),
+    data_pagamento: "", observacoes_pagamento: "", status: "aguardando",
     observacoes: [budget.descricao, budget.observacoes].filter(Boolean).join("\n")
   };
 }
@@ -808,15 +823,26 @@ export function terrainServiceInputFromBudget(budget = {}, terrain = {}, today =
 export function normalizeTerrainServiceInput(input = {}) {
   const value = (key) => String(input[key] ?? "").trim();
   const charged = terrainNumber(input.valor_cobrado, "valor cobrado");
+  const received = terrainNumber(input.valor_recebido ?? 0, "valor recebido");
   const cost = terrainNumber(input.custo, "custo");
+  if (received > charged) throw new Error("O valor recebido não pode ser maior que o valor total.");
+  const balance = Math.max(charged - received, 0);
+  const requestedPaymentStatus = value("status_pagamento");
+  const paymentStatus = requestedPaymentStatus === "cancelado"
+    ? "cancelado"
+    : (received <= 0 ? "pendente" : (balance <= 0 ? "pago" : "parcial"));
+  const normalizedPaymentMethod = value("forma_pagamento").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const service = {
     owner_id: value("owner_id"), terrain_id: value("terrain_id"), budget_id: value("budget_id") || null,
     data_prevista: value("data_prevista"), data_realizada: value("data_realizada") || null, horario: value("horario"),
     area_m2: terrainNumber(input.area_m2, "área"),
     tipo_servico: TERRAIN_SERVICE_TYPE_VALUES.has(value("tipo_servico")) ? value("tipo_servico") : "outro",
     equipamentos: value("equipamentos"), responsaveis: value("responsaveis"), tempo_gasto: value("tempo_gasto"),
-    valor_cobrado: charged, custo: cost, lucro_estimado: charged - cost, forma_pagamento: value("forma_pagamento"),
-    status_pagamento: ["pendente", "parcial", "pago"].includes(value("status_pagamento")) ? value("status_pagamento") : "pendente",
+    valor_cobrado: charged, valor_recebido: received, saldo: balance,
+    custo: cost, lucro_estimado: charged - cost,
+    forma_pagamento: TERRAIN_PAYMENT_METHOD_VALUES.has(normalizedPaymentMethod) ? normalizedPaymentMethod : "outro",
+    status_pagamento: TERRAIN_PAYMENT_STATUS_VALUES.has(paymentStatus) ? paymentStatus : "pendente",
+    data_pagamento: value("data_pagamento") || null, observacoes_pagamento: value("observacoes_pagamento"),
     status: TERRAIN_SERVICE_STATUS_VALUES.has(value("status")) ? value("status") : "aguardando",
     observacoes: value("observacoes")
   };
@@ -835,6 +861,46 @@ export function buildTerrainServiceRecord(input, { id, existing = {}, timestamp 
 export function terrainServiceRecords(records = {}) {
   const list = Array.isArray(records) ? records : Object.entries(records || {}).map(([id, item]) => ({ id, ...(item || {}) }));
   return list.filter((item) => item?.id).sort((a, b) => String(b.data_prevista || "").localeCompare(String(a.data_prevista || "")));
+}
+
+export function terrainPaymentMethodLabel(method) {
+  return TERRAIN_PAYMENT_METHOD_OPTIONS.find((item) => item.value === method)?.label || "Outro";
+}
+
+export function terrainPaymentStatusMeta(status) {
+  return TERRAIN_PAYMENT_STATUS_OPTIONS.find((item) => item.value === status) || TERRAIN_PAYMENT_STATUS_OPTIONS[0];
+}
+
+function terrainFinanceReferenceDate(service = {}) {
+  return String(service.data_realizada || service.data_prevista || "").slice(0, 10);
+}
+
+export function calculateTerrainFinance(records = {}, filters = {}) {
+  const now = new Date();
+  const year = String(filters.year || now.getFullYear());
+  const month = String(filters.month || (now.getMonth() + 1)).padStart(2, "0");
+  const paymentStatus = String(filters.paymentStatus || "todos");
+  const eligible = terrainServiceRecords(records).filter((service) => service.status !== "cancelado" && service.status_pagamento !== "cancelado");
+  const statusFiltered = paymentStatus === "todos" ? eligible : eligible.filter((service) => service.status_pagamento === paymentStatus);
+  const annual = statusFiltered.filter((service) => terrainFinanceReferenceDate(service).startsWith(`${year}-`));
+  const monthly = annual.filter((service) => terrainFinanceReferenceDate(service).startsWith(`${year}-${month}-`));
+  const sum = (items, field) => items.reduce((total, item) => total + Number(item[field] || 0), 0);
+  const billing = sum(monthly, "valor_cobrado");
+  const area = sum(monthly, "area_m2");
+  return {
+    year,
+    month,
+    records: monthly,
+    pendingRecords: monthly.filter((service) => ["pendente", "parcial"].includes(service.status_pagamento) && Number(service.saldo ?? service.valor_cobrado) > 0),
+    faturamento_mes: billing,
+    faturamento_anual: sum(annual, "valor_cobrado"),
+    valores_pagos: sum(monthly, "valor_recebido"),
+    valores_pendentes: monthly.reduce((total, service) => total + Number(service.saldo ?? Math.max(Number(service.valor_cobrado || 0) - Number(service.valor_recebido || 0), 0)), 0),
+    custos: sum(monthly, "custo"),
+    lucro_estimado: billing - sum(monthly, "custo"),
+    ticket_medio: monthly.length ? billing / monthly.length : 0,
+    valor_medio_m2: area > 0 ? billing / area : 0
+  };
 }
 
 export function terrainServicePhotoStoragePath(terrainId, serviceId, type, file = {}, timestamp = Date.now(), index = 0) {

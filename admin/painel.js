@@ -44,6 +44,7 @@ import {
   buildTerrainPhotoRecord,
   buildTerrainRecord,
   buildTerrainOwnerRecord,
+  calculateTerrainFinance,
   canDeleteTerrainDevelopment,
   canDeleteTerrainOwner,
   clampTerrainPlanZoom,
@@ -58,6 +59,8 @@ import {
   terrainOwnerOriginLabel,
   terrainOwnerStatusMeta,
   terrainOwnerWhatsappUrl,
+  terrainPaymentMethodLabel,
+  terrainPaymentStatusMeta,
   terrainCharacteristicLabels,
   terrainDevelopmentName,
   terrainDevelopmentLinkedTerrains,
@@ -89,7 +92,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=8";
+} from "./gestao-terrenos-schema.js?v=9";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -104,10 +107,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 690,
-  label: "v697",
+  numero: 691,
+  label: "v698",
   data: "2026-09-01",
-  nota: "Servicos e fotos antes/depois na Gestao de Terrenos."
+  nota: "Pagamentos e Financeiro na Gestao de Terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3236,6 +3239,7 @@ function renderTerrainManagement() {
   renderTerrainDevelopmentList();
   renderTerrainBudgetList();
   renderTerrainServiceList();
+  renderTerrainFinance();
 }
 
 function terrainOwnerById(ownerId) {
@@ -4864,10 +4868,14 @@ function renderTerrainServiceOptions(ownerId = "", terrainId = "") {
   $("terrainServiceTerrain").innerHTML = `<option value="">Selecione</option>${terrains.map((terrain) => `<option value="${escapeAttr(terrain.id)}" ${terrain.id === terrainId ? "selected" : ""}>${escapeHtml(terrain.apelido)}</option>`).join("")}`;
 }
 
-function updateTerrainServiceProfit() {
+function updateTerrainServicePayment() {
   const charged = Number($("terrainServiceCharged")?.value || 0);
   const cost = Number($("terrainServiceCost")?.value || 0);
+  const received = Math.max(Number($("terrainServiceReceived")?.value || 0), 0);
   if ($("terrainServiceProfit")) $("terrainServiceProfit").value = String(charged - cost);
+  if ($("terrainServiceBalance")) $("terrainServiceBalance").value = String(Math.max(charged - received, 0));
+  const status = $("terrainServicePaymentStatus");
+  if (status && status.value !== "cancelado") status.value = received <= 0 ? "pendente" : (received >= charged ? "pago" : "parcial");
 }
 
 function resetTerrainServiceForm() {
@@ -4884,6 +4892,8 @@ function openTerrainServiceForm(serviceId = "", { budgetId = "" } = {}) {
   if (budget && terrainServiceRecords(state.terrainManagement?.services || {}).some((item) => item.budget_id === budget.id)) return showToast("Este orçamento já foi transformado em serviço.");
   const terrain = terrainById(service?.terrain_id || budget?.terrain_id || "");
   const values = service || (budget ? terrainServiceInputFromBudget(budget, terrain, terrainBudgetLocalDate()) : {});
+  const rawPaymentMethod = String(values.forma_pagamento || "pix").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const paymentMethod = ["pix", "dinheiro", "cartao", "transferencia", "outro"].includes(rawPaymentMethod) ? rawPaymentMethod : "outro";
   state.selectedTerrainServiceId = service?.id || null;
   switchTerrainManagementTab("services");
   $("terrainServiceForm")?.reset();
@@ -4896,11 +4906,13 @@ function openTerrainServiceForm(serviceId = "", { budgetId = "" } = {}) {
     terrainServiceType: values.tipo_servico || "rocada", terrainServiceEquipment: values.equipamentos || "",
     terrainServiceResponsible: values.responsaveis || "", terrainServiceDuration: values.tempo_gasto || "",
     terrainServiceCharged: values.valor_cobrado ?? 0, terrainServiceCost: values.custo ?? 0,
-    terrainServicePaymentMethod: values.forma_pagamento || "", terrainServicePaymentStatus: values.status_pagamento || "pendente",
+    terrainServicePaymentMethod: paymentMethod, terrainServicePaymentStatus: values.status_pagamento || "pendente",
+    terrainServiceReceived: values.valor_recebido ?? 0, terrainServiceBalance: values.saldo ?? Math.max(Number(values.valor_cobrado || 0) - Number(values.valor_recebido || 0), 0),
+    terrainServicePaymentDate: values.data_pagamento || "", terrainServicePaymentNotes: values.observacoes_pagamento || "",
     terrainServiceStatus: values.status || "aguardando", terrainServiceNotes: values.observacoes || ""
   };
   Object.entries(fields).forEach(([id, value]) => { if ($(id)) $(id).value = value; });
-  updateTerrainServiceProfit();
+  updateTerrainServicePayment();
   $("terrainServiceFormTitle").textContent = service ? "Editar serviço" : (budget ? `Serviço do orçamento ${budget.numero}` : "Novo serviço");
   $("terrainServiceFormCard")?.classList.remove("hidden");
   $("terrainServiceExpectedDate")?.focus();
@@ -4916,7 +4928,9 @@ function terrainServiceFormValues() {
     equipamentos: $("terrainServiceEquipment").value, responsaveis: $("terrainServiceResponsible").value,
     tempo_gasto: $("terrainServiceDuration").value, valor_cobrado: $("terrainServiceCharged").value,
     custo: $("terrainServiceCost").value, forma_pagamento: $("terrainServicePaymentMethod").value,
+    valor_recebido: $("terrainServiceReceived").value, saldo: $("terrainServiceBalance").value,
     status_pagamento: $("terrainServicePaymentStatus").value, status: $("terrainServiceStatus").value,
+    data_pagamento: $("terrainServicePaymentDate").value, observacoes_pagamento: $("terrainServicePaymentNotes").value,
     observacoes: $("terrainServiceNotes").value
   };
 }
@@ -4999,8 +5013,11 @@ function openTerrainServiceDetail(id) {
     <div><span>Horário</span><strong>${escapeHtml(service.horario || "-")}</strong></div><div><span>Área</span><strong>${escapeHtml(formatTerrainMeasure(service.area_m2, "m²"))}</strong></div>
     <div><span>Tipo</span><strong>${escapeHtml(terrainServiceTypeLabel(service.tipo_servico))}</strong></div><div><span>Tempo gasto</span><strong>${escapeHtml(service.tempo_gasto || "-")}</strong></div>
     <div class="wide"><span>Equipamentos utilizados</span><strong>${escapeHtml(service.equipamentos || "-")}</strong></div><div class="wide"><span>Funcionários/responsáveis</span><strong>${escapeHtml(service.responsaveis)}</strong></div>
-    <div><span>Valor cobrado</span><strong>${escapeHtml(moneyBR(service.valor_cobrado))}</strong></div><div><span>Custo</span><strong>${escapeHtml(moneyBR(service.custo))}</strong></div>
-    <div><span>Lucro estimado</span><strong>${escapeHtml(moneyBR(service.lucro_estimado))}</strong></div><div><span>Pagamento</span><strong>${escapeHtml(`${service.forma_pagamento} - ${service.status_pagamento}`)}</strong></div>
+    <div><span>Valor total</span><strong>${escapeHtml(moneyBR(service.valor_cobrado))}</strong></div><div><span>Custo</span><strong>${escapeHtml(moneyBR(service.custo))}</strong></div>
+    <div><span>Lucro estimado</span><strong>${escapeHtml(moneyBR(service.lucro_estimado))}</strong></div><div><span>Forma de pagamento</span><strong>${escapeHtml(terrainPaymentMethodLabel(service.forma_pagamento))}</strong></div>
+    <div><span>Status do pagamento</span><strong>${escapeHtml(terrainPaymentStatusMeta(service.status_pagamento).label)}</strong></div><div><span>Valor recebido</span><strong>${escapeHtml(moneyBR(service.valor_recebido))}</strong></div>
+    <div><span>Saldo</span><strong>${escapeHtml(moneyBR(service.saldo ?? Math.max(Number(service.valor_cobrado || 0) - Number(service.valor_recebido || 0), 0)))}</strong></div><div><span>Data do pagamento</span><strong>${escapeHtml(terrainBudgetDateLabel(service.data_pagamento))}</strong></div>
+    <div class="wide"><span>Observações do pagamento</span><strong>${escapeHtml(service.observacoes_pagamento || "-")}</strong></div>
     <div class="wide"><span>Observações</span><strong>${escapeHtml(service.observacoes || "-")}</strong></div></div>
     <div class="terrain-before-after"><section><h3>Antes</h3>${terrainServiceGalleryHtml(id, "antes")}</section><section><h3>Depois</h3>${terrainServiceGalleryHtml(id, "depois")}</section></div>`;
   $("terrainServiceDetailModal")?.classList.remove("hidden"); $("terrainServiceDetailModal")?.setAttribute("aria-hidden", "false"); document.body.classList.add("terrain-owner-detail-open");
@@ -5015,8 +5032,56 @@ async function deleteTerrainService(id) {
   await firebaseUpdate(ref(db), updates); delete state.terrainManagement.services[id]; closeTerrainServiceDetail(); renderTerrainManagement(); showToast("Serviço excluído.");
 }
 
+function renderTerrainFinance() {
+  const yearSelect = $("terrainFinanceYear");
+  const monthSelect = $("terrainFinanceMonth");
+  if (!yearSelect || !monthSelect) return;
+  const services = terrainServiceRecords(state.terrainManagement?.services || {});
+  const now = new Date();
+  const years = [...new Set([String(now.getFullYear()), ...services.map((service) => String(service.data_realizada || service.data_prevista || "").slice(0, 4)).filter(Boolean)])].sort((a, b) => b.localeCompare(a));
+  const selectedYear = yearSelect.value || String(now.getFullYear());
+  yearSelect.innerHTML = years.map((year) => `<option value="${escapeAttr(year)}">${escapeHtml(year)}</option>`).join("");
+  yearSelect.value = years.includes(selectedYear) ? selectedYear : years[0];
+  if (!monthSelect.dataset.initialized) {
+    monthSelect.value = String(now.getMonth() + 1).padStart(2, "0");
+    monthSelect.dataset.initialized = "true";
+  }
+  const finance = calculateTerrainFinance(services, {
+    year: yearSelect.value,
+    month: monthSelect.value,
+    paymentStatus: $("terrainFinancePaymentStatus")?.value || "todos"
+  });
+  const values = {
+    terrainFinanceMonthlyBilling: finance.faturamento_mes,
+    terrainFinanceAnnualBilling: finance.faturamento_anual,
+    terrainFinancePaid: finance.valores_pagos,
+    terrainFinancePending: finance.valores_pendentes,
+    terrainFinanceCosts: finance.custos,
+    terrainFinanceProfit: finance.lucro_estimado,
+    terrainFinanceAverageTicket: finance.ticket_medio,
+    terrainFinanceAverageSquareMeter: finance.valor_medio_m2
+  };
+  Object.entries(values).forEach(([id, value]) => { if ($(id)) $(id).textContent = moneyBR(value); });
+  const mount = $("terrainFinancePendingList");
+  const summary = $("terrainFinancePendingSummary");
+  if (summary) summary.textContent = finance.pendingRecords.length
+    ? `${finance.pendingRecords.length} ${finance.pendingRecords.length === 1 ? "pagamento pendente" : "pagamentos pendentes"} no período.`
+    : "Nenhum pagamento pendente no período.";
+  if (!mount) return;
+  if (!finance.pendingRecords.length) {
+    mount.innerHTML = `<div class="terrain-owner-list-empty"><i class="fa-solid fa-circle-check"></i><strong>Nenhum pagamento pendente</strong><span>Os recebimentos do período estão em dia.</span></div>`;
+    return;
+  }
+  mount.innerHTML = finance.pendingRecords.map((service) => {
+    const owner = terrainOwnerById(service.owner_id) || {};
+    const terrain = terrainById(service.terrain_id) || {};
+    const balance = Number(service.saldo ?? Math.max(Number(service.valor_cobrado || 0) - Number(service.valor_recebido || 0), 0));
+    return `<article class="terrain-finance-pending-row"><div data-label="Cliente"><strong>${escapeHtml(owner.nome || "-")}</strong></div><div data-label="Terreno"><strong>${escapeHtml(terrain.apelido || "-")}</strong></div><div data-label="Data"><strong>${escapeHtml(terrainBudgetDateLabel(service.data_realizada || service.data_prevista))}</strong></div><div data-label="Total"><strong>${escapeHtml(moneyBR(service.valor_cobrado))}</strong></div><div data-label="Recebido"><strong>${escapeHtml(moneyBR(service.valor_recebido))}</strong></div><div data-label="Saldo"><strong>${escapeHtml(moneyBR(balance))}</strong></div><div class="terrain-owner-actions" data-label="Ação"><button type="button" class="terrain-owner-icon-button" data-finance-service-edit="${escapeAttr(service.id)}" data-no-loading aria-label="Editar pagamento"><i class="fa-solid fa-pen"></i></button></div></article>`;
+  }).join("");
+}
+
 function switchTerrainManagementTab(tabName = "dashboard") {
-  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services"]);
+  const allowedTabs = new Set(["dashboard", "owners", "terrains", "developments", "budgets", "services", "finance"]);
   const target = allowedTabs.has(tabName) ? tabName : "dashboard";
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     const isActive = button.dataset.terrainTab === target;
@@ -5032,6 +5097,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
   if (target === "developments") renderTerrainDevelopmentList();
   if (target === "budgets") renderTerrainBudgetList();
   if (target === "services") renderTerrainServiceList();
+  if (target === "finance") renderTerrainFinance();
 }
 
 function updateChrome() {
@@ -25245,7 +25311,17 @@ function bindEvents() {
     renderTerrainServiceOptions(terrain.owner_id, terrain.id);
     $("terrainServiceArea").value = terrain.area_m2 ?? "";
   });
-  ["terrainServiceCharged", "terrainServiceCost"].forEach((id) => $(id)?.addEventListener("input", updateTerrainServiceProfit));
+  ["terrainServiceCharged", "terrainServiceCost", "terrainServiceReceived"].forEach((id) => $(id)?.addEventListener("input", updateTerrainServicePayment));
+  $("terrainServicePaymentStatus")?.addEventListener("change", () => {
+    const status = $("terrainServicePaymentStatus").value;
+    if (status === "pago") {
+      $("terrainServiceReceived").value = $("terrainServiceCharged").value || "0";
+      if (!$("terrainServicePaymentDate").value) $("terrainServicePaymentDate").value = terrainBudgetLocalDate();
+    } else if (status === "pendente") {
+      $("terrainServiceReceived").value = "0";
+    }
+    updateTerrainServicePayment();
+  });
   $("terrainServiceBeforeFiles")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainServiceBeforeFiles", "terrainServiceBeforePreview"));
   $("terrainServiceAfterFiles")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainServiceAfterFiles", "terrainServiceAfterPreview"));
   $("terrainServiceList")?.addEventListener("click", (event) => {
@@ -25272,6 +25348,12 @@ function bindEvents() {
       const photo = state.terrainManagement?.servicePhotos?.[photoButton.dataset.servicePhotoView];
       if (photo) openTerrainPhotoViewer(photo.url, photo.tipo === "antes" ? "Antes do serviço" : "Depois do serviço");
     }
+  });
+  ["terrainFinanceYear", "terrainFinanceMonth", "terrainFinancePaymentStatus"].forEach((id) => $(id)?.addEventListener("change", renderTerrainFinance));
+  $("terrainFinancePendingList")?.addEventListener("click", (event) => {
+    const edit = event.target.closest("[data-finance-service-edit]");
+    if (!edit) return;
+    openTerrainServiceForm(edit.dataset.financeServiceEdit);
   });
 
   $("clientShortDescription")?.addEventListener("input", updateClientShortDescriptionCount);
