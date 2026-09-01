@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=15";
+} from "./gestao-terrenos-schema.js?v=16";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 697,
-  label: "v704",
+  numero: 698,
+  label: "v705",
   data: "2026-09-01",
-  nota: "Correcao da apresentacao do QR Code Pix nas faturas dos clientes."
+  nota: "Correcao do valor e payload Pix nas faturas dos clientes."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -12068,10 +12068,17 @@ function syncFinanceRowPlanValue(row) {
 }
 
 function clientForInvoicePlan(client, tipoPlano) {
+  const selectedPlan = tipoPlano || client?.tipoPlano || "mensal";
+  const configuredValue = defaultPlanValue(selectedPlan);
+  const currentClientValue = Number(client?.valorPlano ?? client?.valorMensal ?? 0);
+  const isCurrentPlan = selectedPlan === (client?.tipoPlano || "mensal");
+  const planValue = isCurrentPlan && currentClientValue > 0
+    ? currentClientValue
+    : (configuredValue > 0 ? configuredValue : currentClientValue);
   return {
     ...client,
-    tipoPlano: tipoPlano || client?.tipoPlano || "mensal",
-    valorPlano: defaultPlanValue(tipoPlano || client?.tipoPlano || "mensal")
+    tipoPlano: selectedPlan,
+    valorPlano: planValue
   };
 }
 
@@ -12412,8 +12419,9 @@ function financeMonthOptionsForClient(client) {
 function buildClientInvoice(client, mes, paymentConfig = {}, totalOverride = null, options = {}) {
   const saved = client.faturas?.[mes] || {};
   const savedPlano = options.ignoreSaved ? 0 : Number(saved.valorPlano || 0);
+  const savedTotal = options.ignoreSaved ? 0 : Number(saved.valorTotal || 0);
   const valorPlano = savedPlano > 0 ? savedPlano : valorFinalPlano(client);
-  const valorTotal = Number(totalOverride ?? valorPlano);
+  const valorTotal = Number(totalOverride ?? (savedTotal > 0 ? savedTotal : valorPlano));
   const planDueDate = ["anual", "semestral"].includes(client?.tipoPlano) ? financePlanDueDate(client) : "";
   const txid = `OC${normalizeName(client.nome || client.id).slice(0, 8).toUpperCase()}${String(mes).replace(/\W/g, "").slice(0, 12)}`;
   const pixCode = gerarPixCopiaCola({
@@ -24800,7 +24808,7 @@ function renderClientInvoices() {
     const selected = [...mount.querySelectorAll("[data-invoice-select]:checked")].map((input) => input.value);
     const selectedPlan = client.tipoPlano || "mensal";
     const plannedClient = clientForInvoicePlan(client, selectedPlan);
-    const selectedInvoices = selected.map((mes) => buildClientInvoice(plannedClient, mes, paymentConfig, null, { ignoreSaved: true }));
+    const selectedInvoices = selected.map((mes) => buildClientInvoice(plannedClient, mes, paymentConfig));
     const selectedTotal = selectedInvoices.reduce((sum, fatura) => sum + fatura.valorTotal, 0);
     const selectedLabel = selected.length === 1 ? selected[0] : `${selected[0] || currentMonthKey()}-${selected.length}M`;
     const unified = buildClientInvoice(plannedClient, selectedLabel, paymentConfig, selectedTotal, { ignoreSaved: true });
@@ -24821,8 +24829,16 @@ function renderClientInvoices() {
 
   $("generateSelectedInvoicePix")?.addEventListener("click", async (event) => {
     const { selected, selectedPlan, selectedTotal, unified } = selectedInvoiceData();
-    if (selectedTotal <= 0 || !unified.pixCode) {
+    if (!selected.length) {
       showToast("Selecione pelo menos um mes para gerar o Pix.");
+      return;
+    }
+    if (selectedTotal <= 0) {
+      showToast("O valor das faturas selecionadas nao esta configurado.");
+      return;
+    }
+    if (!unified.pixCode) {
+      showToast("A chave Pix nao esta configurada corretamente.");
       return;
     }
     const button = event.currentTarget;
