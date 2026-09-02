@@ -1,4 +1,4 @@
-/* Casas de veraneio publica - 2026-09-02_v6 */
+/* Casas de veraneio publica - 2026-09-02_v7 */
 .vacation-public-page {
   width: min(1180px, 100%);
   margin: 0 auto 40px;
@@ -727,7 +727,7 @@ body.vacation-modal-open { overflow: hidden; }
 @media (max-width: 480px) {
   .vacation-public-filters { grid-template-columns: 1fr; }
 }
-/* Carrossel dos cards e modal mobile fluida - 2026-09-02_v6 */
+/* Carrossel dos cards e modal mobile fluida - 2026-09-02_v7 */
 .vacation-public-media {
   overflow: hidden;
   cursor: default;
@@ -758,28 +758,6 @@ body.vacation-modal-open { overflow: hidden; }
   scroll-snap-stop: always;
 }
 .vacation-card-gallery-slide img { display: block; }
-.vacation-card-gallery-nav {
-  position: absolute;
-  top: 50%;
-  z-index: 4;
-  display: grid;
-  width: 34px;
-  height: 42px;
-  place-items: center;
-  border: 0;
-  border-radius: 6px;
-  padding: 0;
-  background: rgba(255, 255, 255, .88);
-  color: #25364a;
-  box-shadow: 0 3px 12px rgba(15, 23, 42, .2);
-  cursor: pointer;
-  transform: translateY(-50%);
-}
-.vacation-card-gallery-nav:hover,
-.vacation-card-gallery-nav:focus-visible { background: #fff; }
-.vacation-card-gallery-previous { left: 7px; }
-.vacation-card-gallery-next { right: 7px; }
-
 .vacation-public-page.is-compact .vacation-public-actions {
   flex-wrap: nowrap;
   gap: 6px;
@@ -814,10 +792,6 @@ body.vacation-modal-open { overflow: hidden; }
   .vacation-public-page.is-compact .vacation-public-actions > a span {
     display: none;
   }
-  .vacation-card-gallery-nav {
-    width: 30px;
-    height: 38px;
-  }
   .vacation-public-modal {
     align-items: start;
     overflow-y: hidden;
@@ -838,4 +812,84 @@ body.vacation-modal-open { overflow: hidden; }
   .vacation-modal-gallery img {
     object-fit: contain;
   }
+}
+/* Galeria publica no padrao visual de Imoveis - 2026-09-02_v7 */
+.vacation-modal-gallery button {
+  height: clamp(220px, 34vw, 360px);
+  aspect-ratio: auto;
+}
+
+.vacation-modal-gallery img {
+  object-fit: contain;
+  background: #0f172a;
+}
+
+.vacation-image-viewer figure {
+  position: relative;
+  width: min(96vw, 1120px);
+  height: min(92vh, 820px);
+  max-width: 96vw;
+  max-height: 92vh;
+  overflow: hidden;
+  border-radius: 14px;
+  background: #05070d;
+}
+
+.vacation-image-viewer img {
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: #05070d;
+}
+
+.vacation-image-viewer figcaption {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  margin: 0;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: rgba(15, 23, 42, .78);
+  font-size: .78rem;
+}
+
+.vacation-image-viewer .vacation-viewer-nav {
+  width: 30px;
+  height: 36px;
+  flex-basis: 30px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .68);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+  font-size: .72rem;
+  opacity: .72;
+  transition: opacity .18s ease, background .18s ease;
+}
+
+.vacation-image-viewer .vacation-viewer-nav:hover,
+.vacation-image-viewer .vacation-viewer-nav:focus-visible {
+  background: rgba(255, 255, 255, .94);
+  opacity: 1;
+}
+
+@media (max-width: 700px) {
+  .vacation-modal-gallery button {
+    height: min(62vw, 280px);
+  }
+
+  .vacation-image-viewer figure {
+    width: calc(100vw - 16px);
+    height: min(78vh, 620px);
+    border-radius: 10px;
+  }
+
+  .vacation-image-viewer .vacation-viewer-nav {
+    width: 28px;
+    height: 34px;
+    flex-basis: 28px;
+  }
+
+  .vacation-image-viewer .vacation-viewer-prev { left: 6px; }
+  .vacation-image-viewer .vacation-viewer-next { right: 6px; }
 }

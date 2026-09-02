@@ -23,7 +23,7 @@ test("formulario Minha empresa continua salvando pelo evento submit", () => {
 });
 
 test("versao corrigida do painel e carregada sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.js?v=645"));
-  assert.ok(panelJs.includes("numero: 708"));
-  assert.ok(panelJs.includes('label: "v715"'));
+  assert.ok(panelHtml.includes("painel.js?v=646"));
+  assert.ok(panelJs.includes("numero: 709"));
+  assert.ok(panelJs.includes('label: "v716"'));
 });

@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v629.
+// Release do site v630.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -14600,18 +14600,6 @@ plotarPinsImoveis(stateImoveis.filtered);
     const updateCounter = () => {
       if (counter) counter.textContent = (currentIndex() + 1) + " / " + slides.length;
     };
-    const move = (step) => {
-      const nextIndex = (currentIndex() + step + slides.length) % slides.length;
-      track.scrollTo({ left: nextIndex * track.clientWidth, behavior: "smooth" });
-    };
-    media.querySelector("[data-vacation-card-previous]")?.addEventListener("click", (event) => {
-      event.stopPropagation();
-      move(-1);
-    });
-    media.querySelector("[data-vacation-card-next]")?.addEventListener("click", (event) => {
-      event.stopPropagation();
-      move(1);
-    });
     track.addEventListener("scroll", () => {
       cancelAnimationFrame(scrollFrame);
       scrollFrame = requestAnimationFrame(updateCounter);
@@ -14629,7 +14617,6 @@ plotarPinsImoveis(stateImoveis.filtered);
         '<div class="vacation-card-gallery-track">' + cardImages.map((url, index) =>
           '<button type="button" class="vacation-card-gallery-slide" data-vacation-detail="' + vacationPublicEscape(item.id) + '" aria-label="Ver foto ' + (index + 1) + ' e detalhes de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><img src="' + vacationPublicEscape(url) + '" alt="Foto ' + (index + 1) + ' de ' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '" loading="lazy"></button>'
         ).join("") + '</div>' +
-        (images.length > 1 ? '<button type="button" class="vacation-card-gallery-nav vacation-card-gallery-previous" data-vacation-card-previous aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="vacation-card-gallery-nav vacation-card-gallery-next" data-vacation-card-next aria-label="Proxima foto"><i class="fa-solid fa-chevron-right"></i></button>' : "") +
         (item.destaque ? '<span class="vacation-featured-badge"><i class="fa-solid fa-star"></i> Destaque</span>' : "") +
         (images.length ? '<span class="vacation-photo-count"><i class="fa-solid fa-images"></i> <span data-vacation-card-count>1 / ' + images.length + '</span></span>' : "") +
       '</div>' +

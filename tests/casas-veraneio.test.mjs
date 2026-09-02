@@ -24,7 +24,7 @@ test("rota publica carrega somente registros ativos", () => {
 test("catalogo inicia compacto e permite alternar para detalhes", () => {
   assert.match(publicJs, /savedMode === null \? true/);
   assert.match(publicJs, /casasVeraneioModoCompacto/);
-  assert.match(publicHtml, /casas-veraneio\.css\?v=6/);
+  assert.match(publicHtml, /casas-veraneio\.css\?v=7/);
   assert.match(publicCss, /vacation-public-page\.is-compact/);
 });
 
@@ -183,20 +183,26 @@ test("SEO das casas usa titulo descricao url e imagem principal", () => {
 });
 
 test("versoes dos ativos das casas foram atualizadas", () => {
-  assert.ok(publicHtml.includes("casas-veraneio.css?v=6"));
+  assert.ok(publicHtml.includes("casas-veraneio.css?v=7"));
   assert.ok(adminHtml.includes("casas-veraneio-admin.css?v=4"));
-  assert.ok(publicCss.includes("2026-09-02_v6"));
+  assert.ok(publicCss.includes("2026-09-02_v7"));
   assert.ok(adminCss.includes("2026-09-02_v4"));
 });
 
-test("cards publicos possuem carrossel por gesto lateral e setas", () => {
+test("cards publicos possuem carrossel por gesto lateral sem setas", () => {
   assert.ok(publicJs.includes("function bindVacationCardGallery"));
   assert.ok(publicJs.includes('class="vacation-card-gallery-track"'));
-  assert.ok(publicJs.includes("data-vacation-card-previous"));
-  assert.ok(publicJs.includes("data-vacation-card-next"));
-  assert.ok(publicJs.includes('track.scrollTo({ left: nextIndex * track.clientWidth, behavior: "smooth" })'));
+  assert.ok(!publicJs.includes("data-vacation-card-previous"));
+  assert.ok(!publicJs.includes("data-vacation-card-next"));
   assert.ok(publicCss.includes("scroll-snap-type: x mandatory"));
   assert.ok(publicCss.includes("overflow-x: auto"));
+});
+
+test("galeria das casas mantem fotos inteiras em quadro fixo e setas discretas", () => {
+  assert.match(publicCss, /\.vacation-image-viewer figure \{[\s\S]*width: min\(96vw, 1120px\);[\s\S]*height: min\(92vh, 820px\);/);
+  assert.match(publicCss, /\.vacation-image-viewer img \{[\s\S]*width: 100%;[\s\S]*height: 100%;[\s\S]*object-fit: contain;/);
+  assert.match(publicCss, /\.vacation-image-viewer \.vacation-viewer-nav \{[\s\S]*width: 30px;[\s\S]*height: 36px;[\s\S]*opacity: \.72;/);
+  assert.match(publicCss, /\.vacation-modal-gallery img \{[\s\S]*object-fit: contain;/);
 });
 
 test("modo Cards mantem detalhes compartilhar calendario e contato na mesma linha", () => {
