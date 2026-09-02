@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 706,
-  label: "v713",
+  numero: 707,
+  label: "v714",
   data: "2026-09-02",
-  nota: "Tipos, finalidades, comodidades, eventos, represa, filtros e SEO das casas de veraneio ampliados."
+  nota: "Salvamento dos dados do cliente corrigido quando o modulo de promocoes esta oculto."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -23870,7 +23870,7 @@ function renderClientOnlyEditor() {
           ${canEditPromocoes ? `
           <div class="promo-admin-form">
             <p class="promo-required-note wide"><span class="required-mark" aria-hidden="true">*</span> Campo obrigatório</p>
-            <label>Título da promoção <span class="required-mark" aria-hidden="true">*</span><input id="coPromoTitle" placeholder="Ex.: Pizza grande" required aria-required="true"></label>
+            <label>Título da promoção <span class="required-mark" aria-hidden="true">*</span><input id="coPromoTitle" placeholder="Ex.: Pizza grande" aria-required="true"></label>
             <label>Preco atual<input id="coPromoPrice" placeholder="Ex.: 49,90"></label>
             <label>Desconto / chamada<input id="coPromoDiscount" placeholder="Ex.: 20% OFF ou ATE 30% OFF"></label>
             <label>Preco antigo<input id="coPromoOldPrice" placeholder="Opcional"></label>
