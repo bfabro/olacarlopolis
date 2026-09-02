@@ -6,7 +6,8 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=438">
+  <link rel="stylesheet" href="painel.css?v=439">
+  <link rel="stylesheet" href="casas-veraneio-admin.css?v=1">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -81,6 +82,7 @@
           <button data-view="imoveisArtes" data-permission="gerar_imagens_imoveis"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de imoveis</button>
           <button data-view="automoveisArtes" data-permission="gerar_imagens_veiculos"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de veiculos</button>
           <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
+          <button data-view="casasVeraneio" data-permission="casas_veraneio"><i class="fa-solid fa-umbrella-beach"></i> Casas de veraneio</button>
           <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
           <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Noticias</button>
         </section>
@@ -1879,6 +1881,120 @@
         </div>
       </section>
 
+      <section id="casasVeraneioView" class="panel-view hidden">
+        <div class="split-layout vacation-admin-layout">
+          <section class="panel-card form-collapsed vacation-form-card">
+            <div class="section-head">
+              <div>
+                <h2>Cadastrar ou editar casa de veraneio</h2>
+                <p>Hospedagens ativas aparecem na nova area publica do site.</p>
+              </div>
+              <div class="section-actions">
+                <button id="closeVacationRentalFormButton" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+                <button id="newVacationRentalButton" type="button" class="ghost-button new-entry-button"><i class="fa-solid fa-plus"></i> Nova propriedade</button>
+              </div>
+            </div>
+            <form id="vacationRentalForm" class="grid-form">
+              <input id="vacationRentalId" type="hidden">
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-house-chimney-window"></i>
+                <div><strong>Identificacao e publicacao</strong><span>Dados principais apresentados ao visitante.</span></div>
+              </div>
+              <label id="vacationRentalClientField">Cliente responsavel
+                <select id="vacationRentalClient"><option value="">Selecione o cliente</option></select>
+              </label>
+              <label>Titulo do anuncio<input id="vacationRentalTitle" required maxlength="100" placeholder="Ex: Rancho com piscina na represa"></label>
+              <label>Tipo de propriedade
+                <select id="vacationRentalType">
+                  <option value="casa">Casa</option><option value="chacara">Chacara</option><option value="rancho">Rancho</option>
+                  <option value="apartamento">Apartamento</option><option value="chale">Chale</option><option value="pousada">Pousada</option><option value="outro">Outro</option>
+                </select>
+              </label>
+              <label>Status
+                <select id="vacationRentalStatus"><option value="ativo">Ativo no site</option><option value="rascunho">Rascunho</option><option value="inativo">Inativo</option></select>
+              </label>
+              <label class="check-row"><input id="vacationRentalFeatured" type="checkbox"> Destacar no catalogo</label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-location-dot"></i>
+                <div><strong>Localizacao</strong><span>Informe o suficiente para o hospede localizar a propriedade.</span></div>
+              </div>
+              <label>Bairro<input id="vacationRentalNeighborhood" required maxlength="80"></label>
+              <label>Cidade<input id="vacationRentalCity" required value="Carlopolis" maxlength="80"></label>
+              <label>Estado<input id="vacationRentalState" required value="PR" maxlength="2"></label>
+              <label>Endereco ou referencia<input id="vacationRentalAddress" maxlength="160" placeholder="Rua, numero ou ponto de referencia"></label>
+              <label class="wide">Link do Google Maps<input id="vacationRentalMapsUrl" type="url" placeholder="https://maps.google.com/..."></label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-users"></i>
+                <div><strong>Capacidade e estadia</strong><span>Estrutura disponivel e horarios usuais.</span></div>
+              </div>
+              <label>Hospedes<input id="vacationRentalGuests" type="number" required min="1" max="100" value="1"></label>
+              <label>Quartos<input id="vacationRentalBedrooms" type="number" min="0" max="50" value="0"></label>
+              <label>Camas<input id="vacationRentalBeds" type="number" min="0" max="100" value="0"></label>
+              <label>Suites<input id="vacationRentalSuites" type="number" min="0" max="50" value="0"></label>
+              <label>Banheiros<input id="vacationRentalBathrooms" type="number" min="0" max="50" value="0"></label>
+              <label>Minimo de noites<input id="vacationRentalMinNights" type="number" min="1" max="365" value="1"></label>
+              <label>Check-in<input id="vacationRentalCheckin" type="time"></label>
+              <label>Check-out<input id="vacationRentalCheckout" type="time"></label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-sack-dollar"></i>
+                <div><strong>Valores</strong><span>Os valores podem ser deixados em branco para consulta.</span></div>
+              </div>
+              <label>Diaria<input id="vacationRentalDailyPrice" inputmode="decimal" placeholder="R$ 450,00"></label>
+              <label>Pacote de fim de semana<input id="vacationRentalWeekendPrice" inputmode="decimal" placeholder="R$ 1.000,00"></label>
+              <label>Taxa de limpeza<input id="vacationRentalCleaningFee" inputmode="decimal" placeholder="R$ 100,00"></label>
+              <label>Caucao<input id="vacationRentalDeposit" inputmode="decimal" placeholder="Opcional"></label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-list-check"></i>
+                <div><strong>Comodidades</strong><span>Marque os recursos disponiveis na propriedade.</span></div>
+              </div>
+              <div id="vacationRentalAmenities" class="wide vacation-amenities-admin">
+                <label><input type="checkbox" value="piscina"> Piscina</label><label><input type="checkbox" value="churrasqueira"> Churrasqueira</label>
+                <label><input type="checkbox" value="wifi"> Wi-Fi</label><label><input type="checkbox" value="ar_condicionado"> Ar-condicionado</label>
+                <label><input type="checkbox" value="cozinha_equipada"> Cozinha equipada</label><label><input type="checkbox" value="estacionamento"> Estacionamento</label>
+                <label><input type="checkbox" value="roupa_cama"> Roupa de cama</label><label><input type="checkbox" value="tv"> TV</label>
+                <label><input type="checkbox" value="acesso_represa"> Acesso a represa</label><label><input type="checkbox" value="acessibilidade"> Acessibilidade</label>
+                <label><input type="checkbox" value="aceita_pets"> Aceita pets</label><label><input type="checkbox" value="area_lazer"> Area de lazer</label>
+              </div>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-address-book"></i>
+                <div><strong>Contato e detalhes</strong><span>Informacoes para consulta e reserva direta.</span></div>
+              </div>
+              <label>Responsavel<input id="vacationRentalContactName" required maxlength="100"></label>
+              <label>WhatsApp<input id="vacationRentalWhatsapp" required placeholder="(43) 99999-9999"></label>
+              <label>Telefone alternativo<input id="vacationRentalPhone" placeholder="Opcional"></label>
+              <label>Instagram<input id="vacationRentalInstagram" placeholder="@perfil ou link"></label>
+              <label class="wide">Descricao<textarea id="vacationRentalDescription" required rows="5" maxlength="1800" placeholder="Descreva os ambientes, diferenciais e experiencia da hospedagem."></textarea></label>
+              <label class="wide">Regras da hospedagem<textarea id="vacationRentalRules" rows="4" maxlength="1200" placeholder="Horarios, limite de pessoas, festas, animais e outras regras."></textarea></label>
+              <label class="wide">Informacoes de disponibilidade<textarea id="vacationRentalAvailability" rows="3" maxlength="800" placeholder="Ex: Consulte datas disponiveis pelo WhatsApp."></textarea></label>
+
+              <section class="wide upload-panel">
+                <div class="section-head compact"><div><h3>Fotos da propriedade</h3><p>Envie varias imagens. A primeira sera a capa do anuncio.</p></div><span id="vacationRentalImagesCount" class="badge">0 imagens</span></div>
+                <input id="vacationRentalImagesUpload" type="file" accept="image/*" multiple>
+                <div id="vacationRentalImagesPreview" class="image-grid"></div>
+              </section>
+
+              <div class="form-actions wide">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar propriedade</button>
+                <button id="deleteVacationRentalButton" type="button" class="danger hidden"><i class="fa-solid fa-trash"></i> Excluir</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel-card vacation-list-card">
+            <div class="section-head"><div><h2>Propriedades cadastradas</h2><p>O Admin Master visualiza os anuncios de todos os clientes.</p></div><span id="vacationRentalTotal" class="badge">0</span></div>
+            <div class="vacation-admin-filters">
+              <input id="vacationRentalSearch" class="search-input" type="search" placeholder="Buscar por titulo, cidade, bairro ou cliente...">
+              <select id="vacationRentalStatusFilter"><option value="">Todos os status</option><option value="ativo">Ativos</option><option value="rascunho">Rascunhos</option><option value="inativo">Inativos</option></select>
+            </div>
+            <div id="vacationRentalsList" class="entity-list"></div>
+          </section>
+        </div>
+      </section>
       <section id="imoveisView" class="panel-view hidden">
         <div class="split-layout imoveis-admin-layout">
           <section class="panel-card form-collapsed imoveis-form-card">
@@ -2491,6 +2607,12 @@
                       </div>
                     </div>
 
+                    <div class="permission-segment segment-vacation-rentals">
+                      <strong class="permission-segment-tag"><i class="fa-solid fa-umbrella-beach"></i> Casas de veraneio</strong>
+                      <div class="permission-options">
+                        <label><input type="checkbox" value="casas_veraneio"> Cadastrar e gerenciar casas de veraneio</label>
+                      </div>
+                    </div>
                     <div class="permission-segment segment-other">
                       <strong class="permission-segment-tag"><i class="fa-solid fa-shapes"></i> Outros</strong>
                       <div class="permission-options">
@@ -2987,6 +3109,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=638"></script>
+  <script type="module" src="painel.js?v=639"></script>
 </body>
 </html>

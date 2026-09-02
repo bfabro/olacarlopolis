@@ -1,10 +1,11 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-09-01-faturas-pix-persistente-v756'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-09-02-casas-veraneio-v757'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
+  '/casas-veraneio.css',
   '/loterias.css',
   '/loterias.js',
   '/images/img_padrao_site/icon-192_2.png',

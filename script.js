@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v623.
+// Release do site v624.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -6803,6 +6803,7 @@ carlopdiesel:"s",
         "menuPromocoes"
       ]],
        ["Lazer e gastronomia", [
+        "menuCasasVeraneio",
         "menuOndeComer",
         "menuJogos"
       ]],
@@ -6841,6 +6842,7 @@ carlopdiesel:"s",
 
   const CARD_VIEW_DEFAULTS = {
     menuAutomoveis: "__automoveisModoCards",
+    menuCasasVeraneio: "__casasVeraneioModoCompacto",
     menuGruposWhats: "__gruposWhatsappModoCards",
     menuImoveis: "__imoveisModoCards",
     menuPromocoes: "__promoModoCompacto",
@@ -6854,7 +6856,7 @@ carlopdiesel:"s",
 
   document.addEventListener("click", (event) => {
     const menuLink = event.target.closest?.(
-      "#menuAutomoveis, #menuGruposWhats, #menuImoveis, #menuPromocoes, #menuNotaFalecimento, #menuVagasTrabalho"
+      "#menuAutomoveis, #menuCasasVeraneio, #menuGruposWhats, #menuImoveis, #menuPromocoes, #menuNotaFalecimento, #menuVagasTrabalho"
     );
     if (!menuLink) return;
     const stateKey = CARD_VIEW_DEFAULTS[menuLink.id];
@@ -14248,6 +14250,241 @@ plotarPinsImoveis(stateImoveis.filtered);
     }, Math.max(Number(delay) || 0, 3000));
   }
 
+  const VACATION_PUBLIC_AMENITIES = {
+    piscina: ["fa-solid fa-water-ladder", "Piscina"],
+    churrasqueira: ["fa-solid fa-fire-burner", "Churrasqueira"],
+    wifi: ["fa-solid fa-wifi", "Wi-Fi"],
+    ar_condicionado: ["fa-solid fa-snowflake", "Ar-condicionado"],
+    cozinha_equipada: ["fa-solid fa-kitchen-set", "Cozinha equipada"],
+    estacionamento: ["fa-solid fa-square-parking", "Estacionamento"],
+    roupa_cama: ["fa-solid fa-bed", "Roupa de cama"],
+    tv: ["fa-solid fa-tv", "TV"],
+    acesso_represa: ["fa-solid fa-sailboat", "Acesso a represa"],
+    acessibilidade: ["fa-solid fa-wheelchair", "Acessibilidade"],
+    aceita_pets: ["fa-solid fa-paw", "Aceita pets"],
+    area_lazer: ["fa-solid fa-umbrella-beach", "Area de lazer"]
+  };
+
+  function vacationPublicEscape(value) {
+    return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    })[char]);
+  }
+
+  function vacationPublicMoney(value) {
+    const number = Number(value || 0);
+    return number > 0 ? number.toLocaleString("pt-BR", { style: "currency", currency: "BRL" }) : "";
+  }
+
+  function vacationPublicPhone(value) {
+    let digits = String(value || "").replace(/\D/g, "");
+    if (digits.length === 10 || digits.length === 11) digits = "55" + digits;
+    return digits;
+  }
+
+  function vacationPublicWhatsapp(item) {
+    const phone = vacationPublicPhone(item.whatsapp || item.telefone);
+    if (!phone) return "";
+    const message = "Ola! Vi a hospedagem " + (item.titulo || "Casa de veraneio") + " no Ola Carlopolis e gostaria de consultar disponibilidade e valores.";
+    return "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
+  }
+
+  function vacationPublicImages(item) {
+    const images = Array.isArray(item.imagens) ? item.imagens.filter(Boolean) : [];
+    if (item.imagem && !images.includes(item.imagem)) images.unshift(item.imagem);
+    return images;
+  }
+
+  async function carregarCasasVeraneioFirebase(force = false) {
+    if (!force && Array.isArray(window.__vacationRentalsCache)) return window.__vacationRentalsCache;
+    const dbAdmin = await esperarFirebaseDatabase();
+    if (!dbAdmin) return [];
+    const snapshot = await Promise.race([
+      dbAdmin.ref("conteudosInformativos/casasVeraneio").once("value"),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Tempo limite ao carregar casas de veraneio.")), 7000))
+    ]);
+    const list = [];
+    snapshot.forEach((child) => {
+      const value = child.val() || {};
+      if (value.status === "ativo") list.push({ id: child.key, ...value });
+      return false;
+    });
+    list.sort((a, b) => Number(Boolean(b.destaque)) - Number(Boolean(a.destaque)) || String(a.titulo || "").localeCompare(String(b.titulo || ""), "pt-BR"));
+    window.__vacationRentalsCache = list;
+    return list;
+  }
+
+  function renderVacationPublicAmenities(item, limit = 0) {
+    const amenities = Array.isArray(item.comodidades) ? item.comodidades : [];
+    const visible = limit > 0 ? amenities.slice(0, limit) : amenities;
+    return visible.map((key) => {
+      const meta = VACATION_PUBLIC_AMENITIES[key] || ["fa-solid fa-circle-check", key];
+      return '<span><i class="' + meta[0] + '"></i> ' + vacationPublicEscape(meta[1]) + '</span>';
+    }).join("");
+  }
+
+  function vacationPublicCard(item) {
+    const images = vacationPublicImages(item);
+    const image = images[0] || "images/img_padrao_site/logo_1.png";
+    const price = vacationPublicMoney(item.valorDiaria);
+    const whatsapp = vacationPublicWhatsapp(item);
+    return '<article class="vacation-public-card' + (item.destaque ? " is-featured" : "") + '" data-vacation-id="' + vacationPublicEscape(item.id) + '">' +
+      '<button type="button" class="vacation-public-media" data-vacation-detail="' + vacationPublicEscape(item.id) + '" aria-label="Ver detalhes de ' + vacationPublicEscape(item.titulo) + '">' +
+        '<img src="' + vacationPublicEscape(image) + '" alt="' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '" loading="lazy">' +
+        (item.destaque ? '<span class="vacation-featured-badge"><i class="fa-solid fa-star"></i> Destaque</span>' : "") +
+        '<span class="vacation-photo-count"><i class="fa-solid fa-images"></i> ' + images.length + '</span>' +
+      '</button>' +
+      '<div class="vacation-public-body">' +
+        '<div class="vacation-public-heading"><div><small>' + vacationPublicEscape(item.tipo || "Hospedagem") + '</small><h3>' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '</h3></div>' +
+        '<strong>' + (price ? vacationPublicEscape(price) + '<small>/ diaria</small>' : "Consulte") + '</strong></div>' +
+        '<p class="vacation-public-location"><i class="fa-solid fa-location-dot"></i> ' + vacationPublicEscape([item.bairro, item.cidade, item.estado].filter(Boolean).join(" - ")) + '</p>' +
+        '<div class="vacation-public-capacity"><span><i class="fa-solid fa-users"></i> ' + vacationPublicEscape(item.hospedes || 1) + ' hospedes</span><span><i class="fa-solid fa-bed"></i> ' + vacationPublicEscape(item.quartos || 0) + ' quartos</span><span><i class="fa-solid fa-bath"></i> ' + vacationPublicEscape(item.banheiros || 0) + ' banheiros</span></div>' +
+        '<div class="vacation-public-amenities">' + renderVacationPublicAmenities(item, 5) + '</div>' +
+        '<p class="vacation-public-description">' + vacationPublicEscape(item.descricao || "Consulte os detalhes e a disponibilidade desta hospedagem.") + '</p>' +
+        '<div class="vacation-public-actions">' +
+          '<button type="button" data-vacation-detail="' + vacationPublicEscape(item.id) + '"><i class="fa-solid fa-eye"></i> Ver detalhes</button>' +
+          (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Consultar</a>' : "") +
+        '</div>' +
+      '</div>' +
+    '</article>';
+  }
+
+  function closeVacationPublicModal() {
+    document.getElementById("vacationPublicModal")?.remove();
+    document.body.classList.remove("vacation-modal-open");
+  }
+
+  function openVacationPublicModal(item) {
+    closeVacationPublicModal();
+    const images = vacationPublicImages(item);
+    const whatsapp = vacationPublicWhatsapp(item);
+    const price = vacationPublicMoney(item.valorDiaria);
+    const modal = document.createElement("div");
+    modal.id = "vacationPublicModal";
+    modal.className = "vacation-public-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Detalhes de " + (item.titulo || "casa de veraneio"));
+    modal.innerHTML = '<div class="vacation-modal-backdrop" data-vacation-close></div><section class="vacation-modal-card">' +
+      '<header><div><small>Casa de veraneio</small><h2>' + vacationPublicEscape(item.titulo || "Hospedagem") + '</h2><p><i class="fa-solid fa-location-dot"></i> ' + vacationPublicEscape([item.bairro, item.cidade, item.estado].filter(Boolean).join(" - ")) + '</p></div>' +
+      '<button type="button" data-vacation-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></header>' +
+      '<div class="vacation-modal-gallery">' + (images.length ? images.map((url, index) =>
+        '<button type="button" data-vacation-large-image="' + vacationPublicEscape(url) + '"><img src="' + vacationPublicEscape(url) + '" alt="Foto ' + (index + 1) + ' de ' + vacationPublicEscape(item.titulo) + '" loading="lazy"></button>'
+      ).join("") : '<div class="vacation-modal-image-empty"><i class="fa-solid fa-house-chimney-window"></i></div>') + '</div>' +
+      '<div class="vacation-modal-content"><div class="vacation-modal-summary">' +
+        '<strong>' + (price ? vacationPublicEscape(price) + ' <small>por diaria</small>' : "Valor sob consulta") + '</strong>' +
+        '<span><i class="fa-solid fa-users"></i> Ate ' + vacationPublicEscape(item.hospedes || 1) + ' hospedes</span>' +
+        '<span><i class="fa-solid fa-bed"></i> ' + vacationPublicEscape(item.quartos || 0) + ' quartos</span>' +
+        '<span><i class="fa-solid fa-bath"></i> ' + vacationPublicEscape(item.banheiros || 0) + ' banheiros</span>' +
+        '<span><i class="fa-solid fa-moon"></i> Minimo ' + vacationPublicEscape(item.minimoNoites || 1) + ' noite(s)</span></div>' +
+        '<section><h3>Sobre a hospedagem</h3><p>' + vacationPublicEscape(item.descricao || "Informacoes disponiveis pelo contato.") + '</p></section>' +
+        (Array.isArray(item.comodidades) && item.comodidades.length ? '<section><h3>Comodidades</h3><div class="vacation-modal-amenities">' + renderVacationPublicAmenities(item) + '</div></section>' : "") +
+        (item.regras ? '<section><h3>Regras da hospedagem</h3><p>' + vacationPublicEscape(item.regras) + '</p></section>' : "") +
+        (item.disponibilidade ? '<section><h3>Disponibilidade</h3><p>' + vacationPublicEscape(item.disponibilidade) + '</p></section>' : "") +
+        '<section><h3>Contato</h3><p><strong>' + vacationPublicEscape(item.responsavel || item.clienteNome || "") + '</strong></p></section>' +
+      '</div><footer>' +
+        (item.googleMapsUrl ? '<a class="vacation-maps-action" href="' + vacationPublicEscape(item.googleMapsUrl) + '" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Abrir no Maps</a>' : "") +
+        (whatsapp ? '<a class="vacation-whatsapp-action" href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Consultar disponibilidade</a>' : "") +
+      '</footer></section>';
+    document.body.appendChild(modal);
+    document.body.classList.add("vacation-modal-open");
+    modal.querySelectorAll("[data-vacation-close]").forEach((button) => button.addEventListener("click", closeVacationPublicModal));
+    modal.querySelectorAll("[data-vacation-large-image]").forEach((button) => button.addEventListener("click", () => {
+      const viewer = document.createElement("div");
+      viewer.className = "vacation-image-viewer";
+      viewer.innerHTML = '<button type="button" aria-label="Fechar imagem"><i class="fa-solid fa-xmark"></i></button><img src="' + vacationPublicEscape(button.dataset.vacationLargeImage) + '" alt="Imagem ampliada">';
+      viewer.addEventListener("click", (event) => { if (event.target === viewer || event.target.closest("button")) viewer.remove(); });
+      document.body.appendChild(viewer);
+    }));
+    modal.querySelector("[data-vacation-close]")?.focus();
+  }
+
+  async function mostrarCasasVeraneio() {
+    if (location.hash !== "#casas-veraneio") history.pushState(null, "", "#casas-veraneio");
+    prepararNavegacaoMenuEspecial();
+    atualizarVisibilidadeHomeQuickBanner();
+    if (typeof definirTelaContentArea === "function") definirTelaContentArea(null);
+    const area = document.querySelector(".content_area");
+    if (!area) return;
+    area.dataset.currentRoute = "casas-veraneio";
+    const savedMode = localStorage.getItem("casasVeraneioModoCompacto");
+    window.__casasVeraneioModoCompacto = savedMode === null ? true : savedMode === "true";
+    area.innerHTML = '<section class="vacation-public-page' + (window.__casasVeraneioModoCompacto ? " is-compact" : "") + '">' +
+      '<header class="vacation-public-title"><div><span><i class="fa-solid fa-umbrella-beach"></i> Hospedagens em Carlópolis</span><h1>Casas de veraneio</h1><p>Encontre casas, ranchos, chacaras e outros espacos para sua estadia.</p></div></header>' +
+      '<section class="vacation-public-toolbar"><div class="vacation-toolbar-main">' +
+        '<button id="vacationToggleFilters" type="button" aria-expanded="false"><i class="fa-solid fa-sliders"></i> Filtros</button>' +
+        '<span id="vacationPublicTotal"><i class="fa-solid fa-house"></i> ...</span>' +
+        '<label class="vacation-view-switch"><input id="vacationCompactMode" type="checkbox"' + (window.__casasVeraneioModoCompacto ? " checked" : "") + '><span class="track"><span class="thumb"></span></span><span>2 por linha</span></label>' +
+      '</div><div id="vacationPublicFilters" class="vacation-public-filters" hidden>' +
+        '<label>Busca<input id="vacationPublicSearch" type="search" placeholder="Nome, bairro ou cidade"></label>' +
+        '<label>Cidade<select id="vacationPublicCity"><option value="">Todas</option></select></label>' +
+        '<label>Bairro<select id="vacationPublicNeighborhood"><option value="">Todos</option></select></label>' +
+        '<label>Hospedes<input id="vacationPublicGuests" type="number" min="1" placeholder="Quantidade minima"></label>' +
+        '<label>Diaria ate<input id="vacationPublicMaxPrice" inputmode="numeric" placeholder="R$"></label>' +
+        '<label>Comodidade<select id="vacationPublicAmenity"><option value="">Todas</option>' + Object.entries(VACATION_PUBLIC_AMENITIES).map(([key, value]) => '<option value="' + key + '">' + vacationPublicEscape(value[1]) + '</option>').join("") + '</select></label>' +
+      '</div></section><div id="vacationPublicList" class="vacation-public-grid"><div class="vacation-public-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Carregando hospedagens...</div></div></section>';
+    const page = area.querySelector(".vacation-public-page");
+    const listBox = $("vacationPublicList");
+    let rentals = [];
+    const apply = () => {
+      const search = normalizeName($("vacationPublicSearch")?.value || "");
+      const city = $("vacationPublicCity")?.value || "";
+      const neighborhood = $("vacationPublicNeighborhood")?.value || "";
+      const guests = Number($("vacationPublicGuests")?.value || 0);
+      const maxPrice = Number(String($("vacationPublicMaxPrice")?.value || "").replace(/\D/g, ""));
+      const amenity = $("vacationPublicAmenity")?.value || "";
+      const filtered = rentals.filter((item) => {
+        const haystack = normalizeName([item.titulo, item.tipo, item.bairro, item.cidade, item.descricao].join(" "));
+        return (!search || haystack.includes(search))
+          && (!city || item.cidade === city)
+          && (!neighborhood || item.bairro === neighborhood)
+          && (!guests || Number(item.hospedes || 0) >= guests)
+          && (!maxPrice || !Number(item.valorDiaria || 0) || Number(item.valorDiaria) <= maxPrice)
+          && (!amenity || (Array.isArray(item.comodidades) && item.comodidades.includes(amenity)));
+      });
+      $("vacationPublicTotal").innerHTML = '<i class="fa-solid fa-house"></i> <strong>' + filtered.length + '</strong> ' + (filtered.length === 1 ? "opcao" : "opcoes");
+      listBox.innerHTML = filtered.length ? filtered.map(vacationPublicCard).join("") : '<div class="vacation-public-empty"><i class="fa-solid fa-house-circle-xmark"></i><strong>Nenhuma hospedagem encontrada</strong><span>Ajuste os filtros para ver outras opcoes.</span></div>';
+      listBox.querySelectorAll("[data-vacation-detail]").forEach((button) => button.addEventListener("click", () => {
+        const item = rentals.find((entry) => entry.id === button.dataset.vacationDetail);
+        if (item) openVacationPublicModal(item);
+      }));
+    };
+    $("vacationToggleFilters")?.addEventListener("click", (event) => {
+      const filters = $("vacationPublicFilters");
+      const open = filters.hasAttribute("hidden");
+      filters.toggleAttribute("hidden", !open);
+      event.currentTarget.setAttribute("aria-expanded", String(open));
+    });
+    $("vacationCompactMode")?.addEventListener("change", (event) => {
+      window.__casasVeraneioModoCompacto = event.target.checked;
+      localStorage.setItem("casasVeraneioModoCompacto", String(event.target.checked));
+      page.classList.toggle("is-compact", event.target.checked);
+    });
+    ["vacationPublicSearch", "vacationPublicGuests", "vacationPublicMaxPrice"].forEach((id) => $(id)?.addEventListener("input", apply));
+    ["vacationPublicCity", "vacationPublicNeighborhood", "vacationPublicAmenity"].forEach((id) => $(id)?.addEventListener("change", apply));
+    try {
+      rentals = await carregarCasasVeraneioFirebase(true);
+      if (area.dataset.currentRoute !== "casas-veraneio") return;
+      const options = (field) => [...new Set(rentals.map((item) => item[field]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+      $("vacationPublicCity").innerHTML += options("cidade").map((value) => '<option value="' + vacationPublicEscape(value) + '">' + vacationPublicEscape(value) + '</option>').join("");
+      $("vacationPublicNeighborhood").innerHTML += options("bairro").map((value) => '<option value="' + vacationPublicEscape(value) + '">' + vacationPublicEscape(value) + '</option>').join("");
+      apply();
+    } catch (error) {
+      console.error("Nao foi possivel carregar casas de veraneio.", error);
+      listBox.innerHTML = '<div class="vacation-public-empty"><i class="fa-solid fa-triangle-exclamation"></i><strong>Nao foi possivel carregar as hospedagens</strong><span>Tente novamente em alguns instantes.</span><button type="button" id="vacationPublicRetry"><i class="fa-solid fa-rotate-right"></i> Tentar novamente</button></div>';
+      $("vacationPublicRetry")?.addEventListener("click", mostrarCasasVeraneio);
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  window.mostrarCasasVeraneio = mostrarCasasVeraneio;
+
+  document.getElementById("menuCasasVeraneio")?.addEventListener("click", function (event) {
+    event.preventDefault();
+    event.__menuClickTracked = true;
+    registrarCliqueMenuLateral("Casas de veraneio");
+    mostrarCasasVeraneio();
+  });
   const elMenuAutomoveis = document.getElementById("menuAutomoveis");
   if (elMenuAutomoveis) {
     elMenuAutomoveis.addEventListener("click", function (event) {
@@ -25959,6 +26196,7 @@ ${servicosIniciaisLoja.length ? `
     if (h === "#loterias" || h.startsWith("#loterias-")) { return window.mostrarLoterias?.(h.replace("#loterias-", "").replace("#loterias", "")); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
+    if (h === "#casas-veraneio") { return mostrarCasasVeraneio(); }
     if (h === "#vagas" || h === "#vagas-trabalho") { return mostrarVagasTrabalhoPublicas(); }
     if (h === "#sobre-nos") { return mostrarSobreNos(); }
     if (h === "#climaDoDia" || h === "#clima-do-dia") { return mostrarSol(); }

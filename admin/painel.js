@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=19";
+} from "./gestao-terrenos-schema.js?v=20";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 701,
-  label: "v708",
-  data: "2026-09-01",
-  nota: "Persistencia do quadro Pix durante a atualizacao das faturas."
+  numero: 702,
+  label: "v709",
+  data: "2026-09-02",
+  nota: "Nova area publica e administrativa de Casas de veraneio."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -261,6 +261,10 @@ let state = {
   noticiaExtraImages: [],
   imoveis: [],
   automoveis: [],
+  casasVeraneio: [],
+  vacationRentalImages: [],
+  vacationRentalPendingFiles: [],
+  vacationRentalPendingCover: false,
   notasFalecimento: [],
   gruposWhatsapp: [],
   categorias: [],
@@ -325,6 +329,7 @@ let state = {
   selectedEventId: null,
   selectedImovelId: null,
   selectedAutomovelId: null,
+  selectedVacationRentalId: null,
   selectedDeathNoticeId: null,
   selectedWhatsappGroupId: null,
   selectedClientWhatsappGroupId: null,
@@ -839,6 +844,7 @@ const views = {
   eventos: $("eventosView"),
   noticias: $("noticiasView"),
   imoveis: $("imoveisView"),
+  casasVeraneio: $("casasVeraneioView"),
   imoveisArtes: $("imoveisArtesView"),
   automoveis: $("automoveisView"),
   automoveisArtes: $("automoveisArtesView"),
@@ -874,6 +880,7 @@ const viewCopy = {
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
   noticias: ["Noticias", "Cadastre materias para a home e para a pagina publica de noticias."],
   imoveis: ["Imoveis", "Cadastre imoveis para venda ou aluguel no site publico."],
+  casasVeraneio: ["Casas de veraneio", "Cadastre hospedagens temporarias para o catalogo publico."],
   imoveisArtes: ["Artes de imoveis", "Gere imagens para Instagram a partir dos imoveis cadastrados."],
   automoveis: ["Automoveis", "Cadastre veiculos para venda no site publico."],
   automoveisArtes: ["Artes de veiculos", "Gere imagens para Instagram de um ou varios veiculos."],
@@ -1094,6 +1101,10 @@ function canAccessImoveis() {
   return hasPermission("imoveis");
 }
 
+function canAccessVacationRentals() {
+  return hasPermission("casas_veraneio");
+}
+
 function canAccessAutomoveis() {
   return hasPermission("veiculos") || canGenerateVeiculoImages() || clienteAssociadoAutomoveis(currentClientRecord());
 }
@@ -1183,6 +1194,7 @@ function canAccessView(viewName) {
   }
   if (viewName === "faturas") return hasPermission("faturas") || clientHasOpenInvoice(currentClientRecord());
   if (viewName === "imoveis") return canAccessImoveis();
+  if (viewName === "casasVeraneio") return canAccessVacationRentals();
   if (viewName === "imoveisArtes") return canGenerateImovelImages();
   if (viewName === "automoveis") return canAccessAutomoveis();
   if (viewName === "automoveisArtes") return canGenerateVeiculoImages();
@@ -2695,7 +2707,7 @@ function hidePanelLoading() {
 
 async function loadProfile(user) {
   const masterEmail = isMasterEmail(user.email);
-  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, produtos: true, servicos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
+  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, produtos: true, servicos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, casas_veraneio: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
   const uidSnap = await get(ref(db, `usuariosByUid/${user.uid}`));
   if (uidSnap.exists()) {
     const profile = { uid: user.uid, ...uidSnap.val() };
@@ -2749,7 +2761,7 @@ async function loadProfile(user) {
 
 async function saveUserProfile(profile) {
   const masterEmail = isMasterEmail(profile.email);
-  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, produtos: true, servicos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
+  const masterPermissions = { dados: true, vagas: true, imagens: true, cardapio: true, produtos: true, servicos: true, promocoes: true, noticias: true, gerar_imagens_promocoes: true, relatorios: true, origem_acessos: true, faturas: true, financeiro: true, imoveis: true, casas_veraneio: true, gerar_imagens_imoveis: true, veiculos: true, gerar_imagens_veiculos: true, informacoes: true, informacoes_nota_falecimento: true, grupos_whatsapp: true, combustiveis_precos: true };
   const payload = {
     uid: profile.uid,
     email: String(profile.email || "").toLowerCase(),
@@ -2827,6 +2839,7 @@ async function loadAllData(onProgress = null) {
     eventosSnap,
     imoveisSnap,
     automoveisSnap,
+    casasVeraneioSnap,
     categoriasSnap,
     notasFalecimentoSnap,
     gruposWhatsappSnap,
@@ -2869,6 +2882,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("eventos"),
     getPanelSnapshot("conteudosInformativos/imoveis"),
     getPanelSnapshot("conteudosInformativos/automoveis"),
+    getPanelSnapshot("conteudosInformativos/casasVeraneio"),
     getPanelSnapshot("categorias"),
     getPanelSnapshot("conteudosInformativos/notaFalecimento"),
     getPanelSnapshot("conteudosInformativos/gruposWhatsapp"),
@@ -2953,6 +2967,17 @@ async function loadAllData(onProgress = null) {
     state.automoveis = state.automoveis.filter(itemBelongsToCurrentClient);
   }
   state.automoveis.sort((a, b) => String(a.marca || "").localeCompare(String(b.marca || ""), "pt-BR"));
+  state.casasVeraneio = [];
+  if (casasVeraneioSnap.exists()) {
+    casasVeraneioSnap.forEach((child) => {
+      state.casasVeraneio.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  if (!canManageClients()) {
+    state.casasVeraneio = state.casasVeraneio.filter(itemBelongsToCurrentClient);
+  }
+  state.casasVeraneio.sort((a, b) => String(a.titulo || "").localeCompare(String(b.titulo || ""), "pt-BR"));
   state.gruposWhatsapp = [];
   if (gruposWhatsappSnap.exists()) {
     gruposWhatsappSnap.forEach((child) => {
@@ -3101,6 +3126,7 @@ async function loadAllData(onProgress = null) {
   renderNewsAdminList();
   renderImoveisList();
   renderAutomoveisList();
+  renderVacationRentalsList();
   renderInfoDeathNoticeList();
   renderInfoWhatsappGroupsList();
   try {
@@ -5896,6 +5922,9 @@ function updateChrome() {
   document.querySelectorAll("[data-permission='imoveis']").forEach((el) => {
     el.classList.toggle("hidden", !canAccessImoveis());
   });
+  document.querySelectorAll("[data-permission='casas_veraneio']").forEach((el) => {
+    el.classList.toggle("hidden", !canAccessVacationRentals());
+  });
   document.querySelectorAll("[data-permission='veiculos']").forEach((el) => {
     el.classList.toggle("hidden", !canAccessAutomoveis());
   });
@@ -5909,7 +5938,7 @@ function updateChrome() {
     el.classList.toggle("hidden", !canGenerateImovelImages());
   });
   document.querySelectorAll("[data-classified-nav='true']").forEach((el) => {
-    el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !canGenerateImovelImages() && !canAccessAutomoveis());
+    el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !canGenerateImovelImages() && !canAccessAutomoveis() && !canAccessVacationRentals());
   });
   if (isBenefitPartner()) {
     document.querySelectorAll(".nav-admin button").forEach((button) => {
@@ -8817,6 +8846,7 @@ function switchView(name) {
   if (target === "promocoesClientes") renderStaffPromocoesView();
   if (target === "noticias") renderNewsAdminList();
   if (target === "imoveis") renderImoveisList();
+  if (target === "casasVeraneio") renderVacationRentalsList();
   if (target === "imoveisArtes") renderImovelArteOptions();
   if (target === "automoveis") {
     renderAutomoveisList();
@@ -8852,6 +8882,7 @@ function collapseEntryFormsForView(target) {
     eventos: ["eventForm"],
     informacoes: ["infoDeathNoticeForm"],
     imoveis: ["imovelForm"],
+    casasVeraneio: ["vacationRentalForm"],
     automoveis: ["automovelForm"],
     usuarios: ["userForm"]
   };
@@ -8964,6 +8995,7 @@ function setFormCardOpen(formId, isOpen) {
     eventForm: "closeEventFormButton",
     infoDeathNoticeForm: "closeInfoDeathNoticeFormButton",
     imovelForm: "closeImovelFormButton",
+    vacationRentalForm: "closeVacationRentalFormButton",
     automovelForm: "closeAutomovelFormButton",
     userForm: "closeUserFormButton"
   };
@@ -14690,6 +14722,331 @@ async function gerarArtesInstagramAutomoveisSelecionados() {
   }
 }
 
+const VACATION_RENTAL_AMENITY_LABELS = {
+  piscina: "Piscina",
+  churrasqueira: "Churrasqueira",
+  wifi: "Wi-Fi",
+  ar_condicionado: "Ar-condicionado",
+  cozinha_equipada: "Cozinha equipada",
+  estacionamento: "Estacionamento",
+  roupa_cama: "Roupa de cama",
+  tv: "TV",
+  acesso_represa: "Acesso a represa",
+  acessibilidade: "Acessibilidade",
+  aceita_pets: "Aceita pets",
+  area_lazer: "Area de lazer"
+};
+
+const VACATION_RENTAL_TYPE_LABELS = {
+  casa: "Casa",
+  chacara: "Chacara",
+  rancho: "Rancho",
+  apartamento: "Apartamento",
+  chale: "Chale",
+  pousada: "Pousada",
+  outro: "Outro"
+};
+
+function vacationRentalClient(item = {}) {
+  return state.clientes.find((client) => client.id === (item.clienteId || item.clientId))
+    || state.clientes.find((client) => normalizeName(client.nome) === normalizeName(item.clienteNome))
+    || null;
+}
+
+function fillVacationRentalClientOptions(selectedId = "") {
+  const select = $("vacationRentalClient");
+  const field = $("vacationRentalClientField");
+  if (!select) return;
+  field?.classList.toggle("hidden", !canManageClients());
+  const clients = [...state.clientes].sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"));
+  select.innerHTML = '<option value="">Selecione o cliente</option>' + clients.map((client) =>
+    '<option value="' + escapeAttr(client.id) + '">' + escapeHtml(client.nome || client.id) + '</option>'
+  ).join("");
+  select.value = canManageClients() ? selectedId : currentClientId();
+  select.required = canManageClients();
+}
+
+function resetVacationRentalForm() {
+  state.selectedVacationRentalId = null;
+  state.vacationRentalImages = [];
+  state.vacationRentalPendingFiles = [];
+  state.vacationRentalPendingCover = false;
+  $("vacationRentalForm")?.reset();
+  if ($("vacationRentalId")) $("vacationRentalId").value = "";
+  if ($("vacationRentalCity")) $("vacationRentalCity").value = "Carlopolis";
+  if ($("vacationRentalState")) $("vacationRentalState").value = "PR";
+  if ($("vacationRentalGuests")) $("vacationRentalGuests").value = "1";
+  if ($("vacationRentalMinNights")) $("vacationRentalMinNights").value = "1";
+  if ($("vacationRentalStatus")) $("vacationRentalStatus").value = "ativo";
+  fillVacationRentalClientOptions(canManageClients() ? "" : currentClientId());
+  $("deleteVacationRentalButton")?.classList.add("hidden");
+  renderVacationRentalImagesPreview();
+  setFormCardOpen("vacationRentalForm", false);
+}
+
+function renderVacationRentalImagesPreview() {
+  const box = $("vacationRentalImagesPreview");
+  const count = $("vacationRentalImagesCount");
+  if (!box) return;
+  const existing = state.vacationRentalImages.map((url, sourceIndex) => ({ url, pending: false, sourceIndex }));
+  const pending = state.vacationRentalPendingFiles.map((file, sourceIndex) => ({ url: URL.createObjectURL(file), pending: true, file, sourceIndex }));
+  const items = state.vacationRentalPendingCover ? [...pending, ...existing] : [...existing, ...pending];
+  if (count) count.textContent = items.length + (items.length === 1 ? " imagem" : " imagens");
+  if (!items.length) {
+    box.innerHTML = '<div class="list-meta">Nenhuma foto adicionada.</div>';
+    return;
+  }
+  box.innerHTML = items.map((item, index) =>
+    '<article class="' + (index === 0 ? "is-cover" : "") + '">' +
+      '<img src="' + escapeAttr(displayImageUrl(item.url)) + '" alt="Foto ' + (index + 1) + ' da propriedade">' +
+      '<div class="vacation-image-actions">' +
+        (index > 0 ? '<button type="button" class="ghost-button" data-vacation-cover="' + index + '"><i class="fa-solid fa-star"></i> Capa</button>' : '<span class="badge">Capa</span>') +
+        '<button type="button" class="danger-mini" data-vacation-image-remove="' + index + '" aria-label="Remover foto"><i class="fa-solid fa-trash"></i></button>' +
+      '</div>' +
+    '</article>'
+  ).join("");
+  box.querySelectorAll("[data-vacation-image-remove]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.vacationImageRemove);
+      const item = items[index];
+      if (item?.pending) state.vacationRentalPendingFiles.splice(item.sourceIndex, 1);
+      else if (item) state.vacationRentalImages.splice(item.sourceIndex, 1);
+      if (!state.vacationRentalPendingFiles.length) state.vacationRentalPendingCover = false;
+      renderVacationRentalImagesPreview();
+    });
+  });
+  box.querySelectorAll("[data-vacation-cover]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const index = Number(button.dataset.vacationCover);
+      const chosen = items[index];
+      if (chosen?.pending) {
+        state.vacationRentalPendingFiles.splice(chosen.sourceIndex, 1);
+        state.vacationRentalPendingFiles.unshift(chosen.file);
+        state.vacationRentalPendingCover = true;
+      } else if (chosen) {
+        state.vacationRentalImages.splice(chosen.sourceIndex, 1);
+        state.vacationRentalImages.unshift(chosen.url);
+        state.vacationRentalPendingCover = false;
+      }
+      renderVacationRentalImagesPreview();
+    });
+  });
+}
+
+function fillVacationRentalForm(item) {
+  if (!itemBelongsToCurrentClient(item)) {
+    showToast("Voce nao tem permissao para editar esta propriedade.");
+    return;
+  }
+  state.selectedVacationRentalId = item.id;
+  state.vacationRentalImages = Array.isArray(item.imagens) ? [...item.imagens] : (item.imagem ? [item.imagem] : []);
+  state.vacationRentalPendingFiles = [];
+  state.vacationRentalPendingCover = false;
+  const values = {
+    vacationRentalId: item.id,
+    vacationRentalTitle: item.titulo,
+    vacationRentalType: item.tipo || "casa",
+    vacationRentalStatus: item.status || "ativo",
+    vacationRentalNeighborhood: item.bairro,
+    vacationRentalCity: item.cidade || "Carlopolis",
+    vacationRentalState: item.estado || "PR",
+    vacationRentalAddress: item.endereco,
+    vacationRentalMapsUrl: item.googleMapsUrl,
+    vacationRentalGuests: item.hospedes || 1,
+    vacationRentalBedrooms: item.quartos || 0,
+    vacationRentalBeds: item.camas || 0,
+    vacationRentalSuites: item.suites || 0,
+    vacationRentalBathrooms: item.banheiros || 0,
+    vacationRentalMinNights: item.minimoNoites || 1,
+    vacationRentalCheckin: item.checkin,
+    vacationRentalCheckout: item.checkout,
+    vacationRentalDailyPrice: item.valorDiaria ? moneyBR(item.valorDiaria) : "",
+    vacationRentalWeekendPrice: item.valorFimSemana ? moneyBR(item.valorFimSemana) : "",
+    vacationRentalCleaningFee: item.taxaLimpeza ? moneyBR(item.taxaLimpeza) : "",
+    vacationRentalDeposit: item.caucao ? moneyBR(item.caucao) : "",
+    vacationRentalContactName: item.responsavel,
+    vacationRentalWhatsapp: item.whatsapp,
+    vacationRentalPhone: item.telefone,
+    vacationRentalInstagram: item.instagram,
+    vacationRentalDescription: item.descricao,
+    vacationRentalRules: item.regras,
+    vacationRentalAvailability: item.disponibilidade
+  };
+  Object.entries(values).forEach(([id, value]) => { if ($(id)) $(id).value = value ?? ""; });
+  if ($("vacationRentalFeatured")) $("vacationRentalFeatured").checked = Boolean(item.destaque);
+  const amenities = new Set(Array.isArray(item.comodidades) ? item.comodidades : []);
+  document.querySelectorAll("#vacationRentalAmenities input[type='checkbox']").forEach((input) => {
+    input.checked = amenities.has(input.value);
+  });
+  fillVacationRentalClientOptions(item.clienteId || item.clientId || "");
+  $("deleteVacationRentalButton")?.classList.remove("hidden");
+  renderVacationRentalImagesPreview();
+  openFormForEdit("vacationRentalForm");
+}
+
+async function uploadVacationRentalImages(id, files) {
+  const urls = [];
+  const list = Array.from(files || []);
+  for (let index = 0; index < list.length; index += 1) {
+    const file = await optimizeAutomovelImageFile(list[index]);
+    const path = "conteudosInformativos/casasVeraneio/" + id + "/" + Date.now() + "-" + index + "-" + slugify(file.name || "hospedagem");
+    const fileRef = storageRef(storage, path);
+    urls.push(await uploadFileWithProgress(fileRef, file, "Enviando fotos da propriedade", (file.name || "imagem") + " (" + (index + 1) + "/" + list.length + ")"));
+  }
+  return urls;
+}
+
+function vacationRentalFormPayload() {
+  const clientId = canManageClients() ? $("vacationRentalClient")?.value : currentClientId();
+  const client = state.clientes.find((item) => item.id === clientId) || currentClientRecord();
+  return {
+    clienteId: clientId || "",
+    clienteNome: client?.nome || "",
+    titulo: $("vacationRentalTitle")?.value.trim() || "",
+    tipo: $("vacationRentalType")?.value || "casa",
+    status: $("vacationRentalStatus")?.value || "ativo",
+    destaque: Boolean($("vacationRentalFeatured")?.checked),
+    bairro: $("vacationRentalNeighborhood")?.value.trim() || "",
+    cidade: $("vacationRentalCity")?.value.trim() || "",
+    estado: $("vacationRentalState")?.value.trim().toUpperCase() || "",
+    endereco: $("vacationRentalAddress")?.value.trim() || "",
+    googleMapsUrl: $("vacationRentalMapsUrl")?.value.trim() || "",
+    hospedes: Math.max(1, Number($("vacationRentalGuests")?.value || 1)),
+    quartos: Math.max(0, Number($("vacationRentalBedrooms")?.value || 0)),
+    camas: Math.max(0, Number($("vacationRentalBeds")?.value || 0)),
+    suites: Math.max(0, Number($("vacationRentalSuites")?.value || 0)),
+    banheiros: Math.max(0, Number($("vacationRentalBathrooms")?.value || 0)),
+    minimoNoites: Math.max(1, Number($("vacationRentalMinNights")?.value || 1)),
+    checkin: $("vacationRentalCheckin")?.value || "",
+    checkout: $("vacationRentalCheckout")?.value || "",
+    valorDiaria: numberFromMoney($("vacationRentalDailyPrice")?.value || ""),
+    valorFimSemana: numberFromMoney($("vacationRentalWeekendPrice")?.value || ""),
+    taxaLimpeza: numberFromMoney($("vacationRentalCleaningFee")?.value || ""),
+    caucao: numberFromMoney($("vacationRentalDeposit")?.value || ""),
+    comodidades: [...document.querySelectorAll("#vacationRentalAmenities input:checked")].map((input) => input.value),
+    responsavel: $("vacationRentalContactName")?.value.trim() || "",
+    whatsapp: $("vacationRentalWhatsapp")?.value.trim() || "",
+    telefone: $("vacationRentalPhone")?.value.trim() || "",
+    instagram: $("vacationRentalInstagram")?.value.trim() || "",
+    descricao: $("vacationRentalDescription")?.value.trim() || "",
+    regras: $("vacationRentalRules")?.value.trim() || "",
+    disponibilidade: $("vacationRentalAvailability")?.value.trim() || "",
+    updatedAt: serverTimestamp(),
+    updatedBy: state.user?.uid || ""
+  };
+}
+
+function renderVacationRentalsList() {
+  const box = $("vacationRentalsList");
+  if (!box) return;
+  fillVacationRentalClientOptions($("vacationRentalClient")?.value || "");
+  const search = normalizeName($("vacationRentalSearch")?.value || "");
+  const status = $("vacationRentalStatusFilter")?.value || "";
+  const list = state.casasVeraneio.filter(itemBelongsToCurrentClient).filter((item) => {
+    const haystack = normalizeName([item.titulo, item.tipo, item.bairro, item.cidade, item.clienteNome, item.responsavel].join(" "));
+    return (!search || haystack.includes(search)) && (!status || item.status === status);
+  });
+  if ($("vacationRentalTotal")) $("vacationRentalTotal").textContent = String(list.length);
+  if (!list.length) {
+    box.innerHTML = '<div class="list-meta">Nenhuma propriedade encontrada.</div>';
+    return;
+  }
+  box.innerHTML = list.map((item) => {
+    const image = item.imagem || (Array.isArray(item.imagens) ? item.imagens[0] : "");
+    const statusValue = item.status || "ativo";
+    return '<article class="list-card event-card vacation-admin-card">' +
+      '<div class="vacation-admin-thumb">' + (image
+        ? '<img src="' + escapeAttr(displayImageUrl(image)) + '" alt="' + escapeAttr(item.titulo || "Propriedade") + '" ' + lazyImageAttrs() + " " + imageFallbackAttr() + '>'
+        : '<div class="vacation-admin-thumb-empty"><i class="fa-solid fa-house-chimney-window"></i></div>') + '</div>' +
+      '<div class="vacation-admin-info"><div class="vacation-admin-main"><div><div class="list-title">' + escapeHtml(item.titulo || item.id) + '</div>' +
+      '<div class="list-meta">' + escapeHtml([VACATION_RENTAL_TYPE_LABELS[item.tipo] || item.tipo, item.bairro, item.cidade].filter(Boolean).join(" - ")) + '</div></div>' +
+      '<span class="badge ' + escapeAttr(statusValue) + '">' + escapeHtml(statusValue === "rascunho" ? "Rascunho" : statusLabel(statusValue)) + '</span></div>' +
+      '<div class="vacation-admin-meta"><span><i class="fa-solid fa-user"></i> ' + escapeHtml(item.clienteNome || vacationRentalClient(item)?.nome || "Sem cliente") + '</span>' +
+      '<span><i class="fa-solid fa-users"></i> Ate ' + escapeHtml(item.hospedes || 1) + ' hospedes</span>' +
+      '<strong>' + escapeHtml(item.valorDiaria ? moneyBR(item.valorDiaria) + " / diaria" : "Valor sob consulta") + '</strong></div>' +
+      '<div class="list-card-actions"><button type="button" data-edit-vacation-rental="' + escapeAttr(item.id) + '"><i class="fa-solid fa-pen"></i> Editar</button>' +
+      '<button type="button" class="danger-mini" data-delete-vacation-rental="' + escapeAttr(item.id) + '"><i class="fa-solid fa-trash"></i> Excluir</button></div></div></article>';
+  }).join("");
+  box.querySelectorAll("[data-edit-vacation-rental]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const item = state.casasVeraneio.find((entry) => entry.id === button.dataset.editVacationRental && itemBelongsToCurrentClient(entry));
+      if (item) fillVacationRentalForm(item);
+    });
+  });
+  box.querySelectorAll("[data-delete-vacation-rental]").forEach((button) => {
+    button.addEventListener("click", () => deleteVacationRental(button.dataset.deleteVacationRental));
+  });
+}
+
+async function deleteVacationRental(id) {
+  const item = state.casasVeraneio.find((entry) => entry.id === id);
+  if (!item || !itemBelongsToCurrentClient(item) || !canAccessVacationRentals()) {
+    showToast("Voce nao tem permissao para excluir esta propriedade.");
+    return;
+  }
+  if (!(await confirmarExclusao(item.titulo || id, "casa de veraneio"))) return;
+  await remove(ref(db, "conteudosInformativos/casasVeraneio/" + id));
+  if (state.selectedVacationRentalId === id) resetVacationRentalForm();
+  showToast("Propriedade excluida.");
+  await loadAllData();
+}
+
+async function saveVacationRental(event) {
+  event.preventDefault();
+  if (!canAccessVacationRentals()) return;
+  const payload = vacationRentalFormPayload();
+  if (!payload.clienteId) {
+    showToast("Selecione o cliente responsavel pela propriedade.");
+    return;
+  }
+  const original = state.selectedVacationRentalId
+    ? state.casasVeraneio.find((item) => item.id === state.selectedVacationRentalId)
+    : null;
+  if (state.selectedVacationRentalId && (!original || !itemBelongsToCurrentClient(original))) {
+    showToast("Voce nao tem permissao para alterar esta propriedade.");
+    return;
+  }
+  const id = state.selectedVacationRentalId || push(ref(db, "conteudosInformativos/casasVeraneio")).key;
+  const submitButton = $("vacationRentalForm")?.querySelector("button[type='submit']");
+  try {
+    setBusy(submitButton, true);
+    const uploaded = await uploadVacationRentalImages(id, state.vacationRentalPendingFiles);
+    payload.imagens = state.vacationRentalPendingCover
+      ? [...uploaded, ...state.vacationRentalImages]
+      : [...state.vacationRentalImages, ...uploaded];
+    payload.imagem = payload.imagens[0] || "";
+    payload.createdAt = original?.createdAt || serverTimestamp();
+    await set(ref(db, "conteudosInformativos/casasVeraneio/" + id), payload);
+    showToast(original ? "Propriedade atualizada." : "Propriedade cadastrada.");
+    resetVacationRentalForm();
+    await loadAllData();
+  } catch (error) {
+    console.error("Falha ao salvar casa de veraneio.", error);
+    showToast("Nao foi possivel salvar a propriedade. Confira os dados e tente novamente.");
+  } finally {
+    setBusy(submitButton, false);
+  }
+}
+
+function bindVacationRentalAdminEvents() {
+  $("newVacationRentalButton")?.addEventListener("click", () => {
+    resetVacationRentalForm();
+    openFormForEdit("vacationRentalForm");
+  });
+  $("closeVacationRentalFormButton")?.addEventListener("click", resetVacationRentalForm);
+  $("vacationRentalSearch")?.addEventListener("input", renderVacationRentalsList);
+  $("vacationRentalStatusFilter")?.addEventListener("change", renderVacationRentalsList);
+  $("vacationRentalImagesUpload")?.addEventListener("change", (event) => {
+    const files = Array.from(event.target.files || []).filter((file) => file.type.startsWith("image/"));
+    state.vacationRentalPendingFiles.push(...files);
+    event.target.value = "";
+    renderVacationRentalImagesPreview();
+  });
+  $("vacationRentalForm")?.addEventListener("submit", saveVacationRental);
+  $("deleteVacationRentalButton")?.addEventListener("click", () => deleteVacationRental(state.selectedVacationRentalId));
+  bindPhoneMask("vacationRentalWhatsapp");
+  bindPhoneMask("vacationRentalPhone");
+}
 function renderAutomoveisList() {
   const box = $("automoveisList");
   if (!box) return;
@@ -26652,6 +27009,7 @@ function bindEvents() {
 renderPanelVersion();
 updateClientShortDescriptionCount();
 bindEvents();
+bindVacationRentalAdminEvents();
 initializeReportTableEnhancements();
 bindAdminIdleTimer();
 

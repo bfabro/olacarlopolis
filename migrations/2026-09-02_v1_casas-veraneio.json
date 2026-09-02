@@ -1,0 +1,32 @@
+{
+  "version": "2026-09-02_v1",
+  "operation": "create_vacation_rentals_module",
+  "recreates_existing_data": false,
+  "new_paths": {
+    "conteudosInformativos/casasVeraneio/{propertyId}": {
+      "owner_field": "clienteId",
+      "public_status": "ativo",
+      "supports_multiple_records_per_client": true,
+      "supports_multiple_images": true
+    },
+    "usuariosByUid/{uid}/permissoes/casas_veraneio": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "schema_changes": true,
+  "affected_areas": [
+    "public_sidebar",
+    "public_vacation_rentals_catalog",
+    "admin_master",
+    "admin_client_permissions",
+    "service_worker"
+  ],
+  "public_route": "#casas-veraneio",
+  "admin_view": "casasVeraneio",
+  "notes": [
+    "Existing records are not changed.",
+    "Client ownership is stored independently from commercial categories.",
+    "Admin Master can list and manage records from every client."
+  ]
+}
