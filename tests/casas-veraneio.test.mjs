@@ -7,6 +7,7 @@ const publicJs = readFileSync(new URL("../script.js", import.meta.url), "utf8");
 const publicCss = readFileSync(new URL("../casas-veraneio.css", import.meta.url), "utf8");
 const adminHtml = readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
 const adminJs = readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
+const adminCss = readFileSync(new URL("../admin/casas-veraneio-admin.css", import.meta.url), "utf8");
 
 test("menu publico posiciona Casas de veraneio antes de Onde Comer", () => {
   assert.ok(publicHtml.indexOf('id="menuCasasVeraneio"') > 0);
@@ -23,7 +24,7 @@ test("rota publica carrega somente registros ativos", () => {
 test("catalogo inicia compacto e permite alternar para detalhes", () => {
   assert.match(publicJs, /savedMode === null \? true/);
   assert.match(publicJs, /casasVeraneioModoCompacto/);
-  assert.match(publicHtml, /casas-veraneio\.css\?v=3/);
+  assert.match(publicHtml, /casas-veraneio\.css\?v=4/);
   assert.match(publicCss, /vacation-public-page\.is-compact/);
 });
 
@@ -72,6 +73,36 @@ test("galeria ampliada navega por setas teclado e gesto lateral", () => {
 test("modal mobile exibe fotos completas", () => {
   assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*\.vacation-modal-gallery img \{[\s\S]*object-fit: contain;/);
   assert.match(publicCss, /scroll-snap-type: x mandatory/);
+});
+
+test("painel permite marcar disponibilidade alugado e manutencao por dia", () => {
+  assert.match(adminHtml, /id="vacationRentalCalendarGrid"/);
+  assert.match(adminHtml, /data-vacation-calendar-status="disponivel"/);
+  assert.match(adminHtml, /data-vacation-calendar-status="alugado"/);
+  assert.match(adminHtml, /data-vacation-calendar-status="manutencao"/);
+  assert.match(adminJs, /function renderVacationRentalCalendar/);
+  assert.match(adminJs, /calendarioDisponibilidade: \{ \.\.\.vacationRentalCalendar \}/);
+  assert.match(adminJs, /delete vacationRentalCalendar\[date\]/);
+  assert.match(adminCss, /vacation-calendar-grid button\.is-rented \{ background: #dc3545; \}/);
+  assert.match(adminCss, /vacation-calendar-grid button\.is-maintenance \{ background: #2775d7; \}/);
+});
+
+test("site publico abre calendario pelo icone de cada propriedade", () => {
+  assert.match(publicJs, /class="vacation-calendar-action"/);
+  assert.match(publicJs, /data-vacation-calendar=/);
+  assert.match(publicJs, /function openVacationAvailabilityCalendar/);
+  assert.match(publicJs, /calendarioDisponibilidade/);
+  assert.match(publicCss, /vacation-availability-grid \.is-available \{ background: #22a447; \}/);
+  assert.match(publicCss, /vacation-availability-grid \.is-rented \{ background: #dc3545; \}/);
+  assert.match(publicCss, /vacation-availability-grid \.is-maintenance \{ background: #2775d7; \}/);
+});
+
+test("calendarios possuem navegacao mensal e legenda acessivel", () => {
+  assert.match(adminHtml, /id="vacationCalendarPrevious"/);
+  assert.match(adminHtml, /id="vacationCalendarNext"/);
+  assert.match(publicJs, /data-vacation-month-previous/);
+  assert.match(publicJs, /data-vacation-month-next/);
+  assert.match(publicJs, /aria-label="Dia ' \+ day \+ ', ' \+ label/);
 });
 
 test("painel expoe flag propria sem depender da categoria", () => {

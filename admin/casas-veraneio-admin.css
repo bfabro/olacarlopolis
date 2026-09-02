@@ -1,4 +1,4 @@
-/* Casas de veraneio admin - 2026-09-02_v2 */
+/* Casas de veraneio admin - 2026-09-02_v3 */
 .vacation-admin-layout {
   align-items: start;
 }
@@ -134,4 +134,71 @@
   .vacation-admin-main { display: block; }
   .vacation-admin-main .badge { display: inline-flex; margin-top: 6px; }
   #vacationRentalImagesPreview.image-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.vacation-calendar-admin {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.vacation-calendar-heading,
+.vacation-calendar-navigation,
+.vacation-calendar-statuses {
+  display: flex;
+  align-items: center;
+}
+.vacation-calendar-heading { justify-content: space-between; gap: 12px; }
+.vacation-calendar-heading h3 { margin: 0 0 4px; }
+.vacation-calendar-heading p { margin: 0; color: var(--muted); font-size: .82rem; }
+.vacation-calendar-navigation { gap: 8px; }
+.vacation-calendar-navigation button { width: 38px; min-height: 38px; padding: 0; }
+.vacation-calendar-navigation strong { min-width: 145px; text-align: center; text-transform: capitalize; }
+.vacation-calendar-statuses { flex-wrap: wrap; gap: 7px; margin: 14px 0 10px; }
+.vacation-calendar-statuses button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 7px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 7px 10px;
+  background: #fff;
+  color: var(--ink);
+  font-weight: 750;
+  cursor: pointer;
+}
+.vacation-calendar-statuses button.is-selected { border-color: #0f766e; box-shadow: 0 0 0 2px rgba(15, 118, 110, .14); }
+.calendar-status-dot { width: 11px; height: 11px; border-radius: 50%; }
+.calendar-status-dot.is-available { background: #22a447; }
+.calendar-status-dot.is-rented { background: #dc3545; }
+.calendar-status-dot.is-maintenance { background: #2775d7; }
+.vacation-calendar-weekdays,
+.vacation-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+}
+.vacation-calendar-weekdays { margin-bottom: 5px; color: var(--muted); font-size: .72rem; font-weight: 800; text-align: center; }
+.vacation-calendar-grid button,
+.vacation-calendar-grid .calendar-empty-day {
+  min-height: 42px;
+  border-radius: 7px;
+}
+.vacation-calendar-grid button {
+  border: 1px solid transparent;
+  color: #fff;
+  font-weight: 850;
+  cursor: pointer;
+}
+.vacation-calendar-grid button.is-available { background: #22a447; }
+.vacation-calendar-grid button.is-rented { background: #dc3545; }
+.vacation-calendar-grid button.is-maintenance { background: #2775d7; }
+.vacation-calendar-grid button.is-today { outline: 3px solid #f5b700; outline-offset: 1px; }
+
+@media (max-width: 720px) {
+  .vacation-calendar-heading { align-items: stretch; flex-direction: column; }
+  .vacation-calendar-navigation { justify-content: space-between; }
+  .vacation-calendar-grid button,
+  .vacation-calendar-grid .calendar-empty-day { min-height: 38px; }
 }

@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="stylesheet" href="painel.css?v=440">
-  <link rel="stylesheet" href="casas-veraneio-admin.css?v=2">
+  <link rel="stylesheet" href="casas-veraneio-admin.css?v=3">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1975,6 +1975,24 @@
               <label class="wide">Regras da hospedagem<textarea id="vacationRentalRules" rows="4" maxlength="1200" placeholder="Horarios, limite de pessoas, festas, animais e outras regras."></textarea></label>
               <label class="wide">Informacoes de disponibilidade<textarea id="vacationRentalAvailability" rows="3" maxlength="800" placeholder="Ex: Consulte datas disponiveis pelo WhatsApp."></textarea></label>
 
+              <section class="wide vacation-calendar-admin" aria-labelledby="vacationCalendarAdminTitle">
+                <div class="vacation-calendar-heading">
+                  <div><h3 id="vacationCalendarAdminTitle"><i class="fa-solid fa-calendar-days"></i> Calendario de disponibilidade</h3><p>Escolha uma situacao e clique nos dias para atualizar a agenda.</p></div>
+                  <div class="vacation-calendar-navigation">
+                    <button id="vacationCalendarPrevious" type="button" class="ghost-button" aria-label="Mes anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                    <strong id="vacationCalendarMonthLabel"></strong>
+                    <button id="vacationCalendarNext" type="button" class="ghost-button" aria-label="Proximo mes"><i class="fa-solid fa-chevron-right"></i></button>
+                  </div>
+                </div>
+                <div class="vacation-calendar-statuses" role="group" aria-label="Situacao para marcar">
+                  <button type="button" data-vacation-calendar-status="disponivel" class="is-selected"><span class="calendar-status-dot is-available"></span> Disponivel</button>
+                  <button type="button" data-vacation-calendar-status="alugado"><span class="calendar-status-dot is-rented"></span> Alugado</button>
+                  <button type="button" data-vacation-calendar-status="manutencao"><span class="calendar-status-dot is-maintenance"></span> Manutencao</button>
+                </div>
+                <div class="vacation-calendar-weekdays" aria-hidden="true"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sab</span></div>
+                <div id="vacationRentalCalendarGrid" class="vacation-calendar-grid"></div>
+              </section>
+
               <section class="wide upload-panel">
                 <div class="section-head compact"><div><h3>Fotos da propriedade</h3><p>Envie varias imagens. A primeira sera a capa do anuncio.</p></div><span id="vacationRentalImagesCount" class="badge">0 imagens</span></div>
                 <input id="vacationRentalImagesUpload" type="file" accept="image/*" multiple>
@@ -3113,6 +3131,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=641"></script>
+  <script type="module" src="painel.js?v=642"></script>
 </body>
 </html>

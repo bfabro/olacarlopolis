@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 704,
-  label: "v711",
+  numero: 705,
+  label: "v712",
   data: "2026-09-02",
-  nota: "Compartilhamento e galerias responsivas das casas de veraneio aprimorados."
+  nota: "Calendario de disponibilidade das casas de veraneio no painel e no site publico."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -14792,11 +14792,60 @@ function fillVacationRentalClientOptions(selectedId = "") {
   select.required = canManageClients();
 }
 
+let vacationRentalCalendar = {};
+let vacationRentalCalendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+let vacationRentalCalendarStatus = "disponivel";
+
+function normalizeVacationRentalCalendar(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(Object.entries(value).filter(([date, status]) =>
+    /^\d{4}-\d{2}-\d{2}$/.test(date) && ["alugado", "manutencao"].includes(status)
+  ));
+}
+
+function vacationRentalCalendarDateKey(year, month, day) {
+  return [year, String(month + 1).padStart(2, "0"), String(day).padStart(2, "0")].join("-");
+}
+
+function renderVacationRentalCalendar() {
+  const grid = $("vacationRentalCalendarGrid");
+  const label = $("vacationCalendarMonthLabel");
+  if (!grid || !label) return;
+  const year = vacationRentalCalendarMonth.getFullYear();
+  const month = vacationRentalCalendarMonth.getMonth();
+  const firstWeekday = new Date(year, month, 1).getDay();
+  const totalDays = new Date(year, month + 1, 0).getDate();
+  const today = new Date();
+  const todayKey = vacationRentalCalendarDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+  label.textContent = vacationRentalCalendarMonth.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  grid.innerHTML = Array.from({ length: firstWeekday }, () => '<span class="calendar-empty-day" aria-hidden="true"></span>').join("") +
+    Array.from({ length: totalDays }, (_, index) => {
+      const day = index + 1;
+      const date = vacationRentalCalendarDateKey(year, month, day);
+      const status = vacationRentalCalendar[date] || "disponivel";
+      const statusLabel = status === "alugado" ? "alugado" : (status === "manutencao" ? "em manutencao" : "disponivel");
+      return '<button type="button" class="is-' + (status === "alugado" ? "rented" : status === "manutencao" ? "maintenance" : "available") +
+        (date === todayKey ? " is-today" : "") + '" data-vacation-calendar-date="' + date + '" title="' + date.split("-").reverse().join("/") + " - " + statusLabel +
+        '" aria-label="Dia ' + day + ', ' + statusLabel + '">' + day + '</button>';
+    }).join("");
+  grid.querySelectorAll("[data-vacation-calendar-date]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const date = button.dataset.vacationCalendarDate;
+      if (vacationRentalCalendarStatus === "disponivel") delete vacationRentalCalendar[date];
+      else vacationRentalCalendar[date] = vacationRentalCalendarStatus;
+      renderVacationRentalCalendar();
+    });
+  });
+}
+
 function resetVacationRentalForm() {
   state.selectedVacationRentalId = null;
   state.vacationRentalImages = [];
   state.vacationRentalPendingFiles = [];
   state.vacationRentalPendingCover = false;
+  vacationRentalCalendar = {};
+  vacationRentalCalendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  vacationRentalCalendarStatus = "disponivel";
   $("vacationRentalForm")?.reset();
   if ($("vacationRentalId")) $("vacationRentalId").value = "";
   if ($("vacationRentalCity")) $("vacationRentalCity").value = "Carlopolis";
@@ -14807,6 +14856,10 @@ function resetVacationRentalForm() {
   fillVacationRentalClientOptions(canManageClients() ? "" : currentClientId());
   $("deleteVacationRentalButton")?.classList.add("hidden");
   renderVacationRentalImagesPreview();
+  document.querySelectorAll("[data-vacation-calendar-status]").forEach((button) => {
+    button.classList.toggle("is-selected", button.dataset.vacationCalendarStatus === vacationRentalCalendarStatus);
+  });
+  renderVacationRentalCalendar();
   setFormCardOpen("vacationRentalForm", false);
 }
 
@@ -14868,6 +14921,9 @@ function fillVacationRentalForm(item) {
   state.vacationRentalImages = Array.isArray(item.imagens) ? [...item.imagens] : (item.imagem ? [item.imagem] : []);
   state.vacationRentalPendingFiles = [];
   state.vacationRentalPendingCover = false;
+  vacationRentalCalendar = normalizeVacationRentalCalendar(item.calendarioDisponibilidade);
+  vacationRentalCalendarMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  vacationRentalCalendarStatus = "disponivel";
   const values = {
     vacationRentalId: item.id,
     vacationRentalTitle: item.titulo,
@@ -14907,6 +14963,10 @@ function fillVacationRentalForm(item) {
   fillVacationRentalClientOptions(item.clienteId || item.clientId || "");
   $("deleteVacationRentalButton")?.classList.remove("hidden");
   renderVacationRentalImagesPreview();
+  document.querySelectorAll("[data-vacation-calendar-status]").forEach((button) => {
+    button.classList.toggle("is-selected", button.dataset.vacationCalendarStatus === vacationRentalCalendarStatus);
+  });
+  renderVacationRentalCalendar();
   openFormForEdit("vacationRentalForm");
 }
 
@@ -14957,6 +15017,7 @@ function vacationRentalFormPayload() {
     descricao: $("vacationRentalDescription")?.value.trim() || "",
     regras: $("vacationRentalRules")?.value.trim() || "",
     disponibilidade: $("vacationRentalAvailability")?.value.trim() || "",
+    calendarioDisponibilidade: { ...vacationRentalCalendar },
     updatedAt: serverTimestamp(),
     updatedBy: state.user?.uid || ""
   };
@@ -15062,6 +15123,20 @@ function bindVacationRentalAdminEvents() {
   $("closeVacationRentalFormButton")?.addEventListener("click", resetVacationRentalForm);
   $("vacationRentalSearch")?.addEventListener("input", renderVacationRentalsList);
   $("vacationRentalStatusFilter")?.addEventListener("change", renderVacationRentalsList);
+  $("vacationCalendarPrevious")?.addEventListener("click", () => {
+    vacationRentalCalendarMonth = new Date(vacationRentalCalendarMonth.getFullYear(), vacationRentalCalendarMonth.getMonth() - 1, 1);
+    renderVacationRentalCalendar();
+  });
+  $("vacationCalendarNext")?.addEventListener("click", () => {
+    vacationRentalCalendarMonth = new Date(vacationRentalCalendarMonth.getFullYear(), vacationRentalCalendarMonth.getMonth() + 1, 1);
+    renderVacationRentalCalendar();
+  });
+  document.querySelectorAll("[data-vacation-calendar-status]").forEach((button) => {
+    button.addEventListener("click", () => {
+      vacationRentalCalendarStatus = button.dataset.vacationCalendarStatus || "disponivel";
+      document.querySelectorAll("[data-vacation-calendar-status]").forEach((entry) => entry.classList.toggle("is-selected", entry === button));
+    });
+  });
   $("vacationRentalImagesUpload")?.addEventListener("change", (event) => {
     const files = Array.from(event.target.files || []).filter((file) => file.type.startsWith("image/"));
     state.vacationRentalPendingFiles.push(...files);

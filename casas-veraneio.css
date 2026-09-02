@@ -1,4 +1,4 @@
-/* Casas de veraneio publica - 2026-09-02_v3 */
+/* Casas de veraneio publica - 2026-09-02_v4 */
 .vacation-public-page {
   width: min(1180px, 100%);
   margin: 0 auto 40px;
@@ -554,4 +554,143 @@ body.vacation-modal-open { overflow: hidden; }
   .vacation-image-viewer .vacation-viewer-next {
     right: 8px;
   }
+}
+/* Calendario publico de disponibilidade - 2026-09-02_v4 */
+.vacation-public-actions {
+  flex-wrap: wrap;
+}
+.vacation-public-actions .vacation-calendar-action {
+  border-color: #2775d7;
+  color: #1f64ba;
+}
+.vacation-public-page.is-compact .vacation-public-actions {
+  flex-wrap: wrap;
+}
+.vacation-public-actions .vacation-calendar-action {
+  display: inline-flex;
+  flex: 0 0 42px;
+  padding-inline: 0;
+}
+.vacation-public-page.is-compact .vacation-public-actions .vacation-calendar-action span {
+  display: none;
+}
+.vacation-availability-modal {
+  position: fixed;
+  z-index: 10040;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+.vacation-availability-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 15, 28, .82);
+}
+.vacation-availability-card {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: 94vh;
+  overflow-y: auto;
+  border-radius: 10px;
+  padding: 16px;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .34);
+}
+.vacation-availability-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #dce5e9;
+}
+.vacation-availability-card header small {
+  color: #0f766e;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.vacation-availability-card header h2 { margin: 4px 0; }
+.vacation-availability-card header p { margin: 0; color: #58657a; }
+.vacation-availability-card header button,
+.vacation-availability-navigation button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  background: #edf2f4;
+  color: #172033;
+  cursor: pointer;
+}
+.vacation-availability-navigation {
+  display: grid;
+  grid-template-columns: 42px 1fr 42px;
+  align-items: center;
+  gap: 8px;
+  margin: 14px 0 10px;
+}
+.vacation-availability-navigation strong {
+  text-align: center;
+  text-transform: capitalize;
+}
+.vacation-availability-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 14px;
+  margin-bottom: 12px;
+  color: #475569;
+  font-size: .82rem;
+  font-weight: 750;
+}
+.vacation-availability-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.vacation-availability-legend i { width: 11px; height: 11px; border-radius: 50%; }
+.vacation-availability-legend .is-available { background: #22a447; }
+.vacation-availability-legend .is-rented { background: #dc3545; }
+.vacation-availability-legend .is-maintenance { background: #2775d7; }
+.vacation-availability-weekdays,
+.vacation-availability-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+.vacation-availability-weekdays {
+  margin-bottom: 6px;
+  color: #667085;
+  font-size: .72rem;
+  font-weight: 800;
+  text-align: center;
+}
+.vacation-availability-grid > span {
+  display: grid;
+  min-height: 46px;
+  place-items: center;
+  border-radius: 7px;
+  color: #fff;
+  font-weight: 850;
+}
+.vacation-availability-grid .calendar-empty-day { background: transparent; }
+.vacation-availability-grid .is-available { background: #22a447; }
+.vacation-availability-grid .is-rented { background: #dc3545; }
+.vacation-availability-grid .is-maintenance { background: #2775d7; }
+.vacation-availability-grid .is-today { outline: 3px solid #f5b700; outline-offset: 1px; }
+.vacation-availability-note {
+  margin: 14px 0 0;
+  padding: 10px;
+  border-radius: 7px;
+  background: #eef6f5;
+  color: #365563;
+  line-height: 1.45;
+}
+
+@media (max-width: 700px) {
+  .vacation-availability-modal { padding: 8px; }
+  .vacation-availability-card { max-height: 96vh; padding: 12px; }
+  .vacation-availability-grid > span { min-height: 40px; font-size: .86rem; }
+  .vacation-availability-weekdays,
+  .vacation-availability-grid { gap: 4px; }
 }

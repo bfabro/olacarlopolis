@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v626.
+// Release do site v627.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -14328,6 +14328,77 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
   }
 
+  function vacationAvailabilityData(item) {
+    const value = item?.calendarioDisponibilidade;
+    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+    return Object.fromEntries(Object.entries(value).filter(([date, status]) =>
+      /^\d{4}-\d{2}-\d{2}$/.test(date) && ["alugado", "manutencao"].includes(status)
+    ));
+  }
+
+  function vacationAvailabilityDateKey(year, month, day) {
+    return [year, String(month + 1).padStart(2, "0"), String(day).padStart(2, "0")].join("-");
+  }
+
+  function closeVacationAvailabilityCalendar() {
+    document.getElementById("vacationAvailabilityModal")?.remove();
+  }
+
+  function openVacationAvailabilityCalendar(item) {
+    closeVacationAvailabilityCalendar();
+    const availability = vacationAvailabilityData(item);
+    let visibleMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+    const modal = document.createElement("div");
+    modal.id = "vacationAvailabilityModal";
+    modal.className = "vacation-availability-modal";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Disponibilidade de " + (item.titulo || "hospedagem"));
+    modal.innerHTML = '<div class="vacation-availability-backdrop" data-vacation-availability-close></div>' +
+      '<section class="vacation-availability-card"><header><div><small>Consulte antes de reservar</small><h2><i class="fa-solid fa-calendar-days"></i> Disponibilidade</h2><p>' + vacationPublicEscape(item.titulo || "Hospedagem") + '</p></div>' +
+      '<button type="button" data-vacation-availability-close aria-label="Fechar calendario"><i class="fa-solid fa-xmark"></i></button></header>' +
+      '<div class="vacation-availability-navigation"><button type="button" data-vacation-month-previous aria-label="Mes anterior"><i class="fa-solid fa-chevron-left"></i></button><strong data-vacation-month-label></strong><button type="button" data-vacation-month-next aria-label="Proximo mes"><i class="fa-solid fa-chevron-right"></i></button></div>' +
+      '<div class="vacation-availability-legend"><span><i class="is-available"></i> Disponivel</span><span><i class="is-rented"></i> Alugado</span><span><i class="is-maintenance"></i> Manutencao</span></div>' +
+      '<div class="vacation-availability-weekdays" aria-hidden="true"><span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sab</span></div>' +
+      '<div class="vacation-availability-grid"></div>' +
+      (item.disponibilidade ? '<p class="vacation-availability-note"><i class="fa-solid fa-circle-info"></i> ' + vacationPublicEscape(item.disponibilidade) + '</p>' : "") +
+      '</section>';
+    const render = () => {
+      const year = visibleMonth.getFullYear();
+      const month = visibleMonth.getMonth();
+      const firstWeekday = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const today = new Date();
+      const todayKey = vacationAvailabilityDateKey(today.getFullYear(), today.getMonth(), today.getDate());
+      modal.querySelector("[data-vacation-month-label]").textContent = visibleMonth.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+      modal.querySelector(".vacation-availability-grid").innerHTML =
+        Array.from({ length: firstWeekday }, () => '<span class="calendar-empty-day" aria-hidden="true"></span>').join("") +
+        Array.from({ length: totalDays }, (_, index) => {
+          const day = index + 1;
+          const date = vacationAvailabilityDateKey(year, month, day);
+          const status = availability[date] || "disponivel";
+          const statusClass = status === "alugado" ? "rented" : status === "manutencao" ? "maintenance" : "available";
+          const label = status === "alugado" ? "alugado" : status === "manutencao" ? "em manutencao" : "disponivel";
+          return '<span class="is-' + statusClass + (date === todayKey ? " is-today" : "") + '" aria-label="Dia ' + day + ', ' + label + '" title="' + date.split("-").reverse().join("/") + " - " + label + '">' + day + '</span>';
+        }).join("");
+    };
+    modal.querySelectorAll("[data-vacation-availability-close]").forEach((button) => button.addEventListener("click", closeVacationAvailabilityCalendar));
+    modal.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") closeVacationAvailabilityCalendar();
+    });
+    modal.querySelector("[data-vacation-month-previous]").addEventListener("click", () => {
+      visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() - 1, 1);
+      render();
+    });
+    modal.querySelector("[data-vacation-month-next]").addEventListener("click", () => {
+      visibleMonth = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth() + 1, 1);
+      render();
+    });
+    document.body.appendChild(modal);
+    render();
+    modal.querySelector("[data-vacation-availability-close]").focus();
+  }
+
   async function carregarCasasVeraneioFirebase(force = false) {
     if (!force && Array.isArray(window.__vacationRentalsCache)) return window.__vacationRentalsCache;
     const dbAdmin = await esperarFirebaseDatabase();
@@ -14377,6 +14448,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         '<div class="vacation-public-actions">' +
           '<button type="button" class="vacation-detail-action" data-vacation-detail="' + vacationPublicEscape(item.id) + '"><i class="fa-solid fa-eye"></i> Ver detalhes</button>' +
           '<button type="button" class="vacation-share-action" data-vacation-share="' + vacationPublicEscape(item.id) + '" aria-label="Compartilhar ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-share-nodes"></i><span> Compartilhar</span></button>' +
+          '<button type="button" class="vacation-calendar-action" data-vacation-calendar="' + vacationPublicEscape(item.id) + '" aria-label="Ver disponibilidade de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-calendar-days"></i><span> Disponibilidade</span></button>' +
           (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Consultar</a>' : "") +
         '</div>' +
       '</div>' +
@@ -14470,6 +14542,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         '<section><h3>Contato</h3><p><strong>' + vacationPublicEscape(item.responsavel || item.clienteNome || "") + '</strong></p></section>' +
       '</div><footer>' +
         '<button type="button" class="vacation-modal-share" data-vacation-share="' + vacationPublicEscape(item.id) + '"><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>' +
+        '<button type="button" class="vacation-modal-calendar" data-vacation-calendar="' + vacationPublicEscape(item.id) + '"><i class="fa-solid fa-calendar-days"></i> Disponibilidade</button>' +
         (item.googleMapsUrl ? '<a class="vacation-maps-action" href="' + vacationPublicEscape(item.googleMapsUrl) + '" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Abrir no Maps</a>' : "") +
         (whatsapp ? '<a class="vacation-whatsapp-action" href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Consultar disponibilidade</a>' : "") +
       '</footer></section>';
@@ -14480,6 +14553,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       openVacationImageViewer(images, Number(button.dataset.vacationLargeImage), item.titulo || "Hospedagem");
     }));
     modal.querySelector("[data-vacation-share]")?.addEventListener("click", () => vacationPublicShare(item));
+    modal.querySelector("[data-vacation-calendar]")?.addEventListener("click", () => openVacationAvailabilityCalendar(item));
     modal.querySelector("[data-vacation-close]")?.focus();
   }
 
@@ -14536,6 +14610,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       listBox.querySelectorAll("[data-vacation-share]").forEach((button) => button.addEventListener("click", () => {
         const item = rentals.find((entry) => entry.id === button.dataset.vacationShare);
         if (item) vacationPublicShare(item);
+      }));
+      listBox.querySelectorAll("[data-vacation-calendar]").forEach((button) => button.addEventListener("click", () => {
+        const item = rentals.find((entry) => entry.id === button.dataset.vacationCalendar);
+        if (item) openVacationAvailabilityCalendar(item);
       }));
     };
     $("vacationSharePage")?.addEventListener("click", () => vacationPublicShare());
