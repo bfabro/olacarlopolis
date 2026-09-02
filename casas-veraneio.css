@@ -1,4 +1,4 @@
-/* Casas de veraneio publica - 2026-09-02_v2 */
+/* Casas de veraneio publica - 2026-09-02_v3 */
 .vacation-public-page {
   width: min(1180px, 100%);
   margin: 0 auto 40px;
@@ -408,5 +408,150 @@ body.vacation-modal-open { overflow: hidden; }
   .content_area:has(.vacation-public-page) {
     margin-top: 0 !important;
     padding-top: 120px !important;
+  }
+}
+
+/* Compartilhamento e galeria navegavel - 2026-09-02_v3 */
+.vacation-public-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.vacation-public-title > button {
+  display: inline-flex;
+  min-height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #0f766e;
+  border-radius: 6px;
+  padding: 9px 13px;
+  background: #fff;
+  color: #0f766e;
+  font-weight: 800;
+  cursor: pointer;
+}
+.vacation-public-actions .vacation-share-action {
+  border-color: #476276;
+  color: #344d60;
+}
+.vacation-public-page.is-compact .vacation-public-actions .vacation-detail-action {
+  display: none;
+}
+.vacation-public-page.is-compact .vacation-public-actions .vacation-share-action {
+  display: inline-flex;
+  flex: 0 0 42px;
+  padding-inline: 0;
+}
+.vacation-public-page.is-compact .vacation-public-actions .vacation-share-action span {
+  display: none;
+}
+.vacation-public-page.is-compact .vacation-public-actions a {
+  width: auto;
+  flex: 1;
+}
+.vacation-modal-gallery {
+  scroll-snap-type: x mandatory;
+}
+.vacation-modal-gallery button {
+  background: #dce9e7;
+  scroll-snap-align: center;
+}
+.vacation-modal-card > footer button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #476276;
+  border-radius: 6px;
+  padding: 9px 14px;
+  background: #fff;
+  color: #344d60;
+  font-weight: 800;
+  cursor: pointer;
+}
+.vacation-image-viewer {
+  touch-action: pan-y;
+}
+.vacation-image-viewer figure {
+  display: grid;
+  max-width: 96vw;
+  max-height: 92vh;
+  place-items: center;
+  margin: 0;
+}
+.vacation-image-viewer img {
+  max-height: 86vh;
+  user-select: none;
+}
+.vacation-image-viewer figcaption {
+  margin-top: 9px;
+  color: #fff;
+  font-weight: 800;
+}
+.vacation-image-viewer .vacation-viewer-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+.vacation-image-viewer .vacation-viewer-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  background: rgba(255, 255, 255, .9);
+  transform: translateY(-50%);
+}
+.vacation-image-viewer .vacation-viewer-prev {
+  left: 16px;
+  right: auto;
+}
+.vacation-image-viewer .vacation-viewer-next {
+  right: 16px;
+}
+.vacation-image-viewer.has-single-image .vacation-viewer-nav {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .vacation-public-title {
+    align-items: flex-start;
+  }
+  .vacation-public-title > button {
+    width: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+  .vacation-public-title > button span {
+    display: none;
+  }
+  .vacation-modal-gallery {
+    grid-auto-columns: 92%;
+  }
+  .vacation-modal-gallery button {
+    height: min(42vh, 320px);
+    aspect-ratio: auto;
+  }
+  .vacation-modal-gallery img {
+    object-fit: contain;
+  }
+  .vacation-image-viewer {
+    padding-inline: 8px;
+  }
+  .vacation-image-viewer img {
+    max-width: 100%;
+    max-height: 80vh;
+  }
+  .vacation-image-viewer .vacation-viewer-nav {
+    width: 40px;
+    height: 48px;
+    border-radius: 6px;
+  }
+  .vacation-image-viewer .vacation-viewer-prev {
+    left: 8px;
+  }
+  .vacation-image-viewer .vacation-viewer-next {
+    right: 8px;
   }
 }

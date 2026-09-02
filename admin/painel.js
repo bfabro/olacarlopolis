@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 703,
-  label: "v710",
+  numero: 704,
+  label: "v711",
   data: "2026-09-02",
-  nota: "Casas de veraneio publicas corrigidas e novo cliente responsavel sem categoria."
+  nota: "Compartilhamento e galerias responsivas das casas de veraneio aprimorados."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

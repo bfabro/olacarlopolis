@@ -23,7 +23,7 @@ test("rota publica carrega somente registros ativos", () => {
 test("catalogo inicia compacto e permite alternar para detalhes", () => {
   assert.match(publicJs, /savedMode === null \? true/);
   assert.match(publicJs, /casasVeraneioModoCompacto/);
-  assert.match(publicHtml, /casas-veraneio\.css\?v=2/);
+  assert.match(publicHtml, /casas-veraneio\.css\?v=3/);
   assert.match(publicCss, /vacation-public-page\.is-compact/);
 });
 
@@ -47,6 +47,31 @@ test("responsavel por locacao e salvo como cliente sem categoria", () => {
 
 test("mobile compacto usa dois cards por linha", () => {
   assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
+});
+
+test("pagina e propriedades possuem compartilhamento com link direto", () => {
+  assert.match(publicJs, /id="vacationSharePage"/);
+  assert.match(publicJs, /data-vacation-share=/);
+  assert.match(publicJs, /url\.searchParams\.set\("item", "casa-veraneio"\)/);
+  assert.match(publicJs, /sharedParams\.get\("item"\) === "casa-veraneio"/);
+});
+
+test("seletor compacto usa o nome Cards", () => {
+  assert.match(publicJs, /<span>Cards<\/span>/);
+  assert.doesNotMatch(publicJs, /<span>2 por linha<\/span>/);
+});
+
+test("galeria ampliada navega por setas teclado e gesto lateral", () => {
+  assert.match(publicJs, /function openVacationImageViewer/);
+  assert.match(publicJs, /data-vacation-viewer-prev/);
+  assert.match(publicJs, /event\.key === "ArrowLeft"/);
+  assert.match(publicJs, /pointerdown/);
+  assert.match(publicJs, /Math\.abs\(distance\) >= 45/);
+});
+
+test("modal mobile exibe fotos completas", () => {
+  assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*\.vacation-modal-gallery img \{[\s\S]*object-fit: contain;/);
+  assert.match(publicCss, /scroll-snap-type: x mandatory/);
 });
 
 test("painel expoe flag propria sem depender da categoria", () => {
