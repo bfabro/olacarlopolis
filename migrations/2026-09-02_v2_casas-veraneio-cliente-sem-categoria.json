@@ -1,0 +1,28 @@
+{
+  "version": "2026-09-02_v2",
+  "operation": "fix_vacation_rentals_public_and_categoryless_client",
+  "recreates_existing_data": false,
+  "schema_changes": true,
+  "client_type": {
+    "value": "responsavel_locacao",
+    "label": "Responsavel por casa de veraneio",
+    "category_required": false,
+    "payment_status": "isento"
+  },
+  "affected_paths": {
+    "clientes/{clientId}": {
+      "tipoCliente": "responsavel_locacao",
+      "tipo": "responsavel_locacao",
+      "categoria": "",
+      "categoriaId": ""
+    },
+    "conteudosInformativos/casasVeraneio/{propertyId}": {
+      "owner_field": "clienteId",
+      "public_status": "ativo"
+    }
+  },
+  "notes": [
+    "Existing clients and vacation rentals are not changed automatically.",
+    "The public catalog now renders active records and hides layout controls when empty."
+  ]
+}

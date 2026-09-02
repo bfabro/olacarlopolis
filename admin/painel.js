@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=20";
+} from "./gestao-terrenos-schema.js?v=21";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 702,
-  label: "v709",
+  numero: 703,
+  label: "v710",
   data: "2026-09-02",
-  nota: "Nova area publica e administrativa de Casas de veraneio."
+  nota: "Casas de veraneio publicas corrigidas e novo cliente responsavel sem categoria."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1126,6 +1126,26 @@ function isBillableClientType(clientOrType = "") {
       : (clientOrType?.tipoCliente || clientOrType?.tipo || "")
   );
   return type === "comercio" || type === "servico";
+}
+
+function isCategorylessClientType(clientOrType = "") {
+  const type = normalizeName(
+    typeof clientOrType === "string"
+      ? clientOrType
+      : (clientOrType?.tipoCliente || clientOrType?.tipo || "")
+  );
+  return type === "responsavel_locacao";
+}
+
+function syncClientCategoryByType() {
+  const categoryless = isCategorylessClientType($("clientType")?.value || "");
+  ["clientCategoryField", "clientNewCategoryField"].forEach((id) => $(id)?.classList.toggle("hidden", categoryless));
+  if ($("clientCategory")) $("clientCategory").disabled = categoryless;
+  if ($("clientNewCategory")) $("clientNewCategory").disabled = categoryless;
+  if (categoryless) {
+    if ($("clientCategory")) $("clientCategory").value = "";
+    if ($("clientNewCategory")) $("clientNewCategory").value = "";
+  }
 }
 
 function syncClientPaymentByType(resetWhenBecomingBillable = false) {
@@ -9043,6 +9063,7 @@ function resetClientForm() {
     if ($(id)) $(id).value = "";
   });
   fillClientCategorySelect();
+  syncClientCategoryByType();
   atualizarVisibilidadeCreciCliente();
   $("deleteClientButton").classList.add("hidden");
   renderProfilePreview("clientImage", "clientProfilePreview");
@@ -9064,8 +9085,10 @@ function getClientFormData() {
   const id = $("clientId").value || slugify(name);
   const newCategory = $("clientNewCategory").value.trim();
   const currentClient = state.clientes.find((client) => client.id === state.selectedClientId);
-  const category = newCategory || $("clientCategory").value.trim() || currentClient?.categoria || currentClient?.category || $("clientForm").dataset.originalCategory || "Outros";
   const tipoCliente = $("clientType")?.value || currentClient?.tipoCliente || currentClient?.tipo || "comercio";
+  const category = isCategorylessClientType(tipoCliente)
+    ? ""
+    : (newCategory || $("clientCategory").value.trim() || currentClient?.categoria || currentClient?.category || $("clientForm").dataset.originalCategory || "Outros");
   const horarios = readScheduleEditor("clientScheduleEditor");
   const scheduleBox = $("clientScheduleEditor");
   const shouldSaveSchedule = scheduleHasAnyOpen(horarios) || scheduleBox?.dataset.initialSchedule === "true" || scheduleBox?.dataset.touchedSchedule === "true";
@@ -9556,6 +9579,7 @@ function fillClientForm(client) {
   if ($("clientType")) $("clientType").value = client.tipoCliente || client.tipo || "comercio";
   if ($("clientCreci")) $("clientCreci").value = client.creci || client.registroCreci || "";
   $("clientNewCategory").value = "";
+  syncClientCategoryByType();
   atualizarVisibilidadeCreciCliente();
   $("clientStatus").value = client.status || "ativo";
   $("clientPaymentStatus").value = isBillableClientType(client)
@@ -11365,14 +11389,15 @@ function updateClientFilterCounts() {
     const type = String(client.tipoCliente || client.tipo || "comercio").toLowerCase();
     if (Object.prototype.hasOwnProperty.call(total, type)) total[type] += 1;
     return total;
-  }, { comercio: 0, servico: 0, institucional: 0, outro: 0 });
+  }, { comercio: 0, servico: 0, institucional: 0, outro: 0, responsavel_locacao: 0 });
 
   const typeLabels = {
     todos: "Todos",
     comercio: "Comercio",
     servico: "Servico",
     institucional: "Institucional",
-    outro: "Outro"
+    outro: "Outro",
+    responsavel_locacao: "Responsavel por casa de veraneio"
   };
 
   const typeFilter = $("clientTypeFilter");
@@ -11419,7 +11444,8 @@ function clientDisclosureTypeLabel(type = "") {
     comercio: "Comércio",
     servico: "Serviço",
     institucional: "Institucional",
-    outro: "Outro"
+    outro: "Outro",
+    responsavel_locacao: "Responsável por casa de veraneio"
   }[type] || type;
 }
 
@@ -11840,7 +11866,7 @@ function renderUsersList() {
   if (!box) return;
   const query = normalizeName($("userSearch")?.value || "");
   const typeFilter = $("userClientTypeFilter")?.value || "todos";
-  const validClientTypes = new Set(["comercio", "servico", "institucional", "outro"]);
+  const validClientTypes = new Set(["comercio", "servico", "institucional", "outro", "responsavel_locacao"]);
   const users = state.usuarios.map((user) => {
     const client = state.clientes.find((item) => item.id === user.clienteId);
     const rawType = String(client?.tipoCliente || client?.tipo || "").trim().toLowerCase();
@@ -26667,7 +26693,10 @@ function bindEvents() {
   });
   $("clientCategory")?.addEventListener("change", atualizarVisibilidadeCreciCliente);
   $("clientNewCategory")?.addEventListener("input", atualizarVisibilidadeCreciCliente);
-  $("clientType")?.addEventListener("change", () => syncClientPaymentByType(true));
+  $("clientType")?.addEventListener("change", () => {
+    syncClientPaymentByType(true);
+    syncClientCategoryByType();
+  });
   $("clientShowAllSections")?.addEventListener("change", (event) => {
     setAllClientSectionsExpanded(Boolean(event.target.checked));
   });

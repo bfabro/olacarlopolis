@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v624.
+// Release do site v625.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -14400,6 +14400,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   async function mostrarCasasVeraneio() {
+    const $ = (id) => document.getElementById(id);
     if (location.hash !== "#casas-veraneio") history.pushState(null, "", "#casas-veraneio");
     prepararNavegacaoMenuEspecial();
     atualizarVisibilidadeHomeQuickBanner();
@@ -14411,7 +14412,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     window.__casasVeraneioModoCompacto = savedMode === null ? true : savedMode === "true";
     area.innerHTML = '<section class="vacation-public-page' + (window.__casasVeraneioModoCompacto ? " is-compact" : "") + '">' +
       '<header class="vacation-public-title"><div><span><i class="fa-solid fa-umbrella-beach"></i> Hospedagens em Carlópolis</span><h1>Casas de veraneio</h1><p>Encontre casas, ranchos, chacaras e outros espacos para sua estadia.</p></div></header>' +
-      '<section class="vacation-public-toolbar"><div class="vacation-toolbar-main">' +
+      '<section id="vacationPublicToolbar" class="vacation-public-toolbar"><div class="vacation-toolbar-main">' +
         '<button id="vacationToggleFilters" type="button" aria-expanded="false"><i class="fa-solid fa-sliders"></i> Filtros</button>' +
         '<span id="vacationPublicTotal"><i class="fa-solid fa-house"></i> ...</span>' +
         '<label class="vacation-view-switch"><input id="vacationCompactMode" type="checkbox"' + (window.__casasVeraneioModoCompacto ? " checked" : "") + '><span class="track"><span class="thumb"></span></span><span>2 por linha</span></label>' +
@@ -14465,12 +14466,24 @@ plotarPinsImoveis(stateImoveis.filtered);
     try {
       rentals = await carregarCasasVeraneioFirebase(true);
       if (area.dataset.currentRoute !== "casas-veraneio") return;
+      if (!rentals.length) {
+        $("vacationPublicToolbar")?.classList.add("hidden");
+        page.classList.remove("is-compact");
+        listBox.innerHTML = '<div class="vacation-public-empty vacation-public-empty-catalog"><span class="vacation-empty-icon"><i class="fa-solid fa-house-chimney-window"></i></span><strong>Em breve, novas casas de veraneio</strong><p>Ainda nao ha hospedagens publicadas nesta area. Estamos preparando novas opcoes para sua estadia em Carlopolis.</p><button type="button" id="vacationPublicEmptyBack"><i class="fa-solid fa-arrow-left"></i> Voltar ao inicio</button></div>';
+        $("vacationPublicEmptyBack")?.addEventListener("click", () => {
+          history.pushState(null, "", location.pathname + location.search);
+          location.reload();
+        });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
       const options = (field) => [...new Set(rentals.map((item) => item[field]).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
       $("vacationPublicCity").innerHTML += options("cidade").map((value) => '<option value="' + vacationPublicEscape(value) + '">' + vacationPublicEscape(value) + '</option>').join("");
       $("vacationPublicNeighborhood").innerHTML += options("bairro").map((value) => '<option value="' + vacationPublicEscape(value) + '">' + vacationPublicEscape(value) + '</option>').join("");
       apply();
     } catch (error) {
       console.error("Nao foi possivel carregar casas de veraneio.", error);
+      $("vacationPublicToolbar")?.classList.add("hidden");
       listBox.innerHTML = '<div class="vacation-public-empty"><i class="fa-solid fa-triangle-exclamation"></i><strong>Nao foi possivel carregar as hospedagens</strong><span>Tente novamente em alguns instantes.</span><button type="button" id="vacationPublicRetry"><i class="fa-solid fa-rotate-right"></i> Tentar novamente</button></div>';
       $("vacationPublicRetry")?.addEventListener("click", mostrarCasasVeraneio);
     }

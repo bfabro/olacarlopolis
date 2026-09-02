@@ -23,8 +23,26 @@ test("rota publica carrega somente registros ativos", () => {
 test("catalogo inicia compacto e permite alternar para detalhes", () => {
   assert.match(publicJs, /savedMode === null \? true/);
   assert.match(publicJs, /casasVeraneioModoCompacto/);
-  assert.match(publicHtml, /casas-veraneio\.css\?v=1/);
+  assert.match(publicHtml, /casas-veraneio\.css\?v=2/);
   assert.match(publicCss, /vacation-public-page\.is-compact/);
+});
+
+test("catalogo publico resolve os elementos antes de carregar os registros", () => {
+  assert.match(publicJs, /async function mostrarCasasVeraneio\(\) \{\s*const \$ = \(id\) => document\.getElementById\(id\);/);
+  assert.match(publicJs, /rentals = await carregarCasasVeraneioFirebase\(true\)/);
+});
+
+test("estado sem hospedagens e amigavel e oculta os controles de exibicao", () => {
+  assert.match(publicJs, /if \(!rentals\.length\) \{[\s\S]*vacationPublicToolbar[\s\S]*Em breve, novas casas de veraneio/);
+  assert.match(publicCss, /vacation-public-toolbar\.hidden \{ display: none !important; \}/);
+  assert.match(publicCss, /vacation-public-empty-catalog/);
+});
+
+test("responsavel por locacao e salvo como cliente sem categoria", () => {
+  assert.match(adminHtml, /option value="responsavel_locacao"/);
+  assert.match(adminJs, /function isCategorylessClientType[\s\S]*responsavel_locacao/);
+  assert.match(adminJs, /const category = isCategorylessClientType\(tipoCliente\)\s*\? ""/);
+  assert.match(adminJs, /syncClientCategoryByType/);
 });
 
 test("mobile compacto usa dois cards por linha", () => {

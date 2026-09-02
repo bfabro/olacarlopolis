@@ -6,8 +6,8 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=439">
-  <link rel="stylesheet" href="casas-veraneio-admin.css?v=1">
+  <link rel="stylesheet" href="painel.css?v=440">
+  <link rel="stylesheet" href="casas-veraneio-admin.css?v=2">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -788,7 +788,7 @@
                 <textarea id="clientShortDescription" rows="3" maxlength="400" aria-describedby="clientShortDescriptionHelp" placeholder="Ex.: Solucoes completas em instalacoes eletricas, manutencoes e projetos."></textarea>
                 <small id="clientShortDescriptionHelp" class="field-character-count"><span id="clientShortDescriptionCount">0</span>/400 caracteres permitidos</small>
               </label>
-              <label>Categoria
+              <label id="clientCategoryField">Categoria
                 <select id="clientCategory"></select>
               </label>
               <label>Tipo do cliente
@@ -797,12 +797,13 @@
                   <option value="servico">Servico</option>
                   <option value="institucional">Institucional</option>
                   <option value="outro">Outro</option>
+                  <option value="responsavel_locacao">Responsavel por casa de veraneio</option>
                 </select>
               </label>
               <label id="clientCreciField" class="hidden">CRECI (opcional)
                 <input id="clientCreci" placeholder="Ex.: 38.105 F">
               </label>
-              <label>Nova categoria
+              <label id="clientNewCategoryField">Nova categoria
                 <input id="clientNewCategory" placeholder="Preencha se a categoria nao existir">
               </label>
               <label>Status
@@ -1128,6 +1129,7 @@
                     <option value="servico">Serviço</option>
                     <option value="institucional">Institucional</option>
                     <option value="outro">Outro</option>
+                    <option value="responsavel_locacao">Responsável por casa de veraneio</option>
                   </select>
                 </label>
                 <label>Categoria
@@ -1179,6 +1181,7 @@
                   <option value="servico">Servico</option>
                   <option value="institucional">Institucional</option>
                   <option value="outro">Outro</option>
+                  <option value="responsavel_locacao">Responsavel por casa de veraneio</option>
                 </select>
               </label>
               <label>Ordenar atualizacoes
@@ -2665,6 +2668,7 @@
                   <option value="servico">Servico</option>
                   <option value="institucional">Institucional</option>
                   <option value="outro">Outro</option>
+                  <option value="responsavel_locacao">Responsavel por casa de veraneio</option>
                   <option value="sem_cliente">Sem cliente vinculado</option>
                 </select>
               </label>
@@ -3109,6 +3113,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=639"></script>
+  <script type="module" src="painel.js?v=640"></script>
 </body>
 </html>
