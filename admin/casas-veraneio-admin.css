@@ -1,8 +1,9 @@
-/* Casas de veraneio admin - 2026-09-02_v3 */
+/* Casas de veraneio admin - 2026-09-02_v4 */
 .vacation-admin-layout {
   align-items: start;
 }
-.vacation-amenities-admin {
+.vacation-amenities-admin,
+.vacation-options-admin {
   display: grid;
   grid-template-columns: repeat(3, minmax(150px, 1fr));
   gap: 8px;
@@ -11,7 +12,8 @@
   border-radius: 8px;
   background: #f7fafb;
 }
-.vacation-amenities-admin label {
+.vacation-amenities-admin label,
+.vacation-options-admin label {
   display: flex;
   min-height: 38px;
   align-items: center;
@@ -126,7 +128,8 @@
   }
 }
 @media (max-width: 720px) {
-  .vacation-amenities-admin { grid-template-columns: 1fr 1fr; padding: 8px; }
+  .vacation-amenities-admin,
+  .vacation-options-admin { grid-template-columns: 1fr 1fr; padding: 8px; }
   .vacation-admin-filters { grid-template-columns: 1fr; }
   .vacation-admin-card { grid-template-columns: 96px minmax(0, 1fr); gap: 8px; }
   .vacation-admin-thumb,
@@ -202,3 +205,7 @@
   .vacation-calendar-grid button,
   .vacation-calendar-grid .calendar-empty-day { min-height: 38px; }
 }
+.vacation-amenities-admin label i,
+.vacation-options-admin label i { width: 18px; color: #0f766e; text-align: center; }
+.vacation-amenities-admin input[type="checkbox"],
+.vacation-options-admin input[type="checkbox"] { width: 17px; height: 17px; flex: 0 0 17px; accent-color: #0f766e; }

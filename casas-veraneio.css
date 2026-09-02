@@ -1,4 +1,4 @@
-/* Casas de veraneio publica - 2026-09-02_v4 */
+/* Casas de veraneio publica - 2026-09-02_v5 */
 .vacation-public-page {
   width: min(1180px, 100%);
   margin: 0 auto 40px;
@@ -555,7 +555,7 @@ body.vacation-modal-open { overflow: hidden; }
     right: 8px;
   }
 }
-/* Calendario publico de disponibilidade - 2026-09-02_v4 */
+/* Calendario publico de disponibilidade - 2026-09-02_v5 */
 .vacation-public-actions {
   flex-wrap: wrap;
 }
@@ -693,4 +693,37 @@ body.vacation-modal-open { overflow: hidden; }
   .vacation-availability-grid > span { min-height: 40px; font-size: .86rem; }
   .vacation-availability-weekdays,
   .vacation-availability-grid { gap: 4px; }
+}
+.vacation-public-purposes,
+.vacation-modal-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.vacation-public-purposes { margin: 8px 0; }
+.vacation-public-purposes span,
+.vacation-modal-facts span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 6px 9px;
+  background: #edf7f5;
+  color: #0f625b;
+  font-size: .78rem;
+  font-weight: 750;
+}
+.vacation-modal-facts { margin-top: 9px; }
+.vacation-modal-note {
+  margin: 10px 0 0;
+  padding: 10px;
+  border-left: 3px solid #0f766e;
+  border-radius: 4px;
+  background: #f4f8f8;
+  white-space: pre-line;
+}
+.vacation-public-page.is-compact .vacation-public-purposes { display: none; }
+
+@media (max-width: 480px) {
+  .vacation-public-filters { grid-template-columns: 1fr; }
 }

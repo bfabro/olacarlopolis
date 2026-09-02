@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="stylesheet" href="painel.css?v=440">
-  <link rel="stylesheet" href="casas-veraneio-admin.css?v=3">
+  <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
   <main id="loginView" class="login-view">
@@ -1909,14 +1909,32 @@
               <label>Titulo do anuncio<input id="vacationRentalTitle" required maxlength="100" placeholder="Ex: Rancho com piscina na represa"></label>
               <label>Tipo de propriedade
                 <select id="vacationRentalType">
-                  <option value="casa">Casa</option><option value="chacara">Chacara</option><option value="rancho">Rancho</option>
-                  <option value="apartamento">Apartamento</option><option value="chale">Chale</option><option value="pousada">Pousada</option><option value="outro">Outro</option>
+                  <option value="casa_veraneio">Casa de veraneio</option><option value="rancho">Rancho</option><option value="chacara">Chacara</option>
+                  <option value="casa_represa">Casa na represa</option><option value="espaco_eventos">Espaco para eventos</option><option value="hospedagem">Hospedagem</option>
                 </select>
               </label>
               <label>Status
                 <select id="vacationRentalStatus"><option value="ativo">Ativo no site</option><option value="rascunho">Rascunho</option><option value="inativo">Inativo</option></select>
               </label>
               <label class="check-row"><input id="vacationRentalFeatured" type="checkbox"> Destacar no catalogo</label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-bullseye"></i>
+                <div><strong>Finalidades</strong><span>Marque todos os usos para os quais o local e indicado.</span></div>
+              </div>
+              <div id="vacationRentalPurposes" class="wide vacation-options-admin">
+                <label><input type="checkbox" value="descanso_familia"><i class="fa-solid fa-people-roof"></i> Descanso em familia</label>
+                <label><input type="checkbox" value="final_semana"><i class="fa-solid fa-calendar-week"></i> Final de semana</label>
+                <label><input type="checkbox" value="festas"><i class="fa-solid fa-champagne-glasses"></i> Festas</label>
+                <label><input type="checkbox" value="eventos"><i class="fa-solid fa-calendar-check"></i> Eventos</label>
+                <label><input type="checkbox" value="confraternizacoes"><i class="fa-solid fa-people-group"></i> Confraternizacoes</label>
+                <label><input type="checkbox" value="pesca"><i class="fa-solid fa-fish-fins"></i> Pesca</label>
+                <label><input type="checkbox" value="represa"><i class="fa-solid fa-water"></i> Represa</label>
+                <label><input type="checkbox" value="hospedagem"><i class="fa-solid fa-bed"></i> Hospedagem</label>
+                <label><input type="checkbox" value="chacara"><i class="fa-solid fa-tree"></i> Chacara</label>
+                <label><input type="checkbox" value="rancho"><i class="fa-solid fa-house-flag"></i> Rancho</label>
+                <label><input type="checkbox" value="casa_veraneio"><i class="fa-solid fa-umbrella-beach"></i> Casa de veraneio</label>
+              </div>
 
               <div class="form-section-title wide">
                 <i class="fa-solid fa-location-dot"></i>
@@ -1937,6 +1955,8 @@
               <label>Camas<input id="vacationRentalBeds" type="number" min="0" max="100" value="0"></label>
               <label>Suites<input id="vacationRentalSuites" type="number" min="0" max="50" value="0"></label>
               <label>Banheiros<input id="vacationRentalBathrooms" type="number" min="0" max="50" value="0"></label>
+              <label>Capacidade para eventos<input id="vacationRentalEventCapacity" type="number" min="0" max="5000" value="0"></label>
+              <label>Capacidade aproximada de estacionamento<input id="vacationRentalParkingCapacity" type="number" min="0" max="1000" value="0"></label>
               <label>Minimo de noites<input id="vacationRentalMinNights" type="number" min="1" max="365" value="1"></label>
               <label>Check-in<input id="vacationRentalCheckin" type="time"></label>
               <label>Check-out<input id="vacationRentalCheckout" type="time"></label>
@@ -1955,13 +1975,67 @@
                 <div><strong>Comodidades</strong><span>Marque os recursos disponiveis na propriedade.</span></div>
               </div>
               <div id="vacationRentalAmenities" class="wide vacation-amenities-admin">
-                <label><input type="checkbox" value="piscina"> Piscina</label><label><input type="checkbox" value="churrasqueira"> Churrasqueira</label>
-                <label><input type="checkbox" value="wifi"> Wi-Fi</label><label><input type="checkbox" value="ar_condicionado"> Ar-condicionado</label>
-                <label><input type="checkbox" value="cozinha_equipada"> Cozinha equipada</label><label><input type="checkbox" value="estacionamento"> Estacionamento</label>
-                <label><input type="checkbox" value="roupa_cama"> Roupa de cama</label><label><input type="checkbox" value="tv"> TV</label>
-                <label><input type="checkbox" value="acesso_represa"> Acesso a represa</label><label><input type="checkbox" value="acessibilidade"> Acessibilidade</label>
-                <label><input type="checkbox" value="aceita_pets"> Aceita pets</label><label><input type="checkbox" value="area_lazer"> Area de lazer</label>
+                <label><input type="checkbox" value="piscina"><i class="fa-solid fa-water-ladder"></i> Piscina</label>
+                <label><input type="checkbox" value="churrasqueira"><i class="fa-solid fa-fire-burner"></i> Churrasqueira</label>
+                <label><input type="checkbox" value="cozinha_equipada"><i class="fa-solid fa-kitchen-set"></i> Cozinha equipada</label>
+                <label><input type="checkbox" value="geladeira"><i class="fa-solid fa-box"></i> Geladeira</label>
+                <label><input type="checkbox" value="freezer"><i class="fa-solid fa-snowflake"></i> Freezer</label>
+                <label><input type="checkbox" value="fogao"><i class="fa-solid fa-fire-flame-simple"></i> Fogao</label>
+                <label><input type="checkbox" value="micro_ondas"><i class="fa-solid fa-temperature-high"></i> Micro-ondas</label>
+                <label><input type="checkbox" value="wifi"><i class="fa-solid fa-wifi"></i> Wi-Fi</label>
+                <label><input type="checkbox" value="tv"><i class="fa-solid fa-tv"></i> Televisao</label>
+                <label><input type="checkbox" value="ar_condicionado"><i class="fa-solid fa-snowflake"></i> Ar-condicionado</label>
+                <label><input type="checkbox" value="ventiladores"><i class="fa-solid fa-fan"></i> Ventiladores</label>
+                <label><input type="checkbox" value="estacionamento"><i class="fa-solid fa-square-parking"></i> Estacionamento</label>
+                <label><input type="checkbox" value="area_coberta"><i class="fa-solid fa-warehouse"></i> Area coberta</label>
+                <label><input type="checkbox" value="area_externa"><i class="fa-solid fa-sun"></i> Area externa</label>
+                <label><input type="checkbox" value="playground"><i class="fa-solid fa-child-reaching"></i> Playground</label>
+                <label><input type="checkbox" value="campo_futebol"><i class="fa-solid fa-futbol"></i> Campo de futebol</label>
+                <label><input type="checkbox" value="mesa_sinuca"><i class="fa-solid fa-circle-dot"></i> Mesa de sinuca</label>
+                <label><input type="checkbox" value="area_pesca"><i class="fa-solid fa-fish-fins"></i> Area de pesca</label>
+                <label><input type="checkbox" value="acesso_represa"><i class="fa-solid fa-sailboat"></i> Acesso a represa</label>
+                <label><input type="checkbox" value="pier"><i class="fa-solid fa-water"></i> Pier</label>
+                <label><input type="checkbox" value="rampa_barco"><i class="fa-solid fa-ship"></i> Rampa para barco</label>
+                <label><input type="checkbox" value="deck"><i class="fa-solid fa-grip-lines"></i> Deck</label>
+                <label><input type="checkbox" value="area_fogueira"><i class="fa-solid fa-fire"></i> Area para fogueira</label>
+                <label><input type="checkbox" value="aceita_pets"><i class="fa-solid fa-paw"></i> Aceita animais</label>
+                <label><input type="checkbox" value="roupa_cama"><i class="fa-solid fa-bed"></i> Roupa de cama</label>
+                <label><input type="checkbox" value="acessibilidade"><i class="fa-solid fa-wheelchair"></i> Acessibilidade</label>
+                <label><input type="checkbox" value="area_lazer"><i class="fa-solid fa-umbrella-beach"></i> Area de lazer</label>
               </div>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-champagne-glasses"></i>
+                <div><strong>Festas e eventos</strong><span>Regras e estrutura disponivel para celebracoes.</span></div>
+              </div>
+              <div id="vacationRentalEventOptions" class="wide vacation-options-admin">
+                <label><input id="vacationRentalAcceptsParties" type="checkbox"><i class="fa-solid fa-music"></i> Aceita festas</label>
+                <label><input id="vacationRentalAcceptsBirthdays" type="checkbox"><i class="fa-solid fa-cake-candles"></i> Aceita aniversarios</label>
+                <label><input id="vacationRentalAcceptsGatherings" type="checkbox"><i class="fa-solid fa-people-group"></i> Aceita confraternizacoes</label>
+                <label><input id="vacationRentalAcceptsWeddings" type="checkbox"><i class="fa-solid fa-ring"></i> Aceita casamentos</label>
+                <label><input id="vacationRentalAcceptsCorporateEvents" type="checkbox"><i class="fa-solid fa-briefcase"></i> Aceita eventos empresariais</label>
+                <label><input id="vacationRentalAllowsSound" type="checkbox"><i class="fa-solid fa-volume-high"></i> Permite som</label>
+                <label><input id="vacationRentalCoveredEventSpace" type="checkbox"><i class="fa-solid fa-warehouse"></i> Espaco coberto</label>
+                <label><input id="vacationRentalTablesChairs" type="checkbox"><i class="fa-solid fa-chair"></i> Mesas e cadeiras</label>
+              </div>
+              <label>Horario limite para som<input id="vacationRentalSoundLimit" type="time"></label>
+              <label>Capacidade maxima do evento<input id="vacationRentalMaxEventCapacity" type="number" min="0" max="5000"></label>
+              <label class="wide">Observacoes e regras de eventos<textarea id="vacationRentalEventNotes" rows="4" maxlength="1200"></textarea></label>
+
+              <div class="form-section-title wide">
+                <i class="fa-solid fa-fish-fins"></i>
+                <div><strong>Represa e pesca</strong><span>Estrutura de acesso a agua e apoio a embarcacoes.</span></div>
+              </div>
+              <div id="vacationRentalReservoirOptions" class="wide vacation-options-admin">
+                <label><input id="vacationRentalWaterfront" type="checkbox"><i class="fa-solid fa-water"></i> Beira da represa</label>
+                <label><input id="vacationRentalDirectWaterAccess" type="checkbox"><i class="fa-solid fa-person-swimming"></i> Acesso direto a agua</label>
+                <label><input id="vacationRentalHasPier" type="checkbox"><i class="fa-solid fa-anchor"></i> Pier</label>
+                <label><input id="vacationRentalHasBoatRamp" type="checkbox"><i class="fa-solid fa-ship"></i> Rampa para barco</label>
+                <label><input id="vacationRentalBoatPlace" type="checkbox"><i class="fa-solid fa-sailboat"></i> Local para embarcacao</label>
+                <label><input id="vacationRentalFishingArea" type="checkbox"><i class="fa-solid fa-fish"></i> Area para pesca</label>
+                <label><input id="vacationRentalBoatStorage" type="checkbox"><i class="fa-solid fa-warehouse"></i> Possibilidade de guardar barco</label>
+              </div>
+              <label class="wide">Distancia aproximada da agua<input id="vacationRentalWaterDistance" maxlength="80" placeholder="Ex: 50 metros"></label>
 
               <div class="form-section-title wide">
                 <i class="fa-solid fa-address-book"></i>
@@ -3131,6 +3205,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=642"></script>
+  <script type="module" src="painel.js?v=643"></script>
 </body>
 </html>

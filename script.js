@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v627.
+// Release do site v628.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -14253,18 +14253,102 @@ plotarPinsImoveis(stateImoveis.filtered);
   const VACATION_PUBLIC_AMENITIES = {
     piscina: ["fa-solid fa-water-ladder", "Piscina"],
     churrasqueira: ["fa-solid fa-fire-burner", "Churrasqueira"],
-    wifi: ["fa-solid fa-wifi", "Wi-Fi"],
-    ar_condicionado: ["fa-solid fa-snowflake", "Ar-condicionado"],
     cozinha_equipada: ["fa-solid fa-kitchen-set", "Cozinha equipada"],
+    geladeira: ["fa-solid fa-temperature-low", "Geladeira"],
+    freezer: ["fa-solid fa-snowflake", "Freezer"],
+    fogao: ["fa-solid fa-fire-burner", "Fogão"],
+    micro_ondas: ["fa-solid fa-box", "Micro-ondas"],
+    wifi: ["fa-solid fa-wifi", "Wi-Fi"],
+    tv: ["fa-solid fa-tv", "Televisão"],
+    ar_condicionado: ["fa-solid fa-snowflake", "Ar-condicionado"],
+    ventiladores: ["fa-solid fa-fan", "Ventiladores"],
     estacionamento: ["fa-solid fa-square-parking", "Estacionamento"],
+    area_coberta: ["fa-solid fa-warehouse", "Área coberta"],
+    area_externa: ["fa-solid fa-tree", "Área externa"],
+    playground: ["fa-solid fa-child-reaching", "Playground"],
+    campo_futebol: ["fa-solid fa-futbol", "Campo de futebol"],
+    mesa_sinuca: ["fa-solid fa-circle-dot", "Mesa de sinuca"],
+    area_pesca: ["fa-solid fa-fish", "Área de pesca"],
+    acesso_represa: ["fa-solid fa-water", "Acesso à represa"],
+    pier: ["fa-solid fa-anchor", "Pier"],
+    rampa_barco: ["fa-solid fa-sailboat", "Rampa para barco"],
+    deck: ["fa-solid fa-border-all", "Deck"],
+    area_fogueira: ["fa-solid fa-fire", "Área para fogueira"],
+    aceita_pets: ["fa-solid fa-paw", "Aceita animais"],
     roupa_cama: ["fa-solid fa-bed", "Roupa de cama"],
-    tv: ["fa-solid fa-tv", "TV"],
-    acesso_represa: ["fa-solid fa-sailboat", "Acesso a represa"],
     acessibilidade: ["fa-solid fa-wheelchair", "Acessibilidade"],
-    aceita_pets: ["fa-solid fa-paw", "Aceita pets"],
-    area_lazer: ["fa-solid fa-umbrella-beach", "Area de lazer"]
+    area_lazer: ["fa-solid fa-umbrella-beach", "Área de lazer"]
   };
 
+  const VACATION_PUBLIC_TYPES = {
+    casa_veraneio: "Casa de veraneio",
+    rancho: "Rancho",
+    chacara: "Chácara",
+    casa_represa: "Casa na represa",
+    espaco_eventos: "Espaço para eventos",
+    hospedagem: "Hospedagem"
+  };
+
+  const VACATION_PUBLIC_TYPE_ALIASES = {
+    casa: "casa_veraneio",
+    apartamento: "hospedagem",
+    chale: "hospedagem",
+    pousada: "hospedagem",
+    outro: "hospedagem"
+  };
+
+  const VACATION_PUBLIC_PURPOSES = {
+    descanso_familia: "Descanso em família",
+    final_semana: "Final de semana",
+    festas: "Festas",
+    eventos: "Eventos",
+    confraternizacoes: "Confraternizações",
+    pesca: "Pesca",
+    represa: "Represa",
+    hospedagem: "Hospedagem",
+    chacara: "Chácara",
+    rancho: "Rancho",
+    casa_veraneio: "Casa de veraneio"
+  };
+
+  const VACATION_PUBLIC_EVENT_FILTERS = {
+    aceitaFestas: "Aceita festas",
+    aceitaAniversarios: "Aceita aniversários",
+    aceitaConfraternizacoes: "Aceita confraternizações",
+    aceitaCasamentos: "Aceita casamentos",
+    aceitaEventosEmpresariais: "Aceita eventos empresariais",
+    permiteSom: "Permite som",
+    espacoCoberto: "Espaço coberto",
+    mesasCadeiras: "Mesas e cadeiras"
+  };
+
+  const VACATION_PUBLIC_RESERVOIR_FILTERS = {
+    beiraRepresa: "À beira da represa",
+    acessoDiretoAgua: "Acesso direto à água",
+    pier: "Pier",
+    rampaBarco: "Rampa para barco",
+    localEmbarcacao: "Local para embarcação",
+    areaPesca: "Área para pesca",
+    guardaBarco: "Possibilidade de guardar barco"
+  };
+
+  const VACATION_BASE_SEO = {
+    title: document.title,
+    description: document.head.querySelector('meta[name="description"]')?.getAttribute("content") || "",
+    canonical: document.head.querySelector('link[rel="canonical"]')?.href || window.location.origin + window.location.pathname,
+    ogTitle: document.head.querySelector('meta[property="og:title"]')?.getAttribute("content") || document.title,
+    ogDescription: document.head.querySelector('meta[property="og:description"]')?.getAttribute("content") || "",
+    ogImage: document.head.querySelector('meta[property="og:image"]')?.getAttribute("content") || ""
+  };
+  function vacationPublicTypeKey(item) {
+    const type = String(item?.tipo || "").trim();
+    return VACATION_PUBLIC_TYPE_ALIASES[type] || type || "hospedagem";
+  }
+
+  function vacationPublicTypeLabel(item) {
+    const key = vacationPublicTypeKey(item);
+    return VACATION_PUBLIC_TYPES[key] || String(item?.tipo || "Hospedagem");
+  }
   function vacationPublicEscape(value) {
     return String(value ?? "").replace(/[&<>"']/g, (char) => ({
       "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
@@ -14427,6 +14511,84 @@ plotarPinsImoveis(stateImoveis.filtered);
     }).join("");
   }
 
+  function renderVacationPublicPurposes(item) {
+    const purposes = Array.isArray(item.finalidades) ? item.finalidades : [];
+    return purposes.map((key) => '<span><i class="fa-solid fa-circle-check"></i> ' + vacationPublicEscape(VACATION_PUBLIC_PURPOSES[key] || key) + '</span>').join("");
+  }
+
+  function renderVacationPublicFacts(data, labels) {
+    const source = data && typeof data === "object" && !Array.isArray(data) ? data : {};
+    return Object.entries(labels).filter(([key]) => source[key] === true).map(([, label]) =>
+      '<span><i class="fa-solid fa-circle-check"></i> ' + vacationPublicEscape(label) + '</span>'
+    ).join("");
+  }
+
+  function vacationSeoDescription(item = null) {
+    if (!item) return "Encontre casas de veraneio, ranchos, chácaras, hospedagens e espaços para eventos em Carlópolis PR.";
+    const parts = [
+      vacationPublicTypeLabel(item) + " em Carlópolis PR",
+      Number(item.hospedes || 0) > 0 ? "para até " + Number(item.hospedes) + " hóspedes" : "",
+      Number(item.capacidadeEventos || item.eventos?.capacidadeMaxima || 0) > 0 ? "eventos para até " + Number(item.capacidadeEventos || item.eventos?.capacidadeMaxima) + " pessoas" : "",
+      (Array.isArray(item.comodidades) ? item.comodidades.slice(0, 3) : []).map((key) => VACATION_PUBLIC_AMENITIES[key]?.[1] || key).join(", ")
+    ].filter(Boolean);
+    return (parts.join(". ") + ". Consulte disponibilidade no Olá Carlópolis.").slice(0, 160);
+  }
+
+  function vacationEnsureMeta(selector, attributes) {
+    let element = document.head.querySelector(selector);
+    if (!element) {
+      element = document.createElement("meta");
+      Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
+      document.head.appendChild(element);
+    }
+    return element;
+  }
+
+  function vacationRestoreSeo() {
+    document.title = VACATION_BASE_SEO.title;
+    vacationEnsureMeta('meta[name="description"]', { name: "description" }).setAttribute("content", VACATION_BASE_SEO.description);
+    vacationEnsureMeta('meta[property="og:title"]', { property: "og:title" }).setAttribute("content", VACATION_BASE_SEO.ogTitle);
+    vacationEnsureMeta('meta[property="og:description"]', { property: "og:description" }).setAttribute("content", VACATION_BASE_SEO.ogDescription);
+    vacationEnsureMeta('meta[property="og:type"]', { property: "og:type" }).setAttribute("content", "website");
+    vacationEnsureMeta('meta[property="og:url"]', { property: "og:url" }).setAttribute("content", VACATION_BASE_SEO.canonical);
+    vacationEnsureMeta('meta[name="twitter:title"]', { name: "twitter:title" }).setAttribute("content", VACATION_BASE_SEO.ogTitle);
+    vacationEnsureMeta('meta[name="twitter:description"]', { name: "twitter:description" }).setAttribute("content", VACATION_BASE_SEO.ogDescription);
+    if (VACATION_BASE_SEO.ogImage) {
+      vacationEnsureMeta('meta[property="og:image"]', { property: "og:image" }).setAttribute("content", VACATION_BASE_SEO.ogImage);
+      vacationEnsureMeta('meta[name="twitter:image"]', { name: "twitter:image" }).setAttribute("content", VACATION_BASE_SEO.ogImage);
+    }
+    const canonical = document.head.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.href = VACATION_BASE_SEO.canonical;
+  }
+  function vacationUpdateSeo(item = null) {
+    const title = item
+      ? (item.titulo || vacationPublicTypeLabel(item)) + " em Carlópolis PR | Olá Carlópolis"
+      : "Casas de Veraneio em Carlópolis PR | Olá Carlópolis";
+    const description = vacationSeoDescription(item);
+    const url = vacationPublicShareUrl(item?.id || "");
+    const image = item ? vacationPublicImages(item)[0] : "";
+    document.title = title;
+    vacationEnsureMeta('meta[name="description"]', { name: "description" }).setAttribute("content", description);
+    vacationEnsureMeta('meta[property="og:title"]', { property: "og:title" }).setAttribute("content", title);
+    vacationEnsureMeta('meta[property="og:description"]', { property: "og:description" }).setAttribute("content", description);
+    vacationEnsureMeta('meta[property="og:type"]', { property: "og:type" }).setAttribute("content", item ? "article" : "website");
+    vacationEnsureMeta('meta[property="og:url"]', { property: "og:url" }).setAttribute("content", url);
+    vacationEnsureMeta('meta[name="twitter:title"]', { name: "twitter:title" }).setAttribute("content", title);
+    vacationEnsureMeta('meta[name="twitter:description"]', { name: "twitter:description" }).setAttribute("content", description);
+    const socialImage = image ? new URL(image, window.location.href).href : VACATION_BASE_SEO.ogImage;
+    if (socialImage) {
+      vacationEnsureMeta('meta[property="og:image"]', { property: "og:image" }).setAttribute("content", socialImage);
+      vacationEnsureMeta('meta[name="twitter:image"]', { name: "twitter:image" }).setAttribute("content", socialImage);
+      vacationEnsureMeta('meta[name="twitter:card"]', { name: "twitter:card" }).setAttribute("content", "summary_large_image");
+    }
+    let canonical = document.head.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = url;
+  }
   function vacationPublicCard(item) {
     const images = vacationPublicImages(item);
     const image = images[0] || "images/img_padrao_site/logo_1.png";
@@ -14439,9 +14601,10 @@ plotarPinsImoveis(stateImoveis.filtered);
         '<span class="vacation-photo-count"><i class="fa-solid fa-images"></i> ' + images.length + '</span>' +
       '</button>' +
       '<div class="vacation-public-body">' +
-        '<div class="vacation-public-heading"><div><small>' + vacationPublicEscape(item.tipo || "Hospedagem") + '</small><h3>' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '</h3></div>' +
+        '<div class="vacation-public-heading"><div><small>' + vacationPublicEscape(vacationPublicTypeLabel(item)) + '</small><h3>' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '</h3></div>' +
         '<strong>' + (price ? vacationPublicEscape(price) + '<small>/ diaria</small>' : "Consulte") + '</strong></div>' +
         '<p class="vacation-public-location"><i class="fa-solid fa-location-dot"></i> ' + vacationPublicEscape([item.bairro, item.cidade, item.estado].filter(Boolean).join(" - ")) + '</p>' +
+        (Array.isArray(item.finalidades) && item.finalidades.length ? '<div class="vacation-public-purposes">' + renderVacationPublicPurposes(item) + '</div>' : "") +
         '<div class="vacation-public-capacity"><span><i class="fa-solid fa-users"></i> ' + vacationPublicEscape(item.hospedes || 1) + ' hospedes</span><span><i class="fa-solid fa-bed"></i> ' + vacationPublicEscape(item.quartos || 0) + ' quartos</span><span><i class="fa-solid fa-bath"></i> ' + vacationPublicEscape(item.banheiros || 0) + ' banheiros</span></div>' +
         '<div class="vacation-public-amenities">' + renderVacationPublicAmenities(item, 5) + '</div>' +
         '<p class="vacation-public-description">' + vacationPublicEscape(item.descricao || "Consulte os detalhes e a disponibilidade desta hospedagem.") + '</p>' +
@@ -14458,6 +14621,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   function closeVacationPublicModal() {
     document.getElementById("vacationPublicModal")?.remove();
     document.body.classList.remove("vacation-modal-open");
+    if (location.hash === "#casas-veraneio") vacationUpdateSeo();
   }
 
   function openVacationImageViewer(images, startIndex = 0, title = "Hospedagem") {
@@ -14517,6 +14681,12 @@ plotarPinsImoveis(stateImoveis.filtered);
     const images = vacationPublicImages(item);
     const whatsapp = vacationPublicWhatsapp(item);
     const price = vacationPublicMoney(item.valorDiaria);
+    const eventData = item.eventos && typeof item.eventos === "object" ? item.eventos : {};
+    const reservoirData = item.represaPesca && typeof item.represaPesca === "object" ? item.represaPesca : {};
+    const eventFacts = renderVacationPublicFacts(eventData, VACATION_PUBLIC_EVENT_FILTERS);
+    const reservoirFacts = renderVacationPublicFacts(reservoirData, VACATION_PUBLIC_RESERVOIR_FILTERS);
+    const eventCapacity = Number(item.capacidadeEventos || eventData.capacidadeMaxima || 0);
+    const parkingCapacity = Number(item.capacidadeEstacionamento || 0);
     const modal = document.createElement("div");
     modal.id = "vacationPublicModal";
     modal.className = "vacation-public-modal";
@@ -14524,7 +14694,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     modal.setAttribute("aria-modal", "true");
     modal.setAttribute("aria-label", "Detalhes de " + (item.titulo || "casa de veraneio"));
     modal.innerHTML = '<div class="vacation-modal-backdrop" data-vacation-close></div><section class="vacation-modal-card">' +
-      '<header><div><small>Casa de veraneio</small><h2>' + vacationPublicEscape(item.titulo || "Hospedagem") + '</h2><p><i class="fa-solid fa-location-dot"></i> ' + vacationPublicEscape([item.bairro, item.cidade, item.estado].filter(Boolean).join(" - ")) + '</p></div>' +
+      '<header><div><small>' + vacationPublicEscape(vacationPublicTypeLabel(item)) + '</small><h2>' + vacationPublicEscape(item.titulo || "Hospedagem") + '</h2><p><i class="fa-solid fa-location-dot"></i> ' + vacationPublicEscape([item.bairro, item.cidade, item.estado].filter(Boolean).join(" - ")) + '</p></div>' +
       '<button type="button" data-vacation-close aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></header>' +
       '<div class="vacation-modal-gallery">' + (images.length ? images.map((url, index) =>
         '<button type="button" data-vacation-large-image="' + index + '" aria-label="Ampliar foto ' + (index + 1) + ' de ' + images.length + '"><img src="' + vacationPublicEscape(url) + '" alt="Foto ' + (index + 1) + ' de ' + vacationPublicEscape(item.titulo) + '" loading="lazy"></button>'
@@ -14534,9 +14704,20 @@ plotarPinsImoveis(stateImoveis.filtered);
         '<span><i class="fa-solid fa-users"></i> Ate ' + vacationPublicEscape(item.hospedes || 1) + ' hospedes</span>' +
         '<span><i class="fa-solid fa-bed"></i> ' + vacationPublicEscape(item.quartos || 0) + ' quartos</span>' +
         '<span><i class="fa-solid fa-bath"></i> ' + vacationPublicEscape(item.banheiros || 0) + ' banheiros</span>' +
-        '<span><i class="fa-solid fa-moon"></i> Minimo ' + vacationPublicEscape(item.minimoNoites || 1) + ' noite(s)</span></div>' +
+        '<span><i class="fa-solid fa-moon"></i> Minimo ' + vacationPublicEscape(item.minimoNoites || 1) + ' noite(s)</span>' +
+        (eventCapacity ? '<span><i class="fa-solid fa-champagne-glasses"></i> Eventos para ate ' + eventCapacity + ' pessoas</span>' : "") +
+        (parkingCapacity ? '<span><i class="fa-solid fa-square-parking"></i> Estacionamento para cerca de ' + parkingCapacity + ' veiculos</span>' : "") +
+      '</div>' +
         '<section><h3>Sobre a hospedagem</h3><p>' + vacationPublicEscape(item.descricao || "Informacoes disponiveis pelo contato.") + '</p></section>' +
+        (Array.isArray(item.finalidades) && item.finalidades.length ? '<section><h3>Indicado para</h3><div class="vacation-modal-facts">' + renderVacationPublicPurposes(item) + '</div></section>' : "") +
         (Array.isArray(item.comodidades) && item.comodidades.length ? '<section><h3>Comodidades</h3><div class="vacation-modal-amenities">' + renderVacationPublicAmenities(item) + '</div></section>' : "") +
+        (eventFacts || eventData.horarioLimiteSom || eventCapacity || eventData.observacoes ? '<section><h3>Festas e eventos</h3><div class="vacation-modal-facts">' + eventFacts +
+          (eventData.horarioLimiteSom ? '<span><i class="fa-solid fa-clock"></i> Som ate ' + vacationPublicEscape(eventData.horarioLimiteSom) + '</span>' : "") +
+          (eventCapacity ? '<span><i class="fa-solid fa-users"></i> Capacidade maxima: ' + eventCapacity + '</span>' : "") +
+          '</div>' + (eventData.observacoes ? '<p class="vacation-modal-note">' + vacationPublicEscape(eventData.observacoes) + '</p>' : "") + '</section>' : "") +
+        (reservoirFacts || reservoirData.distanciaAgua ? '<section><h3>Represa e pesca</h3><div class="vacation-modal-facts">' + reservoirFacts +
+          (reservoirData.distanciaAgua ? '<span><i class="fa-solid fa-ruler"></i> Distancia da agua: ' + vacationPublicEscape(reservoirData.distanciaAgua) + '</span>' : "") +
+          '</div></section>' : "") +
         (item.regras ? '<section><h3>Regras da hospedagem</h3><p>' + vacationPublicEscape(item.regras) + '</p></section>' : "") +
         (item.disponibilidade ? '<section><h3>Disponibilidade</h3><p>' + vacationPublicEscape(item.disponibilidade) + '</p></section>' : "") +
         '<section><h3>Contato</h3><p><strong>' + vacationPublicEscape(item.responsavel || item.clienteNome || "") + '</strong></p></section>' +
@@ -14548,6 +14729,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       '</footer></section>';
     document.body.appendChild(modal);
     document.body.classList.add("vacation-modal-open");
+    vacationUpdateSeo(item);
     modal.querySelectorAll("[data-vacation-close]").forEach((button) => button.addEventListener("click", closeVacationPublicModal));
     modal.querySelectorAll("[data-vacation-large-image]").forEach((button) => button.addEventListener("click", () => {
       openVacationImageViewer(images, Number(button.dataset.vacationLargeImage), item.titulo || "Hospedagem");
@@ -14578,10 +14760,17 @@ plotarPinsImoveis(stateImoveis.filtered);
         '<label>Busca<input id="vacationPublicSearch" type="search" placeholder="Nome, bairro ou cidade"></label>' +
         '<label>Cidade<select id="vacationPublicCity"><option value="">Todas</option></select></label>' +
         '<label>Bairro<select id="vacationPublicNeighborhood"><option value="">Todos</option></select></label>' +
+        '<label>Tipo<select id="vacationPublicType"><option value="">Todos</option>' + Object.entries(VACATION_PUBLIC_TYPES).map(([key, label]) => '<option value="' + key + '">' + vacationPublicEscape(label) + '</option>').join("") + '</select></label>' +
+        '<label>Finalidade<select id="vacationPublicPurpose"><option value="">Todas</option>' + Object.entries(VACATION_PUBLIC_PURPOSES).map(([key, label]) => '<option value="' + key + '">' + vacationPublicEscape(label) + '</option>').join("") + '</select></label>' +
         '<label>Hospedes<input id="vacationPublicGuests" type="number" min="1" placeholder="Quantidade minima"></label>' +
+        '<label>Capacidade para eventos<input id="vacationPublicEventCapacity" type="number" min="1" placeholder="Pessoas"></label>' +
+        '<label>Vagas aproximadas<input id="vacationPublicParkingCapacity" type="number" min="1" placeholder="Veiculos"></label>' +
         '<label>Diaria ate<input id="vacationPublicMaxPrice" inputmode="numeric" placeholder="R$"></label>' +
         '<label>Comodidade<select id="vacationPublicAmenity"><option value="">Todas</option>' + Object.entries(VACATION_PUBLIC_AMENITIES).map(([key, value]) => '<option value="' + key + '">' + vacationPublicEscape(value[1]) + '</option>').join("") + '</select></label>' +
+        '<label>Festas e eventos<select id="vacationPublicEvent"><option value="">Todos</option>' + Object.entries(VACATION_PUBLIC_EVENT_FILTERS).map(([key, label]) => '<option value="' + key + '">' + vacationPublicEscape(label) + '</option>').join("") + '</select></label>' +
+        '<label>Represa e pesca<select id="vacationPublicReservoir"><option value="">Todos</option>' + Object.entries(VACATION_PUBLIC_RESERVOIR_FILTERS).map(([key, label]) => '<option value="' + key + '">' + vacationPublicEscape(label) + '</option>').join("") + '</select></label>' +
       '</div></section><div id="vacationPublicList" class="vacation-public-grid"><div class="vacation-public-loading"><i class="fa-solid fa-circle-notch fa-spin"></i> Carregando hospedagens...</div></div></section>';
+    vacationUpdateSeo();
     const page = area.querySelector(".vacation-public-page");
     const listBox = $("vacationPublicList");
     let rentals = [];
@@ -14589,17 +14778,33 @@ plotarPinsImoveis(stateImoveis.filtered);
       const search = normalizeName($("vacationPublicSearch")?.value || "");
       const city = $("vacationPublicCity")?.value || "";
       const neighborhood = $("vacationPublicNeighborhood")?.value || "";
+      const type = $("vacationPublicType")?.value || "";
+      const purpose = $("vacationPublicPurpose")?.value || "";
       const guests = Number($("vacationPublicGuests")?.value || 0);
-      const maxPrice = Number(String($("vacationPublicMaxPrice")?.value || "").replace(/\D/g, ""));
+      const eventCapacity = Number($("vacationPublicEventCapacity")?.value || 0);
+      const parkingCapacity = Number($("vacationPublicParkingCapacity")?.value || 0);
+      const maxPrice = Number(String($("vacationPublicMaxPrice")?.value || "").replace(/D/g, ""));
       const amenity = $("vacationPublicAmenity")?.value || "";
+      const eventFeature = $("vacationPublicEvent")?.value || "";
+      const reservoirFeature = $("vacationPublicReservoir")?.value || "";
       const filtered = rentals.filter((item) => {
-        const haystack = normalizeName([item.titulo, item.tipo, item.bairro, item.cidade, item.descricao].join(" "));
+        const purposes = Array.isArray(item.finalidades) ? item.finalidades : [];
+        const events = item.eventos && typeof item.eventos === "object" ? item.eventos : {};
+        const reservoir = item.represaPesca && typeof item.represaPesca === "object" ? item.represaPesca : {};
+        const availableEventCapacity = Number(item.capacidadeEventos || events.capacidadeMaxima || 0);
+        const haystack = normalizeName([item.titulo, vacationPublicTypeLabel(item), item.bairro, item.cidade, item.descricao, purposes.map((key) => VACATION_PUBLIC_PURPOSES[key] || key).join(" ")].join(" "));
         return (!search || haystack.includes(search))
           && (!city || item.cidade === city)
           && (!neighborhood || item.bairro === neighborhood)
+          && (!type || vacationPublicTypeKey(item) === type)
+          && (!purpose || purposes.includes(purpose))
           && (!guests || Number(item.hospedes || 0) >= guests)
+          && (!eventCapacity || availableEventCapacity >= eventCapacity)
+          && (!parkingCapacity || Number(item.capacidadeEstacionamento || 0) >= parkingCapacity)
           && (!maxPrice || !Number(item.valorDiaria || 0) || Number(item.valorDiaria) <= maxPrice)
-          && (!amenity || (Array.isArray(item.comodidades) && item.comodidades.includes(amenity)));
+          && (!amenity || (Array.isArray(item.comodidades) && item.comodidades.includes(amenity)))
+          && (!eventFeature || events[eventFeature] === true)
+          && (!reservoirFeature || reservoir[reservoirFeature] === true);
       });
       $("vacationPublicTotal").innerHTML = '<i class="fa-solid fa-house"></i> <strong>' + filtered.length + '</strong> ' + (filtered.length === 1 ? "opcao" : "opcoes");
       listBox.innerHTML = filtered.length ? filtered.map(vacationPublicCard).join("") : '<div class="vacation-public-empty"><i class="fa-solid fa-house-circle-xmark"></i><strong>Nenhuma hospedagem encontrada</strong><span>Ajuste os filtros para ver outras opcoes.</span></div>';
@@ -14628,8 +14833,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       localStorage.setItem("casasVeraneioModoCompacto", String(event.target.checked));
       page.classList.toggle("is-compact", event.target.checked);
     });
-    ["vacationPublicSearch", "vacationPublicGuests", "vacationPublicMaxPrice"].forEach((id) => $(id)?.addEventListener("input", apply));
-    ["vacationPublicCity", "vacationPublicNeighborhood", "vacationPublicAmenity"].forEach((id) => $(id)?.addEventListener("change", apply));
+    ["vacationPublicSearch", "vacationPublicGuests", "vacationPublicEventCapacity", "vacationPublicParkingCapacity", "vacationPublicMaxPrice"].forEach((id) => $(id)?.addEventListener("input", apply));
+    ["vacationPublicCity", "vacationPublicNeighborhood", "vacationPublicType", "vacationPublicPurpose", "vacationPublicAmenity", "vacationPublicEvent", "vacationPublicReservoir"].forEach((id) => $(id)?.addEventListener("change", apply));
     try {
       rentals = await carregarCasasVeraneioFirebase(true);
       if (area.dataset.currentRoute !== "casas-veraneio") return;
@@ -14663,6 +14868,12 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   window.mostrarCasasVeraneio = mostrarCasasVeraneio;
+  window.addEventListener("hashchange", () => {
+    if (location.hash !== "#casas-veraneio") {
+      closeVacationPublicModal();
+      vacationRestoreSeo();
+    }
+  });
 
   document.getElementById("menuCasasVeraneio")?.addEventListener("click", function (event) {
     event.preventDefault();

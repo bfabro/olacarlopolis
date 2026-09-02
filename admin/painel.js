@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 705,
-  label: "v712",
+  numero: 706,
+  label: "v713",
   data: "2026-09-02",
-  nota: "Calendario de disponibilidade das casas de veraneio no painel e no site publico."
+  nota: "Tipos, finalidades, comodidades, eventos, represa, filtros e SEO das casas de veraneio ampliados."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -14749,29 +14749,36 @@ async function gerarArtesInstagramAutomoveisSelecionados() {
 }
 
 const VACATION_RENTAL_AMENITY_LABELS = {
-  piscina: "Piscina",
-  churrasqueira: "Churrasqueira",
-  wifi: "Wi-Fi",
-  ar_condicionado: "Ar-condicionado",
-  cozinha_equipada: "Cozinha equipada",
-  estacionamento: "Estacionamento",
-  roupa_cama: "Roupa de cama",
-  tv: "TV",
-  acesso_represa: "Acesso a represa",
-  acessibilidade: "Acessibilidade",
-  aceita_pets: "Aceita pets",
-  area_lazer: "Area de lazer"
+  piscina: "Piscina", churrasqueira: "Churrasqueira", cozinha_equipada: "Cozinha equipada",
+  geladeira: "Geladeira", freezer: "Freezer", fogao: "Fogao", micro_ondas: "Micro-ondas",
+  wifi: "Wi-Fi", tv: "Televisao", ar_condicionado: "Ar-condicionado", ventiladores: "Ventiladores",
+  estacionamento: "Estacionamento", area_coberta: "Area coberta", area_externa: "Area externa",
+  playground: "Playground", campo_futebol: "Campo de futebol", mesa_sinuca: "Mesa de sinuca",
+  area_pesca: "Area de pesca", acesso_represa: "Acesso a represa", pier: "Pier",
+  rampa_barco: "Rampa para barco", deck: "Deck", area_fogueira: "Area para fogueira",
+  aceita_pets: "Aceita animais", roupa_cama: "Roupa de cama",
+  acessibilidade: "Acessibilidade", area_lazer: "Area de lazer"
 };
 
 const VACATION_RENTAL_TYPE_LABELS = {
-  casa: "Casa",
-  chacara: "Chacara",
-  rancho: "Rancho",
-  apartamento: "Apartamento",
-  chale: "Chale",
-  pousada: "Pousada",
-  outro: "Outro"
+  casa_veraneio: "Casa de veraneio", rancho: "Rancho", chacara: "Chacara",
+  casa_represa: "Casa na represa", espaco_eventos: "Espaco para eventos", hospedagem: "Hospedagem",
+  casa: "Casa de veraneio", apartamento: "Hospedagem", chale: "Hospedagem", pousada: "Hospedagem", outro: "Hospedagem"
 };
+
+const VACATION_RENTAL_TYPE_ALIASES = {
+  casa: "casa_veraneio", apartamento: "hospedagem", chale: "hospedagem", pousada: "hospedagem", outro: "hospedagem"
+};
+
+const VACATION_RENTAL_PURPOSE_LABELS = {
+  descanso_familia: "Descanso em familia", final_semana: "Final de semana", festas: "Festas",
+  eventos: "Eventos", confraternizacoes: "Confraternizacoes", pesca: "Pesca", represa: "Represa",
+  hospedagem: "Hospedagem", chacara: "Chacara", rancho: "Rancho", casa_veraneio: "Casa de veraneio"
+};
+
+function normalizeVacationRentalType(value) {
+  return VACATION_RENTAL_TYPE_ALIASES[value] || value || "casa_veraneio";
+}
 
 function vacationRentalClient(item = {}) {
   return state.clientes.find((client) => client.id === (item.clienteId || item.clientId))
@@ -14927,7 +14934,7 @@ function fillVacationRentalForm(item) {
   const values = {
     vacationRentalId: item.id,
     vacationRentalTitle: item.titulo,
-    vacationRentalType: item.tipo || "casa",
+    vacationRentalType: normalizeVacationRentalType(item.tipo),
     vacationRentalStatus: item.status || "ativo",
     vacationRentalNeighborhood: item.bairro,
     vacationRentalCity: item.cidade || "Carlopolis",
@@ -14939,6 +14946,8 @@ function fillVacationRentalForm(item) {
     vacationRentalBeds: item.camas || 0,
     vacationRentalSuites: item.suites || 0,
     vacationRentalBathrooms: item.banheiros || 0,
+    vacationRentalEventCapacity: item.capacidadeEventos || 0,
+    vacationRentalParkingCapacity: item.capacidadeEstacionamento || 0,
     vacationRentalMinNights: item.minimoNoites || 1,
     vacationRentalCheckin: item.checkin,
     vacationRentalCheckout: item.checkout,
@@ -14952,7 +14961,11 @@ function fillVacationRentalForm(item) {
     vacationRentalInstagram: item.instagram,
     vacationRentalDescription: item.descricao,
     vacationRentalRules: item.regras,
-    vacationRentalAvailability: item.disponibilidade
+    vacationRentalAvailability: item.disponibilidade,
+    vacationRentalSoundLimit: item.eventos?.horarioLimiteSom,
+    vacationRentalMaxEventCapacity: item.eventos?.capacidadeMaxima,
+    vacationRentalEventNotes: item.eventos?.observacoes,
+    vacationRentalWaterDistance: item.represaPesca?.distanciaAgua
   };
   Object.entries(values).forEach(([id, value]) => { if ($(id)) $(id).value = value ?? ""; });
   if ($("vacationRentalFeatured")) $("vacationRentalFeatured").checked = Boolean(item.destaque);
@@ -14960,6 +14973,28 @@ function fillVacationRentalForm(item) {
   document.querySelectorAll("#vacationRentalAmenities input[type='checkbox']").forEach((input) => {
     input.checked = amenities.has(input.value);
   });
+  const purposes = new Set(Array.isArray(item.finalidades) ? item.finalidades : []);
+  document.querySelectorAll("#vacationRentalPurposes input[type='checkbox']").forEach((input) => {
+    input.checked = purposes.has(input.value);
+  });
+  const booleanFields = {
+    vacationRentalAcceptsParties: item.eventos?.aceitaFestas,
+    vacationRentalAcceptsBirthdays: item.eventos?.aceitaAniversarios,
+    vacationRentalAcceptsGatherings: item.eventos?.aceitaConfraternizacoes,
+    vacationRentalAcceptsWeddings: item.eventos?.aceitaCasamentos,
+    vacationRentalAcceptsCorporateEvents: item.eventos?.aceitaEventosEmpresariais,
+    vacationRentalAllowsSound: item.eventos?.permiteSom,
+    vacationRentalCoveredEventSpace: item.eventos?.espacoCoberto,
+    vacationRentalTablesChairs: item.eventos?.mesasCadeiras,
+    vacationRentalWaterfront: item.represaPesca?.beiraRepresa,
+    vacationRentalDirectWaterAccess: item.represaPesca?.acessoDiretoAgua,
+    vacationRentalHasPier: item.represaPesca?.pier,
+    vacationRentalHasBoatRamp: item.represaPesca?.rampaBarco,
+    vacationRentalBoatPlace: item.represaPesca?.localEmbarcacao,
+    vacationRentalFishingArea: item.represaPesca?.areaPesca,
+    vacationRentalBoatStorage: item.represaPesca?.guardaBarco
+  };
+  Object.entries(booleanFields).forEach(([id, checked]) => { if ($(id)) $(id).checked = Boolean(checked); });
   fillVacationRentalClientOptions(item.clienteId || item.clientId || "");
   $("deleteVacationRentalButton")?.classList.remove("hidden");
   renderVacationRentalImagesPreview();
@@ -14989,7 +15024,7 @@ function vacationRentalFormPayload() {
     clienteId: clientId || "",
     clienteNome: client?.nome || "",
     titulo: $("vacationRentalTitle")?.value.trim() || "",
-    tipo: $("vacationRentalType")?.value || "casa",
+    tipo: $("vacationRentalType")?.value || "casa_veraneio",
     status: $("vacationRentalStatus")?.value || "ativo",
     destaque: Boolean($("vacationRentalFeatured")?.checked),
     bairro: $("vacationRentalNeighborhood")?.value.trim() || "",
@@ -15002,6 +15037,8 @@ function vacationRentalFormPayload() {
     camas: Math.max(0, Number($("vacationRentalBeds")?.value || 0)),
     suites: Math.max(0, Number($("vacationRentalSuites")?.value || 0)),
     banheiros: Math.max(0, Number($("vacationRentalBathrooms")?.value || 0)),
+    capacidadeEventos: Math.max(0, Number($("vacationRentalEventCapacity")?.value || 0)),
+    capacidadeEstacionamento: Math.max(0, Number($("vacationRentalParkingCapacity")?.value || 0)),
     minimoNoites: Math.max(1, Number($("vacationRentalMinNights")?.value || 1)),
     checkin: $("vacationRentalCheckin")?.value || "",
     checkout: $("vacationRentalCheckout")?.value || "",
@@ -15010,6 +15047,30 @@ function vacationRentalFormPayload() {
     taxaLimpeza: numberFromMoney($("vacationRentalCleaningFee")?.value || ""),
     caucao: numberFromMoney($("vacationRentalDeposit")?.value || ""),
     comodidades: [...document.querySelectorAll("#vacationRentalAmenities input:checked")].map((input) => input.value),
+    finalidades: [...document.querySelectorAll("#vacationRentalPurposes input:checked")].map((input) => input.value),
+    eventos: {
+      aceitaFestas: Boolean($("vacationRentalAcceptsParties")?.checked),
+      aceitaAniversarios: Boolean($("vacationRentalAcceptsBirthdays")?.checked),
+      aceitaConfraternizacoes: Boolean($("vacationRentalAcceptsGatherings")?.checked),
+      aceitaCasamentos: Boolean($("vacationRentalAcceptsWeddings")?.checked),
+      aceitaEventosEmpresariais: Boolean($("vacationRentalAcceptsCorporateEvents")?.checked),
+      permiteSom: Boolean($("vacationRentalAllowsSound")?.checked),
+      horarioLimiteSom: $("vacationRentalSoundLimit")?.value || "",
+      capacidadeMaxima: Math.max(0, Number($("vacationRentalMaxEventCapacity")?.value || 0)),
+      espacoCoberto: Boolean($("vacationRentalCoveredEventSpace")?.checked),
+      mesasCadeiras: Boolean($("vacationRentalTablesChairs")?.checked),
+      observacoes: $("vacationRentalEventNotes")?.value.trim() || ""
+    },
+    represaPesca: {
+      beiraRepresa: Boolean($("vacationRentalWaterfront")?.checked),
+      acessoDiretoAgua: Boolean($("vacationRentalDirectWaterAccess")?.checked),
+      pier: Boolean($("vacationRentalHasPier")?.checked),
+      rampaBarco: Boolean($("vacationRentalHasBoatRamp")?.checked),
+      localEmbarcacao: Boolean($("vacationRentalBoatPlace")?.checked),
+      areaPesca: Boolean($("vacationRentalFishingArea")?.checked),
+      guardaBarco: Boolean($("vacationRentalBoatStorage")?.checked),
+      distanciaAgua: $("vacationRentalWaterDistance")?.value.trim() || ""
+    },
     responsavel: $("vacationRentalContactName")?.value.trim() || "",
     whatsapp: $("vacationRentalWhatsapp")?.value.trim() || "",
     telefone: $("vacationRentalPhone")?.value.trim() || "",
