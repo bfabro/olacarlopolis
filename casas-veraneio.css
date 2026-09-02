@@ -1,4 +1,4 @@
-/* Casas de veraneio publica - 2026-09-02_v5 */
+/* Casas de veraneio publica - 2026-09-02_v6 */
 .vacation-public-page {
   width: min(1180px, 100%);
   margin: 0 auto 40px;
@@ -726,4 +726,116 @@ body.vacation-modal-open { overflow: hidden; }
 
 @media (max-width: 480px) {
   .vacation-public-filters { grid-template-columns: 1fr; }
+}
+/* Carrossel dos cards e modal mobile fluida - 2026-09-02_v6 */
+.vacation-public-media {
+  overflow: hidden;
+  cursor: default;
+}
+.vacation-card-gallery-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.vacation-card-gallery-track::-webkit-scrollbar { display: none; }
+.vacation-card-gallery-slide {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  flex: 0 0 100%;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  background: #e7f1f1;
+  cursor: pointer;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.vacation-card-gallery-slide img { display: block; }
+.vacation-card-gallery-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 4;
+  display: grid;
+  width: 34px;
+  height: 42px;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  padding: 0;
+  background: rgba(255, 255, 255, .88);
+  color: #25364a;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, .2);
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+.vacation-card-gallery-nav:hover,
+.vacation-card-gallery-nav:focus-visible { background: #fff; }
+.vacation-card-gallery-previous { left: 7px; }
+.vacation-card-gallery-next { right: 7px; }
+
+.vacation-public-page.is-compact .vacation-public-actions {
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+.vacation-public-page.is-compact .vacation-public-actions .vacation-detail-action {
+  display: inline-flex;
+  flex: 0 0 42px;
+  padding-inline: 0;
+}
+.vacation-public-page.is-compact .vacation-public-actions .vacation-detail-action span {
+  display: none;
+}
+.vacation-public-page.is-compact .vacation-public-actions > a {
+  min-width: 0;
+}
+
+@media (max-width: 700px) {
+  .vacation-public-page.is-compact .vacation-public-actions {
+    gap: 3px;
+  }
+  .vacation-public-page.is-compact .vacation-public-actions .vacation-detail-action,
+  .vacation-public-page.is-compact .vacation-public-actions .vacation-share-action,
+  .vacation-public-page.is-compact .vacation-public-actions .vacation-calendar-action,
+  .vacation-public-page.is-compact .vacation-public-actions > a {
+    width: auto;
+    min-width: 29px;
+    min-height: 36px;
+    flex: 1 1 29px;
+    padding: 0;
+    font-size: .76rem;
+  }
+  .vacation-public-page.is-compact .vacation-public-actions > a span {
+    display: none;
+  }
+  .vacation-card-gallery-nav {
+    width: 30px;
+    height: 38px;
+  }
+  .vacation-public-modal {
+    align-items: start;
+    overflow-y: hidden;
+    padding: 8px;
+  }
+  .vacation-modal-card {
+    display: block;
+    max-height: 96vh;
+    margin: auto 0;
+    overflow-y: auto;
+  }
+  .vacation-modal-content {
+    overflow-y: visible;
+  }
+  .vacation-modal-gallery button {
+    height: min(48vh, 360px);
+  }
+  .vacation-modal-gallery img {
+    object-fit: contain;
+  }
 }

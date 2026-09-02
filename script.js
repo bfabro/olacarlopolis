@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v628.
+// Release do site v629.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -14589,17 +14589,50 @@ plotarPinsImoveis(stateImoveis.filtered);
     }
     canonical.href = url;
   }
+
+  function bindVacationCardGallery(media) {
+    const track = media?.querySelector(".vacation-card-gallery-track");
+    const slides = [...(track?.querySelectorAll(".vacation-card-gallery-slide") || [])];
+    if (!track || slides.length < 2) return;
+    const counter = media.querySelector("[data-vacation-card-count]");
+    let scrollFrame = 0;
+    const currentIndex = () => Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))));
+    const updateCounter = () => {
+      if (counter) counter.textContent = (currentIndex() + 1) + " / " + slides.length;
+    };
+    const move = (step) => {
+      const nextIndex = (currentIndex() + step + slides.length) % slides.length;
+      track.scrollTo({ left: nextIndex * track.clientWidth, behavior: "smooth" });
+    };
+    media.querySelector("[data-vacation-card-previous]")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      move(-1);
+    });
+    media.querySelector("[data-vacation-card-next]")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      move(1);
+    });
+    track.addEventListener("scroll", () => {
+      cancelAnimationFrame(scrollFrame);
+      scrollFrame = requestAnimationFrame(updateCounter);
+    }, { passive: true });
+    updateCounter();
+  }
+
   function vacationPublicCard(item) {
     const images = vacationPublicImages(item);
-    const image = images[0] || "images/img_padrao_site/logo_1.png";
+    const cardImages = images.length ? images : ["images/img_padrao_site/logo_1.png"];
     const price = vacationPublicMoney(item.valorDiaria);
     const whatsapp = vacationPublicWhatsapp(item);
     return '<article class="vacation-public-card' + (item.destaque ? " is-featured" : "") + '" data-vacation-id="' + vacationPublicEscape(item.id) + '">' +
-      '<button type="button" class="vacation-public-media" data-vacation-detail="' + vacationPublicEscape(item.id) + '" aria-label="Ver detalhes de ' + vacationPublicEscape(item.titulo) + '">' +
-        '<img src="' + vacationPublicEscape(image) + '" alt="' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '" loading="lazy">' +
+      '<div class="vacation-public-media" data-vacation-card-gallery>' +
+        '<div class="vacation-card-gallery-track">' + cardImages.map((url, index) =>
+          '<button type="button" class="vacation-card-gallery-slide" data-vacation-detail="' + vacationPublicEscape(item.id) + '" aria-label="Ver foto ' + (index + 1) + ' e detalhes de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><img src="' + vacationPublicEscape(url) + '" alt="Foto ' + (index + 1) + ' de ' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '" loading="lazy"></button>'
+        ).join("") + '</div>' +
+        (images.length > 1 ? '<button type="button" class="vacation-card-gallery-nav vacation-card-gallery-previous" data-vacation-card-previous aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button><button type="button" class="vacation-card-gallery-nav vacation-card-gallery-next" data-vacation-card-next aria-label="Proxima foto"><i class="fa-solid fa-chevron-right"></i></button>' : "") +
         (item.destaque ? '<span class="vacation-featured-badge"><i class="fa-solid fa-star"></i> Destaque</span>' : "") +
-        '<span class="vacation-photo-count"><i class="fa-solid fa-images"></i> ' + images.length + '</span>' +
-      '</button>' +
+        (images.length ? '<span class="vacation-photo-count"><i class="fa-solid fa-images"></i> <span data-vacation-card-count>1 / ' + images.length + '</span></span>' : "") +
+      '</div>' +
       '<div class="vacation-public-body">' +
         '<div class="vacation-public-heading"><div><small>' + vacationPublicEscape(vacationPublicTypeLabel(item)) + '</small><h3>' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '</h3></div>' +
         '<strong>' + (price ? vacationPublicEscape(price) + '<small>/ diaria</small>' : "Consulte") + '</strong></div>' +
@@ -14609,10 +14642,10 @@ plotarPinsImoveis(stateImoveis.filtered);
         '<div class="vacation-public-amenities">' + renderVacationPublicAmenities(item, 5) + '</div>' +
         '<p class="vacation-public-description">' + vacationPublicEscape(item.descricao || "Consulte os detalhes e a disponibilidade desta hospedagem.") + '</p>' +
         '<div class="vacation-public-actions">' +
-          '<button type="button" class="vacation-detail-action" data-vacation-detail="' + vacationPublicEscape(item.id) + '"><i class="fa-solid fa-eye"></i> Ver detalhes</button>' +
+          '<button type="button" class="vacation-detail-action" data-vacation-detail="' + vacationPublicEscape(item.id) + '" aria-label="Ver detalhes de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-eye"></i><span> Ver detalhes</span></button>' +
           '<button type="button" class="vacation-share-action" data-vacation-share="' + vacationPublicEscape(item.id) + '" aria-label="Compartilhar ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-share-nodes"></i><span> Compartilhar</span></button>' +
           '<button type="button" class="vacation-calendar-action" data-vacation-calendar="' + vacationPublicEscape(item.id) + '" aria-label="Ver disponibilidade de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-calendar-days"></i><span> Disponibilidade</span></button>' +
-          (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Consultar</a>' : "") +
+          (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span> Consultar</span></a>' : "") +
         '</div>' +
       '</div>' +
     '</article>';
@@ -14722,10 +14755,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         (item.disponibilidade ? '<section><h3>Disponibilidade</h3><p>' + vacationPublicEscape(item.disponibilidade) + '</p></section>' : "") +
         '<section><h3>Contato</h3><p><strong>' + vacationPublicEscape(item.responsavel || item.clienteNome || "") + '</strong></p></section>' +
       '</div><footer>' +
-        '<button type="button" class="vacation-modal-share" data-vacation-share="' + vacationPublicEscape(item.id) + '"><i class="fa-solid fa-share-nodes"></i> Compartilhar</button>' +
-        '<button type="button" class="vacation-modal-calendar" data-vacation-calendar="' + vacationPublicEscape(item.id) + '"><i class="fa-solid fa-calendar-days"></i> Disponibilidade</button>' +
         (item.googleMapsUrl ? '<a class="vacation-maps-action" href="' + vacationPublicEscape(item.googleMapsUrl) + '" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Abrir no Maps</a>' : "") +
-        (whatsapp ? '<a class="vacation-whatsapp-action" href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Consultar disponibilidade</a>' : "") +
+        (whatsapp ? '<a class="vacation-whatsapp-action" href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Entrar em contato</a>' : "") +
       '</footer></section>';
     document.body.appendChild(modal);
     document.body.classList.add("vacation-modal-open");
@@ -14734,8 +14765,6 @@ plotarPinsImoveis(stateImoveis.filtered);
     modal.querySelectorAll("[data-vacation-large-image]").forEach((button) => button.addEventListener("click", () => {
       openVacationImageViewer(images, Number(button.dataset.vacationLargeImage), item.titulo || "Hospedagem");
     }));
-    modal.querySelector("[data-vacation-share]")?.addEventListener("click", () => vacationPublicShare(item));
-    modal.querySelector("[data-vacation-calendar]")?.addEventListener("click", () => openVacationAvailabilityCalendar(item));
     modal.querySelector("[data-vacation-close]")?.focus();
   }
 
@@ -14820,6 +14849,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         const item = rentals.find((entry) => entry.id === button.dataset.vacationCalendar);
         if (item) openVacationAvailabilityCalendar(item);
       }));
+      listBox.querySelectorAll("[data-vacation-card-gallery]").forEach(bindVacationCardGallery);
     };
     $("vacationSharePage")?.addEventListener("click", () => vacationPublicShare());
     $("vacationToggleFilters")?.addEventListener("click", (event) => {

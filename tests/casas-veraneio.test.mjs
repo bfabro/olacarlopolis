@@ -24,7 +24,7 @@ test("rota publica carrega somente registros ativos", () => {
 test("catalogo inicia compacto e permite alternar para detalhes", () => {
   assert.match(publicJs, /savedMode === null \? true/);
   assert.match(publicJs, /casasVeraneioModoCompacto/);
-  assert.match(publicHtml, /casas-veraneio\.css\?v=5/);
+  assert.match(publicHtml, /casas-veraneio\.css\?v=6/);
   assert.match(publicCss, /vacation-public-page\.is-compact/);
 });
 
@@ -183,8 +183,40 @@ test("SEO das casas usa titulo descricao url e imagem principal", () => {
 });
 
 test("versoes dos ativos das casas foram atualizadas", () => {
-  assert.ok(publicHtml.includes("casas-veraneio.css?v=5"));
+  assert.ok(publicHtml.includes("casas-veraneio.css?v=6"));
   assert.ok(adminHtml.includes("casas-veraneio-admin.css?v=4"));
-  assert.ok(publicCss.includes("2026-09-02_v5"));
+  assert.ok(publicCss.includes("2026-09-02_v6"));
   assert.ok(adminCss.includes("2026-09-02_v4"));
+});
+
+test("cards publicos possuem carrossel por gesto lateral e setas", () => {
+  assert.ok(publicJs.includes("function bindVacationCardGallery"));
+  assert.ok(publicJs.includes('class="vacation-card-gallery-track"'));
+  assert.ok(publicJs.includes("data-vacation-card-previous"));
+  assert.ok(publicJs.includes("data-vacation-card-next"));
+  assert.ok(publicJs.includes('track.scrollTo({ left: nextIndex * track.clientWidth, behavior: "smooth" })'));
+  assert.ok(publicCss.includes("scroll-snap-type: x mandatory"));
+  assert.ok(publicCss.includes("overflow-x: auto"));
+});
+
+test("modo Cards mantem detalhes compartilhar calendario e contato na mesma linha", () => {
+  assert.ok(publicJs.includes('class="vacation-detail-action"'));
+  assert.ok(publicJs.includes('fa-solid fa-eye'));
+  assert.ok(publicCss.includes(".vacation-public-page.is-compact .vacation-public-actions .vacation-detail-action"));
+  assert.ok(publicCss.includes("flex-wrap: nowrap"));
+});
+
+test("modal mobile rola inteira exibe fotos completas e simplifica acoes", () => {
+  const start = publicJs.indexOf("function openVacationPublicModal");
+  const end = publicJs.indexOf("async function mostrarCasasVeraneio", start);
+  const modalSource = publicJs.slice(start, end);
+  assert.ok(!modalSource.includes("vacation-modal-share"));
+  assert.ok(!modalSource.includes("vacation-modal-calendar"));
+  assert.ok(modalSource.includes("Entrar em contato"));
+  assert.ok(publicCss.includes(".vacation-modal-card {"));
+  assert.ok(publicCss.includes("display: block"));
+  assert.ok(publicCss.includes("overflow-y: auto"));
+  assert.ok(publicCss.includes(".vacation-modal-content {"));
+  assert.ok(publicCss.includes("overflow-y: visible"));
+  assert.ok(publicCss.includes("object-fit: contain"));
 });
