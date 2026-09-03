@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v634.
+// Release do site v635.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -5020,6 +5020,51 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     return tipo.includes("estabelecimento") && normalizeName(novidadeTextoAcao(item)).includes("atualiz");
   }
 
+  function novidadeEhCadastroGenericoCliente(item = {}) {
+    const tipo = novidadeTipoNormalizado(item.destinoTipo || item.tipo || "");
+    const tema = item.raw?.novidadeTema || item.novidadeTema || "";
+    return tipo.includes("estabelecimento")
+      || tipo.startsWith("cliente")
+      || [
+        "novoCliente",
+        "nomeCliente",
+        "dadosCliente",
+        "logoCliente",
+        "endereco",
+        "telefone",
+        "horario",
+        "imagens",
+        "cardapio",
+        "redesSociais",
+        "destaque",
+        "categoria"
+      ].includes(tema);
+  }
+
+  function novidadePertenceAResponsavelLocacao(item = {}) {
+    if (!novidadeEhCadastroGenericoCliente(item)) return false;
+    const tiposDiretos = [item.tipoCliente, item.raw?.tipoCliente, item.raw?.clientType]
+      .map(novidadeTipoNormalizado)
+      .filter(Boolean);
+    if (tiposDiretos.includes("responsavellocacao")) return true;
+
+    const clientes = window.__clientesPublicosCache || {};
+    const clienteId = String(item.raw?.clienteId || item.clienteId || "").trim();
+    const clienteDireto = clienteId ? clientes[clienteId] : null;
+    if (novidadeTipoNormalizado(clienteDireto?.tipoCliente || clienteDireto?.tipo || "") === "responsavellocacao") return true;
+
+    const identidades = [clienteId, item.destinoId, item.estabelecimento, item.raw?.clienteNome]
+      .map((valor) => normalizeName(valor || ""))
+      .filter(Boolean);
+    return Object.entries(clientes).some(([id, cliente]) => {
+      if (novidadeTipoNormalizado(cliente?.tipoCliente || cliente?.tipo || "") !== "responsavellocacao") return false;
+      const chaves = [id, cliente?.nome, cliente?.nomeNormalizado]
+        .map((valor) => normalizeName(valor || ""))
+        .filter(Boolean);
+      return chaves.some((chave) => identidades.includes(chave));
+    });
+  }
+
   function novidadeResumoAlteracao(item = {}) {
     const texto = novidadeTextoAcao(item);
     return texto && normalizeName(texto) !== normalizeName(item.estabelecimento || "") ? texto : "";
@@ -5497,6 +5542,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         const tipo = novidadeTipoNormalizado(item.destinoTipo || item.tipo || "");
         const textoNovidade = normalizeName(`${item.tipo || ""} ${item.titulo || ""} ${item.descricao || ""}`);
         if (/(financeiro|pagamento|mensalidade|fatura|inadimplente|clienteativo|clienteinativo|ativado|desativad|removid|excluid|retirad|ocultad|cancelad|encerrad|apagado)/.test(textoNovidade)) return false;
+        if (novidadePertenceAResponsavelLocacao(item)) return false;
         if (!clienteEstaPublico(item.destinoId, item.estabelecimento, item.raw?.clienteId, item.raw?.clienteNome)) return false;
         if (tipo.includes("estabelecimento")) {
           return true;

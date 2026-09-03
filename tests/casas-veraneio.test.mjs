@@ -42,13 +42,13 @@ test("estado sem hospedagens e amigavel e oculta os controles de exibicao", () =
 
 test("responsavel por locacao e salvo como cliente sem categoria", () => {
   assert.match(adminHtml, /option value="responsavel_locacao"/);
-  assert.match(adminJs, /function isCategorylessClientType[\s\S]*responsavel_locacao/);
+  assert.match(adminJs, /function isCategorylessClientType[\s\S]*return type === "responsavellocacao"/);
   assert.match(adminJs, /const category = isCategorylessClientType\(tipoCliente\)\s*\? ""/);
   assert.match(adminJs, /syncClientCategoryByType/);
 });
 
 test("responsavel por casa de veraneio pode ter cobranca mensal opcional", () => {
-  assert.match(adminJs, /function isBillableClientType[\s\S]*responsavel_locacao/);
+  assert.match(adminJs, /function isBillableClientType[\s\S]*type === "responsavellocacao"/);
   assert.match(adminHtml, /id="clientPaymentStatus"[\s\S]*value="isento"/);
 });
 

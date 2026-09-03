@@ -23,7 +23,20 @@ test("formulario Minha empresa continua salvando pelo evento submit", () => {
 });
 
 test("versao corrigida do painel e carregada sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.js?v=650"));
-  assert.ok(panelJs.includes("numero: 713"));
-  assert.ok(panelJs.includes('label: "v720"'));
+  assert.ok(panelHtml.includes("painel.js?v=651"));
+  assert.ok(panelJs.includes("numero: 714"));
+  assert.ok(panelJs.includes('label: "v721"'));
+});
+
+test("responsavel por locacao pode ser cobrado mesmo apos normalizacao do tipo", () => {
+  assert.ok(panelJs.includes('type === "responsavellocacao"'));
+  assert.ok(panelJs.includes('return type === "comercio" || type === "servico" || type === "responsavellocacao"'));
+});
+
+test("menu de servicos aparece quando a permissao foi liberada", () => {
+  assert.ok(panelJs.includes('const canEditServicos = hasPermission("servicos") || (client.servicosHabilitados === true && hasPermission("produtos"));'));
+});
+
+test("cadastro do responsavel nao gera novidade generica de comercio", () => {
+  assert.ok(panelJs.includes("if (isCategorylessClientType(effective)) return;"));
 });

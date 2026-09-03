@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 713,
-  label: "v720",
+  numero: 714,
+  label: "v721",
   data: "2026-09-03",
-  nota: "Novidades identificam o posto alterado, exibem casas como Lazer e usam detalhe horizontal."
+  nota: "Responsaveis por locacao nao viram comercio, acessam Servicos quando liberados e podem receber cobranca."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1125,7 +1125,7 @@ function isBillableClientType(clientOrType = "") {
       ? clientOrType
       : (clientOrType?.tipoCliente || clientOrType?.tipo || "")
   );
-  return type === "comercio" || type === "servico" || type === "responsavel_locacao";
+  return type === "comercio" || type === "servico" || type === "responsavellocacao";
 }
 
 function isCategorylessClientType(clientOrType = "") {
@@ -1134,7 +1134,7 @@ function isCategorylessClientType(clientOrType = "") {
       ? clientOrType
       : (clientOrType?.tipoCliente || clientOrType?.tipo || "")
   );
-  return type === "responsavel_locacao";
+  return type === "responsavellocacao";
 }
 
 function syncClientCategoryByType() {
@@ -9363,6 +9363,7 @@ async function registrarNovidadeAdmin(payload = {}) {
 
 async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, original = null) {
   const effective = { ...(original || {}), ...payload };
+  if (isCategorylessClientType(effective)) return;
   const profileImage = String(
     effective.imagem
     || effective.profileImage
@@ -23640,7 +23641,7 @@ function renderClientOnlyEditor() {
   const canEditVagas = hasPermission("vagas");
   const canEditCardapio = hasPermission("cardapio");
   const canEditProdutos = hasPermission("produtos");
-  const canEditServicos = client.servicosHabilitados === true && (hasPermission("servicos") || hasPermission("produtos"));
+  const canEditServicos = hasPermission("servicos") || (client.servicosHabilitados === true && hasPermission("produtos"));
   const canEditPromocoes = hasPermission("promocoes");
   const canGeneratePromoImages = hasPermission("gerar_imagens_promocoes");
   const isRealEstateClient = clienteAssociadoImoveis(client, true);
