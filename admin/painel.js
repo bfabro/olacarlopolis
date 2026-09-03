@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 709,
-  label: "v716",
-  data: "2026-09-02",
-  nota: "Galeria publica das casas padronizada com Imoveis, sem setas nos cards e com fotos inteiras."
+  numero: 710,
+  label: "v717",
+  data: "2026-09-03",
+  nota: "Cards das casas no tamanho de Imoveis, com autoplay, sem contador e disponibilidade ajustada."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

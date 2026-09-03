@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v630.
+// Release do site v631.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -14594,17 +14594,16 @@ plotarPinsImoveis(stateImoveis.filtered);
     const track = media?.querySelector(".vacation-card-gallery-track");
     const slides = [...(track?.querySelectorAll(".vacation-card-gallery-slide") || [])];
     if (!track || slides.length < 2) return;
-    const counter = media.querySelector("[data-vacation-card-count]");
-    let scrollFrame = 0;
     const currentIndex = () => Math.max(0, Math.min(slides.length - 1, Math.round(track.scrollLeft / Math.max(track.clientWidth, 1))));
-    const updateCounter = () => {
-      if (counter) counter.textContent = (currentIndex() + 1) + " / " + slides.length;
-    };
-    track.addEventListener("scroll", () => {
-      cancelAnimationFrame(scrollFrame);
-      scrollFrame = requestAnimationFrame(updateCounter);
-    }, { passive: true });
-    updateCounter();
+    const autoplayTimer = window.setInterval(() => {
+      if (!media.isConnected) {
+        window.clearInterval(autoplayTimer);
+        return;
+      }
+      if (media.matches(":hover") || media.contains(document.activeElement)) return;
+      const nextIndex = (currentIndex() + 1) % slides.length;
+      track.scrollTo({ left: nextIndex * track.clientWidth, behavior: "smooth" });
+    }, 4000);
   }
 
   function vacationPublicCard(item) {
@@ -14618,7 +14617,6 @@ plotarPinsImoveis(stateImoveis.filtered);
           '<button type="button" class="vacation-card-gallery-slide" data-vacation-detail="' + vacationPublicEscape(item.id) + '" aria-label="Ver foto ' + (index + 1) + ' e detalhes de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><img src="' + vacationPublicEscape(url) + '" alt="Foto ' + (index + 1) + ' de ' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '" loading="lazy"></button>'
         ).join("") + '</div>' +
         (item.destaque ? '<span class="vacation-featured-badge"><i class="fa-solid fa-star"></i> Destaque</span>' : "") +
-        (images.length ? '<span class="vacation-photo-count"><i class="fa-solid fa-images"></i> <span data-vacation-card-count>1 / ' + images.length + '</span></span>' : "") +
       '</div>' +
       '<div class="vacation-public-body">' +
         '<div class="vacation-public-heading"><div><small>' + vacationPublicEscape(vacationPublicTypeLabel(item)) + '</small><h3>' + vacationPublicEscape(item.titulo || "Casa de veraneio") + '</h3></div>' +

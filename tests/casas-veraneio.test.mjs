@@ -24,7 +24,7 @@ test("rota publica carrega somente registros ativos", () => {
 test("catalogo inicia compacto e permite alternar para detalhes", () => {
   assert.match(publicJs, /savedMode === null \? true/);
   assert.match(publicJs, /casasVeraneioModoCompacto/);
-  assert.match(publicHtml, /casas-veraneio\.css\?v=7/);
+  assert.match(publicHtml, /casas-veraneio\.css\?v=8/);
   assert.match(publicCss, /vacation-public-page\.is-compact/);
 });
 
@@ -183,19 +183,31 @@ test("SEO das casas usa titulo descricao url e imagem principal", () => {
 });
 
 test("versoes dos ativos das casas foram atualizadas", () => {
-  assert.ok(publicHtml.includes("casas-veraneio.css?v=7"));
+  assert.ok(publicHtml.includes("casas-veraneio.css?v=8"));
   assert.ok(adminHtml.includes("casas-veraneio-admin.css?v=4"));
-  assert.ok(publicCss.includes("2026-09-02_v7"));
+  assert.ok(publicCss.includes("2026-09-03_v8"));
   assert.ok(adminCss.includes("2026-09-02_v4"));
 });
 
-test("cards publicos possuem carrossel por gesto lateral sem setas", () => {
+test("cards publicos avancam automaticamente e permitem gesto lateral sem setas nem contador", () => {
   assert.ok(publicJs.includes("function bindVacationCardGallery"));
   assert.ok(publicJs.includes('class="vacation-card-gallery-track"'));
+  assert.ok(publicJs.includes("window.setInterval"));
+  assert.ok(publicJs.includes('track.scrollTo({ left: nextIndex * track.clientWidth, behavior: "smooth" })'));
+  assert.ok(publicJs.includes("}, 4000);"));
   assert.ok(!publicJs.includes("data-vacation-card-previous"));
   assert.ok(!publicJs.includes("data-vacation-card-next"));
+  assert.ok(!publicJs.includes("vacation-photo-count"));
+  assert.ok(!publicJs.includes("data-vacation-card-count"));
   assert.ok(publicCss.includes("scroll-snap-type: x mandatory"));
   assert.ok(publicCss.includes("overflow-x: auto"));
+});
+
+test("cards das casas repetem as alturas de Imoveis e disponibilidade respeita as bordas", () => {
+  assert.match(publicCss, /\.vacation-public-page\.is-compact \.vacation-public-media,[\s\S]*height: 170px;[\s\S]*min-height: 170px;/);
+  assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*\.vacation-public-page\.is-compact \.vacation-public-media,[\s\S]*height: 130px;[\s\S]*min-height: 130px;/);
+  assert.match(publicCss, /\.vacation-public-actions \.vacation-calendar-action \{[\s\S]*min-width: 0;[\s\S]*max-width: 100%;/);
+  assert.match(publicCss, /\.vacation-public-page\.is-compact \.vacation-public-actions \.vacation-calendar-action \{[\s\S]*flex: 0 0 42px;/);
 });
 
 test("galeria das casas mantem fotos inteiras em quadro fixo e setas discretas", () => {

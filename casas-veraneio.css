@@ -1,4 +1,4 @@
-/* Casas de veraneio publica - 2026-09-02_v7 */
+/* Casas de veraneio publica - 2026-09-03_v8 */
 .vacation-public-page {
   width: min(1180px, 100%);
   margin: 0 auto 40px;
@@ -135,8 +135,7 @@
   height: 100%;
   object-fit: cover;
 }
-.vacation-featured-badge,
-.vacation-photo-count {
+.vacation-featured-badge {
   position: absolute;
   top: 9px;
   padding: 6px 8px;
@@ -146,7 +145,6 @@
   font-weight: 800;
 }
 .vacation-featured-badge { left: 9px; background: #b45309; }
-.vacation-photo-count { right: 9px; background: rgba(15, 23, 42, .82); }
 .vacation-public-body {
   display: flex;
   min-width: 0;
@@ -566,7 +564,7 @@ body.vacation-modal-open { overflow: hidden; }
 .vacation-public-page.is-compact .vacation-public-actions {
   flex-wrap: wrap;
 }
-.vacation-public-actions .vacation-calendar-action {
+.vacation-public-page.is-compact .vacation-public-actions .vacation-calendar-action {
   display: inline-flex;
   flex: 0 0 42px;
   padding-inline: 0;
@@ -727,7 +725,7 @@ body.vacation-modal-open { overflow: hidden; }
 @media (max-width: 480px) {
   .vacation-public-filters { grid-template-columns: 1fr; }
 }
-/* Carrossel dos cards e modal mobile fluida - 2026-09-02_v7 */
+/* Carrossel dos cards e modal mobile fluida - 2026-09-03_v8 */
 .vacation-public-media {
   overflow: hidden;
   cursor: default;
@@ -813,7 +811,7 @@ body.vacation-modal-open { overflow: hidden; }
     object-fit: contain;
   }
 }
-/* Galeria publica no padrao visual de Imoveis - 2026-09-02_v7 */
+/* Galeria publica no padrao visual de Imoveis - 2026-09-03_v8 */
 .vacation-modal-gallery button {
   height: clamp(220px, 34vw, 360px);
   aspect-ratio: auto;
@@ -892,4 +890,38 @@ body.vacation-modal-open { overflow: hidden; }
 
   .vacation-image-viewer .vacation-viewer-prev { left: 6px; }
   .vacation-image-viewer .vacation-viewer-next { right: 6px; }
+}
+/* Cards das casas no mesmo dimensionamento e autoplay visual de Imoveis - 2026-09-03_v8 */
+.vacation-public-page.is-compact .vacation-public-media,
+.vacation-public-page.is-compact .vacation-card-gallery-track,
+.vacation-public-page.is-compact .vacation-card-gallery-slide,
+.vacation-public-page.is-compact .vacation-card-gallery-slide img {
+  height: 170px;
+  min-height: 170px;
+  aspect-ratio: auto;
+}
+
+.vacation-card-gallery-slide img {
+  object-fit: cover;
+}
+
+.vacation-public-actions .vacation-calendar-action {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 700px) {
+  .vacation-public-page.is-compact .vacation-public-media,
+  .vacation-public-page.is-compact .vacation-card-gallery-track,
+  .vacation-public-page.is-compact .vacation-card-gallery-slide,
+  .vacation-public-page.is-compact .vacation-card-gallery-slide img {
+    height: 130px;
+    min-height: 130px;
+    aspect-ratio: auto;
+  }
+
+  .vacation-public-page.is-compact .vacation-public-actions {
+    width: 100%;
+    padding-inline: 2px;
+  }
 }
