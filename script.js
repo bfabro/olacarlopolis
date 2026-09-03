@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v632.
+// Release do site v633.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -4787,6 +4787,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   function novidadeDestinoNome(tipo) {
     const key = normalizeName(tipo || "");
+    if (key.includes("casaveraneio")) return "casa de veraneio";
+    if (key.includes("combustivel")) return "preços de combustível";
     if (key.includes("promoc")) return "promoção";
     if (key.includes("produto")) return "produto";
     if (key.includes("servico")) return "serviço";
@@ -4932,6 +4934,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     const clienteInstitucional = tipoCliente.includes("institucional");
     const clienteServico = tipoCliente.includes("servic");
     const texto = normalizeName(`${item?.titulo || ""} ${item?.acao || ""} ${item?.descricao || ""}`);
+    if (tipo.includes("casaveraneio")) return { key: "casas-veraneio", label: "Casa de veraneio", icon: "fa-umbrella-beach" };
+    if (tipo.includes("combustivel")) return { key: "combustiveis", label: "Combustível", icon: "fa-gas-pump" };
     if (tipo.includes("imovel")) return { key: "imoveis", label: "Imóvel", icon: "fa-house" };
     if (tipo.includes("veiculo") || tipo.includes("automovel")) return { key: "veiculos", label: "Veículo", icon: "fa-car" };
     if (tipo.includes("produto")) return { key: "produtos", label: "Produto", icon: "fa-box-open" };
@@ -5025,6 +5029,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   function novidadeTipoClasse(tipo, item = null) {
     const key = normalizeName(tipo || "");
+    if (key.includes("casaveraneio")) return "tipo-imovel";
+    if (key.includes("combustivel")) return "tipo-promocao";
     if (key.includes("imovel")) return "tipo-imovel";
     if (key.includes("veiculo") || key.includes("automovel")) return "tipo-veiculo";
     if (key.includes("produto")) return "tipo-produto";
@@ -5146,6 +5152,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         if (tipo.includes("produto")) return "produto";
         if (tipo.includes("servico")) return "servico";
         if (tipo.includes("promoc")) return "promocao";
+        if (tipo.includes("casaveraneio")) return "imovel";
+        if (tipo.includes("combustivel")) return "preco";
         if (tipo.includes("imovel")) return "imovel";
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return "automovel";
         if (tipo.includes("vaga")) return "vaga";
@@ -5171,6 +5179,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       const liveServicos = new Set();
       const liveAutomoveis = new Set();
       const liveImoveis = new Set();
+      const liveCasasVeraneio = new Set();
+      const liveCombustiveis = new Set();
       const liveEventos = new Set();
       const liveVagas = new Set();
       const clienteEstaPublico = (...ids) => {
@@ -5413,6 +5423,73 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
         });
       } catch (e) { }
 
+      try {
+        const [casasVeraneio, combustiveisConfig] = await Promise.all([
+          carregarCasasVeraneioFirebase(),
+          fuelPublicEnsureConfig().catch(() => fuelPublicConfig())
+        ]);
+        (casasVeraneio || []).forEach((casa) => {
+          const id = String(casa.id || "");
+          if (!id) return;
+          liveCasasVeraneio.add(id);
+          const criadoMs = novidadeCidadeMs(casa.createdAt || casa.criadoEm);
+          const atualizadoMs = novidadeCidadeMs(casa.updatedAt || casa.atualizadoEm);
+          const dataMs = atualizadoMs || criadoMs;
+          if (!dataMs) return;
+          const atualizado = Boolean(atualizadoMs && criadoMs && atualizadoMs > criadoMs + 1000);
+          geradas.push(montarNovidadeRecord({
+            ...casa,
+            id: `casa-veraneio-${id}`,
+            tipo: "casa_veraneio",
+            novidadeTema: "imovel",
+            titulo: atualizado ? "Casa de veraneio atualizada" : "Nova casa de veraneio cadastrada",
+            acao: atualizado ? "Casa de veraneio atualizada" : "Casa de veraneio inserida",
+            descricao: casa.descricao || (atualizado ? "Casa de veraneio atualizada" : "Casa de veraneio inserida"),
+            tituloConteudo: casa.titulo || casa.nome || "Casa de veraneio",
+            estabelecimento: casa.clienteNome || casa.responsavel || "",
+            imagem: casa.imagem || casa.imagens?.[0] || "",
+            imagens: casa.imagens || (casa.imagem ? [casa.imagem] : []),
+            dataCriacao: dataMs,
+            destinoTipo: "casa_veraneio",
+            destinoId: id,
+            itemId: id,
+            telefone: casa.whatsapp || casa.telefone || "",
+            valor: casa.valorDiaria || ""
+          }));
+        });
+        fuelPublicStations(combustiveisConfig || {}).forEach((station) => {
+          const stationId = String(station.codigoSIMP || station.id || "");
+          if (!stationId) return;
+          liveCombustiveis.add(stationId);
+          const criadoMs = novidadeCidadeMs(station.createdAt || station.criadoEm);
+          const produtoMs = Object.values(station.combustiveis || {}).reduce((latest, product) => Math.max(
+            latest,
+            novidadeCidadeMs(product?.atualizadoEmTimestamp || product?.updatedAt || product?.promocao?.atualizadoEmTimestamp) || 0
+          ), 0);
+          const atualizadoMs = Math.max(novidadeCidadeMs(station.updatedAt || station.atualizadoEm) || 0, produtoMs);
+          const dataMs = atualizadoMs || criadoMs;
+          if (!dataMs) return;
+          const atualizado = Boolean(atualizadoMs && (!criadoMs || atualizadoMs > criadoMs + 1000));
+          geradas.push(montarNovidadeRecord({
+            ...station,
+            id: `combustivel-${stationId}`,
+            tipo: "combustivel",
+            novidadeTema: "preco",
+            titulo: atualizado ? "Preços de combustíveis atualizados" : "Novo posto de combustível cadastrado",
+            acao: atualizado ? "Preços de combustíveis atualizados" : "Posto de combustível inserido",
+            descricao: atualizado ? "Consulte os preços atualizados" : "Novo posto disponível na consulta de preços",
+            tituloConteudo: station.nomeExibicao || station.razaoSocial || "Posto de combustível",
+            estabelecimento: station.nomeExibicao || station.razaoSocial || "Posto de combustível",
+            imagem: station.imagem || "",
+            dataCriacao: dataMs,
+            destinoTipo: "combustivel",
+            destinoId: stationId,
+            itemId: stationId,
+            categoria: "Combustíveis"
+          }));
+        });
+      } catch (e) { }
+
       const novidadeDestinoExiste = (item) => {
         const tipo = normalizeName(item.destinoTipo || item.tipo || "");
         const textoNovidade = normalizeName(`${item.tipo || ""} ${item.titulo || ""} ${item.descricao || ""}`);
@@ -5439,6 +5516,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
           if (itemId && liveServicos.has(normalizeName(item.destinoId || "") + "|" + itemId)) return true;
           return itemId ? liveServicos.has(itemId) : true;
         }
+        if (tipo.includes("casaveraneio")) return liveCasasVeraneio.has(String(item.destinoId || item.raw?.itemId || ""));
+        if (tipo.includes("combustivel")) return liveCombustiveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("veiculo") || tipo.includes("automovel")) return liveAutomoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("imovel")) return liveImoveis.has(String(item.destinoId || item.raw?.itemId || ""));
         if (tipo.includes("evento")) return liveEventos.has(String(item.destinoId || item.raw?.itemId || "")) || liveEventos.has(normalizeName(item.tituloConteudo || item.raw?.tituloConteudo || item.descricao || item.estabelecimento || item.titulo || ""));
@@ -5498,6 +5577,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       ["produtos", "Produtos"],
       ["promocoes", "Promoções"],
       ["imoveis", "Imóveis"],
+      ["casas-veraneio", "Casas de veraneio"],
+      ["combustiveis", "Combustíveis"],
       ["veiculos", "Veículos"],
       ["servicos", "Serviços"]
     ];
@@ -5650,7 +5731,15 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       if (!texto || /^undefined|null|nan$/i.test(texto)) return;
       infos.push({ icon, principal: texto, secundario: secundario || "" });
     };
-    if (tipo.includes("imovel")) {
+    if (tipo.includes("casaveraneio")) {
+      add("fa-location-dot", novidadeValorCampo(item, ["endereco", "bairro", "cidade"]) || "Carlópolis - PR", "Localização");
+      add("fa-users", novidadeValorCampo(item, ["hospedes", "capacidadeHospedes", "capacidade"]), "Hóspedes");
+      add("fa-calendar-check", "Consulte a disponibilidade", "Reservas");
+    } else if (tipo.includes("combustivel")) {
+      add("fa-gas-pump", item.estabelecimento || novidadeTituloDestino(item), "Posto");
+      add("fa-location-dot", novidadeValorCampo(item, ["endereco", "bairro", "cidade"]) || "Carlópolis - PR", "Localização");
+      add("fa-clock", "Preços atualizados", "Consulte os valores");
+    } else if (tipo.includes("imovel")) {
       add("fa-location-dot", novidadeValorCampo(item, ["endereco", "bairro", "local"]) || "Carlópolis", novidadeValorCampo(item, ["cidade"]) || "Carlópolis - PR");
       add("fa-star", novidadeValorCampo(item, ["caracteristica", "outros", "procura", "tipo"]), "Destaque");
       const area = novidadeValorCampo(item, ["area", "metragem", "construcao", "areaConstruida"]);
@@ -5689,6 +5778,8 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   function novidadeIconeAcao(tipo) {
     const key = normalizeName(tipo || "");
+    if (key.includes("casaveraneio")) return "fa-umbrella-beach";
+    if (key.includes("combustivel")) return "fa-gas-pump";
     if (key.includes("imovel")) return "fa-house";
     if (key.includes("veiculo") || key.includes("automovel")) return "fa-car";
     if (key.includes("promoc")) return "fa-tag";
@@ -5848,6 +5939,13 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   async function abrirDestinoNovidadeCidade(item) {
     const tipo = normalizeName(novidadeEhEvento(item) ? "evento" : (item.destinoTipo || item.tipo || ""));
+    if (tipo.includes("casaveraneio")) {
+      await Promise.resolve(mostrarCasasVeraneio());
+      return destacarDestinoNovidade(`[data-vacation-id="${CSS.escape(String(item.destinoId || item.itemId || ""))}"]`);
+    }
+    if (tipo.includes("combustivel")) {
+      return mostrarCombustivel();
+    }
     if (tipo.includes("promoc")) {
       location.hash = item.destinoId ? `#promocoes-${item.destinoId}` : "#promocoes";
       await Promise.resolve(mostrarPromocoes(item.destinoId || "todos"));

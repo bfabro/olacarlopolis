@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 711,
-  label: "v718",
+  numero: 712,
+  label: "v719",
   data: "2026-09-03",
-  nota: "Calendario publico inicia contato por data disponivel e imagens mobile seguem o padrao de Imoveis."
+  nota: "Novidades incluem casas de veraneio e combustiveis; responsaveis por locacao podem ter mensalidade."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -1125,7 +1125,7 @@ function isBillableClientType(clientOrType = "") {
       ? clientOrType
       : (clientOrType?.tipoCliente || clientOrType?.tipo || "")
   );
-  return type === "comercio" || type === "servico";
+  return type === "comercio" || type === "servico" || type === "responsavel_locacao";
 }
 
 function isCategorylessClientType(clientOrType = "") {
@@ -9171,6 +9171,8 @@ function imagemPrincipalNovidade(payload = {}) {
 
 function tituloConteudoNovidadeAdmin(tipo, payload = {}) {
   const key = normalizeName(tipo || "");
+  if (key.includes("casaveraneio")) return payload.titulo || payload.nome || "Casa de veraneio";
+  if (key.includes("combustivel")) return payload.nomeExibicao || payload.razaoSocial || payload.nome || "Posto de combustível";
   if (key.includes("veiculo") || key.includes("automovel")) return [payload.marca, payload.modelo, payload.ano].filter(Boolean).join(" ") || "Veiculo";
   if (key.includes("imovel")) return payload.titulo || payload.endereco || "Imovel";
   if (key.includes("produto")) return payload.titulo || payload.nome || "Produto";
@@ -9184,6 +9186,8 @@ function tituloConteudoNovidadeAdmin(tipo, payload = {}) {
 
 function acaoNovidadeAdmin(tipo, isNew, payload = {}, original = {}) {
   const key = normalizeName(tipo || "");
+  if (key.includes("casaveraneio")) return isNew ? "Casa de veraneio inserida" : "Casa de veraneio atualizada";
+  if (key.includes("combustivel")) return isNew ? "Posto de combustível inserido" : "Preços de combustíveis atualizados";
   if (key.includes("veiculo") || key.includes("automovel")) {
     if (isNew) return "Veiculo inserido";
     const antes = numberFromMoney(original.preco || original.valor || "");
@@ -9232,6 +9236,8 @@ function novidadeTopicFromPayload(payload = {}) {
   if (payload.novidadeTema && NOVIDADES_TOPICS[payload.novidadeTema]) return payload.novidadeTema;
   const tipo = normalizeName(payload.destinoTipo || payload.tipo || "");
   const acao = normalizeName(`${payload.acao || ""} ${payload.titulo || ""}`);
+  if (tipo.includes("casaveraneio")) return "imovel";
+  if (tipo.includes("combustivel")) return "preco";
   if (acao.includes("preco")) return "preco";
   if (tipo.includes("servico")) return "servico";
   if (tipo.includes("produto")) return "produto";
@@ -15164,7 +15170,27 @@ async function saveVacationRental(event) {
       : [...state.vacationRentalImages, ...uploaded];
     payload.imagem = payload.imagens[0] || "";
     payload.createdAt = original?.createdAt || serverTimestamp();
+    payload.updatedAt = serverTimestamp();
     await set(ref(db, "conteudosInformativos/casasVeraneio/" + id), payload);
+    const acao = acaoNovidadeAdmin("casa_veraneio", !original, payload, original || {});
+    await registrarNovidadeAdmin({
+      tipo: "casa_veraneio",
+      novidadeTema: "imovel",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("casa_veraneio", payload),
+      estabelecimento: payload.clienteNome || vacationRentalClient(payload)?.nome || "",
+      imagem: imagemPrincipalNovidade(payload),
+      imagens: payload.imagens || [],
+      valor: payload.valorDiaria || "",
+      categoria: "Casas de veraneio",
+      destinoTipo: "casa_veraneio",
+      destinoId: id,
+      itemId: id,
+      clienteId: payload.clienteId || "",
+      telefone: payload.whatsapp || payload.telefone || ""
+    });
     showToast(original ? "Propriedade atualizada." : "Propriedade cadastrada.");
     resetVacationRentalForm();
     await loadAllData();
@@ -21752,6 +21778,21 @@ async function saveFuelAdminSettings() {
   const cidade = $("fuelAdminCity")?.value.trim().toUpperCase();
   const uf = $("fuelAdminUf")?.value.trim().toUpperCase();
   if (!cidade || uf.length !== 2) { showToast("Informe uma cidade e UF válidas."); return; }
+  const currentStations = fuelAdminStationMap();
+  const nextStations = collectFuelAdminStationsFromForm();
+  const changedStationIds = Object.entries(nextStations)
+    .filter(([id, station]) => JSON.stringify(currentStations[id] || null) !== JSON.stringify(station))
+    .map(([id]) => id);
+  const timestamp = Date.now();
+  changedStationIds.forEach((id) => {
+    const original = currentStations[id] || {};
+    nextStations[id] = {
+      ...nextStations[id],
+      createdAt: original.createdAt || timestamp,
+      updatedAt: timestamp,
+      updatedBy: state.user?.uid || ""
+    };
+  });
   const payload = {
     ativo: $("fuelAdminActive")?.checked === true,
     cidade,
@@ -21760,8 +21801,8 @@ async function saveFuelAdminSettings() {
     menorPrecoAutomatico: $("fuelAdminMenorPrecoAutomatico")?.checked !== false,
     menorPrecoIntervaloMinutos: [15, 30, 60].includes(Number($("fuelAdminMenorPrecoIntervaloMinutos")?.value)) ? Number($("fuelAdminMenorPrecoIntervaloMinutos").value) : 60,
     menorPrecoRaioKm: Number(state.combustiveisConfig?.menorPrecoRaioKm || 10),
-    postos: collectFuelAdminStationsFromForm(),
-    updatedAt: Date.now(),
+    postos: nextStations,
+    updatedAt: timestamp,
     updatedBy: state.user?.uid || ""
   };
   try {
@@ -21772,6 +21813,26 @@ async function saveFuelAdminSettings() {
     });
     await update(ref(db, "configuracoes/combustiveis"), updates);
     state.combustiveisConfig = { ...state.combustiveisConfig, ...payload };
+    for (const stationId of changedStationIds) {
+      const station = nextStations[stationId];
+      if (!station || station.ativo === false) continue;
+      const isNewStation = !currentStations[stationId];
+      const acao = acaoNovidadeAdmin("combustivel", isNewStation, station, currentStations[stationId] || {});
+      await registrarNovidadeAdmin({
+        tipo: "combustivel",
+        novidadeTema: "preco",
+        titulo: acao,
+        acao,
+        descricao: acao,
+        tituloConteudo: tituloConteudoNovidadeAdmin("combustivel", station),
+        estabelecimento: station.nomeExibicao || station.razaoSocial || "Posto de combustível",
+        imagem: station.imagem || "",
+        categoria: "Combustíveis",
+        destinoTipo: "combustivel",
+        destinoId: stationId,
+        itemId: stationId
+      });
+    }
     renderFuelAdminSettings();
     showToast("Configuração de combustíveis salva e publicada.");
   } catch (error) {
@@ -21980,10 +22041,27 @@ async function saveFuelClientPrices(event) {
       updates[`${base}/preco`] = price; updates[`${base}/atualizadoEm`] = date; updates[`${base}/atualizadoEmTimestamp`] = timestamp; updates[`${base}/origemAtualizacao`] = "painel"; updates[`${base}/promocao`] = promotion;
       changes[productId] = { nome: current.nome || productId, precoAnterior: Number(current.preco || 0), precoNovo: price, promocaoAnterior: fuelPanelPromotion(current.promocao), promocaoNova: promotion };
     });
+    updates[`configuracoes/combustiveis/postos/${stationId}/updatedAt`] = timestamp;
+    updates[`configuracoes/combustiveis/postos/${stationId}/updatedBy`] = state.user?.uid || "";
     const historyId = push(ref(db, `combustiveisHistorico/${stationId}`)).key;
     const history = { postoId: stationId, postoNome: station.nomeExibicao || station.razaoSocial || "Posto", origem: "painel", viaLink: false, responsavelNome: responsible, uid: state.user?.uid || "", email: state.user?.email || "", atualizadoEm: date, atualizadoEmTimestamp: timestamp, precos: prices, alteracoes: changes };
     updates[`combustiveisHistorico/${stationId}/${historyId}`] = history;
     await update(ref(db), updates);
+    const acao = acaoNovidadeAdmin("combustivel", false, station, station);
+    await registrarNovidadeAdmin({
+      tipo: "combustivel",
+      novidadeTema: "preco",
+      titulo: acao,
+      acao,
+      descricao: acao,
+      tituloConteudo: tituloConteudoNovidadeAdmin("combustivel", station),
+      estabelecimento: station.nomeExibicao || station.razaoSocial || "Posto de combustível",
+      imagem: station.imagem || "",
+      categoria: "Combustíveis",
+      destinoTipo: "combustivel",
+      destinoId: stationId,
+      itemId: stationId
+    });
     Object.entries(prices).forEach(([productId, price]) => { const target = state.combustiveisConfig.postos?.[stationId]?.combustiveis?.[productId]; if (target) Object.assign(target, { preco: price, atualizadoEm: date, atualizadoEmTimestamp: timestamp, origemAtualizacao: "painel", promocao: fuelClientPromotions[productId] ? { ...fuelClientPromotions[productId], responsavelNome: responsible, atualizadoEmTimestamp: timestamp } : null }); });
     state.combustiveisHistorico[stationId] = { ...(state.combustiveisHistorico[stationId] || {}), [historyId]: history };
     renderFuelClientPrices(); showToast("Precos atualizados e registrados no historico.");

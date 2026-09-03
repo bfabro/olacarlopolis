@@ -46,6 +46,20 @@ test("responsavel por locacao e salvo como cliente sem categoria", () => {
   assert.match(adminJs, /syncClientCategoryByType/);
 });
 
+test("responsavel por casa de veraneio pode ter cobranca mensal opcional", () => {
+  assert.match(adminJs, /function isBillableClientType[\s\S]*responsavel_locacao/);
+  assert.match(adminHtml, /id="clientPaymentStatus"[\s\S]*value="isento"/);
+});
+
+test("casas de veraneio e combustiveis publicam novidades e abrem seus destinos", () => {
+  assert.match(adminJs, /registrarNovidadeAdmin\(\{[\s\S]*tipo: "casa_veraneio"/);
+  assert.match(adminJs, /registrarNovidadeAdmin\(\{[\s\S]*tipo: "combustivel"/);
+  assert.match(publicJs, /key: "casas-veraneio", label: "Casa de veraneio"/);
+  assert.match(publicJs, /key: "combustiveis", label: "Combustível"/);
+  assert.match(publicJs, /tipo\.includes\("casaveraneio"\)[\s\S]*mostrarCasasVeraneio/);
+  assert.match(publicJs, /tipo\.includes\("combustivel"\)[\s\S]*mostrarCombustivel/);
+});
+
 test("mobile compacto usa dois cards por linha", () => {
   assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\)/);
 });
@@ -214,7 +228,7 @@ test("cards publicos avancam automaticamente e permitem gesto lateral sem setas 
 
 test("cards das casas repetem as alturas de Imoveis e disponibilidade respeita as bordas", () => {
   assert.match(publicCss, /\.vacation-public-page\.is-compact \.vacation-public-media,[\s\S]*height: 170px;[\s\S]*min-height: 170px;/);
-  assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*\.vacation-public-page \.vacation-public-media,[\s\S]*height: 130px;[\s\S]*min-height: 130px;/);
+  assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*\.vacation-public-page \.vacation-public-media,[\s\S]*height: 400px;[\s\S]*min-height: 100px;/);
   assert.match(publicCss, /\.vacation-public-actions \.vacation-calendar-action \{[\s\S]*min-width: 0;[\s\S]*max-width: 100%;/);
   assert.match(publicCss, /\.vacation-public-page\.is-compact \.vacation-public-actions \.vacation-calendar-action \{[\s\S]*flex: 0 0 42px;/);
 });
