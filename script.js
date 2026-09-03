@@ -14536,6 +14536,18 @@ plotarPinsImoveis(stateImoveis.filtered);
     return "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
   }
 
+  function registrarCliqueCasaVeraneio(tipo, item = {}, detalhes = {}) {
+    const responsavel = item.clienteId || item.clienteNome || item.responsavel || "";
+    if (!responsavel || typeof registrarCliqueBotao !== "function") return Promise.resolve({ ok: false });
+    return registrarCliqueBotao(`casa_veraneio_${tipo}`, responsavel, "casas-veraneio", {
+      casaVeraneioId: item.id || "",
+      codRef: item.id || "",
+      tituloConteudo: item.titulo || "Casa de veraneio",
+      acao: tipo,
+      ...detalhes
+    }).catch(() => ({ ok: false }));
+  }
+
   function vacationPublicImages(item) {
     const images = Array.isArray(item.imagens) ? item.imagens.filter(Boolean) : [];
     if (item.imagem && !images.includes(item.imagem)) images.unshift(item.imagem);
@@ -14562,6 +14574,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       ? "Confira esta hospedagem no Olá Carlópolis: " + title
       : "Confira as casas de veraneio disponíveis no Olá Carlópolis.";
     const url = vacationPublicShareUrl(item?.id || "");
+    if (item) registrarCliqueCasaVeraneio("compartilhamento", item);
     try {
       if (navigator.share) {
         await navigator.share({ title, text, url });
@@ -14606,7 +14619,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener" data-vacation-schedule-contact><i class="fa-brands fa-whatsapp"></i> Entrar em contato</a>' : '<button type="button" disabled>Contato indisponível</button>') + '</div></section>';
     const close = () => prompt.remove();
     prompt.querySelectorAll("[data-vacation-schedule-close]").forEach((button) => button.addEventListener("click", close));
-    prompt.querySelector("[data-vacation-schedule-contact]")?.addEventListener("click", closeVacationAvailabilityCalendar);
+    prompt.querySelector("[data-vacation-schedule-contact]")?.addEventListener("click", () => {
+      registrarCliqueCasaVeraneio("agendamento", item, { dataAgendamento: date });
+      closeVacationAvailabilityCalendar();
+    });
     prompt.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
     document.body.appendChild(prompt);
     prompt.querySelector("[data-vacation-schedule-contact], [data-vacation-schedule-close]")?.focus();
@@ -14614,6 +14630,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function openVacationAvailabilityCalendar(item) {
     closeVacationAvailabilityCalendar();
+    registrarCliqueCasaVeraneio("disponibilidade", item);
     const availability = vacationAvailabilityData(item);
     let visibleMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
     const modal = document.createElement("div");
@@ -14821,7 +14838,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           '<button type="button" class="vacation-detail-action" data-vacation-detail="' + vacationPublicEscape(item.id) + '" aria-label="Ver detalhes de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-eye"></i><span> Ver detalhes</span></button>' +
           '<button type="button" class="vacation-share-action" data-vacation-share="' + vacationPublicEscape(item.id) + '" aria-label="Compartilhar ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-share-nodes"></i><span> Compartilhar</span></button>' +
           '<button type="button" class="vacation-calendar-action" data-vacation-calendar="' + vacationPublicEscape(item.id) + '" aria-label="Ver disponibilidade de ' + vacationPublicEscape(item.titulo || "hospedagem") + '"><i class="fa-solid fa-calendar-days"></i><span> Disponibilidade</span></button>' +
-          (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i><span> Consultar</span></a>' : "") +
+          (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener" data-vacation-contact="' + vacationPublicEscape(item.id) + '"><i class="fa-brands fa-whatsapp"></i><span> Consultar</span></a>' : "") +
         '</div>' +
       '</div>' +
     '</article>';
@@ -14887,6 +14904,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function openVacationPublicModal(item) {
     closeVacationPublicModal();
+    registrarCliqueCasaVeraneio("detalhes", item);
     const images = vacationPublicImages(item);
     const whatsapp = vacationPublicWhatsapp(item);
     const price = vacationPublicMoney(item.valorDiaria);
@@ -14931,16 +14949,19 @@ plotarPinsImoveis(stateImoveis.filtered);
         (item.disponibilidade ? '<section><h3>Disponibilidade</h3><p>' + vacationPublicEscape(item.disponibilidade) + '</p></section>' : "") +
         '<section><h3>Contato</h3><p><strong>' + vacationPublicEscape(item.responsavel || item.clienteNome || "") + '</strong></p></section>' +
       '</div><footer>' +
-        (item.googleMapsUrl ? '<a class="vacation-maps-action" href="' + vacationPublicEscape(item.googleMapsUrl) + '" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Abrir no Maps</a>' : "") +
-        (whatsapp ? '<a class="vacation-whatsapp-action" href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Entrar em contato</a>' : "") +
+        (item.googleMapsUrl ? '<a class="vacation-maps-action" data-vacation-modal-maps href="' + vacationPublicEscape(item.googleMapsUrl) + '" target="_blank" rel="noopener"><i class="fa-solid fa-map-location-dot"></i> Abrir no Maps</a>' : "") +
+        (whatsapp ? '<a class="vacation-whatsapp-action" data-vacation-modal-contact href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener"><i class="fa-brands fa-whatsapp"></i> Entrar em contato</a>' : "") +
       '</footer></section>';
     document.body.appendChild(modal);
     document.body.classList.add("vacation-modal-open");
     vacationUpdateSeo(item);
     modal.querySelectorAll("[data-vacation-close]").forEach((button) => button.addEventListener("click", closeVacationPublicModal));
     modal.querySelectorAll("[data-vacation-large-image]").forEach((button) => button.addEventListener("click", () => {
+      registrarCliqueCasaVeraneio("fotos", item);
       openVacationImageViewer(images, Number(button.dataset.vacationLargeImage), item.titulo || "Hospedagem");
     }));
+    modal.querySelector("[data-vacation-modal-maps]")?.addEventListener("click", () => registrarCliqueCasaVeraneio("maps", item));
+    modal.querySelector("[data-vacation-modal-contact]")?.addEventListener("click", () => registrarCliqueCasaVeraneio("whatsapp", item));
     modal.querySelector("[data-vacation-close]")?.focus();
   }
 
@@ -15024,6 +15045,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       listBox.querySelectorAll("[data-vacation-calendar]").forEach((button) => button.addEventListener("click", () => {
         const item = rentals.find((entry) => entry.id === button.dataset.vacationCalendar);
         if (item) openVacationAvailabilityCalendar(item);
+      }));
+      listBox.querySelectorAll("[data-vacation-contact]").forEach((link) => link.addEventListener("click", () => {
+        const item = rentals.find((entry) => entry.id === link.dataset.vacationContact);
+        if (item) registrarCliqueCasaVeraneio("whatsapp", item);
       }));
       listBox.querySelectorAll("[data-vacation-card-gallery]").forEach(bindVacationCardGallery);
     };
