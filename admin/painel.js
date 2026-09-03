@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 719,
-  label: "v726",
+  numero: 720,
+  label: "v727",
   data: "2026-09-03",
-  nota: "Casas de veraneio ganham cards no relatorio, referencias sequenciais e tabelas inicialmente recolhidas."
+  nota: "Relatorios exibem somente areas publicas reais, habilitadas e contabilizaveis para cada cliente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -19072,6 +19072,18 @@ function clientReportHasPermission(client = {}, permission = "") {
   return Boolean(clientReportPermissions(client)[permission]);
 }
 
+function clientReportHasPublicProfile(client = {}) {
+  const category = String(client.categoria || client.category || client.categoriaId || "").trim();
+  const status = normalizeName(client.status || "ativo");
+  const explicitlyHidden = client.paginaPublicaAtiva === false
+    || client.exibirNoSite === false
+    || client.visivelNoSite === false;
+  return Boolean(category)
+    && !isCategorylessClientType(client)
+    && !explicitlyHidden
+    && !["inativo", "inativa", "inactive"].includes(status);
+}
+
 function clientReportResourceAllowed(category = "", client = currentClientRecord() || {}) {
   const normalized = normalizeName(category);
   if (/casaveraneio|casasveraneio/.test(normalized)) return clientReportHasPermission(client, "casas_veraneio");
@@ -19212,6 +19224,7 @@ function renderClientReportMonitorSection({ title = "", icon = "fa-chart-column"
 }
 
 function clientReportAvailability(client = {}, counts = {}) {
+  const hasPublicProfile = clientReportHasPublicProfile(client);
   const hasContacts = normalizeClientContactDetails(client).length > 0;
   const hasImages = Boolean(client.imagem || client.image || normalizeImageItems(client.imagens).length);
   const hasMenu = clientReportMenuEnabled(client);
@@ -19224,27 +19237,27 @@ function clientReportAvailability(client = {}, counts = {}) {
   const hasVeiculos = clientReportHasPermission(client, "veiculos");
   const hasVacationRentals = clientReportHasPermission(client, "casas_veraneio");
   return {
-    whats: hasContacts,
+    whats: hasPublicProfile && hasContacts,
     whatsappPromocao: hasPromotions,
     cardapios: hasMenu,
-    fotos: clientReportHasPermission(client, "imagens") && hasImages,
-    novidades: Number(counts.novidades || 0) > 0,
-    perfil: true,
+    fotos: hasPublicProfile && clientReportHasPermission(client, "imagens") && hasImages,
+    novidades: hasPublicProfile && Number(counts.novidades || 0) > 0,
+    perfil: hasPublicProfile,
     imoveis: hasImoveis,
     veiculos: hasVeiculos,
     casasVeraneio: hasVacationRentals,
     servicos: clientReportHasPermission(client, "servicos"),
-    destaques: Number(counts.destaques || 0) > 0,
+    destaques: hasPublicProfile && Number(counts.destaques || 0) > 0,
     promocoes: clientReportHasPermission(client, "promocoes") && hasPromotions,
-    gruposWhatsapp: hasWhatsappGroup,
-    instagram: Boolean(String(client.instagram || "").trim()),
-    facebook: Boolean(String(client.facebook || "").trim()),
-    tiktok: Boolean(String(client.tiktok || "").trim()),
-    youtube: Boolean(String(client.youtube || "").trim()),
-    site: Boolean(String(client.site || "").trim()),
-    outrasRedes: Number(counts.outrasRedes || 0) > 0,
-    compartilhamentos: true,
-    outros: Number(counts.outros || 0) > 0
+    gruposWhatsapp: hasPublicProfile && hasWhatsappGroup,
+    instagram: hasPublicProfile && Boolean(String(client.instagram || "").trim()),
+    facebook: hasPublicProfile && Boolean(String(client.facebook || "").trim()),
+    tiktok: hasPublicProfile && Boolean(String(client.tiktok || "").trim()),
+    youtube: hasPublicProfile && Boolean(String(client.youtube || "").trim()),
+    site: hasPublicProfile && Boolean(String(client.site || "").trim()),
+    outrasRedes: hasPublicProfile && Number(counts.outrasRedes || 0) > 0,
+    compartilhamentos: hasPublicProfile,
+    outros: hasPublicProfile && Number(counts.outros || 0) > 0
   };
 }
 
@@ -19392,7 +19405,7 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
   const ondeComerTotal = ondeComerCardapios + ondeComerWhats + ondeComerFotos + ondeComerInstagram
     + ondeComerEndereco + ondeComerHorarios + ondeComerImagem + ondeComerOutros;
   const ondeComerAtivo = clientReportOndeComerEnabled(client);
-  const ondeComerEntries = [
+  const ondeComerEntries = ondeComerAtivo ? [
     { label: "Onde Comer - Cardapio", count: ondeComerCardapios, note: "Cliques no cardapio", available: clientReportMenuEnabled(client) },
     { label: "Onde Comer - WhatsApp", count: ondeComerWhats, note: "Cliques nos contatos", available: normalizeClientContactDetails(client).length > 0 },
     { label: "Onde Comer - Fotos", count: ondeComerFotos, note: "Aberturas da galeria de fotos", available: normalizeImageItems(client.novidadesImages).length > 0 },
@@ -19401,21 +19414,21 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
     { label: "Onde Comer - Horarios", count: ondeComerHorarios, note: "Consultas aos dias e horarios", available: Boolean(client.funcionamento24Horas || client.horarios || client.hours) },
     { label: "Onde Comer - Imagem", count: ondeComerImagem, note: "Cliques na imagem do estabelecimento", available: Boolean(client.imagem || client.image) },
     { label: "Onde Comer - Outros", count: ondeComerOutros, note: "Outros controles desta tela", available: false }
-  ].filter((entry) => entry.count > 0 || (ondeComerAtivo && entry.available));
+  ].filter((entry) => entry.count > 0 || entry.available) : [];
   const cardapioEntries = canShowCardapioReport
     ? [{ label: "Aberturas do cardapio", count: cardapios, note: "Cliques na opcao Cardapio" }]
     : [];
   const produtosAtivo = clientReportHasPermission(client, "produtos");
-  const produtosEntries = [
+  const produtosEntries = produtosAtivo ? [
     { label: "Aberturas de Produtos", count: produtosAberturas, note: "Cliques para abrir a aba" },
     { label: "Produtos visualizados", count: produtoVisualizacoes, note: "Aberturas dos detalhes" },
     { label: "WhatsApp dos produtos", count: produtoWhatsapp, note: "Cliques em Tenho interesse" },
     { label: "Fotos dos produtos", count: produtoFotos, note: "Cliques e navegacao nas imagens" },
     { label: "Compartilhamentos", count: produtoCompartilhamentos, note: "Cliques para compartilhar produto" },
     { label: "Outras interacoes", count: produtoOutros, note: "Outros controles de Produtos" }
-  ].filter((entry) => entry.count > 0 || (produtosAtivo && entry.label !== "Outras interacoes"));
+  ].filter((entry) => entry.count > 0 || entry.label !== "Outras interacoes") : [];
   const servicosAtivo = clientReportHasPermission(client, "servicos");
-  const servicosEntries = [
+  const servicosEntries = servicosAtivo ? [
     { label: "Aberturas de Servicos", count: servicosAberturas, note: "Cliques para abrir a aba" },
     { label: "Servicos visualizados", count: servicoVisualizacoes, note: "Aberturas dos detalhes" },
     { label: "WhatsApp dos servicos", count: servicoWhatsapp, note: "Cliques para solicitar orcamento" },
@@ -19423,9 +19436,9 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
     { label: "Compartilhamentos", count: servicoCompartilhamentos, note: "Cliques para compartilhar servico" },
     { label: "Links externos", count: servicoLinks, note: "Cliques nos links do servico" },
     { label: "Outras interacoes", count: servicoOutros, note: "Outros controles de Servicos" }
-  ].filter((entry) => entry.count > 0 || (servicosAtivo && entry.label !== "Outras interacoes"));
+  ].filter((entry) => entry.count > 0 || entry.label !== "Outras interacoes") : [];
   const promocoesAtivo = clientReportHasPermission(client, "promocoes");
-  const promocoesEntries = [
+  const promocoesEntries = promocoesAtivo ? [
     { label: "Aberturas de Promocoes", count: promocoesAberturas, note: "Cliques para abrir a aba" },
     { label: "Promocoes visualizadas", count: promocaoVisualizacoes, note: "Aberturas dos detalhes" },
     { label: "WhatsApp das promocoes", count: whatsappPromocao, note: "Cliques de interesse nas ofertas" },
@@ -19433,7 +19446,7 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
     { label: "Fotos das promocoes", count: promocaoFotos, note: "Cliques e navegacao nas imagens" },
     { label: "Compartilhamentos", count: promocaoCompartilhamentos, note: "Cliques para compartilhar promocao" },
     { label: "Outras interacoes", count: promocoesOutros, note: "Historico e outros controles" }
-  ].filter((entry) => entry.count > 0 || (promocoesAtivo && entry.label !== "Outras interacoes"));
+  ].filter((entry) => entry.count > 0 || entry.label !== "Outras interacoes") : [];
   const casasVeraneioEntries = availability.casasVeraneio ? [
     { label: "Detalhes visualizados", count: casasVeraneioDetalhes, note: "Aberturas dos detalhes das propriedades" },
     { label: "Fotos ampliadas", count: casasVeraneioFotos, note: "Aberturas das galerias de fotos" },
@@ -19472,7 +19485,12 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
     .map((row) => ({ ...row, categoria: clientReportCategory(row) }))
     .filter((row) => normalizeName(row.area).includes("ondecomer")
       ? ondeComerAtivo
-      : clientReportResourceAllowed(row.categoria, client));
+      : clientReportResourceAllowed(row.categoria, client))
+    .filter((row) => {
+      if (availability.perfil) return true;
+      const identity = normalizeName(`${row.area} ${row.tipo} ${row.categoria}`);
+      return /casaveraneio|imovel|veiculo|automovel|produto|servico|promoc|cardapio|ondecomer/.test(identity);
+    });
   const moduleTypes = {
     imoveis: (row) => row.categoria === "Imoveis",
     veiculos: (row) => row.categoria === "Veiculos",
@@ -19544,7 +19562,7 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
   const veiculoAccessRows = itemAccessRows.filter((row) => row.kind === "veiculo");
   const casasVeraneioAccessRows = itemAccessRows.filter((row) => row.kind === "casa_veraneio");
   const cidadesClique = aggregateClickCities(timeline);
-  const canShowOrigemAcessos = clientReportHasPermission(client, "origem_acessos");
+  const canShowOrigemAcessos = availability.perfil && clientReportHasPermission(client, "origem_acessos");
   const origemPaginaResumo = canShowOrigemAcessos
     ? aggregateClientPageOrigins(filterDailyMetrics(metricsSource.origemPaginaCliente, range), keys)
     : [];
@@ -19564,7 +19582,7 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
         "Tabela completa: clique nos titulos das colunas para ordenar"
       )}
       <div class="client-report-monitored-screens">
-        ${renderClientReportMonitorSection({
+        ${availability.perfil ? renderClientReportMonitorSection({
           title: "Pagina do cliente",
           icon: "fa-store",
           description: "Perfil, contatos, fotos, redes sociais e demais recursos da pagina principal.",
@@ -19573,7 +19591,7 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
           rangeLabel: range.label,
           timeline: commonTimeline,
           timelineTitle: "Cliques detalhados da pagina do cliente"
-        })}
+        }) : ""}
         ${canShowCardapioReport ? renderClientReportMonitorSection({
           title: "Cardapio",
           icon: "fa-utensils",

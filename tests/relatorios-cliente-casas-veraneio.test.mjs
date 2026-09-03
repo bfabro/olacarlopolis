@@ -42,3 +42,22 @@ test("propriedades recebem referencia incremental baseada no nome", () => {
   assert.match(adminJs, /await ensureVacationRentalReferenceCodes\(\)/);
   assert.match(publicJs, /codRef: item\.codRef \|\| item\.codigoReferencia \|\| item\.id/);
 });
+
+test("pagina do cliente aparece apenas quando existe area publica real", () => {
+  assert.match(adminJs, /function clientReportHasPublicProfile\(client = \{\}\)/);
+  assert.match(adminJs, /!isCategorylessClientType\(client\)/);
+  assert.match(adminJs, /perfil: hasPublicProfile/);
+  assert.match(adminJs, /availability\.perfil \? renderClientReportMonitorSection/);
+  assert.match(adminJs, /const canShowOrigemAcessos = availability\.perfil && clientReportHasPermission/);
+});
+
+test("cliente sem perfil publico mantem apenas metricas dos modulos habilitados", () => {
+  assert.match(adminJs, /if \(availability\.perfil\) return true/);
+  assert.match(adminJs, /casaveraneio\|imovel\|veiculo\|automovel\|produto\|servico\|promoc\|cardapio\|ondecomer/);
+  assert.match(adminJs, /compartilhamentos: hasPublicProfile/);
+  assert.match(adminJs, /outrasRedes: hasPublicProfile/);
+  assert.match(adminJs, /const produtosEntries = produtosAtivo \? \[/);
+  assert.match(adminJs, /const servicosEntries = servicosAtivo \? \[/);
+  assert.match(adminJs, /const promocoesEntries = promocoesAtivo \? \[/);
+  assert.match(adminJs, /const ondeComerEntries = ondeComerAtivo \? \[/);
+});
