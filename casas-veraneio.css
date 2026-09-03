@@ -985,9 +985,11 @@ body.vacation-modal-open { overflow: hidden; }
   .vacation-public-page .vacation-card-gallery-track,
   .vacation-public-page .vacation-card-gallery-slide,
   .vacation-public-page .vacation-card-gallery-slide img {
-    height: 130px;
-    min-height: 130px;
+    height: 400px;
+    min-height: 100px;
     aspect-ratio: auto;
+    border-radius: 8px;
+    object-fit: cover;
   }
 
   .vacation-schedule-card { padding: 18px 14px; }
