@@ -15,6 +15,7 @@ test("menu administrativo separa os acessos por temas coerentes", () => {
     "Anúncios e vitrines",
     "Relacionamento",
     "Gestão e relatórios",
+    "Módulos especiais",
     "Configurações do site"
   ].forEach((titulo) => assert.ok(panelHtml.includes(titulo), `grupo ausente: ${titulo}`));
 });
@@ -28,6 +29,7 @@ test("cada quadrante principal recebe uma identidade visual propria", () => {
     "nav-theme-listings",
     "nav-theme-relationship",
     "nav-theme-management",
+    "nav-theme-special",
     "nav-theme-system"
   ].forEach((classe) => {
     assert.ok(panelHtml.includes(classe), `classe ausente no menu: ${classe}`);
@@ -43,8 +45,8 @@ test("submenus do cliente alternam cores e preservam contraste nos estados", () 
 });
 
 test("ativos do painel usam as novas versoes sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.css?v=441"));
-  assert.ok(panelHtml.includes("painel.js?v=652"));
+  assert.ok(panelHtml.includes("painel.css?v=442"));
+  assert.ok(panelHtml.includes("painel.js?v=653"));
 });
 
 test("mantem a area do parceiro visivel para o perfil correspondente", () => {
@@ -52,4 +54,29 @@ test("mantem a area do parceiro visivel para o perfil correspondente", () => {
     panelJs.includes(`group.querySelector("[data-view='areaParceiro']")`),
     "o grupo da area do parceiro deve ser preservado pela regra de visibilidade"
   );
+});
+
+test("modulos especiais agrupam combustivel terrenos e xadrez", () => {
+  const group = panelHtml.match(/<section class="nav-admin-group nav-theme-special"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.ok(group.includes('data-view="combustiveisConfig"'));
+  assert.ok(group.includes('data-view="gestaoTerrenos"'));
+  assert.ok(group.includes('data-view="xadrezConfig"'));
+});
+
+test("relacionamento reune beneficios e area do parceiro", () => {
+  const group = panelHtml.match(/<section class="nav-admin-group nav-theme-relationship"[\s\S]*?<\/section>/)?.[0] || "";
+  assert.ok(group.includes('data-view="beneficios"'));
+  assert.ok(group.includes('data-view="areaParceiro"'));
+});
+
+test("produtos servicos notas e grupos possuem acessos diretos", () => {
+  assert.ok(panelHtml.includes('data-view="produtosServicosClientes"'));
+  assert.ok(panelHtml.includes('id="produtosServicosClientesView"'));
+  assert.ok(panelJs.includes("renderStaffClientCatalogView"));
+  assert.ok(panelHtml.includes('data-view="notaFalecimento"'));
+  assert.ok(panelHtml.includes('id="notaFalecimentoView"'));
+  assert.ok(panelHtml.includes('data-view="gruposWhatsapp"'));
+  assert.ok(panelHtml.includes('id="gruposWhatsappView"'));
+  assert.ok(!panelHtml.includes('data-view="informacoes"'));
+  assert.ok(!panelHtml.includes("data-info-module-target"));
 });

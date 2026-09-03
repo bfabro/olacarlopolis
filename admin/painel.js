@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 715,
-  label: "v722",
+  numero: 716,
+  label: "v723",
   data: "2026-09-03",
-  nota: "Menu lateral reorganizado por temas, com cores distintas para localizar cada grupo rapidamente."
+  nota: "Menu ampliado com modulos especiais, catalogo de clientes e acessos separados para notas e grupos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -364,6 +364,7 @@ let state = {
   storyCustomImage: "",
   pendingClientModuleTarget: "",
   selectedPromoClientId: "",
+  selectedCatalogClientId: "",
   imovelImages: [],
   imovelCsEditorItemId: "",
   imovelCsBrokerImage: "",
@@ -840,6 +841,7 @@ const views = {
   artesPostagem: $("artesPostagemView"),
   clientes: $("clientesView"),
   promocoesClientes: $("promocoesClientesView"),
+  produtosServicosClientes: $("produtosServicosClientesView"),
   categorias: $("categoriasView"),
   eventos: $("eventosView"),
   noticias: $("noticiasView"),
@@ -848,7 +850,8 @@ const views = {
   imoveisArtes: $("imoveisArtesView"),
   automoveis: $("automoveisView"),
   automoveisArtes: $("automoveisArtesView"),
-  informacoes: $("informacoesView"),
+  notaFalecimento: $("notaFalecimentoView"),
+  gruposWhatsapp: $("gruposWhatsappView"),
   financeiro: $("financeiroView"),
   gestaoTerrenos: $("gestaoTerrenosView"),
   relatorioAcessos: $("relatorioAcessosView"),
@@ -876,6 +879,7 @@ const viewCopy = {
   artesPostagem: ["Gerar postagem", "Crie postagens de produtos, promocoes e servicos com previa antes de baixar."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
+  produtosServicosClientes: ["Produtos e serviços", "Acesse diretamente as vitrines e os atendimentos cadastrados por cliente."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
   eventos: ["Eventos", "Configure eventos e divulgacoes."],
   noticias: ["Noticias", "Cadastre materias para a home e para a pagina publica de noticias."],
@@ -884,7 +888,8 @@ const viewCopy = {
   imoveisArtes: ["Artes de imoveis", "Gere imagens para Instagram a partir dos imoveis cadastrados."],
   automoveis: ["Automoveis", "Cadastre veiculos para venda no site publico."],
   automoveisArtes: ["Artes de veiculos", "Gere imagens para Instagram de um ou varios veiculos."],
-  informacoes: ["Informacoes", "Gerencie os conteudos do menu Informacoes."],
+  notaFalecimento: ["Nota de falecimento", "Cadastre, edite e remova notas publicadas no site."],
+  gruposWhatsapp: ["Grupos de WhatsApp", "Cadastre e organize os grupos divulgados no site."],
   financeiro: ["Financeiro", "Visao consolidada dos clientes e faturas."],
   gestaoTerrenos: ["Gestão de Terrenos", "Proprietários, terrenos e loteamentos."],
   relatorioAcessos: ["Relatorio Acessos", "Acessos, cliques, origens e acoes realizadas pelos usuarios."],
@@ -1185,14 +1190,21 @@ function itemBelongsToCurrentClient(item = {}) {
   return ownKeys.some((key) => candidates.some((candidate) => candidate === key || candidate.includes(key) || key.includes(candidate)));
 }
 
-function canManageInformacoes() {
+function canManageDeathNotices() {
   return hasPermission("informacoes") || hasPermission("informacoes_nota_falecimento");
+}
+
+function canManageWhatsappGroups() {
+  return hasPermission("informacoes") || hasPermission("grupos_whatsapp");
 }
 
 function canAccessView(viewName) {
   if (isBenefitPartner()) return viewName === "areaParceiro";
   if (viewName === "areaParceiro") return hasBenefitPartnerAreaAccess();
   if (viewName === "beneficios") return !isBenefitPartner();
+  if (viewName === "produtosServicosClientes") return canManageClients();
+  if (viewName === "notaFalecimento") return canManageDeathNotices();
+  if (viewName === "gruposWhatsapp") return canManageWhatsappGroups();
   if (viewName === "artesPostagem") {
     return !isBenefitPartner() && (canManageClients() || hasPermission("gerar_imagens_promocoes"));
   }
@@ -1219,7 +1231,6 @@ function canAccessView(viewName) {
   if (viewName === "automoveis") return canAccessAutomoveis();
   if (viewName === "automoveisArtes") return canGenerateVeiculoImages();
   if (viewName === "noticias") return canManageClients() || hasPermission("noticias");
-  if (viewName === "informacoes") return canManageInformacoes();
   if (viewName === "minhaEmpresa") return true;
   return false;
 }
@@ -5924,8 +5935,11 @@ function updateChrome() {
   document.querySelectorAll("[data-master='true']").forEach((el) => {
     el.classList.toggle("hidden", !isMaster());
   });
-  document.querySelectorAll("[data-permission='informacoes']").forEach((el) => {
-    el.classList.toggle("hidden", !canManageInformacoes());
+  document.querySelectorAll("[data-permission='nota_falecimento']").forEach((el) => {
+    el.classList.toggle("hidden", !canManageDeathNotices());
+  });
+  document.querySelectorAll("[data-permission='grupos_whatsapp']").forEach((el) => {
+    el.classList.toggle("hidden", !canManageWhatsappGroups());
   });
   document.querySelectorAll("[data-permission='noticias']").forEach((el) => {
     el.classList.toggle("hidden", !hasPermission("noticias"));
@@ -5959,6 +5973,10 @@ function updateChrome() {
   });
   document.querySelectorAll("[data-classified-nav='true']").forEach((el) => {
     el.classList.toggle("hidden", !canManageClients() && !hasPermission("noticias") && !canAccessImoveis() && !canGenerateImovelImages() && !canAccessAutomoveis() && !canAccessVacationRentals());
+  });
+  document.querySelectorAll("[data-relationship-nav-group='true']").forEach((group) => {
+    const hasVisibleButton = [...group.querySelectorAll("button")].some((button) => !button.classList.contains("hidden"));
+    group.classList.toggle("hidden", !hasVisibleButton);
   });
   if (isBenefitPartner()) {
     document.querySelectorAll(".nav-admin button").forEach((button) => {
@@ -8866,6 +8884,7 @@ function switchView(name) {
     renderEventsList();
   }
   if (target === "promocoesClientes") renderStaffPromocoesView();
+  if (target === "produtosServicosClientes") renderStaffClientCatalogView();
   if (target === "noticias") renderNewsAdminList();
   if (target === "imoveis") renderImoveisList();
   if (target === "casasVeraneio") renderVacationRentalsList();
@@ -8876,7 +8895,11 @@ function switchView(name) {
   if (target === "automoveisArtes") {
     renderAutomovelArteView();
   }
-  if (target === "informacoes" && !canManageInformacoes()) {
+  if (target === "notaFalecimento" && !canManageDeathNotices()) {
+    switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
+    return;
+  }
+  if (target === "gruposWhatsapp" && !canManageWhatsappGroups()) {
     switchView(canManageClients() ? "dashboard" : "minhaEmpresa");
     return;
   }
@@ -16949,7 +16972,7 @@ function renderInfoDeathNoticeList() {
 
 async function uploadInfoDeathNoticeImage(file) {
   if (!file) return;
-  if (!canManageInformacoes()) return;
+  if (!canManageDeathNotices()) return;
   const id = $("infoDeathNoticeId").value || `${slugify($("infoDeathNoticeName").value.trim() || "nota")}-${Date.now()}`;
   const path = `conteudosInformativos/notaFalecimento/${id}/${Date.now()}-${slugify(file.name || "imagem")}`;
   const fileRef = storageRef(storage, path);
@@ -17065,7 +17088,7 @@ function renderInfoWhatsappGroupsList() {
 
 async function uploadInfoWhatsappGroupImage(file) {
   if (!file) return;
-  if (!canManageInformacoes()) return;
+  if (!canManageWhatsappGroups()) return;
   const id = $("infoWhatsappGroupId").value || `${slugify($("infoWhatsappGroupName").value.trim() || "grupo")}-${Date.now()}`;
   const path = `conteudosInformativos/gruposWhatsapp/${id}/${Date.now()}-${slugify(file.name || "imagem")}`;
   const fileRef = storageRef(storage, path);
@@ -23600,6 +23623,100 @@ function renderStaffPromocoesView() {
     });
   });
 }
+
+function openStaffClientCatalogModule(clientId, moduleName) {
+  const client = state.clientes.find((item) => item.id === clientId);
+  if (!client || !canManageClients()) return;
+  switchView("clientes");
+  fillClientForm(client);
+  requestAnimationFrame(() => {
+    const fieldId = moduleName === "servicos" ? "clientServiceName" : "clientProductTitle";
+    const target = $(fieldId);
+    const section = target?.closest("[data-client-edit-section]");
+    setClientSectionExpanded(section, true);
+    section?.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+}
+
+function renderStaffClientCatalogView() {
+  const mount = $("staffCatalogMount");
+  if (!mount) return;
+  if (!canManageClients()) {
+    mount.innerHTML = `<section class="panel-card"><p>Somente master ou admin geral pode acessar os produtos e serviços dos clientes.</p></section>`;
+    return;
+  }
+
+  const clientes = [...state.clientes].sort((a, b) => String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR"));
+  if (!clientes.length) {
+    mount.innerHTML = `<section class="panel-card"><p>Nenhum cliente cadastrado ainda.</p></section>`;
+    return;
+  }
+  if (!state.selectedCatalogClientId || !clientes.some((client) => client.id === state.selectedCatalogClientId)) {
+    state.selectedCatalogClientId = clientes[0].id;
+  }
+
+  const client = clientes.find((item) => item.id === state.selectedCatalogClientId) || clientes[0];
+  const produtos = normalizeProdutos(client.produtos);
+  const servicos = normalizeServicos(client.servicos, client.id);
+  const selectedId = client.id;
+  const productNames = produtos.slice(0, 6).map((item) => `<span>${escapeHtml(item.titulo)}</span>`).join("");
+  const serviceNames = servicos.slice(0, 6).map((item) => `<span>${escapeHtml(item.nome)}</span>`).join("");
+
+  mount.innerHTML = `
+    <section class="panel-card staff-promos-panel">
+      <div class="section-head">
+        <div>
+          <h2>Produtos e serviços dos clientes</h2>
+          <p>Selecione um cliente e abra diretamente o cadastro da vitrine ou dos atendimentos oferecidos.</p>
+        </div>
+        <span class="badge">${produtos.length + servicos.length} item${produtos.length + servicos.length === 1 ? "" : "s"}</span>
+      </div>
+      <label class="wide">Cliente
+        <select id="staffCatalogClientSelect">
+          ${clientes.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === selectedId ? "selected" : ""}>${escapeHtml(item.nome || item.id)}${item.status && item.status !== "ativo" ? ` (${escapeHtml(statusLabel(item.status))})` : ""}</option>`).join("")}
+        </select>
+      </label>
+      <div class="staff-promo-client-card">
+        <img src="${escapeAttr(displayImageUrl(client.imagem || imageUrl(client.imagens && client.imagens[0])) || "../images/img_padrao_site/logo_1.png")}" alt="${escapeAttr(client.nome || "Cliente")}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
+        <div>
+          <strong>${escapeHtml(client.nome || client.id)}</strong>
+          <span>${escapeHtml(client.categoria || "Sem categoria")} - ${escapeHtml(client.contato || client.whatsapp || "Sem contato")}</span>
+        </div>
+      </div>
+    </section>
+    <div class="staff-catalog-grid">
+      <section class="panel-card staff-catalog-card is-product">
+        <div class="staff-catalog-card-icon"><i class="fa-solid fa-box-open"></i></div>
+        <div>
+          <span class="feature-kicker">Vitrine pública</span>
+          <h3>Produtos</h3>
+          <p>${produtos.length} produto${produtos.length === 1 ? "" : "s"} cadastrado${produtos.length === 1 ? "" : "s"}.</p>
+        </div>
+        <div class="staff-catalog-tags">${productNames || "<span>Nenhum produto cadastrado</span>"}</div>
+        <button type="button" data-open-staff-catalog="produtos"><i class="fa-solid fa-arrow-up-right-from-square"></i> Gerenciar produtos</button>
+      </section>
+      <section class="panel-card staff-catalog-card is-service">
+        <div class="staff-catalog-card-icon"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div>
+          <span class="feature-kicker">Atendimentos</span>
+          <h3>Serviços oferecidos</h3>
+          <p>${servicos.length} serviço${servicos.length === 1 ? "" : "s"} cadastrado${servicos.length === 1 ? "" : "s"} ${client.servicosHabilitados === true ? "e publicados" : "salvos"}.</p>
+        </div>
+        <div class="staff-catalog-tags">${serviceNames || "<span>Nenhum servico cadastrado</span>"}</div>
+        <button type="button" data-open-staff-catalog="servicos"><i class="fa-solid fa-arrow-up-right-from-square"></i> Gerenciar serviços</button>
+      </section>
+    </div>
+  `;
+
+  mount.querySelector("#staffCatalogClientSelect")?.addEventListener("change", (event) => {
+    state.selectedCatalogClientId = event.target.value;
+    renderStaffClientCatalogView();
+  });
+  mount.querySelectorAll("[data-open-staff-catalog]").forEach((button) => {
+    button.addEventListener("click", () => openStaffClientCatalogModule(selectedId, button.dataset.openStaffCatalog));
+  });
+}
+
 function serviceAdminFormHtml(prefix) {
   const imageUrlField = prefix === "co"
     ? '<input id="' + prefix + 'ServiceImageUrl" type="hidden">'
@@ -26139,15 +26256,6 @@ function bindEvents() {
     await uploadInfoWhatsappGroupImage(event.target.files?.[0]);
     event.target.value = "";
   });
-  document.querySelectorAll("[data-info-module-target]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetId = button.dataset.infoModuleTarget;
-      document.querySelectorAll("[data-info-module-target]").forEach((item) => item.classList.toggle("active", item === button));
-      document.querySelectorAll("#informacoesView .info-module-panel").forEach((panel) => {
-        panel.classList.toggle("active", panel.id === targetId);
-      });
-    });
-  });
   $("financeSearch").addEventListener("input", renderFinanceiro);
   $("financeFilter").addEventListener("change", renderFinanceiro);
   $("financePlanFilter")?.addEventListener("change", renderFinanceiro);
@@ -27159,7 +27267,7 @@ function bindEvents() {
 
   $("infoDeathNoticeForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!canManageInformacoes()) return;
+    if (!canManageDeathNotices()) return;
     const payload = getInfoDeathNoticeFormData();
     const id = payload.id;
     delete payload.id;
@@ -27181,7 +27289,7 @@ function bindEvents() {
 
   $("infoWhatsappGroupForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();
-    if (!canManageInformacoes()) return;
+    if (!canManageWhatsappGroups()) return;
     const payload = getInfoWhatsappGroupFormData();
     if (!payload.nome || !payload.link) {
       showToast("Informe nome e link do grupo.");

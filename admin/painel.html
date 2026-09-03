@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=441">
+  <link rel="stylesheet" href="painel.css?v=442">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -78,9 +78,11 @@
         <section class="nav-admin-group nav-theme-content" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-bullhorn"></i> Conteúdo público</span>
           <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
-          <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informações</button>
           <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Notícias</button>
+          <button data-view="produtosServicosClientes" data-role="staff"><i class="fa-solid fa-boxes-stacked"></i> Produtos e serviços</button>
           <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promoções</button>
+          <button data-view="notaFalecimento" data-role="staff"><i class="fa-solid fa-dove"></i> Nota de falecimento</button>
+          <button data-view="gruposWhatsapp" data-role="staff"><i class="fa-brands fa-whatsapp"></i> Grupos de WhatsApp</button>
         </section>
         <section class="nav-admin-group nav-theme-listings" data-classified-nav="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-rectangle-list"></i> Anúncios e vitrines</span>
@@ -90,18 +92,24 @@
           <button data-view="automoveisArtes" data-permission="gerar_imagens_veiculos"><i class="fa-solid fa-image"></i> Artes de automóveis</button>
           <button data-view="imoveisArtes" data-permission="gerar_imagens_imoveis"><i class="fa-solid fa-image"></i> Artes de imóveis</button>
         </section>
-        <section class="nav-admin-group nav-theme-relationship" data-role="staff">
+        <section class="nav-admin-group nav-theme-relationship" data-relationship-nav-group="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-handshake-angle"></i> Relacionamento</span>
           <button data-view="beneficios" data-role="staff"><i class="fa-solid fa-gift"></i> Benefícios</button>
+          <button data-view="areaParceiro" data-role="parceiro"><i class="fa-solid fa-handshake"></i> Área do Parceiro</button>
         </section>
         <section class="nav-admin-group nav-theme-management" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestão e relatórios</span>
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
-          <button data-view="gestaoTerrenos" data-master="true"><i class="fa-solid fa-map-location-dot"></i> Gestão de Terrenos</button>
           <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatório de acessos</button>
           <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatório financeiro</button>
           <button data-view="relatorioExclusoes" data-master="true"><i class="fa-solid fa-trash-can-arrow-up"></i> Exclusões</button>
           <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuários online</button>
+        </section>
+        <section class="nav-admin-group nav-theme-special" data-master="true">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-puzzle-piece"></i> Módulos especiais</span>
+          <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço de combustível</button>
+          <button data-view="gestaoTerrenos" data-master="true"><i class="fa-solid fa-map-location-dot"></i> Gestão de terrenos</button>
+          <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
         <section class="nav-admin-group nav-theme-system" data-master="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Configurações do site</span>
@@ -110,12 +118,6 @@
           <button data-view="integracaoPagamento" data-master="true"><i class="fa-solid fa-building-columns"></i> Integração de pagamentos</button>
           <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página inicial</button>
           <button data-view="sobreNos" data-master="true"><i class="fa-solid fa-circle-info"></i> Sobre nós</button>
-          <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</button>
-          <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
-        </section>
-        <section class="nav-admin-group nav-theme-partner" data-role="parceiro">
-          <span class="nav-admin-group-title"><i class="fa-solid fa-handshake"></i> Parcerias</span>
-          <button data-view="areaParceiro" data-role="parceiro"><i class="fa-solid fa-handshake"></i> Área do Parceiro</button>
         </section>
         <section class="nav-admin-group nav-theme-company" data-role="cliente">
           <span class="nav-admin-group-title"><i class="fa-solid fa-store"></i> Minha empresa</span>
@@ -1210,6 +1212,10 @@
         <div id="staffPromocoesMount" class="staff-promos-view"></div>
       </section>
 
+      <section id="produtosServicosClientesView" class="panel-view hidden">
+        <div id="staffCatalogMount" class="staff-promos-view"></div>
+      </section>
+
       <section id="categoriasView" class="panel-view hidden">
         <div class="split-layout">
           <section class="panel-card form-collapsed">
@@ -1800,12 +1806,8 @@
         </section>
       </section>
 
-      <section id="informacoesView" class="panel-view hidden">
-        <div class="info-module-tabs">
-          <button type="button" class="active" data-info-module-target="infoDeathNoticeModule"><i class="fa-solid fa-dove"></i> Nota de falecimento</button>
-          <button type="button" data-info-module-target="infoWhatsappGroupsModule"><i class="fa-brands fa-whatsapp"></i> Grupos WhatsApp</button>
-        </div>
-        <div id="infoDeathNoticeModule" class="split-layout info-module-panel active">
+      <section id="notaFalecimentoView" class="panel-view hidden">
+        <div class="split-layout info-admin-block">
           <section class="panel-card form-collapsed">
             <div class="section-head">
               <div>
@@ -1846,8 +1848,10 @@
             <div id="infoDeathNoticeList" class="list-area"></div>
           </section>
         </div>
+      </section>
 
-        <div id="infoWhatsappGroupsModule" class="split-layout info-admin-block info-module-panel">
+      <section id="gruposWhatsappView" class="panel-view hidden">
+        <div class="split-layout info-admin-block">
           <section class="panel-card form-collapsed">
             <div class="section-head">
               <div>
@@ -3214,6 +3218,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=652"></script>
+  <script type="module" src="painel.js?v=653"></script>
 </body>
 </html>
