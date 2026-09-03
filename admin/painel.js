@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 714,
-  label: "v721",
+  numero: 715,
+  label: "v722",
   data: "2026-09-03",
-  nota: "Responsaveis por locacao nao viram comercio, acessam Servicos quando liberados e podem receber cobranca."
+  nota: "Menu lateral reorganizado por temas, com cores distintas para localizar cada grupo rapidamente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -5964,7 +5964,9 @@ function updateChrome() {
     document.querySelectorAll(".nav-admin button").forEach((button) => {
       button.classList.toggle("hidden", button.dataset.view !== "areaParceiro");
     });
-    document.querySelectorAll(".nav-admin-group").forEach((group) => group.classList.add("hidden"));
+    document.querySelectorAll(".nav-admin-group").forEach((group) => {
+      group.classList.toggle("hidden", !group.querySelector("[data-view='areaParceiro']"));
+    });
   }
 
   const masterOption = $("newUserRole")?.querySelector("option[value='master']");

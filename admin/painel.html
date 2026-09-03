@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=440">
+  <link rel="stylesheet" href="painel.css?v=441">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -60,60 +60,69 @@
       </div>
 
       <nav class="nav-admin">
-        <button data-view="dashboard" data-role="staff" class="active"><i class="fa-solid fa-chart-line"></i> Visao geral</button>
-        <section class="nav-admin-group" data-post-art-nav-group="true">
-          <span class="nav-admin-group-title"><i class="fa-solid fa-pen-ruler"></i> Criar conteúdo</span>
-          <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar postagem</button>
+        <section class="nav-admin-group nav-theme-overview" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-house"></i> Começar</span>
+          <button data-view="dashboard" data-role="staff" class="active"><i class="fa-solid fa-chart-line"></i> Visão geral</button>
         </section>
-        <section class="nav-admin-group" data-role="staff">
+        <section class="nav-admin-group nav-theme-creation" data-post-art-nav-group="true">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Criar e divulgar</span>
+          <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar postagem</button>
+          <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-mobile-screen-button"></i> Stories comerciais</button>
+        </section>
+        <section class="nav-admin-group nav-theme-registry" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-database"></i> Cadastros</span>
           <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
           <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
-          <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuarios</button>
+          <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuários</button>
         </section>
-        <section class="nav-admin-group" data-role="staff">
-          <span class="nav-admin-group-title"><i class="fa-solid fa-bullhorn"></i> Conteudo</span>
+        <section class="nav-admin-group nav-theme-content" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-bullhorn"></i> Conteúdo público</span>
           <button data-view="eventos" data-role="staff"><i class="fa-solid fa-calendar-days"></i> Eventos</button>
-          <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informacoes</button>
-          <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promocoes</button>
+          <button data-view="informacoes" data-permission="informacoes"><i class="fa-solid fa-circle-info"></i> Informações</button>
+          <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Notícias</button>
+          <button data-view="promocoesClientes" data-role="staff"><i class="fa-solid fa-tags"></i> Promoções</button>
         </section>
-        <section class="nav-admin-group" data-classified-nav="true">
-          <span class="nav-admin-group-title"><i class="fa-solid fa-rectangle-list"></i> Classificados</span>
-          <button data-view="imoveisArtes" data-permission="gerar_imagens_imoveis"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de imoveis</button>
-          <button data-view="automoveisArtes" data-permission="gerar_imagens_veiculos"><i class="fa-solid fa-wand-magic-sparkles"></i> Artes de veiculos</button>
-          <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automoveis</button>
+        <section class="nav-admin-group nav-theme-listings" data-classified-nav="true">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-rectangle-list"></i> Anúncios e vitrines</span>
+          <button data-view="automoveis" data-permission="veiculos"><i class="fa-solid fa-car"></i> Automóveis</button>
           <button data-view="casasVeraneio" data-permission="casas_veraneio"><i class="fa-solid fa-umbrella-beach"></i> Casas de veraneio</button>
-          <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imoveis</button>
-          <button data-view="noticias" data-permission="noticias"><i class="fa-solid fa-newspaper"></i> Noticias</button>
+          <button data-view="imoveis" data-permission="imoveis"><i class="fa-solid fa-house-chimney"></i> Imóveis</button>
+          <button data-view="automoveisArtes" data-permission="gerar_imagens_veiculos"><i class="fa-solid fa-image"></i> Artes de automóveis</button>
+          <button data-view="imoveisArtes" data-permission="gerar_imagens_imoveis"><i class="fa-solid fa-image"></i> Artes de imóveis</button>
         </section>
-        <section class="nav-admin-group" data-role="staff">
-          <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestao</span>
+        <section class="nav-admin-group nav-theme-relationship" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-handshake-angle"></i> Relacionamento</span>
+          <button data-view="beneficios" data-role="staff"><i class="fa-solid fa-gift"></i> Benefícios</button>
+        </section>
+        <section class="nav-admin-group nav-theme-management" data-role="staff">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestão e relatórios</span>
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
           <button data-view="gestaoTerrenos" data-master="true"><i class="fa-solid fa-map-location-dot"></i> Gestão de Terrenos</button>
-          <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatorio Acessos</button>
-          <button data-view="relatorioExclusoes" data-master="true"><i class="fa-solid fa-trash-can-arrow-up"></i> Relatorio Exclusoes</button>
-          <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatorio Financeiro</button>
-          <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuarios online</button>
+          <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatório de acessos</button>
+          <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatório financeiro</button>
+          <button data-view="relatorioExclusoes" data-master="true"><i class="fa-solid fa-trash-can-arrow-up"></i> Exclusões</button>
+          <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuários online</button>
         </section>
-        <section class="nav-admin-group" data-master="true">
-          <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Sistema</span>
+        <section class="nav-admin-group nav-theme-system" data-master="true">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Configurações do site</span>
           <button data-view="novidadesConfig" data-master="true"><i class="fa-solid fa-bell"></i> Novidades do site</button>
           <button data-view="pagamentoSistema" data-master="true"><i class="fa-solid fa-money-check-dollar"></i> Pagamento</button>
           <button data-view="integracaoPagamento" data-master="true"><i class="fa-solid fa-building-columns"></i> Integração de pagamentos</button>
-          <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página Inicial Site</button>
+          <button data-view="paginaInicialSite" data-master="true"><i class="fa-solid fa-window-maximize"></i> Página inicial</button>
           <button data-view="sobreNos" data-master="true"><i class="fa-solid fa-circle-info"></i> Sobre nós</button>
           <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço Combustível</button>
-          <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Stories comerciais</button>
           <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
-        <button data-view="beneficios" data-role="staff"><i class="fa-solid fa-gift"></i> Benefícios</button>
-        <button data-view="areaParceiro" data-role="parceiro"><i class="fa-solid fa-handshake"></i> Área do Parceiro</button>
-        <section class="nav-admin-group" data-role="cliente">
+        <section class="nav-admin-group nav-theme-partner" data-role="parceiro">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-handshake"></i> Parcerias</span>
+          <button data-view="areaParceiro" data-role="parceiro"><i class="fa-solid fa-handshake"></i> Área do Parceiro</button>
+        </section>
+        <section class="nav-admin-group nav-theme-company" data-role="cliente">
           <span class="nav-admin-group-title"><i class="fa-solid fa-store"></i> Minha empresa</span>
           <button data-view="minhaEmpresa" data-role="cliente" data-client-root-nav="true"><i class="fa-solid fa-briefcase"></i> Minha empresa</button>
           <div id="clientModuleSidebar" class="client-module-sidebar hidden" data-role="cliente"></div>
         </section>
-        <section class="nav-admin-group" data-role="cliente">
+        <section class="nav-admin-group nav-theme-account" data-role="cliente">
           <span class="nav-admin-group-title"><i class="fa-solid fa-layer-group"></i> Conta e recursos</span>
           <button data-view="beneficios" data-benefits-client-nav="true"><i class="fa-solid fa-gift"></i> Benefícios</button>
           <button data-view="faturas" data-permission="faturas"><i class="fa-solid fa-qrcode"></i> Faturas</button>
@@ -3205,6 +3214,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=651"></script>
+  <script type="module" src="painel.js?v=652"></script>
 </body>
 </html>
