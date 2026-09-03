@@ -1,4 +1,4 @@
-/* Casas de veraneio publica - 2026-09-03_v8 */
+/* Casas de veraneio publica - 2026-09-03_v9 */
 .vacation-public-page {
   width: min(1180px, 100%);
   margin: 0 auto 40px;
@@ -663,13 +663,24 @@ body.vacation-modal-open { overflow: hidden; }
   font-weight: 800;
   text-align: center;
 }
-.vacation-availability-grid > span {
+.vacation-availability-grid > span,
+.vacation-availability-grid > button {
   display: grid;
   min-height: 46px;
   place-items: center;
   border-radius: 7px;
   color: #fff;
   font-weight: 850;
+}
+.vacation-availability-grid > button {
+  border: 0;
+  cursor: pointer;
+}
+.vacation-availability-grid > button:hover,
+.vacation-availability-grid > button:focus-visible {
+  filter: brightness(.9);
+  outline: 3px solid rgba(15, 118, 110, .28);
+  outline-offset: 1px;
 }
 .vacation-availability-grid .calendar-empty-day { background: transparent; }
 .vacation-availability-grid .is-available { background: #22a447; }
@@ -688,7 +699,8 @@ body.vacation-modal-open { overflow: hidden; }
 @media (max-width: 700px) {
   .vacation-availability-modal { padding: 8px; }
   .vacation-availability-card { max-height: 96vh; padding: 12px; }
-  .vacation-availability-grid > span { min-height: 40px; font-size: .86rem; }
+  .vacation-availability-grid > span,
+  .vacation-availability-grid > button { min-height: 40px; font-size: .86rem; }
   .vacation-availability-weekdays,
   .vacation-availability-grid { gap: 4px; }
 }
@@ -725,7 +737,7 @@ body.vacation-modal-open { overflow: hidden; }
 @media (max-width: 480px) {
   .vacation-public-filters { grid-template-columns: 1fr; }
 }
-/* Carrossel dos cards e modal mobile fluida - 2026-09-03_v8 */
+/* Carrossel dos cards e modal mobile fluida - 2026-09-03_v9 */
 .vacation-public-media {
   overflow: hidden;
   cursor: default;
@@ -811,7 +823,7 @@ body.vacation-modal-open { overflow: hidden; }
     object-fit: contain;
   }
 }
-/* Galeria publica no padrao visual de Imoveis - 2026-09-03_v8 */
+/* Galeria publica no padrao visual de Imoveis - 2026-09-03_v9 */
 .vacation-modal-gallery button {
   height: clamp(220px, 34vw, 360px);
   aspect-ratio: auto;
@@ -891,7 +903,7 @@ body.vacation-modal-open { overflow: hidden; }
   .vacation-image-viewer .vacation-viewer-prev { left: 6px; }
   .vacation-image-viewer .vacation-viewer-next { right: 6px; }
 }
-/* Cards das casas no mesmo dimensionamento e autoplay visual de Imoveis - 2026-09-03_v8 */
+/* Cards das casas no mesmo dimensionamento e autoplay visual de Imoveis - 2026-09-03_v9 */
 .vacation-public-page.is-compact .vacation-public-media,
 .vacation-public-page.is-compact .vacation-card-gallery-track,
 .vacation-public-page.is-compact .vacation-card-gallery-slide,
@@ -924,4 +936,62 @@ body.vacation-modal-open { overflow: hidden; }
     width: 100%;
     padding-inline: 2px;
   }
+}
+/* Confirmacao de agendamento e imagens mobile no padrao de Imoveis - 2026-09-03_v9 */
+.vacation-schedule-modal {
+  position: fixed;
+  z-index: 10050;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+.vacation-schedule-backdrop { position: absolute; inset: 0; background: rgba(8, 15, 28, .78); }
+.vacation-schedule-card {
+  position: relative;
+  width: min(420px, 100%);
+  border-radius: 12px;
+  padding: 22px;
+  background: #fff;
+  color: #172033;
+  text-align: center;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, .34);
+}
+.vacation-schedule-card > i { color: #22a447; font-size: 2rem; }
+.vacation-schedule-card h3 { margin: 10px 0 6px; }
+.vacation-schedule-card p { margin: 0; color: #526175; line-height: 1.5; }
+.vacation-schedule-card > div { display: flex; justify-content: center; gap: 8px; margin-top: 18px; }
+.vacation-schedule-card button,
+.vacation-schedule-card a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  padding: 9px 13px;
+  background: #fff;
+  color: #344154;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+.vacation-schedule-card a { border-color: #128c4a; background: #128c4a; color: #fff; }
+.vacation-schedule-card button:disabled { cursor: not-allowed; opacity: .58; }
+
+@media (max-width: 700px) {
+  .vacation-public-page .vacation-public-media,
+  .vacation-public-page .vacation-card-gallery-track,
+  .vacation-public-page .vacation-card-gallery-slide,
+  .vacation-public-page .vacation-card-gallery-slide img {
+    height: 130px;
+    min-height: 130px;
+    aspect-ratio: auto;
+  }
+
+  .vacation-schedule-card { padding: 18px 14px; }
+  .vacation-schedule-card > div { flex-direction: column-reverse; }
+  .vacation-schedule-card button,
+  .vacation-schedule-card a { width: 100%; }
 }

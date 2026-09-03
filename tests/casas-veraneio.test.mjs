@@ -24,7 +24,7 @@ test("rota publica carrega somente registros ativos", () => {
 test("catalogo inicia compacto e permite alternar para detalhes", () => {
   assert.match(publicJs, /savedMode === null \? true/);
   assert.match(publicJs, /casasVeraneioModoCompacto/);
-  assert.match(publicHtml, /casas-veraneio\.css\?v=8/);
+  assert.match(publicHtml, /casas-veraneio\.css\?v=9/);
   assert.match(publicCss, /vacation-public-page\.is-compact/);
 });
 
@@ -97,6 +97,15 @@ test("site publico abre calendario pelo icone de cada propriedade", () => {
   assert.match(publicCss, /vacation-availability-grid \.is-maintenance \{ background: #2775d7; \}/);
 });
 
+test("dia disponivel abre confirmacao e prepara contato com a data escolhida", () => {
+  assert.ok(publicJs.includes('data-vacation-available-date="'));
+  assert.ok(publicJs.includes('return status === "disponivel"'));
+  assert.ok(publicJs.includes("function openVacationSchedulePrompt"));
+  assert.ok(publicJs.includes("vacationPublicWhatsapp(item, date)"));
+  assert.ok(publicJs.includes("agendamento a partir de"));
+  assert.ok(publicJs.includes("data-vacation-schedule-contact"));
+  assert.ok(publicCss.includes(".vacation-schedule-modal"));
+});
 test("calendarios possuem navegacao mensal e legenda acessivel", () => {
   assert.match(adminHtml, /id="vacationCalendarPrevious"/);
   assert.match(adminHtml, /id="vacationCalendarNext"/);
@@ -183,9 +192,9 @@ test("SEO das casas usa titulo descricao url e imagem principal", () => {
 });
 
 test("versoes dos ativos das casas foram atualizadas", () => {
-  assert.ok(publicHtml.includes("casas-veraneio.css?v=8"));
+  assert.ok(publicHtml.includes("casas-veraneio.css?v=9"));
   assert.ok(adminHtml.includes("casas-veraneio-admin.css?v=4"));
-  assert.ok(publicCss.includes("2026-09-03_v8"));
+  assert.ok(publicCss.includes("2026-09-03_v9"));
   assert.ok(adminCss.includes("2026-09-02_v4"));
 });
 
@@ -205,7 +214,7 @@ test("cards publicos avancam automaticamente e permitem gesto lateral sem setas 
 
 test("cards das casas repetem as alturas de Imoveis e disponibilidade respeita as bordas", () => {
   assert.match(publicCss, /\.vacation-public-page\.is-compact \.vacation-public-media,[\s\S]*height: 170px;[\s\S]*min-height: 170px;/);
-  assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*\.vacation-public-page\.is-compact \.vacation-public-media,[\s\S]*height: 130px;[\s\S]*min-height: 130px;/);
+  assert.match(publicCss, /@media \(max-width: 700px\)[\s\S]*\.vacation-public-page \.vacation-public-media,[\s\S]*height: 130px;[\s\S]*min-height: 130px;/);
   assert.match(publicCss, /\.vacation-public-actions \.vacation-calendar-action \{[\s\S]*min-width: 0;[\s\S]*max-width: 100%;/);
   assert.match(publicCss, /\.vacation-public-page\.is-compact \.vacation-public-actions \.vacation-calendar-action \{[\s\S]*flex: 0 0 42px;/);
 });

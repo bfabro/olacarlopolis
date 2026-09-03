@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v631.
+// Release do site v632.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -14366,10 +14366,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     return digits;
   }
 
-  function vacationPublicWhatsapp(item) {
+  function vacationPublicWhatsapp(item, startDate = "") {
     const phone = vacationPublicPhone(item.whatsapp || item.telefone);
     if (!phone) return "";
-    const message = "Ola! Vi a hospedagem " + (item.titulo || "Casa de veraneio") + " no Ola Carlopolis e gostaria de consultar disponibilidade e valores.";
+    const formattedDate = /^\d{4}-\d{2}-\d{2}$/.test(startDate) ? startDate.split("-").reverse().join("/") : "";
+    const message = formattedDate
+      ? "Ola! Vi a hospedagem " + (item.titulo || "Casa de veraneio") + " no Ola Carlopolis e gostaria de entrar em contato para agendamento a partir de " + formattedDate + "."
+      : "Ola! Vi a hospedagem " + (item.titulo || "Casa de veraneio") + " no Ola Carlopolis e gostaria de consultar disponibilidade e valores.";
     return "https://wa.me/" + phone + "?text=" + encodeURIComponent(message);
   }
 
@@ -14425,7 +14428,28 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function closeVacationAvailabilityCalendar() {
+    document.getElementById("vacationSchedulePrompt")?.remove();
     document.getElementById("vacationAvailabilityModal")?.remove();
+  }
+
+  function openVacationSchedulePrompt(item, date) {
+    document.getElementById("vacationSchedulePrompt")?.remove();
+    const formattedDate = date.split("-").reverse().join("/");
+    const whatsapp = vacationPublicWhatsapp(item, date);
+    const prompt = document.createElement("div");
+    prompt.id = "vacationSchedulePrompt";
+    prompt.className = "vacation-schedule-modal";
+    prompt.setAttribute("role", "dialog");
+    prompt.setAttribute("aria-modal", "true");
+    prompt.setAttribute("aria-label", "Contato para agendamento");
+    prompt.innerHTML = '<div class="vacation-schedule-backdrop" data-vacation-schedule-close></div><section class="vacation-schedule-card"><i class="fa-solid fa-calendar-check"></i><h3>Entrar em contato?</h3><p>Deseja solicitar um agendamento para <strong>' + vacationPublicEscape(item.titulo || "esta hospedagem") + '</strong> a partir de <strong>' + formattedDate + '</strong>?</p><div><button type="button" data-vacation-schedule-close>Agora não</button>' +
+      (whatsapp ? '<a href="' + vacationPublicEscape(whatsapp) + '" target="_blank" rel="noopener" data-vacation-schedule-contact><i class="fa-brands fa-whatsapp"></i> Entrar em contato</a>' : '<button type="button" disabled>Contato indisponível</button>') + '</div></section>';
+    const close = () => prompt.remove();
+    prompt.querySelectorAll("[data-vacation-schedule-close]").forEach((button) => button.addEventListener("click", close));
+    prompt.querySelector("[data-vacation-schedule-contact]")?.addEventListener("click", closeVacationAvailabilityCalendar);
+    prompt.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+    document.body.appendChild(prompt);
+    prompt.querySelector("[data-vacation-schedule-contact], [data-vacation-schedule-close]")?.focus();
   }
 
   function openVacationAvailabilityCalendar(item) {
@@ -14463,10 +14487,17 @@ plotarPinsImoveis(stateImoveis.filtered);
           const status = availability[date] || "disponivel";
           const statusClass = status === "alugado" ? "rented" : status === "manutencao" ? "maintenance" : "available";
           const label = status === "alugado" ? "alugado" : status === "manutencao" ? "em manutencao" : "disponivel";
-          return '<span class="is-' + statusClass + (date === todayKey ? " is-today" : "") + '" aria-label="Dia ' + day + ', ' + label + '" title="' + date.split("-").reverse().join("/") + " - " + label + '">' + day + '</span>';
+          const content = 'class="is-' + statusClass + (date === todayKey ? " is-today" : "") + '" aria-label="Dia ' + day + ', ' + label + '" title="' + date.split("-").reverse().join("/") + " - " + label + '"';
+          return status === "disponivel"
+            ? '<button type="button" data-vacation-available-date="' + date + '" ' + content + '>' + day + '</button>'
+            : '<span ' + content + '>' + day + '</span>';
         }).join("");
     };
     modal.querySelectorAll("[data-vacation-availability-close]").forEach((button) => button.addEventListener("click", closeVacationAvailabilityCalendar));
+    modal.querySelector(".vacation-availability-grid").addEventListener("click", (event) => {
+      const day = event.target.closest("[data-vacation-available-date]");
+      if (day) openVacationSchedulePrompt(item, day.dataset.vacationAvailableDate);
+    });
     modal.addEventListener("keydown", (event) => {
       if (event.key === "Escape") closeVacationAvailabilityCalendar();
     });
