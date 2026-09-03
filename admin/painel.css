@@ -6084,6 +6084,80 @@ body.terrain-owner-detail-open {
   font-size: 18px;
 }
 
+.invoice-exempt-card {
+  overflow: hidden;
+  border-color: rgba(5, 150, 105, .28);
+  background: linear-gradient(145deg, #ecfdf5, #fff 72%);
+}
+
+.invoice-exempt-heading {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 13px;
+  align-items: center;
+}
+
+.invoice-exempt-heading h3,
+.invoice-exempt-heading p {
+  margin: 0;
+}
+
+.invoice-exempt-heading h3 {
+  margin-top: 3px;
+  color: #065f46;
+  font-size: 20px;
+}
+
+.invoice-exempt-heading p {
+  margin-top: 4px;
+  color: #4b6b60;
+  font-size: 13px;
+}
+
+.invoice-exempt-icon {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 14px;
+  color: #047857;
+  background: #d1fae5;
+  font-size: 21px;
+}
+
+.invoice-exempt-card .invoice-contract-grid {
+  padding: 14px;
+  border: 1px solid rgba(5, 150, 105, .18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .72);
+}
+
+.invoice-exempt-card .invoice-contract-grid strong {
+  color: #047857;
+}
+
+.invoice-exempt-notice {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 13px;
+  border-radius: 11px;
+  color: #166534;
+  background: #dcfce7;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+@media (max-width: 620px) {
+  .invoice-exempt-heading {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .invoice-exempt-heading > .badge {
+    grid-column: 1 / -1;
+  }
+}
+
 .home-banner-admin-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));

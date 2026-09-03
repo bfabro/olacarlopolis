@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 716,
-  label: "v723",
+  numero: 717,
+  label: "v724",
   data: "2026-09-03",
-  nota: "Menu ampliado com modulos especiais, catalogo de clientes e acessos separados para notas e grupos."
+  nota: "Clientes isentos visualizam somente o status de isencao, sem valores de planos ou geracao de cobranca."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -12263,6 +12263,7 @@ function selectedClientPlanPayment(client = {}, mount = document) {
 
 async function saveClientPlanRequest(client = {}, selection = {}, status = "aguardando_pagamento", extra = {}) {
   if (!client.id || !state.user?.uid) throw new Error("Cliente ou usuário não identificado.");
+  if (effectivePaymentStatus(client) === "isento") throw new Error("Cliente isento não pode gerar cobrança de plano.");
   const configuredValue = configuredPlanValue(selection.tipoPlano);
   const storedPlanValue = Number(configuredValue) > 0
     ? configuredValue
@@ -25244,6 +25245,7 @@ async function syncClientsFromScript(options = {}) {
 }
 
 function clientPlanChooserCard(client = {}, paymentConfig = {}) {
+  if (effectivePaymentStatus(client) === "isento") return "";
   const request = activeClientPlanRequest(client);
   const requestPixCode = String(request?.pixCodigo || "");
   const requestPixTotal = Number(request?.valorTotal || request?.valorPlano || 0);
@@ -25301,6 +25303,7 @@ function presentClientPlanPix(mount, code, qrUrl, total) {
 }
 
 function bindClientPlanPaymentControls(mount, client, paymentConfig = {}) {
+  if (effectivePaymentStatus(client) === "isento") return;
   const summary = mount.querySelector("[data-plan-choice-summary]");
   const pixBox = mount.querySelector("[data-plan-pix-box]");
   const pixCode = mount.querySelector("[data-plan-pix-code]");
@@ -25433,6 +25436,7 @@ async function generateSelectedClientInvoicePix(button) {
   const mount = $("clientInvoicesMount");
   const client = currentClientRecord();
   if (!mount || !client) return showToast("Cliente nao encontrado para gerar o Pix.");
+  if (effectivePaymentStatus(client) === "isento") return showToast("Este cliente e isento e nao possui cobranca para gerar.");
   const paymentConfig = state.pagamentoSistema || {};
   const { selected, selectedPlan, selectedTotal, unified } = selectedClientInvoicePaymentData(mount, client, paymentConfig);
   if (!selected.length) return showToast("Selecione pelo menos um mes para gerar o Pix.");
@@ -25468,6 +25472,47 @@ function renderClientInvoices() {
       $("clientModuleSidebar").innerHTML = "";
       $("clientModuleSidebar").classList.add("hidden");
     }
+    return;
+  }
+
+  const isExempt = effectivePaymentStatus(client) === "isento";
+  if (isExempt) {
+    mount.innerHTML = `
+      <div class="invoice-list">
+        <article class="invoice-card invoice-exempt-card">
+          <div class="invoice-exempt-heading">
+            <span class="invoice-exempt-icon"><i class="fa-solid fa-shield-heart"></i></span>
+            <div>
+              <span class="feature-kicker">Situação da conta</span>
+              <h3>Cliente isento</h3>
+              <p>Este cadastro não possui mensalidade, cobrança ou pagamento pendente.</p>
+            </div>
+            <span class="badge isento">Isento</span>
+          </div>
+          <div class="invoice-contract-grid">
+            <div>
+              <span>Plano/pagamento</span>
+              <strong>Isento</strong>
+              <small>Sem mensalidade</small>
+            </div>
+            <div>
+              <span>Valor</span>
+              <strong>Isento</strong>
+              <small>Nenhum valor de plano é exibido</small>
+            </div>
+            <div>
+              <span>Faturas</span>
+              <strong>Isento</strong>
+              <small>Nenhuma cobrança disponível</small>
+            </div>
+          </div>
+          <div class="invoice-exempt-notice">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>Não é necessário gerar QR Code, Pix, boleto ou enviar comprovante.</span>
+          </div>
+        </article>
+      </div>
+    `;
     return;
   }
 
