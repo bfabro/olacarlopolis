@@ -4897,6 +4897,35 @@ body.terrain-owner-detail-open {
   text-transform: uppercase;
 }
 
+.report-whatsapp-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid #86efac;
+  border-radius: 999px;
+  color: #166534;
+  background: #dcfce7;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.report-whatsapp-marker i {
+  color: #16a34a;
+  font-size: 17px;
+}
+
+.report-whatsapp-marker strong {
+  color: #15803d;
+}
+
+.report-whatsapp-empty {
+  color: #94a3b8;
+  font-weight: 700;
+}
+
 .report-click-table th.report-quantity-sort {
   cursor: pointer;
   user-select: none;

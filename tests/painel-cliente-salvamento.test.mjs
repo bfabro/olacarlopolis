@@ -23,9 +23,9 @@ test("formulario Minha empresa continua salvando pelo evento submit", () => {
 });
 
 test("versao corrigida do painel e carregada sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.js?v=657"));
-  assert.ok(panelJs.includes("numero: 720"));
-  assert.ok(panelJs.includes('label: "v727"'));
+  assert.ok(panelHtml.includes("painel.js?v=658"));
+  assert.ok(panelJs.includes("numero: 721"));
+  assert.ok(panelJs.includes('label: "v728"'));
 });
 
 test("responsavel por locacao pode ser cobrado mesmo apos normalizacao do tipo", () => {

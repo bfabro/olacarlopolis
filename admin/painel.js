@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 720,
-  label: "v727",
+  numero: 721,
+  label: "v728",
   data: "2026-09-03",
-  nota: "Relatorios exibem somente areas publicas reais, habilitadas e contabilizaveis para cada cliente."
+  nota: "Relatorios separam imoveis, veiculos e casas de veraneio, com destaque visual para contatos pelo WhatsApp."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -18924,20 +18924,26 @@ function renderVacationRentalAccessTable(rows = [], emptyMessage = "Nenhum cliqu
   return `
     <div class="report-table-wrap">
       <table class="report-click-table">
-        <thead><tr><th>Propriedade</th><th>Detalhes</th><th>Fotos</th><th>Disponibilidade</th><th>Contatos</th><th>Compartilhamentos</th><th>Maps</th><th>Total</th></tr></thead>
+        <thead><tr><th>Propriedade</th><th>Detalhes</th><th>Fotos</th><th>Disponibilidade</th><th>WhatsApp</th><th>Agendamentos</th><th>Compartilhamentos</th><th>Maps</th><th>Total</th></tr></thead>
         <tbody>
-          ${rows.map((row) => `
+          ${rows.map((row) => {
+            const whatsappClicks = Number(row.whatsapp || 0);
+            return `
             <tr>
               <td><strong>${escapeHtml(row.titulo || row.codigo || "Casa de veraneio")}</strong><br><small>${escapeHtml(row.codigo || "-")}</small></td>
               <td>${row.detalhes || row.visualizacao || 0}</td>
               <td>${row.fotos || 0}</td>
               <td>${row.disponibilidade || 0}</td>
-              <td>${Number(row.whatsapp || 0) + Number(row.agendamento || 0)}</td>
+              <td>${whatsappClicks > 0
+                ? `<span class="report-whatsapp-marker" title="Houve contato pelo WhatsApp"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><strong>${whatsappClicks}</strong><span>Contato</span></span>`
+                : `<span class="report-whatsapp-empty" title="Nenhum contato pelo WhatsApp">0</span>`}</td>
+              <td>${Number(row.agendamento || 0)}</td>
               <td>${row.compartilhamento || 0}</td>
               <td>${row.maps || 0}</td>
               <td><strong>${row.total || 0}</strong></td>
             </tr>
-          `).join("")}
+          `;
+          }).join("")}
         </tbody>
       </table>
     </div>
@@ -20709,6 +20715,7 @@ function renderReports(reportType = "") {
   let newsClickRows;
   const getClickTimeline = () => clickTimeline ??= buildClickTimeline(state.metricas, periodRange);
   const getItemAccessRows = () => itemAccessRows ??= buildItemAccessRows(state.metricas, periodRange);
+  const getItemAccessRowsByKind = (kind) => getItemAccessRows().filter((row) => row.kind === kind);
   const getAccessTimeline = () => accessTimeline ??= buildAccessTimeline(filteredMetrics.acessos, periodRange);
   const getGeneralClickReport = () => generalClickReport ??= buildGeneralClickRows(detalhesClientes);
   const getOndeComerClickRows = () => ondeComerClickRows ??= buildOndeComerClickRows(
@@ -20906,9 +20913,19 @@ function renderReports(reportType = "") {
         ${renderNewsClickReportTable(getNewsClickRows(), "Ainda não há cliques em notícias registrados neste período.")}
       `, true)}
 
-      ${isFinanceReport ? "" : renderFinanceReportSection("imoveis-veiculos", "Imóveis e veículos", periodRange, () => `
-        <p class="list-meta">Visualizações, WhatsApp e fotos separados pelo código de referência de cada anúncio.</p>
-        ${renderItemAccessTable(getItemAccessRows(), "Ainda não há acessos em imóveis ou veículos neste período.")}
+      ${isFinanceReport ? "" : renderFinanceReportSection("imoveis", "Imóveis", periodRange, () => `
+        <p class="list-meta">Visualizações, WhatsApp e fotos separados pelo código de referência de cada imóvel.</p>
+        ${renderItemAccessTable(getItemAccessRowsByKind("imovel"), "Ainda não há acessos em imóveis neste período.")}
+      `, true)}
+
+      ${isFinanceReport ? "" : renderFinanceReportSection("veiculos", "Veículos", periodRange, () => `
+        <p class="list-meta">Visualizações, WhatsApp e fotos separados pelo código de referência de cada veículo.</p>
+        ${renderItemAccessTable(getItemAccessRowsByKind("veiculo"), "Ainda não há acessos em veículos neste período.")}
+      `, true)}
+
+      ${isFinanceReport ? "" : renderFinanceReportSection("casas-veraneio", "Casas de veraneio", periodRange, () => `
+        <p class="list-meta">Detalhes, fotos, disponibilidade, contatos e compartilhamentos separados por propriedade.</p>
+        ${renderVacationRentalAccessTable(getItemAccessRowsByKind("casa_veraneio"), "Ainda não há cliques em casas de veraneio neste período.")}
       `, true)}
 
       ${isFinanceReport ? "" : renderFinanceReportSection("linha-tempo", "Horários e linha do tempo", periodRange, () => `

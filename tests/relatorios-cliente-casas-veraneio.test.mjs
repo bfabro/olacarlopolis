@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const publicJs = readFileSync(new URL("../script.js", import.meta.url), "utf8");
 const adminJs = readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
+const adminCss = readFileSync(new URL("../admin/painel.css", import.meta.url), "utf8");
 
 test("relatorio individual usa as permissoes do cliente selecionado", () => {
   assert.match(adminJs, /function clientReportPermissions\(client = currentClientRecord\(\) \|\| \{\}\)/);
@@ -28,6 +29,24 @@ test("casas de veraneio possuem cards proprios no monitoramento", () => {
   assert.match(adminJs, /title: "Casas de veraneio"/);
   assert.match(adminJs, /entries: casasVeraneioEntries/);
   assert.match(adminJs, /total: casasVeraneio/);
+});
+
+test("contatos de casas de veraneio destacam cliques no WhatsApp", () => {
+  assert.match(adminJs, /class="report-whatsapp-marker"/);
+  assert.match(adminJs, /fa-brands fa-whatsapp/);
+  assert.match(adminJs, /const whatsappClicks = Number\(row\.whatsapp \|\| 0\)/);
+  assert.match(adminJs, /<th>WhatsApp<\/th><th>Agendamentos<\/th>/);
+  assert.match(adminCss, /\.report-whatsapp-marker[\s\S]*color: #166534/);
+});
+
+test("admin master separa imoveis veiculos e casas de veraneio", () => {
+  assert.match(adminJs, /renderFinanceReportSection\("imoveis", "Imóveis"/);
+  assert.match(adminJs, /getItemAccessRowsByKind\("imovel"\)/);
+  assert.match(adminJs, /renderFinanceReportSection\("veiculos", "Veículos"/);
+  assert.match(adminJs, /getItemAccessRowsByKind\("veiculo"\)/);
+  assert.match(adminJs, /renderFinanceReportSection\("casas-veraneio", "Casas de veraneio"/);
+  assert.match(adminJs, /renderVacationRentalAccessTable\(getItemAccessRowsByKind\("casa_veraneio"\)/);
+  assert.doesNotMatch(adminJs, /renderFinanceReportSection\("imoveis-veiculos"/);
 });
 
 test("tabelas do relatorio iniciam recolhidas", () => {
