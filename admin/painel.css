@@ -4926,6 +4926,19 @@ body.terrain-owner-detail-open {
   font-weight: 700;
 }
 
+.report-whatsapp-timeline-row td {
+  background: #f0fdf4;
+  border-bottom-color: #bbf7d0;
+}
+
+.report-whatsapp-timeline-row:hover td {
+  background: #dcfce7;
+}
+
+.report-whatsapp-timeline-marker {
+  min-width: 116px;
+}
+
 .report-click-table th.report-quantity-sort {
   cursor: pointer;
   user-select: none;

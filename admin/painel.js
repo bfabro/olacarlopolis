@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 721,
-  label: "v728",
+  numero: 722,
+  label: "v729",
   data: "2026-09-03",
-  nota: "Relatorios separam imoveis, veiculos e casas de veraneio, com destaque visual para contatos pelo WhatsApp."
+  nota: "Cliques de veiculos sao vinculados ao cliente correto e contatos por WhatsApp recebem destaque tambem na linha do tempo."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -19093,8 +19093,8 @@ function clientReportHasPublicProfile(client = {}) {
 function clientReportResourceAllowed(category = "", client = currentClientRecord() || {}) {
   const normalized = normalizeName(category);
   if (/casaveraneio|casasveraneio/.test(normalized)) return clientReportHasPermission(client, "casas_veraneio");
-  if (/imovel/.test(normalized)) return clientReportHasPermission(client, "imoveis");
-  if (/veiculo|automovel/.test(normalized)) return clientReportHasPermission(client, "veiculos");
+  if (/imovel/.test(normalized)) return clientReportHasPermission(client, "imoveis") || clienteAssociadoImoveis(client);
+  if (/veiculo|automovel/.test(normalized)) return clientReportHasPermission(client, "veiculos") || clienteAssociadoAutomoveis(client);
   if (/cardapio/.test(normalized)) return clientReportHasPermission(client, "cardapio") || clientReportMenuEnabled(client);
   if (/novidade/.test(normalized)) return true;
   if (/promoc/.test(normalized)) return clientReportHasPermission(client, "promocoes");
@@ -19178,17 +19178,22 @@ function renderClientModuleTimelineTable(rows, moduleLabel, emptyMessage) {
       <table class="report-click-table client-report-click-table">
         <thead><tr><th>Data</th><th>Horario</th><th>Acao</th><th>Cidade</th><th>Codigo de referencia</th><th>Anuncio</th><th>Origem do clique</th></tr></thead>
         <tbody>
-          ${rows.slice(0, 200).map((row) => `
-            <tr title="${escapeAttr(row.pagina || "")}">
+          ${rows.slice(0, 200).map((row) => {
+            const isWhatsappAction = /whatsapp/.test(normalizeName(`${row.tipo || ""} ${row.acao || ""}`));
+            return `
+            <tr class="${isWhatsappAction ? "report-whatsapp-timeline-row" : ""}" title="${escapeAttr(row.pagina || "")}">
               <td>${escapeHtml(formatDateBR(row.date))}</td>
               <td><strong>${escapeHtml(row.hora)}</strong></td>
-              <td>${escapeHtml(row.tipo || moduleLabel)}</td>
+              <td>${isWhatsappAction
+                ? `<span class="report-whatsapp-marker report-whatsapp-timeline-marker"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i><strong>WhatsApp</strong><span>Contato</span></span>`
+                : escapeHtml(row.tipo || moduleLabel)}</td>
               <td>${escapeHtml(row.cidade || "Desconhecida")}</td>
               <td>${escapeHtml(row.codigoReferencia || row.itemId || "-")}</td>
               <td>${escapeHtml(row.tituloConteudo || "-")}</td>
               <td>${escapeHtml(row.origemDescricao || row.area || "Site publico")}</td>
             </tr>
-          `).join("")}
+          `;
+          }).join("")}
         </tbody>
       </table>
     </div>
@@ -19239,8 +19244,8 @@ function clientReportAvailability(client = {}, counts = {}) {
     || Number(counts.promocoes || 0) > 0
     || Number(counts.whatsappPromocao || 0) > 0;
   const hasWhatsappGroup = Boolean(client.grupoWhatsappAtivo !== false && client.grupoWhatsappLink);
-  const hasImoveis = clientReportHasPermission(client, "imoveis");
-  const hasVeiculos = clientReportHasPermission(client, "veiculos");
+  const hasImoveis = clientReportHasPermission(client, "imoveis") || clienteAssociadoImoveis(client);
+  const hasVeiculos = clientReportHasPermission(client, "veiculos") || clienteAssociadoAutomoveis(client);
   const hasVacationRentals = clientReportHasPermission(client, "casas_veraneio");
   return {
     whats: hasPublicProfile && hasContacts,

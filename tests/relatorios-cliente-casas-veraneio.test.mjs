@@ -37,6 +37,17 @@ test("contatos de casas de veraneio destacam cliques no WhatsApp", () => {
   assert.match(adminJs, /const whatsappClicks = Number\(row\.whatsapp \|\| 0\)/);
   assert.match(adminJs, /<th>WhatsApp<\/th><th>Agendamentos<\/th>/);
   assert.match(adminCss, /\.report-whatsapp-marker[\s\S]*color: #166534/);
+  assert.match(adminJs, /const isWhatsappAction = \/whatsapp\//);
+  assert.match(adminJs, /report-whatsapp-timeline-row/);
+  assert.match(adminJs, /report-whatsapp-timeline-marker/);
+  assert.match(adminCss, /\.report-whatsapp-timeline-row td/);
+});
+
+test("revenda de automoveis contabiliza metricas mesmo sem flag redundante", () => {
+  assert.match(publicJs, /clienteId: item\.clienteId \|\| resolverChaveMetricaCliente\(responsavel\) \|\| ""/);
+  assert.match(publicJs, /estabelecimentoId: item\.estabelecimentoId \|\| ""/);
+  assert.match(adminJs, /clientReportHasPermission\(client, "veiculos"\) \|\| clienteAssociadoAutomoveis\(client\)/);
+  assert.match(adminJs, /clientReportHasPermission\(client, "imoveis"\) \|\| clienteAssociadoImoveis\(client\)/);
 });
 
 test("admin master separa imoveis veiculos e casas de veraneio", () => {

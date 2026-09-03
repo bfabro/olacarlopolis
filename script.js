@@ -13637,7 +13637,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       veiculoId: item.id || "",
       tituloConteudo: [item.marca, item.modelo, item.ano].filter(Boolean).join(" "),
       codRef: item.codRef || item.codigo || item.id || "",
-      clienteId: item.clienteId || "",
+      clienteId: item.clienteId || resolverChaveMetricaCliente(responsavel) || "",
+      estabelecimentoId: item.estabelecimentoId || "",
+      clienteNome: item.clienteNome || "",
       vendedor: item.vendedor || item.loja || ""
     });
   }
