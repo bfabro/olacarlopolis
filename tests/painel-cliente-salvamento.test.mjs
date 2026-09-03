@@ -23,9 +23,9 @@ test("formulario Minha empresa continua salvando pelo evento submit", () => {
 });
 
 test("versao corrigida do painel e carregada sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.js?v=664"));
-  assert.ok(panelJs.includes("numero: 727"));
-  assert.ok(panelJs.includes('label: "v734"'));
+  assert.ok(panelHtml.includes("painel.js?v=665"));
+  assert.ok(panelJs.includes("numero: 728"));
+  assert.ok(panelJs.includes('label: "v735"'));
 });
 
 test("cadastro master e painel do cliente salvam a opcao somente delivery", () => {
@@ -34,6 +34,7 @@ test("cadastro master e painel do cliente salvam a opcao somente delivery", () =
   assert.ok(panelJs.includes('id="coDeliveryOnly"'));
   assert.ok(panelJs.includes('somenteDelivery: Boolean($("coDeliveryOnly")?.checked)'));
   assert.ok(panelJs.includes('clienteSomenteDeliveryAtivo(client)'));
+  assert.ok(panelJs.includes('valor === true || valor === 1'));
 });
 
 test("responsavel por locacao pode ser cobrado mesmo apos normalizacao do tipo", () => {

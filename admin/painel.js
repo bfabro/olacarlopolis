@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 727,
-  label: "v734",
+  numero: 728,
+  label: "v735",
   data: "2026-09-03",
-  nota: "Onde Comer inclui clientes de Doces e Chocolates e Salgados para Festas, exibindo o aviso somente delivery."
+  nota: "Flag somente delivery da Lisfit corrigida e leitura booleana reforcada no painel e no site publico."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -959,9 +959,10 @@ function normalizeName(text) {
 }
 
 function clienteSomenteDeliveryAtivo(cliente = {}) {
+  const flagAtiva = (valor) => valor === true || valor === 1 || ["true", "1", "sim", "ativo"].includes(normalizeName(valor));
   return Boolean(
-    cliente.somenteDelivery
-    || cliente.deliveryOnly
+    flagAtiva(cliente.somenteDelivery)
+    || flagAtiva(cliente.deliveryOnly)
     || normalizeName(cliente.endereco || cliente.address || "") === "somentedelivery"
   );
 }

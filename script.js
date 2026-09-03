@@ -23804,9 +23804,10 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   function clienteSomenteDeliveryAtivo(cliente = {}) {
+    const flagAtiva = (valor) => valor === true || valor === 1 || ["true", "1", "sim", "ativo"].includes(normalizeName(valor));
     return Boolean(
-      cliente.somenteDelivery
-      || cliente.deliveryOnly
+      flagAtiva(cliente.somenteDelivery)
+      || flagAtiva(cliente.deliveryOnly)
       || normalizeName(cliente.endereco || cliente.address || "") === "somentedelivery"
     );
   }

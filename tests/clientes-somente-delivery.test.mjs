@@ -8,6 +8,8 @@ const style = readFileSync(new URL("../style.css", import.meta.url), "utf8");
 test("cliente somente delivery conserva o cadastro e oculta o endereco publico", () => {
   assert.ok(script.includes('function clienteSomenteDeliveryAtivo(cliente = {})'));
   assert.ok(script.includes('normalizeName(cliente.endereco || cliente.address || "") === "somentedelivery"'));
+  assert.ok(script.includes('valor === true || valor === 1'));
+  assert.ok(script.includes('["true", "1", "sim", "ativo"].includes(normalizeName(valor))'));
   assert.ok(script.includes('const somenteDelivery = clienteSomenteDeliveryAtivo(cliente);'));
   assert.ok(script.includes('address: somenteDelivery ? "" : (cliente.endereco || "")'));
   assert.ok(script.includes('if (est.somenteDelivery) est.address = "";'));
