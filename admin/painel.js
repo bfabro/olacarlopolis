@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 718,
-  label: "v725",
+  numero: 719,
+  label: "v726",
   data: "2026-09-03",
-  nota: "Relatorios do cliente respeitam os modulos habilitados e detalham os cliques das casas de veraneio vinculadas."
+  nota: "Casas de veraneio ganham cards no relatorio, referencias sequenciais e tabelas inicialmente recolhidas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3009,6 +3009,7 @@ async function loadAllData(onProgress = null) {
     state.casasVeraneio = state.casasVeraneio.filter(itemBelongsToCurrentClient);
   }
   state.casasVeraneio.sort((a, b) => String(a.titulo || "").localeCompare(String(b.titulo || ""), "pt-BR"));
+  await ensureVacationRentalReferenceCodes();
   state.gruposWhatsapp = [];
   if (gruposWhatsappSnap.exists()) {
     gruposWhatsappSnap.forEach((child) => {
@@ -15117,6 +15118,20 @@ function vacationRentalFormPayload() {
   };
 }
 
+async function ensureVacationRentalReferenceCodes() {
+  if (!canAccessVacationRentals()) return;
+  const pending = state.casasVeraneio.filter((item) => !String(item.codRef || item.codigoReferencia || "").trim());
+  for (const item of pending) {
+    try {
+      const codRef = await gerarCodigoReferenciaIncremental("casa_veraneio", item.titulo);
+      await update(ref(db, `conteudosInformativos/casasVeraneio/${item.id}`), { codRef });
+      item.codRef = codRef;
+    } catch (error) {
+      console.warn("Nao foi possivel gerar a referencia da propriedade.", item.id, error);
+    }
+  }
+}
+
 function renderVacationRentalsList() {
   const box = $("vacationRentalsList");
   if (!box) return;
@@ -15124,7 +15139,7 @@ function renderVacationRentalsList() {
   const search = normalizeName($("vacationRentalSearch")?.value || "");
   const status = $("vacationRentalStatusFilter")?.value || "";
   const list = state.casasVeraneio.filter(itemBelongsToCurrentClient).filter((item) => {
-    const haystack = normalizeName([item.titulo, item.tipo, item.bairro, item.cidade, item.clienteNome, item.responsavel].join(" "));
+    const haystack = normalizeName([item.codRef, item.titulo, item.tipo, item.bairro, item.cidade, item.clienteNome, item.responsavel].join(" "));
     return (!search || haystack.includes(search)) && (!status || item.status === status);
   });
   if ($("vacationRentalTotal")) $("vacationRentalTotal").textContent = String(list.length);
@@ -15140,7 +15155,7 @@ function renderVacationRentalsList() {
         ? '<img src="' + escapeAttr(displayImageUrl(image)) + '" alt="' + escapeAttr(item.titulo || "Propriedade") + '" ' + lazyImageAttrs() + " " + imageFallbackAttr() + '>'
         : '<div class="vacation-admin-thumb-empty"><i class="fa-solid fa-house-chimney-window"></i></div>') + '</div>' +
       '<div class="vacation-admin-info"><div class="vacation-admin-main"><div><div class="list-title">' + escapeHtml(item.titulo || item.id) + '</div>' +
-      '<div class="list-meta">' + escapeHtml([VACATION_RENTAL_TYPE_LABELS[item.tipo] || item.tipo, item.bairro, item.cidade].filter(Boolean).join(" - ")) + '</div></div>' +
+      '<div class="list-meta">' + escapeHtml([item.codRef, VACATION_RENTAL_TYPE_LABELS[item.tipo] || item.tipo, item.bairro, item.cidade].filter(Boolean).join(" - ")) + '</div></div>' +
       '<span class="badge ' + escapeAttr(statusValue) + '">' + escapeHtml(statusValue === "rascunho" ? "Rascunho" : statusLabel(statusValue)) + '</span></div>' +
       '<div class="vacation-admin-meta"><span><i class="fa-solid fa-user"></i> ' + escapeHtml(item.clienteNome || vacationRentalClient(item)?.nome || "Sem cliente") + '</span>' +
       '<span><i class="fa-solid fa-users"></i> Ate ' + escapeHtml(item.hospedes || 1) + ' hospedes</span>' +
@@ -15196,6 +15211,7 @@ async function saveVacationRental(event) {
       ? [...uploaded, ...state.vacationRentalImages]
       : [...state.vacationRentalImages, ...uploaded];
     payload.imagem = payload.imagens[0] || "";
+    payload.codRef = original?.codRef || original?.codigoReferencia || await gerarCodigoReferenciaIncremental("casa_veraneio", payload.titulo);
     payload.createdAt = original?.createdAt || serverTimestamp();
     payload.updatedAt = serverTimestamp();
     await set(ref(db, "conteudosInformativos/casasVeraneio/" + id), payload);
@@ -15410,15 +15426,25 @@ function numberOrText(value) {
   return Number.isFinite(number) && /\d/.test(text) && !/[a-zA-Z]/.test(text) ? number : text;
 }
 
-async function gerarCodigoReferenciaIncremental(tipo) {
+async function gerarCodigoReferenciaIncremental(tipo, nomeReferencia = "") {
   const config = {
     imovel: { path: "contadores/codigosReferencia/imoveis", prefix: "Imv_" },
-    automovel: { path: "contadores/codigosReferencia/automoveis", prefix: "car_" }
+    automovel: { path: "contadores/codigosReferencia/automoveis", prefix: "car_" },
+    casa_veraneio: { path: "contadores/codigosReferencia/casasVeraneio", prefix: "" }
   }[tipo];
   if (!config) throw new Error("Tipo de codigo de referencia invalido.");
   const counterRef = ref(db, config.path);
   const result = await runTransaction(counterRef, (current) => (Number(current) || 0) + 1);
   const next = Number(result.snapshot.val()) || 1;
+  if (tipo === "casa_veraneio") {
+    const namePrefix = slugify(nomeReferencia || "propriedade")
+      .split("-")
+      .filter(Boolean)
+      .slice(0, 3)
+      .join("-")
+      .toUpperCase() || "PROPRIEDADE";
+    return `${namePrefix}-${String(next).padStart(3, "0")}`;
+  }
   return `${config.prefix}${next}`;
 }
 
@@ -19408,6 +19434,14 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
     { label: "Compartilhamentos", count: promocaoCompartilhamentos, note: "Cliques para compartilhar promocao" },
     { label: "Outras interacoes", count: promocoesOutros, note: "Historico e outros controles" }
   ].filter((entry) => entry.count > 0 || (promocoesAtivo && entry.label !== "Outras interacoes"));
+  const casasVeraneioEntries = availability.casasVeraneio ? [
+    { label: "Detalhes visualizados", count: casasVeraneioDetalhes, note: "Aberturas dos detalhes das propriedades" },
+    { label: "Fotos ampliadas", count: casasVeraneioFotos, note: "Aberturas das galerias de fotos" },
+    { label: "Disponibilidade", count: casasVeraneioDisponibilidade, note: "Consultas ao calendario" },
+    { label: "Contatos", count: casasVeraneioWhatsapp + casasVeraneioAgendamentos, note: "WhatsApp e pedidos de agendamento" },
+    { label: "Compartilhamentos", count: casasVeraneioCompartilhamentos, note: "Compartilhamentos das propriedades" },
+    { label: "Localizacao", count: casasVeraneioMaps, note: "Aberturas no Maps" }
+  ] : [];
   let resourceEntries = [
     { key: "whats", label: "WhatsApp / telefone", count: whats, note: "Telefone e contato" },
     { key: "fotos", label: "Fotos / divulgacao", count: fotos, note: "Fotos e divulgacoes" },
@@ -19421,12 +19455,6 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
     { key: "veiculos", label: "Automoveis - fotos", count: veiculosFotos, note: "Cliques para ampliar as fotos" },
     { key: "veiculos", label: "Automoveis - WhatsApp", count: veiculosWhatsapp, note: "Cliques no botao Chamar no Whats" },
     { key: "veiculos", label: "Automoveis - Instagram", count: veiculosInstagram, note: "Cliques no Instagram do anunciante" },
-    { key: "casasVeraneio", label: "Casas de veraneio - detalhes", count: casasVeraneioDetalhes, note: "Aberturas dos detalhes das propriedades" },
-    { key: "casasVeraneio", label: "Casas de veraneio - fotos", count: casasVeraneioFotos, note: "Aberturas das fotos ampliadas" },
-    { key: "casasVeraneio", label: "Casas de veraneio - disponibilidade", count: casasVeraneioDisponibilidade, note: "Consultas ao calendario" },
-    { key: "casasVeraneio", label: "Casas de veraneio - contatos", count: casasVeraneioWhatsapp + casasVeraneioAgendamentos, note: "Cliques para entrar em contato" },
-    { key: "casasVeraneio", label: "Casas de veraneio - compartilhamentos", count: casasVeraneioCompartilhamentos, note: "Compartilhamentos das propriedades" },
-    { key: "casasVeraneio", label: "Casas de veraneio - Maps", count: casasVeraneioMaps, note: "Aberturas da localizacao" },
     { key: "destaques", label: "Destaques", count: destaques, note: "Cards e slides em destaque" },
     { key: "gruposWhatsapp", label: "Grupo WhatsApp", count: gruposWhatsapp, note: "Entradas pelo link do grupo" },
     { key: "instagram", label: "Instagram", count: instagram, note: "Cliques no Instagram" },
@@ -19508,7 +19536,7 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
       ? { ...entry, count: Number(detailedPageCounts.get(entry.key) || 0) }
       : entry);
   }
-  const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...servicosEntries, ...promocoesEntries];
+  const allResourceEntries = [...resourceEntries, ...cardapioEntries, ...ondeComerEntries, ...produtosEntries, ...servicosEntries, ...casasVeraneioEntries, ...promocoesEntries];
   const total = allResourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const paginaClienteTotal = resourceEntries.reduce((sum, entry) => sum + Number(entry.count || 0), 0);
   const itemAccessRows = buildItemAccessRows(metricsSource, range, keys);
@@ -19533,8 +19561,7 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
       ${renderClientReportDisclosure(
         "Todos os cliques do cliente",
         renderClientTimelineTable(timeline, "Ainda nao ha cliques detalhados para este cliente no periodo."),
-        "Tabela completa: clique nos titulos das colunas para ordenar",
-        true
+        "Tabela completa: clique nos titulos das colunas para ordenar"
       )}
       <div class="client-report-monitored-screens">
         ${renderClientReportMonitorSection({
@@ -19586,6 +19613,16 @@ function renderClientMetricReportContent(client = {}, metricsSource = state.metr
           rangeLabel: range.label,
           timeline: servicosTimeline,
           timelineTitle: "Cliques detalhados de Servicos"
+        }) : ""}
+        ${availability.casasVeraneio ? renderClientReportMonitorSection({
+          title: "Casas de veraneio",
+          icon: "fa-house-chimney-window",
+          description: "Detalhes, fotos, disponibilidade, contatos e compartilhamentos das propriedades.",
+          entries: casasVeraneioEntries,
+          total: casasVeraneio,
+          rangeLabel: range.label,
+          timeline: casasVeraneioTimeline,
+          timelineTitle: "Cliques detalhados de Casas de veraneio"
         }) : ""}
         ${promocoesAtivo ? renderClientReportMonitorSection({
           title: "Promocoes",

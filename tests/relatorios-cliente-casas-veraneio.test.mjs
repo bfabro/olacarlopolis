@@ -22,3 +22,23 @@ test("cliques das casas de veraneio alimentam a tabela por propriedade", () => {
   assert.match(adminJs, /function renderVacationRentalAccessTable/);
   assert.match(adminJs, /Modulo especial: Casas de veraneio/);
 });
+
+test("casas de veraneio possuem cards proprios no monitoramento", () => {
+  assert.match(adminJs, /const casasVeraneioEntries = availability\.casasVeraneio/);
+  assert.match(adminJs, /title: "Casas de veraneio"/);
+  assert.match(adminJs, /entries: casasVeraneioEntries/);
+  assert.match(adminJs, /total: casasVeraneio/);
+});
+
+test("tabelas do relatorio iniciam recolhidas", () => {
+  assert.match(adminJs, /function renderClientReportDisclosure\(title, content, description = "Clique para visualizar", expanded = false\)/);
+  assert.doesNotMatch(adminJs, /"Todos os cliques do cliente",[\s\S]{0,240}\btrue\s*\)/);
+});
+
+test("propriedades recebem referencia incremental baseada no nome", () => {
+  assert.match(adminJs, /casa_veraneio: \{ path: "contadores\/codigosReferencia\/casasVeraneio", prefix: "" \}/);
+  assert.match(adminJs, /gerarCodigoReferenciaIncremental\("casa_veraneio", payload\.titulo\)/);
+  assert.match(adminJs, /String\(next\)\.padStart\(3, "0"\)/);
+  assert.match(adminJs, /await ensureVacationRentalReferenceCodes\(\)/);
+  assert.match(publicJs, /codRef: item\.codRef \|\| item\.codigoReferencia \|\| item\.id/);
+});

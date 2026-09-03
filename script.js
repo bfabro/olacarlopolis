@@ -14541,7 +14541,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!responsavel || typeof registrarCliqueBotao !== "function") return Promise.resolve({ ok: false });
     return registrarCliqueBotao(`casa_veraneio_${tipo}`, responsavel, "casas-veraneio", {
       casaVeraneioId: item.id || "",
-      codRef: item.id || "",
+      codRef: item.codRef || item.codigoReferencia || item.id || "",
       tituloConteudo: item.titulo || "Casa de veraneio",
       acao: tipo,
       ...detalhes
