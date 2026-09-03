@@ -21020,6 +21020,79 @@ body.vaga-modal-open {
   color: #fff;
 }
 
+/* ===== Detalhe horizontal e legivel das Novidades v478 ===== */
+.novidade-preview-modal {
+  width: min(900px, 100%);
+  padding: 16px;
+}
+
+.novidade-preview-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, .92fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.novidade-preview-visual,
+.novidade-preview-content {
+  min-width: 0;
+}
+
+.novidade-preview-content {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 2px 2px;
+}
+
+.novidade-preview-content > h3 {
+  margin-top: 2px;
+}
+
+.novidade-preview-content > p {
+  margin-right: 0;
+}
+
+.novidade-preview-content .novidade-preview-quick-info {
+  grid-template-columns: 1fr;
+}
+
+.novidade-preview-content .novidade-preview-quick-info div {
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  column-gap: 9px;
+  padding: 11px 13px;
+  text-align: left;
+}
+
+.novidade-preview-content .novidade-preview-quick-info div + div {
+  border-top: 1px solid #e2e8f0;
+  border-left: 0;
+}
+
+.novidade-preview-content .novidade-preview-quick-info small {
+  grid-column: 2;
+}
+
+.novidade-preview-content .novidade-preview-actions {
+  margin-top: auto;
+}
+
+@media (max-width: 760px) {
+  .novidade-preview-modal {
+    width: min(460px, 100%);
+    padding: 12px;
+  }
+
+  .novidade-preview-layout {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .novidade-preview-content {
+    padding: 0;
+  }
+}
+
 @media (max-width: 640px) {
   .novidades-cidade-wrap {
     width: calc(100% - 8px);

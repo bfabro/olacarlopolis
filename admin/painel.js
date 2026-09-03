@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 712,
-  label: "v719",
+  numero: 713,
+  label: "v720",
   data: "2026-09-03",
-  nota: "Novidades incluem casas de veraneio e combustiveis; responsaveis por locacao podem ter mensalidade."
+  nota: "Novidades identificam o posto alterado, exibem casas como Lazer e usam detalhe horizontal."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -9187,7 +9187,7 @@ function tituloConteudoNovidadeAdmin(tipo, payload = {}) {
 function acaoNovidadeAdmin(tipo, isNew, payload = {}, original = {}) {
   const key = normalizeName(tipo || "");
   if (key.includes("casaveraneio")) return isNew ? "Casa de veraneio inserida" : "Casa de veraneio atualizada";
-  if (key.includes("combustivel")) return isNew ? "Posto de combustível inserido" : "Preços de combustíveis atualizados";
+  if (key.includes("combustivel")) return isNew ? "Posto de combustível inserido" : "Posto de combustível atualizado";
   if (key.includes("veiculo") || key.includes("automovel")) {
     if (isNew) return "Veiculo inserido";
     const antes = numberFromMoney(original.preco || original.valor || "");
@@ -21760,6 +21760,17 @@ function fuelAdminIsPlainObject(value) {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+function fuelAdminComparableStation(station = {}) {
+  const source = station && typeof station === "object" ? station : {};
+  const comparable = JSON.parse(JSON.stringify(source));
+  delete comparable.createdAt;
+  delete comparable.updatedAt;
+  delete comparable.updatedBy;
+  const schedule = comparable.horarios && typeof comparable.horarios === "object" ? comparable.horarios : {};
+  if (!Object.values(schedule).some((slots) => Array.isArray(slots) && slots.length)) delete comparable.horarios;
+  return comparable;
+}
+
 function fuelAdminCollectChangedPaths(current, next, path = "", updates = {}) {
   if (next === undefined) {
     if (path && current !== undefined) updates[path] = null;
@@ -21781,7 +21792,7 @@ async function saveFuelAdminSettings() {
   const currentStations = fuelAdminStationMap();
   const nextStations = collectFuelAdminStationsFromForm();
   const changedStationIds = Object.entries(nextStations)
-    .filter(([id, station]) => JSON.stringify(currentStations[id] || null) !== JSON.stringify(station))
+    .filter(([id, station]) => JSON.stringify(fuelAdminComparableStation(currentStations[id] || null)) !== JSON.stringify(fuelAdminComparableStation(station)))
     .map(([id]) => id);
   const timestamp = Date.now();
   changedStationIds.forEach((id) => {
@@ -21816,8 +21827,9 @@ async function saveFuelAdminSettings() {
     for (const stationId of changedStationIds) {
       const station = nextStations[stationId];
       if (!station || station.ativo === false) continue;
-      const isNewStation = !currentStations[stationId];
-      const acao = acaoNovidadeAdmin("combustivel", isNewStation, station, currentStations[stationId] || {});
+      const isNewStation = !currentStations[stationId]?.createdAt;
+      const priceChanged = Object.values(station.combustiveis || {}).some((product) => Number(product?.atualizadoEmTimestamp || 0) === timestamp);
+      const acao = priceChanged ? "Preços de combustíveis atualizados" : acaoNovidadeAdmin("combustivel", isNewStation, station, currentStations[stationId] || {});
       await registrarNovidadeAdmin({
         tipo: "combustivel",
         novidadeTema: "preco",

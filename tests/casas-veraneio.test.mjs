@@ -5,6 +5,7 @@ import { readFileSync } from "node:fs";
 const publicHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const publicJs = readFileSync(new URL("../script.js", import.meta.url), "utf8");
 const publicCss = readFileSync(new URL("../casas-veraneio.css", import.meta.url), "utf8");
+const siteCss = readFileSync(new URL("../style.css", import.meta.url), "utf8");
 const adminHtml = readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
 const adminJs = readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
 const adminCss = readFileSync(new URL("../admin/casas-veraneio-admin.css", import.meta.url), "utf8");
@@ -54,10 +55,27 @@ test("responsavel por casa de veraneio pode ter cobranca mensal opcional", () =>
 test("casas de veraneio e combustiveis publicam novidades e abrem seus destinos", () => {
   assert.match(adminJs, /registrarNovidadeAdmin\(\{[\s\S]*tipo: "casa_veraneio"/);
   assert.match(adminJs, /registrarNovidadeAdmin\(\{[\s\S]*tipo: "combustivel"/);
-  assert.match(publicJs, /key: "casas-veraneio", label: "Casa de veraneio"/);
+  assert.match(publicJs, /key: "casas-veraneio", label: "Lazer"/);
   assert.match(publicJs, /key: "combustiveis", label: "Combustível"/);
   assert.match(publicJs, /tipo\.includes\("casaveraneio"\)[\s\S]*mostrarCasasVeraneio/);
   assert.match(publicJs, /tipo\.includes\("combustivel"\)[\s\S]*mostrarCombustivel/);
+});
+
+test("novidades isolam o posto alterado e exibem casas como Lazer", () => {
+  assert.match(publicJs, /const liveCombustiveisLatest = new Map\(\)/);
+  assert.match(publicJs, /Math\.abs\(Number\(item\.dataMs \|\| 0\) - latestUpdate\) <= 300000/);
+  assert.match(publicJs, /label: "Lazer", icon: "fa-umbrella-beach"/);
+  assert.match(adminJs, /function fuelAdminComparableStation[\s\S]*delete comparable\.horarios/);
+});
+
+test("detalhe da novidade usa layout horizontal e casa abre como Ver local", () => {
+  assert.match(publicJs, /class="novidade-preview-layout"/);
+  assert.match(publicJs, /class="novidade-preview-visual"/);
+  assert.match(publicJs, /class="novidade-preview-content"/);
+  assert.match(publicJs, /includes\("casaveraneio"\)\) return "Ver local"/);
+  assert.match(publicJs, /mostrarCasasVeraneio\(\)[\s\S]*data-vacation-id/);
+  assert.match(siteCss, /\.novidade-preview-layout \{[\s\S]*grid-template-columns: minmax\(0, 1\.08fr\) minmax\(300px, \.92fr\)/);
+  assert.match(siteCss, /@media \(max-width: 760px\)[\s\S]*\.novidade-preview-layout \{[\s\S]*grid-template-columns: 1fr/);
 });
 
 test("mobile compacto usa dois cards por linha", () => {
