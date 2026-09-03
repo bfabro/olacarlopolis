@@ -2333,6 +2333,28 @@ screen and (width: 820px) {
   margin-right: 6px;
 }
 
+.somente-delivery-publico {
+  color: #d32f2f;
+  font-weight: 800;
+}
+
+.onde-comer-endereco.somente-delivery-publico {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.info-box.somente-delivery-publico {
+  border-left-color: #d32f2f;
+  background: #fff5f5;
+}
+
+.info-box.somente-delivery-publico .info-icon,
+.info-box.somente-delivery-publico .info-label,
+.info-box.somente-delivery-publico .info-value {
+  color: #d32f2f;
+}
+
 .horarios-publicos {
   display: grid;
   gap: 4px;

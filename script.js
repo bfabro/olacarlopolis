@@ -9612,7 +9612,11 @@ carlopdiesel:"s",
      
       <h3>${est.name}</h3>
       
-      ${est.address && !est.somenteDelivery ? `
+      ${est.somenteDelivery ? `
+        <span class="onde-comer-endereco endereco-uma-linha somente-delivery-publico">
+          <i class="fas fa-truck" aria-hidden="true"></i> Somente delivery
+        </span>
+      ` : est.address ? `
         <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
           ${est.address.trim().toLowerCase() !== "somente delivery"
             ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank" rel="noopener noreferrer" onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'endereco')">${est.address}</a>`
@@ -25940,7 +25944,15 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-        ${establishment.address && !establishment.somenteDelivery ? `
+        ${establishment.somenteDelivery ? `
+          <div class="info-box somente-delivery-publico">
+            <i class="fas fa-truck info-icon" aria-hidden="true"></i>
+            <div>
+              <div class="info-label">Atendimento</div>
+              <div class="info-value">Somente delivery</div>
+            </div>
+          </div>
+        ` : establishment.address ? `
           <div class="info-box">
             <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" 
               target="_blank">

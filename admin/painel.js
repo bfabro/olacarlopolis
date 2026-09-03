@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 724,
-  label: "v731",
+  numero: 725,
+  label: "v732",
   data: "2026-09-03",
-  nota: "O cadastro do cliente permite marcar atendimento somente por delivery e ocultar o endereco no site publico."
+  nota: "Clientes marcados como somente delivery recebem aviso vermelho na pagina publica e na tela Onde Comer."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
