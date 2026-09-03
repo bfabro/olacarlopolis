@@ -9612,12 +9612,14 @@ carlopdiesel:"s",
      
       <h3>${est.name}</h3>
       
-      <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
-  ${est.address && est.address.trim().toLowerCase() !== "somente delivery"
-          ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank" rel="noopener noreferrer" onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'endereco')">${est.address}</a>`
-          : `<span style="color:#ff0000; font-weight:bold">${est.address}</span>`
-        }
-</span>
+      ${est.address && !est.somenteDelivery ? `
+        <span class="onde-comer-endereco endereco-uma-linha" title="${est.address}">
+          ${est.address.trim().toLowerCase() !== "somente delivery"
+            ? `<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(est.address)}" target="_blank" rel="noopener noreferrer" onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'endereco')">${est.address}</a>`
+            : `<span style="color:#ff0000; font-weight:bold">${est.address}</span>`
+          }
+        </span>
+      ` : ""}
 
 ${est.funcionamento24Horas ? `
   <div class="onde-comer-horario-texto funcionamento-24-horas"><i class="fas fa-clock"></i> Funcionamento: 24 horas</div>
@@ -23944,6 +23946,10 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.contact3 = contatos[2] || "";
     }
     if (campoExiste(cliente, "endereco")) est.address = cliente.endereco || "";
+    if (campoExiste(cliente, "somenteDelivery") || campoExiste(cliente, "deliveryOnly")) {
+      est.somenteDelivery = Boolean(cliente.somenteDelivery || cliente.deliveryOnly);
+    }
+    if (est.somenteDelivery) est.address = "";
     if (campoExiste(cliente, "cidade")) est.cidade = cliente.cidade || "";
     if (campoExiste(cliente, "descricaoCurta")) est.descricaoCurta = cliente.descricaoCurta || "";
     if (campoExiste(cliente, "imagemEnquadramento")) est.imagemEnquadramento = cliente.imagemEnquadramento || "auto";
@@ -24000,6 +24006,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function montarEstabelecimentoDoClienteAdmin(cliente, clienteId) {
     const imagensAdmin = montarImagensAdminComLogoAtual(cliente);
+    const somenteDelivery = Boolean(cliente.somenteDelivery || cliente.deliveryOnly);
 
     const temControleCardapio = campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio");
     const cardapioAtivo = temControleCardapio
@@ -24022,7 +24029,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       hours: cliente.funcionamento24Horas ? "24 horas" : (cliente.horarios ? (formatarHorariosAdmin(cliente.horarios) || cliente.horario || "") : (cliente.horario || "")),
       horarios: cliente.horarios || null,
       statusAberto: cliente.funcionamento24Horas || cliente.horarios ? "a" : "",
-      address: cliente.endereco || "",
+      address: somenteDelivery ? "" : (cliente.endereco || ""),
+      somenteDelivery,
       cidade: cliente.cidade || "",
       descricaoCurta: cliente.descricaoCurta || "",
       imagemEnquadramento: cliente.imagemEnquadramento || "auto",
@@ -25932,7 +25940,7 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-        ${establishment.address ? `
+        ${establishment.address && !establishment.somenteDelivery ? `
           <div class="info-box">
             <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.address.replace(/<br>/g, " "))}" 
               target="_blank">

@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 723,
-  label: "v730",
+  numero: 724,
+  label: "v731",
   data: "2026-09-03",
-  nota: "As modais publicas de imoveis e automoveis exibem somente um botao funcional de compartilhar e um de fechar."
+  nota: "O cadastro do cliente permite marcar atendimento somente por delivery e ocultar o endereco no site publico."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -9150,6 +9150,7 @@ function getClientFormData() {
     contato3: contatos[2] || "",
     creci: $("clientCreci")?.value.trim() || "",
     endereco: $("clientAddress").value.trim(),
+    somenteDelivery: Boolean($("clientDeliveryOnly")?.checked),
     cidade: $("clientCity")?.value.trim() || "",
     funcionamento24Horas,
     horario: horarioTexto,
@@ -9440,8 +9441,10 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     logoUpdate.imagem = profileImage;
     logoUpdate.imagens = profileImage ? [profileImage] : [];
   }
-  if (String(original.endereco || "") !== String(effective.endereco || "")) {
-    if (String(effective.endereco || "").trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
+  const enderecoPublicoAnterior = original.somenteDelivery || original.deliveryOnly ? "" : String(original.endereco || "");
+  const enderecoPublicoAtual = effective.somenteDelivery || effective.deliveryOnly ? "" : String(effective.endereco || "");
+  if (enderecoPublicoAnterior !== enderecoPublicoAtual) {
+    if (enderecoPublicoAtual.trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
     else remove("cliente-endereco", "endereco");
   }
   const contactFingerprint = (client) => JSON.stringify(normalizeClientContactDetails(client).map((item) => ({
@@ -9634,6 +9637,7 @@ function fillClientForm(client) {
   if ($("clientContact4IsWhatsapp")) $("clientContact4IsWhatsapp").checked = Boolean(contatos[3]?.whatsapp);
   setAllClientSectionsExpanded(false);
   $("clientAddress").value = client.endereco || client.address || "";
+  if ($("clientDeliveryOnly")) $("clientDeliveryOnly").checked = Boolean(client.somenteDelivery || client.deliveryOnly);
   if ($("clientCity")) $("clientCity").value = client.cidade || client.city || "Carlopolis - PR";
   $("clientHours").value = client.horario || client.hours || "";
   if ($("clientOpen24Hours")) $("clientOpen24Hours").checked = Boolean(client.funcionamento24Horas);
@@ -24063,6 +24067,10 @@ function renderClientOnlyEditor() {
           <small id="coShortDescriptionHelp" class="field-character-count"><span id="coShortDescriptionCount">${String(client.descricaoCurta || client.shortDescription || "").length}</span>/400 caracteres permitidos</small>
         </label>
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
+        <label class="schedule-global-all-day wide">
+          <input id="coDeliveryOnly" type="checkbox" ${client.somenteDelivery || client.deliveryOnly ? "checked" : ""}>
+          <span><strong>Somente delivery</strong><small>Quando ativo, o endereco permanece salvo, mas nao aparece no site publico.</small></span>
+        </label>
         ${(() => {
           const contactDetails = normalizeClientContactDetails(client);
           const contactInputIds = ["coContact", "coWhatsapp", "coContact3", "coContact4"];
@@ -25052,6 +25060,7 @@ function renderClientOnlyEditor() {
         contato3: contatos[2] || "",
         ...(isRealEstateClient ? { creci: $("coCreci")?.value.trim() || "" } : {}),
         endereco: $("coAddress").value.trim(),
+        somenteDelivery: Boolean($("coDeliveryOnly")?.checked),
         funcionamento24Horas,
         horario: horarioTexto,
         ...(shouldSaveSchedule ? { horarios: normalizeSchedule(horarios) } : {}),
