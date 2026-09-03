@@ -9612,7 +9612,7 @@ carlopdiesel:"s",
      
       <h3>${est.name}</h3>
       
-      ${est.somenteDelivery ? `
+      ${clienteSomenteDeliveryAtivo(est) ? `
         <span class="onde-comer-endereco endereco-uma-linha somente-delivery-publico">
           <i class="fas fa-truck" aria-hidden="true"></i> Somente delivery
         </span>
@@ -23803,6 +23803,14 @@ plotarPinsImoveis(stateImoveis.filtered);
     return Object.prototype.hasOwnProperty.call(obj || {}, campo);
   }
 
+  function clienteSomenteDeliveryAtivo(cliente = {}) {
+    return Boolean(
+      cliente.somenteDelivery
+      || cliente.deliveryOnly
+      || normalizeName(cliente.endereco || cliente.address || "") === "somentedelivery"
+    );
+  }
+
   function preservarIdentidadeAdminEstabelecimento(est) {
     if (!est || est.__adminIdentityReady) return;
     est.__adminOriginalName = est.name || "";
@@ -23950,9 +23958,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       est.contact3 = contatos[2] || "";
     }
     if (campoExiste(cliente, "endereco")) est.address = cliente.endereco || "";
-    if (campoExiste(cliente, "somenteDelivery") || campoExiste(cliente, "deliveryOnly")) {
-      est.somenteDelivery = Boolean(cliente.somenteDelivery || cliente.deliveryOnly);
-    }
+    est.somenteDelivery = clienteSomenteDeliveryAtivo(cliente);
     if (est.somenteDelivery) est.address = "";
     if (campoExiste(cliente, "cidade")) est.cidade = cliente.cidade || "";
     if (campoExiste(cliente, "descricaoCurta")) est.descricaoCurta = cliente.descricaoCurta || "";
@@ -24010,7 +24016,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function montarEstabelecimentoDoClienteAdmin(cliente, clienteId) {
     const imagensAdmin = montarImagensAdminComLogoAtual(cliente);
-    const somenteDelivery = Boolean(cliente.somenteDelivery || cliente.deliveryOnly);
+    const somenteDelivery = clienteSomenteDeliveryAtivo(cliente);
 
     const temControleCardapio = campoExiste(cliente, "cardapioAtivo") || campoExiste(cliente, "menuAtivo") || campoExiste(cliente, "exibirCardapio");
     const cardapioAtivo = temControleCardapio
@@ -25944,7 +25950,7 @@ ${!establishment.descricaoFalecido ? `
 
 
 
-        ${establishment.somenteDelivery ? `
+        ${clienteSomenteDeliveryAtivo(establishment) ? `
           <div class="info-box somente-delivery-publico">
             <i class="fas fa-truck info-icon" aria-hidden="true"></i>
             <div>

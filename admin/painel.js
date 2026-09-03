@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 725,
-  label: "v732",
+  numero: 726,
+  label: "v733",
   data: "2026-09-03",
-  nota: "Clientes marcados como somente delivery recebem aviso vermelho na pagina publica e na tela Onde Comer."
+  nota: "O aviso somente delivery reconhece a flag atual e cadastros legados que usam essa informacao no campo de endereco."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -956,6 +956,14 @@ function normalizeName(text) {
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]/g, "");
+}
+
+function clienteSomenteDeliveryAtivo(cliente = {}) {
+  return Boolean(
+    cliente.somenteDelivery
+    || cliente.deliveryOnly
+    || normalizeName(cliente.endereco || cliente.address || "") === "somentedelivery"
+  );
 }
 
 function addAliasKey(target, value) {
@@ -9441,8 +9449,8 @@ async function registrarAtualizacoesClienteNovidade(clientId, payload = {}, orig
     logoUpdate.imagem = profileImage;
     logoUpdate.imagens = profileImage ? [profileImage] : [];
   }
-  const enderecoPublicoAnterior = original.somenteDelivery || original.deliveryOnly ? "" : String(original.endereco || "");
-  const enderecoPublicoAtual = effective.somenteDelivery || effective.deliveryOnly ? "" : String(effective.endereco || "");
+  const enderecoPublicoAnterior = clienteSomenteDeliveryAtivo(original) ? "" : String(original.endereco || "");
+  const enderecoPublicoAtual = clienteSomenteDeliveryAtivo(effective) ? "" : String(effective.endereco || "");
   if (enderecoPublicoAnterior !== enderecoPublicoAtual) {
     if (enderecoPublicoAtual.trim()) add("endereco", "cliente-endereco", "Endereço atualizado");
     else remove("cliente-endereco", "endereco");
@@ -9637,7 +9645,7 @@ function fillClientForm(client) {
   if ($("clientContact4IsWhatsapp")) $("clientContact4IsWhatsapp").checked = Boolean(contatos[3]?.whatsapp);
   setAllClientSectionsExpanded(false);
   $("clientAddress").value = client.endereco || client.address || "";
-  if ($("clientDeliveryOnly")) $("clientDeliveryOnly").checked = Boolean(client.somenteDelivery || client.deliveryOnly);
+  if ($("clientDeliveryOnly")) $("clientDeliveryOnly").checked = clienteSomenteDeliveryAtivo(client);
   if ($("clientCity")) $("clientCity").value = client.cidade || client.city || "Carlopolis - PR";
   $("clientHours").value = client.horario || client.hours || "";
   if ($("clientOpen24Hours")) $("clientOpen24Hours").checked = Boolean(client.funcionamento24Horas);
@@ -24068,7 +24076,7 @@ function renderClientOnlyEditor() {
         </label>
         <label class="admin-field-line field-address wide">Endereco<input id="coAddress" value="${escapeAttr(client.endereco || "")}"></label>
         <label class="schedule-global-all-day wide">
-          <input id="coDeliveryOnly" type="checkbox" ${client.somenteDelivery || client.deliveryOnly ? "checked" : ""}>
+          <input id="coDeliveryOnly" type="checkbox" ${clienteSomenteDeliveryAtivo(client) ? "checked" : ""}>
           <span><strong>Somente delivery</strong><small>Quando ativo, o endereco permanece salvo, mas nao aparece no site publico.</small></span>
         </label>
         ${(() => {
