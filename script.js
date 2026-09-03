@@ -12609,10 +12609,6 @@ plotarPinsImoveis(stateImoveis.filtered);
           ` : `<div class="imovel-detalhes-sem-foto"><i class="fa-solid fa-house"></i></div>`}
         </div>
         <div class="imovel-detalhes-conteudo">
-          <div class="loja-produto-modal-actions">
-            <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
-            <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
-          </div>
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${escapePromoHtml(im.titulo || "Imovel")}</h2>
@@ -13526,10 +13522,6 @@ plotarPinsImoveis(stateImoveis.filtered);
           ` : `<div class="imovel-detalhes-sem-foto auto-detalhes-sem-foto"><i class="fa-solid fa-car-side"></i></div>`}
         </div>
         <div class="imovel-detalhes-conteudo">
-          <div class="loja-produto-modal-actions">
-            <button type="button" class="item-modal-share" data-item-modal-share aria-label="Copiar link para compartilhar" title="Copiar link para compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
-            <button type="button" class="imovel-detalhes-fechar loja-produto-fechar" aria-label="Fechar">&times;</button>
-          </div>
           <div class="imovel-detalhes-topo">
             <div>
               <h2>${textoSeguroAutomoveis(titulo)}</h2>

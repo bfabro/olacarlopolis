@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 722,
-  label: "v729",
+  numero: 723,
+  label: "v730",
   data: "2026-09-03",
-  nota: "Cliques de veiculos sao vinculados ao cliente correto e contatos por WhatsApp recebem destaque tambem na linha do tempo."
+  nota: "As modais publicas de imoveis e automoveis exibem somente um botao funcional de compartilhar e um de fechar."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
