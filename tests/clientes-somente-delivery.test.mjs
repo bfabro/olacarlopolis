@@ -21,3 +21,11 @@ test("aviso somente delivery aparece em vermelho no Onde Comer e na area do clie
   assert.ok(script.includes('<div class="info-value">Somente delivery</div>'));
   assert.match(style, /\.somente-delivery-publico\s*\{[\s\S]*?color:\s*#d32f2f/);
 });
+
+test("Onde Comer inclui as categorias dos clientes delivery existentes", () => {
+  const inicio = script.indexOf("function mostrarOndeComer");
+  const fim = script.indexOf("function mostrar", inicio + 30);
+  const trecho = script.slice(inicio, fim > inicio ? fim : inicio + 12000);
+  assert.ok(trecho.includes('"Doces e Chocolates"'));
+  assert.ok(trecho.includes('"Salgados para Festas"'));
+});

@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 726,
-  label: "v733",
+  numero: 727,
+  label: "v734",
   data: "2026-09-03",
-  nota: "O aviso somente delivery reconhece a flag atual e cadastros legados que usam essa informacao no campo de endereco."
+  nota: "Onde Comer inclui clientes de Doces e Chocolates e Salgados para Festas, exibindo o aviso somente delivery."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

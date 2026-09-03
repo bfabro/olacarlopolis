@@ -9513,7 +9513,7 @@ carlopdiesel:"s",
   // mostrar onde comer
   function mostrarOndeComer(filtroCategoria = "Todos") {
     const categoriasComida = [
-      "Abertos", "Açai", "Lanchonete", "Padaria", "Pizzaria", "Restaurante", "Sorveteria",
+      "Abertos", "Açai", "Doces e Chocolates", "Lanchonete", "Padaria", "Pizzaria", "Restaurante", "Salgados para Festas", "Sorveteria",
     ];
 
     // 1. Monta o filtro
