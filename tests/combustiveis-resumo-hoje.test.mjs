@@ -6,9 +6,13 @@ const script = readFileSync(new URL("../script.js", import.meta.url), "utf8");
 const style = readFileSync(new URL("../style.css", import.meta.url), "utf8");
 const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 
-test("Menor preço Hoje usa todos os combustiveis e ordena os cards alfabeticamente", () => {
+test("Menor preço Hoje usa todos os combustiveis na ordem comercial definida", () => {
   assert.match(script, /const cheapestByProduct = new Map\(cheapest\.map/);
-  assert.match(script, /const dailySummary = options\s*\.map[\s\S]*?\.sort\(\(a, b\) => a\.label\.localeCompare\(b\.label, "pt-BR"\)\)/);
+  assert.match(script, /function fuelPublicSummaryOrder/);
+  ["arla", "etanol", "s500", "s10", "gasolina"].forEach((term) => {
+    assert.ok(script.includes('key.includes("' + term + '")'));
+  });
+  assert.ok(script.includes("fuelPublicSummaryOrder(a.label) - fuelPublicSummaryOrder(b.label)"));
   assert.match(script, /best\?\.station\?\.imagem/);
   assert.ok(script.includes("Preço não informado"));
   assert.ok(script.includes("Menor preço Hoje"));
@@ -21,8 +25,8 @@ test("card mostra posto, rota, separador, preço por litro e combustível nessa 
   assert.ok(start >= 0 && end > start);
   assert.match(summary, /fuelPublicMapUrl\(best\.station, config\)/);
   assert.match(summary, /target="_blank" rel="noopener noreferrer"/);
-  assert.match(summary, /fa-solid fa-arrow-right/);
-  assert.doesNotMatch(summary, /fa-solid fa-route/);
+  assert.match(summary, /fa-solid fa-location-arrow/);
+  assert.doesNotMatch(summary, /fa-solid fa-route|fa-solid fa-arrow-right/);
   assert.ok(summary.includes("/ litro"));
   const order = [
     "fuel-daily-summary-photo",
@@ -70,6 +74,6 @@ test("cards do resumo sao uniformes e responsivos", () => {
 
 test("versoes publicas foram atualizadas", () => {
   assert.ok(html.includes("style.css?v=482"));
-  assert.ok(html.includes("script.js?v=681"));
-  assert.ok(html.includes("Olá Carlópolis v468"));
+  assert.ok(html.includes("script.js?v=682"));
+  assert.ok(html.includes("Olá Carlópolis v469"));
 });

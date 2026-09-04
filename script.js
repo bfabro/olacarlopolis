@@ -30043,6 +30043,17 @@ function fuelPublicSummaryVisual(label) {
   return { icon: "fa-droplet", className: "is-default" };
 }
 
+function fuelPublicSummaryOrder(label) {
+  const key = fuelPublicNormalize(label);
+  if (key.includes("arla")) return 0;
+  if (key.includes("etanol")) return 1;
+  if (key.includes("s500")) return 2;
+  if (key.includes("s10")) return 3;
+  if (key.includes("gasolina") && !key.includes("aditivada")) return 4;
+  if (key.includes("gasolina") && key.includes("aditivada")) return 5;
+  return 99;
+}
+
 function fuelPublicDate(value) {
   const displayValue = String(value || "");
   if (/^\d{2}\/\d{2}\/\d{4} às \d{2}:\d{2}$/.test(displayValue)) return displayValue;
@@ -30292,7 +30303,8 @@ function renderizarValoresCombustivel() {
   const cheapestByProduct = new Map(cheapest.map((item) => [fuelPublicNormalize(item.label), item]));
   const dailySummary = options
     .map((option) => ({ ...option, best: cheapestByProduct.get(option.key) || null }))
-    .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
+    .sort((a, b) => fuelPublicSummaryOrder(a.label) - fuelPublicSummaryOrder(b.label)
+      || a.label.localeCompare(b.label, "pt-BR"));
   const city = `${config.cidade || "Cidade"}${config.uf ? ` / ${config.uf}` : ""}`;
   const calculatorOptions = cheapest.map((item) => `<option value="${item.price}">${fuelPublicEscape(item.label)} · ${fuelPublicMoney(item.price)}</option>`).join("");
 
@@ -30307,7 +30319,7 @@ function renderizarValoresCombustivel() {
         const stationName = best?.station?.nomeExibicao || best?.station?.razaoSocial || "";
         const stationMapUrl = best ? fuelPublicMapUrl(best.station, config) : "";
         const fuelVisual = fuelPublicSummaryVisual(label);
-        return `<article class="fuel-daily-summary-card"><div class="fuel-daily-summary-photo">${best?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(best.station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<span>Foto indisponível</span>`}</div><div class="fuel-daily-summary-station"><span>${fuelPublicEscape(stationName || "Posto não informado")}</span>${stationMapUrl ? `<a href="${fuelPublicEscape(stationMapUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir rota para ${fuelPublicEscape(stationName || "o posto")}" title="Abrir rota"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>` : ""}</div><div class="fuel-daily-summary-divider" aria-hidden="true"></div><small>Menor preço hoje</small>${best ? `<div class="fuel-daily-summary-price"><strong>${fuelPublicSummaryMoney(best.price)}</strong><span>/ litro</span></div>` : `<div class="fuel-daily-summary-price is-pending"><strong>Preço não informado</strong></div>`}<h4 class="fuel-daily-summary-fuel ${fuelVisual.className}"><i class="fa-solid ${fuelVisual.icon}" aria-hidden="true"></i><span>${fuelPublicEscape(label)}</span></h4></article>`;
+        return `<article class="fuel-daily-summary-card"><div class="fuel-daily-summary-photo">${best?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(best.station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<span>Foto indisponível</span>`}</div><div class="fuel-daily-summary-station"><span>${fuelPublicEscape(stationName || "Posto não informado")}</span>${stationMapUrl ? `<a href="${fuelPublicEscape(stationMapUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir rota para ${fuelPublicEscape(stationName || "o posto")}" title="Abrir rota"><i class="fa-solid fa-location-arrow" aria-hidden="true"></i></a>` : ""}</div><div class="fuel-daily-summary-divider" aria-hidden="true"></div><small>Menor preço hoje</small>${best ? `<div class="fuel-daily-summary-price"><strong>${fuelPublicSummaryMoney(best.price)}</strong><span>/ litro</span></div>` : `<div class="fuel-daily-summary-price is-pending"><strong>Preço não informado</strong></div>`}<h4 class="fuel-daily-summary-fuel ${fuelVisual.className}"><i class="fa-solid ${fuelVisual.icon}" aria-hidden="true"></i><span>${fuelPublicEscape(label)}</span></h4></article>`;
       }).join("")}</div>
     </section>
 
