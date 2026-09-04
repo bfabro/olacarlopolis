@@ -30276,9 +30276,8 @@ function renderizarValoresCombustivel() {
     ? stations
     : stations.filter((station) => fuelPublicProducts(station).some((product) => fuelPublicNormalize(product.label) === fuelPublicActiveFilter));
   const cheapest = fuelPublicCheapest(stations);
-  const highlighted = fuelPublicActiveFilter === "todos"
-    ? (cheapest.find((item) => fuelPublicNormalize(item.label).includes("gasolina")) || cheapest[0])
-    : cheapest.find((item) => fuelPublicNormalize(item.label) === fuelPublicActiveFilter);
+  const cheapestByProduct = new Map(cheapest.map((item) => [fuelPublicNormalize(item.label), item]));
+  const dailySummary = options.map((option) => ({ ...option, best: cheapestByProduct.get(option.key) || null }));
   const city = `${config.cidade || "Cidade"}${config.uf ? ` / ${config.uf}` : ""}`;
   const calculatorOptions = cheapest.map((item) => `<option value="${item.price}">${fuelPublicEscape(item.label)} · ${fuelPublicMoney(item.price)}</option>`).join("");
 
@@ -30287,9 +30286,12 @@ function renderizarValoresCombustivel() {
       <div><i class="fa-solid fa-gas-pump"></i><h2>Combustíveis</h2></div>
       <span><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(city)}</span>
     </header>
-    <section class="fuel-best-banner">
-      <div class="fuel-best-photo">${highlighted?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(highlighted.station.imagem)}" alt="Foto de ${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<i class="fa-solid fa-gas-pump"></i>`}</div>
-      <div class="fuel-best-content">${highlighted ? `<span>Menor ${fuelPublicEscape(highlighted.label)} hoje ${highlighted.promotion ? `<em class="fuel-promo-badge">Promoção</em>` : ""}</span><strong>${fuelPublicMoney(highlighted.price)}</strong>${highlighted.promotion ? fuelPublicPromotionDetails(highlighted.promotion) : ""}<small class="fuel-best-station-name">${fuelPublicEscape(highlighted.station.nomeExibicao || highlighted.station.razaoSocial || "Posto")}</small>` : `<span>Os preços ainda estão sendo atualizados.</span><small>Consulte novamente em breve.</small>`}</div>
+    <section class="fuel-daily-summary" aria-labelledby="fuel-daily-summary-title">
+      <header class="fuel-daily-summary-heading"><i class="fa-solid fa-trophy" aria-hidden="true"></i><h3 id="fuel-daily-summary-title">Resumo de hoje</h3></header>
+      <div class="fuel-daily-summary-grid">${dailySummary.map(({ label, best }) => {
+        const stationName = best?.station?.nomeExibicao || best?.station?.razaoSocial || "";
+        return `<article class="fuel-daily-summary-card"><div class="fuel-daily-summary-photo">${best?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(best.station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<span>Foto indisponível</span>`}</div><h4>${fuelPublicEscape(label)}</h4><small>Menor preço hoje</small>${best ? `<strong>${fuelPublicMoney(best.price)}</strong><footer>${fuelPublicEscape(stationName || "Posto")}</footer>` : `<strong class="is-pending">Preço não informado</strong><footer>Aguardando atualização dos postos</footer>`}</article>`;
+      }).join("")}</div>
     </section>
     <nav class="fuel-filter-chips" aria-label="Filtrar postos por combustível">
       ${options.map((option) => `<button type="button" data-fuel-filter="${fuelPublicEscape(option.key)}" class="${fuelPublicActiveFilter === option.key ? "active" : ""}">${fuelPublicEscape(option.label)}</button>`).join("")}

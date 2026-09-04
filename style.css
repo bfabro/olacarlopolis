@@ -28407,6 +28407,32 @@ body.eventos-image-open { overflow: hidden; }
 .fuel-best-content > span { color: #34465e; font-size: .78rem; font-weight: 850; }
 .fuel-best-content > strong { margin: 0; color: #078a42; font-size: 1.22rem; line-height: 1.1; }
 .fuel-best-content .fuel-best-station-name { display: block; margin: 2px 0 0; color: #17253d; font-size: 1rem; font-weight: 900; line-height: 1.25; }
+.fuel-daily-summary { padding: 18px; border: 1px solid #e3e9f1; border-radius: 18px; background: #fff; box-shadow: 0 6px 18px rgba(15, 23, 42, .05); }
+.fuel-daily-summary-heading { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.fuel-daily-summary-heading > i { color: #f08a00; font-size: 1.25rem; }
+.fuel-daily-summary-heading h3 { margin: 0; color: #101d33; font-size: 1.3rem; line-height: 1.2; }
+.fuel-daily-summary-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.fuel-daily-summary-card { display: grid; grid-template-rows: auto minmax(2.5em, auto) auto minmax(2.4em, auto) minmax(3.1em, auto); align-content: start; min-width: 0; padding: 10px; border: 1px solid #dfe5ec; border-radius: 14px; background: #fff; box-shadow: 0 3px 10px rgba(15, 23, 42, .035); text-align: center; }
+.fuel-daily-summary-photo { width: 100%; aspect-ratio: 4 / 3; margin-bottom: 9px; overflow: hidden; border-radius: 10px; background: #f2f5f8; }
+.fuel-daily-summary-photo img { display: block; width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
+.fuel-daily-summary-photo > span { display: grid; place-items: center; width: 100%; height: 100%; padding: 8px; color: #8a95a4; font-size: .64rem; font-weight: 750; }
+.fuel-daily-summary-card h4 { display: -webkit-box; overflow: hidden; margin: 0; color: #14213d; font-size: .8rem; font-weight: 900; line-height: 1.25; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.fuel-daily-summary-card > small { align-self: center; color: #758195; font-size: .64rem; font-weight: 700; line-height: 1.25; }
+.fuel-daily-summary-card > strong { align-self: center; color: #078a42; font-size: clamp(1.08rem, 1.8vw, 1.42rem); font-weight: 950; line-height: 1.05; white-space: nowrap; }
+.fuel-daily-summary-card > strong.is-pending { color: #697689; font-size: .72rem; line-height: 1.25; white-space: normal; }
+.fuel-daily-summary-card footer { display: -webkit-box; align-self: stretch; overflow: hidden; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e8edf2; color: #17253d; font-size: .7rem; font-weight: 850; line-height: 1.3; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+@media (max-width: 900px) {
+  .fuel-daily-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .fuel-daily-summary { padding: 13px; border-radius: 16px; }
+  .fuel-daily-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+  .fuel-daily-summary-card { padding: 9px; }
+  .fuel-daily-summary-card > strong { font-size: clamp(1.12rem, 6vw, 1.42rem); }
+}
+@media (max-width: 350px) {
+  .fuel-daily-summary-grid { grid-template-columns: minmax(0, 1fr); }
+}
 .fuel-station-card-compact > .fuel-station-summary { grid-template-columns: 78px minmax(0, 1fr) auto; align-items: start; }
 .fuel-station-photo { width: 78px; height: 78px; border-radius: 15px; font-size: 1.6rem; }
 .fuel-station-identity h3 { overflow: visible; margin-bottom: 6px; font-size: 1.06rem; line-height: 1.25; text-overflow: clip; white-space: normal; overflow-wrap: anywhere; }
