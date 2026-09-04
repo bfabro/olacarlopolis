@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 732,
-  label: "v739",
+  numero: 733,
+  label: "v740",
   data: "2026-09-04",
-  nota: "Menor preco Hoje segue a ordem comercial definida e usa seta de localizacao para abrir o Maps."
+  nota: "Relatorio de acessos identifica horarios registrados fora do Brasil com um marcador visual."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -18722,6 +18722,17 @@ function formatReportTime(item = {}, fallbackDate = "") {
   return fallbackDate || "-";
 }
 
+function reportCountryInfo(item = {}) {
+  const pais = String(item.pais || item.country || "").trim();
+  const normalizedCountry = normalizeName(pais);
+  const unknownCountries = new Set(["", "-", "desconhecido", "indefinido", "unknown"]);
+  const brazilAliases = new Set(["br", "bra", "brasil", "brazil"]);
+  return {
+    pais,
+    acessoExterior: !unknownCountries.has(normalizedCountry) && !brazilAliases.has(normalizedCountry)
+  };
+}
+
 function clickCityLabel(item = {}) {
   const cidade = String(item.cidade || item.city || "").trim();
   const estado = String(item.estado || item.region || item.uf || "").trim();
@@ -18805,6 +18816,7 @@ function buildClickTimeline(metrics = {}, range = getReportDateRange()) {
     rows.push({
       date,
       hora: formatReportTime(item, date),
+      ...reportCountryInfo(item),
       area,
       cliente: clientLabelFromMetricKey(cliente),
       tipo: metricButtonLabel(tipo || item.tipo || area),
@@ -18971,6 +18983,7 @@ function buildAccessTimeline(acessos = {}, range = getReportDateRange()) {
       rows.push({
         date,
         hora: formatReportTime(item, date),
+        ...reportCountryInfo(item),
         origem: origemLabel(item?.origem || item?.canal || item?.referrer),
         canal: item?.canal || "-",
         cidade: [item?.cidade || "Desconhecida", item?.estado || ""].filter(Boolean).join(" - "),
@@ -19759,7 +19772,12 @@ function renderTimelineTable(rows, emptyMessage, type = "clicks") {
           ${rows.slice(0, 80).map((row) => `
             <tr title="${escapeAttr(row.pagina || "")}">
               <td>${escapeHtml(row.date)}</td>
-              <td><strong>${escapeHtml(row.hora)}</strong></td>
+              <td>
+                <span class="report-time-value">
+                  <strong>${escapeHtml(row.hora)}</strong>
+                  ${row.acessoExterior ? `<i class="fa-solid fa-earth-americas report-foreign-access-icon" title="Acesso de outro pais: ${escapeAttr(row.pais)}" aria-label="Acesso de outro pais: ${escapeAttr(row.pais)}"></i>` : ""}
+                </span>
+              </td>
               ${isAccess
                 ? `<td>${escapeHtml(row.origem)}</td><td>${escapeHtml(row.canal)}</td><td>${escapeHtml(row.cidade)}</td><td>${escapeHtml(row.dispositivo)}</td>`
                 : `<td>${escapeHtml(row.area)}</td><td>${escapeHtml(row.cliente)}</td><td>${escapeHtml(row.tipo)}</td>`}

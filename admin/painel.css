@@ -4897,6 +4897,23 @@ body.terrain-owner-detail-open {
   text-transform: uppercase;
 }
 
+.report-time-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.report-foreign-access-icon {
+  display: inline-grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border-radius: 50%;
+  color: #fff;
+  background: #6d5bd0;
+  font-size: 10px;
+}
 .report-whatsapp-marker {
   display: inline-flex;
   align-items: center;

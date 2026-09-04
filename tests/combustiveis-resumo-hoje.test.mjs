@@ -75,5 +75,5 @@ test("cards do resumo sao uniformes e responsivos", () => {
 test("versoes publicas foram atualizadas", () => {
   assert.ok(html.includes("style.css?v=482"));
   assert.ok(html.includes("script.js?v=682"));
-  assert.ok(html.includes("Olá Carlópolis v469"));
+  assert.ok(html.includes("Olá Carlópolis v470"));
 });
