@@ -47,6 +47,15 @@ test("captura em campo oferece GPS camera referencia e observacoes", () => {
   assert.match(panelJs, /uploadTerrainGeneralPhotos\(terrainId, files, "frente"\)/);
 });
 
+test("salvamento aguarda o GPS e a previa libera a URL sem JavaScript inline", () => {
+  assert.match(panelHtml, /id="terrainQuickSave"/);
+  assert.match(panelJs, /terrainQuickLocationPending/);
+  assert.match(panelJs, /hasManualReference/);
+  assert.match(panelJs, /Aguardando GPS/);
+  assert.match(panelJs, /window\.URL\.revokeObjectURL/);
+  assert.doesNotMatch(panelJs, /onload="URL\.revokeObjectURL/);
+});
+
 test("prospeccao aceita dados minimos com GPS e preserva precisao", () => {
   const terrain = buildTerrainRecord(quickInput, { id: "quick-1", timestamp: 1000 });
   assert.equal(terrain.cadastro_rapido, true);
@@ -116,8 +125,8 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
   assert.match(panelHtml, /painel\.css\?v=447/);
-  assert.match(panelHtml, /painel\.js\?v=671/);
+  assert.match(panelHtml, /painel\.js\?v=672/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=22/);
-  assert.match(panelJs, /numero: 734/);
-  assert.match(panelJs, /label: "v741"/);
+  assert.match(panelJs, /numero: 735/);
+  assert.match(panelJs, /label: "v742"/);
 });

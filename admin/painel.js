@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 734,
-  label: "v741",
+  numero: 735,
+  label: "v742",
   data: "2026-09-04",
-  nota: "Gestao de terrenos recebe acesso rapido para prospeccao em campo com GPS, camera e consulta."
+  nota: "Correcao do salvamento rapido de terrenos com GPS, previa de fotos e permissao do Storage."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3466,7 +3466,21 @@ function terrainQuickCaptureName() {
   return `Prospecção ${date} ${time}`;
 }
 
+let terrainQuickLocationPending = false;
+
+function setTerrainQuickLocationPending(pending) {
+  terrainQuickLocationPending = Boolean(pending);
+  const saveButton = $("terrainQuickSave");
+  if (!saveButton) return;
+  const hasManualReference = Boolean($("terrainQuickReference")?.value.trim());
+  saveButton.disabled = terrainQuickLocationPending && !hasManualReference;
+  saveButton.innerHTML = terrainQuickLocationPending
+    ? '<i class="fa-solid fa-location-crosshairs fa-beat-fade"></i> Aguardando GPS...'
+    : '<i class="fa-solid fa-floppy-disk"></i> Salvar prospecção';
+}
+
 function resetTerrainQuickForm() {
+  setTerrainQuickLocationPending(false);
   $("terrainQuickForm")?.reset();
   if ($("terrainQuickNickname")) $("terrainQuickNickname").value = terrainQuickCaptureName();
   ["terrainQuickLatitude", "terrainQuickLongitude", "terrainQuickAccuracy"].forEach((id) => { if ($(id)) $(id).value = ""; });
@@ -3475,14 +3489,18 @@ function resetTerrainQuickForm() {
     $("terrainQuickOpenMaps").classList.add("hidden");
     $("terrainQuickOpenMaps").href = "#";
   }
-  if ($("terrainQuickPhotoPreview")) $("terrainQuickPhotoPreview").innerHTML = "";
+  renderTerrainSelectedPhotoPreview("terrainQuickPhotos", "terrainQuickPhotoPreview");
   $("terrainQuickFormCard")?.classList.add("hidden");
 }
 
 function useCurrentTerrainQuickLocation() {
-  if (!navigator.geolocation) return showToast("A localização não está disponível neste navegador.");
+  if (!navigator.geolocation) {
+    setTerrainQuickLocationPending(false);
+    return showToast("A localização não está disponível neste navegador.");
+  }
   const button = $("terrainQuickUseLocation");
   const status = $("terrainQuickLocationStatus");
+  setTerrainQuickLocationPending(true);
   if (button) button.disabled = true;
   if (status) status.textContent = "Buscando o ponto exato pelo GPS...";
   navigator.geolocation.getCurrentPosition((position) => {
@@ -3497,9 +3515,11 @@ function useCurrentTerrainQuickLocation() {
       $("terrainQuickOpenMaps").href = `https://www.google.com/maps?q=${latitude},${longitude}`;
       $("terrainQuickOpenMaps").classList.remove("hidden");
     }
+    setTerrainQuickLocationPending(false);
     if (button) button.disabled = false;
     showToast("Localização do terreno marcada.");
   }, (error) => {
+    setTerrainQuickLocationPending(false);
     if (button) button.disabled = false;
     if (status) status.textContent = error?.code === 1 ? "GPS não autorizado. Informe uma referência abaixo." : "Não foi possível localizar. Tente novamente ou informe uma referência.";
     showToast(error?.code === 1 ? "Permissão de localização não concedida." : "Não foi possível obter sua localização.");
@@ -3577,6 +3597,9 @@ function terrainQuickFormValues() {
 async function saveTerrainQuickCapture(event) {
   event.preventDefault();
   if (!isMaster()) return showToast("Somente o Admin Master pode salvar terrenos.");
+  if (terrainQuickLocationPending && !$("terrainQuickReference")?.value.trim()) {
+    return showToast("Aguarde o GPS terminar ou informe um ponto de referência.");
+  }
   const terrainId = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.terrains.path)).key;
   const files = [...($("terrainQuickPhotos")?.files || [])];
   const uploaded = [];
@@ -4185,15 +4208,36 @@ function renderTerrainSelectedPhotoPreview(inputId, mountId) {
   const mount = $(mountId);
   const files = [...($(inputId)?.files || [])];
   if (!mount) return;
-  mount.innerHTML = files.map((file) => {
+  mount.querySelectorAll("img[data-terrain-preview-url]").forEach((image) => {
+    const objectUrl = image.dataset.terrainPreviewUrl;
+    if (objectUrl && typeof window.URL?.revokeObjectURL === "function") window.URL.revokeObjectURL(objectUrl);
+  });
+  mount.replaceChildren();
+  files.forEach((file) => {
+    const figure = document.createElement("figure");
+    const caption = document.createElement("figcaption");
     try {
       validateTerrainImageFile(file);
-      const url = URL.createObjectURL(file);
-      return `<figure><img src="${escapeAttr(url)}" alt="Prévia de ${escapeAttr(file.name)}" onload="URL.revokeObjectURL(this.src)"><figcaption>${escapeHtml(file.name)}</figcaption></figure>`;
+      const image = document.createElement("img");
+      const objectUrl = window.URL.createObjectURL(file);
+      const releaseObjectUrl = () => {
+        if (!image.dataset.terrainPreviewUrl) return;
+        if (typeof window.URL?.revokeObjectURL === "function") window.URL.revokeObjectURL(image.dataset.terrainPreviewUrl);
+        delete image.dataset.terrainPreviewUrl;
+      };
+      image.alt = `Prévia de ${file.name}`;
+      image.dataset.terrainPreviewUrl = objectUrl;
+      image.addEventListener("load", releaseObjectUrl, { once: true });
+      image.addEventListener("error", releaseObjectUrl, { once: true });
+      image.src = objectUrl;
+      caption.textContent = file.name;
+      figure.append(image, caption);
     } catch (error) {
-      return `<figure><figcaption>${escapeHtml(error.message)}</figcaption></figure>`;
+      caption.textContent = error.message;
+      figure.append(caption);
     }
-  }).join("");
+    mount.append(figure);
+  });
 }
 
 async function uploadTerrainGeneralPhotos(terrainId, files, category) {
@@ -26964,6 +27008,7 @@ function bindEvents() {
   $("closeTerrainQuickForm")?.addEventListener("click", resetTerrainQuickForm);
   $("cancelTerrainQuickForm")?.addEventListener("click", resetTerrainQuickForm);
   $("terrainQuickUseLocation")?.addEventListener("click", useCurrentTerrainQuickLocation);
+  $("terrainQuickReference")?.addEventListener("input", () => setTerrainQuickLocationPending(terrainQuickLocationPending));
   $("terrainQuickPhotos")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainQuickPhotos", "terrainQuickPhotoPreview"));
   $("terrainQuickForm")?.addEventListener("submit", saveTerrainQuickCapture);
   $("newTerrainOwner")?.addEventListener("click", () => openTerrainOwnerForm());
