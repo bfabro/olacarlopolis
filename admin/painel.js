@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 735,
-  label: "v742",
+  numero: 736,
+  label: "v743",
   data: "2026-09-04",
-  nota: "Correcao do salvamento rapido de terrenos com GPS, previa de fotos e permissao do Storage."
+  nota: "Correcao definitiva do salvamento de prospeccoes e sincronizacao da linha do tempo."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3337,15 +3337,25 @@ function addTerrainTimelineUpdate(updates, {
 }
 
 async function refreshTerrainTimeline(terrainId) {
-  const snapshot = await get(query(
-    ref(db, TERRAIN_MANAGEMENT_ENTITIES.timeline.path),
-    orderByChild("terrain_id"),
-    equalTo(terrainId)
-  ));
+  let records = {};
+  try {
+    const snapshot = await get(query(
+      ref(db, TERRAIN_MANAGEMENT_ENTITIES.timeline.path),
+      orderByChild("terrain_id"),
+      equalTo(terrainId)
+    ));
+    records = snapshot.exists() ? snapshot.val() || {} : {};
+  } catch (error) {
+    if (!String(error?.message || "").includes("Index not defined")) throw error;
+    console.warn("Índice da linha do tempo ainda não disponível; usando leitura de compatibilidade.", error);
+    const snapshot = await get(ref(db, TERRAIN_MANAGEMENT_ENTITIES.timeline.path));
+    records = Object.fromEntries(Object.entries(snapshot.val() || {})
+      .filter(([, item]) => item?.terrain_id === terrainId));
+  }
   Object.entries(state.terrainManagement.timeline || {}).forEach(([id, item]) => {
     if (item?.terrain_id === terrainId) delete state.terrainManagement.timeline[id];
   });
-  if (snapshot.exists()) Object.assign(state.terrainManagement.timeline, snapshot.val() || {});
+  Object.assign(state.terrainManagement.timeline, records);
 }
 
 function terrainTimelineReferenceLabel(event) {
@@ -3636,6 +3646,13 @@ async function saveTerrainQuickCapture(event) {
     resetTerrainQuickForm();
     showToast("Prospecção salva. Complete os dados quando localizar o proprietário.", { prominent: true });
   } catch (error) {
+    if (databaseSaved) {
+      console.warn("Prospecção salva, mas a atualização local não foi concluída.", error);
+      renderTerrainManagement();
+      resetTerrainQuickForm();
+      showToast("Prospecção salva com sucesso. Atualize a tela para conferir os dados.", { prominent: true });
+      return;
+    }
     if (!databaseSaved) await Promise.allSettled(uploaded.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
     console.error("Falha ao salvar prospecção rápida.", error);
     showToast(error?.message || "Não foi possível salvar a prospecção.");

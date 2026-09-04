@@ -56,6 +56,13 @@ test("salvamento aguarda o GPS e a previa libera a URL sem JavaScript inline", (
   assert.doesNotMatch(panelJs, /onload="URL\.revokeObjectURL/);
 });
 
+test("salvamento concluido nao vira erro quando apenas a atualizacao da tela falha", () => {
+  assert.match(panelJs, /if \(databaseSaved\) \{/);
+  assert.match(panelJs, /Prospecção salva com sucesso\. Atualize a tela/);
+  assert.match(panelJs, /Index not defined/);
+  assert.match(panelJs, /usando leitura de compatibilidade/);
+});
+
 test("prospeccao aceita dados minimos com GPS e preserva precisao", () => {
   const terrain = buildTerrainRecord(quickInput, { id: "quick-1", timestamp: 1000 });
   assert.equal(terrain.cadastro_rapido, true);
@@ -125,8 +132,8 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
   assert.match(panelHtml, /painel\.css\?v=447/);
-  assert.match(panelHtml, /painel\.js\?v=672/);
+  assert.match(panelHtml, /painel\.js\?v=673/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=22/);
-  assert.match(panelJs, /numero: 735/);
-  assert.match(panelJs, /label: "v742"/);
+  assert.match(panelJs, /numero: 736/);
+  assert.match(panelJs, /label: "v743"/);
 });
