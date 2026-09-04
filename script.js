@@ -30192,7 +30192,6 @@ function renderizarValoresCombustivelAnterior() {
   [priceInput, litersInput, consumptionInput].forEach((input) => input?.addEventListener("input", calculate));
 }
 
-let fuelPublicActiveFilter = "";
 
 function fuelPublicMapUrl(station, config) {
   const coordinates = station.latitude && station.longitude
@@ -30268,16 +30267,12 @@ function renderizarValoresCombustivel() {
   const config = fuelPublicConfig();
   const stations = fuelPublicStations(config);
   const options = fuelPublicFilterOptions(stations);
-  const optionKeys = new Set(options.map((option) => option.key));
-  if (!fuelPublicActiveFilter || (fuelPublicActiveFilter !== "todos" && !optionKeys.has(fuelPublicActiveFilter))) {
-    fuelPublicActiveFilter = options.find((option) => option.key.includes("gasolina"))?.key || options[0]?.key || "todos";
-  }
-  const visibleStations = fuelPublicActiveFilter === "todos"
-    ? stations
-    : stations.filter((station) => fuelPublicProducts(station).some((product) => fuelPublicNormalize(product.label) === fuelPublicActiveFilter));
+  const visibleStations = stations;
   const cheapest = fuelPublicCheapest(stations);
   const cheapestByProduct = new Map(cheapest.map((item) => [fuelPublicNormalize(item.label), item]));
-  const dailySummary = options.map((option) => ({ ...option, best: cheapestByProduct.get(option.key) || null }));
+  const dailySummary = options
+    .map((option) => ({ ...option, best: cheapestByProduct.get(option.key) || null }))
+    .sort((a, b) => a.label.localeCompare(b.label, "pt-BR"));
   const city = `${config.cidade || "Cidade"}${config.uf ? ` / ${config.uf}` : ""}`;
   const calculatorOptions = cheapest.map((item) => `<option value="${item.price}">${fuelPublicEscape(item.label)} · ${fuelPublicMoney(item.price)}</option>`).join("");
 
@@ -30287,16 +30282,14 @@ function renderizarValoresCombustivel() {
       <span><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(city)}</span>
     </header>
     <section class="fuel-daily-summary" aria-labelledby="fuel-daily-summary-title">
-      <header class="fuel-daily-summary-heading"><i class="fa-solid fa-trophy" aria-hidden="true"></i><h3 id="fuel-daily-summary-title">Resumo de hoje</h3></header>
+      <header class="fuel-daily-summary-heading"><i class="fa-solid fa-trophy" aria-hidden="true"></i><h3 id="fuel-daily-summary-title">Menor preço Hoje</h3></header>
       <div class="fuel-daily-summary-grid">${dailySummary.map(({ label, best }) => {
         const stationName = best?.station?.nomeExibicao || best?.station?.razaoSocial || "";
-        return `<article class="fuel-daily-summary-card"><div class="fuel-daily-summary-photo">${best?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(best.station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<span>Foto indisponível</span>`}</div><h4>${fuelPublicEscape(label)}</h4><small>Menor preço hoje</small>${best ? `<strong>${fuelPublicMoney(best.price)}</strong><footer>${fuelPublicEscape(stationName || "Posto")}</footer>` : `<strong class="is-pending">Preço não informado</strong><footer>Aguardando atualização dos postos</footer>`}</article>`;
+        const stationMapUrl = best ? fuelPublicMapUrl(best.station, config) : "";
+        return `<article class="fuel-daily-summary-card"><div class="fuel-daily-summary-photo">${best?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(best.station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<span>Foto indisponível</span>`}</div><div class="fuel-daily-summary-station"><span>${fuelPublicEscape(stationName || "Posto não informado")}</span>${stationMapUrl ? `<a href="${fuelPublicEscape(stationMapUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir rota para ${fuelPublicEscape(stationName || "o posto")}" title="Abrir rota"><i class="fa-solid fa-route" aria-hidden="true"></i></a>` : ""}</div><div class="fuel-daily-summary-divider" aria-hidden="true"></div><small>Menor preço hoje</small>${best ? `<div class="fuel-daily-summary-price"><strong>${fuelPublicMoney(best.price)}</strong><span>/ litro</span></div>` : `<div class="fuel-daily-summary-price is-pending"><strong>Preço não informado</strong></div>`}<h4>${fuelPublicEscape(label)}</h4></article>`;
       }).join("")}</div>
     </section>
-    <nav class="fuel-filter-chips" aria-label="Filtrar postos por combustível">
-      ${options.map((option) => `<button type="button" data-fuel-filter="${fuelPublicEscape(option.key)}" class="${fuelPublicActiveFilter === option.key ? "active" : ""}">${fuelPublicEscape(option.label)}</button>`).join("")}
-      <button type="button" data-fuel-filter="todos" class="${fuelPublicActiveFilter === "todos" ? "active" : ""}">Todos</button>
-    </nav>
+
     <section class="fuel-stations-section fuel-stations-section-compact">
       <div class="fuel-stations-list">${visibleStations.length ? visibleStations.map((station) => {
         const products = fuelPublicProducts(station);
@@ -30328,10 +30321,7 @@ function renderizarValoresCombustivel() {
     <p class="fuel-source-note"><i class="fa-solid fa-shield-halved"></i> Postos consultados na API oficial da ANP. O ARLA 32 pode ser incluído manualmente pelo administrador. Preços e datas são confirmados antes da publicação e podem mudar no estabelecimento.</p>
   `;
 
-  box.querySelectorAll("[data-fuel-filter]").forEach((button) => button.addEventListener("click", () => {
-    fuelPublicActiveFilter = button.dataset.fuelFilter || "todos";
-    renderizarValoresCombustivel();
-  }));
+
   const toggle = document.getElementById("fuelCalculatorToggle");
   const fields = document.getElementById("fuelCalculatorFields");
   const preset = document.getElementById("fuelCalculatorPreset");
