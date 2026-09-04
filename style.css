@@ -28412,7 +28412,7 @@ body.eventos-image-open { overflow: hidden; }
 .fuel-daily-summary-heading > i { color: #f08a00; font-size: 1.25rem; }
 .fuel-daily-summary-heading h3 { margin: 0; color: #101d33; font-size: 1.3rem; line-height: 1.2; }
 .fuel-daily-summary-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
-.fuel-daily-summary-card { display: grid; grid-template-rows: auto minmax(2.8em, auto) 1px auto minmax(2.4em, auto) minmax(2.5em, auto); align-content: start; min-width: 0; padding: 10px; border: 1px solid #dfe5ec; border-radius: 14px; background: #fff; box-shadow: 0 3px 10px rgba(15, 23, 42, .035); text-align: center; }
+.fuel-daily-summary-card { display: grid; grid-template-rows: auto minmax(2.8em, auto) auto auto minmax(2.4em, auto) minmax(2.5em, auto); align-content: start; min-width: 0; padding: 10px; border: 1px solid #dfe5ec; border-radius: 14px; background: #fff; box-shadow: 0 3px 10px rgba(15, 23, 42, .035); text-align: center; }
 .fuel-daily-summary-photo { width: 100%; aspect-ratio: 4 / 3; margin-bottom: 9px; overflow: hidden; border-radius: 10px; background: #f2f5f8; }
 .fuel-daily-summary-photo img { display: block; width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
 .fuel-daily-summary-photo > span { display: grid; place-items: center; width: 100%; height: 100%; padding: 8px; color: #8a95a4; font-size: .64rem; font-weight: 750; }
@@ -28427,7 +28427,16 @@ body.eventos-image-open { overflow: hidden; }
 .fuel-daily-summary-price > strong { font-size: clamp(1.08rem, 1.8vw, 1.42rem); font-weight: 950; line-height: 1.05; white-space: nowrap; }
 .fuel-daily-summary-price > span { font-size: .58rem; font-weight: 800; white-space: nowrap; }
 .fuel-daily-summary-price.is-pending > strong { color: #697689; font-size: .72rem; line-height: 1.25; white-space: normal; }
-.fuel-daily-summary-card h4 { display: -webkit-box; align-self: center; overflow: hidden; margin: 4px 0 0; color: #14213d; font-size: .8rem; font-weight: 900; line-height: 1.25; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.fuel-daily-summary-fuel { display: flex; align-self: center; align-items: center; justify-content: center; gap: 6px; min-width: 0; margin: 4px 0 0; font-size: .8rem; font-weight: 900; line-height: 1.25; }
+.fuel-daily-summary-fuel > i { flex: 0 0 auto; font-size: .82rem; }
+.fuel-daily-summary-fuel > span { display: -webkit-box; min-width: 0; overflow: hidden; overflow-wrap: anywhere; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.fuel-daily-summary-fuel.is-arla { color: #07849f; }
+.fuel-daily-summary-fuel.is-diesel-s10 { color: #1769c2; }
+.fuel-daily-summary-fuel.is-diesel-s500 { color: #7c3aed; }
+.fuel-daily-summary-fuel.is-etanol { color: #16853f; }
+.fuel-daily-summary-fuel.is-gasolina-aditivada { color: #d33b4e; }
+.fuel-daily-summary-fuel.is-gasolina-comum { color: #c76a00; }
+.fuel-daily-summary-fuel.is-default { color: #42526a; }
 @media (max-width: 900px) {
   .fuel-daily-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }

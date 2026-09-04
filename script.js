@@ -30023,6 +30023,26 @@ function fuelPublicMoney(value) {
   return fuelPublicPrice(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL", minimumFractionDigits: 3 });
 }
 
+function fuelPublicSummaryMoney(value) {
+  return fuelPublicPrice(value).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
+function fuelPublicSummaryVisual(label) {
+  const key = fuelPublicNormalize(label);
+  if (key.includes("arla")) return { icon: "fa-flask", className: "is-arla" };
+  if (key.includes("etanol")) return { icon: "fa-leaf", className: "is-etanol" };
+  if (key.includes("gasolina") && key.includes("aditivada")) return { icon: "fa-droplet", className: "is-gasolina-aditivada" };
+  if (key.includes("gasolina")) return { icon: "fa-gas-pump", className: "is-gasolina-comum" };
+  if (key.includes("s10")) return { icon: "fa-truck-fast", className: "is-diesel-s10" };
+  if (key.includes("s500") || key.includes("diesel")) return { icon: "fa-oil-can", className: "is-diesel-s500" };
+  return { icon: "fa-droplet", className: "is-default" };
+}
+
 function fuelPublicDate(value) {
   const displayValue = String(value || "");
   if (/^\d{2}\/\d{2}\/\d{4} às \d{2}:\d{2}$/.test(displayValue)) return displayValue;
@@ -30286,7 +30306,8 @@ function renderizarValoresCombustivel() {
       <div class="fuel-daily-summary-grid">${dailySummary.map(({ label, best }) => {
         const stationName = best?.station?.nomeExibicao || best?.station?.razaoSocial || "";
         const stationMapUrl = best ? fuelPublicMapUrl(best.station, config) : "";
-        return `<article class="fuel-daily-summary-card"><div class="fuel-daily-summary-photo">${best?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(best.station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<span>Foto indisponível</span>`}</div><div class="fuel-daily-summary-station"><span>${fuelPublicEscape(stationName || "Posto não informado")}</span>${stationMapUrl ? `<a href="${fuelPublicEscape(stationMapUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir rota para ${fuelPublicEscape(stationName || "o posto")}" title="Abrir rota"><i class="fa-solid fa-route" aria-hidden="true"></i></a>` : ""}</div><div class="fuel-daily-summary-divider" aria-hidden="true"></div><small>Menor preço hoje</small>${best ? `<div class="fuel-daily-summary-price"><strong>${fuelPublicMoney(best.price)}</strong><span>/ litro</span></div>` : `<div class="fuel-daily-summary-price is-pending"><strong>Preço não informado</strong></div>`}<h4>${fuelPublicEscape(label)}</h4></article>`;
+        const fuelVisual = fuelPublicSummaryVisual(label);
+        return `<article class="fuel-daily-summary-card"><div class="fuel-daily-summary-photo">${best?.station?.imagem ? `<img class="imagem-expandivel" src="${fuelPublicEscape(best.station.imagem)}" alt="Foto de ${fuelPublicEscape(stationName || "posto")}" title="Clique para ampliar" loading="lazy" decoding="async">` : `<span>Foto indisponível</span>`}</div><div class="fuel-daily-summary-station"><span>${fuelPublicEscape(stationName || "Posto não informado")}</span>${stationMapUrl ? `<a href="${fuelPublicEscape(stationMapUrl)}" target="_blank" rel="noopener noreferrer" aria-label="Abrir rota para ${fuelPublicEscape(stationName || "o posto")}" title="Abrir rota"><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>` : ""}</div><div class="fuel-daily-summary-divider" aria-hidden="true"></div><small>Menor preço hoje</small>${best ? `<div class="fuel-daily-summary-price"><strong>${fuelPublicSummaryMoney(best.price)}</strong><span>/ litro</span></div>` : `<div class="fuel-daily-summary-price is-pending"><strong>Preço não informado</strong></div>`}<h4 class="fuel-daily-summary-fuel ${fuelVisual.className}"><i class="fa-solid ${fuelVisual.icon}" aria-hidden="true"></i><span>${fuelPublicEscape(label)}</span></h4></article>`;
       }).join("")}</div>
     </section>
 

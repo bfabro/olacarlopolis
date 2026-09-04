@@ -21,6 +21,8 @@ test("card mostra posto, rota, separador, preço por litro e combustível nessa 
   assert.ok(start >= 0 && end > start);
   assert.match(summary, /fuelPublicMapUrl\(best\.station, config\)/);
   assert.match(summary, /target="_blank" rel="noopener noreferrer"/);
+  assert.match(summary, /fa-solid fa-arrow-right/);
+  assert.doesNotMatch(summary, /fa-solid fa-route/);
   assert.ok(summary.includes("/ litro"));
   const order = [
     "fuel-daily-summary-photo",
@@ -28,10 +30,28 @@ test("card mostra posto, rota, separador, preço por litro e combustível nessa 
     "fuel-daily-summary-divider",
     "<small>Menor preço hoje</small>",
     "fuel-daily-summary-price",
-    "<h4>"
+    '<h4 class="fuel-daily-summary-fuel'
   ].map((value) => summary.indexOf(value));
   assert.ok(order.every((position) => position >= 0));
   assert.deepEqual(order, [...order].sort((a, b) => a - b));
+});
+
+test("preco do resumo usa duas casas e combustiveis possuem icones e cores proprias", () => {
+  const moneyStart = script.indexOf("function fuelPublicSummaryMoney");
+  const moneyEnd = script.indexOf("function fuelPublicDate", moneyStart);
+  const moneyFormatter = script.slice(moneyStart, moneyEnd);
+  assert.ok(moneyStart >= 0 && moneyEnd > moneyStart);
+  assert.ok(moneyFormatter.includes("minimumFractionDigits: 2"));
+  assert.ok(moneyFormatter.includes("maximumFractionDigits: 2"));
+  assert.ok(script.includes("fuelPublicSummaryMoney(best.price)"));
+  assert.match(script, /function fuelPublicSummaryVisual/);
+  ["is-arla", "is-diesel-s10", "is-diesel-s500", "is-etanol", "is-gasolina-aditivada", "is-gasolina-comum"].forEach((className) => {
+    assert.ok(script.includes(className));
+    assert.ok(style.includes(".fuel-daily-summary-fuel." + className));
+  });
+  ["fa-flask", "fa-leaf", "fa-droplet", "fa-gas-pump", "fa-truck-fast", "fa-oil-can"].forEach((icon) => {
+    assert.ok(script.includes(icon));
+  });
 });
 
 test("botoes abaixo do resumo foram removidos sem manter filtro oculto", () => {
@@ -49,7 +69,7 @@ test("cards do resumo sao uniformes e responsivos", () => {
 });
 
 test("versoes publicas foram atualizadas", () => {
-  assert.ok(html.includes("style.css?v=481"));
-  assert.ok(html.includes("script.js?v=680"));
-  assert.ok(html.includes("Olá Carlópolis v467"));
+  assert.ok(html.includes("style.css?v=482"));
+  assert.ok(html.includes("script.js?v=681"));
+  assert.ok(html.includes("Olá Carlópolis v468"));
 });

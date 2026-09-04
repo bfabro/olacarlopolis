@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 730,
-  label: "v737",
+  numero: 731,
+  label: "v738",
   data: "2026-09-04",
-  nota: "Menor preco Hoje organiza os combustiveis em ordem alfabetica, com posto, rota e valor por litro."
+  nota: "Menor preco Hoje exibe seta de rota, preco com duas casas e identidade visual por combustivel."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
