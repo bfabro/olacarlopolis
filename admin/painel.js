@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 736,
-  label: "v743",
+  numero: 737,
+  label: "v744",
   data: "2026-09-04",
-  nota: "Correcao definitiva do salvamento de prospeccoes e sincronizacao da linha do tempo."
+  nota: "Exclusao adequada de prospeccoes com limpeza automatica das fotos e da linha do tempo."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -4350,6 +4350,19 @@ function terrainInspectionHistoryHtml(terrainId) {
   }).join("")}</div>`;
 }
 
+function terrainDeletionInfo(terrain) {
+  const terrainId = terrain?.id || "";
+  const isQuickCapture = terrain?.cadastro_rapido === true;
+  const photos = terrainPhotoRecords(state.terrainManagement?.photos || {}, terrainId);
+  const inspections = terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrainId);
+  const hasBudgets = terrainBudgetRecords(state.terrainManagement?.budgets || {})
+    .some((budget) => budget.terrain_id === terrainId);
+  const hasServices = terrainServiceRecords(state.terrainManagement?.services || {})
+    .some((service) => service.terrain_id === terrainId);
+  const blocked = inspections.length > 0 || hasBudgets || hasServices || (!isQuickCapture && photos.length > 0);
+  return { isQuickCapture, photos, inspections, hasBudgets, hasServices, blocked };
+}
+
 function renderTerrainList() {
   const mount = $("terrainList");
   if (!mount) return;
@@ -4384,6 +4397,10 @@ function renderTerrainList() {
     const status = terrainStatusMeta(terrain.status);
     const whatsappUrl = owner ? terrainOwnerWhatsappUrl(owner) : "";
     const mapsUrl = terrainMapsUrl(terrain);
+    const deletion = terrainDeletionInfo(terrain);
+    const deleteTitle = deletion.blocked
+      ? "Exclusão bloqueada: existem dados vinculados"
+      : (deletion.isQuickCapture ? "Excluir prospecção e suas fotos" : "Excluir");
     return `
       <article class="terrain-row" data-terrain-id="${escapeAttr(terrain.id)}">
         <div data-label="Loteamento"><strong>${escapeHtml(developmentName)}</strong><small>${escapeHtml(terrain.bairro || "-")}</small></div>
@@ -4396,7 +4413,7 @@ function renderTerrainList() {
           <button type="button" class="terrain-owner-icon-button" data-terrain-view="${escapeAttr(terrain.id)}" data-no-loading title="Ver detalhes" aria-label="Ver detalhes de ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-eye"></i></button>
           <button type="button" class="terrain-owner-icon-button" data-terrain-edit="${escapeAttr(terrain.id)}" data-no-loading title="Editar" aria-label="Editar ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-pen"></i></button>
           <button type="button" class="terrain-owner-icon-button warning" data-terrain-inactivate="${escapeAttr(terrain.id)}" ${terrain.status === "inativo" ? "disabled" : ""} title="${terrain.status === "inativo" ? "Terreno já inativo" : "Inativar"}" aria-label="Inativar ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-ban"></i></button>
-          <button type="button" class="terrain-owner-icon-button danger" data-terrain-delete="${escapeAttr(terrain.id)}" ${(terrainPhotoRecords(state.terrainManagement?.photos || {}, terrain.id).length || terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrain.id).length) ? "disabled" : ""} title="${(terrainPhotoRecords(state.terrainManagement?.photos || {}, terrain.id).length || terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrain.id).length) ? "Exclusão bloqueada: existem fotos ou vistorias" : "Excluir"}" aria-label="Excluir ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-trash"></i></button>
+          <button type="button" class="terrain-owner-icon-button danger" data-terrain-delete="${escapeAttr(terrain.id)}" ${deletion.blocked ? "disabled" : ""} title="${escapeAttr(deleteTitle)}" aria-label="${escapeAttr(deleteTitle)}: ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-trash"></i></button>
         </div>
       </article>`;
   }).join("");
@@ -4418,6 +4435,7 @@ function openTerrainDetail(terrainId) {
   const mapsUrl = terrainMapsUrl(terrain);
   const characteristics = terrainCharacteristicLabels(terrain.caracteristicas);
   const reminderClassification = terrainReminderClassification(terrain, terrainBudgetLocalDate());
+  const deletion = terrainDeletionInfo(terrain);
   $("terrainDetailTitle").textContent = terrain.apelido || "Detalhes";
   $("terrainDetailContent").innerHTML = `
     ${terrain.cadastro_rapido ? `<div class="terrain-quick-detail-notice"><i class="fa-solid fa-bolt"></i><div><strong>Cadastro rápido pendente</strong><span>Complete endereço, medidas e proprietário quando essas informações estiverem disponíveis.</span></div></div>` : ""}
@@ -4427,6 +4445,7 @@ function openTerrainDetail(terrainId) {
       ${!terrain.owner_id ? `<button type="button" data-terrain-link-owner="${escapeAttr(terrain.id)}"><i class="fa-solid fa-link"></i> Vincular proprietário</button>` : ""}
       ${mapsUrl ? `<a class="ghost-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Abrir no Google Maps</a>` : ""}
       ${terrain.development_id ? `<button type="button" class="ghost-button" data-terrain-view-development="${escapeAttr(terrain.development_id)}"><i class="fa-solid fa-map"></i> Ver planta do loteamento</button>` : ""}
+      ${terrain.cadastro_rapido ? `<button type="button" class="danger-button" data-terrain-delete="${escapeAttr(terrain.id)}" ${deletion.blocked ? "disabled title=\"Exclusão bloqueada: existem vistorias, orçamentos ou serviços vinculados\"" : ""}><i class="fa-solid fa-trash"></i> Excluir prospecção</button>` : ""}
     </div>
     <div class="terrain-owner-detail-grid">
       <div><span>Proprietário</span><strong>${escapeHtml(terrainOwnerName(terrain, owners))}</strong></div>
@@ -4805,14 +4824,15 @@ async function deleteTerrain(terrainId) {
   if (!isMaster()) return showToast("Somente o Admin Master pode excluir terrenos.");
   const terrain = terrainById(terrainId);
   if (!terrain) return;
-  if (terrainPhotoRecords(state.terrainManagement?.photos || {}, terrainId).length
-    || terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrainId).length
-    || terrainBudgetRecords(state.terrainManagement?.budgets || {}).some((budget) => budget.terrain_id === terrainId)
-    || terrainServiceRecords(state.terrainManagement?.services || {}).some((service) => service.terrain_id === terrainId)) {
-    showToast("Exclusão bloqueada: o terreno possui fotos, vistorias, orçamentos ou serviços.");
+  const deletion = terrainDeletionInfo(terrain);
+  if (deletion.blocked) {
+    showToast(terrain.cadastro_rapido
+      ? "Exclusão bloqueada: a prospecção possui vistorias, orçamentos ou serviços."
+      : "Exclusão bloqueada: o terreno possui fotos, vistorias, orçamentos ou serviços.");
     return;
   }
-  if (!(await confirmarExclusao(terrain.apelido || terrainId, "terreno"))) return;
+  const itemType = deletion.isQuickCapture ? "prospecção e todas as suas fotos" : "terreno";
+  if (!(await confirmarExclusao(terrain.apelido || terrainId, itemType))) return;
   try {
     const linkedQueries = [
       ["photos", TERRAIN_MANAGEMENT_ENTITIES.photos.path],
@@ -4824,16 +4844,26 @@ async function deleteTerrain(terrainId) {
     const snapshots = await Promise.all(linkedQueries.map(([, path]) => get(query(
       ref(db, path), orderByChild("terrain_id"), equalTo(terrainId)
     ))));
-    const blockers = snapshots.slice(0, 4);
-    if (blockers.some((snapshot) => snapshot.exists())) {
+    const hasProtectedRemoteRecords = snapshots.slice(1, 4).some((snapshot) => snapshot.exists());
+    const hasBlockingRemotePhotos = !deletion.isQuickCapture && snapshots[0].exists();
+    if (hasProtectedRemoteRecords || hasBlockingRemotePhotos) {
       linkedQueries.slice(0, 4).forEach(([key], index) => {
         if (snapshots[index].exists()) Object.assign(state.terrainManagement[key], snapshots[index].val() || {});
       });
       renderTerrainManagement();
-      showToast("Exclusão bloqueada: o terreno possui fotos, vistorias, orçamentos ou serviços.");
+      showToast(deletion.isQuickCapture
+        ? "Exclusão bloqueada: a prospecção possui vistorias, orçamentos ou serviços."
+        : "Exclusão bloqueada: o terreno possui fotos, vistorias, orçamentos ou serviços.");
       return;
     }
     const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`]: null };
+    const remotePhotos = snapshots[0].exists() ? snapshots[0].val() || {} : {};
+    const photosToDelete = deletion.isQuickCapture
+      ? terrainPhotoRecords({ ...(state.terrainManagement?.photos || {}), ...remotePhotos }, terrainId)
+      : [];
+    photosToDelete.forEach((photo) => {
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${photo.id}`] = null;
+    });
     const remoteTimeline = snapshots[4].exists() ? snapshots[4].val() || {} : {};
     Object.assign(state.terrainManagement.timeline, remoteTimeline);
     terrainTimelineRecords(state.terrainManagement?.timeline || {}, terrainId).forEach((item) => {
@@ -4841,11 +4871,15 @@ async function deleteTerrain(terrainId) {
       delete state.terrainManagement.timeline[item.id];
     });
     await firebaseUpdate(ref(db), updates);
+    await Promise.allSettled(photosToDelete
+      .filter((photo) => photo.path)
+      .map((photo) => deleteTerrainDevelopmentStoragePath(photo.path)));
+    photosToDelete.forEach((photo) => { delete state.terrainManagement.photos[photo.id]; });
     delete state.terrainManagement.terrains[terrainId];
     if (state.selectedTerrainId === terrainId) resetTerrainForm();
     closeTerrainDetail();
     renderTerrainManagement();
-    showToast("Terreno excluído.");
+    showToast(deletion.isQuickCapture ? "Prospecção e fotos excluídas." : "Terreno excluído.");
   } catch (error) {
     console.error("Falha ao excluir terreno.", error);
     showToast("Não foi possível excluir o terreno.");
@@ -27099,6 +27133,8 @@ function bindEvents() {
     }
   });
   $("terrainDetailContent")?.addEventListener("click", (event) => {
+    const deleteButton = event.target.closest("[data-terrain-delete]");
+    if (deleteButton) return deleteTerrain(deleteButton.dataset.terrainDelete);
     const budgetButton = event.target.closest("[data-terrain-new-budget]");
     if (budgetButton) {
       const terrainId = budgetButton.dataset.terrainNewBudget;

@@ -63,6 +63,15 @@ test("salvamento concluido nao vira erro quando apenas a atualizacao da tela fal
   assert.match(panelJs, /usando leitura de compatibilidade/);
 });
 
+test("prospeccao pode ser excluida junto com fotos e timeline sem apagar historicos protegidos", () => {
+  assert.match(panelJs, /Excluir prospecção/);
+  assert.match(panelJs, /prospecção e todas as suas fotos/);
+  assert.match(panelJs, /hasProtectedRemoteRecords = snapshots\.slice\(1, 4\)/);
+  assert.match(panelJs, /photosToDelete\.forEach/);
+  assert.match(panelJs, /deleteTerrainDevelopmentStoragePath\(photo\.path\)/);
+  assert.match(panelJs, /Prospecção e fotos excluídas/);
+});
+
 test("prospeccao aceita dados minimos com GPS e preserva precisao", () => {
   const terrain = buildTerrainRecord(quickInput, { id: "quick-1", timestamp: 1000 });
   assert.equal(terrain.cadastro_rapido, true);
@@ -132,8 +141,8 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
   assert.match(panelHtml, /painel\.css\?v=447/);
-  assert.match(panelHtml, /painel\.js\?v=673/);
+  assert.match(panelHtml, /painel\.js\?v=674/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=22/);
-  assert.match(panelJs, /numero: 736/);
-  assert.match(panelJs, /label: "v743"/);
+  assert.match(panelJs, /numero: 737/);
+  assert.match(panelJs, /label: "v744"/);
 });
