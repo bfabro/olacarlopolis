@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=446">
+  <link rel="stylesheet" href="painel.css?v=447">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -217,7 +217,8 @@
 
       <section id="gestaoTerrenosView" class="panel-view hidden">
         <nav class="terrain-module-nav" aria-label="Navegação da Gestão de Terrenos">
-          <button type="button" class="active" data-terrain-tab="dashboard" aria-current="page"><i class="fa-solid fa-chart-column"></i> Painel</button>
+          <button type="button" class="active" data-terrain-tab="quick" aria-current="page"><i class="fa-solid fa-bolt"></i> Acesso rápido</button>
+          <button type="button" data-terrain-tab="dashboard"><i class="fa-solid fa-chart-column"></i> Painel</button>
           <button type="button" data-terrain-tab="reports"><i class="fa-solid fa-chart-pie"></i> Relatórios</button>
           <button type="button" data-terrain-tab="owners"><i class="fa-solid fa-user-group"></i> Proprietários</button>
           <button type="button" data-terrain-tab="terrains"><i class="fa-solid fa-vector-square"></i> Terrenos</button>
@@ -229,7 +230,81 @@
           <button type="button" data-terrain-tab="finance"><i class="fa-solid fa-chart-line"></i> Financeiro</button>
         </nav>
 
-        <section class="terrain-module-section" data-terrain-section="dashboard">
+        <section class="terrain-module-section terrain-quick-access" data-terrain-section="quick">
+          <header class="terrain-quick-heading">
+            <span><i class="fa-solid fa-location-crosshairs"></i> Uso em campo</span>
+            <h2>O que você precisa fazer agora?</h2>
+            <p>Registre um terreno em poucos segundos ou consulte os locais já cadastrados.</p>
+          </header>
+          <div class="terrain-quick-actions">
+            <button id="startTerrainQuickCapture" class="terrain-quick-action primary" type="button" data-no-loading>
+              <i class="fa-solid fa-camera"></i>
+              <span><strong>Cadastrar terreno agora</strong><small>GPS, foto e uma anotação rápida</small></span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button id="openTerrainQuickSearch" class="terrain-quick-action secondary" type="button" data-no-loading>
+              <i class="fa-solid fa-magnifying-glass-location"></i>
+              <span><strong>Consultar terrenos</strong><small>Pesquisar e abrir cadastros existentes</small></span>
+              <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <section id="terrainQuickFormCard" class="terrain-quick-form-card hidden">
+            <div class="terrain-quick-form-head">
+              <div><span>Prospecção em campo</span><h3>Cadastro rápido do terreno</h3></div>
+              <button id="closeTerrainQuickForm" class="terrain-quick-close" type="button" data-no-loading aria-label="Fechar cadastro rápido"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="terrainQuickForm" class="terrain-quick-form">
+              <label class="wide">Como identificar este terreno?
+                <input id="terrainQuickNickname" maxlength="140" required placeholder="Ex.: terreno ao lado do nº 120">
+              </label>
+              <section class="wide terrain-quick-location-box">
+                <div class="terrain-quick-location-head">
+                  <span class="terrain-quick-location-icon"><i class="fa-solid fa-location-dot"></i></span>
+                  <div><strong>Localização do terreno</strong><small id="terrainQuickLocationStatus">Toque em “Usar meu GPS” para marcar o ponto exato.</small></div>
+                </div>
+                <input id="terrainQuickLatitude" type="hidden">
+                <input id="terrainQuickLongitude" type="hidden">
+                <input id="terrainQuickAccuracy" type="hidden">
+                <div class="terrain-quick-location-actions">
+                  <button id="terrainQuickUseLocation" type="button" data-no-loading><i class="fa-solid fa-crosshairs"></i> Usar meu GPS</button>
+                  <a id="terrainQuickOpenMaps" class="ghost-button hidden" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Conferir no mapa</a>
+                </div>
+              </section>
+              <label class="wide">Endereço ou ponto de referência
+                <input id="terrainQuickReference" maxlength="220" placeholder="Opcional se o GPS estiver marcado">
+                <small>Use este campo caso o GPS não esteja disponível ou para facilitar a identificação.</small>
+              </label>
+              <label class="wide">Situação percebida
+                <select id="terrainQuickStatus">
+                  <option value="proprietario_desconhecido" selected>Proprietário ainda desconhecido</option>
+                  <option value="limpo">Terreno limpo</option>
+                  <option value="monitorar">Monitorar</option>
+                  <option value="pode_precisar_limpeza">Pode precisar de limpeza</option>
+                  <option value="precisa_limpeza">Precisa de limpeza</option>
+                </select>
+              </label>
+              <label class="wide terrain-quick-camera">
+                <span><i class="fa-solid fa-camera"></i><strong>Tirar foto do terreno</strong><small>A câmera traseira será sugerida no celular.</small></span>
+                <input id="terrainQuickPhotos" type="file" accept="image/*" capture="environment" multiple>
+              </label>
+              <div id="terrainQuickPhotoPreview" class="wide terrain-photo-selection-preview"></div>
+              <label class="wide">Observações rápidas
+                <textarea id="terrainQuickNotes" rows="4" maxlength="2000" placeholder="Ex.: muito mato, portão lateral, esquina, falar com vizinho..."></textarea>
+              </label>
+              <div class="wide terrain-quick-submit-actions">
+                <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar prospecção</button>
+                <button id="cancelTerrainQuickForm" class="ghost-button" type="button" data-no-loading>Cancelar</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="terrain-quick-recent-card">
+            <div class="terrain-quick-recent-head"><div><span>Para completar depois</span><h3>Prospecções recentes</h3></div><strong id="terrainQuickPendingCount">0 pendentes</strong></div>
+            <div id="terrainQuickRecentList" class="terrain-quick-recent-list"></div>
+          </section>
+        </section>
+        <section class="terrain-module-section hidden" data-terrain-section="dashboard">
           <div class="terrain-dashboard-stats">
             <article><span>Total de terrenos</span><strong id="terrainDashboardTerrains">0</strong><small>Cadastros atuais</small></article>
             <article><span>Total de proprietários</span><strong id="terrainDashboardOwners">0</strong><small>Cadastros atuais</small></article>
@@ -426,6 +501,7 @@
               <label>Grau de dificuldade
                 <select id="terrainDifficulty" required>
                   <option value="">Selecione</option>
+                  <option value="nao_informado">Não informado</option>
                   <option value="facil">Fácil</option>
                   <option value="medio">Médio</option>
                   <option value="dificil">Difícil</option>
@@ -435,6 +511,7 @@
               <label>Altura do mato
                 <select id="terrainGrassHeight" required>
                   <option value="">Selecione</option>
+                  <option value="nao_informado">Não informado</option>
                   <option value="ate_30_cm">Até 30 cm</option>
                   <option value="de_30_a_60_cm">30 a 60 cm</option>
                   <option value="de_60_cm_a_1_m">60 cm a 1 metro</option>
@@ -3222,6 +3299,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=670"></script>
+  <script type="module" src="painel.js?v=671"></script>
 </body>
 </html>

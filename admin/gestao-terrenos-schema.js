@@ -1,4 +1,4 @@
-export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-02_v2";
+export const TERRAIN_MANAGEMENT_SCHEMA_VERSION = "2026-09-04_v3";
 
 export const OWNER_STATUSES = Object.freeze([
   "potencial_cliente",
@@ -51,6 +51,7 @@ export const TERRAIN_STATUS_OPTIONS = Object.freeze([
 ]);
 
 export const TERRAIN_DIFFICULTY_OPTIONS = Object.freeze([
+  Object.freeze({ value: "nao_informado", label: "N\u00e3o informado" }),
   Object.freeze({ value: "facil", label: "F\u00e1cil" }),
   Object.freeze({ value: "medio", label: "M\u00e9dio" }),
   Object.freeze({ value: "dificil", label: "Dif\u00edcil" }),
@@ -58,6 +59,7 @@ export const TERRAIN_DIFFICULTY_OPTIONS = Object.freeze([
 ]);
 
 export const TERRAIN_GRASS_HEIGHT_OPTIONS = Object.freeze([
+  Object.freeze({ value: "nao_informado", label: "N\u00e3o informado" }),
   Object.freeze({ value: "ate_30_cm", label: "At\u00e9 30 cm" }),
   Object.freeze({ value: "de_30_a_60_cm", label: "30 a 60 cm" }),
   Object.freeze({ value: "de_60_cm_a_1_m", label: "60 cm a 1 metro" }),
@@ -158,13 +160,16 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
       "inscricao_imobiliaria", "latitude", "longitude", "google_maps_url", "observacoes",
       "grau_dificuldade", "altura_mato", "caracteristicas", "ultima_limpeza_em",
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
-      "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "status", "created_at", "updated_at"
+      "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "cadastro_rapido",
+      "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em",
+      "status", "created_at", "updated_at"
     ]),
     optionalFields: Object.freeze([
       "owner_id", "development_id", "matricula", "inscricao_imobiliaria", "latitude",
       "longitude", "google_maps_url", "caracteristicas", "ultima_limpeza_em",
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
-      "lembrete_verificado_em", "oportunidade_nao_precisa_ate"
+      "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "cadastro_rapido",
+      "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em"
     ]),
     statuses: TERRAIN_STATUSES
   }),
@@ -375,6 +380,7 @@ function terrainOptionalCoordinate(value, field, min, max) {
 
 export function normalizeTerrainInput(input = {}) {
   const value = (key) => String(input[key] ?? "").trim();
+  const quickCapture = input.cadastro_rapido === true || value("cadastro_rapido") === "true";
   const selectedCharacteristics = Array.isArray(input.caracteristicas)
     ? input.caracteristicas
     : Object.entries(input.caracteristicas || {}).filter(([, selected]) => selected).map(([key]) => key);
@@ -391,9 +397,9 @@ export function normalizeTerrainInput(input = {}) {
     numero: value("numero"),
     quadra: value("quadra"),
     lote: value("lote"),
-    area_m2: terrainNumber(input.area_m2, "\u00e1rea"),
-    frente_m: terrainNumber(input.frente_m, "frente"),
-    fundo_m: terrainNumber(input.fundo_m, "fundo"),
+    area_m2: quickCapture && value("area_m2") === "" ? 0 : terrainNumber(input.area_m2, "\u00e1rea"),
+    frente_m: quickCapture && value("frente_m") === "" ? 0 : terrainNumber(input.frente_m, "frente"),
+    fundo_m: quickCapture && value("fundo_m") === "" ? 0 : terrainNumber(input.fundo_m, "fundo"),
     matricula: value("matricula") || null,
     inscricao_imobiliaria: value("inscricao_imobiliaria") || null,
     latitude: terrainOptionalCoordinate(input.latitude, "latitude", -90, 90),
@@ -403,13 +409,20 @@ export function normalizeTerrainInput(input = {}) {
     grau_dificuldade: TERRAIN_DIFFICULTY_VALUES.has(value("grau_dificuldade")) ? value("grau_dificuldade") : "",
     altura_mato: TERRAIN_GRASS_HEIGHT_VALUES.has(value("altura_mato")) ? value("altura_mato") : "",
     caracteristicas: Object.keys(characteristics).length ? characteristics : null,
+    cadastro_rapido: quickCapture,
+    prospeccao_status: quickCapture ? "pendente_dados" : null,
+    localizacao_referencia: quickCapture ? value("localizacao_referencia") : null,
+    precisao_gps_m: quickCapture && value("precisao_gps_m") !== "" ? terrainNumber(input.precisao_gps_m, "precisao do GPS") : null,
     status: TERRAIN_STATUS_VALUES.has(value("status")) ? value("status") : "sem_informacao"
   };
-  const required = [
+  const required = quickCapture ? ["apelido"] : [
     "apelido", "bairro", "rua", "numero", "quadra", "lote", "grau_dificuldade", "altura_mato"
   ];
   const missing = required.filter((key) => !terrain[key]);
   if (missing.length) throw new Error(`Campos obrigatorios ausentes: ${missing.join(", ")}`);
+  if (quickCapture && !((terrain.latitude !== null && terrain.longitude !== null) || terrain.localizacao_referencia)) {
+    throw new Error("Marque a localizacao com o GPS ou informe um ponto de referencia.");
+  }
   if (terrain.google_maps_url && !/^https?:\/\//i.test(terrain.google_maps_url)) {
     throw new Error("O link do Google Maps precisa iniciar com http:// ou https://.");
   }
@@ -424,6 +437,8 @@ export function buildTerrainRecord(input, { id, existing = {}, timestamp = Date.
     created_at: existing.created_at || timestamp,
     updated_at: timestamp
   };
+  if (record.cadastro_rapido) record.capturado_em = existing.capturado_em || timestamp;
+  else ["cadastro_rapido", "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em"].forEach((key) => delete record[key]);
   ["ultima_limpeza_em", "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada", "lembrete_verificado_em", "oportunidade_nao_precisa_ate"].forEach((key) => {
     if (existing[key]) record[key] = existing[key];
   });

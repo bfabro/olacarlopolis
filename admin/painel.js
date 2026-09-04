@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=21";
+} from "./gestao-terrenos-schema.js?v=22";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -122,10 +122,10 @@ const firebaseConfig = {
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const PANEL_VERSION = {
-  numero: 733,
-  label: "v740",
+  numero: 734,
+  label: "v741",
   data: "2026-09-04",
-  nota: "Relatorio de acessos identifica horarios registrados fora do Brasil com um marcador visual."
+  nota: "Gestao de terrenos recebe acesso rapido para prospeccao em campo com GPS, camera e consulta."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3446,6 +3446,7 @@ async function syncTerrainReminderStatuses() {
 function renderTerrainManagement() {
   const terrainData = state.terrainManagement || {};
   $("gestaoTerrenosView")?.setAttribute("data-schema-version", TERRAIN_MANAGEMENT_SCHEMA_VERSION);
+  renderTerrainQuickAccess();
   renderTerrainDashboard();
   renderTerrainReports();
   renderTerrainOwnerList();
@@ -3458,6 +3459,165 @@ function renderTerrainManagement() {
   renderTerrainFinance();
 }
 
+function terrainQuickCaptureName() {
+  const now = new Date();
+  const date = now.toLocaleDateString("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit" });
+  const time = now.toLocaleTimeString("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" });
+  return `Prospecção ${date} ${time}`;
+}
+
+function resetTerrainQuickForm() {
+  $("terrainQuickForm")?.reset();
+  if ($("terrainQuickNickname")) $("terrainQuickNickname").value = terrainQuickCaptureName();
+  ["terrainQuickLatitude", "terrainQuickLongitude", "terrainQuickAccuracy"].forEach((id) => { if ($(id)) $(id).value = ""; });
+  if ($("terrainQuickLocationStatus")) $("terrainQuickLocationStatus").textContent = "Toque em “Usar meu GPS” para marcar o ponto exato.";
+  if ($("terrainQuickOpenMaps")) {
+    $("terrainQuickOpenMaps").classList.add("hidden");
+    $("terrainQuickOpenMaps").href = "#";
+  }
+  if ($("terrainQuickPhotoPreview")) $("terrainQuickPhotoPreview").innerHTML = "";
+  $("terrainQuickFormCard")?.classList.add("hidden");
+}
+
+function useCurrentTerrainQuickLocation() {
+  if (!navigator.geolocation) return showToast("A localização não está disponível neste navegador.");
+  const button = $("terrainQuickUseLocation");
+  const status = $("terrainQuickLocationStatus");
+  if (button) button.disabled = true;
+  if (status) status.textContent = "Buscando o ponto exato pelo GPS...";
+  navigator.geolocation.getCurrentPosition((position) => {
+    const latitude = Number(position.coords.latitude.toFixed(7));
+    const longitude = Number(position.coords.longitude.toFixed(7));
+    const accuracy = Math.max(0, Math.round(Number(position.coords.accuracy || 0)));
+    if ($("terrainQuickLatitude")) $("terrainQuickLatitude").value = String(latitude);
+    if ($("terrainQuickLongitude")) $("terrainQuickLongitude").value = String(longitude);
+    if ($("terrainQuickAccuracy")) $("terrainQuickAccuracy").value = String(accuracy);
+    if (status) status.textContent = `Local marcado com precisão aproximada de ${accuracy || "?"} m.`;
+    if ($("terrainQuickOpenMaps")) {
+      $("terrainQuickOpenMaps").href = `https://www.google.com/maps?q=${latitude},${longitude}`;
+      $("terrainQuickOpenMaps").classList.remove("hidden");
+    }
+    if (button) button.disabled = false;
+    showToast("Localização do terreno marcada.");
+  }, (error) => {
+    if (button) button.disabled = false;
+    if (status) status.textContent = error?.code === 1 ? "GPS não autorizado. Informe uma referência abaixo." : "Não foi possível localizar. Tente novamente ou informe uma referência.";
+    showToast(error?.code === 1 ? "Permissão de localização não concedida." : "Não foi possível obter sua localização.");
+  }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+}
+
+function openTerrainQuickForm() {
+  resetTerrainQuickForm();
+  $("terrainQuickFormCard")?.classList.remove("hidden");
+  $("terrainQuickFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  $("terrainQuickNickname")?.focus({ preventScroll: true });
+  useCurrentTerrainQuickLocation();
+}
+
+function renderTerrainQuickAccess() {
+  const mount = $("terrainQuickRecentList");
+  const prospects = Object.values(state.terrainManagement?.terrains || {})
+    .filter((terrain) => terrain?.cadastro_rapido === true)
+    .sort((a, b) => Number(b.capturado_em || b.created_at || 0) - Number(a.capturado_em || a.created_at || 0));
+  if ($("terrainQuickPendingCount")) $("terrainQuickPendingCount").textContent = `${prospects.length} ${prospects.length === 1 ? "pendente" : "pendentes"}`;
+  if (!mount) return;
+  if (!prospects.length) {
+    mount.innerHTML = `<div class="terrain-quick-empty"><i class="fa-solid fa-circle-check"></i><span>Nenhuma prospecção aguardando complemento.</span></div>`;
+    return;
+  }
+  mount.innerHTML = prospects.slice(0, 5).map((terrain) => {
+    const status = terrainStatusMeta(terrain.status);
+    return `<button type="button" class="terrain-quick-recent-row" data-terrain-quick-view="${escapeAttr(terrain.id)}" data-no-loading>
+      <span><strong>${escapeHtml(terrain.apelido || "Prospecção")}</strong><small>${escapeHtml(terrain.localizacao_referencia || "Local marcado pelo GPS")}</small></span>
+      <span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span>
+      <i class="fa-solid fa-chevron-right"></i>
+    </button>`;
+  }).join("");
+}
+
+function terrainQuickFormValues() {
+  const status = $("terrainQuickStatus")?.value || "proprietario_desconhecido";
+  const grassByStatus = {
+    limpo: "ate_30_cm",
+    monitorar: "de_30_a_60_cm",
+    pode_precisar_limpeza: "de_60_cm_a_1_m",
+    precisa_limpeza: "acima_1_m"
+  };
+  const latitude = $("terrainQuickLatitude")?.value || "";
+  const longitude = $("terrainQuickLongitude")?.value || "";
+  return {
+    owner_id: "",
+    development_id: "",
+    apelido: $("terrainQuickNickname")?.value,
+    bairro: "",
+    rua: $("terrainQuickReference")?.value || "",
+    numero: "",
+    quadra: "",
+    lote: "",
+    area_m2: "",
+    frente_m: "",
+    fundo_m: "",
+    matricula: "",
+    inscricao_imobiliaria: "",
+    latitude,
+    longitude,
+    google_maps_url: latitude && longitude ? `https://www.google.com/maps?q=${latitude},${longitude}` : "",
+    observacoes: $("terrainQuickNotes")?.value || "",
+    grau_dificuldade: "nao_informado",
+    altura_mato: grassByStatus[status] || "nao_informado",
+    caracteristicas: [],
+    status,
+    cadastro_rapido: true,
+    prospeccao_status: "pendente_dados",
+    localizacao_referencia: $("terrainQuickReference")?.value || "",
+    precisao_gps_m: $("terrainQuickAccuracy")?.value || ""
+  };
+}
+
+async function saveTerrainQuickCapture(event) {
+  event.preventDefault();
+  if (!isMaster()) return showToast("Somente o Admin Master pode salvar terrenos.");
+  const terrainId = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.terrains.path)).key;
+  const files = [...($("terrainQuickPhotos")?.files || [])];
+  const uploaded = [];
+  let databaseSaved = false;
+  try {
+    const payload = buildTerrainRecord(terrainQuickFormValues(), { id: terrainId, timestamp: serverTimestamp() });
+    files.forEach(validateTerrainImageFile);
+    uploaded.push(...await uploadTerrainGeneralPhotos(terrainId, files, "frente"));
+    const updates = { [`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${terrainId}`]: payload };
+    uploaded.forEach((item) => { updates[`${TERRAIN_MANAGEMENT_ENTITIES.photos.path}/${item.id}`] = item.record; });
+    addTerrainTimelineUpdate(updates, {
+      terrainId,
+      type: "terrain_created",
+      description: `Prospecção rápida ${payload.apelido} registrada em campo.`,
+      referenceType: "terreno",
+      referenceId: terrainId
+    });
+    if (uploaded.length) addTerrainTimelineUpdate(updates, {
+      terrainId,
+      type: "photo_added",
+      description: `${uploaded.length} ${uploaded.length === 1 ? "foto adicionada" : "fotos adicionadas"} na prospecção.`,
+      referenceType: "foto",
+      referenceId: uploaded[0].id,
+      qualifier: uploaded[0].id
+    });
+    await firebaseUpdate(ref(db), updates);
+    databaseSaved = true;
+    await Promise.all([
+      refreshTerrainRecord(terrainId),
+      refreshTerrainTimeline(terrainId),
+      ...(uploaded.length ? [refreshTerrainPhotos(terrainId)] : [])
+    ]);
+    renderTerrainManagement();
+    resetTerrainQuickForm();
+    showToast("Prospecção salva. Complete os dados quando localizar o proprietário.", { prominent: true });
+  } catch (error) {
+    if (!databaseSaved) await Promise.allSettled(uploaded.map((item) => deleteTerrainDevelopmentStoragePath(item.path)));
+    console.error("Falha ao salvar prospecção rápida.", error);
+    showToast(error?.message || "Não foi possível salvar a prospecção.");
+  }
+}
 function terrainDashboardEmptyHtml(message) {
   return `<div class="terrain-dashboard-empty"><i class="fa-solid fa-circle-check"></i><span>${escapeHtml(message)}</span></div>`;
 }
@@ -4166,9 +4326,9 @@ function renderTerrainList() {
     return `
       <article class="terrain-row" data-terrain-id="${escapeAttr(terrain.id)}">
         <div data-label="Loteamento"><strong>${escapeHtml(developmentName)}</strong><small>${escapeHtml(terrain.bairro || "-")}</small></div>
-        <div data-label="Quadra / lote"><strong>Q. ${escapeHtml(terrain.quadra || "-")} · L. ${escapeHtml(terrain.lote || "-")}</strong><small>${escapeHtml(terrain.apelido || "")}</small></div>
+        <div data-label="Quadra / lote"><strong>Q. ${escapeHtml(terrain.quadra || "-")} · L. ${escapeHtml(terrain.lote || "-")}</strong><small>${escapeHtml(terrain.apelido || "")}${terrain.cadastro_rapido ? `<span class="terrain-quick-badge">Completar cadastro</span>` : ""}</small></div>
         <div data-label="Proprietário"><strong>${escapeHtml(ownerName)}</strong>${whatsappUrl ? `<small><a class="terrain-owner-contact-link" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${escapeHtml(formatPhoneMask(owner.whatsapp || owner.telefone))}</a></small>` : ""}</div>
-        <div data-label="Área"><strong class="terrain-area-value">${escapeHtml(formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
+        <div data-label="Área"><strong class="terrain-area-value">${escapeHtml(terrain.cadastro_rapido ? "A confirmar" : formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
         <div data-label="Status"><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></div>
         <div class="terrain-owner-actions" data-label="Ações">
           ${mapsUrl ? `<a class="terrain-owner-icon-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir no Google Maps" aria-label="Abrir ${escapeAttr(terrain.apelido)} no Google Maps"><i class="fa-solid fa-map-location-dot"></i></a>` : ""}
@@ -4199,6 +4359,7 @@ function openTerrainDetail(terrainId) {
   const reminderClassification = terrainReminderClassification(terrain, terrainBudgetLocalDate());
   $("terrainDetailTitle").textContent = terrain.apelido || "Detalhes";
   $("terrainDetailContent").innerHTML = `
+    ${terrain.cadastro_rapido ? `<div class="terrain-quick-detail-notice"><i class="fa-solid fa-bolt"></i><div><strong>Cadastro rápido pendente</strong><span>Complete endereço, medidas e proprietário quando essas informações estiverem disponíveis.</span></div></div>` : ""}
     <div class="terrain-detail-actions">
       <button type="button" data-terrain-new-inspection="${escapeAttr(terrain.id)}"><i class="fa-solid fa-clipboard-check"></i> Nova vistoria</button>
       <button type="button" class="ghost-button" data-terrain-new-budget="${escapeAttr(terrain.id)}" ${terrain.owner_id ? "" : "disabled title=\"Vincule um proprietário antes de criar o orçamento\""}><i class="fa-solid fa-file-invoice-dollar"></i> Novo orçamento</button>
@@ -4212,18 +4373,18 @@ function openTerrainDetail(terrainId) {
       <div><span>Última limpeza</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.ultima_limpeza_em))}</strong></div>
       <div><span>Próxima vistoria</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.proxima_vistoria_em))}</strong></div>
       <div class="wide"><span>Classificação do acompanhamento</span><strong>${escapeHtml(reminderClassification?.label || "Sem limpeza registrada")}</strong></div>
-      <div class="wide"><span>Endereço</span><strong>${escapeHtml([terrain.rua, terrain.numero, terrain.bairro].filter(Boolean).join(", ") || "-")}</strong></div>
+      <div class="wide"><span>Endereço</span><strong>${escapeHtml(terrain.localizacao_referencia || [terrain.rua, terrain.numero, terrain.bairro].filter(Boolean).join(", ") || "-")}</strong></div>
       <div><span>Loteamento</span><strong>${escapeHtml(terrainDevelopmentName(terrain, developments))}</strong></div>
       <div><span>Quadra</span><strong>${escapeHtml(terrain.quadra || "-")}</strong></div>
       <div><span>Lote</span><strong>${escapeHtml(terrain.lote || "-")}</strong></div>
-      <div><span>Área</span><strong>${escapeHtml(formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
-      <div><span>Frente</span><strong>${escapeHtml(formatTerrainMeasure(terrain.frente_m, "m"))}</strong></div>
-      <div><span>Fundo</span><strong>${escapeHtml(formatTerrainMeasure(terrain.fundo_m, "m"))}</strong></div>
+      <div><span>Área</span><strong>${escapeHtml(terrain.cadastro_rapido ? "A confirmar" : formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
+      <div><span>Frente</span><strong>${escapeHtml(terrain.cadastro_rapido ? "A confirmar" : formatTerrainMeasure(terrain.frente_m, "m"))}</strong></div>
+      <div><span>Fundo</span><strong>${escapeHtml(terrain.cadastro_rapido ? "A confirmar" : formatTerrainMeasure(terrain.fundo_m, "m"))}</strong></div>
       <div><span>Matrícula</span><strong>${escapeHtml(terrain.matricula || "-")}</strong></div>
       <div><span>Inscrição imobiliária</span><strong>${escapeHtml(terrain.inscricao_imobiliaria || "-")}</strong></div>
       <div><span>Grau de dificuldade</span><strong>${escapeHtml(terrainDifficultyLabel(terrain.grau_dificuldade))}</strong></div>
       <div><span>Altura do mato</span><strong>${escapeHtml(terrainGrassHeightLabel(terrain.altura_mato))}</strong></div>
-      <div class="wide"><span>Localização</span><strong>${escapeHtml(Number.isFinite(Number(terrain.latitude)) && Number.isFinite(Number(terrain.longitude)) ? `${terrain.latitude}, ${terrain.longitude}` : "Não informada")}</strong></div>
+      <div class="wide"><span>Localização</span><strong>${escapeHtml(terrain.latitude !== null && terrain.latitude !== "" && terrain.longitude !== null && terrain.longitude !== "" && Number.isFinite(Number(terrain.latitude)) && Number.isFinite(Number(terrain.longitude)) ? `${terrain.latitude}, ${terrain.longitude}` : "Não informada")}</strong></div>
       <div class="wide"><span>Características</span><strong class="terrain-detail-tags">${characteristics.length ? characteristics.map((label) => `<span>${escapeHtml(label)}</span>`).join("") : "<span>Nenhuma informada</span>"}</strong></div>
       <div class="wide"><span>Observações</span><strong>${escapeHtml(terrain.observacoes || "Sem observações.")}</strong></div>
     </div>
@@ -5889,9 +6050,9 @@ function renderTerrainFinance() {
   }).join("");
 }
 
-function switchTerrainManagementTab(tabName = "dashboard") {
-  const allowedTabs = new Set(["dashboard", "reports", "owners", "terrains", "developments", "budgets", "services", "reminders", "opportunities", "finance"]);
-  const target = allowedTabs.has(tabName) ? tabName : "dashboard";
+function switchTerrainManagementTab(tabName = "quick") {
+  const allowedTabs = new Set(["quick", "dashboard", "reports", "owners", "terrains", "developments", "budgets", "services", "reminders", "opportunities", "finance"]);
+  const target = allowedTabs.has(tabName) ? tabName : "quick";
   document.querySelectorAll("[data-terrain-tab]").forEach((button) => {
     const isActive = button.dataset.terrainTab === target;
     button.classList.toggle("active", isActive);
@@ -5901,6 +6062,7 @@ function switchTerrainManagementTab(tabName = "dashboard") {
   document.querySelectorAll("[data-terrain-section]").forEach((section) => {
     section.classList.toggle("hidden", section.dataset.terrainSection !== target);
   });
+  if (target === "quick") renderTerrainQuickAccess();
   if (target === "owners") renderTerrainOwnerList();
   if (target === "dashboard") renderTerrainDashboard();
   if (target === "reports") renderTerrainReports();
@@ -8856,7 +9018,10 @@ function switchView(name) {
   if (target === "artesPostagem") renderPostArtView();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
-  if (target === "gestaoTerrenos") renderTerrainManagement();
+  if (target === "gestaoTerrenos") {
+    switchTerrainManagementTab("quick");
+    renderTerrainManagement();
+  }
   if (target === "integracaoPagamento") loadPaymentIntegration();
   if (target === "paginaInicialSite") renderHomePageSettings();
   if (target === "combustiveisConfig") renderFuelAdminSettings();
@@ -26771,6 +26936,12 @@ function bindEvents() {
     renderTerrainReports();
   });
   $("gestaoTerrenosView")?.addEventListener("click", (event) => {
+    const quickTerrainButton = event.target.closest("[data-terrain-quick-view]");
+    if (quickTerrainButton) {
+      switchTerrainManagementTab("terrains");
+      openTerrainDetail(quickTerrainButton.dataset.terrainQuickView);
+      return;
+    }
     const tabButton = event.target.closest("[data-dashboard-open-tab]");
     if (tabButton) return switchTerrainManagementTab(tabButton.dataset.dashboardOpenTab);
     const terrainButton = event.target.closest("[data-dashboard-terrain]");
@@ -26785,6 +26956,16 @@ function bindEvents() {
       openTerrainServiceDetail(serviceButton.dataset.dashboardService);
     }
   });
+  $("startTerrainQuickCapture")?.addEventListener("click", openTerrainQuickForm);
+  $("openTerrainQuickSearch")?.addEventListener("click", () => {
+    switchTerrainManagementTab("terrains");
+    $("terrainSearch")?.focus();
+  });
+  $("closeTerrainQuickForm")?.addEventListener("click", resetTerrainQuickForm);
+  $("cancelTerrainQuickForm")?.addEventListener("click", resetTerrainQuickForm);
+  $("terrainQuickUseLocation")?.addEventListener("click", useCurrentTerrainQuickLocation);
+  $("terrainQuickPhotos")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainQuickPhotos", "terrainQuickPhotoPreview"));
+  $("terrainQuickForm")?.addEventListener("submit", saveTerrainQuickCapture);
   $("newTerrainOwner")?.addEventListener("click", () => openTerrainOwnerForm());
   $("closeTerrainOwnerForm")?.addEventListener("click", resetTerrainOwnerForm);
   $("cancelTerrainOwnerForm")?.addEventListener("click", resetTerrainOwnerForm);
