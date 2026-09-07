@@ -72,8 +72,19 @@ test("cards do resumo sao uniformes e responsivos", () => {
   assert.match(style, /\.fuel-daily-summary-station > a\s*\{[^}]*border-radius:\s*50%/);
 });
 
+test("cabecalho de combustiveis segue o padrao de automoveis e explica a pagina", () => {
+  const start = script.indexOf('<header class="fuel-page-heading">');
+  const end = script.indexOf('<section class="fuel-daily-summary"', start);
+  const heading = script.slice(start, end);
+  assert.ok(start >= 0 && end > start);
+  assert.match(heading, /<h2 class="highlighted">/);
+  assert.ok(heading.includes("PREÇO DE COMBUSTÍVEL"));
+  assert.ok(heading.includes("Compare os preços dos combustíveis nos postos da cidade"));
+  assert.match(style, /\.fuel-page-heading-details\s*\{/);
+});
+
 test("versoes publicas foram atualizadas", () => {
-  assert.ok(html.includes("style.css?v=482"));
-  assert.ok(html.includes("script.js?v=682"));
-  assert.ok(html.includes("Olá Carlópolis v474"));
+  assert.ok(html.includes("style.css?v=483"));
+  assert.ok(html.includes("script.js?v=683"));
+  assert.ok(html.includes("Olá Carlópolis v475"));
 });

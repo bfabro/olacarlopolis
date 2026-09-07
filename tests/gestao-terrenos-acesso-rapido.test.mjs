@@ -141,8 +141,8 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
   assert.match(panelHtml, /painel\.css\?v=447/);
-  assert.match(panelHtml, /painel\.js\?v=674/);
+  assert.match(panelHtml, /painel\.js\?v=675/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=22/);
-  assert.match(panelJs, /numero: 737/);
-  assert.match(panelJs, /label: "v744"/);
+  assert.match(panelJs, /numero: 738/);
+  assert.match(panelJs, /label: "v745"/);
 });

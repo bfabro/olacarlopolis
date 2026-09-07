@@ -30310,8 +30310,11 @@ function renderizarValoresCombustivel() {
 
   box.innerHTML = `
     <header class="fuel-page-heading">
-      <div><i class="fa-solid fa-gas-pump"></i><h2>Combustíveis</h2></div>
-      <span><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(city)}</span>
+      <h2 class="highlighted"><span><i class="fa-solid fa-gas-pump"></i> PREÇO DE COMBUSTÍVEL</span></h2>
+      <div class="fuel-page-heading-details">
+        <p>Compare os preços dos combustíveis nos postos da cidade e encontre a melhor opção para abastecer.</p>
+        <span><i class="fa-solid fa-location-dot"></i> ${fuelPublicEscape(city)}</span>
+      </div>
     </header>
     <section class="fuel-daily-summary" aria-labelledby="fuel-daily-summary-title">
       <header class="fuel-daily-summary-heading"><i class="fa-solid fa-trophy" aria-hidden="true"></i><h3 id="fuel-daily-summary-title">Menor preço Hoje</h3></header>

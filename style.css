@@ -28350,11 +28350,12 @@ body.eventos-image-open { overflow: hidden; }
 /* Combustiveis - cards compactos por posto v433 */
 .fuel-public-page { width: min(940px, 100%); margin: 0 auto; padding: 18px 14px 34px; }
 .fuel-public-page .fuel-results { gap: 14px; }
-.fuel-page-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 2px 2px; }
-.fuel-page-heading > div { display: flex; align-items: center; gap: 10px; }
-.fuel-page-heading > div > i { color: #e27700; font-size: 1.45rem; }
-.fuel-page-heading h2 { margin: 0; color: #101d33; font-size: clamp(1.45rem, 4vw, 2rem); }
-.fuel-page-heading > span { display: inline-flex; align-items: center; gap: 6px; color: #68778b; font-size: .78rem; font-weight: 800; }
+.fuel-page-heading { display: grid; gap: 8px; padding: 0 2px 2px; }
+.fuel-page-heading > .highlighted { width: 100%; margin: 0; }
+.fuel-page-heading > .highlighted span { display: inline-flex; align-items: center; gap: 10px; }
+.fuel-page-heading-details { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 4px; }
+.fuel-page-heading-details p { margin: 0; color: #5f6f83; font-size: .86rem; line-height: 1.45; }
+.fuel-page-heading-details > span { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 6px; color: #68778b; font-size: .78rem; font-weight: 800; }
 .fuel-best-banner { display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 12px; align-items: center; padding: 13px 16px; border: 1px solid #b9d9ff; border-radius: 14px; background: linear-gradient(135deg, #f7fbff, #eef7ff); color: #1a2941; box-shadow: 0 6px 18px rgba(29, 117, 216, .07); }
 .fuel-best-banner > i { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; color: #fff; background: #2493ed; font-size: 1.15rem; }
 .fuel-best-banner div { min-width: 0; font-size: .9rem; font-weight: 800; }
@@ -28387,7 +28388,7 @@ body.eventos-image-open { overflow: hidden; }
 @media (max-width: 720px) {
   .fuel-public-page { padding: 14px 9px 28px; }
   .fuel-page-heading { padding-inline: 6px; }
-  .fuel-page-heading > span { display: none; }
+  .fuel-page-heading-details > span { display: none; }
   .fuel-best-banner { grid-template-columns: 40px minmax(0, 1fr); padding: 10px 12px; }
   .fuel-best-banner > i { width: 40px; height: 40px; }
   .fuel-station-card-compact > .fuel-station-summary { grid-template-columns: 52px minmax(0, 1fr) auto; gap: 9px; padding: 11px; }
