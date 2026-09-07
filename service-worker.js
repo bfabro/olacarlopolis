@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-09-07-combustivel-cabecalho-publico-v793'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-09-07-gestao-terrenos-acoes-tabela-v794'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

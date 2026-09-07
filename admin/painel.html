@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=447">
+  <link rel="stylesheet" href="painel.css?v=448">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -456,6 +456,9 @@
         </section>
 
         <section class="terrain-module-section hidden" data-terrain-section="terrains">
+          <div class="terrain-tab-primary-actions">
+            <button id="newTerrain" class="new-entry-button terrain-new-primary" type="button" data-no-loading><i class="fa-solid fa-plus"></i> Adicionar novo terreno</button>
+          </div>
           <section id="terrainFormCard" class="panel-card terrain-form-card hidden">
             <div class="section-head">
               <div>
@@ -575,8 +578,9 @@
           <section class="panel-card terrain-list-card">
             <div class="section-head">
               <div><h2>Terrenos</h2><p id="terrainListSummary">0 terrenos encontrados.</p></div>
-              <button id="newTerrain" class="ghost-button new-entry-button" type="button" data-no-loading><i class="fa-solid fa-plus"></i> Novo terreno</button>
+              <button id="toggleTerrainTable" class="ghost-button terrain-table-toggle" type="button" data-no-loading aria-expanded="false" aria-controls="terrainTableContent"><i class="fa-solid fa-chevron-down"></i> <span>Mostrar tabela</span></button>
             </div>
+            <div id="terrainTableContent" class="terrain-table-content hidden">
             <div class="terrain-filters">
               <label class="terrain-filter-search">Busca geral
                 <span class="terrain-owner-search-field"><i class="fa-solid fa-magnifying-glass"></i><input id="terrainSearch" type="search" placeholder="Apelido, endereço, proprietário..."></span>
@@ -604,6 +608,7 @@
               <span>Loteamento</span><span>Quadra / lote</span><span>Proprietário</span><span>Área</span><span>Status</span><span>Ações</span>
             </div>
             <div id="terrainList" class="terrain-list"></div>
+            </div>
           </section>
         </section>
 
@@ -3299,6 +3304,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=675"></script>
+  <script type="module" src="painel.js?v=676"></script>
 </body>
 </html>

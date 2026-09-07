@@ -1493,6 +1493,24 @@ button[type="submit"]:hover,
   color: #b45309;
 }
 
+.terrain-owner-icon-button.success {
+  border-color: #bbf7d0;
+  color: #15803d;
+  background: #f0fdf4;
+}
+
+.terrain-detail-actions .warning-button {
+  border-color: #fcd34d;
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.terrain-detail-actions .success-button {
+  border-color: #86efac;
+  color: #166534;
+  background: #f0fdf4;
+}
+
 .terrain-owner-icon-button.danger {
   color: var(--danger);
 }
@@ -1666,6 +1684,34 @@ body.terrain-owner-detail-open {
 .terrain-list-card {
   --section-accent: #2563eb;
 }
+
+[data-terrain-section="terrains"] {
+  display: grid;
+  gap: 18px;
+}
+
+.terrain-tab-primary-actions { order: 0; }
+.terrain-list-card { order: 1; }
+.terrain-form-card { order: 2; }
+.terrain-new-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid #0f766e;
+  border-radius: 9px;
+  color: #fff;
+  background: #0f766e;
+  font-weight: 900;
+  cursor: pointer;
+}
+.terrain-new-primary:hover { background: #115e59; }
+.terrain-table-toggle { min-width: 148px; }
+.terrain-table-toggle i { transition: transform .18s ease; }
+.terrain-table-toggle[aria-expanded="true"] i { transform: rotate(180deg); }
+.terrain-table-content { padding-top: 4px; }
 
 .terrain-form-section-title {
   display: flex;

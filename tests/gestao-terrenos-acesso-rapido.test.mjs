@@ -64,12 +64,32 @@ test("salvamento concluido nao vira erro quando apenas a atualizacao da tela fal
 });
 
 test("prospeccao pode ser excluida junto com fotos e timeline sem apagar historicos protegidos", () => {
+  assert.match(panelJs, /data-terrain-delete=.*data-no-loading/);
   assert.match(panelJs, /Excluir prospecção/);
   assert.match(panelJs, /prospecção e todas as suas fotos/);
   assert.match(panelJs, /hasProtectedRemoteRecords = snapshots\.slice\(1, 4\)/);
   assert.match(panelJs, /photosToDelete\.forEach/);
   assert.match(panelJs, /deleteTerrainDevelopmentStoragePath\(photo\.path\)/);
   assert.match(panelJs, /Prospecção e fotos excluídas/);
+});
+
+test("aba Terrenos prioriza cadastro e tabela recolhida", () => {
+  const terrainSection = panelHtml.slice(panelHtml.indexOf('data-terrain-section="terrains"'), panelHtml.indexOf('data-terrain-section="developments"'));
+  assert.ok(terrainSection.indexOf('id="newTerrain"') < terrainSection.indexOf('id="terrainList"'));
+  assert.match(terrainSection, /Adicionar novo terreno/);
+  assert.match(terrainSection, /id="terrainTableContent" class="terrain-table-content hidden"/);
+  assert.match(panelJs, /setTerrainTableExpanded\(false\)/);
+  assert.match(panelCss, /\.terrain-list-card \{ order: 1; \}/);
+  assert.match(panelCss, /\.terrain-form-card \{ order: 2; \}/);
+});
+
+test("terrenos podem ser ativados desativados e excluidos com suas fotos", () => {
+  assert.match(panelJs, /function toggleTerrainActiveState/);
+  assert.match(panelJs, /data-terrain-toggle-active/);
+  assert.match(panelJs, /Terreno ativado/);
+  assert.match(panelJs, /Terreno desativado/);
+  assert.doesNotMatch(panelJs, /hasBlockingRemotePhotos/);
+  assert.match(panelJs, /Terreno e fotos excluídos/);
 });
 
 test("prospeccao aceita dados minimos com GPS e preserva precisao", () => {
@@ -140,9 +160,9 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=447/);
-  assert.match(panelHtml, /painel\.js\?v=675/);
+  assert.match(panelHtml, /painel\.css\?v=448/);
+  assert.match(panelHtml, /painel\.js\?v=676/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=22/);
-  assert.match(panelJs, /numero: 738/);
-  assert.match(panelJs, /label: "v745"/);
+  assert.match(panelJs, /numero: 739/);
+  assert.match(panelJs, /label: "v746"/);
 });
