@@ -81,6 +81,27 @@ test("aba Terrenos prioriza cadastro e tabela recolhida", () => {
   assert.match(panelJs, /setTerrainTableExpanded\(false\)/);
   assert.match(panelCss, /\.terrain-list-card \{ order: 1; \}/);
   assert.match(panelCss, /\.terrain-form-card \{ order: 2; \}/);
+  assert.match(terrainSection, /terrain-filter-panel/);
+  assert.match(terrainSection, /id="terrainReferenceCounter"/);
+});
+
+test("cadastro de terreno permite informações parciais e gera referência", () => {
+  const terrainForm = panelHtml.slice(panelHtml.indexOf('id="terrainForm"'), panelHtml.indexOf("</form>", panelHtml.indexOf('id="terrainForm"')));
+  assert.match(terrainForm, /id="terrainReferenceCode" readonly/);
+  ["terrainNickname", "terrainNeighborhood", "terrainStreet", "terrainNumber", "terrainBlock", "terrainLot", "terrainArea", "terrainFront", "terrainBack", "terrainDifficulty", "terrainGrassHeight", "terrainStatus"].forEach((id) => {
+    assert.doesNotMatch(terrainForm, new RegExp(`id="${id}"[^>]*\\srequired(?:\\s|>)`));
+  });
+  assert.match(panelJs, /function nextTerrainReferenceCode/);
+  assert.match(panelJs, /values\.apelido = values\.apelido \|\| values\.codigo_referencia/);
+});
+
+test("detalhe mostra vínculos e permite desvincular preservando histórico", () => {
+  assert.match(panelJs, /function terrainLinkedDataHtml/);
+  assert.match(panelJs, /data-terrain-unlink-kind/);
+  assert.match(panelJs, /function unlinkTerrainLinkedRecord/);
+  assert.match(panelJs, /TERRAIN_UNLINK_ARCHIVE_ID/);
+  assert.match(panelJs, /terreno_desvinculado_codigo/);
+  assert.match(panelCss, /\.terrain-linked-data-section/);
 });
 
 test("terrenos podem ser ativados desativados e excluidos com suas fotos", () => {
@@ -160,9 +181,9 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=448/);
-  assert.match(panelHtml, /painel\.js\?v=676/);
-  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=22/);
-  assert.match(panelJs, /numero: 739/);
-  assert.match(panelJs, /label: "v746"/);
+  assert.match(panelHtml, /painel\.css\?v=449/);
+  assert.match(panelHtml, /painel\.js\?v=677/);
+  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=23/);
+  assert.match(panelJs, /numero: 740/);
+  assert.match(panelJs, /label: "v747"/);
 });

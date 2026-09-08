@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=22";
+} from "./gestao-terrenos-schema.js?v=23";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -121,11 +121,12 @@ const firebaseConfig = {
 };
 
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
+const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 739,
-  label: "v746",
+  numero: 740,
+  label: "v747",
   data: "2026-09-07",
-  nota: "Gestao de terrenos com exclusao corrigida, tabela recolhida e controle de ativacao."
+  nota: "Gestao de terrenos com vinculos detalhados, desvinculacao segura, campos opcionais e referencias sequenciais."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3039,9 +3040,11 @@ async function loadAllData(onProgress = null) {
   state.combustiveisConfig = combustiveisSnap.exists() ? combustiveisSnap.val() : {};
   state.combustiveisLinks = combustiveisLinksSnap.exists() ? combustiveisLinksSnap.val() : {};
   state.combustiveisHistorico = combustiveisHistoricoSnap.exists() ? (isMaster() ? combustiveisHistoricoSnap.val() : { [state.profile?.postoCombustivelId || ""]: combustiveisHistoricoSnap.val() }) : {};
+  const terrainRecordsData = terrainsSnap.exists() ? terrainsSnap.val() : {};
+  delete terrainRecordsData[TERRAIN_UNLINK_ARCHIVE_ID];
   state.terrainManagement = {
     owners: terrainOwnersSnap.exists() ? terrainOwnersSnap.val() : {},
-    terrains: terrainsSnap.exists() ? terrainsSnap.val() : {},
+    terrains: terrainRecordsData,
     developments: terrainDevelopmentsSnap.exists() ? terrainDevelopmentsSnap.val() : {},
     photos: terrainPhotosSnap.exists() ? terrainPhotosSnap.val() : {},
     inspections: terrainInspectionsSnap.exists() ? terrainInspectionsSnap.val() : {},
@@ -3565,6 +3568,40 @@ function renderTerrainQuickAccess() {
   }).join("");
 }
 
+function terrainReferenceCodeMap() {
+  const records = Object.values(state.terrainManagement?.terrains || {})
+    .filter((terrain) => terrain?.id)
+    .sort((a, b) => (Number(a.created_at) || 0) - (Number(b.created_at) || 0) || String(a.id).localeCompare(String(b.id)));
+  const result = new Map();
+  const used = new Set();
+  records.forEach((terrain) => {
+    const match = String(terrain.codigo_referencia || "").match(/^TER-(\d+)$/i);
+    if (!match) return;
+    const number = Number(match[1]);
+    if (!Number.isInteger(number) || number < 1 || used.has(number)) return;
+    used.add(number);
+    result.set(terrain.id, `TER-${String(number).padStart(4, "0")}`);
+  });
+  let next = 1;
+  records.forEach((terrain) => {
+    if (result.has(terrain.id)) return;
+    while (used.has(next)) next += 1;
+    used.add(next);
+    result.set(terrain.id, `TER-${String(next).padStart(4, "0")}`);
+    next += 1;
+  });
+  return { result, next: Math.max(0, ...used) + 1 };
+}
+
+function terrainReferenceCode(terrain) {
+  if (!terrain?.id) return "";
+  return terrainReferenceCodeMap().result.get(terrain.id) || "";
+}
+
+function nextTerrainReferenceCode() {
+  return `TER-${String(terrainReferenceCodeMap().next).padStart(4, "0")}`;
+}
+
 function terrainQuickFormValues() {
   const status = $("terrainQuickStatus")?.value || "proprietario_desconhecido";
   const grassByStatus = {
@@ -3575,10 +3612,12 @@ function terrainQuickFormValues() {
   };
   const latitude = $("terrainQuickLatitude")?.value || "";
   const longitude = $("terrainQuickLongitude")?.value || "";
+  const referenceCode = nextTerrainReferenceCode();
   return {
     owner_id: "",
     development_id: "",
-    apelido: $("terrainQuickNickname")?.value,
+    codigo_referencia: referenceCode,
+    apelido: $("terrainQuickNickname")?.value || referenceCode,
     bairro: "",
     rua: $("terrainQuickReference")?.value || "",
     numero: "",
@@ -4121,6 +4160,7 @@ function terrainFormValues() {
   return {
     owner_id: $("terrainOwner")?.value,
     development_id: $("terrainDevelopment")?.value,
+    codigo_referencia: $("terrainReferenceCode")?.value,
     apelido: $("terrainNickname")?.value,
     bairro: $("terrainNeighborhood")?.value,
     rua: $("terrainStreet")?.value,
@@ -4159,6 +4199,7 @@ function resetTerrainForm() {
   state.selectedTerrainId = null;
   $("terrainForm")?.reset();
   if ($("terrainId")) $("terrainId").value = "";
+  if ($("terrainReferenceCode")) $("terrainReferenceCode").value = "";
   if ($("terrainFormTitle")) $("terrainFormTitle").textContent = "Novo terreno";
   document.querySelectorAll("[data-terrain-characteristic]").forEach((input) => { input.checked = false; });
   if ($("terrainGeneralPhotoSelectionPreview")) $("terrainGeneralPhotoSelectionPreview").innerHTML = "";
@@ -4174,6 +4215,7 @@ function openTerrainForm(terrainId = "", { focusOwner = false } = {}) {
   if ($("terrainId")) $("terrainId").value = terrain?.id || "";
   if ($("terrainFormTitle")) $("terrainFormTitle").textContent = terrain ? "Editar terreno" : "Novo terreno";
   const values = {
+    terrainReferenceCode: terrain ? terrainReferenceCode(terrain) : nextTerrainReferenceCode(),
     terrainNickname: terrain?.apelido || "",
     terrainNeighborhood: terrain?.bairro || "",
     terrainStreet: terrain?.rua || "",
@@ -4355,12 +4397,61 @@ function terrainDeletionInfo(terrain) {
   const isQuickCapture = terrain?.cadastro_rapido === true;
   const photos = terrainPhotoRecords(state.terrainManagement?.photos || {}, terrainId);
   const inspections = terrainInspectionRecords(state.terrainManagement?.inspections || {}, terrainId);
-  const hasBudgets = terrainBudgetRecords(state.terrainManagement?.budgets || {})
-    .some((budget) => budget.terrain_id === terrainId);
-  const hasServices = terrainServiceRecords(state.terrainManagement?.services || {})
-    .some((service) => service.terrain_id === terrainId);
-  const blocked = inspections.length > 0 || hasBudgets || hasServices;
-  return { isQuickCapture, photos, inspections, hasBudgets, hasServices, blocked };
+  const budgets = terrainBudgetRecords(state.terrainManagement?.budgets || {})
+    .filter((budget) => budget.terrain_id === terrainId);
+  const services = terrainServiceRecords(state.terrainManagement?.services || {})
+    .filter((service) => service.terrain_id === terrainId);
+  const blocked = inspections.length > 0 || budgets.length > 0 || services.length > 0;
+  return {
+    isQuickCapture, photos, inspections, budgets, services,
+    hasBudgets: budgets.length > 0,
+    hasServices: services.length > 0,
+    blocked
+  };
+}
+
+function terrainLinkedDataHtml(terrain, deletion = terrainDeletionInfo(terrain)) {
+  const groups = [
+    {
+      key: "inspection", icon: "fa-clipboard-check", label: "Vistorias", records: deletion.inspections,
+      title: (item) => `Vistoria de ${terrainBudgetDateLabel(item.data)}`,
+      meta: (item) => [item.hora, item.responsavel_nome || item.responsavel_email].filter(Boolean).join(" · ") || "Sem detalhes"
+    },
+    {
+      key: "budget", icon: "fa-file-invoice-dollar", label: "Orçamentos", records: deletion.budgets,
+      title: (item) => item.numero ? `Orçamento ${item.numero}` : "Orçamento sem número",
+      meta: (item) => [terrainBudgetDateLabel(item.data), item.tipo_servico].filter(Boolean).join(" · ") || "Sem detalhes"
+    },
+    {
+      key: "service", icon: "fa-screwdriver-wrench", label: "Serviços", records: deletion.services,
+      title: (item) => item.tipo_servico || "Serviço sem descrição",
+      meta: (item) => [terrainBudgetDateLabel(item.data_prevista), item.horario].filter(Boolean).join(" · ") || "Sem detalhes"
+    }
+  ];
+  const linkedCount = groups.reduce((total, group) => total + group.records.length, 0);
+  const groupsHtml = groups.filter((group) => group.records.length).map((group) => `
+    <div class="terrain-linked-group">
+      <h4><i class="fa-solid ${group.icon}"></i> ${escapeHtml(group.label)} <span>${group.records.length}</span></h4>
+      <div class="terrain-linked-list">
+        ${group.records.map((item) => `
+          <article class="terrain-linked-item">
+            <div><strong>${escapeHtml(group.title(item))}</strong><small>${escapeHtml(group.meta(item))}</small></div>
+            <button type="button" class="ghost-button danger-button" data-terrain-unlink-kind="${group.key}" data-terrain-unlink-id="${escapeAttr(item.id)}" data-terrain-unlink-terrain="${escapeAttr(terrain.id)}" data-no-loading><i class="fa-solid fa-link-slash"></i> Desvincular</button>
+          </article>`).join("")}
+      </div>
+    </div>`).join("");
+  return `
+    <section class="terrain-linked-data-section">
+      <div class="terrain-detail-section-head">
+        <div><span>Controle de exclusão</span><h3>Dados vinculados</h3></div>
+        <strong class="terrain-linked-total ${linkedCount ? "has-links" : ""}">${linkedCount} ${linkedCount === 1 ? "vínculo impeditivo" : "vínculos impeditivos"}</strong>
+      </div>
+      <p class="terrain-linked-help">${linkedCount
+        ? "Desvincule individualmente os registros abaixo para liberar a exclusão. Os registros e seus históricos serão preservados."
+        : "Nenhuma vistoria, orçamento ou serviço impede a exclusão deste cadastro."}</p>
+      ${deletion.photos.length ? `<div class="terrain-linked-photo-note"><i class="fa-solid fa-images"></i><span><strong>${deletion.photos.length} ${deletion.photos.length === 1 ? "foto vinculada" : "fotos vinculadas"}</strong> serão excluídas automaticamente junto com ${terrain.cadastro_rapido ? "a prospecção" : "o terreno"}.</span></div>` : ""}
+      ${groupsHtml}
+    </section>`;
 }
 
 function setTerrainTableExpanded(expanded = false) {
@@ -4391,6 +4482,9 @@ function renderTerrainList() {
   if ($("terrainListSummary")) {
     $("terrainListSummary").textContent = `${terrains.length} ${terrains.length === 1 ? "terreno encontrado" : "terrenos encontrados"}.`;
   }
+  if ($("terrainReferenceCounter")) {
+    $("terrainReferenceCounter").textContent = `Próximo código: ${nextTerrainReferenceCode()}`;
+  }
   if (!terrains.length) {
     mount.innerHTML = `
       <div class="terrain-owner-list-empty">
@@ -4415,7 +4509,7 @@ function renderTerrainList() {
     return `
       <article class="terrain-row" data-terrain-id="${escapeAttr(terrain.id)}">
         <div data-label="Loteamento"><strong>${escapeHtml(developmentName)}</strong><small>${escapeHtml(terrain.bairro || "-")}</small></div>
-        <div data-label="Quadra / lote"><strong>Q. ${escapeHtml(terrain.quadra || "-")} · L. ${escapeHtml(terrain.lote || "-")}</strong><small>${escapeHtml(terrain.apelido || "")}${terrain.cadastro_rapido ? `<span class="terrain-quick-badge">Completar cadastro</span>` : ""}</small></div>
+        <div data-label="Quadra / lote"><strong>Q. ${escapeHtml(terrain.quadra || "-")} · L. ${escapeHtml(terrain.lote || "-")}</strong><small><span class="terrain-reference-code">${escapeHtml(terrainReferenceCode(terrain))}</span> ${escapeHtml(terrain.apelido || "Sem apelido")}${terrain.cadastro_rapido ? `<span class="terrain-quick-badge">Completar cadastro</span>` : ""}</small></div>
         <div data-label="Proprietário"><strong>${escapeHtml(ownerName)}</strong>${whatsappUrl ? `<small><a class="terrain-owner-contact-link" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${escapeHtml(formatPhoneMask(owner.whatsapp || owner.telefone))}</a></small>` : ""}</div>
         <div data-label="Área"><strong class="terrain-area-value">${escapeHtml(terrain.cadastro_rapido ? "A confirmar" : formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
         <div data-label="Status"><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></div>
@@ -4461,6 +4555,7 @@ function openTerrainDetail(terrainId) {
       <button type="button" class="danger-button" data-terrain-delete="${escapeAttr(terrain.id)}" data-no-loading ${deletion.blocked ? "disabled title=\"Exclusão bloqueada: existem vistorias, orçamentos ou serviços vinculados\"" : ""}><i class="fa-solid fa-trash"></i> ${terrain.cadastro_rapido ? "Excluir prospecção" : "Excluir terreno"}</button>
     </div>
     <div class="terrain-owner-detail-grid">
+      <div><span>Código de referência</span><strong class="terrain-reference-code">${escapeHtml(terrainReferenceCode(terrain))}</strong></div>
       <div><span>Proprietário</span><strong>${escapeHtml(terrainOwnerName(terrain, owners))}</strong></div>
       <div><span>Status</span><strong><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></strong></div>
       <div><span>Última limpeza</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.ultima_limpeza_em))}</strong></div>
@@ -4481,6 +4576,7 @@ function openTerrainDetail(terrainId) {
       <div class="wide"><span>Características</span><strong class="terrain-detail-tags">${characteristics.length ? characteristics.map((label) => `<span>${escapeHtml(label)}</span>`).join("") : "<span>Nenhuma informada</span>"}</strong></div>
       <div class="wide"><span>Observações</span><strong>${escapeHtml(terrain.observacoes || "Sem observações.")}</strong></div>
     </div>
+    ${terrainLinkedDataHtml(terrain, deletion)}
     <section class="terrain-detail-gallery-section">
       <div class="terrain-detail-section-head"><div><span>Galeria</span><h3>Fotos do terreno</h3></div></div>
       <div class="terrain-detail-upload-bar">
@@ -4746,7 +4842,10 @@ async function saveTerrain(event) {
   const uploaded = [];
   let databaseSaved = false;
   try {
-    const payload = buildTerrainRecord(terrainFormValues(), {
+    const values = terrainFormValues();
+    values.codigo_referencia = existing ? terrainReferenceCode(existing) : (values.codigo_referencia || nextTerrainReferenceCode());
+    values.apelido = values.apelido || values.codigo_referencia;
+    const payload = buildTerrainRecord(values, {
       id: terrainId,
       existing: existing || {},
       timestamp: serverTimestamp()
@@ -4835,6 +4934,98 @@ async function toggleTerrainActiveState(terrainId) {
   } catch (error) {
     console.error("Falha ao alterar situação do terreno.", error);
     showToast("Não foi possível alterar a situação do terreno.");
+  }
+}
+
+async function unlinkTerrainLinkedRecord(terrainId, kind, recordId) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode desvincular dados.");
+  const terrain = terrainById(terrainId);
+  if (!terrain) return showToast("Terreno ou prospecção não encontrado.");
+  const configs = {
+    inspection: { entity: "inspections", label: "vistoria" },
+    budget: { entity: "budgets", label: "orçamento" },
+    service: { entity: "services", label: "serviço" }
+  };
+  const config = configs[kind];
+  if (!config || !recordId) return showToast("Vínculo inválido.");
+  if (!window.confirm(`Desvincular este ${config.label} de ${terrain.apelido || terrainReferenceCode(terrain)}? O registro será preservado no histórico.`)) return;
+  try {
+    const entity = TERRAIN_MANAGEMENT_ENTITIES[config.entity];
+    const snapshot = await get(ref(db, `${entity.path}/${recordId}`));
+    if (!snapshot.exists()) {
+      delete state.terrainManagement[config.entity][recordId];
+      openTerrainDetail(terrainId);
+      renderTerrainList();
+      return showToast("O registro já não existe.");
+    }
+    const record = { id: recordId, ...(snapshot.val() || {}) };
+    if (record.terrain_id !== terrainId) {
+      state.terrainManagement[config.entity][recordId] = record;
+      openTerrainDetail(terrainId);
+      renderTerrainList();
+      return showToast("Este registro já foi desvinculado.");
+    }
+    const archiveSnapshot = await get(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${TERRAIN_UNLINK_ARCHIVE_ID}`));
+    const timestamp = serverTimestamp();
+    const basePath = `${entity.path}/${recordId}`;
+    const updates = {
+      [`${basePath}/terrain_id`]: TERRAIN_UNLINK_ARCHIVE_ID,
+      [`${basePath}/terreno_desvinculado_id`]: terrainId,
+      [`${basePath}/terreno_desvinculado_codigo`]: terrainReferenceCode(terrain),
+      [`${basePath}/terreno_desvinculado_nome`]: terrain.apelido || terrainReferenceCode(terrain),
+      [`${basePath}/desvinculado_em`]: timestamp,
+      [`${basePath}/desvinculado_por_uid`]: state.user?.uid || "",
+      [`${basePath}/updated_at`]: timestamp
+    };
+    if (!archiveSnapshot.exists()) {
+      updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${TERRAIN_UNLINK_ARCHIVE_ID}`] = {
+        id: TERRAIN_UNLINK_ARCHIVE_ID,
+        apelido: "Arquivo interno de vínculos desvinculados",
+        bairro: "", rua: "", numero: "", quadra: "", lote: "",
+        area_m2: 0, frente_m: 0, fundo_m: 0,
+        observacoes: "Cadastro técnico interno para preservar a integridade dos históricos desvinculados.",
+        grau_dificuldade: "nao_informado",
+        altura_mato: "nao_informado",
+        status: "inativo",
+        registro_sistema: true,
+        created_at: timestamp,
+        updated_at: timestamp
+      };
+    }
+    let servicePhotos = [];
+    if (kind === "service") {
+      const photoSnapshot = await get(query(
+        ref(db, TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path),
+        orderByChild("service_id"),
+        equalTo(recordId)
+      ));
+      servicePhotos = Object.entries(photoSnapshot.val() || {}).map(([id, photo]) => ({ id, ...(photo || {}) }));
+      servicePhotos.forEach((photo) => {
+        updates[`${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${photo.id}/terrain_id`] = TERRAIN_UNLINK_ARCHIVE_ID;
+        updates[`${TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path}/${photo.id}/updated_at`] = timestamp;
+      });
+    }
+    await firebaseUpdate(ref(db), updates);
+    const localTimestamp = Date.now();
+    state.terrainManagement[config.entity][recordId] = {
+      ...record,
+      terrain_id: TERRAIN_UNLINK_ARCHIVE_ID,
+      terreno_desvinculado_id: terrainId,
+      terreno_desvinculado_codigo: terrainReferenceCode(terrain),
+      terreno_desvinculado_nome: terrain.apelido || terrainReferenceCode(terrain),
+      desvinculado_em: localTimestamp,
+      desvinculado_por_uid: state.user?.uid || "",
+      updated_at: localTimestamp
+    };
+    servicePhotos.forEach((photo) => {
+      state.terrainManagement.servicePhotos[photo.id] = { ...photo, terrain_id: TERRAIN_UNLINK_ARCHIVE_ID, updated_at: localTimestamp };
+    });
+    renderTerrainManagement();
+    openTerrainDetail(terrainId);
+    showToast(`${config.label.charAt(0).toUpperCase() + config.label.slice(1)} desvinculado e preservado.`, { prominent: true });
+  } catch (error) {
+    console.error("Falha ao desvincular dado do terreno.", error);
+    showToast(error?.message || "Não foi possível desvincular o registro.");
   }
 }
 
@@ -27156,6 +27347,12 @@ function bindEvents() {
   $("terrainDetailContent")?.addEventListener("click", (event) => {
     const activeButton = event.target.closest("[data-terrain-toggle-active]");
     if (activeButton) return toggleTerrainActiveState(activeButton.dataset.terrainToggleActive);
+    const unlinkButton = event.target.closest("[data-terrain-unlink-id]");
+    if (unlinkButton) return unlinkTerrainLinkedRecord(
+      unlinkButton.dataset.terrainUnlinkTerrain,
+      unlinkButton.dataset.terrainUnlinkKind,
+      unlinkButton.dataset.terrainUnlinkId
+    );
     const deleteButton = event.target.closest("[data-terrain-delete]");
     if (deleteButton) return deleteTerrain(deleteButton.dataset.terrainDelete);
     const budgetButton = event.target.closest("[data-terrain-new-budget]");

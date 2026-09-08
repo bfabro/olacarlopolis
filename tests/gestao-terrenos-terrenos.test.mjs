@@ -41,11 +41,21 @@ test("cria terreno sem proprietário ou loteamento", () => {
   assert.deepEqual(terrain.caracteristicas, { pedras: true, declive: true });
 });
 
-test("rejeita medidas obrigatórias vazias", () => {
-  assert.throws(
-    () => buildTerrainRecord({ ...baseInput, area_m2: "" }, { id: "terrain-1", timestamp: 1000 }),
-    /Valor inválido para área/
-  );
+test("permite cadastro sem dados ainda desconhecidos", () => {
+  const terrain = buildTerrainRecord({
+    owner_id: "", development_id: "", codigo_referencia: "TER-0001",
+    apelido: "", bairro: "", rua: "", numero: "", quadra: "", lote: "",
+    area_m2: "", frente_m: "", fundo_m: "", matricula: "", inscricao_imobiliaria: "",
+    latitude: "", longitude: "", google_maps_url: "", observacoes: "",
+    grau_dificuldade: "", altura_mato: "", caracteristicas: [], status: ""
+  }, { id: "terrain-1", timestamp: 1000 });
+  assert.equal(terrain.codigo_referencia, "TER-0001");
+  assert.equal(terrain.area_m2, 0);
+  assert.equal(terrain.frente_m, 0);
+  assert.equal(terrain.fundo_m, 0);
+  assert.equal(terrain.grau_dificuldade, "nao_informado");
+  assert.equal(terrain.altura_mato, "nao_informado");
+  assert.equal(terrain.status, "sem_informacao");
 });
 
 test("cria terreno com os relacionamentos existentes", () => {
@@ -86,6 +96,8 @@ test("pesquisa e combina todos os filtros da listagem", () => {
   const developments = { "dev-1": { id: "dev-1", nome: "Jardim Primavera" } };
   assert.deepEqual(filterTerrains(records, { search: "maria" }, owners, developments).map((item) => item.id), ["a"]);
   assert.deepEqual(filterTerrains(records, { search: "primavera" }, owners, developments).map((item) => item.id), ["a"]);
+  records.a.codigo_referencia = "TER-0042";
+  assert.deepEqual(filterTerrains(records, { search: "ter-0042" }, owners, developments).map((item) => item.id), ["a"]);
   assert.deepEqual(filterTerrains(records, {
     owner_id: "owner-1",
     development_id: "dev-1",

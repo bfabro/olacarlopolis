@@ -391,23 +391,24 @@ export function normalizeTerrainInput(input = {}) {
   const terrain = {
     owner_id: value("owner_id") || null,
     development_id: value("development_id") || null,
+    codigo_referencia: value("codigo_referencia") || null,
     apelido: value("apelido"),
     bairro: value("bairro"),
     rua: value("rua"),
     numero: value("numero"),
     quadra: value("quadra"),
     lote: value("lote"),
-    area_m2: quickCapture && value("area_m2") === "" ? 0 : terrainNumber(input.area_m2, "\u00e1rea"),
-    frente_m: quickCapture && value("frente_m") === "" ? 0 : terrainNumber(input.frente_m, "frente"),
-    fundo_m: quickCapture && value("fundo_m") === "" ? 0 : terrainNumber(input.fundo_m, "fundo"),
+    area_m2: value("area_m2") === "" ? 0 : terrainNumber(input.area_m2, "\u00e1rea"),
+    frente_m: value("frente_m") === "" ? 0 : terrainNumber(input.frente_m, "frente"),
+    fundo_m: value("fundo_m") === "" ? 0 : terrainNumber(input.fundo_m, "fundo"),
     matricula: value("matricula") || null,
     inscricao_imobiliaria: value("inscricao_imobiliaria") || null,
     latitude: terrainOptionalCoordinate(input.latitude, "latitude", -90, 90),
     longitude: terrainOptionalCoordinate(input.longitude, "longitude", -180, 180),
     google_maps_url: value("google_maps_url") || null,
     observacoes: value("observacoes"),
-    grau_dificuldade: TERRAIN_DIFFICULTY_VALUES.has(value("grau_dificuldade")) ? value("grau_dificuldade") : "",
-    altura_mato: TERRAIN_GRASS_HEIGHT_VALUES.has(value("altura_mato")) ? value("altura_mato") : "",
+    grau_dificuldade: TERRAIN_DIFFICULTY_VALUES.has(value("grau_dificuldade")) ? value("grau_dificuldade") : "nao_informado",
+    altura_mato: TERRAIN_GRASS_HEIGHT_VALUES.has(value("altura_mato")) ? value("altura_mato") : "nao_informado",
     caracteristicas: Object.keys(characteristics).length ? characteristics : null,
     cadastro_rapido: quickCapture,
     prospeccao_status: quickCapture ? "pendente_dados" : null,
@@ -415,9 +416,7 @@ export function normalizeTerrainInput(input = {}) {
     precisao_gps_m: quickCapture && value("precisao_gps_m") !== "" ? terrainNumber(input.precisao_gps_m, "precisao do GPS") : null,
     status: TERRAIN_STATUS_VALUES.has(value("status")) ? value("status") : "sem_informacao"
   };
-  const required = quickCapture ? ["apelido"] : [
-    "apelido", "bairro", "rua", "numero", "quadra", "lote", "grau_dificuldade", "altura_mato"
-  ];
+  const required = quickCapture ? ["apelido"] : [];
   const missing = required.filter((key) => !terrain[key]);
   if (missing.length) throw new Error(`Campos obrigatorios ausentes: ${missing.join(", ")}`);
   if (quickCapture && !((terrain.latitude !== null && terrain.longitude !== null) || terrain.localizacao_referencia)) {
@@ -727,7 +726,7 @@ export function filterTerrains(records, filters = {}, owners = {}, developments 
   const lot = normalizeTerrainOwnerSearch(filters.lote);
   return terrainRecords(records).filter((terrain) => {
     const haystack = normalizeTerrainOwnerSearch([
-      terrain.apelido, terrain.bairro, terrain.rua, terrain.numero, terrain.quadra, terrain.lote,
+      terrain.codigo_referencia, terrain.apelido, terrain.bairro, terrain.rua, terrain.numero, terrain.quadra, terrain.lote,
       terrain.matricula, terrain.inscricao_imobiliaria,
       terrainOwnerName(terrain, owners), terrainDevelopmentName(terrain, developments)
     ].filter(Boolean).join(" "));

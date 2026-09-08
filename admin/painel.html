@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=448">
+  <link rel="stylesheet" href="painel.css?v=449">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -470,23 +470,26 @@
             <form id="terrainForm" class="grid-form terrain-form">
               <input id="terrainId" type="hidden">
               <h3 class="wide terrain-form-section-title"><i class="fa-solid fa-address-card"></i> Identificação</h3>
+              <label>Código de referência
+                <input id="terrainReferenceCode" readonly placeholder="Gerado automaticamente">
+              </label>
               <label>Proprietário
                 <select id="terrainOwner"><option value="">Sem proprietário</option></select>
               </label>
               <label>Loteamento
                 <select id="terrainDevelopment"><option value="">Sem loteamento</option></select>
               </label>
-              <label class="wide">Apelido interno do terreno
-                <input id="terrainNickname" maxlength="140" required>
+              <label>Apelido interno do terreno
+                <input id="terrainNickname" maxlength="140" placeholder="Opcional">
               </label>
-              <label>Bairro<input id="terrainNeighborhood" maxlength="100" required></label>
-              <label>Rua<input id="terrainStreet" maxlength="180" required></label>
-              <label>Número<input id="terrainNumber" maxlength="20" required></label>
-              <label>Quadra<input id="terrainBlock" maxlength="40" required></label>
-              <label>Lote<input id="terrainLot" maxlength="40" required></label>
-              <label>Área em m²<input id="terrainArea" type="number" min="0" step="0.01" inputmode="decimal" required></label>
-              <label>Frente em metros<input id="terrainFront" type="number" min="0" step="0.01" inputmode="decimal" required></label>
-              <label>Fundo em metros<input id="terrainBack" type="number" min="0" step="0.01" inputmode="decimal" required></label>
+              <label>Bairro<input id="terrainNeighborhood" maxlength="100" placeholder="Opcional"></label>
+              <label>Rua<input id="terrainStreet" maxlength="180" placeholder="Opcional"></label>
+              <label>Número<input id="terrainNumber" maxlength="20" placeholder="Opcional"></label>
+              <label>Quadra<input id="terrainBlock" maxlength="40" placeholder="Opcional"></label>
+              <label>Lote<input id="terrainLot" maxlength="40" placeholder="Opcional"></label>
+              <label>Área em m²<input id="terrainArea" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Opcional"></label>
+              <label>Frente em metros<input id="terrainFront" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Opcional"></label>
+              <label>Fundo em metros<input id="terrainBack" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Opcional"></label>
               <label>Matrícula<input id="terrainRegistration" maxlength="100" placeholder="Opcional"></label>
               <label>Inscrição imobiliária<input id="terrainMunicipalRegistration" maxlength="100" placeholder="Opcional"></label>
               <label class="wide">Observações<textarea id="terrainNotes" rows="4" maxlength="2000"></textarea></label>
@@ -502,7 +505,7 @@
 
               <h3 class="wide terrain-form-section-title"><i class="fa-solid fa-seedling"></i> Situação</h3>
               <label>Grau de dificuldade
-                <select id="terrainDifficulty" required>
+                <select id="terrainDifficulty">
                   <option value="">Selecione</option>
                   <option value="nao_informado">Não informado</option>
                   <option value="facil">Fácil</option>
@@ -512,7 +515,7 @@
                 </select>
               </label>
               <label>Altura do mato
-                <select id="terrainGrassHeight" required>
+                <select id="terrainGrassHeight">
                   <option value="">Selecione</option>
                   <option value="nao_informado">Não informado</option>
                   <option value="ate_30_cm">Até 30 cm</option>
@@ -538,7 +541,7 @@
                 </div>
               </fieldset>
               <label>Status
-                <select id="terrainStatus" required>
+                <select id="terrainStatus">
                   <option value="sem_informacao">Sem informação</option>
                   <option value="limpo">Limpo</option>
                   <option value="monitorar">Monitorar</option>
@@ -581,7 +584,9 @@
               <button id="toggleTerrainTable" class="ghost-button terrain-table-toggle" type="button" data-no-loading aria-expanded="false" aria-controls="terrainTableContent"><i class="fa-solid fa-chevron-down"></i> <span>Mostrar tabela</span></button>
             </div>
             <div id="terrainTableContent" class="terrain-table-content hidden">
-            <div class="terrain-filters">
+            <section class="terrain-filter-panel" aria-labelledby="terrainFilterTitle">
+              <div class="terrain-filter-panel-head"><div><i class="fa-solid fa-filter"></i><span id="terrainFilterTitle">Filtros de pesquisa</span></div><small>Refine a lista sem alterar os cadastros.</small></div>
+              <div class="terrain-filters">
               <label class="terrain-filter-search">Busca geral
                 <span class="terrain-owner-search-field"><i class="fa-solid fa-magnifying-glass"></i><input id="terrainSearch" type="search" placeholder="Apelido, endereço, proprietário..."></span>
               </label>
@@ -603,10 +608,12 @@
               </label>
               <label>Quadra<input id="terrainBlockFilter" maxlength="40"></label>
               <label>Lote<input id="terrainLotFilter" maxlength="40"></label>
-            </div>
+              </div>
+            </section>
             <div class="terrain-list-head" aria-hidden="true">
               <span>Loteamento</span><span>Quadra / lote</span><span>Proprietário</span><span>Área</span><span>Status</span><span>Ações</span>
             </div>
+            <div class="terrain-results-divider"><span>Terrenos cadastrados</span><strong id="terrainReferenceCounter">Próximo código: TER-0001</strong></div>
             <div id="terrainList" class="terrain-list"></div>
             </div>
           </section>
@@ -3304,6 +3311,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=676"></script>
+  <script type="module" src="painel.js?v=677"></script>
 </body>
 </html>
