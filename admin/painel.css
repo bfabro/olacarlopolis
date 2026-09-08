@@ -2435,8 +2435,8 @@ body.terrain-owner-detail-open {
 }
 
 .terrain-detail-upload-bar {
-  display: grid;
-  grid-template-columns: minmax(130px, .55fr) minmax(200px, 1.3fr) auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 9px;
   align-items: end;
   margin-bottom: 14px;
@@ -2444,8 +2444,24 @@ body.terrain-owner-detail-open {
 
 .terrain-detail-upload-bar > select,
 .terrain-detail-upload-bar > input {
-  width: 100%;
   min-width: 0;
+  box-sizing: border-box;
+}
+
+.terrain-detail-upload-bar > select {
+  flex: 1 1 150px;
+}
+
+.terrain-detail-upload-bar > input {
+  flex: 2 1 260px;
+}
+
+.terrain-detail-upload-bar > button {
+  flex: 0 1 auto;
+  min-width: 130px;
+  max-width: 100%;
+  box-sizing: border-box;
+  white-space: nowrap;
 }
 
 .terrain-detail-upload-bar label {
@@ -2458,13 +2474,15 @@ body.terrain-owner-detail-open {
 
 .terrain-photo-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr));
+  gap: 12px;
 }
 
 .terrain-photo-card {
   position: relative;
+  width: 100%;
   min-width: 0;
+  margin: 0;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -2479,18 +2497,27 @@ body.terrain-owner-detail-open {
 }
 
 .terrain-photo-card figcaption {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  padding: 8px;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 9px;
   color: var(--ink);
   font-size: 11px;
   font-weight: 800;
 }
 
+.terrain-photo-card figcaption > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .terrain-photo-card-actions {
   display: flex;
+  flex: 0 0 auto;
   gap: 4px;
 }
 
@@ -3323,7 +3350,10 @@ body.terrain-owner-detail-open {
     grid-column: auto;
   }
 
-  .terrain-detail-upload-bar button {
+  .terrain-detail-upload-bar > select,
+  .terrain-detail-upload-bar > input,
+  .terrain-detail-upload-bar > button {
+    flex-basis: 100%;
     width: 100%;
   }
 
