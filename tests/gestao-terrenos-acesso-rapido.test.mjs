@@ -102,6 +102,10 @@ test("detalhe mostra vínculos e permite desvincular preservando histórico", ()
   assert.match(panelJs, /TERRAIN_UNLINK_ARCHIVE_ID/);
   assert.match(panelJs, /terreno_desvinculado_codigo/);
   assert.match(panelCss, /\.terrain-linked-data-section/);
+  const unlinkStart = panelJs.indexOf("async function unlinkTerrainLinkedRecord");
+  const unlinkFlow = panelJs.slice(unlinkStart, panelJs.indexOf("async function deleteTerrain(", unlinkStart));
+  assert.ok(unlinkFlow.indexOf("await firebaseSet(archiveRef") < unlinkFlow.indexOf("await firebaseUpdate(ref(db), updates)"));
+  assert.doesNotMatch(unlinkFlow, /updates\[.*TERRAIN_UNLINK_ARCHIVE_ID.*\] = \{/);
 });
 
 test("terrenos podem ser ativados desativados e excluidos com suas fotos", () => {
@@ -182,8 +186,8 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
   assert.match(panelHtml, /painel\.css\?v=449/);
-  assert.match(panelHtml, /painel\.js\?v=677/);
+  assert.match(panelHtml, /painel\.js\?v=678/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=23/);
-  assert.match(panelJs, /numero: 740/);
-  assert.match(panelJs, /label: "v747"/);
+  assert.match(panelJs, /numero: 741/);
+  assert.match(panelJs, /label: "v748"/);
 });

@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 740,
-  label: "v747",
-  data: "2026-09-07",
-  nota: "Gestao de terrenos com vinculos detalhados, desvinculacao segura, campos opcionais e referencias sequenciais."
+  numero: 741,
+  label: "v748",
+  data: "2026-09-08",
+  nota: "Correcao da desvinculacao de vistorias, orcamentos e servicos com destino tecnico previamente validado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -4965,20 +4965,11 @@ async function unlinkTerrainLinkedRecord(terrainId, kind, recordId) {
       renderTerrainList();
       return showToast("Este registro já foi desvinculado.");
     }
-    const archiveSnapshot = await get(ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${TERRAIN_UNLINK_ARCHIVE_ID}`));
+    const archiveRef = ref(db, `${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${TERRAIN_UNLINK_ARCHIVE_ID}`);
+    const archiveSnapshot = await get(archiveRef);
     const timestamp = serverTimestamp();
-    const basePath = `${entity.path}/${recordId}`;
-    const updates = {
-      [`${basePath}/terrain_id`]: TERRAIN_UNLINK_ARCHIVE_ID,
-      [`${basePath}/terreno_desvinculado_id`]: terrainId,
-      [`${basePath}/terreno_desvinculado_codigo`]: terrainReferenceCode(terrain),
-      [`${basePath}/terreno_desvinculado_nome`]: terrain.apelido || terrainReferenceCode(terrain),
-      [`${basePath}/desvinculado_em`]: timestamp,
-      [`${basePath}/desvinculado_por_uid`]: state.user?.uid || "",
-      [`${basePath}/updated_at`]: timestamp
-    };
     if (!archiveSnapshot.exists()) {
-      updates[`${TERRAIN_MANAGEMENT_ENTITIES.terrains.path}/${TERRAIN_UNLINK_ARCHIVE_ID}`] = {
+      await firebaseSet(archiveRef, {
         id: TERRAIN_UNLINK_ARCHIVE_ID,
         apelido: "Arquivo interno de vínculos desvinculados",
         bairro: "", rua: "", numero: "", quadra: "", lote: "",
@@ -4990,8 +4981,18 @@ async function unlinkTerrainLinkedRecord(terrainId, kind, recordId) {
         registro_sistema: true,
         created_at: timestamp,
         updated_at: timestamp
-      };
+      });
     }
+    const basePath = `${entity.path}/${recordId}`;
+    const updates = {
+      [`${basePath}/terrain_id`]: TERRAIN_UNLINK_ARCHIVE_ID,
+      [`${basePath}/terreno_desvinculado_id`]: terrainId,
+      [`${basePath}/terreno_desvinculado_codigo`]: terrainReferenceCode(terrain),
+      [`${basePath}/terreno_desvinculado_nome`]: terrain.apelido || terrainReferenceCode(terrain),
+      [`${basePath}/desvinculado_em`]: timestamp,
+      [`${basePath}/desvinculado_por_uid`]: state.user?.uid || "",
+      [`${basePath}/updated_at`]: timestamp
+    };
     let servicePhotos = [];
     if (kind === "service") {
       const photoSnapshot = await get(query(
