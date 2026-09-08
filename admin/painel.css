@@ -2402,10 +2402,97 @@ body.terrain-owner-detail-open {
 }
 
 .terrain-detail-gallery-section,
+.terrain-service-history-section,
 .terrain-inspection-history-section {
   margin-top: 20px;
   padding-top: 18px;
   border-top: 2px solid var(--line);
+}
+
+.terrain-service-history {
+  display: grid;
+  gap: 10px;
+}
+
+.terrain-service-history-item {
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.terrain-service-history-item > header,
+.terrain-service-history-item > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.terrain-service-history-item > header {
+  align-items: flex-start;
+  margin-bottom: 11px;
+}
+
+.terrain-service-history-item > header strong,
+.terrain-service-history-item > header small {
+  display: block;
+}
+
+.terrain-service-history-item > header small {
+  margin-top: 3px;
+  color: var(--muted);
+}
+
+.terrain-service-history-details {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.terrain-service-history-details > div {
+  min-width: 0;
+  padding-top: 8px;
+  border-top: 1px solid #edf1f6;
+}
+
+.terrain-service-history-details span,
+.terrain-service-history-details strong {
+  display: block;
+}
+
+.terrain-service-history-details span {
+  margin-bottom: 4px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.terrain-service-history-item > footer {
+  margin-top: 12px;
+}
+
+.terrain-service-history-archived {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+@media (max-width: 680px) {
+  .terrain-service-history-item > header,
+  .terrain-service-history-item > footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .terrain-service-history-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .terrain-service-history-item > footer button {
+    width: 100%;
+  }
 }
 
 .terrain-detail-section-head {

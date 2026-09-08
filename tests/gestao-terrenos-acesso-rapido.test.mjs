@@ -116,6 +116,16 @@ test("galeria do terreno preserva fotos e botoes sem cortes", () => {
   assert.match(panelCss, /\.terrain-photo-card-actions \{[\s\S]*flex: 0 0 auto;/);
 });
 
+test("detalhe do terreno mostra data e histórico completo de serviços", () => {
+  assert.match(panelJs, /function terrainServiceHistoryRecords/);
+  assert.match(panelJs, /service\.terrain_id === terrainId \|\| service\.terreno_desvinculado_id === terrainId/);
+  assert.match(panelJs, /Data do serviço mais recente/);
+  assert.match(panelJs, /Serviços deste terreno/);
+  assert.match(panelJs, /data-terrain-service-view/);
+  assert.match(panelCss, /\.terrain-service-history-section/);
+  assert.match(panelCss, /\.terrain-service-history-details/);
+});
+
 test("terrenos podem ser ativados desativados e excluidos com suas fotos", () => {
   assert.match(panelJs, /function toggleTerrainActiveState/);
   assert.match(panelJs, /data-terrain-toggle-active/);
@@ -193,9 +203,9 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=450/);
-  assert.match(panelHtml, /painel\.js\?v=679/);
+  assert.match(panelHtml, /painel\.css\?v=451/);
+  assert.match(panelHtml, /painel\.js\?v=680/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=23/);
-  assert.match(panelJs, /numero: 742/);
-  assert.match(panelJs, /label: "v749"/);
+  assert.match(panelJs, /numero: 743/);
+  assert.match(panelJs, /label: "v750"/);
 });

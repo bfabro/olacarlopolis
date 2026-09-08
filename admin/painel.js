@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 742,
-  label: "v749",
+  numero: 743,
+  label: "v750",
   data: "2026-09-08",
-  nota: "Galeria de terrenos responsiva com cards uniformes e acoes sempre visiveis."
+  nota: "Detalhes do terreno com data do serviço mais recente e histórico completo de serviços."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -4454,6 +4454,44 @@ function terrainLinkedDataHtml(terrain, deletion = terrainDeletionInfo(terrain))
     </section>`;
 }
 
+function terrainServiceHistoryRecords(terrainId) {
+  return terrainServiceRecords(state.terrainManagement?.services || {})
+    .filter((service) => service.terrain_id === terrainId || service.terreno_desvinculado_id === terrainId)
+    .sort((a, b) => String(b.data_realizada || b.data_prevista || "").localeCompare(String(a.data_realizada || a.data_prevista || "")));
+}
+
+function terrainServiceReferenceDate(service = {}) {
+  return service.data_realizada || service.data_prevista || "";
+}
+
+function terrainServiceHistoryHtml(terrainId) {
+  const services = terrainServiceHistoryRecords(terrainId);
+  if (!services.length) {
+    return `<div class="terrain-owner-linked-empty"><i class="fa-solid fa-screwdriver-wrench"></i><strong>Nenhum serviço registrado neste terreno</strong></div>`;
+  }
+  return `<div class="terrain-service-history">${services.map((service) => {
+    const status = terrainServiceStatusMeta(service.status);
+    const payment = terrainPaymentStatusMeta(service.status_pagamento);
+    const detached = service.terrain_id !== terrainId;
+    return `<article class="terrain-service-history-item">
+      <header>
+        <div><strong>${escapeHtml(terrainServiceTypeLabel(service.tipo_servico))}</strong><small>Data do serviço: ${escapeHtml(terrainBudgetDateLabel(terrainServiceReferenceDate(service)))}${service.horario ? ` às ${escapeHtml(service.horario)}` : ""}</small></div>
+        <span class="terrain-owner-status terrain-budget-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span>
+      </header>
+      <div class="terrain-service-history-details">
+        <div><span>Data prevista</span><strong>${escapeHtml(terrainBudgetDateLabel(service.data_prevista))}</strong></div>
+        <div><span>Data realizada</span><strong>${escapeHtml(terrainBudgetDateLabel(service.data_realizada))}</strong></div>
+        <div><span>Valor</span><strong>${escapeHtml(moneyBR(service.valor_cobrado))}</strong></div>
+        <div><span>Pagamento</span><strong>${escapeHtml(payment.label)}</strong></div>
+      </div>
+      <footer>
+        ${detached ? `<span class="terrain-service-history-archived"><i class="fa-solid fa-box-archive"></i> Histórico preservado após desvinculação</span>` : "<span></span>"}
+        <button type="button" class="ghost-button" data-terrain-service-view="${escapeAttr(service.id)}" data-no-loading><i class="fa-solid fa-eye"></i> Ver serviço</button>
+      </footer>
+    </article>`;
+  }).join("")}</div>`;
+}
+
 function setTerrainTableExpanded(expanded = false) {
   const content = $("terrainTableContent");
   const button = $("toggleTerrainTable");
@@ -4541,6 +4579,7 @@ function openTerrainDetail(terrainId) {
   const characteristics = terrainCharacteristicLabels(terrain.caracteristicas);
   const reminderClassification = terrainReminderClassification(terrain, terrainBudgetLocalDate());
   const deletion = terrainDeletionInfo(terrain);
+  const latestService = terrainServiceHistoryRecords(terrain.id)[0] || null;
   const isInactive = terrain.status === "inativo";
   $("terrainDetailTitle").textContent = terrain.apelido || "Detalhes";
   $("terrainDetailContent").innerHTML = `
@@ -4559,6 +4598,7 @@ function openTerrainDetail(terrainId) {
       <div><span>Proprietário</span><strong>${escapeHtml(terrainOwnerName(terrain, owners))}</strong></div>
       <div><span>Status</span><strong><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></strong></div>
       <div><span>Última limpeza</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.ultima_limpeza_em))}</strong></div>
+      <div><span>Data do serviço mais recente</span><strong>${latestService ? escapeHtml(terrainBudgetDateLabel(terrainServiceReferenceDate(latestService))) : "Nenhum serviço registrado"}</strong></div>
       <div><span>Próxima vistoria</span><strong>${escapeHtml(terrainBudgetDateLabel(terrain.proxima_vistoria_em))}</strong></div>
       <div class="wide"><span>Classificação do acompanhamento</span><strong>${escapeHtml(reminderClassification?.label || "Sem limpeza registrada")}</strong></div>
       <div class="wide"><span>Endereço</span><strong>${escapeHtml(terrain.localizacao_referencia || [terrain.rua, terrain.numero, terrain.bairro].filter(Boolean).join(", ") || "-")}</strong></div>
@@ -4577,6 +4617,10 @@ function openTerrainDetail(terrainId) {
       <div class="wide"><span>Observações</span><strong>${escapeHtml(terrain.observacoes || "Sem observações.")}</strong></div>
     </div>
     ${terrainLinkedDataHtml(terrain, deletion)}
+    <section class="terrain-service-history-section">
+      <div class="terrain-detail-section-head"><div><span>Histórico</span><h3>Serviços deste terreno</h3></div></div>
+      ${terrainServiceHistoryHtml(terrain.id)}
+    </section>
     <section class="terrain-detail-gallery-section">
       <div class="terrain-detail-section-head"><div><span>Galeria</span><h3>Fotos do terreno</h3></div></div>
       <div class="terrain-detail-upload-bar">
@@ -6067,7 +6111,7 @@ function openTerrainServiceDetail(id) {
   $("terrainServiceDetailTitle").textContent = terrainServiceTypeLabel(service.tipo_servico);
   const status = terrainServiceStatusMeta(service.status);
   $("terrainServiceDetailContent").innerHTML = `<div class="terrain-detail-actions"><button type="button" data-service-detail-edit="${escapeAttr(id)}"><i class="fa-solid fa-pen"></i> Editar</button></div><div class="terrain-owner-detail-grid">
-    <div><span>Proprietário</span><strong>${escapeHtml(owner.nome || "-")}</strong></div><div><span>Terreno</span><strong>${escapeHtml(terrain.apelido || "-")}</strong></div>
+    <div><span>Proprietário</span><strong>${escapeHtml(owner.nome || "-")}</strong></div><div><span>Terreno</span><strong>${escapeHtml(terrain.apelido || service.terreno_desvinculado_nome || "-")}</strong></div>
     <div><span>Status</span><strong><span class="terrain-owner-status terrain-budget-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></strong></div>
     <div><span>Orçamento de origem</span><strong>${escapeHtml(service.budget_id ? (terrainBudgetById(service.budget_id)?.numero || service.budget_id) : "Sem orçamento")}</strong></div>
     <div><span>Data prevista</span><strong>${escapeHtml(terrainBudgetDateLabel(service.data_prevista))}</strong></div><div><span>Data realizada</span><strong>${escapeHtml(terrainBudgetDateLabel(service.data_realizada))}</strong></div>
@@ -27366,6 +27410,12 @@ function bindEvents() {
     const inspectionButton = event.target.closest("[data-terrain-new-inspection]");
     if (inspectionButton) {
       openTerrainInspectionForm(inspectionButton.dataset.terrainNewInspection);
+      return;
+    }
+    const serviceButton = event.target.closest("[data-terrain-service-view]");
+    if (serviceButton) {
+      closeTerrainDetail();
+      openTerrainServiceDetail(serviceButton.dataset.terrainServiceView);
       return;
     }
     const uploadButton = event.target.closest("[data-terrain-upload-photos]");
