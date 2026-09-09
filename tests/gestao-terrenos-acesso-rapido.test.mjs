@@ -224,10 +224,22 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
   assert.match(terrainRules.capturado_em[".validate"], /newData\.isNumber/);
 });
 
+test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
+  assert.match(panelJs, /function terrainListGalleryHtml\(terrain\)/);
+  assert.match(panelJs, /data-terrain-list-photo-view/);
+  assert.match(panelJs, /data-terrain-list-photo-step/);
+  assert.match(panelJs, /openTerrainPhotoViewer\(photo\.url/);
+  assert.match(panelJs, /track\.scrollTo\(\{ left: target, behavior: "smooth" \}\)/);
+  assert.match(panelCss, /\.terrain-list \{[\s\S]*gap: 16px/);
+  assert.match(panelCss, /\.terrain-list-gallery-track \{[\s\S]*scroll-snap-type: x mandatory/);
+  assert.match(panelCss, /\.terrain-list-gallery-slide img \{[\s\S]*object-fit: cover/);
+  assert.match(panelCss, /\.terrain-list-card-facts \{[\s\S]*grid-template-columns: repeat\(4/);
+});
+
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=452/);
-  assert.match(panelHtml, /painel\.js\?v=681/);
+  assert.match(panelHtml, /painel\.css\?v=453/);
+  assert.match(panelHtml, /painel\.js\?v=682/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
-  assert.match(panelJs, /numero: 744/);
-  assert.match(panelJs, /label: "v751"/);
+  assert.match(panelJs, /numero: 745/);
+  assert.match(panelJs, /label: "v752"/);
 });

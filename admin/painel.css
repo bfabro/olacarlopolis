@@ -1898,52 +1898,210 @@ body.terrain-owner-detail-open {
   grid-column: span 2;
 }
 
-.terrain-list-head,
 .terrain-row {
   display: grid;
-  grid-template-columns: minmax(135px, 1fr) minmax(100px, .7fr) minmax(155px, 1.15fr) 85px minmax(125px, .9fr) minmax(230px, auto);
-  gap: 11px;
-  align-items: center;
-}
-
-.terrain-list-head {
-  padding: 0 12px 8px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 800;
+  grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
+  overflow: hidden;
 }
 
 .terrain-list {
   display: grid;
-  gap: 8px;
+  gap: 16px;
 }
 
 .terrain-row {
-  min-height: 76px;
-  padding: 11px 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  min-height: 220px;
+  border: 1px solid #d8e1ec;
+  border-radius: 14px;
   background: #fff;
+  box-shadow: 0 5px 16px rgba(15, 23, 42, .06);
+  transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
 }
 
-.terrain-row > div {
+.terrain-row:hover {
+  border-color: #b8c8db;
+  box-shadow: 0 9px 24px rgba(15, 23, 42, .1);
+  transform: translateY(-1px);
+}
+
+.terrain-list-card-media,
+.terrain-list-card-content {
   min-width: 0;
 }
 
-.terrain-row strong,
-.terrain-row small {
+.terrain-list-card-media {
+  position: relative;
+  min-height: 220px;
+  background: #eef3f8;
+}
+
+.terrain-list-gallery,
+.terrain-list-gallery-track,
+.terrain-list-gallery-slide,
+.terrain-list-gallery-slide img,
+.terrain-list-gallery-empty {
+  width: 100%;
+  height: 100%;
+}
+
+.terrain-list-gallery {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.terrain-list-gallery-track {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+  touch-action: pan-x pan-y;
+}
+
+.terrain-list-gallery-track::-webkit-scrollbar { display: none; }
+
+.terrain-list-gallery-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  scroll-snap-align: start;
+  cursor: zoom-in;
+}
+
+.terrain-list-gallery-slide img {
+  display: block;
+  object-fit: cover;
+  transition: transform .25s ease;
+}
+
+.terrain-list-gallery-slide:hover img { transform: scale(1.025); }
+
+.terrain-list-gallery-count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .78);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  pointer-events: none;
+}
+
+.terrain-list-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .85);
+  border-radius: 50%;
+  background: rgba(15, 23, 42, .65);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .2);
+  transform: translateY(-50%);
+}
+
+.terrain-list-gallery-arrow:hover { background: rgba(15, 23, 42, .88); }
+.terrain-list-gallery-arrow.previous { left: 9px; }
+.terrain-list-gallery-arrow.next { right: 9px; }
+
+.terrain-list-gallery-empty {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 9px;
+  min-height: 220px;
+  color: #7b8ba0;
+  background: linear-gradient(145deg, #f8fafc, #e8eef5);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.terrain-list-gallery-empty i { font-size: 30px; }
+
+.terrain-list-card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  padding: 18px 20px;
+}
+
+.terrain-list-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.terrain-list-card-header > div { min-width: 0; }
+
+.terrain-list-card-header h3 {
+  margin: 7px 0 5px;
+  color: var(--ink);
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.terrain-list-card-header p {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.terrain-list-card-facts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.terrain-list-card-facts > div {
+  min-width: 0;
+  padding: 9px 10px;
+  border: 1px solid #e7edf4;
+  border-radius: 9px;
+  background: #f8fafc;
+}
+
+.terrain-list-card-facts span,
+.terrain-list-card-facts strong,
+.terrain-list-card-facts small {
   display: block;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.terrain-row small {
-  margin-top: 4px;
+.terrain-list-card-facts span {
+  margin-bottom: 4px;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .04em;
+  text-transform: uppercase;
 }
 
-.terrain-row .terrain-owner-actions {
+.terrain-list-card-facts strong { font-size: 12px; }
+.terrain-list-card-facts small { margin-top: 4px; font-size: 11px; }
+
+.terrain-row .terrain-list-card-actions {
+  justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 11px;
+  border-top: 1px solid #edf1f5;
   flex-wrap: wrap;
 }
 
@@ -3257,27 +3415,11 @@ body.terrain-owner-detail-open {
     justify-content: flex-start;
   }
 
-  .terrain-list-head {
-    display: none;
-  }
-
   .terrain-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(190px, 240px) minmax(0, 1fr);
   }
 
-  .terrain-row > div::before {
-    content: attr(data-label);
-    display: block;
-    margin-bottom: 4px;
-    color: var(--muted);
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-  }
-
-  .terrain-row .terrain-owner-actions {
-    grid-column: 1 / -1;
-  }
+  .terrain-list-card-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .terrain-development-list-head {
     display: none;
@@ -3411,7 +3553,6 @@ body.terrain-owner-detail-open {
   }
 
   .terrain-filters,
-  .terrain-row,
   .terrain-characteristics-grid,
   .terrain-development-upload-grid,
   .terrain-development-row,
@@ -3438,21 +3579,10 @@ body.terrain-owner-detail-open {
     width: 100%;
   }
 
-  .terrain-row > div {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  .terrain-row > div::before {
-    margin-bottom: 0;
-  }
-
-  .terrain-row .terrain-owner-actions {
-    grid-column: auto;
-    justify-content: flex-start;
-  }
+  .terrain-row { grid-template-columns: 1fr; }
+  .terrain-list-card-media,
+  .terrain-list-gallery-empty { min-height: 230px; }
+  .terrain-row .terrain-list-card-actions { justify-content: flex-start; }
 
   .terrain-development-row > div {
     display: flex;

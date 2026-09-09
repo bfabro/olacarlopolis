@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 744,
-  label: "v751",
+  numero: 745,
+  label: "v752",
   data: "2026-09-09",
-  nota: "Módulos especiais priorizados e cadastro rápido com GPS, endereço, mapa, direção e situação visual."
+  nota: "Gestão de terrenos com cards organizados, galeria navegável e ampliação de fotos na listagem."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -4649,6 +4649,31 @@ function setTerrainTableExpanded(expanded = false) {
   if (label) label.textContent = expanded ? "Recolher tabela" : "Mostrar tabela";
 }
 
+function terrainListGalleryHtml(terrain) {
+  const photos = terrainPhotoRecords(state.terrainManagement?.photos || {}, terrain.id);
+  if (!photos.length) {
+    return `
+      <div class="terrain-list-gallery-empty">
+        <i class="fa-regular fa-image"></i>
+        <span>Sem fotos deste terreno</span>
+      </div>`;
+  }
+  const terrainName = terrain.apelido || terrainReferenceCode(terrain);
+  return `
+    <div class="terrain-list-gallery" data-terrain-list-gallery="${escapeAttr(terrain.id)}">
+      <div class="terrain-list-gallery-track">
+        ${photos.map((photo, index) => `
+          <button type="button" class="terrain-list-gallery-slide" data-terrain-list-photo-view="${escapeAttr(photo.id)}" data-no-loading aria-label="Ampliar foto ${index + 1} de ${photos.length} de ${escapeAttr(terrainName)}">
+            <img src="${escapeAttr(photo.url)}" alt="${escapeAttr(`${terrainPhotoCategoryLabel(photo.categoria)} de ${terrainName}`)}" loading="lazy" decoding="async">
+          </button>`).join("")}
+      </div>
+      <span class="terrain-list-gallery-count"><i class="fa-solid fa-images"></i> ${photos.length}</span>
+      ${photos.length > 1 ? `
+        <button type="button" class="terrain-list-gallery-arrow previous" data-terrain-list-photo-step="-1" data-no-loading aria-label="Foto anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" class="terrain-list-gallery-arrow next" data-terrain-list-photo-step="1" data-no-loading aria-label="Próxima foto"><i class="fa-solid fa-chevron-right"></i></button>` : ""}
+    </div>`;
+}
+
 function renderTerrainList() {
   const mount = $("terrainList");
   if (!mount) return;
@@ -4691,19 +4716,34 @@ function renderTerrainList() {
       ? "Exclusão bloqueada: existem dados vinculados"
       : (deletion.isQuickCapture ? "Excluir prospecção e suas fotos" : "Excluir terreno e suas fotos");
     const isInactive = terrain.status === "inativo";
+    const displayName = terrain.apelido || "Terreno sem apelido";
+    const address = [terrain.rua, terrain.numero, terrain.bairro].filter(Boolean).join(", ") || "Endereço ainda não informado";
     return `
       <article class="terrain-row" data-terrain-id="${escapeAttr(terrain.id)}">
-        <div data-label="Loteamento"><strong>${escapeHtml(developmentName)}</strong><small>${escapeHtml(terrain.bairro || "-")}</small></div>
-        <div data-label="Quadra / lote"><strong>Q. ${escapeHtml(terrain.quadra || "-")} · L. ${escapeHtml(terrain.lote || "-")}</strong><small><span class="terrain-reference-code">${escapeHtml(terrainReferenceCode(terrain))}</span> ${escapeHtml(terrain.apelido || "Sem apelido")}${terrain.cadastro_rapido ? `<span class="terrain-quick-badge">Completar cadastro</span>` : ""}</small></div>
-        <div data-label="Proprietário"><strong>${escapeHtml(ownerName)}</strong>${whatsappUrl ? `<small><a class="terrain-owner-contact-link" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${escapeHtml(formatPhoneMask(owner.whatsapp || owner.telefone))}</a></small>` : ""}</div>
-        <div data-label="Área"><strong class="terrain-area-value">${escapeHtml(terrain.cadastro_rapido ? "A confirmar" : formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
-        <div data-label="Status"><span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span></div>
-        <div class="terrain-owner-actions" data-label="Ações">
-          ${mapsUrl ? `<a class="terrain-owner-icon-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir no Google Maps" aria-label="Abrir ${escapeAttr(terrain.apelido)} no Google Maps"><i class="fa-solid fa-map-location-dot"></i></a>` : ""}
-          <button type="button" class="terrain-owner-icon-button" data-terrain-view="${escapeAttr(terrain.id)}" data-no-loading title="Ver detalhes" aria-label="Ver detalhes de ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-eye"></i></button>
-          <button type="button" class="terrain-owner-icon-button" data-terrain-edit="${escapeAttr(terrain.id)}" data-no-loading title="Editar" aria-label="Editar ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-pen"></i></button>
-          <button type="button" class="terrain-owner-icon-button ${isInactive ? "success" : "warning"}" data-terrain-toggle-active="${escapeAttr(terrain.id)}" data-no-loading title="${isInactive ? "Ativar terreno" : "Desativar terreno"}" aria-label="${isInactive ? "Ativar" : "Desativar"} ${escapeAttr(terrain.apelido)}"><i class="fa-solid ${isInactive ? "fa-circle-check" : "fa-ban"}"></i></button>
-          <button type="button" class="terrain-owner-icon-button danger" data-terrain-delete="${escapeAttr(terrain.id)}" data-no-loading ${deletion.blocked ? "disabled" : ""} title="${escapeAttr(deleteTitle)}" aria-label="${escapeAttr(deleteTitle)}: ${escapeAttr(terrain.apelido)}"><i class="fa-solid fa-trash"></i></button>
+        <div class="terrain-list-card-media">${terrainListGalleryHtml(terrain)}</div>
+        <div class="terrain-list-card-content">
+          <header class="terrain-list-card-header">
+            <div>
+              <span class="terrain-reference-code">${escapeHtml(terrainReferenceCode(terrain))}</span>
+              <h3>${escapeHtml(displayName)}</h3>
+              <p><i class="fa-solid fa-location-dot"></i> ${escapeHtml(address)}</p>
+            </div>
+            <span class="terrain-owner-status terrain-status-${escapeAttr(status.tone)}">${escapeHtml(status.label)}</span>
+          </header>
+          ${terrain.cadastro_rapido ? `<span class="terrain-quick-badge">Completar cadastro</span>` : ""}
+          <div class="terrain-list-card-facts">
+            <div><span>Loteamento</span><strong>${escapeHtml(developmentName)}</strong></div>
+            <div><span>Quadra / lote</span><strong>Q. ${escapeHtml(terrain.quadra || "-")} · L. ${escapeHtml(terrain.lote || "-")}</strong></div>
+            <div><span>Área</span><strong class="terrain-area-value">${escapeHtml(terrain.cadastro_rapido ? "A confirmar" : formatTerrainMeasure(terrain.area_m2, "m²"))}</strong></div>
+            <div><span>Proprietário</span><strong>${escapeHtml(ownerName)}</strong>${whatsappUrl ? `<small><a class="terrain-owner-contact-link" href="${escapeAttr(whatsappUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-whatsapp"></i> ${escapeHtml(formatPhoneMask(owner.whatsapp || owner.telefone))}</a></small>` : ""}</div>
+          </div>
+          <div class="terrain-owner-actions terrain-list-card-actions" aria-label="Ações de ${escapeAttr(displayName)}">
+            ${mapsUrl ? `<a class="terrain-owner-icon-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer" title="Abrir no Google Maps" aria-label="Abrir ${escapeAttr(displayName)} no Google Maps"><i class="fa-solid fa-map-location-dot"></i></a>` : ""}
+            <button type="button" class="terrain-owner-icon-button" data-terrain-view="${escapeAttr(terrain.id)}" data-no-loading title="Ver detalhes" aria-label="Ver detalhes de ${escapeAttr(displayName)}"><i class="fa-solid fa-eye"></i></button>
+            <button type="button" class="terrain-owner-icon-button" data-terrain-edit="${escapeAttr(terrain.id)}" data-no-loading title="Editar" aria-label="Editar ${escapeAttr(displayName)}"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="terrain-owner-icon-button ${isInactive ? "success" : "warning"}" data-terrain-toggle-active="${escapeAttr(terrain.id)}" data-no-loading title="${isInactive ? "Ativar terreno" : "Desativar terreno"}" aria-label="${isInactive ? "Ativar" : "Desativar"} ${escapeAttr(displayName)}"><i class="fa-solid ${isInactive ? "fa-circle-check" : "fa-ban"}"></i></button>
+            <button type="button" class="terrain-owner-icon-button danger" data-terrain-delete="${escapeAttr(terrain.id)}" data-no-loading ${deletion.blocked ? "disabled" : ""} title="${escapeAttr(deleteTitle)}" aria-label="${escapeAttr(deleteTitle)}: ${escapeAttr(displayName)}"><i class="fa-solid fa-trash"></i></button>
+          </div>
         </div>
       </article>`;
   }).join("");
@@ -27522,6 +27562,24 @@ function bindEvents() {
   });
   $("terrainUseCurrentLocation")?.addEventListener("click", useCurrentTerrainLocation);
   $("terrainList")?.addEventListener("click", (event) => {
+    const photoButton = event.target.closest("[data-terrain-list-photo-view]");
+    if (photoButton) {
+      const photo = state.terrainManagement?.photos?.[photoButton.dataset.terrainListPhotoView];
+      if (photo) openTerrainPhotoViewer(photo.url, terrainPhotoCategoryLabel(photo.categoria));
+      return;
+    }
+    const galleryStepButton = event.target.closest("[data-terrain-list-photo-step]");
+    if (galleryStepButton) {
+      const track = galleryStepButton.closest("[data-terrain-list-gallery]")?.querySelector(".terrain-list-gallery-track");
+      if (!track) return;
+      const direction = Number(galleryStepButton.dataset.terrainListPhotoStep) || 1;
+      const limit = Math.max(0, track.scrollWidth - track.clientWidth);
+      let target = track.scrollLeft + (track.clientWidth * direction);
+      if (target > limit + 2) target = 0;
+      if (target < -2) target = limit;
+      track.scrollTo({ left: target, behavior: "smooth" });
+      return;
+    }
     const viewButton = event.target.closest("[data-terrain-view]");
     if (viewButton) return openTerrainDetail(viewButton.dataset.terrainView);
     const editButton = event.target.closest("[data-terrain-edit]");

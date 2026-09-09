@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-09-09-gestao-terrenos-gps-mapa-v799'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-09-09-gestao-terrenos-cards-galeria-v800'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
