@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=451">
+  <link rel="stylesheet" href="painel.css?v=452">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -60,6 +60,12 @@
       </div>
 
       <nav class="nav-admin">
+        <section class="nav-admin-group nav-theme-special" data-master="true">
+          <span class="nav-admin-group-title"><i class="fa-solid fa-puzzle-piece"></i> Módulos especiais</span>
+          <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço de combustível</button>
+          <button data-view="gestaoTerrenos" data-master="true"><i class="fa-solid fa-map-location-dot"></i> Gestão de terrenos</button>
+          <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
+        </section>
         <section class="nav-admin-group nav-theme-overview" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-house"></i> Começar</span>
           <button data-view="dashboard" data-role="staff" class="active"><i class="fa-solid fa-chart-line"></i> Visão geral</button>
@@ -104,12 +110,6 @@
           <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatório financeiro</button>
           <button data-view="relatorioExclusoes" data-master="true"><i class="fa-solid fa-trash-can-arrow-up"></i> Exclusões</button>
           <button data-view="usuariosOnline" data-master="true"><i class="fa-solid fa-users-viewfinder"></i> Usuários online</button>
-        </section>
-        <section class="nav-admin-group nav-theme-special" data-master="true">
-          <span class="nav-admin-group-title"><i class="fa-solid fa-puzzle-piece"></i> Módulos especiais</span>
-          <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço de combustível</button>
-          <button data-view="gestaoTerrenos" data-master="true"><i class="fa-solid fa-map-location-dot"></i> Gestão de terrenos</button>
-          <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
         <section class="nav-admin-group nav-theme-system" data-master="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-gear"></i> Configurações do site</span>
@@ -261,29 +261,38 @@
               <section class="wide terrain-quick-location-box">
                 <div class="terrain-quick-location-head">
                   <span class="terrain-quick-location-icon"><i class="fa-solid fa-location-dot"></i></span>
-                  <div><strong>Localização do terreno</strong><small id="terrainQuickLocationStatus">Toque em “Usar meu GPS” para marcar o ponto exato.</small></div>
+                  <div><strong>Localização do terreno</strong><small id="terrainQuickLocationStatus">Toque no botão verde para marcar o ponto exato.</small></div>
                 </div>
                 <input id="terrainQuickLatitude" type="hidden">
                 <input id="terrainQuickLongitude" type="hidden">
                 <input id="terrainQuickAccuracy" type="hidden">
+                <input id="terrainQuickHeading" type="hidden">
+                <input id="terrainQuickStreet" type="hidden">
+                <input id="terrainQuickNeighborhood" type="hidden">
                 <div class="terrain-quick-location-actions">
-                  <button id="terrainQuickUseLocation" type="button" data-no-loading><i class="fa-solid fa-crosshairs"></i> Usar meu GPS</button>
+                  <button id="terrainQuickUseLocation" class="terrain-quick-gps-button" type="button" data-no-loading><i class="fa-solid fa-location-crosshairs"></i><span><strong>Marcar localização exata com GPS</strong><small>Toque aqui e aponte o topo do celular para o terreno</small></span></button>
                   <a id="terrainQuickOpenMaps" class="ghost-button hidden" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Conferir no mapa</a>
                 </div>
+                <div id="terrainQuickMapPreview" class="terrain-location-map hidden" aria-live="polite">
+                  <iframe id="terrainQuickMapFrame" title="Mapa do ponto marcado pelo GPS" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                  <span id="terrainQuickMapMarker" class="terrain-location-map-marker" aria-hidden="true"><i class="fa-solid fa-location-arrow"></i><b></b></span>
+                  <div class="terrain-location-map-caption"><strong>Ponto salvo no terreno</strong><small id="terrainQuickDirectionLabel">Direção aguardando leitura do celular</small></div>
+                </div>
               </section>
-              <label class="wide">Endereço ou ponto de referência
+              <label class="wide">Endereço localizado ou ponto de referência
                 <input id="terrainQuickReference" maxlength="220" placeholder="Opcional se o GPS estiver marcado">
-                <small>Use este campo caso o GPS não esteja disponível ou para facilitar a identificação.</small>
+                <small>Após marcar o GPS, tentaremos preencher automaticamente a rua. Você pode corrigir ou complementar. Endereço: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>.</small>
               </label>
-              <label class="wide">Situação percebida
-                <select id="terrainQuickStatus">
-                  <option value="proprietario_desconhecido" selected>Proprietário ainda desconhecido</option>
-                  <option value="limpo">Terreno limpo</option>
-                  <option value="monitorar">Monitorar</option>
-                  <option value="pode_precisar_limpeza">Pode precisar de limpeza</option>
-                  <option value="precisa_limpeza">Precisa de limpeza</option>
-                </select>
-              </label>
+              <fieldset class="wide terrain-quick-status-fieldset">
+                <legend>Situação atual do terreno</legend>
+                <div class="terrain-quick-status-grid">
+                  <label><input type="radio" name="terrainQuickStatus" value="proprietario_desconhecido" checked><span><i class="fa-solid fa-user-secret"></i><strong>Proprietário desconhecido</strong></span></label>
+                  <label><input type="radio" name="terrainQuickStatus" value="limpo"><span><i class="fa-solid fa-circle-check"></i><strong>Terreno limpo</strong></span></label>
+                  <label><input type="radio" name="terrainQuickStatus" value="monitorar"><span><i class="fa-solid fa-eye"></i><strong>Monitorar</strong></span></label>
+                  <label><input type="radio" name="terrainQuickStatus" value="pode_precisar_limpeza"><span><i class="fa-solid fa-triangle-exclamation"></i><strong>Pode precisar de limpeza</strong></span></label>
+                  <label><input type="radio" name="terrainQuickStatus" value="precisa_limpeza"><span><i class="fa-solid fa-broom"></i><strong>Precisa de limpeza</strong></span></label>
+                </div>
+              </fieldset>
               <label class="wide terrain-quick-camera">
                 <span><i class="fa-solid fa-camera"></i><strong>Tirar foto do terreno</strong><small>A câmera traseira será sugerida no celular.</small></span>
                 <input id="terrainQuickPhotos" type="file" accept="image/*" capture="environment" multiple>
@@ -469,6 +478,7 @@
             </div>
             <form id="terrainForm" class="grid-form terrain-form">
               <input id="terrainId" type="hidden">
+              <input id="terrainDirection" type="hidden">
               <h3 class="wide terrain-form-section-title"><i class="fa-solid fa-address-card"></i> Identificação</h3>
               <label>Código de referência
                 <input id="terrainReferenceCode" readonly placeholder="Gerado automaticamente">
@@ -3311,6 +3321,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=680"></script>
+  <script type="module" src="painel.js?v=681"></script>
 </body>
 </html>

@@ -157,7 +157,7 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
     fields: Object.freeze([
       "id", "owner_id", "development_id", "apelido", "bairro", "rua", "numero",
       "quadra", "lote", "area_m2", "frente_m", "fundo_m", "matricula",
-      "inscricao_imobiliaria", "latitude", "longitude", "google_maps_url", "observacoes",
+      "inscricao_imobiliaria", "latitude", "longitude", "direcao_graus", "google_maps_url", "observacoes",
       "grau_dificuldade", "altura_mato", "caracteristicas", "ultima_limpeza_em",
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
       "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "cadastro_rapido",
@@ -166,7 +166,7 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
     ]),
     optionalFields: Object.freeze([
       "owner_id", "development_id", "matricula", "inscricao_imobiliaria", "latitude",
-      "longitude", "google_maps_url", "caracteristicas", "ultima_limpeza_em",
+      "longitude", "direcao_graus", "google_maps_url", "caracteristicas", "ultima_limpeza_em",
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
       "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "cadastro_rapido",
       "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em"
@@ -405,6 +405,7 @@ export function normalizeTerrainInput(input = {}) {
     inscricao_imobiliaria: value("inscricao_imobiliaria") || null,
     latitude: terrainOptionalCoordinate(input.latitude, "latitude", -90, 90),
     longitude: terrainOptionalCoordinate(input.longitude, "longitude", -180, 180),
+    direcao_graus: terrainOptionalCoordinate(input.direcao_graus, "direção", 0, 360),
     google_maps_url: value("google_maps_url") || null,
     observacoes: value("observacoes"),
     grau_dificuldade: TERRAIN_DIFFICULTY_VALUES.has(value("grau_dificuldade")) ? value("grau_dificuldade") : "nao_informado",

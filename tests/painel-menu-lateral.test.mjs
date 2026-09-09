@@ -45,8 +45,8 @@ test("submenus do cliente alternam cores e preservam contraste nos estados", () 
 });
 
 test("ativos do painel usam as novas versoes sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.css?v=451"));
-  assert.ok(panelHtml.includes("painel.js?v=680"));
+  assert.ok(panelHtml.includes("painel.css?v=452"));
+  assert.ok(panelHtml.includes("painel.js?v=681"));
 });
 
 test("mantem a area do parceiro visivel para o perfil correspondente", () => {
@@ -61,6 +61,13 @@ test("modulos especiais agrupam combustivel terrenos e xadrez", () => {
   assert.ok(group.includes('data-view="combustiveisConfig"'));
   assert.ok(group.includes('data-view="gestaoTerrenos"'));
   assert.ok(group.includes('data-view="xadrezConfig"'));
+});
+
+test("modulos especiais e o primeiro bloco do menu master", () => {
+  const navStart = panelHtml.indexOf('<nav class="nav-admin">');
+  const navEnd = panelHtml.indexOf("</nav>", navStart);
+  const navHtml = panelHtml.slice(navStart, navEnd);
+  assert.ok(navHtml.indexOf("nav-theme-special") < navHtml.indexOf("nav-theme-overview"));
 });
 
 test("relacionamento reune beneficios e area do parceiro", () => {

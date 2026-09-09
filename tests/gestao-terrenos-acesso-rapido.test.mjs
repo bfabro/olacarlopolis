@@ -47,10 +47,31 @@ test("captura em campo oferece GPS camera referencia e observacoes", () => {
   assert.match(panelJs, /uploadTerrainGeneralPhotos\(terrainId, files, "frente"\)/);
 });
 
+test("GPS explicito preenche endereco e preserva mapa com direcao", () => {
+  assert.match(panelHtml, /Marcar localização exata com GPS/);
+  assert.match(panelHtml, /id="terrainQuickMapFrame"/);
+  assert.match(panelHtml, /id="terrainQuickMapMarker"/);
+  assert.match(panelJs, /nominatim\.openstreetmap\.org\/reverse/);
+  assert.match(panelJs, /terrainMapEmbedUrl/);
+  assert.match(panelJs, /DeviceOrientationEvent/);
+  assert.match(panelJs, /direcao_graus/);
+  assert.match(panelJs, /found\.street/);
+  assert.doesNotMatch(panelJs.slice(panelJs.indexOf("function openTerrainQuickForm"), panelJs.indexOf("function renderTerrainQuickAccess")), /useCurrentTerrainQuickLocation\(\)/);
+  assert.match(panelCss, /\.terrain-location-map-marker/);
+});
+
+test("cadastro rapido mostra situacao em grade visual", () => {
+  assert.match(panelHtml, /name="terrainQuickStatus" value="proprietario_desconhecido" checked/);
+  assert.match(panelHtml, /name="terrainQuickStatus" value="precisa_limpeza"/);
+  assert.match(panelJs, /input\[name="terrainQuickStatus"\]:checked/);
+  assert.match(panelCss, /\.terrain-quick-status-grid/);
+});
+
 test("salvamento aguarda o GPS e a previa libera a URL sem JavaScript inline", () => {
   assert.match(panelHtml, /id="terrainQuickSave"/);
   assert.match(panelJs, /terrainQuickLocationPending/);
-  assert.match(panelJs, /hasManualReference/);
+  assert.match(panelJs, /saveButton\.disabled = terrainQuickLocationPending/);
+  assert.match(panelJs, /Aguarde o GPS e a busca do endereço terminarem/);
   assert.match(panelJs, /Aguardando GPS/);
   assert.match(panelJs, /window\.URL\.revokeObjectURL/);
   assert.doesNotMatch(panelJs, /onload="URL\.revokeObjectURL/);
@@ -199,13 +220,14 @@ test("regras do Firebase aceitam e validam os campos da prospeccao", () => {
   assert.match(terrainRules[".validate"], /nao_informado/);
   assert.equal(terrainRules.cadastro_rapido[".validate"], "!newData.exists() || newData.isBoolean()");
   assert.match(terrainRules.precisao_gps_m[".validate"], /newData\.isNumber/);
+  assert.match(terrainRules.direcao_graus[".validate"], /newData\.val\(\) <= 360/);
   assert.match(terrainRules.capturado_em[".validate"], /newData\.isNumber/);
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=451/);
-  assert.match(panelHtml, /painel\.js\?v=680/);
-  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=23/);
-  assert.match(panelJs, /numero: 743/);
-  assert.match(panelJs, /label: "v750"/);
+  assert.match(panelHtml, /painel\.css\?v=452/);
+  assert.match(panelHtml, /painel\.js\?v=681/);
+  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
+  assert.match(panelJs, /numero: 744/);
+  assert.match(panelJs, /label: "v751"/);
 });

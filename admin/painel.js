@@ -107,7 +107,7 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=23";
+} from "./gestao-terrenos-schema.js?v=24";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 743,
-  label: "v750",
-  data: "2026-09-08",
-  nota: "Detalhes do terreno com data do serviço mais recente e histórico completo de serviços."
+  numero: 744,
+  label: "v751",
+  data: "2026-09-09",
+  nota: "Módulos especiais priorizados e cadastro rápido com GPS, endereço, mapa, direção e situação visual."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3480,13 +3480,102 @@ function terrainQuickCaptureName() {
 }
 
 let terrainQuickLocationPending = false;
+let terrainQuickDirectionListener = null;
+let terrainQuickAutoAddress = "";
+
+function terrainDirectionLabel(value) {
+  if (value === null || value === undefined || value === "") return "Direção não disponível neste aparelho";
+  const heading = Number(value);
+  if (!Number.isFinite(heading)) return "Direção não disponível neste aparelho";
+  const directions = ["Norte", "Nordeste", "Leste", "Sudeste", "Sul", "Sudoeste", "Oeste", "Noroeste"];
+  return `${directions[Math.round(((heading % 360) + 360) % 360 / 45) % 8]} · ${Math.round(((heading % 360) + 360) % 360)}°`;
+}
+
+function terrainMapEmbedUrl(latitude, longitude) {
+  const lat = Number(latitude);
+  const lon = Number(longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return "";
+  return `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lon}`)}&z=19&output=embed`;
+}
+
+function updateTerrainQuickMapPreview(latitude, longitude, heading = $("terrainQuickHeading")?.value) {
+  const map = $("terrainQuickMapPreview");
+  const frame = $("terrainQuickMapFrame");
+  const marker = $("terrainQuickMapMarker");
+  const url = terrainMapEmbedUrl(latitude, longitude);
+  if (!map || !frame || !url) return;
+  if (frame.dataset.mapUrl !== url) {
+    frame.src = url;
+    frame.dataset.mapUrl = url;
+  }
+  map.classList.remove("hidden");
+  const numericHeading = Number(heading);
+  const hasHeading = heading !== "" && Number.isFinite(numericHeading);
+  marker?.classList.toggle("without-direction", !hasHeading);
+  marker?.style.setProperty("--terrain-heading", `${hasHeading ? numericHeading : 0}deg`);
+  if ($("terrainQuickDirectionLabel")) $("terrainQuickDirectionLabel").textContent = terrainDirectionLabel(hasHeading ? numericHeading : null);
+}
+
+function stopTerrainQuickDirectionCapture() {
+  if (!terrainQuickDirectionListener) return;
+  window.removeEventListener("deviceorientationabsolute", terrainQuickDirectionListener);
+  window.removeEventListener("deviceorientation", terrainQuickDirectionListener);
+  terrainQuickDirectionListener = null;
+}
+
+function startTerrainQuickDirectionCapture() {
+  const Orientation = window.DeviceOrientationEvent;
+  if (!Orientation) return;
+  const attach = () => {
+    stopTerrainQuickDirectionCapture();
+    terrainQuickDirectionListener = (event) => {
+      const rawHeading = event.webkitCompassHeading !== null && event.webkitCompassHeading !== undefined && Number.isFinite(Number(event.webkitCompassHeading))
+        ? Number(event.webkitCompassHeading)
+        : (event.alpha !== null && event.alpha !== undefined && Number.isFinite(Number(event.alpha)) ? (360 - Number(event.alpha)) % 360 : null);
+      if (rawHeading === null) return;
+      const heading = Math.round(((rawHeading % 360) + 360) % 360);
+      if ($("terrainQuickHeading")) $("terrainQuickHeading").value = String(heading);
+      updateTerrainQuickMapPreview($("terrainQuickLatitude")?.value, $("terrainQuickLongitude")?.value, heading);
+    };
+    window.addEventListener("deviceorientationabsolute", terrainQuickDirectionListener, true);
+    window.addEventListener("deviceorientation", terrainQuickDirectionListener, true);
+  };
+  if (typeof Orientation.requestPermission === "function") {
+    Orientation.requestPermission().then((permission) => { if (permission === "granted") attach(); }).catch(() => {});
+  } else {
+    attach();
+  }
+}
+
+async function reverseTerrainQuickAddress(latitude, longitude) {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), 7000);
+  try {
+    const params = new URLSearchParams({
+      format: "jsonv2", lat: String(latitude), lon: String(longitude),
+      addressdetails: "1", zoom: "18", layer: "address", "accept-language": "pt-BR"
+    });
+    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`, {
+      headers: { Accept: "application/json" }, signal: controller.signal
+    });
+    if (!response.ok) throw new Error("Endereço não localizado.");
+    const result = await response.json();
+    const address = result?.address || {};
+    const street = address.road || address.pedestrian || address.residential || address.footway || "";
+    const number = address.house_number || "";
+    const neighborhood = address.neighbourhood || address.suburb || address.quarter || address.village || "";
+    const label = [street, number].filter(Boolean).join(", ") + (neighborhood ? ` - ${neighborhood}` : "");
+    return { street, neighborhood, label: label || String(result?.display_name || "").split(",").slice(0, 3).join(", ") };
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
 
 function setTerrainQuickLocationPending(pending) {
   terrainQuickLocationPending = Boolean(pending);
   const saveButton = $("terrainQuickSave");
   if (!saveButton) return;
-  const hasManualReference = Boolean($("terrainQuickReference")?.value.trim());
-  saveButton.disabled = terrainQuickLocationPending && !hasManualReference;
+  saveButton.disabled = terrainQuickLocationPending;
   saveButton.innerHTML = terrainQuickLocationPending
     ? '<i class="fa-solid fa-location-crosshairs fa-beat-fade"></i> Aguardando GPS...'
     : '<i class="fa-solid fa-floppy-disk"></i> Salvar prospecção';
@@ -3494,13 +3583,24 @@ function setTerrainQuickLocationPending(pending) {
 
 function resetTerrainQuickForm() {
   setTerrainQuickLocationPending(false);
+  stopTerrainQuickDirectionCapture();
+  terrainQuickAutoAddress = "";
   $("terrainQuickForm")?.reset();
   if ($("terrainQuickNickname")) $("terrainQuickNickname").value = terrainQuickCaptureName();
-  ["terrainQuickLatitude", "terrainQuickLongitude", "terrainQuickAccuracy"].forEach((id) => { if ($(id)) $(id).value = ""; });
-  if ($("terrainQuickLocationStatus")) $("terrainQuickLocationStatus").textContent = "Toque em “Usar meu GPS” para marcar o ponto exato.";
+  ["terrainQuickLatitude", "terrainQuickLongitude", "terrainQuickAccuracy", "terrainQuickHeading", "terrainQuickStreet", "terrainQuickNeighborhood"].forEach((id) => { if ($(id)) $(id).value = ""; });
+  if ($("terrainQuickLocationStatus")) $("terrainQuickLocationStatus").textContent = "Toque no botão verde para marcar o ponto exato.";
   if ($("terrainQuickOpenMaps")) {
     $("terrainQuickOpenMaps").classList.add("hidden");
     $("terrainQuickOpenMaps").href = "#";
+  }
+  if ($("terrainQuickMapPreview")) $("terrainQuickMapPreview").classList.add("hidden");
+  if ($("terrainQuickMapFrame")) {
+    $("terrainQuickMapFrame").removeAttribute("src");
+    delete $("terrainQuickMapFrame").dataset.mapUrl;
+  }
+  if ($("terrainQuickUseLocation")) {
+    $("terrainQuickUseLocation").disabled = false;
+    $("terrainQuickUseLocation").innerHTML = '<i class="fa-solid fa-location-crosshairs"></i><span><strong>Marcar localização exata com GPS</strong><small>Toque aqui e aponte o topo do celular para o terreno</small></span>';
   }
   renderTerrainSelectedPhotoPreview("terrainQuickPhotos", "terrainQuickPhotoPreview");
   $("terrainQuickFormCard")?.classList.add("hidden");
@@ -3514,26 +3614,56 @@ function useCurrentTerrainQuickLocation() {
   const button = $("terrainQuickUseLocation");
   const status = $("terrainQuickLocationStatus");
   setTerrainQuickLocationPending(true);
+  startTerrainQuickDirectionCapture();
   if (button) button.disabled = true;
+  if (button) button.innerHTML = '<i class="fa-solid fa-location-crosshairs fa-beat-fade"></i><span><strong>Localizando o terreno...</strong><small>Aguarde alguns segundos</small></span>';
   if (status) status.textContent = "Buscando o ponto exato pelo GPS...";
-  navigator.geolocation.getCurrentPosition((position) => {
+  navigator.geolocation.getCurrentPosition(async (position) => {
     const latitude = Number(position.coords.latitude.toFixed(7));
     const longitude = Number(position.coords.longitude.toFixed(7));
     const accuracy = Math.max(0, Math.round(Number(position.coords.accuracy || 0)));
     if ($("terrainQuickLatitude")) $("terrainQuickLatitude").value = String(latitude);
     if ($("terrainQuickLongitude")) $("terrainQuickLongitude").value = String(longitude);
     if ($("terrainQuickAccuracy")) $("terrainQuickAccuracy").value = String(accuracy);
-    if (status) status.textContent = `Local marcado com precisão aproximada de ${accuracy || "?"} m.`;
+    if (Number.isFinite(Number(position.coords.heading)) && Number(position.coords.heading) >= 0 && $("terrainQuickHeading")) {
+      $("terrainQuickHeading").value = String(Math.round(Number(position.coords.heading)));
+    }
+    updateTerrainQuickMapPreview(latitude, longitude);
+    if (status) status.textContent = `Ponto marcado com precisão aproximada de ${accuracy || "?"} m. Buscando o nome da rua...`;
     if ($("terrainQuickOpenMaps")) {
       $("terrainQuickOpenMaps").href = `https://www.google.com/maps?q=${latitude},${longitude}`;
       $("terrainQuickOpenMaps").classList.remove("hidden");
     }
-    setTerrainQuickLocationPending(false);
-    if (button) button.disabled = false;
-    showToast("Localização do terreno marcada.");
+    try {
+      const found = await reverseTerrainQuickAddress(latitude, longitude);
+      if ($("terrainQuickStreet")) $("terrainQuickStreet").value = found.street || "";
+      if ($("terrainQuickNeighborhood")) $("terrainQuickNeighborhood").value = found.neighborhood || "";
+      const reference = $("terrainQuickReference");
+      if (reference && found.label && (!reference.value.trim() || reference.value === terrainQuickAutoAddress)) {
+        reference.value = found.label;
+        terrainQuickAutoAddress = found.label;
+      }
+      if (status) status.textContent = found.label
+        ? `Local marcado: ${found.label}. Precisão aproximada de ${accuracy || "?"} m.`
+        : `Local marcado com precisão aproximada de ${accuracy || "?"} m. Complete o endereço abaixo.`;
+    } catch (addressError) {
+      console.warn("Não foi possível preencher o endereço pelo GPS.", addressError);
+      if (status) status.textContent = `Local marcado com precisão aproximada de ${accuracy || "?"} m. Complete o endereço abaixo.`;
+    } finally {
+      setTerrainQuickLocationPending(false);
+      if (button) {
+        button.disabled = false;
+        button.innerHTML = '<i class="fa-solid fa-location-dot"></i><span><strong>Localização marcada</strong><small>Toque novamente para atualizar o ponto</small></span>';
+      }
+    }
+    showToast("Localização e mapa do terreno marcados.");
   }, (error) => {
     setTerrainQuickLocationPending(false);
-    if (button) button.disabled = false;
+    stopTerrainQuickDirectionCapture();
+    if (button) {
+      button.disabled = false;
+      button.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i><span><strong>Tentar marcar o GPS novamente</strong><small>Confira a permissão de localização do navegador</small></span>';
+    }
     if (status) status.textContent = error?.code === 1 ? "GPS não autorizado. Informe uma referência abaixo." : "Não foi possível localizar. Tente novamente ou informe uma referência.";
     showToast(error?.code === 1 ? "Permissão de localização não concedida." : "Não foi possível obter sua localização.");
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
@@ -3544,7 +3674,6 @@ function openTerrainQuickForm() {
   $("terrainQuickFormCard")?.classList.remove("hidden");
   $("terrainQuickFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
   $("terrainQuickNickname")?.focus({ preventScroll: true });
-  useCurrentTerrainQuickLocation();
 }
 
 function renderTerrainQuickAccess() {
@@ -3603,7 +3732,7 @@ function nextTerrainReferenceCode() {
 }
 
 function terrainQuickFormValues() {
-  const status = $("terrainQuickStatus")?.value || "proprietario_desconhecido";
+  const status = document.querySelector('input[name="terrainQuickStatus"]:checked')?.value || "proprietario_desconhecido";
   const grassByStatus = {
     limpo: "ate_30_cm",
     monitorar: "de_30_a_60_cm",
@@ -3618,8 +3747,8 @@ function terrainQuickFormValues() {
     development_id: "",
     codigo_referencia: referenceCode,
     apelido: $("terrainQuickNickname")?.value || referenceCode,
-    bairro: "",
-    rua: $("terrainQuickReference")?.value || "",
+    bairro: $("terrainQuickNeighborhood")?.value || "",
+    rua: $("terrainQuickStreet")?.value || $("terrainQuickReference")?.value || "",
     numero: "",
     quadra: "",
     lote: "",
@@ -3630,6 +3759,7 @@ function terrainQuickFormValues() {
     inscricao_imobiliaria: "",
     latitude,
     longitude,
+    direcao_graus: $("terrainQuickHeading")?.value || "",
     google_maps_url: latitude && longitude ? `https://www.google.com/maps?q=${latitude},${longitude}` : "",
     observacoes: $("terrainQuickNotes")?.value || "",
     grau_dificuldade: "nao_informado",
@@ -3646,8 +3776,8 @@ function terrainQuickFormValues() {
 async function saveTerrainQuickCapture(event) {
   event.preventDefault();
   if (!isMaster()) return showToast("Somente o Admin Master pode salvar terrenos.");
-  if (terrainQuickLocationPending && !$("terrainQuickReference")?.value.trim()) {
-    return showToast("Aguarde o GPS terminar ou informe um ponto de referência.");
+  if (terrainQuickLocationPending) {
+    return showToast("Aguarde o GPS e a busca do endereço terminarem.");
   }
   const terrainId = push(ref(db, TERRAIN_MANAGEMENT_ENTITIES.terrains.path)).key;
   const files = [...($("terrainQuickPhotos")?.files || [])];
@@ -4174,6 +4304,7 @@ function terrainFormValues() {
     inscricao_imobiliaria: $("terrainMunicipalRegistration")?.value,
     latitude: $("terrainLatitude")?.value,
     longitude: $("terrainLongitude")?.value,
+    direcao_graus: $("terrainDirection")?.value,
     google_maps_url: $("terrainMapsLink")?.value,
     observacoes: $("terrainNotes")?.value,
     grau_dificuldade: $("terrainDifficulty")?.value,
@@ -4229,6 +4360,7 @@ function openTerrainForm(terrainId = "", { focusOwner = false } = {}) {
     terrainMunicipalRegistration: terrain?.inscricao_imobiliaria || "",
     terrainLatitude: terrain?.latitude ?? "",
     terrainLongitude: terrain?.longitude ?? "",
+    terrainDirection: terrain?.direcao_graus ?? "",
     terrainMapsLink: terrain?.google_maps_url || "",
     terrainNotes: terrain?.observacoes || "",
     terrainDifficulty: terrain?.grau_dificuldade || "",
@@ -4492,6 +4624,21 @@ function terrainServiceHistoryHtml(terrainId) {
   }).join("")}</div>`;
 }
 
+function terrainLocationMapHtml(terrain = {}) {
+  const url = terrainMapEmbedUrl(terrain.latitude, terrain.longitude);
+  if (!url) return "";
+  const numericHeading = Number(terrain.direcao_graus);
+  const hasHeading = terrain.direcao_graus !== null && terrain.direcao_graus !== "" && Number.isFinite(numericHeading);
+  return `<section class="terrain-saved-location-section">
+    <div class="terrain-detail-section-head"><div><span>Localização registrada</span><h3>Mapa do ponto capturado</h3></div><strong>${escapeHtml(terrainDirectionLabel(hasHeading ? numericHeading : null))}</strong></div>
+    <div class="terrain-location-map is-saved">
+      <iframe src="${escapeAttr(url)}" title="Mapa do ponto salvo para ${escapeAttr(terrain.apelido || "terreno")}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      <span class="terrain-location-map-marker ${hasHeading ? "" : "without-direction"}" style="--terrain-heading:${hasHeading ? numericHeading : 0}deg" aria-hidden="true"><i class="fa-solid fa-location-arrow"></i><b></b></span>
+      <div class="terrain-location-map-caption"><strong>Ponto exato salvo pelo GPS</strong><small>${escapeHtml(`${terrain.latitude}, ${terrain.longitude}`)}</small></div>
+    </div>
+  </section>`;
+}
+
 function setTerrainTableExpanded(expanded = false) {
   const content = $("terrainTableContent");
   const button = $("toggleTerrainTable");
@@ -4616,6 +4763,7 @@ function openTerrainDetail(terrainId) {
       <div class="wide"><span>Características</span><strong class="terrain-detail-tags">${characteristics.length ? characteristics.map((label) => `<span>${escapeHtml(label)}</span>`).join("") : "<span>Nenhuma informada</span>"}</strong></div>
       <div class="wide"><span>Observações</span><strong>${escapeHtml(terrain.observacoes || "Sem observações.")}</strong></div>
     </div>
+    ${terrainLocationMapHtml(terrain)}
     ${terrainLinkedDataHtml(terrain, deletion)}
     <section class="terrain-service-history-section">
       <div class="terrain-detail-section-head"><div><span>Histórico</span><h3>Serviços deste terreno</h3></div></div>
@@ -5149,6 +5297,9 @@ function useCurrentTerrainLocation() {
     const longitude = Number(position.coords.longitude.toFixed(7));
     if ($("terrainLatitude")) $("terrainLatitude").value = String(latitude);
     if ($("terrainLongitude")) $("terrainLongitude").value = String(longitude);
+    if ($("terrainDirection")) $("terrainDirection").value = Number.isFinite(Number(position.coords.heading)) && Number(position.coords.heading) >= 0
+      ? String(Math.round(Number(position.coords.heading)))
+      : "";
     if ($("terrainMapsLink")) $("terrainMapsLink").value = `https://www.google.com/maps?q=${latitude},${longitude}`;
     if (button) button.disabled = false;
     updateTerrainMapsButton();

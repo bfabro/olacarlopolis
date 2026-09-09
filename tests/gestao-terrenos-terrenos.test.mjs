@@ -24,6 +24,7 @@ const baseInput = {
   inscricao_imobiliaria: "",
   latitude: "",
   longitude: "",
+  direcao_graus: "",
   google_maps_url: "",
   observacoes: "Acesso pelo portão lateral.",
   grau_dificuldade: "medio",
@@ -129,6 +130,12 @@ test("gera link do Maps por URL ou coordenadas", () => {
     "https://www.google.com/maps?q=-23.426,-49.72"
   );
   assert.equal(terrainMapsUrl({ latitude: "", longitude: "" }), "");
+});
+
+test("preserva direcao valida do ponto capturado", () => {
+  const terrain = buildTerrainRecord({ ...baseInput, direcao_graus: "135" }, { id: "terrain-direction", timestamp: 1 });
+  assert.equal(terrain.direcao_graus, 135);
+  assert.throws(() => buildTerrainRecord({ ...baseInput, direcao_graus: "361" }, { id: "terrain-direction", timestamp: 1 }), /direção/);
 });
 
 test("traduz somente características selecionadas", () => {

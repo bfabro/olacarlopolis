@@ -50,6 +50,7 @@
         "prospeccao_status": { ".validate": "!newData.exists() || newData.val() === 'pendente_dados'" },
         "localizacao_referencia": { ".validate": "!newData.exists() || newData.isString()" },
         "precisao_gps_m": { ".validate": "!newData.exists() || (newData.isNumber() && newData.val() >= 0)" },
+        "direcao_graus": { ".validate": "!newData.exists() || (newData.isNumber() && newData.val() >= 0 && newData.val() <= 360)" },
         "capturado_em": { ".validate": "!newData.exists() || newData.isNumber()" }
       }
     },
