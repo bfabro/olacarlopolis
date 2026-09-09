@@ -1318,6 +1318,10 @@ img {
 }
 
 
+.sidebar .close-btn {
+  display: none;
+}
+
 /* Estilos para telas pequenas */
 @media screen and (max-width: 768px) {
 
@@ -1367,6 +1371,8 @@ img {
 
   /* Botão de fechar dentro do menu */
   .sidebar .close-btn {
+    display: grid;
+    place-items: center;
     position: absolute;
     top: 10px;
     right: 10px;
