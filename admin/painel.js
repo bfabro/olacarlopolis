@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 748,
-  label: "v755",
+  numero: 749,
+  label: "v756",
   data: "2026-09-09",
-  nota: "Botão de fechar do menu público restrito ao mobile, sem exibição residual no desktop."
+  nota: "Detalhe do terreno com duas visões de satélite do GPS: lote próximo e entorno."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -4626,16 +4626,26 @@ function terrainServiceHistoryHtml(terrainId) {
 }
 
 function terrainLocationMapHtml(terrain = {}) {
-  const url = terrainMapEmbedUrl(terrain.latitude, terrain.longitude, { zoom: 17, satellite: true });
-  if (!url) return "";
+  const closeUrl = terrainMapEmbedUrl(terrain.latitude, terrain.longitude, { zoom: 19, satellite: true });
+  const contextUrl = terrainMapEmbedUrl(terrain.latitude, terrain.longitude, { zoom: 17, satellite: true });
+  if (!closeUrl || !contextUrl) return "";
   const numericHeading = Number(terrain.direcao_graus);
   const hasHeading = terrain.direcao_graus !== null && terrain.direcao_graus !== "" && Number.isFinite(numericHeading);
+  const marker = `<span class="terrain-location-map-marker ${hasHeading ? "" : "without-direction"}" style="--terrain-heading:${hasHeading ? numericHeading : 0}deg" aria-hidden="true"><i class="fa-solid fa-location-arrow"></i><b></b></span>`;
+  const mapView = (url, title, description) => `
+    <article class="terrain-location-map-view">
+      <header><div><span>Satélite</span><h4>${title}</h4></div><small>${description}</small></header>
+      <div class="terrain-location-map is-saved">
+        <iframe src="${escapeAttr(url)}" title="${escapeAttr(`${title} do ponto salvo para ${terrain.apelido || "terreno"}`)}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        ${marker}
+        <div class="terrain-location-map-caption"><strong>Ponto salvo pelo GPS</strong><small>${escapeHtml(`${terrain.latitude}, ${terrain.longitude}`)}</small></div>
+      </div>
+    </article>`;
   return `<section class="terrain-saved-location-section">
     <div class="terrain-detail-section-head"><div><span>Localização registrada</span><h3>Mapa do ponto capturado</h3></div><strong>${escapeHtml(terrainDirectionLabel(hasHeading ? numericHeading : null))}</strong></div>
-    <div class="terrain-location-map is-saved">
-      <iframe src="${escapeAttr(url)}" title="Mapa do ponto salvo para ${escapeAttr(terrain.apelido || "terreno")}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-      <span class="terrain-location-map-marker ${hasHeading ? "" : "without-direction"}" style="--terrain-heading:${hasHeading ? numericHeading : 0}deg" aria-hidden="true"><i class="fa-solid fa-location-arrow"></i><b></b></span>
-      <div class="terrain-location-map-caption"><strong>Visão de satélite do ponto salvo pelo GPS</strong><small>${escapeHtml(`${terrain.latitude}, ${terrain.longitude}`)}</small></div>
+    <div class="terrain-location-map-views">
+      ${mapView(closeUrl, "Visão próxima", "Ajuda a localizar os limites do lote.")}
+      ${mapView(contextUrl, "Visão do entorno", "Mostra ruas e referências próximas.")}
     </div>
   </section>`;
 }

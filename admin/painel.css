@@ -1266,8 +1266,17 @@ button[type="submit"]:hover,
 .terrain-quick-detail-notice > i { font-size: 1.1rem; }
 .terrain-saved-location-section { margin-top: 20px; padding-top: 18px; border-top: 2px solid var(--line); }
 .terrain-saved-location-section .terrain-detail-section-head > strong { color: #21664f; font-size: .78rem; }
+.terrain-location-map-views { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.terrain-location-map-view { min-width: 0; padding: 10px; border: 1px solid #d7e4de; border-radius: 14px; background: #f8fbfa; }
+.terrain-location-map-view > header { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 9px; }
+.terrain-location-map-view > header div { min-width: 0; }
+.terrain-location-map-view > header span { color: #168565; font-size: .62rem; font-weight: 900; text-transform: uppercase; }
+.terrain-location-map-view > header h4 { margin: 2px 0 0; color: #203b31; font-size: .88rem; }
+.terrain-location-map-view > header small { max-width: 190px; color: #6c7f77; font-size: .66rem; line-height: 1.3; text-align: right; }
 .terrain-location-map.is-saved { min-height: 300px; }
 .terrain-location-map.is-saved iframe { height: 320px; }
+.terrain-location-map-view .terrain-location-map.is-saved { min-height: 260px; }
+.terrain-location-map-view .terrain-location-map.is-saved iframe { height: 280px; }
 
 @media (max-width: 680px) {
   .terrain-quick-location-actions { display: grid; }
@@ -1276,6 +1285,9 @@ button[type="submit"]:hover,
   .terrain-location-map iframe, .terrain-location-map.is-saved iframe { height: 250px; }
   .terrain-location-map-caption { align-items: flex-start; flex-direction: column; }
   .terrain-location-map-caption small { text-align: left; }
+  .terrain-location-map-views { grid-template-columns: 1fr; }
+  .terrain-location-map-view > header { align-items: flex-start; flex-direction: column; }
+  .terrain-location-map-view > header small { max-width: none; text-align: left; }
   .terrain-quick-status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 

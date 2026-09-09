@@ -54,13 +54,18 @@ test("GPS explicito preenche endereco e preserva mapa com direcao", () => {
   assert.match(panelHtml, /id="terrainQuickMapMarker"/);
   assert.match(panelJs, /nominatim\.openstreetmap\.org\/reverse/);
   assert.match(panelJs, /terrainMapEmbedUrl/);
-  assert.match(panelJs, /terrainMapEmbedUrl\(terrain\.latitude, terrain\.longitude, \{ zoom: 17, satellite: true \}\)/);
+  assert.match(panelJs, /const closeUrl = terrainMapEmbedUrl\(terrain\.latitude, terrain\.longitude, \{ zoom: 19, satellite: true \}\)/);
+  assert.match(panelJs, /const contextUrl = terrainMapEmbedUrl\(terrain\.latitude, terrain\.longitude, \{ zoom: 17, satellite: true \}\)/);
+  assert.match(panelJs, /mapView\(closeUrl, "Visão próxima"/);
+  assert.match(panelJs, /mapView\(contextUrl, "Visão do entorno"/);
   assert.match(panelJs, /satellite \? "&t=k" : ""/);
   assert.match(panelJs, /DeviceOrientationEvent/);
   assert.match(panelJs, /direcao_graus/);
   assert.match(panelJs, /found\.street/);
   assert.doesNotMatch(panelJs.slice(panelJs.indexOf("function openTerrainQuickForm"), panelJs.indexOf("function renderTerrainQuickAccess")), /useCurrentTerrainQuickLocation\(\)/);
   assert.match(panelCss, /\.terrain-location-map-marker/);
+  assert.match(panelCss, /\.terrain-location-map-views \{[^}]*grid-template-columns: repeat\(2/);
+  assert.match(panelCss, /@media \(max-width: 680px\)[\s\S]*\.terrain-location-map-views \{ grid-template-columns: 1fr/);
 });
 
 test("cadastro rapido mostra situacao em grade visual", () => {
@@ -253,9 +258,9 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=455/);
-  assert.match(panelHtml, /painel\.js\?v=685/);
+  assert.match(panelHtml, /painel\.css\?v=456/);
+  assert.match(panelHtml, /painel\.js\?v=686/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
-  assert.match(panelJs, /numero: 748/);
-  assert.match(panelJs, /label: "v755"/);
+  assert.match(panelJs, /numero: 749/);
+  assert.match(panelJs, /label: "v756"/);
 });
