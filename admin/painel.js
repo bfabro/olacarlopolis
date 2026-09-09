@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 746,
-  label: "v753",
+  numero: 747,
+  label: "v754",
   data: "2026-09-09",
-  nota: "Terrenos com separadores reforçados, setas discretas e mapa de satélite mais aberto no detalhe."
+  nota: "Separadores visíveis na lista e características disponíveis também no cadastro rápido de terrenos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3765,7 +3765,7 @@ function terrainQuickFormValues() {
     observacoes: $("terrainQuickNotes")?.value || "",
     grau_dificuldade: "nao_informado",
     altura_mato: grassByStatus[status] || "nao_informado",
-    caracteristicas: [],
+    caracteristicas: [...document.querySelectorAll("[data-terrain-quick-characteristic]:checked")].map((input) => input.value),
     status,
     cadastro_rapido: true,
     prospeccao_status: "pendente_dados",

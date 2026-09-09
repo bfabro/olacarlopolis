@@ -1901,7 +1901,6 @@ body.terrain-owner-detail-open {
 .terrain-row {
   display: grid;
   grid-template-columns: minmax(220px, 280px) minmax(0, 1fr);
-  overflow: hidden;
 }
 
 .terrain-list {
@@ -1923,10 +1922,10 @@ body.terrain-owner-detail-open {
   content: "";
   position: absolute;
   top: -13px;
-  right: 8px;
-  left: 8px;
-  height: 1px;
-  background: #cbd5e1;
+  right: 0;
+  left: 0;
+  height: 2px;
+  background: #b8c5d4;
   box-shadow: 0 1px 0 rgba(255, 255, 255, .9);
 }
 
@@ -1944,6 +1943,8 @@ body.terrain-owner-detail-open {
 .terrain-list-card-media {
   position: relative;
   min-height: 220px;
+  overflow: hidden;
+  border-radius: 13px 0 0 13px;
   background: #eef3f8;
 }
 
@@ -3601,6 +3602,7 @@ body.terrain-owner-detail-open {
   .terrain-row { grid-template-columns: 1fr; }
   .terrain-list-card-media,
   .terrain-list-gallery-empty { min-height: 230px; }
+  .terrain-list-card-media { border-radius: 13px 13px 0 0; }
   .terrain-row .terrain-list-card-actions { justify-content: flex-start; }
 
   .terrain-development-row > div {

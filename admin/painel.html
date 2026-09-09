@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=454">
+  <link rel="stylesheet" href="painel.css?v=455">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -291,6 +291,22 @@
                   <label><input type="radio" name="terrainQuickStatus" value="monitorar"><span><i class="fa-solid fa-eye"></i><strong>Monitorar</strong></span></label>
                   <label><input type="radio" name="terrainQuickStatus" value="pode_precisar_limpeza"><span><i class="fa-solid fa-triangle-exclamation"></i><strong>Pode precisar de limpeza</strong></span></label>
                   <label><input type="radio" name="terrainQuickStatus" value="precisa_limpeza"><span><i class="fa-solid fa-broom"></i><strong>Precisa de limpeza</strong></span></label>
+                </div>
+              </fieldset>
+              <fieldset class="wide terrain-characteristics terrain-quick-characteristics">
+                <legend>Características observadas</legend>
+                <div class="terrain-characteristics-grid">
+                  <label><input type="checkbox" value="entulho" data-terrain-quick-characteristic> Entulho</label>
+                  <label><input type="checkbox" value="pedras" data-terrain-quick-characteristic> Pedras</label>
+                  <label><input type="checkbox" value="arvores" data-terrain-quick-characteristic> Árvores</label>
+                  <label><input type="checkbox" value="cerca" data-terrain-quick-characteristic> Cerca</label>
+                  <label><input type="checkbox" value="declive" data-terrain-quick-characteristic> Declive</label>
+                  <label><input type="checkbox" value="construcao" data-terrain-quick-characteristic> Construção</label>
+                  <label><input type="checkbox" value="poste" data-terrain-quick-characteristic> Poste</label>
+                  <label><input type="checkbox" value="objetos_abandonados" data-terrain-quick-characteristic> Objetos abandonados</label>
+                  <label><input type="checkbox" value="possivel_presenca_animais" data-terrain-quick-characteristic> Possível presença de animais</label>
+                  <label><input type="checkbox" value="acesso_dificil" data-terrain-quick-characteristic> Acesso difícil</label>
+                  <label><input type="checkbox" value="outro" data-terrain-quick-characteristic> Outro</label>
                 </div>
               </fieldset>
               <label class="wide terrain-quick-camera">
@@ -3318,6 +3334,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=683"></script>
+  <script type="module" src="painel.js?v=684"></script>
 </body>
 </html>

@@ -27,6 +27,7 @@ const quickInput = {
   observacoes: "Mato alto.",
   grau_dificuldade: "nao_informado",
   altura_mato: "acima_1_m",
+  caracteristicas: ["entulho", "cerca"],
   status: "precisa_limpeza"
 };
 
@@ -67,6 +68,14 @@ test("cadastro rapido mostra situacao em grade visual", () => {
   assert.match(panelHtml, /name="terrainQuickStatus" value="precisa_limpeza"/);
   assert.match(panelJs, /input\[name="terrainQuickStatus"\]:checked/);
   assert.match(panelCss, /\.terrain-quick-status-grid/);
+});
+
+test("cadastro rapido permite registrar as mesmas caracteristicas do terreno", () => {
+  assert.match(panelHtml, /class="wide terrain-characteristics terrain-quick-characteristics"/);
+  assert.match(panelHtml, /value="entulho" data-terrain-quick-characteristic/);
+  assert.match(panelHtml, /value="possivel_presenca_animais" data-terrain-quick-characteristic/);
+  assert.match(panelHtml, /value="acesso_dificil" data-terrain-quick-characteristic/);
+  assert.match(panelJs, /querySelectorAll\("\[data-terrain-quick-characteristic\]:checked"\)/);
 });
 
 test("salvamento aguarda o GPS e a previa libera a URL sem JavaScript inline", () => {
@@ -164,6 +173,7 @@ test("prospeccao aceita dados minimos com GPS e preserva precisao", () => {
   assert.equal(terrain.prospeccao_status, "pendente_dados");
   assert.equal(terrain.area_m2, 0);
   assert.equal(terrain.grau_dificuldade, "nao_informado");
+  assert.deepEqual(terrain.caracteristicas, { entulho: true, cerca: true });
   assert.equal(terrain.precisao_gps_m, 8);
   assert.equal(terrain.capturado_em, 1000);
 });
@@ -234,6 +244,8 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
   assert.match(panelJs, /track\.scrollTo\(\{ left: target, behavior: "smooth" \}\)/);
   assert.match(panelCss, /\.terrain-list \{[\s\S]*gap: 24px/);
   assert.match(panelCss, /\.terrain-row \+ \.terrain-row::before/);
+  assert.doesNotMatch(panelCss, /\.terrain-row \{[\s\S]{0,180}overflow: hidden/);
+  assert.match(panelCss, /\.terrain-list-card-media \{[\s\S]*overflow: hidden/);
   assert.match(panelCss, /\.terrain-list-gallery-track \{[\s\S]*scroll-snap-type: x mandatory/);
   assert.match(panelCss, /\.terrain-list-gallery-slide img \{[\s\S]*object-fit: cover/);
   assert.match(panelCss, /\.terrain-list-card-facts \{[\s\S]*grid-template-columns: repeat\(4/);
@@ -241,9 +253,9 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=454/);
-  assert.match(panelHtml, /painel\.js\?v=683/);
+  assert.match(panelHtml, /painel\.css\?v=455/);
+  assert.match(panelHtml, /painel\.js\?v=684/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
-  assert.match(panelJs, /numero: 746/);
-  assert.match(panelJs, /label: "v753"/);
+  assert.match(panelJs, /numero: 747/);
+  assert.match(panelJs, /label: "v754"/);
 });
