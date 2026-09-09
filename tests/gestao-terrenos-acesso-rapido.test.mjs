@@ -53,6 +53,8 @@ test("GPS explicito preenche endereco e preserva mapa com direcao", () => {
   assert.match(panelHtml, /id="terrainQuickMapMarker"/);
   assert.match(panelJs, /nominatim\.openstreetmap\.org\/reverse/);
   assert.match(panelJs, /terrainMapEmbedUrl/);
+  assert.match(panelJs, /terrainMapEmbedUrl\(terrain\.latitude, terrain\.longitude, \{ zoom: 17, satellite: true \}\)/);
+  assert.match(panelJs, /satellite \? "&t=k" : ""/);
   assert.match(panelJs, /DeviceOrientationEvent/);
   assert.match(panelJs, /direcao_graus/);
   assert.match(panelJs, /found\.street/);
@@ -230,16 +232,18 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
   assert.match(panelJs, /data-terrain-list-photo-step/);
   assert.match(panelJs, /openTerrainPhotoViewer\(photo\.url/);
   assert.match(panelJs, /track\.scrollTo\(\{ left: target, behavior: "smooth" \}\)/);
-  assert.match(panelCss, /\.terrain-list \{[\s\S]*gap: 16px/);
+  assert.match(panelCss, /\.terrain-list \{[\s\S]*gap: 24px/);
+  assert.match(panelCss, /\.terrain-row \+ \.terrain-row::before/);
   assert.match(panelCss, /\.terrain-list-gallery-track \{[\s\S]*scroll-snap-type: x mandatory/);
   assert.match(panelCss, /\.terrain-list-gallery-slide img \{[\s\S]*object-fit: cover/);
   assert.match(panelCss, /\.terrain-list-card-facts \{[\s\S]*grid-template-columns: repeat\(4/);
+  assert.match(panelCss, /\.terrain-list-gallery-arrow \{[\s\S]*width: 24px;[\s\S]*height: 24px/);
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=453/);
-  assert.match(panelHtml, /painel\.js\?v=682/);
+  assert.match(panelHtml, /painel\.css\?v=454/);
+  assert.match(panelHtml, /painel\.js\?v=683/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
-  assert.match(panelJs, /numero: 745/);
-  assert.match(panelJs, /label: "v752"/);
+  assert.match(panelJs, /numero: 746/);
+  assert.match(panelJs, /label: "v753"/);
 });

@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 745,
-  label: "v752",
+  numero: 746,
+  label: "v753",
   data: "2026-09-09",
-  nota: "Gestão de terrenos com cards organizados, galeria navegável e ampliação de fotos na listagem."
+  nota: "Terrenos com separadores reforçados, setas discretas e mapa de satélite mais aberto no detalhe."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3491,11 +3491,12 @@ function terrainDirectionLabel(value) {
   return `${directions[Math.round(((heading % 360) + 360) % 360 / 45) % 8]} · ${Math.round(((heading % 360) + 360) % 360)}°`;
 }
 
-function terrainMapEmbedUrl(latitude, longitude) {
+function terrainMapEmbedUrl(latitude, longitude, { zoom = 19, satellite = false } = {}) {
   const lat = Number(latitude);
   const lon = Number(longitude);
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) return "";
-  return `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lon}`)}&z=19&output=embed`;
+  const safeZoom = Math.max(1, Math.min(20, Number(zoom) || 19));
+  return `https://www.google.com/maps?q=${encodeURIComponent(`${lat},${lon}`)}${satellite ? "&t=k" : ""}&z=${safeZoom}&output=embed`;
 }
 
 function updateTerrainQuickMapPreview(latitude, longitude, heading = $("terrainQuickHeading")?.value) {
@@ -4625,7 +4626,7 @@ function terrainServiceHistoryHtml(terrainId) {
 }
 
 function terrainLocationMapHtml(terrain = {}) {
-  const url = terrainMapEmbedUrl(terrain.latitude, terrain.longitude);
+  const url = terrainMapEmbedUrl(terrain.latitude, terrain.longitude, { zoom: 17, satellite: true });
   if (!url) return "";
   const numericHeading = Number(terrain.direcao_graus);
   const hasHeading = terrain.direcao_graus !== null && terrain.direcao_graus !== "" && Number.isFinite(numericHeading);
@@ -4634,7 +4635,7 @@ function terrainLocationMapHtml(terrain = {}) {
     <div class="terrain-location-map is-saved">
       <iframe src="${escapeAttr(url)}" title="Mapa do ponto salvo para ${escapeAttr(terrain.apelido || "terreno")}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       <span class="terrain-location-map-marker ${hasHeading ? "" : "without-direction"}" style="--terrain-heading:${hasHeading ? numericHeading : 0}deg" aria-hidden="true"><i class="fa-solid fa-location-arrow"></i><b></b></span>
-      <div class="terrain-location-map-caption"><strong>Ponto exato salvo pelo GPS</strong><small>${escapeHtml(`${terrain.latitude}, ${terrain.longitude}`)}</small></div>
+      <div class="terrain-location-map-caption"><strong>Visão de satélite do ponto salvo pelo GPS</strong><small>${escapeHtml(`${terrain.latitude}, ${terrain.longitude}`)}</small></div>
     </div>
   </section>`;
 }

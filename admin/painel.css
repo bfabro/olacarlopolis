@@ -1906,16 +1906,28 @@ body.terrain-owner-detail-open {
 
 .terrain-list {
   display: grid;
-  gap: 16px;
+  gap: 24px;
 }
 
 .terrain-row {
+  position: relative;
   min-height: 220px;
   border: 1px solid #d8e1ec;
   border-radius: 14px;
   background: #fff;
   box-shadow: 0 5px 16px rgba(15, 23, 42, .06);
   transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+}
+
+.terrain-row + .terrain-row::before {
+  content: "";
+  position: absolute;
+  top: -13px;
+  right: 8px;
+  left: 8px;
+  height: 1px;
+  background: #cbd5e1;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .9);
 }
 
 .terrain-row:hover {
@@ -2002,20 +2014,27 @@ body.terrain-owner-detail-open {
   position: absolute;
   top: 50%;
   z-index: 2;
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 1px solid rgba(255, 255, 255, .85);
   border-radius: 50%;
-  background: rgba(15, 23, 42, .65);
+  background: rgba(15, 23, 42, .48);
   color: #fff;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, .2);
+  box-shadow: 0 1px 5px rgba(15, 23, 42, .16);
+  font-size: .62rem;
+  opacity: .76;
   transform: translateY(-50%);
+  transition: background .2s ease, opacity .2s ease;
 }
 
-.terrain-list-gallery-arrow:hover { background: rgba(15, 23, 42, .88); }
-.terrain-list-gallery-arrow.previous { left: 9px; }
-.terrain-list-gallery-arrow.next { right: 9px; }
+.terrain-list-gallery-arrow:hover,
+.terrain-list-gallery-arrow:focus-visible {
+  background: rgba(15, 23, 42, .72);
+  opacity: 1;
+}
+.terrain-list-gallery-arrow.previous { left: 6px; }
+.terrain-list-gallery-arrow.next { right: 6px; }
 
 .terrain-list-gallery-empty {
   display: grid;
