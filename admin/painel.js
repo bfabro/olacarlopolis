@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 750,
-  label: "v757",
+  numero: 751,
+  label: "v758",
   data: "2026-09-13",
-  nota: "Filtros da listagem de terrenos recolhidos por padrão."
+  nota: "Cadastro rápido de terrenos com bairro e loteamento como referências."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3482,6 +3482,7 @@ function terrainQuickCaptureName() {
 let terrainQuickLocationPending = false;
 let terrainQuickDirectionListener = null;
 let terrainQuickAutoAddress = "";
+let terrainQuickAutoNeighborhood = "";
 
 function terrainDirectionLabel(value) {
   if (value === null || value === undefined || value === "") return "Direção não disponível neste aparelho";
@@ -3586,7 +3587,9 @@ function resetTerrainQuickForm() {
   setTerrainQuickLocationPending(false);
   stopTerrainQuickDirectionCapture();
   terrainQuickAutoAddress = "";
+  terrainQuickAutoNeighborhood = "";
   $("terrainQuickForm")?.reset();
+  renderTerrainQuickReferenceOptions();
   if ($("terrainQuickNickname")) $("terrainQuickNickname").value = terrainQuickCaptureName();
   ["terrainQuickLatitude", "terrainQuickLongitude", "terrainQuickAccuracy", "terrainQuickHeading", "terrainQuickStreet", "terrainQuickNeighborhood"].forEach((id) => { if ($(id)) $(id).value = ""; });
   if ($("terrainQuickLocationStatus")) $("terrainQuickLocationStatus").textContent = "Toque no botão verde para marcar o ponto exato.";
@@ -3638,7 +3641,11 @@ function useCurrentTerrainQuickLocation() {
     try {
       const found = await reverseTerrainQuickAddress(latitude, longitude);
       if ($("terrainQuickStreet")) $("terrainQuickStreet").value = found.street || "";
-      if ($("terrainQuickNeighborhood")) $("terrainQuickNeighborhood").value = found.neighborhood || "";
+      const neighborhoodInput = $("terrainQuickNeighborhood");
+      if (neighborhoodInput && found.neighborhood && (!neighborhoodInput.value.trim() || neighborhoodInput.value === terrainQuickAutoNeighborhood)) {
+        neighborhoodInput.value = found.neighborhood;
+        terrainQuickAutoNeighborhood = found.neighborhood;
+      }
       const reference = $("terrainQuickReference");
       if (reference && found.label && (!reference.value.trim() || reference.value === terrainQuickAutoAddress)) {
         reference.value = found.label;
@@ -3677,7 +3684,29 @@ function openTerrainQuickForm() {
   $("terrainQuickNickname")?.focus({ preventScroll: true });
 }
 
+function renderTerrainQuickReferenceOptions() {
+  const developmentSelect = $("terrainQuickDevelopment");
+  const currentDevelopment = developmentSelect?.value || "";
+  if (developmentSelect) {
+    developmentSelect.innerHTML = terrainSelectOptions(
+      terrainDevelopmentRecords(state.terrainManagement?.developments || {}),
+      currentDevelopment,
+      "Sem loteamento",
+      (development) => development.nome || development.id
+    );
+  }
+  const neighborhoodList = $("terrainQuickNeighborhoodOptions");
+  if (neighborhoodList) {
+    const neighborhoods = [...new Set([
+      ...Object.values(state.terrainManagement?.terrains || {}).map((terrain) => String(terrain?.bairro || "").trim()),
+      ...terrainDevelopmentRecords(state.terrainManagement?.developments || {}).map((development) => String(development?.bairro || "").trim())
+    ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
+    neighborhoodList.innerHTML = neighborhoods.map((neighborhood) => `<option value="${escapeAttr(neighborhood)}"></option>`).join("");
+  }
+}
+
 function renderTerrainQuickAccess() {
+  renderTerrainQuickReferenceOptions();
   const mount = $("terrainQuickRecentList");
   const prospects = Object.values(state.terrainManagement?.terrains || {})
     .filter((terrain) => terrain?.cadastro_rapido === true)
@@ -3742,14 +3771,19 @@ function terrainQuickFormValues() {
   };
   const latitude = $("terrainQuickLatitude")?.value || "";
   const longitude = $("terrainQuickLongitude")?.value || "";
+  const developmentId = $("terrainQuickDevelopment")?.value || "";
+  const development = terrainDevelopmentById(developmentId);
+  const neighborhood = $("terrainQuickNeighborhood")?.value || "";
+  const manualReference = $("terrainQuickReference")?.value || "";
+  const locationReference = manualReference || [development?.nome, neighborhood].filter(Boolean).join(" · ").slice(0, 220);
   const referenceCode = nextTerrainReferenceCode();
   return {
     owner_id: "",
-    development_id: "",
+    development_id: developmentId,
     codigo_referencia: referenceCode,
     apelido: $("terrainQuickNickname")?.value || referenceCode,
-    bairro: $("terrainQuickNeighborhood")?.value || "",
-    rua: $("terrainQuickStreet")?.value || $("terrainQuickReference")?.value || "",
+    bairro: neighborhood,
+    rua: $("terrainQuickStreet")?.value || manualReference,
     numero: "",
     quadra: "",
     lote: "",
@@ -3769,7 +3803,7 @@ function terrainQuickFormValues() {
     status,
     cadastro_rapido: true,
     prospeccao_status: "pendente_dados",
-    localizacao_referencia: $("terrainQuickReference")?.value || "",
+    localizacao_referencia: locationReference,
     precisao_gps_m: $("terrainQuickAccuracy")?.value || ""
   };
 }

@@ -268,7 +268,6 @@
                 <input id="terrainQuickAccuracy" type="hidden">
                 <input id="terrainQuickHeading" type="hidden">
                 <input id="terrainQuickStreet" type="hidden">
-                <input id="terrainQuickNeighborhood" type="hidden">
                 <div class="terrain-quick-location-actions">
                   <button id="terrainQuickUseLocation" class="terrain-quick-gps-button" type="button" data-no-loading><i class="fa-solid fa-location-crosshairs"></i><span><strong>Marcar localização exata com GPS</strong><small>Toque aqui e aponte o topo do celular para o terreno</small></span></button>
                   <a id="terrainQuickOpenMaps" class="ghost-button hidden" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Conferir no mapa</a>
@@ -280,8 +279,17 @@
                 </div>
               </section>
               <label class="wide">Endereço localizado ou ponto de referência
-                <input id="terrainQuickReference" maxlength="220" placeholder="Opcional se o GPS estiver marcado">
-                <small>Após marcar o GPS, tentaremos preencher automaticamente a rua. Você pode corrigir ou complementar. Endereço: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>.</small>
+                <input id="terrainQuickReference" maxlength="220" placeholder="Opcional com GPS, bairro ou loteamento">
+                <small>Após marcar o GPS, tentaremos preencher automaticamente a rua. Você pode corrigir, complementar ou usar apenas o bairro/loteamento como referência. Endereço: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>.</small>
+              </label>
+              <label>Bairro para referência
+                <input id="terrainQuickNeighborhood" list="terrainQuickNeighborhoodOptions" maxlength="120" placeholder="Digite ou escolha um bairro">
+                <datalist id="terrainQuickNeighborhoodOptions"></datalist>
+                <small>Você pode informar o bairro mesmo sem marcar o GPS.</small>
+              </label>
+              <label>Loteamento cadastrado
+                <select id="terrainQuickDevelopment"><option value="">Sem loteamento</option></select>
+                <small>Vincule agora para facilitar a identificação posterior.</small>
               </label>
               <fieldset class="wide terrain-quick-status-fieldset">
                 <legend>Situação atual do terreno</legend>
@@ -3334,6 +3342,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=687"></script>
+  <script type="module" src="painel.js?v=688"></script>
 </body>
 </html>

@@ -48,6 +48,24 @@ test("captura em campo oferece GPS camera referencia e observacoes", () => {
   assert.match(panelJs, /uploadTerrainGeneralPhotos\(terrainId, files, "frente"\)/);
 });
 
+test("cadastro rapido aceita bairro e loteamento como referencias", () => {
+  assert.match(panelHtml, /id="terrainQuickNeighborhood" list="terrainQuickNeighborhoodOptions"/);
+  assert.match(panelHtml, /id="terrainQuickDevelopment"/);
+  assert.match(panelJs, /function renderTerrainQuickReferenceOptions/);
+  assert.match(panelJs, /development_id: developmentId/);
+  assert.match(panelJs, /localizacao_referencia: locationReference/);
+  assert.match(panelJs, /manualReference \|\| \[development\?\.nome, neighborhood\]/);
+  const terrain = buildTerrainRecord({
+    ...quickInput,
+    development_id: "development-1",
+    bairro: "Centro",
+    localizacao_referencia: "Jardim Central · Centro"
+  }, { id: "quick-reference", timestamp: 1500 });
+  assert.equal(terrain.development_id, "development-1");
+  assert.equal(terrain.bairro, "Centro");
+  assert.equal(terrain.localizacao_referencia, "Jardim Central · Centro");
+});
+
 test("GPS explicito preenche endereco e preserva mapa com direcao", () => {
   assert.match(panelHtml, /Marcar localização exata com GPS/);
   assert.match(panelHtml, /id="terrainQuickMapFrame"/);
@@ -262,8 +280,8 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
   assert.match(panelHtml, /painel\.css\?v=457/);
-  assert.match(panelHtml, /painel\.js\?v=687/);
+  assert.match(panelHtml, /painel\.js\?v=688/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
-  assert.match(panelJs, /numero: 750/);
-  assert.match(panelJs, /label: "v757"/);
+  assert.match(panelJs, /numero: 751/);
+  assert.match(panelJs, /label: "v758"/);
 });
