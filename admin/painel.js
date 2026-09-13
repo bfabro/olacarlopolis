@@ -123,10 +123,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 749,
-  label: "v756",
-  data: "2026-09-09",
-  nota: "Detalhe do terreno com duas visões de satélite do GPS: lote próximo e entorno."
+  numero: 750,
+  label: "v757",
+  data: "2026-09-13",
+  nota: "Filtros da listagem de terrenos recolhidos por padrão."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

@@ -118,7 +118,10 @@ test("aba Terrenos prioriza cadastro e tabela recolhida", () => {
   assert.match(panelJs, /setTerrainTableExpanded\(false\)/);
   assert.match(panelCss, /\.terrain-list-card \{ order: 1; \}/);
   assert.match(panelCss, /\.terrain-form-card \{ order: 2; \}/);
-  assert.match(terrainSection, /terrain-filter-panel/);
+  assert.match(terrainSection, /<details class="terrain-filter-panel">/);
+  assert.doesNotMatch(terrainSection, /<details class="terrain-filter-panel" open/);
+  assert.match(terrainSection, /<summary class="terrain-filter-panel-head"/);
+  assert.match(terrainSection, /Mostrar filtros/);
   assert.match(terrainSection, /id="terrainReferenceCounter"/);
 });
 
@@ -258,9 +261,9 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=456/);
-  assert.match(panelHtml, /painel\.js\?v=686/);
+  assert.match(panelHtml, /painel\.css\?v=457/);
+  assert.match(panelHtml, /painel\.js\?v=687/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
-  assert.match(panelJs, /numero: 749/);
-  assert.match(panelJs, /label: "v756"/);
+  assert.match(panelJs, /numero: 750/);
+  assert.match(panelJs, /label: "v757"/);
 });

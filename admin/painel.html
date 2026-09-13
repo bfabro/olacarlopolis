@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=456">
+  <link rel="stylesheet" href="painel.css?v=457">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -610,8 +610,8 @@
               <button id="toggleTerrainTable" class="ghost-button terrain-table-toggle" type="button" data-no-loading aria-expanded="false" aria-controls="terrainTableContent"><i class="fa-solid fa-chevron-down"></i> <span>Mostrar tabela</span></button>
             </div>
             <div id="terrainTableContent" class="terrain-table-content hidden">
-            <section class="terrain-filter-panel" aria-labelledby="terrainFilterTitle">
-              <div class="terrain-filter-panel-head"><div><i class="fa-solid fa-filter"></i><span id="terrainFilterTitle">Filtros de pesquisa</span></div><small>Refine a lista sem alterar os cadastros.</small></div>
+            <details class="terrain-filter-panel">
+              <summary class="terrain-filter-panel-head"><div><i class="fa-solid fa-filter"></i><span>Filtros de pesquisa</span></div><small>Mostrar filtros</small><i class="fa-solid fa-chevron-down terrain-filter-chevron" aria-hidden="true"></i></summary>
               <div class="terrain-filters">
               <label class="terrain-filter-search">Busca geral
                 <span class="terrain-owner-search-field"><i class="fa-solid fa-magnifying-glass"></i><input id="terrainSearch" type="search" placeholder="Apelido, endereço, proprietário..."></span>
@@ -635,7 +635,7 @@
               <label>Quadra<input id="terrainBlockFilter" maxlength="40"></label>
               <label>Lote<input id="terrainLotFilter" maxlength="40"></label>
               </div>
-            </section>
+            </details>
             <div class="terrain-results-divider"><span>Terrenos cadastrados</span><strong id="terrainReferenceCounter">Próximo código: TER-0001</strong></div>
             <div id="terrainList" class="terrain-list"></div>
             </div>
@@ -3334,6 +3334,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=686"></script>
+  <script type="module" src="painel.js?v=687"></script>
 </body>
 </html>

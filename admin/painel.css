@@ -1852,10 +1852,15 @@ body.terrain-owner-detail-open {
 .terrain-filter-panel-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 12px;
-  margin-bottom: 12px;
+  cursor: pointer;
+  list-style: none;
 }
+
+.terrain-filter-panel-head::-webkit-details-marker { display: none; }
+
+.terrain-filter-panel[open] .terrain-filter-panel-head { margin-bottom: 12px; }
 
 .terrain-filter-panel-head > div {
   display: flex;
@@ -1867,9 +1872,18 @@ body.terrain-owner-detail-open {
 }
 
 .terrain-filter-panel-head small {
+  margin-left: auto;
   color: var(--muted);
   font-size: 11px;
 }
+
+.terrain-filter-chevron {
+  color: var(--brand-strong);
+  font-size: 11px;
+  transition: transform .2s ease;
+}
+
+.terrain-filter-panel[open] .terrain-filter-chevron { transform: rotate(180deg); }
 
 .terrain-results-divider {
   display: flex;
