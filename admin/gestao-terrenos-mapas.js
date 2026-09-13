@@ -113,9 +113,59 @@ export function terrainInteractiveMapById(mapId = "") {
 }
 
 export function terrainInteractiveMapForDevelopment(development = {}) {
+  const developmentId = String(development.id || "").trim();
+  const linkedMapId = String(
+    development.mapa_interativo_id
+    || development.interactive_map_id
+    || (developmentId.startsWith("mapa-interativo-") ? developmentId.slice("mapa-interativo-".length) : "")
+  ).trim();
+  if (linkedMapId) return terrainInteractiveMapById(linkedMapId);
   const normalized = normalizeTerrainInteractiveMapName(development.nome || development.name || "");
   if (!normalized) return null;
   return TERRAIN_INTERACTIVE_MAPS.find((map) => map.aliases.some((alias) => normalized === alias || normalized.endsWith(` ${alias}`))) || null;
+}
+
+export function terrainInteractiveDevelopmentId(mapId = "") {
+  return `mapa-interativo-${String(mapId).trim()}`;
+}
+
+export function buildTerrainInteractiveDevelopmentRecord(map, timestamp = Date.now()) {
+  if (!map?.id) return null;
+  return {
+    id: terrainInteractiveDevelopmentId(map.id),
+    nome: map.name,
+    bairro: map.neighborhood,
+    cidade: "Carlópolis",
+    descricao: `Loteamento com mapa interativo publicado. Área total: ${map.totalArea}.`,
+    observacoes: "Planta interativa usada como referência operacional; confirme os dados na documentação oficial.",
+    planta_imagem_url: map.image,
+    planta_imagem_path: null,
+    planta_pdf_url: null,
+    planta_pdf_path: null,
+    mapa_interativo_id: map.id,
+    origem: "mapa_interativo",
+    created_at: timestamp,
+    updated_at: timestamp
+  };
+}
+
+export function mergeTerrainInteractiveDevelopments(records = {}, timestamp = Date.now()) {
+  const developments = { ...(records || {}) };
+  const created = {};
+  TERRAIN_INTERACTIVE_MAPS.forEach((map) => {
+    const existingEntry = Object.entries(developments).find(([, development]) => (
+      terrainInteractiveMapForDevelopment(development)?.id === map.id
+    ));
+    if (existingEntry) {
+      const [id, development] = existingEntry;
+      if (!development.id) developments[id] = { id, ...development };
+      return;
+    }
+    const record = buildTerrainInteractiveDevelopmentRecord(map, timestamp);
+    developments[record.id] = record;
+    created[record.id] = record;
+  });
+  return { developments, created };
 }
 
 export function terrainInteractiveBlock(mapId, blockId) {

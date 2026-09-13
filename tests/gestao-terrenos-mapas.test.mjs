@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import {
   TERRAIN_INTERACTIVE_MAPS,
   buildTerrainInteractiveSelection,
+  mergeTerrainInteractiveDevelopments,
   terrainInteractiveLotNumbers,
   terrainInteractiveMapForDevelopment
 } from "../admin/gestao-terrenos-mapas.js";
@@ -37,6 +38,31 @@ test("associa loteamento previamente cadastrado por nome", () => {
     "novo-horizonte-ii"
   );
   assert.equal(terrainInteractiveMapForDevelopment({ nome: "Residencial Vila Ray" })?.id, "vila-ray");
+  assert.equal(
+    terrainInteractiveMapForDevelopment({ id: "mapa-interativo-novo-horizonte-iii", nome: "Nome personalizado" })?.id,
+    "novo-horizonte-iii"
+  );
+});
+
+test("publica mapas como loteamentos sem duplicar cadastros existentes", () => {
+  const existing = {
+    amaral: { id: "amaral", nome: "Amaral 1", bairro: "Centro" },
+    horizonte: { id: "horizonte", nome: "Loteamento Residencial Novo Horizonte I", bairro: "Novo Horizonte" }
+  };
+  const merged = mergeTerrainInteractiveDevelopments(existing, 1234);
+  assert.equal(Object.keys(merged.developments).length, 5);
+  assert.equal(Object.keys(merged.created).length, 3);
+  assert.equal(merged.developments.horizonte.nome, "Loteamento Residencial Novo Horizonte I");
+  assert.equal(merged.developments["mapa-interativo-novo-horizonte-ii"].mapa_interativo_id, "novo-horizonte-ii");
+  assert.equal(merged.developments["mapa-interativo-novo-horizonte-iii"].cidade, "Carlópolis");
+  assert.equal(merged.developments["mapa-interativo-vila-ray"].origem, "mapa_interativo");
+});
+
+test("painel sincroniza loteamentos dos mapas com todas as listas", () => {
+  assert.match(panelJs, /gestao-terrenos-mapas\.js\?v=2/);
+  assert.match(panelJs, /mergeTerrainInteractiveDevelopments/);
+  assert.match(panelJs, /interactiveDevelopmentUpdates/);
+  assert.match(panelJs, /developments: interactiveDevelopments\.developments/);
 });
 
 test("nao oferece areas institucionais como lotes numerados", () => {

@@ -111,11 +111,12 @@ import {
 import {
   TERRAIN_INTERACTIVE_MAPS,
   buildTerrainInteractiveSelection,
+  mergeTerrainInteractiveDevelopments,
   terrainInteractiveBlock,
   terrainInteractiveLotNumbers,
   terrainInteractiveMapById,
   terrainInteractiveMapForDevelopment
-} from "./gestao-terrenos-mapas.js?v=1";
+} from "./gestao-terrenos-mapas.js?v=2";
 import {
   terrainInteractiveHotspotNear,
   terrainInteractiveHotspots
@@ -135,10 +136,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 753,
-  label: "v760",
+  numero: 754,
+  label: "v761",
   data: "2026-09-13",
-  nota: "Zoom e identificação automática de quadra e lote nos mapas interativos."
+  nota: "Mapas interativos publicados disponíveis como loteamentos em todos os cadastros."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3063,10 +3064,14 @@ async function loadAllData(onProgress = null) {
   state.combustiveisHistorico = combustiveisHistoricoSnap.exists() ? (isMaster() ? combustiveisHistoricoSnap.val() : { [state.profile?.postoCombustivelId || ""]: combustiveisHistoricoSnap.val() }) : {};
   const terrainRecordsData = terrainsSnap.exists() ? terrainsSnap.val() : {};
   delete terrainRecordsData[TERRAIN_UNLINK_ARCHIVE_ID];
+  const interactiveDevelopments = mergeTerrainInteractiveDevelopments(
+    terrainDevelopmentsSnap.exists() ? terrainDevelopmentsSnap.val() : {},
+    serverTimestamp()
+  );
   state.terrainManagement = {
     owners: terrainOwnersSnap.exists() ? terrainOwnersSnap.val() : {},
     terrains: terrainRecordsData,
-    developments: terrainDevelopmentsSnap.exists() ? terrainDevelopmentsSnap.val() : {},
+    developments: interactiveDevelopments.developments,
     photos: terrainPhotosSnap.exists() ? terrainPhotosSnap.val() : {},
     inspections: terrainInspectionsSnap.exists() ? terrainInspectionsSnap.val() : {},
     budgets: terrainBudgetsSnap.exists() ? terrainBudgetsSnap.val() : {},
@@ -3074,6 +3079,16 @@ async function loadAllData(onProgress = null) {
     servicePhotos: terrainServicePhotosSnap.exists() ? terrainServicePhotosSnap.val() : {},
     timeline: terrainTimelineSnap.exists() ? terrainTimelineSnap.val() : {}
   };
+  const interactiveDevelopmentUpdates = Object.fromEntries(Object.entries(interactiveDevelopments.created).map(([id, development]) => (
+    [`${TERRAIN_MANAGEMENT_ENTITIES.developments.path}/${id}`, development]
+  )));
+  if (isMaster() && Object.keys(interactiveDevelopmentUpdates).length) {
+    try {
+      await firebaseUpdate(ref(db), interactiveDevelopmentUpdates);
+    } catch (error) {
+      console.warn("Não foi possível registrar os loteamentos dos mapas interativos no Firebase.", error);
+    }
+  }
   await syncTerrainTimelineBaselines();
   await syncTerrainReminderStatuses();
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
