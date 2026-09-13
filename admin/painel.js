@@ -108,6 +108,14 @@ import {
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
 } from "./gestao-terrenos-schema.js?v=24";
+import {
+  TERRAIN_INTERACTIVE_MAPS,
+  buildTerrainInteractiveSelection,
+  terrainInteractiveBlock,
+  terrainInteractiveLotNumbers,
+  terrainInteractiveMapById,
+  terrainInteractiveMapForDevelopment
+} from "./gestao-terrenos-mapas.js?v=1";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -123,10 +131,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 751,
-  label: "v758",
+  numero: 752,
+  label: "v759",
   data: "2026-09-13",
-  nota: "Cadastro rápido de terrenos com bairro e loteamento como referências."
+  nota: "Mapas interativos separados por loteamento com envio ao Cadastro Rápido."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -326,6 +334,13 @@ let state = {
     startY: 0,
     originX: 0,
     originY: 0
+  },
+  terrainInteractiveMapView: {
+    mapId: "novo-horizonte-i",
+    block: "",
+    lot: "",
+    pointX: null,
+    pointY: null
   },
   selectedEventId: null,
   selectedImovelId: null,
@@ -3640,7 +3655,8 @@ function useCurrentTerrainQuickLocation() {
     }
     try {
       const found = await reverseTerrainQuickAddress(latitude, longitude);
-      if ($("terrainQuickStreet")) $("terrainQuickStreet").value = found.street || "";
+      const streetInput = $("terrainQuickStreet");
+      if (streetInput && found.street && !streetInput.value.trim()) streetInput.value = found.street;
       const neighborhoodInput = $("terrainQuickNeighborhood");
       if (neighborhoodInput && found.neighborhood && (!neighborhoodInput.value.trim() || neighborhoodInput.value === terrainQuickAutoNeighborhood)) {
         neighborhoodInput.value = found.neighborhood;
@@ -3785,9 +3801,9 @@ function terrainQuickFormValues() {
     bairro: neighborhood,
     rua: $("terrainQuickStreet")?.value || manualReference,
     numero: "",
-    quadra: "",
-    lote: "",
-    area_m2: "",
+    quadra: $("terrainQuickBlock")?.value || "",
+    lote: $("terrainQuickLot")?.value || "",
+    area_m2: $("terrainQuickArea")?.value || "",
     frente_m: "",
     fundo_m: "",
     matricula: "",
@@ -5400,6 +5416,149 @@ function terrainDevelopmentById(developmentId) {
   return state.terrainManagement?.developments?.[developmentId] || null;
 }
 
+function terrainInteractiveDevelopmentForMap(map) {
+  if (!map) return null;
+  return terrainDevelopmentRecords(state.terrainManagement?.developments || {}).find((development) => (
+    terrainInteractiveMapForDevelopment(development)?.id === map.id
+  )) || null;
+}
+
+function renderTerrainInteractiveMapPin() {
+  const pin = $("terrainInteractiveMapPin");
+  const view = state.terrainInteractiveMapView;
+  const hasPoint = Number.isFinite(view.pointX) && Number.isFinite(view.pointY);
+  pin?.classList.toggle("hidden", !hasPoint);
+  if (!pin || !hasPoint) return;
+  pin.style.left = `${view.pointX}%`;
+  pin.style.top = `${view.pointY}%`;
+}
+
+function renderTerrainInteractiveSelection() {
+  const mount = $("terrainInteractiveSelection");
+  if (!mount) return;
+  const view = state.terrainInteractiveMapView;
+  const map = terrainInteractiveMapById(view.mapId);
+  const block = terrainInteractiveBlock(view.mapId, view.block);
+  const selection = buildTerrainInteractiveSelection(view.mapId, view.block, view.lot);
+  const registeredDevelopment = terrainInteractiveDevelopmentForMap(map);
+  const registrationHtml = registeredDevelopment
+    ? `<span class="terrain-interactive-linked"><i class="fa-solid fa-link"></i> Vinculado a ${escapeHtml(registeredDevelopment.nome)}</span>`
+    : '<span class="terrain-interactive-unlinked"><i class="fa-solid fa-triangle-exclamation"></i> Cadastro do loteamento ainda não localizado</span>';
+  if (!map) {
+    mount.innerHTML = '<div class="terrain-interactive-empty"><i class="fa-solid fa-map"></i><strong>Mapa indisponível</strong></div>';
+    return;
+  }
+  const pointText = Number.isFinite(view.pointX) && Number.isFinite(view.pointY)
+    ? `<span><i class="fa-solid fa-location-dot"></i> Ponto visual marcado em ${view.pointX.toFixed(1)}% / ${view.pointY.toFixed(1)}%</span>`
+    : '<span><i class="fa-regular fa-hand-pointer"></i> Toque no lote para marcar sua posição visual</span>';
+  if (!selection) {
+    mount.innerHTML = `
+      <header><span>Mapa selecionado</span><h3>${escapeHtml(map.shortName)}</h3></header>
+      ${registrationHtml}
+      <div class="terrain-interactive-map-summary"><span>Área total<strong>${escapeHtml(map.totalArea)}</strong></span><span>Lotes declarados<strong>${map.declaredLots || "Consultar planta"}</strong></span></div>
+      <div class="terrain-interactive-point-status">${pointText}</div>
+      <div class="terrain-interactive-empty"><i class="fa-solid fa-vector-square"></i><strong>${block ? `Agora selecione o lote da quadra ${escapeHtml(block.id)}` : "Selecione uma quadra e um lote"}</strong><span>Os dados aparecerão aqui antes de abrir o Cadastro Rápido.</span></div>
+      <button type="button" class="ghost-button" data-interactive-prepare-development data-no-loading><i class="fa-solid fa-pen-to-square"></i> ${registeredDevelopment ? "Editar cadastro do loteamento" : "Preparar cadastro do loteamento"}</button>`;
+    return;
+  }
+  mount.innerHTML = `
+    <header><span>Referência selecionada</span><h3>${escapeHtml(selection.shortName)}</h3></header>
+    ${registrationHtml}
+    <div class="terrain-interactive-point-status">${pointText}</div>
+    <div class="terrain-interactive-selected-grid">
+      <div><span>Quadra</span><strong>${escapeHtml(selection.block)}</strong></div>
+      <div><span>Lote</span><strong>${escapeHtml(selection.lot)}</strong></div>
+      <div class="wide"><span>Rua de referência</span><strong>${escapeHtml(selection.street)}</strong></div>
+      <div><span>Área da quadra</span><strong>${escapeHtml(selection.blockArea || "Consultar planta")}</strong></div>
+      <div><span>Área provável do lote</span><strong>${escapeHtml(selection.lotArea || "Consultar planta")}</strong></div>
+    </div>
+    ${selection.requiresLotConfirmation ? '<p class="terrain-interactive-warning"><i class="fa-solid fa-triangle-exclamation"></i> A Vila Ray possui lotes irregulares. Confirme a numeração e a área diretamente na planta.</p>' : ""}
+    <div class="terrain-interactive-selection-actions">
+      <button type="button" data-interactive-use-selection data-no-loading><i class="fa-solid fa-user-plus"></i> Adicionar possível cliente</button>
+      <button type="button" class="ghost-button" data-interactive-use-selection-gps data-no-loading><i class="fa-solid fa-location-crosshairs"></i> Adicionar e marcar GPS</button>
+    </div>`;
+}
+
+function renderTerrainInteractiveMapLibrary() {
+  const view = state.terrainInteractiveMapView;
+  const map = terrainInteractiveMapById(view.mapId) || TERRAIN_INTERACTIVE_MAPS[0];
+  if (!map) return;
+  view.mapId = map.id;
+  if (!map.blocks.some((block) => block.id === view.block)) {
+    view.block = "";
+    view.lot = "";
+  }
+  const mapSelect = $("terrainInteractiveMapSelect");
+  if (mapSelect) mapSelect.innerHTML = TERRAIN_INTERACTIVE_MAPS.map((item) => `<option value="${escapeAttr(item.id)}" ${item.id === map.id ? "selected" : ""}>${escapeHtml(item.shortName)}</option>`).join("");
+  const blockSelect = $("terrainInteractiveBlockSelect");
+  if (blockSelect) blockSelect.innerHTML = `<option value="">Selecione</option>${map.blocks.map((block) => `<option value="${escapeAttr(block.id)}" ${block.id === view.block ? "selected" : ""}>Quadra ${escapeHtml(block.id)}</option>`).join("")}`;
+  const validLots = terrainInteractiveLotNumbers(map.id, view.block);
+  if (!validLots.includes(view.lot)) view.lot = "";
+  const lotSelect = $("terrainInteractiveLotSelect");
+  if (lotSelect) {
+    lotSelect.disabled = !view.block;
+    lotSelect.innerHTML = `<option value="">${view.block ? "Selecione" : "Escolha a quadra"}</option>${validLots.map((lot) => `<option value="${escapeAttr(lot)}" ${lot === view.lot ? "selected" : ""}>Lote ${escapeHtml(lot)}</option>`).join("")}`;
+  }
+  const image = $("terrainInteractiveMapImage");
+  if (image && image.getAttribute("src") !== map.image) {
+    image.src = map.image;
+    image.alt = `Planta interativa de ${map.name}`;
+  }
+  renderTerrainInteractiveMapPin();
+  renderTerrainInteractiveSelection();
+}
+
+function markTerrainInteractiveMapPoint(event) {
+  const surface = $("terrainInteractiveMapSurface");
+  if (!surface) return;
+  const rect = surface.getBoundingClientRect();
+  const clientX = event.clientX ?? (rect.left + rect.width / 2);
+  const clientY = event.clientY ?? (rect.top + rect.height / 2);
+  state.terrainInteractiveMapView.pointX = Math.max(0, Math.min(100, (clientX - rect.left) / rect.width * 100));
+  state.terrainInteractiveMapView.pointY = Math.max(0, Math.min(100, (clientY - rect.top) / rect.height * 100));
+  renderTerrainInteractiveMapPin();
+  renderTerrainInteractiveSelection();
+}
+
+function prepareTerrainInteractiveDevelopment() {
+  const map = terrainInteractiveMapById(state.terrainInteractiveMapView.mapId);
+  if (!map) return;
+  const existing = terrainInteractiveDevelopmentForMap(map);
+  openTerrainDevelopmentForm(existing?.id || "");
+  if (existing) return;
+  if ($("terrainDevelopmentName")) $("terrainDevelopmentName").value = map.name;
+  if ($("terrainDevelopmentNeighborhood")) $("terrainDevelopmentNeighborhood").value = map.neighborhood;
+  if ($("terrainDevelopmentCity")) $("terrainDevelopmentCity").value = "Carlópolis";
+  if ($("terrainDevelopmentDescription")) $("terrainDevelopmentDescription").value = `Loteamento com mapa interativo preparado a partir da planta técnica. Área total: ${map.totalArea}.`;
+  if ($("terrainDevelopmentNotes")) $("terrainDevelopmentNotes").value = "Revise os dados cadastrais antes de salvar. A planta interativa é uma referência operacional e não substitui documentação oficial.";
+}
+
+function terrainInteractiveExactArea(value = "") {
+  const match = String(value).match(/^([\d.]+,\d{2}) m²$/);
+  return match ? match[1].replace(/\./g, "").replace(",", ".") : "";
+}
+
+function useTerrainInteractiveSelection({ captureGps = false } = {}) {
+  const view = state.terrainInteractiveMapView;
+  const selection = buildTerrainInteractiveSelection(view.mapId, view.block, view.lot);
+  if (!selection) return showToast("Selecione a quadra e o lote antes de continuar.");
+  const map = terrainInteractiveMapById(view.mapId);
+  const development = terrainInteractiveDevelopmentForMap(map);
+  switchTerrainManagementTab("quick");
+  openTerrainQuickForm();
+  if ($("terrainQuickDevelopment")) $("terrainQuickDevelopment").value = development?.id || "";
+  if ($("terrainQuickNeighborhood")) $("terrainQuickNeighborhood").value = development?.bairro || selection.neighborhood;
+  if ($("terrainQuickBlock")) $("terrainQuickBlock").value = selection.block;
+  if ($("terrainQuickLot")) $("terrainQuickLot").value = selection.lot;
+  if ($("terrainQuickArea")) $("terrainQuickArea").value = terrainInteractiveExactArea(selection.lotArea);
+  if ($("terrainQuickStreet")) $("terrainQuickStreet").value = selection.street === "Confirmar na planta" ? "" : selection.street;
+  if ($("terrainQuickReference")) $("terrainQuickReference").value = selection.reference;
+  if ($("terrainQuickNickname")) $("terrainQuickNickname").value = `${selection.shortName} - Q. ${selection.block} / L. ${selection.lot}`;
+  if ($("terrainQuickNotes") && selection.requiresLotConfirmation) $("terrainQuickNotes").value = "Numeração e área do lote devem ser confirmadas na planta da Vila Ray.";
+  $("terrainQuickFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  if (captureGps) window.setTimeout(useCurrentTerrainQuickLocation, 0);
+}
+
 function renderTerrainDevelopmentCurrentFiles(development = null) {
   const imageMount = $("terrainDevelopmentCurrentImage");
   const pdfMount = $("terrainDevelopmentCurrentPdf");
@@ -5456,6 +5615,7 @@ function openTerrainDevelopmentForm(developmentId = "") {
 }
 
 function renderTerrainDevelopmentList() {
+  renderTerrainInteractiveMapLibrary();
   const mount = $("terrainDevelopmentList");
   if (!mount) return;
   const developments = filterTerrainDevelopments(
@@ -5478,7 +5638,9 @@ function renderTerrainDevelopmentList() {
   mount.innerHTML = developments.map((development) => {
     const linkedTerrains = terrainDevelopmentLinkedTerrains(development.id, terrains);
     const canDelete = canDeleteTerrainDevelopment(development.id, terrains);
+    const interactiveMap = terrainInteractiveMapForDevelopment(development);
     const badges = [
+      interactiveMap ? '<span><i class="fa-solid fa-vector-square"></i> Mapa clicável</span>' : "",
       development.planta_imagem_url ? '<span><i class="fa-solid fa-image"></i> Imagem</span>' : "",
       development.planta_pdf_url ? '<span><i class="fa-solid fa-file-pdf"></i> PDF</span>' : ""
     ].filter(Boolean).join("");
@@ -5687,6 +5849,8 @@ function openTerrainDevelopmentDetail(developmentId) {
     state.terrainManagement?.terrains || {},
     owners
   );
+  const interactiveMap = terrainInteractiveMapForDevelopment(development);
+  const planImageUrl = development.planta_imagem_url || interactiveMap?.image || "";
   $("terrainDevelopmentDetailTitle").textContent = development.nome || "Detalhes";
   $("terrainDevelopmentDetailContent").innerHTML = `
     <div class="terrain-development-summary">
@@ -5701,7 +5865,7 @@ function openTerrainDevelopmentDetail(developmentId) {
       <div class="section-head compact">
         <div><h3>Planta do loteamento</h3><p>Visualização da planta cadastrada.</p></div>
       </div>
-      ${development.planta_imagem_url ? `
+      ${planImageUrl ? `
         <div class="terrain-plan-toolbar">
           <button type="button" class="terrain-owner-icon-button" data-plan-zoom-out data-no-loading title="Diminuir zoom" aria-label="Diminuir zoom"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
           <output id="terrainDevelopmentPlanZoomValue">100%</output>
@@ -5710,7 +5874,7 @@ function openTerrainDevelopmentDetail(developmentId) {
           <button type="button" class="terrain-owner-icon-button" data-plan-fullscreen data-no-loading title="Abrir em tela cheia" aria-label="Abrir planta em tela cheia"><i class="fa-solid fa-expand"></i></button>
         </div>
         <div id="terrainDevelopmentPlanViewport" class="terrain-plan-viewport" tabindex="0" aria-label="Planta de ${escapeAttr(development.nome)}. Use o zoom e arraste para movimentar.">
-          <img id="terrainDevelopmentPlanImageViewer" src="${escapeAttr(development.planta_imagem_url)}" alt="Planta do loteamento ${escapeAttr(development.nome)}" draggable="false">
+          <img id="terrainDevelopmentPlanImageViewer" src="${escapeAttr(planImageUrl)}" alt="Planta do loteamento ${escapeAttr(development.nome)}" draggable="false">
         </div>` : `
         <div class="terrain-development-plan-empty">
           <i class="fa-solid fa-map"></i>
@@ -27734,6 +27898,36 @@ function bindEvents() {
   $("cancelTerrainDevelopmentForm")?.addEventListener("click", resetTerrainDevelopmentForm);
   $("terrainDevelopmentForm")?.addEventListener("submit", saveTerrainDevelopment);
   $("terrainDevelopmentSearch")?.addEventListener("input", renderTerrainDevelopmentList);
+  $("terrainInteractiveMapSelect")?.addEventListener("change", (event) => {
+    state.terrainInteractiveMapView = {
+      mapId: event.target.value,
+      block: "",
+      lot: "",
+      pointX: null,
+      pointY: null
+    };
+    renderTerrainInteractiveMapLibrary();
+  });
+  $("terrainInteractiveBlockSelect")?.addEventListener("change", (event) => {
+    state.terrainInteractiveMapView.block = event.target.value;
+    state.terrainInteractiveMapView.lot = "";
+    renderTerrainInteractiveMapLibrary();
+  });
+  $("terrainInteractiveLotSelect")?.addEventListener("change", (event) => {
+    state.terrainInteractiveMapView.lot = event.target.value;
+    renderTerrainInteractiveSelection();
+  });
+  $("terrainInteractiveMapStage")?.addEventListener("click", markTerrainInteractiveMapPoint);
+  $("terrainInteractiveMapStage")?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    markTerrainInteractiveMapPoint(event);
+  });
+  $("terrainInteractiveSelection")?.addEventListener("click", (event) => {
+    if (event.target.closest("[data-interactive-prepare-development]")) return prepareTerrainInteractiveDevelopment();
+    if (event.target.closest("[data-interactive-use-selection-gps]")) return useTerrainInteractiveSelection({ captureGps: true });
+    if (event.target.closest("[data-interactive-use-selection]")) return useTerrainInteractiveSelection();
+  });
   $("terrainDevelopmentPlanImage")?.addEventListener("change", (event) => {
     const file = event.target.files?.[0];
     if (!file) return;

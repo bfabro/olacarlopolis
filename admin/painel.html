@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=457">
+  <link rel="stylesheet" href="painel.css?v=458">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -267,7 +267,6 @@
                 <input id="terrainQuickLongitude" type="hidden">
                 <input id="terrainQuickAccuracy" type="hidden">
                 <input id="terrainQuickHeading" type="hidden">
-                <input id="terrainQuickStreet" type="hidden">
                 <div class="terrain-quick-location-actions">
                   <button id="terrainQuickUseLocation" class="terrain-quick-gps-button" type="button" data-no-loading><i class="fa-solid fa-location-crosshairs"></i><span><strong>Marcar localização exata com GPS</strong><small>Toque aqui e aponte o topo do celular para o terreno</small></span></button>
                   <a id="terrainQuickOpenMaps" class="ghost-button hidden" href="#" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Conferir no mapa</a>
@@ -291,6 +290,10 @@
                 <select id="terrainQuickDevelopment"><option value="">Sem loteamento</option></select>
                 <small>Vincule agora para facilitar a identificação posterior.</small>
               </label>
+              <label>Quadra<input id="terrainQuickBlock" maxlength="40" placeholder="Opcional"></label>
+              <label>Lote<input id="terrainQuickLot" maxlength="40" placeholder="Opcional"></label>
+              <label>Área aproximada em m²<input id="terrainQuickArea" type="number" min="0" step="0.01" placeholder="Opcional"></label>
+              <label>Rua conforme a planta<input id="terrainQuickStreet" maxlength="180" placeholder="Opcional"></label>
               <fieldset class="wide terrain-quick-status-fieldset">
                 <legend>Situação atual do terreno</legend>
                 <div class="terrain-quick-status-grid">
@@ -651,6 +654,30 @@
         </section>
 
         <section class="terrain-module-section hidden" data-terrain-section="developments">
+          <section class="panel-card terrain-interactive-map-card">
+            <div class="section-head">
+              <div><h2>Mapas interativos dos loteamentos</h2><p>Selecione a planta, marque visualmente o terreno e confirme quadra e lote.</p></div>
+              <span class="terrain-interactive-map-badge"><i class="fa-solid fa-location-crosshairs"></i> Preparado para uso em campo</span>
+            </div>
+            <div class="terrain-interactive-map-controls">
+              <label>Loteamento<select id="terrainInteractiveMapSelect"></select></label>
+              <label>Quadra<select id="terrainInteractiveBlockSelect"><option value="">Selecione</option></select></label>
+              <label>Lote<select id="terrainInteractiveLotSelect"><option value="">Selecione</option></select></label>
+            </div>
+            <div class="terrain-interactive-map-layout">
+              <div>
+                <div id="terrainInteractiveMapStage" class="terrain-interactive-map-stage" role="button" tabindex="0" aria-label="Toque na planta para marcar visualmente a posição do lote">
+                  <div id="terrainInteractiveMapSurface" class="terrain-interactive-map-surface">
+                    <img id="terrainInteractiveMapImage" src="" alt="Planta interativa do loteamento" draggable="false">
+                    <span id="terrainInteractiveMapPin" class="terrain-interactive-map-pin hidden" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>
+                  </div>
+                </div>
+                <p class="terrain-interactive-map-help"><i class="fa-solid fa-circle-info"></i> Toque sobre o lote na planta e confirme a numeração nos seletores. O ponto é uma referência visual; o GPS será marcado no Cadastro Rápido.</p>
+              </div>
+              <aside id="terrainInteractiveSelection" class="terrain-interactive-selection" aria-live="polite"></aside>
+            </div>
+          </section>
+
           <section id="terrainDevelopmentFormCard" class="panel-card terrain-development-form-card hidden">
             <div class="section-head">
               <div>
@@ -3342,6 +3369,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=688"></script>
+  <script type="module" src="painel.js?v=689"></script>
 </body>
 </html>
