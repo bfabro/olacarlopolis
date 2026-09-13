@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=458">
+  <link rel="stylesheet" href="painel.css?v=459">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -666,13 +666,19 @@
             </div>
             <div class="terrain-interactive-map-layout">
               <div>
+                <div class="terrain-interactive-map-toolbar" aria-label="Controles de zoom da planta">
+                  <button id="terrainInteractiveZoomOut" type="button" class="terrain-owner-icon-button" data-no-loading title="Diminuir zoom" aria-label="Diminuir zoom"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                  <output id="terrainInteractiveZoomValue">100%</output>
+                  <button id="terrainInteractiveZoomIn" type="button" class="terrain-owner-icon-button" data-no-loading title="Aumentar zoom" aria-label="Aumentar zoom"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                  <button id="terrainInteractiveZoomReset" type="button" class="ghost-button" data-no-loading><i class="fa-solid fa-arrows-rotate"></i> Ajustar</button>
+                </div>
                 <div id="terrainInteractiveMapStage" class="terrain-interactive-map-stage" role="button" tabindex="0" aria-label="Toque na planta para marcar visualmente a posição do lote">
                   <div id="terrainInteractiveMapSurface" class="terrain-interactive-map-surface">
                     <img id="terrainInteractiveMapImage" src="" alt="Planta interativa do loteamento" draggable="false">
                     <span id="terrainInteractiveMapPin" class="terrain-interactive-map-pin hidden" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>
                   </div>
                 </div>
-                <p class="terrain-interactive-map-help"><i class="fa-solid fa-circle-info"></i> Toque sobre o lote na planta e confirme a numeração nos seletores. O ponto é uma referência visual; o GPS será marcado no Cadastro Rápido.</p>
+                <p class="terrain-interactive-map-help"><i class="fa-solid fa-circle-info"></i> Use o zoom e as barras de rolagem. Nos mapas Novo Horizonte, toque no terreno para preencher quadra e lote automaticamente. O GPS será marcado no Cadastro Rápido.</p>
               </div>
               <aside id="terrainInteractiveSelection" class="terrain-interactive-selection" aria-live="polite"></aside>
             </div>
@@ -3369,6 +3375,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=689"></script>
+  <script type="module" src="painel.js?v=690"></script>
 </body>
 </html>

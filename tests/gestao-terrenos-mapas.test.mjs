@@ -8,6 +8,10 @@ import {
   terrainInteractiveLotNumbers,
   terrainInteractiveMapForDevelopment
 } from "../admin/gestao-terrenos-mapas.js";
+import {
+  terrainInteractiveHotspotNear,
+  terrainInteractiveHotspots
+} from "../admin/gestao-terrenos-hotspots.js";
 
 const workspace = fileURLToPath(new URL("..", import.meta.url));
 const panelHtml = readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
@@ -63,4 +67,30 @@ test("interface permite marcar a planta e enviar os dados ao cadastro rapido", (
   assert.match(panelJs, /found\.street && !streetInput\.value\.trim\(\)/);
   assert.match(panelCss, /\.terrain-interactive-map-layout/);
   assert.match(panelCss, /\.terrain-interactive-map-pin/);
+});
+
+test("mapeia todos os lotes identificaveis dos tres Novo Horizonte", () => {
+  assert.equal(terrainInteractiveHotspots("novo-horizonte-i").length, 390);
+  assert.equal(terrainInteractiveHotspots("novo-horizonte-ii").length, 233);
+  assert.equal(terrainInteractiveHotspots("novo-horizonte-iii").length, 281);
+  assert.equal(terrainInteractiveHotspots("vila-ray").length, 0);
+});
+
+test("clique proximo ao numero identifica quadra e lote", () => {
+  const hotspot = terrainInteractiveHotspots("novo-horizonte-i").find((item) => item.block === "C" && item.lot === "7");
+  assert.ok(hotspot);
+  const identified = terrainInteractiveHotspotNear("novo-horizonte-i", hotspot.x + 0.1, hotspot.y + 0.05, 900, 1900);
+  assert.equal(identified.block, "C");
+  assert.equal(identified.lot, "7");
+  assert.ok(identified.distance < 2);
+  assert.equal(terrainInteractiveHotspotNear("vila-ray", 50, 50, 900, 600), null);
+});
+
+test("interface oferece zoom de 100 a 400 por cento", () => {
+  assert.match(panelHtml, /id="terrainInteractiveZoomOut"/);
+  assert.match(panelHtml, /id="terrainInteractiveZoomIn"/);
+  assert.match(panelHtml, /id="terrainInteractiveZoomReset"/);
+  assert.match(panelJs, /function setTerrainInteractiveMapZoom/);
+  assert.match(panelJs, /Math\.max\(1, Math\.min\(4/);
+  assert.match(panelCss, /\.terrain-interactive-map-toolbar/);
 });

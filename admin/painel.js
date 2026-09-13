@@ -116,6 +116,10 @@ import {
   terrainInteractiveMapById,
   terrainInteractiveMapForDevelopment
 } from "./gestao-terrenos-mapas.js?v=1";
+import {
+  terrainInteractiveHotspotNear,
+  terrainInteractiveHotspots
+} from "./gestao-terrenos-hotspots.js?v=1";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -131,10 +135,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 752,
-  label: "v759",
+  numero: 753,
+  label: "v760",
   data: "2026-09-13",
-  nota: "Mapas interativos separados por loteamento com envio ao Cadastro Rápido."
+  nota: "Zoom e identificação automática de quadra e lote nos mapas interativos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -340,7 +344,9 @@ let state = {
     block: "",
     lot: "",
     pointX: null,
-    pointY: null
+    pointY: null,
+    scale: 1,
+    autoIdentified: false
   },
   selectedEventId: null,
   selectedImovelId: null,
@@ -5433,6 +5439,34 @@ function renderTerrainInteractiveMapPin() {
   pin.style.top = `${view.pointY}%`;
 }
 
+function applyTerrainInteractiveMapZoom() {
+  const view = state.terrainInteractiveMapView;
+  const surface = $("terrainInteractiveMapSurface");
+  const output = $("terrainInteractiveZoomValue");
+  const scale = Math.max(1, Math.min(4, Number(view.scale) || 1));
+  view.scale = scale;
+  if (surface) {
+    surface.style.width = `${scale * 100}%`;
+    surface.style.minWidth = `${680 * scale}px`;
+  }
+  if (output) output.textContent = `${Math.round(scale * 100)}%`;
+  if ($("terrainInteractiveZoomOut")) $("terrainInteractiveZoomOut").disabled = scale <= 1;
+  if ($("terrainInteractiveZoomIn")) $("terrainInteractiveZoomIn").disabled = scale >= 4;
+}
+
+function setTerrainInteractiveMapZoom(nextScale) {
+  const stage = $("terrainInteractiveMapStage");
+  const currentWidth = Math.max(1, stage?.scrollWidth || 1);
+  const currentHeight = Math.max(1, stage?.scrollHeight || 1);
+  const centerX = ((stage?.scrollLeft || 0) + (stage?.clientWidth || 0) / 2) / currentWidth;
+  const centerY = ((stage?.scrollTop || 0) + (stage?.clientHeight || 0) / 2) / currentHeight;
+  state.terrainInteractiveMapView.scale = Math.max(1, Math.min(4, Number(nextScale) || 1));
+  applyTerrainInteractiveMapZoom();
+  if (!stage) return;
+  stage.scrollLeft = centerX * stage.scrollWidth - stage.clientWidth / 2;
+  stage.scrollTop = centerY * stage.scrollHeight - stage.clientHeight / 2;
+}
+
 function renderTerrainInteractiveSelection() {
   const mount = $("terrainInteractiveSelection");
   if (!mount) return;
@@ -5440,6 +5474,7 @@ function renderTerrainInteractiveSelection() {
   const map = terrainInteractiveMapById(view.mapId);
   const block = terrainInteractiveBlock(view.mapId, view.block);
   const selection = buildTerrainInteractiveSelection(view.mapId, view.block, view.lot);
+  const automaticIdentification = terrainInteractiveHotspots(view.mapId).length > 0;
   const registeredDevelopment = terrainInteractiveDevelopmentForMap(map);
   const registrationHtml = registeredDevelopment
     ? `<span class="terrain-interactive-linked"><i class="fa-solid fa-link"></i> Vinculado a ${escapeHtml(registeredDevelopment.nome)}</span>`
@@ -5450,13 +5485,14 @@ function renderTerrainInteractiveSelection() {
   }
   const pointText = Number.isFinite(view.pointX) && Number.isFinite(view.pointY)
     ? `<span><i class="fa-solid fa-location-dot"></i> Ponto visual marcado em ${view.pointX.toFixed(1)}% / ${view.pointY.toFixed(1)}%</span>`
-    : '<span><i class="fa-regular fa-hand-pointer"></i> Toque no lote para marcar sua posição visual</span>';
+    : `<span><i class="fa-regular fa-hand-pointer"></i> ${automaticIdentification ? "Toque em um terreno para identificar quadra e lote" : "Toque no lote para marcar sua posição visual"}</span>`;
   if (!selection) {
     mount.innerHTML = `
       <header><span>Mapa selecionado</span><h3>${escapeHtml(map.shortName)}</h3></header>
       ${registrationHtml}
       <div class="terrain-interactive-map-summary"><span>Área total<strong>${escapeHtml(map.totalArea)}</strong></span><span>Lotes declarados<strong>${map.declaredLots || "Consultar planta"}</strong></span></div>
       <div class="terrain-interactive-point-status">${pointText}</div>
+      ${automaticIdentification ? '<span class="terrain-interactive-auto-badge"><i class="fa-solid fa-wand-magic-sparkles"></i> Identificação automática disponível</span>' : '<p class="terrain-interactive-warning"><i class="fa-solid fa-triangle-exclamation"></i> A planta disponível da Vila Ray é parcial e irregular. Confirme quadra e lote nos seletores.</p>'}
       <div class="terrain-interactive-empty"><i class="fa-solid fa-vector-square"></i><strong>${block ? `Agora selecione o lote da quadra ${escapeHtml(block.id)}` : "Selecione uma quadra e um lote"}</strong><span>Os dados aparecerão aqui antes de abrir o Cadastro Rápido.</span></div>
       <button type="button" class="ghost-button" data-interactive-prepare-development data-no-loading><i class="fa-solid fa-pen-to-square"></i> ${registeredDevelopment ? "Editar cadastro do loteamento" : "Preparar cadastro do loteamento"}</button>`;
     return;
@@ -5464,6 +5500,7 @@ function renderTerrainInteractiveSelection() {
   mount.innerHTML = `
     <header><span>Referência selecionada</span><h3>${escapeHtml(selection.shortName)}</h3></header>
     ${registrationHtml}
+    ${view.autoIdentified ? '<span class="terrain-interactive-auto-badge"><i class="fa-solid fa-check"></i> Quadra e lote identificados pelo clique</span>' : ""}
     <div class="terrain-interactive-point-status">${pointText}</div>
     <div class="terrain-interactive-selected-grid">
       <div><span>Quadra</span><strong>${escapeHtml(selection.block)}</strong></div>
@@ -5505,6 +5542,7 @@ function renderTerrainInteractiveMapLibrary() {
     image.alt = `Planta interativa de ${map.name}`;
   }
   renderTerrainInteractiveMapPin();
+  applyTerrainInteractiveMapZoom();
   renderTerrainInteractiveSelection();
 }
 
@@ -5514,8 +5552,19 @@ function markTerrainInteractiveMapPoint(event) {
   const rect = surface.getBoundingClientRect();
   const clientX = event.clientX ?? (rect.left + rect.width / 2);
   const clientY = event.clientY ?? (rect.top + rect.height / 2);
-  state.terrainInteractiveMapView.pointX = Math.max(0, Math.min(100, (clientX - rect.left) / rect.width * 100));
-  state.terrainInteractiveMapView.pointY = Math.max(0, Math.min(100, (clientY - rect.top) / rect.height * 100));
+  const pointX = Math.max(0, Math.min(100, (clientX - rect.left) / rect.width * 100));
+  const pointY = Math.max(0, Math.min(100, (clientY - rect.top) / rect.height * 100));
+  const hotspot = terrainInteractiveHotspotNear(state.terrainInteractiveMapView.mapId, pointX, pointY, rect.width, rect.height);
+  state.terrainInteractiveMapView.pointX = hotspot?.x ?? pointX;
+  state.terrainInteractiveMapView.pointY = hotspot?.y ?? pointY;
+  state.terrainInteractiveMapView.autoIdentified = Boolean(hotspot);
+  if (hotspot) {
+    state.terrainInteractiveMapView.block = hotspot.block;
+    state.terrainInteractiveMapView.lot = hotspot.lot;
+    renderTerrainInteractiveMapLibrary();
+    showToast(`Quadra ${hotspot.block}, lote ${hotspot.lot} identificado.`);
+    return;
+  }
   renderTerrainInteractiveMapPin();
   renderTerrainInteractiveSelection();
 }
@@ -27904,19 +27953,26 @@ function bindEvents() {
       block: "",
       lot: "",
       pointX: null,
-      pointY: null
+      pointY: null,
+      scale: 1,
+      autoIdentified: false
     };
     renderTerrainInteractiveMapLibrary();
   });
   $("terrainInteractiveBlockSelect")?.addEventListener("change", (event) => {
     state.terrainInteractiveMapView.block = event.target.value;
     state.terrainInteractiveMapView.lot = "";
+    state.terrainInteractiveMapView.autoIdentified = false;
     renderTerrainInteractiveMapLibrary();
   });
   $("terrainInteractiveLotSelect")?.addEventListener("change", (event) => {
     state.terrainInteractiveMapView.lot = event.target.value;
+    state.terrainInteractiveMapView.autoIdentified = false;
     renderTerrainInteractiveSelection();
   });
+  $("terrainInteractiveZoomOut")?.addEventListener("click", () => setTerrainInteractiveMapZoom(state.terrainInteractiveMapView.scale - 0.25));
+  $("terrainInteractiveZoomIn")?.addEventListener("click", () => setTerrainInteractiveMapZoom(state.terrainInteractiveMapView.scale + 0.25));
+  $("terrainInteractiveZoomReset")?.addEventListener("click", () => setTerrainInteractiveMapZoom(1));
   $("terrainInteractiveMapStage")?.addEventListener("click", markTerrainInteractiveMapPoint);
   $("terrainInteractiveMapStage")?.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
