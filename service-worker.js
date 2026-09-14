@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-09-14-area-ficha-prospeccao-v811'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-09-14-ordenacao-area-medidas-v812'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

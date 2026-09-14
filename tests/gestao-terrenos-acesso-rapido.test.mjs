@@ -96,10 +96,20 @@ test("prospeccao exporta ficha unica com satelite planta dados e foto", () => {
 
 test("clique no mapa preenche somente area exata e preserva faixa como referencia", () => {
   assert.match(panelHtml, /id="terrainQuickAreaHint"/);
-  assert.match(panelJs, /const exactArea = terrainInteractiveExactArea\(selection\?\.lotArea \|\| ""\)/);
+  assert.match(panelHtml, /id="terrainQuickFront"/);
+  assert.match(panelHtml, /id="terrainQuickBack"/);
+  assert.match(panelJs, /function applyTerrainQuickInteractiveMeasurements/);
   assert.match(panelJs, /Área preenchida conforme a planta/);
   assert.match(panelJs, /Referência da planta:.*Confirme a metragem exata/);
   assert.match(panelJs, /mapSelection\?\.lotArea.*referência da planta/);
+});
+
+test("tabela inicia nos mais recentes permite ordenar e mostra medidas conhecidas de prospeccoes", () => {
+  assert.match(panelHtml, /id="terrainSortOrder"/);
+  assert.match(panelHtml, /value="newest" selected>Mais recentes primeiro/);
+  assert.match(panelJs, /sortTerrainRecords\(filterTerrains/);
+  assert.match(panelJs, /function formatTerrainKnownMeasure/);
+  assert.doesNotMatch(panelJs, /terrain\.cadastro_rapido \? "A confirmar" : formatTerrainMeasure\(terrain\.area_m2/);
 });
 
 test("prospeccao preserva mapa e ponto visual selecionados", () => {
@@ -299,7 +309,7 @@ test("consulta rapida destaca pendentes e abre o cadastro existente", () => {
   assert.match(panelHtml, /id="terrainQuickRecentList"/);
   assert.match(panelJs, /data-terrain-quick-view/);
   assert.match(panelJs, /terrain-quick-badge/);
-  assert.match(panelJs, /terrain\.cadastro_rapido \? "A confirmar"/);
+  assert.match(panelJs, /terrain\?\.cadastro_rapido \? "A confirmar" : "-"/);
   assert.match(panelCss, /\.terrain-quick-actions[\s\S]*grid-template-columns: repeat\(2/);
   assert.match(panelCss, /@media \(max-width: 680px\)[\s\S]*\.terrain-quick-actions \{ grid-template-columns: 1fr/);
 });
@@ -330,9 +340,9 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=462/);
-  assert.match(panelHtml, /painel\.js\?v=693/);
-  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=25/);
-  assert.match(panelJs, /numero: 756/);
-  assert.match(panelJs, /label: "v763"/);
+  assert.match(panelHtml, /painel\.css\?v=463/);
+  assert.match(panelHtml, /painel\.js\?v=694/);
+  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=26/);
+  assert.match(panelJs, /numero: 757/);
+  assert.match(panelJs, /label: "v764"/);
 });

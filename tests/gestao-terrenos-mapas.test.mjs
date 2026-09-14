@@ -6,6 +6,7 @@ import {
   TERRAIN_INTERACTIVE_MAPS,
   buildTerrainInteractiveSelection,
   mergeTerrainInteractiveDevelopments,
+  terrainInteractiveLotMeasurements,
   terrainInteractiveLotNumbers,
   terrainInteractiveMapForDevelopment,
   terrainInteractiveMapsForNeighborhood
@@ -60,10 +61,24 @@ test("publica mapas como loteamentos sem duplicar cadastros existentes", () => {
 });
 
 test("painel sincroniza loteamentos dos mapas com todas as listas", () => {
-  assert.match(panelJs, /gestao-terrenos-mapas\.js\?v=3/);
+  assert.match(panelJs, /gestao-terrenos-mapas\.js\?v=4/);
   assert.match(panelJs, /mergeTerrainInteractiveDevelopments/);
   assert.match(panelJs, /interactiveDevelopmentUpdates/);
   assert.match(panelJs, /developments: interactiveDevelopments\.developments/);
+});
+
+test("retorna area e medidas exatas quando identificadas na planta", () => {
+  assert.deepEqual(terrainInteractiveLotMeasurements("novo-horizonte-i", "C", "1"), { areaM2: 234, frontM: 13, backM: 18 });
+  assert.deepEqual(terrainInteractiveLotMeasurements("novo-horizonte-i", "C", "2"), { areaM2: 180, frontM: 10, backM: 18 });
+  assert.deepEqual(terrainInteractiveLotMeasurements("novo-horizonte-ii", "B", "2"), { areaM2: 198, frontM: 11, backM: 18 });
+  assert.equal(buildTerrainInteractiveSelection("novo-horizonte-iii", "M", "1").areaM2, 329.97);
+  assert.equal(terrainInteractiveLotMeasurements("novo-horizonte-i", "Q", "1"), null);
+  const regularBlockTotal = terrainInteractiveLotNumbers("novo-horizonte-i", "C")
+    .reduce((total, lot) => total + terrainInteractiveLotMeasurements("novo-horizonte-i", "C", lot).areaM2, 0);
+  assert.equal(regularBlockTotal, 4536);
+  const horizonTwoBlockTotal = terrainInteractiveLotNumbers("novo-horizonte-ii", "B")
+    .reduce((total, lot) => total + terrainInteractiveLotMeasurements("novo-horizonte-ii", "B", lot).areaM2, 0);
+  assert.equal(horizonTwoBlockTotal, 4266);
 });
 
 test("localiza todas as plantas disponíveis para o bairro selecionado", () => {

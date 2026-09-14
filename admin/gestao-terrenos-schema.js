@@ -749,6 +749,17 @@ export function filterTerrains(records, filters = {}, owners = {}, developments 
   });
 }
 
+export function sortTerrainRecords(records = [], order = "newest") {
+  const list = [...records];
+  const moment = (terrain) => Number(terrain?.created_at || terrain?.capturado_em || terrain?.updated_at || 0);
+  const reference = (terrain) => Number(String(terrain?.codigo_referencia || "").match(/TER-(\d+)/i)?.[1] || 0);
+  if (order === "oldest") return list.sort((a, b) => moment(a) - moment(b) || reference(a) - reference(b) || String(a.id).localeCompare(String(b.id)));
+  if (order === "reference_asc") return list.sort((a, b) => reference(a) - reference(b) || moment(a) - moment(b));
+  if (order === "reference_desc") return list.sort((a, b) => reference(b) - reference(a) || moment(b) - moment(a));
+  if (order === "neighborhood") return list.sort((a, b) => String(a.bairro || "").localeCompare(String(b.bairro || ""), "pt-BR") || String(a.quadra || "").localeCompare(String(b.quadra || ""), "pt-BR", { numeric: true }) || String(a.lote || "").localeCompare(String(b.lote || ""), "pt-BR", { numeric: true }));
+  return list.sort((a, b) => moment(b) - moment(a) || reference(b) - reference(a) || String(b.id).localeCompare(String(a.id)));
+}
+
 export function terrainStatusMeta(status) {
   return TERRAIN_STATUS_OPTIONS.find((item) => item.value === status) || TERRAIN_STATUS_OPTIONS[0];
 }

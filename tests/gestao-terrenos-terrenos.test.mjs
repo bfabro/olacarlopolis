@@ -3,10 +3,23 @@ import assert from "node:assert/strict";
 import {
   buildTerrainRecord,
   filterTerrains,
+  sortTerrainRecords,
   terrainCharacteristicLabels,
   terrainMapsUrl,
   terrainStatusMeta
 } from "../admin/gestao-terrenos-schema.js";
+
+test("ordena terrenos do mais recente para o mais antigo por padrão e permite alternativas", () => {
+  const records = [
+    { id: "a", codigo_referencia: "TER-0001", bairro: "Z", created_at: 100 },
+    { id: "b", codigo_referencia: "TER-0002", bairro: "A", created_at: 300 },
+    { id: "c", codigo_referencia: "TER-0003", bairro: "M", created_at: 200 }
+  ];
+  assert.deepEqual(sortTerrainRecords(records).map((item) => item.id), ["b", "c", "a"]);
+  assert.deepEqual(sortTerrainRecords(records, "oldest").map((item) => item.id), ["a", "c", "b"]);
+  assert.deepEqual(sortTerrainRecords(records, "reference_asc").map((item) => item.id), ["a", "b", "c"]);
+  assert.deepEqual(sortTerrainRecords(records, "neighborhood").map((item) => item.id), ["b", "c", "a"]);
+});
 
 const baseInput = {
   owner_id: "",

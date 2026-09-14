@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=462">
+  <link rel="stylesheet" href="painel.css?v=463">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -320,6 +320,8 @@
               <label>Quadra<input id="terrainQuickBlock" maxlength="40" placeholder="Opcional"></label>
               <label>Lote<input id="terrainQuickLot" maxlength="40" placeholder="Opcional"></label>
               <label>Área aproximada em m²<input id="terrainQuickArea" type="number" min="0" step="0.01" placeholder="Opcional"><small id="terrainQuickAreaHint">Selecione um lote no mapa para preencher quando a planta informar a metragem exata.</small></label>
+              <label>Frente em metros<input id="terrainQuickFront" type="number" min="0" step="0.01" placeholder="Opcional"></label>
+              <label>Profundidade/lateral em metros<input id="terrainQuickBack" type="number" min="0" step="0.01" placeholder="Opcional"></label>
               <label>Rua conforme a planta<input id="terrainQuickStreet" maxlength="180" placeholder="Opcional"></label>
               <fieldset class="wide terrain-quick-status-fieldset">
                 <legend>Situação atual do terreno</legend>
@@ -673,6 +675,15 @@
               </label>
               <label>Quadra<input id="terrainBlockFilter" maxlength="40"></label>
               <label>Lote<input id="terrainLotFilter" maxlength="40"></label>
+              <label>Ordenação
+                <select id="terrainSortOrder">
+                  <option value="newest" selected>Mais recentes primeiro</option>
+                  <option value="oldest">Mais antigos primeiro</option>
+                  <option value="reference_desc">Maior código primeiro</option>
+                  <option value="reference_asc">Menor código primeiro</option>
+                  <option value="neighborhood">Bairro, quadra e lote</option>
+                </select>
+              </label>
               </div>
             </details>
             <div class="terrain-results-divider"><span>Terrenos cadastrados</span><strong id="terrainReferenceCounter">Próximo código: TER-0001</strong></div>
@@ -3403,6 +3414,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=693"></script>
+  <script type="module" src="painel.js?v=694"></script>
 </body>
 </html>

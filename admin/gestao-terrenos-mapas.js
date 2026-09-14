@@ -2,6 +2,49 @@ const createBlock = (id, lots, street, blockArea = "", lotArea = "", startLot = 
   id: String(id), lots, street, blockArea, lotArea, startLot
 });
 
+const formatLotArea = (value) => `${Number(value).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })} m²`;
+
+const regularLotMeasurements = (lot, lots) => {
+  const lotNumber = Number(lot);
+  const rowLength = lots / 2;
+  if (!Number.isInteger(lotNumber) || !Number.isInteger(rowLength)) return null;
+  const position = ((lotNumber - 1) % rowLength) + 1;
+  const frontM = position === 1 || position === rowLength ? 13 : 10;
+  return { areaM2: frontM * 18, frontM, backM: 18 };
+};
+
+export function terrainInteractiveLotMeasurements(mapId, blockId, lot) {
+  const normalizedBlock = String(blockId || "");
+  const lotNumber = Number(lot);
+  if (!Number.isInteger(lotNumber)) return null;
+
+  if (mapId === "novo-horizonte-i") {
+    const regular24 = new Set(["C", "E", "G", "I", "K", "M", "O"]);
+    const regular22 = new Set(["D", "F", "H", "J", "L", "N", "P", "R"]);
+    if (regular24.has(normalizedBlock)) return regularLotMeasurements(lotNumber, 24);
+    if (regular22.has(normalizedBlock)) return regularLotMeasurements(lotNumber, 22);
+  }
+
+  if (mapId === "novo-horizonte-ii" && /^[B-J]$/.test(normalizedBlock)) {
+    const position = ((lotNumber - 1) % 11) + 1;
+    const frontM = position === 1 ? 13.5 : ([2, 3].includes(position) ? 11 : (position === 11 ? 13 : 10));
+    return { areaM2: frontM * 18, frontM, backM: 18 };
+  }
+
+  if (mapId === "novo-horizonte-iii") {
+    if (/^[B-K]$/.test(normalizedBlock)) return regularLotMeasurements(lotNumber, 22);
+    if (normalizedBlock === "M" && lotNumber === 1) return { areaM2: 329.97, frontM: null, backM: null };
+    const narrowBlockAreas = {
+      N: [235.17, 180.8, 235.17], O: [235.08, 180.86, 235.08], P: [235.06, 180.78, 235.06],
+      Q: [235.02, 180.73, 235.02], R: [234.95, 180.74, 234.97], S: [234.9, 180.7, 234.93],
+      T: [234.86, 180.67, 234.88], U: [234.82, 180.63, 234.84], V: [234.77, 180.6, 234.79]
+    };
+    const areaM2 = narrowBlockAreas[normalizedBlock]?.[lotNumber - 1];
+    if (areaM2) return { areaM2, frontM: null, backM: null };
+  }
+  return null;
+}
+
 const novoHorizonteIBlocks = [
   createBlock("A", 12, "Rua José Paula de Miranda", "5.166,00 m²", "180 a 234 m²", 2),
   createBlock("B", 11, "Rua José Paula de Miranda", "4.756,00 m²", "180 a 234 m²", 2),
@@ -195,6 +238,7 @@ export function buildTerrainInteractiveSelection(mapId, blockId, lot) {
   const block = terrainInteractiveBlock(mapId, blockId);
   const lotNumber = String(lot || "");
   if (!map || !block || !terrainInteractiveLotNumbers(mapId, blockId).includes(lotNumber)) return null;
+  const measurements = terrainInteractiveLotMeasurements(mapId, blockId, lotNumber);
   return {
     mapId: map.id,
     developmentName: map.name,
@@ -204,7 +248,10 @@ export function buildTerrainInteractiveSelection(mapId, blockId, lot) {
     lot: lotNumber,
     street: block.street,
     blockArea: block.blockArea,
-    lotArea: block.lotArea,
+    lotArea: measurements?.areaM2 ? formatLotArea(measurements.areaM2) : block.lotArea,
+    areaM2: measurements?.areaM2 || null,
+    frontM: measurements?.frontM || null,
+    backM: measurements?.backM || null,
     requiresLotConfirmation: map.requiresLotConfirmation === true,
     reference: `${map.shortName} · Quadra ${block.id} · Lote ${lotNumber}${block.street && block.street !== "Confirmar na planta" ? ` · ${block.street}` : ""}`
   };
