@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=461">
+  <link rel="stylesheet" href="painel.css?v=462">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -319,7 +319,7 @@
               </section>
               <label>Quadra<input id="terrainQuickBlock" maxlength="40" placeholder="Opcional"></label>
               <label>Lote<input id="terrainQuickLot" maxlength="40" placeholder="Opcional"></label>
-              <label>Área aproximada em m²<input id="terrainQuickArea" type="number" min="0" step="0.01" placeholder="Opcional"></label>
+              <label>Área aproximada em m²<input id="terrainQuickArea" type="number" min="0" step="0.01" placeholder="Opcional"><small id="terrainQuickAreaHint">Selecione um lote no mapa para preencher quando a planta informar a metragem exata.</small></label>
               <label>Rua conforme a planta<input id="terrainQuickStreet" maxlength="180" placeholder="Opcional"></label>
               <fieldset class="wide terrain-quick-status-fieldset">
                 <legend>Situação atual do terreno</legend>
@@ -3403,6 +3403,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=692"></script>
+  <script type="module" src="painel.js?v=693"></script>
 </body>
 </html>

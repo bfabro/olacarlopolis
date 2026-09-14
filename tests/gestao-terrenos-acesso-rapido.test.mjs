@@ -87,7 +87,19 @@ test("prospeccao exporta ficha unica com satelite planta dados e foto", () => {
   assert.match(panelJs, /terrainQuickPhotos.*files/);
   assert.match(panelJs, /canvasParaBlob/);
   assert.match(panelJs, /data-terrain-export-prospection/);
+  const exportSource = panelJs.slice(panelJs.indexOf("async function exportTerrainProspectionImage"), panelJs.indexOf("async function saveTerrainQuickCapture"));
+  assert.match(exportSource, /\["Área aproximada", area\]/);
+  assert.doesNotMatch(exportSource, /\["Situação"/);
+  assert.doesNotMatch(exportSource, /\["GPS \/ direção"/);
   assert.match(imageProxy, /server\.arcgisonline\.com/);
+});
+
+test("clique no mapa preenche somente area exata e preserva faixa como referencia", () => {
+  assert.match(panelHtml, /id="terrainQuickAreaHint"/);
+  assert.match(panelJs, /const exactArea = terrainInteractiveExactArea\(selection\?\.lotArea \|\| ""\)/);
+  assert.match(panelJs, /Área preenchida conforme a planta/);
+  assert.match(panelJs, /Referência da planta:.*Confirme a metragem exata/);
+  assert.match(panelJs, /mapSelection\?\.lotArea.*referência da planta/);
 });
 
 test("prospeccao preserva mapa e ponto visual selecionados", () => {
@@ -318,9 +330,9 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=461/);
-  assert.match(panelHtml, /painel\.js\?v=692/);
+  assert.match(panelHtml, /painel\.css\?v=462/);
+  assert.match(panelHtml, /painel\.js\?v=693/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=25/);
-  assert.match(panelJs, /numero: 755/);
-  assert.match(panelJs, /label: "v762"/);
+  assert.match(panelJs, /numero: 756/);
+  assert.match(panelJs, /label: "v763"/);
 });

@@ -138,10 +138,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 755,
-  label: "v762",
-  data: "2026-09-13",
-  nota: "Seleção pela planta no Cadastro Rápido e ficha de prospecção exportável em imagem."
+  numero: 756,
+  label: "v763",
+  data: "2026-09-14",
+  nota: "Área da planta integrada ao Cadastro Rápido e ficha de prospecção simplificada."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3522,6 +3522,7 @@ let terrainQuickDirectionListener = null;
 let terrainQuickAutoAddress = "";
 let terrainQuickAutoNeighborhood = "";
 let terrainQuickAutoMapReference = "";
+let terrainQuickAutoMapArea = "";
 let terrainQuickInteractiveMapState = {
   mapId: "",
   scale: 1,
@@ -3635,12 +3636,14 @@ function resetTerrainQuickForm() {
   terrainQuickAutoAddress = "";
   terrainQuickAutoNeighborhood = "";
   terrainQuickAutoMapReference = "";
+  terrainQuickAutoMapArea = "";
   $("terrainQuickForm")?.reset();
   renderTerrainQuickReferenceOptions();
   if ($("terrainQuickNickname")) $("terrainQuickNickname").value = terrainQuickCaptureName();
   ["terrainQuickLatitude", "terrainQuickLongitude", "terrainQuickAccuracy", "terrainQuickHeading", "terrainQuickStreet", "terrainQuickNeighborhood"].forEach((id) => { if ($(id)) $(id).value = ""; });
   terrainQuickInteractiveMapState = { mapId: "", scale: 1, pointX: null, pointY: null, autoIdentified: false };
   renderTerrainQuickInteractiveMapPicker();
+  if ($("terrainQuickAreaHint")) $("terrainQuickAreaHint").textContent = "Selecione um lote no mapa para preencher quando a planta informar a metragem exata.";
   if ($("terrainQuickLocationStatus")) $("terrainQuickLocationStatus").textContent = "Toque no botão verde para marcar o ponto exato.";
   if ($("terrainQuickOpenMaps")) {
     $("terrainQuickOpenMaps").classList.add("hidden");
@@ -3884,7 +3887,20 @@ function markTerrainQuickInteractiveMapPoint(event) {
     const selection = buildTerrainInteractiveSelection(terrainQuickInteractiveMapState.mapId, hotspot.block, hotspot.lot);
     if ($("terrainQuickBlock")) $("terrainQuickBlock").value = hotspot.block;
     if ($("terrainQuickLot")) $("terrainQuickLot").value = hotspot.lot;
-    if ($("terrainQuickArea")) $("terrainQuickArea").value = terrainInteractiveExactArea(selection?.lotArea || "");
+    const areaField = $("terrainQuickArea");
+    const exactArea = terrainInteractiveExactArea(selection?.lotArea || "");
+    if (areaField && exactArea) {
+      areaField.value = exactArea;
+      terrainQuickAutoMapArea = exactArea;
+    } else if (areaField && areaField.value === terrainQuickAutoMapArea) {
+      areaField.value = "";
+      terrainQuickAutoMapArea = "";
+    }
+    if ($("terrainQuickAreaHint")) {
+      $("terrainQuickAreaHint").textContent = exactArea
+        ? `Área preenchida conforme a planta: ${selection.lotArea}.`
+        : (selection?.lotArea ? `Referência da planta: ${selection.lotArea}. Confirme a metragem exata.` : "A planta não informa a área deste lote.");
+    }
     if ($("terrainQuickStreet") && selection?.street !== "Confirmar na planta") $("terrainQuickStreet").value = selection?.street || "";
     const reference = $("terrainQuickReference");
     if (reference && (!reference.value.trim() || reference.value === terrainQuickAutoMapReference || reference.value === terrainQuickAutoAddress)) {
@@ -4132,6 +4148,9 @@ async function exportTerrainProspectionImage(savedTerrain = null, sourceButton =
     const development = terrainDevelopmentById(terrain.development_id);
     const map = terrainInteractiveMapById(terrain.mapa_interativo_id)
       || terrainInteractiveMapForDevelopment(development || {});
+    const mapSelection = map && terrain.quadra && terrain.lote
+      ? buildTerrainInteractiveSelection(map.id, terrain.quadra, terrain.lote)
+      : null;
     const pointX = savedTerrain ? terrain.mapa_interativo_x : terrainQuickInteractiveMapState.pointX;
     const pointY = savedTerrain ? terrain.mapa_interativo_y : terrainQuickInteractiveMapState.pointY;
     const satellite = await terrainSatelliteCanvas(terrain.latitude, terrain.longitude);
@@ -4168,27 +4187,19 @@ async function exportTerrainProspectionImage(savedTerrain = null, sourceButton =
     ctx.font = "600 17px Arial";
     ctx.fillText(new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }), 1160, 101);
 
-    const status = terrainStatusMeta(terrain.status);
-    const area = Number(terrain.area_m2) > 0 ? `${Number(terrain.area_m2).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} m²` : "A confirmar";
-    const hasGps = terrain.latitude !== "" && terrain.latitude !== null && terrain.latitude !== undefined
-      && terrain.longitude !== "" && terrain.longitude !== null && terrain.longitude !== undefined
-      && Number.isFinite(Number(terrain.latitude)) && Number.isFinite(Number(terrain.longitude));
-    const gps = hasGps
-      ? `${Number(terrain.latitude).toFixed(6)}, ${Number(terrain.longitude).toFixed(6)}${terrain.precisao_gps_m ? ` · precisão ${terrain.precisao_gps_m} m` : ""}`
-      : "Não marcado";
-    const direction = terrainDirectionLabel(terrain.direcao_graus);
+    const area = Number(terrain.area_m2) > 0
+      ? `${Number(terrain.area_m2).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} m²`
+      : (mapSelection?.lotArea ? `${mapSelection.lotArea} · referência da planta` : "A confirmar");
     const fields = [
       ["Bairro", terrain.bairro],
       ["Loteamento", development?.nome || map?.name],
       ["Quadra / lote", terrain.quadra || terrain.lote ? `Q. ${terrain.quadra || "-"} · L. ${terrain.lote || "-"}` : "Não informado"],
-      ["Área aproximada", area],
-      ["Situação", status.label],
-      ["GPS / direção", `${gps} · ${direction}`]
+      ["Área aproximada", area]
     ];
     fields.forEach(([label, value], index) => {
-      const column = index % 3;
-      const row = Math.floor(index / 3);
-      drawTerrainProspectionField(ctx, label, value, 40 + column * 380, 178 + row * 108, 360, 92);
+      const column = index % 2;
+      const row = Math.floor(index / 2);
+      drawTerrainProspectionField(ctx, label, value, 40 + column * 570, 178 + row * 108, 550, 92);
     });
 
     drawTerrainProspectionImageTitle(ctx, "Imagem aérea do ponto", satellite ? "Ponto GPS centralizado" : "GPS não disponível", 40, 420, 540);
@@ -6018,7 +6029,16 @@ function useTerrainInteractiveSelection({ captureGps = false } = {}) {
   if ($("terrainQuickNeighborhood")) $("terrainQuickNeighborhood").value = development?.bairro || selection.neighborhood;
   if ($("terrainQuickBlock")) $("terrainQuickBlock").value = selection.block;
   if ($("terrainQuickLot")) $("terrainQuickLot").value = selection.lot;
-  if ($("terrainQuickArea")) $("terrainQuickArea").value = terrainInteractiveExactArea(selection.lotArea);
+  const exactArea = terrainInteractiveExactArea(selection.lotArea);
+  if ($("terrainQuickArea") && exactArea) {
+    $("terrainQuickArea").value = exactArea;
+    terrainQuickAutoMapArea = exactArea;
+  }
+  if ($("terrainQuickAreaHint")) {
+    $("terrainQuickAreaHint").textContent = exactArea
+      ? `Área preenchida conforme a planta: ${selection.lotArea}.`
+      : (selection.lotArea ? `Referência da planta: ${selection.lotArea}. Confirme a metragem exata.` : "A planta não informa a área deste lote.");
+  }
   if ($("terrainQuickStreet")) $("terrainQuickStreet").value = selection.street === "Confirmar na planta" ? "" : selection.street;
   if ($("terrainQuickReference")) $("terrainQuickReference").value = selection.reference;
   if ($("terrainQuickNickname")) $("terrainQuickNickname").value = `${selection.shortName} - Q. ${selection.block} / L. ${selection.lot}`;
