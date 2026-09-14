@@ -1,6 +1,7 @@
 const ALLOWED_HOSTS = new Set([
   "firebasestorage.googleapis.com",
-  "storage.googleapis.com"
+  "storage.googleapis.com",
+  "server.arcgisonline.com"
 ]);
 
 const CORS_HEADERS = {

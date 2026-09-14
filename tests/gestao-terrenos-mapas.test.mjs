@@ -7,7 +7,8 @@ import {
   buildTerrainInteractiveSelection,
   mergeTerrainInteractiveDevelopments,
   terrainInteractiveLotNumbers,
-  terrainInteractiveMapForDevelopment
+  terrainInteractiveMapForDevelopment,
+  terrainInteractiveMapsForNeighborhood
 } from "../admin/gestao-terrenos-mapas.js";
 import {
   terrainInteractiveHotspotNear,
@@ -59,10 +60,23 @@ test("publica mapas como loteamentos sem duplicar cadastros existentes", () => {
 });
 
 test("painel sincroniza loteamentos dos mapas com todas as listas", () => {
-  assert.match(panelJs, /gestao-terrenos-mapas\.js\?v=2/);
+  assert.match(panelJs, /gestao-terrenos-mapas\.js\?v=3/);
   assert.match(panelJs, /mergeTerrainInteractiveDevelopments/);
   assert.match(panelJs, /interactiveDevelopmentUpdates/);
   assert.match(panelJs, /developments: interactiveDevelopments\.developments/);
+});
+
+test("localiza todas as plantas disponíveis para o bairro selecionado", () => {
+  const developments = mergeTerrainInteractiveDevelopments({}, 1234).developments;
+  assert.deepEqual(
+    terrainInteractiveMapsForNeighborhood(developments, "Novo Horizonte").map((item) => item.map.id),
+    ["novo-horizonte-i", "novo-horizonte-ii", "novo-horizonte-iii"]
+  );
+  assert.deepEqual(
+    terrainInteractiveMapsForNeighborhood(developments, "Vila Ray").map((item) => item.map.id),
+    ["vila-ray"]
+  );
+  assert.deepEqual(terrainInteractiveMapsForNeighborhood(developments, "Centro"), []);
 });
 
 test("nao oferece areas institucionais como lotes numerados", () => {

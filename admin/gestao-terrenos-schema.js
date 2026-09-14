@@ -162,6 +162,7 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
       "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "cadastro_rapido",
       "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em",
+      "mapa_interativo_id", "mapa_interativo_x", "mapa_interativo_y",
       "status", "created_at", "updated_at"
     ]),
     optionalFields: Object.freeze([
@@ -169,7 +170,8 @@ export const TERRAIN_MANAGEMENT_ENTITIES = Object.freeze({
       "longitude", "direcao_graus", "google_maps_url", "caracteristicas", "ultima_limpeza_em",
       "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada",
       "lembrete_verificado_em", "oportunidade_nao_precisa_ate", "cadastro_rapido",
-      "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em"
+      "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em",
+      "mapa_interativo_id", "mapa_interativo_x", "mapa_interativo_y"
     ]),
     statuses: TERRAIN_STATUSES
   }),
@@ -415,6 +417,9 @@ export function normalizeTerrainInput(input = {}) {
     prospeccao_status: quickCapture ? "pendente_dados" : null,
     localizacao_referencia: quickCapture ? value("localizacao_referencia") : null,
     precisao_gps_m: quickCapture && value("precisao_gps_m") !== "" ? terrainNumber(input.precisao_gps_m, "precisao do GPS") : null,
+    mapa_interativo_id: value("mapa_interativo_id") || null,
+    mapa_interativo_x: terrainOptionalCoordinate(input.mapa_interativo_x, "posição horizontal no mapa", 0, 100),
+    mapa_interativo_y: terrainOptionalCoordinate(input.mapa_interativo_y, "posição vertical no mapa", 0, 100),
     status: TERRAIN_STATUS_VALUES.has(value("status")) ? value("status") : "sem_informacao"
   };
   const required = quickCapture ? ["apelido"] : [];
@@ -441,6 +446,9 @@ export function buildTerrainRecord(input, { id, existing = {}, timestamp = Date.
   else ["cadastro_rapido", "prospeccao_status", "localizacao_referencia", "precisao_gps_m", "capturado_em"].forEach((key) => delete record[key]);
   ["ultima_limpeza_em", "intervalo_vistoria", "proxima_vistoria_em", "proxima_vistoria_personalizada", "lembrete_verificado_em", "oportunidade_nao_precisa_ate"].forEach((key) => {
     if (existing[key]) record[key] = existing[key];
+  });
+  ["mapa_interativo_id", "mapa_interativo_x", "mapa_interativo_y"].forEach((key) => {
+    if ((record[key] === null || record[key] === "") && existing[key] !== null && existing[key] !== undefined) record[key] = existing[key];
   });
   return record;
 }

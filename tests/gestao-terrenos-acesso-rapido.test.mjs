@@ -7,6 +7,7 @@ const panelHtml = readFileSync(new URL("../admin/painel.html", import.meta.url),
 const panelJs = readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
 const panelCss = readFileSync(new URL("../admin/painel.css", import.meta.url), "utf8");
 const databaseRules = JSON.parse(readFileSync(new URL("../database.rules.json", import.meta.url), "utf8"));
+const imageProxy = readFileSync(new URL("../netlify/functions/image-proxy.mjs", import.meta.url), "utf8");
 
 const quickInput = {
   cadastro_rapido: true,
@@ -64,6 +65,44 @@ test("cadastro rapido aceita bairro e loteamento como referencias", () => {
   assert.equal(terrain.development_id, "development-1");
   assert.equal(terrain.bairro, "Centro");
   assert.equal(terrain.localizacao_referencia, "Jardim Central · Centro");
+});
+
+test("bairro com loteamento exibe selecao opcional pelo mapa interativo", () => {
+  assert.match(panelHtml, /id="terrainQuickInteractiveMapCard"/);
+  assert.match(panelHtml, /id="terrainQuickInteractiveMapSelect"/);
+  assert.match(panelHtml, /id="terrainQuickInteractiveMapStage"/);
+  assert.match(panelHtml, /id="terrainQuickInteractiveZoomIn"/);
+  assert.match(panelJs, /terrainInteractiveMapsForNeighborhood/);
+  assert.match(panelJs, /markTerrainQuickInteractiveMapPoint/);
+  assert.match(panelJs, /terrainQuickNeighborhood.*addEventListener\("input"/);
+  assert.match(panelJs, /terrainQuickDevelopment.*addEventListener\("change"/);
+});
+
+test("prospeccao exporta ficha unica com satelite planta dados e foto", () => {
+  assert.match(panelHtml, /id="terrainQuickExportImage"/);
+  assert.match(panelJs, /function exportTerrainProspectionImage/);
+  assert.match(panelJs, /terrainSatelliteCanvas/);
+  assert.match(panelJs, /World_Imagery\/MapServer\/tile/);
+  assert.match(panelJs, /drawTerrainInteractiveExport/);
+  assert.match(panelJs, /terrainQuickPhotos.*files/);
+  assert.match(panelJs, /canvasParaBlob/);
+  assert.match(panelJs, /data-terrain-export-prospection/);
+  assert.match(imageProxy, /server\.arcgisonline\.com/);
+});
+
+test("prospeccao preserva mapa e ponto visual selecionados", () => {
+  const terrain = buildTerrainRecord({
+    ...quickInput,
+    mapa_interativo_id: "novo-horizonte-i",
+    mapa_interativo_x: 42.5,
+    mapa_interativo_y: 61.25
+  }, { id: "quick-map", timestamp: 1600 });
+  assert.equal(terrain.mapa_interativo_id, "novo-horizonte-i");
+  assert.equal(terrain.mapa_interativo_x, 42.5);
+  assert.equal(terrain.mapa_interativo_y, 61.25);
+  assert.ok(databaseRules.rules.terrenos.$terrainId.mapa_interativo_id);
+  assert.ok(databaseRules.rules.terrenos.$terrainId.mapa_interativo_x);
+  assert.ok(databaseRules.rules.terrenos.$terrainId.mapa_interativo_y);
 });
 
 test("GPS explicito preenche endereco e preserva mapa com direcao", () => {
@@ -279,9 +318,9 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=460/);
-  assert.match(panelHtml, /painel\.js\?v=691/);
-  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=24/);
-  assert.match(panelJs, /numero: 754/);
-  assert.match(panelJs, /label: "v761"/);
+  assert.match(panelHtml, /painel\.css\?v=461/);
+  assert.match(panelHtml, /painel\.js\?v=692/);
+  assert.match(panelJs, /gestao-terrenos-schema\.js\?v=25/);
+  assert.match(panelJs, /numero: 755/);
+  assert.match(panelJs, /label: "v762"/);
 });

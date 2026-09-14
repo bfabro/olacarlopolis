@@ -168,6 +168,18 @@ export function mergeTerrainInteractiveDevelopments(records = {}, timestamp = Da
   return { developments, created };
 }
 
+export function terrainInteractiveMapsForNeighborhood(records = {}, neighborhood = "") {
+  const normalizedNeighborhood = normalizeTerrainInteractiveMapName(neighborhood);
+  if (!normalizedNeighborhood) return [];
+  const matches = new Map();
+  Object.entries(records || {}).forEach(([id, development = {}]) => {
+    if (normalizeTerrainInteractiveMapName(development.bairro) !== normalizedNeighborhood) return;
+    const map = terrainInteractiveMapForDevelopment({ id, ...development });
+    if (map && !matches.has(map.id)) matches.set(map.id, { map, development: { id, ...development } });
+  });
+  return TERRAIN_INTERACTIVE_MAPS.map((map) => matches.get(map.id)).filter(Boolean);
+}
+
 export function terrainInteractiveBlock(mapId, blockId) {
   const map = terrainInteractiveMapById(mapId);
   return map?.blocks.find((block) => block.id === String(blockId || "")) || null;

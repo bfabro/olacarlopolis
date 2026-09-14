@@ -107,16 +107,18 @@ import {
   validateTerrainDevelopmentPlanFile,
   TERRAIN_MANAGEMENT_ENTITIES,
   TERRAIN_MANAGEMENT_SCHEMA_VERSION
-} from "./gestao-terrenos-schema.js?v=24";
+} from "./gestao-terrenos-schema.js?v=25";
 import {
   TERRAIN_INTERACTIVE_MAPS,
   buildTerrainInteractiveSelection,
   mergeTerrainInteractiveDevelopments,
+  normalizeTerrainInteractiveMapName,
   terrainInteractiveBlock,
   terrainInteractiveLotNumbers,
   terrainInteractiveMapById,
-  terrainInteractiveMapForDevelopment
-} from "./gestao-terrenos-mapas.js?v=2";
+  terrainInteractiveMapForDevelopment,
+  terrainInteractiveMapsForNeighborhood
+} from "./gestao-terrenos-mapas.js?v=3";
 import {
   terrainInteractiveHotspotNear,
   terrainInteractiveHotspots
@@ -136,10 +138,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 754,
-  label: "v761",
+  numero: 755,
+  label: "v762",
   data: "2026-09-13",
-  nota: "Mapas interativos publicados disponíveis como loteamentos em todos os cadastros."
+  nota: "Seleção pela planta no Cadastro Rápido e ficha de prospecção exportável em imagem."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -3519,6 +3521,14 @@ let terrainQuickLocationPending = false;
 let terrainQuickDirectionListener = null;
 let terrainQuickAutoAddress = "";
 let terrainQuickAutoNeighborhood = "";
+let terrainQuickAutoMapReference = "";
+let terrainQuickInteractiveMapState = {
+  mapId: "",
+  scale: 1,
+  pointX: null,
+  pointY: null,
+  autoIdentified: false
+};
 
 function terrainDirectionLabel(value) {
   if (value === null || value === undefined || value === "") return "Direção não disponível neste aparelho";
@@ -3624,10 +3634,13 @@ function resetTerrainQuickForm() {
   stopTerrainQuickDirectionCapture();
   terrainQuickAutoAddress = "";
   terrainQuickAutoNeighborhood = "";
+  terrainQuickAutoMapReference = "";
   $("terrainQuickForm")?.reset();
   renderTerrainQuickReferenceOptions();
   if ($("terrainQuickNickname")) $("terrainQuickNickname").value = terrainQuickCaptureName();
   ["terrainQuickLatitude", "terrainQuickLongitude", "terrainQuickAccuracy", "terrainQuickHeading", "terrainQuickStreet", "terrainQuickNeighborhood"].forEach((id) => { if ($(id)) $(id).value = ""; });
+  terrainQuickInteractiveMapState = { mapId: "", scale: 1, pointX: null, pointY: null, autoIdentified: false };
+  renderTerrainQuickInteractiveMapPicker();
   if ($("terrainQuickLocationStatus")) $("terrainQuickLocationStatus").textContent = "Toque no botão verde para marcar o ponto exato.";
   if ($("terrainQuickOpenMaps")) {
     $("terrainQuickOpenMaps").classList.add("hidden");
@@ -3682,6 +3695,7 @@ function useCurrentTerrainQuickLocation() {
       if (neighborhoodInput && found.neighborhood && (!neighborhoodInput.value.trim() || neighborhoodInput.value === terrainQuickAutoNeighborhood)) {
         neighborhoodInput.value = found.neighborhood;
         terrainQuickAutoNeighborhood = found.neighborhood;
+        renderTerrainQuickInteractiveMapPicker();
       }
       const reference = $("terrainQuickReference");
       if (reference && found.label && (!reference.value.trim() || reference.value === terrainQuickAutoAddress)) {
@@ -3740,6 +3754,150 @@ function renderTerrainQuickReferenceOptions() {
     ].filter(Boolean))].sort((a, b) => a.localeCompare(b, "pt-BR"));
     neighborhoodList.innerHTML = neighborhoods.map((neighborhood) => `<option value="${escapeAttr(neighborhood)}"></option>`).join("");
   }
+}
+
+function terrainQuickInteractiveCandidates() {
+  const neighborhood = $("terrainQuickNeighborhood")?.value || "";
+  return terrainInteractiveMapsForNeighborhood(state.terrainManagement?.developments || {}, neighborhood);
+}
+
+function applyTerrainQuickInteractiveZoom() {
+  const stage = $("terrainQuickInteractiveMapStage");
+  const surface = $("terrainQuickInteractiveMapSurface");
+  const output = $("terrainQuickInteractiveZoomValue");
+  const scale = Math.max(1, Math.min(4, Number(terrainQuickInteractiveMapState.scale) || 1));
+  terrainQuickInteractiveMapState.scale = scale;
+  if (surface) {
+    surface.style.width = `${scale * 100}%`;
+    surface.style.minWidth = `${620 * scale}px`;
+  }
+  if (output) output.textContent = `${Math.round(scale * 100)}%`;
+  if ($("terrainQuickInteractiveZoomOut")) $("terrainQuickInteractiveZoomOut").disabled = scale <= 1;
+  if ($("terrainQuickInteractiveZoomIn")) $("terrainQuickInteractiveZoomIn").disabled = scale >= 4;
+  if (stage && scale === 1) {
+    stage.scrollLeft = 0;
+    stage.scrollTop = 0;
+  }
+}
+
+function setTerrainQuickInteractiveZoom(nextScale) {
+  const stage = $("terrainQuickInteractiveMapStage");
+  const currentWidth = Math.max(1, stage?.scrollWidth || 1);
+  const currentHeight = Math.max(1, stage?.scrollHeight || 1);
+  const centerX = ((stage?.scrollLeft || 0) + (stage?.clientWidth || 0) / 2) / currentWidth;
+  const centerY = ((stage?.scrollTop || 0) + (stage?.clientHeight || 0) / 2) / currentHeight;
+  terrainQuickInteractiveMapState.scale = Math.max(1, Math.min(4, Number(nextScale) || 1));
+  applyTerrainQuickInteractiveZoom();
+  if (!stage) return;
+  stage.scrollLeft = centerX * stage.scrollWidth - stage.clientWidth / 2;
+  stage.scrollTop = centerY * stage.scrollHeight - stage.clientHeight / 2;
+}
+
+function renderTerrainQuickInteractivePin() {
+  const pin = $("terrainQuickInteractiveMapPin");
+  const hasPoint = Number.isFinite(terrainQuickInteractiveMapState.pointX) && Number.isFinite(terrainQuickInteractiveMapState.pointY);
+  pin?.classList.toggle("hidden", !hasPoint);
+  if (!pin || !hasPoint) return;
+  pin.style.left = `${terrainQuickInteractiveMapState.pointX}%`;
+  pin.style.top = `${terrainQuickInteractiveMapState.pointY}%`;
+}
+
+function renderTerrainQuickInteractiveMapPicker() {
+  const card = $("terrainQuickInteractiveMapCard");
+  const select = $("terrainQuickInteractiveMapSelect");
+  const workspace = $("terrainQuickInteractiveMapWorkspace");
+  const empty = $("terrainQuickInteractiveMapEmpty");
+  if (!card || !select || !workspace || !empty) return;
+  const candidates = terrainQuickInteractiveCandidates();
+  const selectedDevelopment = terrainDevelopmentById($("terrainQuickDevelopment")?.value || "");
+  const selectedNeighborhood = normalizeTerrainInteractiveMapName($("terrainQuickNeighborhood")?.value || "");
+  const selectedDevelopmentMap = selectedDevelopment
+    && (!selectedNeighborhood || normalizeTerrainInteractiveMapName(selectedDevelopment.bairro) === selectedNeighborhood)
+    ? terrainInteractiveMapForDevelopment(selectedDevelopment)
+    : null;
+  if (selectedDevelopmentMap && !candidates.some((item) => item.map.id === selectedDevelopmentMap.id)) {
+    candidates.unshift({ map: selectedDevelopmentMap, development: selectedDevelopment });
+  }
+  card.classList.toggle("hidden", candidates.length === 0);
+  if (!candidates.length) {
+    terrainQuickInteractiveMapState = { mapId: "", scale: 1, pointX: null, pointY: null, autoIdentified: false };
+    return;
+  }
+  const validMapIds = new Set(candidates.map((item) => item.map.id));
+  let mapId = selectedDevelopmentMap?.id || (validMapIds.has(terrainQuickInteractiveMapState.mapId) ? terrainQuickInteractiveMapState.mapId : "");
+  if (!mapId && candidates.length === 1) {
+    mapId = candidates[0].map.id;
+    if ($("terrainQuickDevelopment")) $("terrainQuickDevelopment").value = candidates[0].development.id;
+  }
+  if (mapId !== terrainQuickInteractiveMapState.mapId) {
+    terrainQuickInteractiveMapState = { mapId, scale: 1, pointX: null, pointY: null, autoIdentified: false };
+  }
+  select.innerHTML = `<option value="">${candidates.length > 1 ? "Escolha qual loteamento" : "Selecione"}</option>${candidates.map(({ map }) => (
+    `<option value="${escapeAttr(map.id)}" ${map.id === mapId ? "selected" : ""}>${escapeHtml(map.shortName)}</option>`
+  )).join("")}`;
+  const map = terrainInteractiveMapById(mapId);
+  workspace.classList.toggle("hidden", !map);
+  empty.classList.toggle("hidden", Boolean(map));
+  if (!map) {
+    empty.innerHTML = '<i class="fa-solid fa-map-location-dot"></i><span>Este bairro possui mais de uma planta. Escolha o loteamento para abrir o mapa.</span>';
+    return;
+  }
+  const image = $("terrainQuickInteractiveMapImage");
+  if (image && image.getAttribute("src") !== map.image) {
+    image.src = map.image;
+    image.alt = `Planta interativa de ${map.name}`;
+  }
+  const status = $("terrainQuickInteractiveMapStatus");
+  if (status) {
+    const block = $("terrainQuickBlock")?.value || "";
+    const lot = $("terrainQuickLot")?.value || "";
+    status.innerHTML = terrainQuickInteractiveMapState.autoIdentified
+      ? `<i class="fa-solid fa-circle-check"></i> Quadra ${escapeHtml(block)} e lote ${escapeHtml(lot)} preenchidos pelo mapa.`
+      : `<i class="fa-regular fa-hand-pointer"></i> ${terrainInteractiveHotspots(map.id).length ? "Toque no terreno para identificar quadra e lote." : "Toque para marcar a posição e preencha quadra e lote manualmente."}`;
+  }
+  applyTerrainQuickInteractiveZoom();
+  renderTerrainQuickInteractivePin();
+}
+
+function selectTerrainQuickInteractiveMap(mapId) {
+  const candidates = terrainQuickInteractiveCandidates();
+  const selected = candidates.find((item) => item.map.id === mapId);
+  terrainQuickInteractiveMapState = { mapId, scale: 1, pointX: null, pointY: null, autoIdentified: false };
+  if (selected && $("terrainQuickDevelopment")) $("terrainQuickDevelopment").value = selected.development.id;
+  if (selected?.development?.bairro && $("terrainQuickNeighborhood")) $("terrainQuickNeighborhood").value = selected.development.bairro;
+  renderTerrainQuickInteractiveMapPicker();
+}
+
+function markTerrainQuickInteractiveMapPoint(event) {
+  const surface = $("terrainQuickInteractiveMapSurface");
+  if (!surface || !terrainQuickInteractiveMapState.mapId) return;
+  const rect = surface.getBoundingClientRect();
+  const clientX = event.clientX ?? (rect.left + rect.width / 2);
+  const clientY = event.clientY ?? (rect.top + rect.height / 2);
+  const pointX = Math.max(0, Math.min(100, (clientX - rect.left) / rect.width * 100));
+  const pointY = Math.max(0, Math.min(100, (clientY - rect.top) / rect.height * 100));
+  const hotspot = terrainInteractiveHotspotNear(terrainQuickInteractiveMapState.mapId, pointX, pointY, rect.width, rect.height);
+  terrainQuickInteractiveMapState.pointX = hotspot?.x ?? pointX;
+  terrainQuickInteractiveMapState.pointY = hotspot?.y ?? pointY;
+  terrainQuickInteractiveMapState.autoIdentified = Boolean(hotspot);
+  if (hotspot) {
+    const selection = buildTerrainInteractiveSelection(terrainQuickInteractiveMapState.mapId, hotspot.block, hotspot.lot);
+    if ($("terrainQuickBlock")) $("terrainQuickBlock").value = hotspot.block;
+    if ($("terrainQuickLot")) $("terrainQuickLot").value = hotspot.lot;
+    if ($("terrainQuickArea")) $("terrainQuickArea").value = terrainInteractiveExactArea(selection?.lotArea || "");
+    if ($("terrainQuickStreet") && selection?.street !== "Confirmar na planta") $("terrainQuickStreet").value = selection?.street || "";
+    const reference = $("terrainQuickReference");
+    if (reference && (!reference.value.trim() || reference.value === terrainQuickAutoMapReference || reference.value === terrainQuickAutoAddress)) {
+      reference.value = selection?.reference || "";
+      terrainQuickAutoMapReference = reference.value;
+    }
+    const nickname = $("terrainQuickNickname");
+    if (nickname && (!nickname.value.trim() || /^Prospecção \d{2}\/\d{2}/.test(nickname.value))) {
+      nickname.value = `${selection.shortName} - Q. ${selection.block} / L. ${selection.lot}`;
+    }
+    showToast(`Quadra ${hotspot.block}, lote ${hotspot.lot} selecionado no Cadastro Rápido.`);
+  }
+  renderTerrainQuickInteractiveMapPicker();
 }
 
 function renderTerrainQuickAccess() {
@@ -3841,8 +3999,253 @@ function terrainQuickFormValues() {
     cadastro_rapido: true,
     prospeccao_status: "pendente_dados",
     localizacao_referencia: locationReference,
-    precisao_gps_m: $("terrainQuickAccuracy")?.value || ""
+    precisao_gps_m: $("terrainQuickAccuracy")?.value || "",
+    mapa_interativo_id: terrainQuickInteractiveMapState.mapId || "",
+    mapa_interativo_x: Number.isFinite(terrainQuickInteractiveMapState.pointX) ? terrainQuickInteractiveMapState.pointX : "",
+    mapa_interativo_y: Number.isFinite(terrainQuickInteractiveMapState.pointY) ? terrainQuickInteractiveMapState.pointY : ""
   };
+}
+
+function terrainProspectionCharacteristics(terrain = {}) {
+  const source = Array.isArray(terrain.caracteristicas)
+    ? Object.fromEntries(terrain.caracteristicas.map((key) => [key, true]))
+    : (terrain.caracteristicas || {});
+  return terrainCharacteristicLabels(source);
+}
+
+function terrainSatelliteTileProxyUrl(zoom, tileX, tileY) {
+  const normalizedX = ((tileX % (2 ** zoom)) + (2 ** zoom)) % (2 ** zoom);
+  const source = `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${zoom}/${tileY}/${normalizedX}`;
+  const proxyOrigin = /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname)
+    ? "https://www.olacarlopolis.com"
+    : window.location.origin;
+  return `${proxyOrigin}/api/image-proxy?url=${encodeURIComponent(source)}`;
+}
+
+async function terrainSatelliteCanvas(latitude, longitude, width = 540, height = 390, zoom = 18) {
+  if (latitude === "" || latitude === null || latitude === undefined || longitude === "" || longitude === null || longitude === undefined) return null;
+  const lat = Number(latitude);
+  const lon = Number(longitude);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  const safeLat = Math.max(-85.05112878, Math.min(85.05112878, lat));
+  const tileCount = 2 ** zoom;
+  const centerX = ((lon + 180) / 360) * tileCount * 256;
+  const latRad = safeLat * Math.PI / 180;
+  const centerY = (1 - Math.asinh(Math.tan(latRad)) / Math.PI) / 2 * tileCount * 256;
+  const originX = centerX - width / 2;
+  const originY = centerY - height / 2;
+  const startX = Math.floor(originX / 256);
+  const endX = Math.floor((originX + width) / 256);
+  const startY = Math.max(0, Math.floor(originY / 256));
+  const endY = Math.min(tileCount - 1, Math.floor((originY + height) / 256));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = "#dbe5df";
+  ctx.fillRect(0, 0, width, height);
+  const jobs = [];
+  for (let x = startX; x <= endX; x += 1) {
+    for (let y = startY; y <= endY; y += 1) {
+      jobs.push((async () => {
+        const image = await carregarImagemCanvas(terrainSatelliteTileProxyUrl(zoom, x, y));
+        if (image) ctx.drawImage(image, x * 256 - originX, y * 256 - originY, 256, 256);
+        return Boolean(image);
+      })());
+    }
+  }
+  const loaded = await Promise.all(jobs);
+  return loaded.some(Boolean) ? canvas : null;
+}
+
+function drawTerrainProspectionField(ctx, label, value, x, y, width, height = 92, maxLines = 2, fontSize = 24) {
+  preencherRoundRect(ctx, x, y, width, height, 14, "#f4f8f6");
+  ctx.fillStyle = "#168565";
+  ctx.font = "900 17px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText(String(label || "").toUpperCase(), x + 18, y + 28);
+  ctx.fillStyle = "#1f3b32";
+  ctx.font = `800 ${fontSize}px Arial`;
+  textoQuebradoCanvas(ctx, value || "Não informado", x + 18, y + 61, width - 36, 27, maxLines);
+}
+
+function drawTerrainProspectionImageTitle(ctx, title, subtitle, x, y, width) {
+  ctx.fillStyle = "#183b31";
+  ctx.font = "900 22px Arial";
+  ctx.textAlign = "left";
+  ctx.fillText(title, x, y);
+  ctx.fillStyle = "#687d74";
+  ctx.font = "600 15px Arial";
+  ctx.textAlign = "right";
+  ctx.fillText(subtitle, x + width, y);
+}
+
+function drawTerrainInteractiveExport(ctx, image, map, x, y, width, height, pointX, pointY) {
+  preencherRoundRect(ctx, x, y, width, height, 18, "#eef3f1");
+  if (!image || !map) {
+    ctx.fillStyle = "#63776e";
+    ctx.font = "800 22px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Nenhuma planta interativa selecionada", x + width / 2, y + height / 2);
+    return;
+  }
+  const hasPoint = pointX !== "" && pointX !== null && pointX !== undefined
+    && pointY !== "" && pointY !== null && pointY !== undefined
+    && Number.isFinite(Number(pointX)) && Number.isFinite(Number(pointY));
+  ctx.save();
+  canvasRoundRect(ctx, x, y, width, height, 18);
+  ctx.clip();
+  if (hasPoint) {
+    const cropWidth = image.width * .34;
+    const cropHeight = Math.min(image.height, cropWidth * height / width);
+    const centerX = Number(pointX) / 100 * image.width;
+    const centerY = Number(pointY) / 100 * image.height;
+    const sourceX = Math.max(0, Math.min(image.width - cropWidth, centerX - cropWidth / 2));
+    const sourceY = Math.max(0, Math.min(image.height - cropHeight, centerY - cropHeight / 2));
+    ctx.drawImage(image, sourceX, sourceY, cropWidth, cropHeight, x, y, width, height);
+    const markerX = x + (centerX - sourceX) / cropWidth * width;
+    const markerY = y + (centerY - sourceY) / cropHeight * height;
+    ctx.fillStyle = "rgba(220, 38, 38, .22)";
+    ctx.beginPath();
+    ctx.arc(markerX, markerY, 24, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#dc2626";
+    ctx.beginPath();
+    ctx.arc(markerX, markerY, 10, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.lineWidth = 4;
+    ctx.strokeStyle = "#ffffff";
+    ctx.stroke();
+  } else {
+    desenharImagemContain(ctx, image, x, y, width, height, 0, "#eef3f1");
+  }
+  ctx.restore();
+}
+
+async function exportTerrainProspectionImage(savedTerrain = null, sourceButton = null) {
+  const button = sourceButton || $("terrainQuickExportImage");
+  setBusy(button, true, "Gerando imagem...");
+  try {
+    const terrain = savedTerrain
+      ? { ...savedTerrain, codigo_referencia: terrainReferenceCode(savedTerrain) || savedTerrain.codigo_referencia }
+      : terrainQuickFormValues();
+    const development = terrainDevelopmentById(terrain.development_id);
+    const map = terrainInteractiveMapById(terrain.mapa_interativo_id)
+      || terrainInteractiveMapForDevelopment(development || {});
+    const pointX = savedTerrain ? terrain.mapa_interativo_x : terrainQuickInteractiveMapState.pointX;
+    const pointY = savedTerrain ? terrain.mapa_interativo_y : terrainQuickInteractiveMapState.pointY;
+    const satellite = await terrainSatelliteCanvas(terrain.latitude, terrain.longitude);
+    const interactiveImage = map ? await carregarImagemCanvas(map.image) : null;
+    let terrainPhoto = null;
+    if (savedTerrain) {
+      const photo = terrainPhotoRecords(state.terrainManagement?.photos || {}, terrain.id)[0];
+      if (photo?.url) terrainPhoto = await carregarImagemCanvas(photo.url);
+    } else {
+      const photoFile = $("terrainQuickPhotos")?.files?.[0];
+      if (photoFile) terrainPhoto = await loadImageElementFromFile(photoFile);
+    }
+    const hasPhoto = Boolean(terrainPhoto);
+    const canvas = document.createElement("canvas");
+    canvas.width = 1200;
+    canvas.height = hasPhoto ? 1790 : 1320;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#edf4f1";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+    gradient.addColorStop(0, "#0f604a");
+    gradient.addColorStop(1, "#168565");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, 148);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "900 39px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText("Ficha de prospecção de terreno", 40, 62);
+    ctx.font = "700 22px Arial";
+    ctx.fillText(terrain.apelido || "Terreno em prospecção", 40, 103, 790);
+    ctx.textAlign = "right";
+    ctx.font = "900 25px Arial";
+    ctx.fillText(terrain.codigo_referencia || "SEM CÓDIGO", 1160, 62);
+    ctx.font = "600 17px Arial";
+    ctx.fillText(new Date().toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" }), 1160, 101);
+
+    const status = terrainStatusMeta(terrain.status);
+    const area = Number(terrain.area_m2) > 0 ? `${Number(terrain.area_m2).toLocaleString("pt-BR", { maximumFractionDigits: 2 })} m²` : "A confirmar";
+    const hasGps = terrain.latitude !== "" && terrain.latitude !== null && terrain.latitude !== undefined
+      && terrain.longitude !== "" && terrain.longitude !== null && terrain.longitude !== undefined
+      && Number.isFinite(Number(terrain.latitude)) && Number.isFinite(Number(terrain.longitude));
+    const gps = hasGps
+      ? `${Number(terrain.latitude).toFixed(6)}, ${Number(terrain.longitude).toFixed(6)}${terrain.precisao_gps_m ? ` · precisão ${terrain.precisao_gps_m} m` : ""}`
+      : "Não marcado";
+    const direction = terrainDirectionLabel(terrain.direcao_graus);
+    const fields = [
+      ["Bairro", terrain.bairro],
+      ["Loteamento", development?.nome || map?.name],
+      ["Quadra / lote", terrain.quadra || terrain.lote ? `Q. ${terrain.quadra || "-"} · L. ${terrain.lote || "-"}` : "Não informado"],
+      ["Área aproximada", area],
+      ["Situação", status.label],
+      ["GPS / direção", `${gps} · ${direction}`]
+    ];
+    fields.forEach(([label, value], index) => {
+      const column = index % 3;
+      const row = Math.floor(index / 3);
+      drawTerrainProspectionField(ctx, label, value, 40 + column * 380, 178 + row * 108, 360, 92);
+    });
+
+    drawTerrainProspectionImageTitle(ctx, "Imagem aérea do ponto", satellite ? "Ponto GPS centralizado" : "GPS não disponível", 40, 420, 540);
+    drawTerrainProspectionImageTitle(ctx, "Planta interativa", map ? map.shortName : "Não selecionada", 620, 420, 540);
+    preencherRoundRect(ctx, 40, 442, 540, 390, 18, "#dbe5df");
+    if (satellite) {
+      ctx.save();
+      canvasRoundRect(ctx, 40, 442, 540, 390, 18);
+      ctx.clip();
+      ctx.drawImage(satellite, 40, 442, 540, 390);
+      ctx.fillStyle = "rgba(220, 38, 38, .24)";
+      ctx.beginPath();
+      ctx.arc(310, 637, 26, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#dc2626";
+      ctx.beginPath();
+      ctx.arc(310, 637, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = "#ffffff";
+      ctx.stroke();
+      ctx.restore();
+    } else {
+      ctx.fillStyle = "#63776e";
+      ctx.font = "800 22px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText("Marque o GPS para incluir a imagem aérea", 310, 640);
+    }
+    drawTerrainInteractiveExport(ctx, interactiveImage, map, 620, 442, 540, 390, pointX, pointY);
+
+    drawTerrainProspectionField(ctx, "Endereço ou referência", terrain.localizacao_referencia || [terrain.rua, terrain.bairro].filter(Boolean).join(" · "), 40, 860, 1120, 116);
+    const characteristics = terrainProspectionCharacteristics(terrain);
+    drawTerrainProspectionField(ctx, "Características observadas", characteristics.join(", ") || "Nenhuma informada", 40, 994, 540, 150, 4, 20);
+    drawTerrainProspectionField(ctx, "Observações", terrain.observacoes || "Nenhuma observação informada", 620, 994, 540, 150, 4, 20);
+
+    if (hasPhoto) {
+      drawTerrainProspectionImageTitle(ctx, "Foto registrada em campo", "Primeira imagem da prospecção", 40, 1192, 1120);
+      desenharImagemCover(ctx, terrainPhoto, 40, 1214, 1120, 470, 18);
+    }
+    const footerY = canvas.height - 48;
+    ctx.fillStyle = "#526c62";
+    ctx.font = "600 14px Arial";
+    ctx.textAlign = "left";
+    ctx.fillText("Imagem aérea: Esri World Imagery. Planta interativa usada como referência operacional.", 40, footerY);
+    ctx.textAlign = "right";
+    ctx.fillText("Olá Carlópolis · Gestão de Terrenos", 1160, footerY);
+    const blob = await canvasParaBlob(canvas);
+    baixarBlobCanvas(blob, `prospeccao-${slugify(terrain.codigo_referencia || terrain.apelido || Date.now())}.png`);
+    showToast(satellite
+      ? "Ficha da prospecção exportada em uma única imagem."
+      : "Ficha exportada. Marque o GPS para incluir a imagem aérea.", { prominent: true });
+  } catch (error) {
+    console.error("Falha ao exportar a ficha da prospecção.", error);
+    showToast(error?.message || "Não foi possível gerar a imagem da prospecção.");
+  } finally {
+    setBusy(button, false);
+  }
 }
 
 async function saveTerrainQuickCapture(event) {
@@ -4859,6 +5262,7 @@ function openTerrainDetail(terrainId) {
       ${!terrain.owner_id ? `<button type="button" data-terrain-link-owner="${escapeAttr(terrain.id)}"><i class="fa-solid fa-link"></i> Vincular proprietário</button>` : ""}
       ${mapsUrl ? `<a class="ghost-button" href="${escapeAttr(mapsUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-map-location-dot"></i> Abrir no Google Maps</a>` : ""}
       ${terrain.development_id ? `<button type="button" class="ghost-button" data-terrain-view-development="${escapeAttr(terrain.development_id)}"><i class="fa-solid fa-map"></i> Ver planta do loteamento</button>` : ""}
+      ${terrain.cadastro_rapido ? `<button type="button" class="ghost-button" data-terrain-export-prospection="${escapeAttr(terrain.id)}" data-no-loading><i class="fa-solid fa-file-image"></i> Exportar ficha em imagem</button>` : ""}
       <button type="button" class="ghost-button ${isInactive ? "success-button" : "warning-button"}" data-terrain-toggle-active="${escapeAttr(terrain.id)}" data-no-loading><i class="fa-solid ${isInactive ? "fa-circle-check" : "fa-ban"}"></i> ${isInactive ? "Ativar terreno" : "Desativar terreno"}</button>
       <button type="button" class="danger-button" data-terrain-delete="${escapeAttr(terrain.id)}" data-no-loading ${deletion.blocked ? "disabled title=\"Exclusão bloqueada: existem vistorias, orçamentos ou serviços vinculados\"" : ""}><i class="fa-solid fa-trash"></i> ${terrain.cadastro_rapido ? "Excluir prospecção" : "Excluir terreno"}</button>
     </div>
@@ -27778,7 +28182,38 @@ function bindEvents() {
   $("cancelTerrainQuickForm")?.addEventListener("click", resetTerrainQuickForm);
   $("terrainQuickUseLocation")?.addEventListener("click", useCurrentTerrainQuickLocation);
   $("terrainQuickReference")?.addEventListener("input", () => setTerrainQuickLocationPending(terrainQuickLocationPending));
+  $("terrainQuickNeighborhood")?.addEventListener("input", renderTerrainQuickInteractiveMapPicker);
+  $("terrainQuickNeighborhood")?.addEventListener("change", () => {
+    const selectedDevelopment = terrainDevelopmentById($("terrainQuickDevelopment")?.value || "");
+    if (selectedDevelopment && normalizeTerrainInteractiveMapName(selectedDevelopment.bairro) !== normalizeTerrainInteractiveMapName($("terrainQuickNeighborhood")?.value || "")) {
+      $("terrainQuickDevelopment").value = "";
+      terrainQuickInteractiveMapState = { mapId: "", scale: 1, pointX: null, pointY: null, autoIdentified: false };
+    }
+    renderTerrainQuickInteractiveMapPicker();
+  });
+  $("terrainQuickDevelopment")?.addEventListener("change", () => {
+    const development = terrainDevelopmentById($("terrainQuickDevelopment")?.value || "");
+    if (development?.bairro && $("terrainQuickNeighborhood")) $("terrainQuickNeighborhood").value = development.bairro;
+    const map = terrainInteractiveMapForDevelopment(development || {});
+    terrainQuickInteractiveMapState = { mapId: map?.id || "", scale: 1, pointX: null, pointY: null, autoIdentified: false };
+    renderTerrainQuickInteractiveMapPicker();
+  });
+  $("terrainQuickInteractiveMapSelect")?.addEventListener("change", (event) => selectTerrainQuickInteractiveMap(event.target.value));
+  $("terrainQuickInteractiveZoomOut")?.addEventListener("click", () => setTerrainQuickInteractiveZoom(terrainQuickInteractiveMapState.scale - 0.25));
+  $("terrainQuickInteractiveZoomIn")?.addEventListener("click", () => setTerrainQuickInteractiveZoom(terrainQuickInteractiveMapState.scale + 0.25));
+  $("terrainQuickInteractiveZoomReset")?.addEventListener("click", () => setTerrainQuickInteractiveZoom(1));
+  $("terrainQuickInteractiveMapStage")?.addEventListener("click", markTerrainQuickInteractiveMapPoint);
+  $("terrainQuickInteractiveMapStage")?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    markTerrainQuickInteractiveMapPoint(event);
+  });
+  ["terrainQuickBlock", "terrainQuickLot"].forEach((id) => $(id)?.addEventListener("input", () => {
+    terrainQuickInteractiveMapState.autoIdentified = false;
+    renderTerrainQuickInteractiveMapPicker();
+  }));
   $("terrainQuickPhotos")?.addEventListener("change", () => renderTerrainSelectedPhotoPreview("terrainQuickPhotos", "terrainQuickPhotoPreview"));
+  $("terrainQuickExportImage")?.addEventListener("click", () => exportTerrainProspectionImage());
   $("terrainQuickForm")?.addEventListener("submit", saveTerrainQuickCapture);
   $("newTerrainOwner")?.addEventListener("click", () => openTerrainOwnerForm());
   $("closeTerrainOwnerForm")?.addEventListener("click", resetTerrainOwnerForm);
@@ -27872,6 +28307,8 @@ function bindEvents() {
     }
   });
   $("terrainDetailContent")?.addEventListener("click", (event) => {
+    const exportButton = event.target.closest("[data-terrain-export-prospection]");
+    if (exportButton) return exportTerrainProspectionImage(terrainById(exportButton.dataset.terrainExportProspection), exportButton);
     const activeButton = event.target.closest("[data-terrain-toggle-active]");
     if (activeButton) return toggleTerrainActiveState(activeButton.dataset.terrainToggleActive);
     const unlinkButton = event.target.closest("[data-terrain-unlink-id]");
