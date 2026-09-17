@@ -11943,6 +11943,15 @@ button.admin-button-loading::after {
 .post-art-layout-card.variant-3 .post-art-layout-mini i { inset: 12px 7px 12px 38px; transform: rotate(5deg); }
 .post-art-layout-card.variant-3 .post-art-layout-mini b { left: 7px; right: 43px; bottom: 23px; height: 30px; }
 
+.post-art-layout-card[data-post-art-layout^="produto-"] .post-art-layout-mini i { inset: 13px 40px 9px 5px; transform: none; border: 1px solid var(--art-accent); }
+.post-art-layout-card[data-post-art-layout^="produto-"] .post-art-layout-mini b { left: 41px; right: 5px; top: 20px; bottom: auto; height: 14px; background: var(--art-primary); }
+.post-art-layout-card[data-post-art-layout^="produto-"] .post-art-layout-mini em { right: 5px; bottom: 22px; width: 30px; height: 12px; }
+.post-art-layout-card[data-post-art-layout="produto-vermelho"] .post-art-layout-mini i { border-radius: 50%; }
+.post-art-layout-card[data-post-art-layout="produto-rosa"] .post-art-layout-mini i { border-radius: 20px 20px 4px 4px; }
+.post-art-layout-card[data-post-art-layout="produto-artesanal"] .post-art-layout-mini i,
+.post-art-layout-card[data-post-art-layout="produto-amarelo"] .post-art-layout-mini i { transform: rotate(-7deg); }
+.post-art-layout-card[data-post-art-layout="produto-preto"] .post-art-layout-mini i { border: 2px solid var(--art-accent); }
+
 .post-art-fields {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

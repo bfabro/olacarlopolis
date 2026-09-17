@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 757,
-  label: "v764",
-  data: "2026-09-14",
-  nota: "Terrenos em ordem configurável, áreas visíveis e medidas da planta preenchidas automaticamente."
+  numero: 758,
+  label: "v765",
+  data: "2026-09-17",
+  nota: "Oito modelos de produtos para Feed e Reels sem exposição do campo de URL da imagem."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24475,10 +24475,14 @@ async function baixarStoryComercial() {
 
 const POST_ART_LAYOUTS = {
   produto: [
-    { key: "produto-minimal", nome: "Minimal Shop", descricao: "Estilo clean de e-commerce com foco no produto", variant: 0, bg: "#f8fafc", panel: "#ffffff", primary: "#111827", accent: "#bef264", ink: "#111827" },
-    { key: "produto-gradient", nome: "Gradient Commerce", descricao: "Gradiente atual, contraste alto e preço evidente", variant: 1, bg: "#0f172a", panel: "#172554", primary: "#06b6d4", accent: "#facc15", ink: "#ffffff" },
-    { key: "produto-editorial", nome: "Foto Editorial", descricao: "Imagem dominante com tipografia de campanha", variant: 2, bg: "#111111", panel: "#fff7ed", primary: "#ea580c", accent: "#fed7aa", ink: "#ffffff" },
-    { key: "produto-pop", nome: "Pop Social", descricao: "Cores vivas e composição dinâmica para o feed", variant: 3, bg: "#581c87", panel: "#ffffff", primary: "#f43f5e", accent: "#fde047", ink: "#ffffff" }
+    { key: "produto-azul", nome: "01 · Azul Comercial", descricao: "Ondas azuis, vitrine clara e preço amarelo", variant: 0, reference: true, bg: "#f7faff", panel: "#ffffff", primary: "#0068ee", accent: "#ffda21", ink: "#06244c", shape: "podium" },
+    { key: "produto-bege", nome: "02 · Luxo Elegante", descricao: "Bege, curva escura e detalhes dourados", variant: 1, reference: true, bg: "#efe2ce", panel: "#f7eedf", primary: "#262019", accent: "#c99b57", ink: "#241b12", shape: "luxury", serif: true },
+    { key: "produto-preto", nome: "03 · Preto e Dourado", descricao: "Moldura premium, contraste escuro e ouro", variant: 1, reference: true, bg: "#101112", panel: "#1a1b1c", primary: "#e2bb64", accent: "#e2bb64", ink: "#ffffff", shape: "frame" },
+    { key: "produto-artesanal", nome: "04 · Artesanal", descricao: "Papel creme, madeira e foto estilo polaroid", variant: 0, reference: true, bg: "#f1e5ce", panel: "#fffaef", primary: "#703314", accent: "#555c2c", ink: "#4c2a16", shape: "polaroid", serif: true },
+    { key: "produto-vermelho", nome: "05 · Vermelho Impacto", descricao: "Vitrine circular e etiqueta amarela", variant: 3, reference: true, bg: "#c90808", panel: "#fffdfa", primary: "#ffffff", accent: "#ffde27", ink: "#ffffff", shape: "circle" },
+    { key: "produto-amarelo", nome: "06 · Amarelo Destaque", descricao: "Cores vivas, foto inclinada e preço claro", variant: 3, reference: true, bg: "#ffdf00", panel: "#fffdf5", primary: "#10181d", accent: "#ffffff", ink: "#10181d", shape: "tilted" },
+    { key: "produto-rosa", nome: "07 · Rosa Delicado", descricao: "Arco suave, detalhes rosados e elegância", variant: 0, reference: true, bg: "#ffe9ee", panel: "#fff7f8", primary: "#ae264c", accent: "#f8c4d2", ink: "#7e1836", shape: "arch", serif: true },
+    { key: "produto-laranja", nome: "08 · Laranja Vibrante", descricao: "Vitrine com pedestal e chamada intensa", variant: 3, reference: true, bg: "#ff6900", panel: "#fff9ee", primary: "#ffffff", accent: "#ffe695", ink: "#ffffff", shape: "podium" }
   ],
   promocao: [
     { key: "promocao-flash", nome: "Flash Sale", descricao: "Oferta limpa com preço grande e urgência visual", variant: 0, bg: "#fff7ed", panel: "#ffffff", primary: "#dc2626", accent: "#fde047", ink: "#2b1717" },
@@ -24546,7 +24550,6 @@ function postArtLayout(type = state.postArtType, key = state.postArtLayout) {
 function postArtItemImage(item = {}) {
   return normalizarImagemArteAdmin(
     state.postArtCustomImage
-      || $("postArtImage")?.value
       || item.imagem
       || item.imagens?.[0]
       || ""
@@ -24814,7 +24817,160 @@ function desenharPostArtReelsCanvas(ctx, data, client, image, logo, siteLogo, la
   }
 }
 
+function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLogo, layout) {
+  const vertical = data.format === "reels";
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const dark = layout.key === "produto-preto";
+  const rustic = layout.shape === "polaroid";
+  const luxury = layout.shape === "luxury";
+  const family = layout.serif ? "Georgia" : "Arial";
+  ctx.save();
+  const background = ctx.createLinearGradient(0, 0, w, h);
+  background.addColorStop(0, layout.bg);
+  background.addColorStop(1, dark ? "#030404" : layout.bg);
+  ctx.fillStyle = background;
+  ctx.fillRect(0, 0, w, h);
+
+  // Each reference keeps its own framing, palette and decorative geometry.
+  ctx.fillStyle = rustic ? "#573019" : (luxury ? "#262019" : layout.primary);
+  if (luxury || rustic) {
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(vertical ? 360 : 350, 0);
+    ctx.quadraticCurveTo(vertical ? 470 : 570, h * .42, vertical ? 250 : 360, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fill();
+    if (rustic) {
+      ctx.strokeStyle = "rgba(236,196,147,.18)";
+      ctx.lineWidth = 3;
+      for (let y = 10; y < h; y += 19) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(420, y + 8); ctx.stroke();
+      }
+    }
+  } else if (dark) {
+    ctx.fillStyle = "#202123";
+    ctx.beginPath(); ctx.moveTo(300, 0); ctx.lineTo(650, 0); ctx.lineTo(0, 900); ctx.lineTo(0, 470); ctx.closePath(); ctx.fill();
+  } else {
+    ctx.globalAlpha = layout.key === "produto-azul" ? 1 : .12;
+    ctx.beginPath(); ctx.ellipse(-90, h * .4, 650, h * .34, -.25, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = .12;
+    ctx.beginPath(); ctx.ellipse(w + 60, 0, 380, 230, .4, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+  }
+
+  if (vertical) {
+    ctx.fillStyle = layout.bg;
+    ctx.fillRect(0, 900, w, h - 900);
+  }
+  postArtDrawBrand(ctx, client, logo, siteLogo, layout, {
+    x: 42, y: vertical ? 65 : 28, width: 565, dark: dark || luxury || rustic,
+    showSiteLogo: data.showSiteLogo
+  });
+  if (!vertical) postArtDrawText(ctx, "Conheça nossos produtos", 640, 61, 380, 2, 27, layout.ink, { family, weight: 600, min: 18 });
+
+  const photo = vertical ? { x: 90, y: 228, w: 900, h: 650 } : { x: 42, y: 182, w: 470, h: 690 };
+  ctx.save();
+  if (layout.shape === "tilted" || rustic) {
+    ctx.translate(photo.x + photo.w / 2, photo.y + photo.h / 2);
+    ctx.rotate(rustic ? -.045 : -.035);
+    ctx.translate(-photo.x - photo.w / 2, -photo.y - photo.h / 2);
+  }
+  const radius = layout.shape === "arch" ? Math.min(photo.w / 2, 220) : (dark ? 24 : 48);
+  const photoFill = dark ? "#202224" : "#f6f5f1";
+  if (layout.shape !== "circle") preencherRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, radius, photoFill);
+  if (layout.shape === "circle") {
+    ctx.beginPath();
+    ctx.ellipse(photo.x + photo.w / 2, photo.y + photo.h / 2, photo.w / 2, photo.h / 2, 0, 0, Math.PI * 2);
+    ctx.fillStyle = photoFill;
+    ctx.fill();
+    ctx.clip();
+  }
+  postArtDrawPhoto(ctx, image, { x: photo.x + 16, y: photo.y + 16, w: photo.w - 32, h: photo.h - 32 }, data.imageFit || "contain", Math.max(0, radius - 12), photoFill);
+  if (dark || luxury || layout.shape === "arch") desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, radius, layout.accent, 3);
+  if (rustic) {
+    desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 8, "#fff8e9", 18);
+    preencherRoundRect(ctx, photo.x + photo.w * .3, photo.y - 15, photo.w * .4, 36, 2, "#c69d69");
+  }
+  if (layout.shape === "podium" || layout.shape === "arch" || luxury) {
+    const pedestal = ctx.createLinearGradient(0, photo.y + photo.h - 80, 0, photo.y + photo.h + 10);
+    pedestal.addColorStop(0, "#ffffff"); pedestal.addColorStop(1, dark ? "#303030" : "#c5c7ca");
+    ctx.fillStyle = pedestal;
+    ctx.beginPath(); ctx.ellipse(photo.x + photo.w / 2, photo.y + photo.h - 15, photo.w * .49, 42, 0, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+
+  const x = vertical ? 90 : 552;
+  const width = vertical ? 900 : 480;
+  const titleY = vertical ? 960 : 225;
+  const calloutY = vertical ? 906 : 172;
+  preencherRoundRect(ctx, x, calloutY, width * .75, 35, 18, layout.accent);
+  postArtDrawText(ctx, data.callout || "PRODUTO EM DESTAQUE", x + width * .375, calloutY + 9, width * .7, 1, 16, dark ? "#17130b" : (luxury ? "#241b12" : "#29200e"), { align: "center", min: 11 });
+  postArtDrawText(ctx, data.title, x, titleY, width, vertical ? 2 : 3, vertical ? 68 : 58, layout.ink, { family, min: vertical ? 34 : 29, lineHeight: vertical ? 72 : 61, blockHeight: vertical ? 152 : 187 });
+  const descriptionY = vertical ? 1134 : 425;
+  postArtDrawText(ctx, data.description, x, descriptionY, width, 3, vertical ? 29 : 23, dark ? "#d6d6d6" : layout.ink, { min: vertical ? 18 : 15, weight: 500, lineHeight: vertical ? 34 : 28 });
+
+  const priceY = vertical ? 1264 : 535;
+  const priceHeight = vertical ? 158 : 137;
+  const priceFill = luxury || dark ? "#191714" : (rustic ? "#a04b26" : layout.key === "produto-azul" ? layout.accent : layout.panel);
+  const priceInk = luxury || dark ? layout.accent : (rustic ? "#fff3df" : layout.key === "produto-vermelho" || layout.key === "produto-laranja" ? layout.bg : layout.ink);
+  preencherRoundRect(ctx, x, priceY, width, priceHeight, 30, priceFill);
+  if (luxury || dark) desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 30, layout.accent, 2);
+  postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 27, width - 48, 1, 15, priceInk, { min: 11, weight: 700 });
+  postArtDrawText(ctx, postArtMoney(data.price), x + width / 2, priceY + (vertical ? 121 : 104), width - 42, 1, vertical ? 74 : 56, priceInk, { family, min: 27, align: "center" });
+
+  const factsY = vertical ? 1450 : 693;
+  const factHeight = vertical ? 128 : 115;
+  const facts = [["DETALHES", "Conheça o produto"], ["ATENDIMENTO", "Fale com a empresa"], ["PEDIDOS", "Consulte disponibilidade"]];
+  facts.forEach(([label, detail], index) => {
+    const cardW = (width - 20) / 3;
+    const cardX = x + index * (cardW + 10);
+    preencherRoundRect(ctx, cardX, factsY, cardW, factHeight, rustic ? 40 : 18, dark ? "#171819" : layout.panel);
+    ctx.strokeStyle = luxury || dark || rustic ? layout.accent
+      : (["produto-vermelho", "produto-laranja"].includes(layout.key) ? layout.bg : layout.primary);
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(cardX + cardW / 2, factsY + 27, 13, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cardX + cardW / 2 - 6, factsY + 27); ctx.lineTo(cardX + cardW / 2 - 1, factsY + 32); ctx.lineTo(cardX + cardW / 2 + 7, factsY + 22); ctx.stroke();
+    const factInk = dark ? "#ffffff" : (luxury ? "#241b12" : rustic ? layout.ink : "#19212b");
+    postArtDrawText(ctx, label, cardX + cardW / 2, factsY + 61, cardW - 12, 1, vertical ? 18 : 14, factInk, { align: "center", min: 10 });
+    postArtDrawText(ctx, detail, cardX + cardW / 2, factsY + 86, cardW - 16, 2, vertical ? 18 : 13, factInk, { align: "center", min: 10, weight: 500, lineHeight: vertical ? 21 : 16 });
+  });
+
+  const ctaY = vertical ? 1633 : 839;
+  const ctaFill = luxury ? "#d0ac72" : rustic ? "#555c2c" : "#079b42";
+  preencherRoundRect(ctx, x, ctaY, width, vertical ? 94 : 82, 40, ctaFill);
+  const ctaInk = luxury ? "#201910" : "#ffffff";
+  ctx.save();
+  ctx.translate(x + 47, ctaY + (vertical ? 47 : 41));
+  ctx.scale(1.6, 1.6);
+  desenharIconeWhatsappCanvas(ctx, 0, 0, ctaInk);
+  ctx.restore();
+  postArtDrawText(ctx, "FALE PELO WHATSAPP  ›", x + width / 2 + 30, ctaY + (vertical ? 60 : 51), width - 102, 1, vertical ? 34 : 25, ctaInk, { min: 17, align: "center" });
+
+  const footerY = vertical ? 1772 : 969;
+  preencherRoundRect(ctx, 28, footerY, 1024, 94, 26, dark ? "#171819" : (rustic ? "#555c2c" : luxury ? "#262019" : layout.key === "produto-azul" ? "#06244c" : layout.panel));
+  const footerInk = dark || rustic || luxury || layout.key === "produto-azul" ? "#ffffff" : layout.key === "produto-rosa" ? layout.ink : "#19212b";
+  const instagram = String(client?.instagram || "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
+  const address = [client?.endereco, client?.bairro, client?.cidade].filter(Boolean).join(" · ");
+  const footerFields = [
+    ["CONTATO", telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte a empresa"],
+    ["INSTAGRAM", instagram || client?.nome || ""],
+    ["ENDEREÇO", address || client?.cidade || "Consulte a empresa"]
+  ];
+  footerFields.forEach(([label, value], index) => {
+    const fx = 49 + index * 338;
+    postArtDrawText(ctx, label, fx, footerY + 16, 306, 1, 13, footerInk, { min: 10, weight: 700 });
+    postArtDrawText(ctx, value, fx, footerY + 41, 306, 2, 19, footerInk, { min: 12, weight: 600, lineHeight: 22 });
+  });
+  ctx.restore();
+}
+
 function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout) {
+  if (data.type === "produto" && layout.reference) {
+    desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLogo, layout);
+    return;
+  }
   if (data.format === "reels") {
     desenharPostArtReelsCanvas(ctx, data, client, image, logo, siteLogo, layout);
     return;
@@ -24858,7 +25014,6 @@ function preencherFormularioPostArt() {
       : (item.categoria || item.setor || "PRODUTO EM DESTAQUE");
   $("postArtValidity").value = isPromo ? (item.validadeFim || "") : "";
   $("postArtServiceMode").value = isService ? (item.atendimento || "") : "";
-  $("postArtImage").value = item.imagem || item.imagens?.[0] || "";
   state.postArtCustomImage = "";
   $("postArtOldPriceLabel")?.classList.toggle("hidden", !isPromo);
   $("postArtValidityLabel")?.classList.toggle("hidden", !isPromo);
@@ -24964,7 +25119,7 @@ function renderPostArtView() {
         </section>
         ${items.length ? `
         <section class="panel-card post-art-step">
-          <div class="post-art-step-title"><span>3</span><div><strong>Modelo visual</strong><small>Quatro estilos atuais adaptados para ${format.nome} e focados em ${typeCopy.plural}.</small></div></div>
+          <div class="post-art-step-title"><span>3</span><div><strong>Modelo visual</strong><small>${layouts.length} estilos adaptados para ${format.nome} e focados em ${typeCopy.plural}.</small></div></div>
           <div class="post-art-layout-grid">
             ${layouts.map((layout) => `<button type="button" data-post-art-layout="${layout.key}" class="post-art-layout-card variant-${layout.variant} ${layout.key === state.postArtLayout ? "active" : ""}" style="--art-bg:${layout.bg};--art-primary:${layout.primary};--art-accent:${layout.accent};--art-panel:${layout.panel}"><span class="post-art-layout-mini"><i></i><b></b><em></em></span><strong>${escapeHtml(layout.nome)}</strong><small>${escapeHtml(layout.descricao)}</small><i class="fa-solid fa-circle-check"></i></button>`).join("")}
           </div>
@@ -24979,7 +25134,6 @@ function renderPostArtView() {
             <label>${typeCopy.callout}<input id="postArtCallout" maxlength="48" placeholder="${type === "servico" ? "Ex.: Atendimento especializado" : "Ex.: Novidade ou 20% OFF"}"></label>
             <label id="postArtValidityLabel" class="${type === "promocao" ? "" : "hidden"}">Validade<input id="postArtValidity" type="date"></label>
             <label id="postArtServiceModeLabel" class="${type === "servico" ? "" : "hidden"}">Forma de atendimento<input id="postArtServiceMode" maxlength="52" placeholder="Ex.: Presencial, online ou a domicílio"></label>
-            <label class="wide ${canManageClients() ? "" : "hidden"}">Imagem usada<input id="postArtImage" placeholder="URL da imagem"></label>
             <label>Nova imagem para esta postagem<input id="postArtImageUpload" type="file" accept="image/*"></label>
             <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
             <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
@@ -25021,7 +25175,7 @@ function renderPostArtView() {
     mount.querySelectorAll("[data-post-art-layout]").forEach((item) => item.classList.toggle("active", item === button));
     atualizarPreviaPostArt();
   }));
-  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImage", "postArtImageFit", "postArtShowSiteLogo"].forEach((id) => {
+  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImageFit", "postArtShowSiteLogo"].forEach((id) => {
     $(id)?.addEventListener("input", agendarPreviaPostArt);
     $(id)?.addEventListener("change", agendarPreviaPostArt);
   });
@@ -25031,7 +25185,6 @@ function renderPostArtView() {
     const reader = new FileReader();
     reader.onload = () => {
       state.postArtCustomImage = String(reader.result || "");
-      if ($("postArtImage")) $("postArtImage").value = "Imagem enviada para esta postagem";
       atualizarPreviaPostArt();
     };
     reader.readAsDataURL(file);
