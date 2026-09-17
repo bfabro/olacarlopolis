@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 763,
-  label: "v770",
+  numero: 764,
+  label: "v771",
   data: "2026-09-17",
-  nota: "Nome editorial e logo do cliente ajustável, sem indicação de consulta quando o produto não possui preço."
+  nota: "Tipografia ajustável do produto e do cliente, com organização responsiva da marca nos formatos Feed e Reels."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24606,7 +24606,7 @@ function postArtDrawBrand(ctx, client, logo, siteLogo, layout, options = {}) {
     const nameWidth = Math.max(90, siteX - nameX - 18);
     const nameSize = (options.nameSize || 30) * (siteWidth ? 1 : 1.5);
     const editorialColor = !siteWidth && options.nameColor ? options.nameColor : textColor;
-    postArtDrawText(ctx, client?.nome || "SUA EMPRESA", nameX + nameWidth / 2, y, nameWidth, 2, Math.round(nameSize), editorialColor, { min: 17, lineHeight: Math.round(nameSize * 1.08), align: "center", blockHeight: logoSize, family: siteWidth ? "Arial" : "Georgia", weight: siteWidth ? 900 : "italic 900" });
+    postArtDrawText(ctx, client?.nome || "SUA EMPRESA", nameX + nameWidth / 2, y, nameWidth, 2, Math.round(nameSize), editorialColor, { min: 17, lineHeight: Math.round(nameSize * 1.08), align: "center", blockHeight: logoSize, family: options.nameFamily || (siteWidth ? "Arial" : "Georgia"), weight: siteWidth ? 900 : "italic 900" });
     if (!siteWidth) {
       ctx.strokeStyle = options.accentColor || editorialColor;
       ctx.lineWidth = 4;
@@ -24896,21 +24896,23 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
 
   const x = vertical ? 70 : 595;
   const width = vertical ? 940 : 445;
-  const brandY = vertical ? 54 : 42;
   const clientLogoSize = Math.max(56, Math.min(vertical ? 180 : 150, Number(data.clientLogoSize) || (vertical ? 110 : 92)));
+  const brandY = vertical ? Math.max(6, (photo.y - clientLogoSize) / 2) : 42;
   postArtDrawBrand(ctx, client, logo, siteLogo, layout, {
     x, y: brandY, width, dark, editorial: true, showSiteLogo: data.showSiteLogo,
     logoSize: clientLogoSize,
     siteWidth: vertical ? 170 : 132,
     nameSize: vertical ? 38 : 29,
     nameLineHeight: vertical ? 40 : 31,
+    nameFamily: data.clientNameFont || "Georgia",
     nameColor: dark ? layout.accent : layout.primary,
     accentColor: layout.accent
   });
 
-  const titleY = vertical ? 1010 : Math.max(186, brandY + clientLogoSize + 20);
-  const titleHeight = postArtDrawText(ctx, data.title, x, titleY, width, 3, vertical ? 72 : 55, layout.ink, { family, min: vertical ? 36 : 27, lineHeight: vertical ? 77 : 58 });
-  const descriptionY = titleY + titleHeight + (vertical ? 28 : 23);
+  const productTitleSize = Math.max(vertical ? 32 : 24, Math.min(vertical ? 92 : 74, Number(data.titleFontSize) || (vertical ? 72 : 55)));
+  const titleTop = vertical ? photo.y + photo.h + 25 : brandY + clientLogoSize + 30;
+  const titleHeight = postArtDrawFittedText(ctx, data.title, x, titleTop, width, vertical ? 205 : 190, productTitleSize, layout.ink, { family, weight: 900 });
+  const descriptionY = titleTop + titleHeight + (vertical ? 24 : 20);
   const hasPrice = numberFromMoney(data.price) > 0;
   const priceY = vertical ? 1595 : 746;
   const contentBottom = hasPrice ? priceY - 22 : (vertical ? 1700 : 838);
@@ -24987,6 +24989,8 @@ function postArtFormData() {
     imageFit: $("postArtImageFit")?.value || "cover",
     showSiteLogo: $("postArtShowSiteLogo")?.checked !== false,
     clientLogoSize: Number($("postArtClientLogoSize")?.value) || (state.postArtFormat === "reels" ? 110 : 92),
+    clientNameFont: $("postArtClientNameFont")?.value || "Georgia",
+    titleFontSize: Number($("postArtTitleFontSize")?.value) || (state.postArtFormat === "reels" ? 72 : 55),
     showHighlightBanner: $("postArtShowHighlightBanner")?.checked === true,
     highlightBannerColor: $("postArtHighlightBannerColor")?.value || "#e8b84b",
     bannerX: Number($("postArtBannerX")?.value ?? (state.postArtFormat === "reels" ? 50 : 9)),
@@ -25153,6 +25157,8 @@ function renderPostArtView() {
               <small class="wide">Com a tarja ativa, arraste-a diretamente na prévia ou use os controles de posição.</small>
               <label class="post-art-font-control">Fonte da descrição (ajustada para caber)<span><input id="postArtDescriptionFontSize" type="range" min="14" max="44" value="22"><output id="postArtDescriptionFontSizeValue">22 px</output></span></label>
               <label class="post-art-font-control">Tamanho da logo do cliente<span><input id="postArtClientLogoSize" type="range" min="56" max="${format.key === "reels" ? 180 : 150}" value="${format.key === "reels" ? 110 : 92}"><output id="postArtClientLogoSizeValue">${format.key === "reels" ? 110 : 92} px</output></span></label>
+              <label class="post-art-font-control">Tamanho do nome do produto<span><input id="postArtTitleFontSize" type="range" min="${format.key === "reels" ? 32 : 24}" max="${format.key === "reels" ? 92 : 74}" value="${format.key === "reels" ? 72 : 55}"><output id="postArtTitleFontSizeValue">${format.key === "reels" ? 72 : 55} px</output></span></label>
+              <label>Fonte do nome do cliente<select id="postArtClientNameFont"><option value="Georgia">Georgia</option><option value="Arial">Arial</option><option value="Trebuchet MS">Trebuchet</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option><option value="Impact">Impact</option><option value="Comic Sans MS">Comic Sans</option><option value="Palatino Linotype">Palatino</option><option value="Garamond">Garamond</option></select></label>
               <label class="check-row wide"><input id="postArtShowHighlightCard" type="checkbox"> Exibir card Destaque do Produto</label>
               <datalist id="postArtHighlightOptions"></datalist>
               ${[1, 2, 3].map((index) => `<label class="wide">Característica ${index} (opcional)<input id="postArtHighlight${index}" list="postArtHighlightOptions" maxlength="120" placeholder="Escolha um detalhe cadastrado ou escreva o destaque"></label>`).join("")}
@@ -25203,11 +25209,11 @@ function renderPostArtView() {
     mount.querySelectorAll("[data-post-art-layout]").forEach((item) => item.classList.toggle("active", item === button));
     atualizarPreviaPostArt();
   }));
-  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImageFit", "postArtShowSiteLogo", "postArtClientLogoSize", "postArtPhoneFontSize", "postArtAddressFontSize", "postArtShowHighlightBanner", "postArtHighlightBannerColor", "postArtDescriptionFontSize", "postArtShowHighlightCard", "postArtHighlightFontSize", "postArtHighlight1", "postArtHighlight2", "postArtHighlight3"].forEach((id) => {
+  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImageFit", "postArtShowSiteLogo", "postArtClientLogoSize", "postArtClientNameFont", "postArtTitleFontSize", "postArtPhoneFontSize", "postArtAddressFontSize", "postArtShowHighlightBanner", "postArtHighlightBannerColor", "postArtDescriptionFontSize", "postArtShowHighlightCard", "postArtHighlightFontSize", "postArtHighlight1", "postArtHighlight2", "postArtHighlight3"].forEach((id) => {
     $(id)?.addEventListener("input", agendarPreviaPostArt);
     $(id)?.addEventListener("change", agendarPreviaPostArt);
   });
-  [["postArtPhoneFontSize", "postArtPhoneFontSizeValue"], ["postArtAddressFontSize", "postArtAddressFontSizeValue"], ["postArtDescriptionFontSize", "postArtDescriptionFontSizeValue"], ["postArtClientLogoSize", "postArtClientLogoSizeValue"], ["postArtHighlightFontSize", "postArtHighlightFontSizeValue"]].forEach(([inputId, outputId]) => {
+  [["postArtPhoneFontSize", "postArtPhoneFontSizeValue"], ["postArtAddressFontSize", "postArtAddressFontSizeValue"], ["postArtDescriptionFontSize", "postArtDescriptionFontSizeValue"], ["postArtClientLogoSize", "postArtClientLogoSizeValue"], ["postArtTitleFontSize", "postArtTitleFontSizeValue"], ["postArtHighlightFontSize", "postArtHighlightFontSizeValue"]].forEach(([inputId, outputId]) => {
     $(inputId)?.addEventListener("input", (event) => {
       if ($(outputId)) $(outputId).textContent = `${event.target.value} px`;
     });

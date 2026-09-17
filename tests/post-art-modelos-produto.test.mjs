@@ -107,7 +107,37 @@ test("formulario oferece fontes e controles opcionais da logo tarja e card", () 
   assert.match(source, /id="postArtDescriptionFontSize" type="range"/);
   assert.match(source, /id="postArtHighlightFontSize" type="range"/);
   assert.match(source, /id="postArtClientLogoSize" type="range"/);
+  assert.match(source, /id="postArtTitleFontSize" type="range"/);
+  assert.match(source, /id="postArtClientNameFont"/);
+  const clientFontOptions = source.match(/<select id="postArtClientNameFont">([\s\S]*?)<\/select>/)?.[1] || "";
+  assert.equal((clientFontOptions.match(/<option /g) || []).length, 10);
   assert.match(source, /editorial: true/);
+});
+
+test("titulo ajustavel respeita a logo e no reels a marca fica acima da foto", () => {
+  const originalContain = sandbox.desenharImagemContain;
+  try {
+    for (const format of ["feed", "reels"]) {
+      const logoCalls = [];
+      sandbox.desenharImagemContain = (_ctx, _image, x, y, width, height) => logoCalls.push({ x, y, width, height });
+      const ctx = mockContext(format === "feed" ? 1080 : 1920);
+      sandbox.desenharPostArtProdutoReferencia(ctx, {
+        ...data,
+        format,
+        clientLogoSize: format === "feed" ? 150 : 180,
+        clientNameFont: "Impact",
+        titleFontSize: format === "feed" ? 74 : 92
+      }, client, null, {}, null, sandbox.layouts[0]);
+      const clientLogo = logoCalls[0];
+      const productTitle = ctx.texts.find((entry) => entry.value.includes("Produto"));
+      assert.ok(clientLogo && productTitle);
+      assert.ok(productTitle.y > clientLogo.y + clientLogo.height, `${format}: título não pode encostar na logo`);
+      if (format === "reels") assert.ok(clientLogo.y + clientLogo.height <= 190, "reels: logo deve permanecer acima da imagem do produto");
+      assert.match(ctx.texts.find((entry) => entry.value.includes("Loja"))?.font || "", /Impact/);
+    }
+  } finally {
+    sandbox.desenharImagemContain = originalContain;
+  }
 });
 
 test("card opcional usa detalhes reais e limita os destaques a tres nos oito modelos", () => {
@@ -192,7 +222,7 @@ if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
     const sc = sheet.getContext("2d");
     sandbox.layouts.forEach((layout, index) => {
       const canvas = createCanvas(1080, height);
-      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, showSiteLogo: index % 2 === 0, clientLogoSize: index % 2 ? (format === "feed" ? 150 : 180) : (format === "feed" ? 92 : 110), price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
+      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, showSiteLogo: index % 2 === 0, clientLogoSize: index % 2 ? (format === "feed" ? 150 : 180) : (format === "feed" ? 92 : 110), clientNameFont: ["Georgia", "Arial", "Trebuchet MS", "Verdana", "Times New Roman", "Courier New", "Impact", "Garamond"][index], titleFontSize: index % 2 ? (format === "feed" ? 68 : 86) : (format === "feed" ? 48 : 64), price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
       writeFileSync(path.join(output, layout.key + "-" + format + ".png"), canvas.toBuffer("image/png"));
       sc.drawImage(canvas, index % 4 * 360, Math.floor(index / 4) * height / 3, 360, height / 3);
     });
