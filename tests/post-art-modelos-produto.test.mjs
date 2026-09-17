@@ -16,7 +16,7 @@ const helperNames = [
   "numberFromMoney", "canvasRoundRect", "preencherRoundRect", "desenharImagemCover",
   "desenharImagemContain", "linhasCanvas", "desenharTextoInteiroCanvas", "desenharBordaRoundRect",
   "postArtMoney", "postArtDrawText", "postArtDrawPhoto", "postArtDrawBrand", "desenharIconeWhatsappCanvas",
-  "postArtProductHighlights", "postArtDrawFittedText", "desenharPostArtProdutoReferencia", "postArtItemImage"
+  "postArtProductHighlights", "postArtDrawFittedText", "postArtBannerRect", "desenharPostArtProdutoReferencia", "postArtItemImage"
 ];
 const sandbox = {
   state: { postArtCustomImage: "" },
@@ -38,7 +38,7 @@ function mockContext(height) {
       if (key in target) return target[key];
       if (key === "createLinearGradient") return () => ({ addColorStop() {} });
       if (key === "measureText") return (value) => ({ width: String(value).length * Number(String(target.font || "20px").match(/(\d+)px/)?.[1] || 20) * .55 });
-      if (key === "fillText") return (value, x, y) => texts.push({ value, x, y });
+      if (key === "fillText") return (value, x, y) => texts.push({ value, x, y, font: target.font });
       return () => {};
     }
   });
@@ -131,6 +131,40 @@ test("fonte solicitada diminui para manter a descricao dentro da altura disponiv
 });
 
 // Optional local visual QA: uses the same production helpers with a real Canvas.
+test("tarja pode ocupar qualquer posicao dentro do canvas e oferece arraste", () => {
+  for (const format of ["feed", "reels"]) {
+    const height = format === "feed" ? 1080 : 1920;
+    for (const bannerX of [0, 50, 100]) for (const bannerY of [0, 50, 100]) {
+      const rect = sandbox.postArtBannerRect({ format, bannerX, bannerY }, 1080, height);
+      assert.ok(rect.x >= 0 && rect.y >= 0 && rect.x + rect.w <= 1080 && rect.y + rect.h <= height);
+    }
+  }
+  assert.match(source, /setPointerCapture/);
+  assert.match(source, /id="postArtBannerX"/);
+  assert.match(source, /id="postArtBannerY"/);
+});
+
+test("nome fica maior e centralizado quando a logo do portal e removida", () => {
+  const sizes = [true, false].map((showSiteLogo) => {
+    const ctx = mockContext(1080);
+    sandbox.postArtDrawBrand(ctx, { nome: "Cliente" }, null, null, sandbox.layouts[0], { editorial: true, showSiteLogo, width: 445, logoSize: 92 });
+    assert.equal(ctx.textAlign, "center");
+    return Number(ctx.texts[0].font.match(/(\d+)px/)[1]);
+  });
+  assert.ok(sizes[1] > sizes[0]);
+});
+
+test("sem preco a descricao e o card aproveitam o espaco liberado", () => {
+  for (const format of ["feed", "reels"]) {
+    const results = ["129,90", ""].map((price) => {
+      const ctx = mockContext(format === "feed" ? 1080 : 1920);
+      sandbox.desenharPostArtProdutoReferencia(ctx, { ...data, format, price, showHighlightCard: true, highlights: ["Cor: Preto", "Tamanho: M"], descriptionFontSize: 44 }, client, null, null, null, sandbox.layouts[0]);
+      return ctx.texts.find((entry) => entry.value === "DESTAQUE DO PRODUTO").y;
+    });
+    assert.ok(results[1] > results[0]);
+  }
+});
+
 if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
   const require = createRequire(import.meta.url);
   const { createCanvas, loadImage } = require(process.env.CODEX_CANVAS_MODULE);
@@ -154,7 +188,7 @@ if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
     const sc = sheet.getContext("2d");
     sandbox.layouts.forEach((layout, index) => {
       const canvas = createCanvas(1080, height);
-      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
+      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, showSiteLogo: index % 2 === 0, price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
       writeFileSync(path.join(output, layout.key + "-" + format + ".png"), canvas.toBuffer("image/png"));
       sc.drawImage(canvas, index % 4 * 360, Math.floor(index / 4) * height / 3, 360, height / 3);
     });

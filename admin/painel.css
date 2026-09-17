@@ -11969,6 +11969,8 @@ button.admin-button-loading::after {
 .post-art-fields .check-row { display: flex; }
 .post-art-fields .check-row input { width: auto; }
 .post-art-fields input[type="color"] { max-width: 120px; min-height: 44px; padding: 5px; cursor: pointer; }
+.post-art-canvas-shell canvas.is-banner-movable { touch-action: none; cursor: grab; }
+.post-art-canvas-shell canvas.is-banner-movable:active { cursor: grabbing; }
 .post-art-fields .post-art-font-control span { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; }
 .post-art-fields .post-art-font-control input { min-height: 38px; padding: 0; accent-color: #1d6f58; }
 .post-art-fields .post-art-font-control output { min-width: 54px; padding: 7px 8px; border-radius: 9px; color: #174d3d; background: #e9f7f1; font-size: .78rem; font-weight: 900; text-align: center; }

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 761,
-  label: "v768",
+  numero: 762,
+  label: "v769",
   data: "2026-09-17",
-  nota: "Tarja colorida, logo opcional e card de características com fontes ajustáveis nos modelos de produto."
+  nota: "Tarja móvel, identidade ampliada e layout adaptativo de descrição e características com ou sem preço."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24506,6 +24506,7 @@ function postArtFormat(key = state.postArtFormat) {
   return POST_ART_FORMATS[key] || POST_ART_FORMATS.feed;
 }
 let postArtPreviewTimer = null;
+let postArtPreviewAssets = null;
 let postArtPreviewRequest = 0;
 
 function postArtClients() {
@@ -24602,7 +24603,9 @@ function postArtDrawBrand(ctx, client, logo, siteLogo, layout, options = {}) {
     const nameX = x + logoSize + 20;
     const siteX = x + width - siteWidth;
     if (logo) desenharImagemContain(ctx, logo, x, y, logoSize, logoSize, 14, "rgba(255,255,255,0)");
-    postArtDrawText(ctx, client?.nome || "SUA EMPRESA", nameX, y + Math.round(logoSize * .31), Math.max(90, siteX - nameX - 18), 2, options.nameSize || 30, textColor, { min: 17, lineHeight: options.nameLineHeight || 31 });
+    const nameWidth = Math.max(90, siteX - nameX - 18);
+    const nameSize = (options.nameSize || 30) * (siteWidth ? 1 : 1.35);
+    postArtDrawText(ctx, client?.nome || "SUA EMPRESA", nameX + nameWidth / 2, y, nameWidth, 2, Math.round(nameSize), textColor, { min: 17, lineHeight: Math.round(nameSize * 1.08), align: "center", blockHeight: logoSize });
     if (siteLogo && siteWidth) desenharImagemContain(ctx, siteLogo, siteX, y, siteWidth, logoSize, 0, "rgba(255,255,255,0)");
     return;
   }
@@ -24851,6 +24854,14 @@ function postArtDrawFittedText(ctx, text, x, top, width, height, requestedSize, 
   return lines.length * spacing;
 }
 
+function postArtBannerRect(data, width, height) {
+  const vertical = data.format === "reels";
+  const bannerWidth = vertical ? 896 : 491;
+  const xPercent = Math.max(0, Math.min(100, Number(data.bannerX ?? (vertical ? 50 : 9))));
+  const yPercent = Math.max(0, Math.min(100, Number(data.bannerY ?? (vertical ? 45 : 80))));
+  return { x: (width - bannerWidth) * xPercent / 100, y: (height - 68) * yPercent / 100, w: bannerWidth, h: 68 };
+}
+
 function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLogo, layout) {
   const vertical = data.format === "reels";
   const w = ctx.canvas.width;
@@ -24876,13 +24887,6 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   preencherRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.panel);
   postArtDrawPhoto(ctx, image, { x: photo.x + 9, y: photo.y + 9, w: photo.w - 18, h: photo.h - 18 }, data.imageFit || "cover", 16, photoFill);
   desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.accent, 3);
-  if (data.showHighlightBanner) {
-    const bannerColor = /^#[0-9a-f]{6}$/i.test(data.highlightBannerColor || "") ? data.highlightBannerColor : "#e8b84b";
-    const rgb = [1, 3, 5].map((start) => parseInt(bannerColor.slice(start, start + 2), 16));
-    const bannerInk = rgb[0] * .299 + rgb[1] * .587 + rgb[2] * .114 > 150 ? "#17120b" : "#ffffff";
-    preencherRoundRect(ctx, photo.x + 22, photo.y + photo.h - 94, photo.w - 44, 68, 18, bannerColor);
-    postArtDrawText(ctx, "PRODUTO EM DESTAQUE", photo.x + photo.w / 2, photo.y + photo.h - 52, photo.w - 72, 1, vertical ? 30 : 25, bannerInk, { align: "center", min: 16, weight: 900 });
-  }
 
   const x = vertical ? 70 : 595;
   const width = vertical ? 940 : 445;
@@ -24898,26 +24902,35 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   const titleY = vertical ? 1010 : 186;
   const titleHeight = postArtDrawText(ctx, data.title, x, titleY, width, 3, vertical ? 72 : 55, layout.ink, { family, min: vertical ? 36 : 27, lineHeight: vertical ? 77 : 58 });
   const descriptionY = titleY + titleHeight + (vertical ? 28 : 23);
-  const priceY = vertical ? 1505 : 640;
+  const hasPrice = numberFromMoney(data.price) > 0;
+  const priceY = vertical ? 1595 : 746;
+  const contentBottom = hasPrice ? priceY - 22 : (vertical ? 1700 : 838);
   const highlights = (Array.isArray(data.highlights) ? data.highlights : []).map((value) => String(value || "").trim()).filter(Boolean).slice(0, 3);
   const showCard = data.showHighlightCard && highlights.length > 0;
-  const cardHeight = vertical ? 180 : 155;
-  const cardY = priceY - cardHeight - 22;
-  const descriptionBottom = showCard ? cardY - 20 : priceY - 30;
+  const cardHeight = vertical ? 200 : 180;
+  const cardY = contentBottom - cardHeight;
+  const descriptionBottom = showCard ? cardY - 20 : contentBottom;
   postArtDrawFittedText(ctx, data.description, x, descriptionY, width, descriptionBottom - descriptionY, Number(data.descriptionFontSize) || (vertical ? 29 : 22), textMuted);
   if (showCard) {
     preencherRoundRect(ctx, x, cardY, width, cardHeight, 20, layout.panel);
-    desenharBordaRoundRect(ctx, x, cardY, width, cardHeight, 20, layout.accent, 2);
-    postArtDrawText(ctx, "DESTAQUE DO PRODUTO", x + 20, cardY + 29, width - 40, 1, vertical ? 23 : 18, layout.ink, { min: 13 });
-    const rowHeight = (cardHeight - 54) / highlights.length;
-    highlights.forEach((value, index) => postArtDrawFittedText(ctx, `• ${value}`, x + 20, cardY + 46 + index * rowHeight, width - 40, rowHeight - 6, Number(data.highlightFontSize) || 22, layout.ink, { weight: 600 }));
+    desenharBordaRoundRect(ctx, x, cardY, width, cardHeight, 20, layout.accent, 3);
+    preencherRoundRect(ctx, x + 7, cardY + 7, width - 14, 44, 15, layout.primary);
+    postArtDrawText(ctx, "DESTAQUE DO PRODUTO", x + width / 2, cardY + 36, width - 40, 1, vertical ? 25 : 20, footerInk, { min: 13, align: "center" });
+    const rowHeight = (cardHeight - 65) / highlights.length;
+    highlights.forEach((value, index) => {
+      preencherRoundRect(ctx, x + 16, cardY + 60 + index * rowHeight, 5, rowHeight - 8, 3, layout.accent);
+      postArtDrawFittedText(ctx, value, x + 31, cardY + 58 + index * rowHeight, width - 51, rowHeight - 8, Number(data.highlightFontSize) || 22, layout.ink, { weight: 700 });
+    });
   }
-  const priceHeight = vertical ? 165 : 145;
-  const hasPrice = numberFromMoney(data.price) > 0;
+  const priceHeight = vertical ? 140 : 126;
+  if (hasPrice) {
   preencherRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.primary);
   desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.accent, 2);
   if (hasPrice) postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
   postArtDrawText(ctx, hasPrice ? postArtMoney(data.price) : "CONSULTE", x + width / 2, priceY + (hasPrice ? (vertical ? 117 : 105) : (vertical ? 102 : 90)), width - 38, 1, vertical ? 72 : 53, footerInk, { family, min: 26, align: "center" });
+  } else {
+    postArtDrawText(ctx, "CONSULTE", x + width / 2, contentBottom + 30, width - 38, 1, 20, layout.ink, { family, align: "center", min: 14 });
+  }
 
   const footerY = vertical ? 1764 : 902;
   const footerHeight = vertical ? 128 : 150;
@@ -24931,6 +24944,14 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   ctx.beginPath(); ctx.moveTo(520, footerY + 24); ctx.lineTo(520, footerY + footerHeight - 24); ctx.stroke();
   postArtDrawText(ctx, phone, 274, footerY + 20, 440, 2, phoneSize, footerInk, { min: 12, weight: 700, lineHeight: phoneSize + 5, align: "center", blockHeight: footerHeight - 40 });
   postArtDrawText(ctx, address || client?.cidade || "Consulte a empresa", 785, footerY + 20, 460, 3, addressSize, footerInk, { min: 12, weight: 700, lineHeight: addressSize + 5, align: "center", blockHeight: footerHeight - 40 });
+  if (data.showHighlightBanner) {
+    const banner = postArtBannerRect(data, w, h);
+    const bannerColor = /^#[0-9a-f]{6}$/i.test(data.highlightBannerColor || "") ? data.highlightBannerColor : "#e8b84b";
+    const rgb = [1, 3, 5].map((start) => parseInt(bannerColor.slice(start, start + 2), 16));
+    const bannerInk = rgb[0] * .299 + rgb[1] * .587 + rgb[2] * .114 > 150 ? "#17120b" : "#ffffff";
+    preencherRoundRect(ctx, banner.x, banner.y, banner.w, banner.h, 18, bannerColor);
+    postArtDrawText(ctx, "PRODUTO EM DESTAQUE", banner.x + banner.w / 2, banner.y + 42, banner.w - 28, 1, vertical ? 30 : 25, bannerInk, { align: "center", min: 16, weight: 900 });
+  }
   ctx.restore();
 }
 
@@ -24960,6 +24981,8 @@ function postArtFormData() {
     showSiteLogo: $("postArtShowSiteLogo")?.checked !== false,
     showHighlightBanner: $("postArtShowHighlightBanner")?.checked === true,
     highlightBannerColor: $("postArtHighlightBannerColor")?.value || "#e8b84b",
+    bannerX: Number($("postArtBannerX")?.value ?? (state.postArtFormat === "reels" ? 50 : 9)),
+    bannerY: Number($("postArtBannerY")?.value ?? (state.postArtFormat === "reels" ? 45 : 80)),
     descriptionFontSize: Number($("postArtDescriptionFontSize")?.value) || 22,
     showHighlightCard: $("postArtShowHighlightCard")?.checked === true,
     highlightFontSize: Number($("postArtHighlightFontSize")?.value) || 22,
@@ -25013,6 +25036,7 @@ async function atualizarPreviaPostArt() {
     carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
   ]);
   if (requestId !== postArtPreviewRequest) return;
+  postArtPreviewAssets = { client, image, logo, siteLogo };
   const format = postArtFormat();
   if (canvas.width !== format.width) canvas.width = format.width;
   if (canvas.height !== format.height) canvas.height = format.height;
@@ -25049,6 +25073,7 @@ async function baixarPostArt() {
 }
 
 function renderPostArtView() {
+  postArtPreviewAssets = null;
   const mount = $("postArtMount");
   if (!mount) return;
   const clients = postArtClients();
@@ -25115,6 +25140,9 @@ function renderPostArtView() {
             ${type === "produto" ? `
               <label class="check-row wide"><input id="postArtShowHighlightBanner" type="checkbox"> Exibir tarja Produto em Destaque</label>
               <label>Cor da tarja<input id="postArtHighlightBannerColor" type="color" value="#e8b84b"></label>
+              <label>Posição horizontal da tarja<input id="postArtBannerX" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 50 : 9}"></label>
+              <label>Posição vertical da tarja<input id="postArtBannerY" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 45 : 80}"></label>
+              <small class="wide">Com a tarja ativa, arraste-a diretamente na prévia ou use os controles de posição.</small>
               <label class="post-art-font-control">Fonte da descrição (ajustada para caber)<span><input id="postArtDescriptionFontSize" type="range" min="14" max="44" value="22"><output id="postArtDescriptionFontSizeValue">22 px</output></span></label>
               <label class="check-row wide"><input id="postArtShowHighlightCard" type="checkbox"> Exibir card Destaque do Produto</label>
               <datalist id="postArtHighlightOptions"></datalist>
@@ -25186,6 +25214,39 @@ function renderPostArtView() {
     reader.readAsDataURL(file);
   });
   $("postArtDownload")?.addEventListener("click", baixarPostArt);
+  const previewCanvas = $("postArtCanvas");
+  const updateBannerInteraction = () => previewCanvas?.classList.toggle("is-banner-movable", type === "produto" && $("postArtShowHighlightBanner")?.checked === true);
+  $("postArtShowHighlightBanner")?.addEventListener("change", updateBannerInteraction);
+  updateBannerInteraction();
+  let bannerDrag = null;
+  const canvasPoint = (event) => {
+    const bounds = previewCanvas.getBoundingClientRect();
+    return { x: (event.clientX - bounds.left) * previewCanvas.width / bounds.width, y: (event.clientY - bounds.top) * previewCanvas.height / bounds.height };
+  };
+  previewCanvas?.addEventListener("pointerdown", (event) => {
+    if (type !== "produto" || !$("postArtShowHighlightBanner")?.checked) return;
+    const point = canvasPoint(event);
+    const rect = postArtBannerRect(postArtFormData(), previewCanvas.width, previewCanvas.height);
+    if (point.x < rect.x || point.x > rect.x + rect.w || point.y < rect.y || point.y > rect.y + rect.h) return;
+    bannerDrag = { x: point.x - rect.x, y: point.y - rect.y };
+    previewCanvas.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+  previewCanvas?.addEventListener("pointermove", (event) => {
+    if (!bannerDrag) return;
+    const point = canvasPoint(event);
+    const rect = postArtBannerRect(postArtFormData(), previewCanvas.width, previewCanvas.height);
+    $("postArtBannerX").value = Math.max(0, Math.min(100, (point.x - bannerDrag.x) / (previewCanvas.width - rect.w) * 100));
+    $("postArtBannerY").value = Math.max(0, Math.min(100, (point.y - bannerDrag.y) / (previewCanvas.height - rect.h) * 100));
+    if (postArtPreviewAssets) {
+      const assets = postArtPreviewAssets;
+      desenharPostArtCanvas(previewCanvas.getContext("2d"), postArtFormData(), assets.client, assets.image, assets.logo, assets.siteLogo, postArtLayout());
+    } else {
+      agendarPreviaPostArt();
+    }
+  });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach((eventName) => previewCanvas?.addEventListener(eventName, () => { bannerDrag = null; }));
+  ["postArtBannerX", "postArtBannerY"].forEach((id) => $(id)?.addEventListener("input", agendarPreviaPostArt));
   preencherFormularioPostArt();
   atualizarPreviaPostArt();
 }
