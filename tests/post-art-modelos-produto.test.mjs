@@ -16,7 +16,7 @@ const helperNames = [
   "numberFromMoney", "canvasRoundRect", "preencherRoundRect", "desenharImagemCover",
   "desenharImagemContain", "linhasCanvas", "desenharTextoInteiroCanvas", "desenharBordaRoundRect",
   "postArtMoney", "postArtDrawText", "postArtDrawPhoto", "postArtDrawBrand", "desenharIconeWhatsappCanvas",
-  "desenharPostArtProdutoReferencia", "postArtItemImage"
+  "postArtProductHighlights", "postArtDrawFittedText", "desenharPostArtProdutoReferencia", "postArtItemImage"
 ];
 const sandbox = {
   state: { postArtCustomImage: "" },
@@ -97,17 +97,43 @@ test("titulos longos descricoes e precos sob consulta cabem nos dois formatos", 
   }
 });
 
-test("formulario oferece ajuste de fonte para telefone e endereco e fixa a logo do portal", () => {
+test("formulario oferece fontes e controles opcionais da logo tarja e card", () => {
   assert.match(source, /id="postArtPhoneFontSize" type="range"/);
   assert.match(source, /id="postArtAddressFontSize" type="range"/);
-  assert.match(source, /state\.postArtType === "produto" \|\|/);
+  assert.match(source, /id="postArtShowSiteLogo" type="checkbox"/);
+  assert.match(source, /id="postArtShowHighlightBanner" type="checkbox"/);
+  assert.match(source, /id="postArtHighlightBannerColor" type="color"/);
+  assert.match(source, /id="postArtShowHighlightCard" type="checkbox"/);
+  assert.match(source, /id="postArtDescriptionFontSize" type="range"/);
+  assert.match(source, /id="postArtHighlightFontSize" type="range"/);
   assert.match(source, /editorial: true/);
+});
+
+test("card opcional usa detalhes reais e limita os destaques a tres nos oito modelos", () => {
+  assert.equal(sandbox.postArtProductHighlights({ marca: "Exemplo", cores: "Preto" }).join("|"), "Marca: Exemplo|Cores: Preto");
+  for (const layout of sandbox.layouts) {
+    for (const format of ["feed", "reels"]) {
+      const ctx = mockContext(format === "feed" ? 1080 : 1920);
+      sandbox.desenharPostArtProdutoReferencia(ctx, { ...data, format, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M", "QUARTO OMITIDO"], descriptionFontSize: 44, highlightFontSize: 36 }, client, null, null, null, layout);
+      assert.ok(ctx.texts.some((entry) => entry.value === "PRODUTO EM DESTAQUE"));
+      assert.ok(ctx.texts.some((entry) => entry.value === "DESTAQUE DO PRODUTO"));
+      assert.ok(!ctx.texts.some((entry) => entry.value.includes("QUARTO")));
+      assert.ok(ctx.texts.every((entry) => entry.y >= 0 && entry.y < ctx.canvas.height));
+    }
+  }
+});
+
+test("fonte solicitada diminui para manter a descricao dentro da altura disponivel", () => {
+  const ctx = mockContext(1080);
+  const height = sandbox.postArtDrawFittedText(ctx, "Descrição longa do produto com todas as informações. ".repeat(5), 0, 100, 445, 120, 44, "#000000");
+  assert.ok(height <= 120);
+  assert.ok(ctx.texts.every((entry) => entry.y >= 100 && entry.y <= 220));
 });
 
 // Optional local visual QA: uses the same production helpers with a real Canvas.
 if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
   const require = createRequire(import.meta.url);
-  const { createCanvas } = require(process.env.CODEX_CANVAS_MODULE);
+  const { createCanvas, loadImage } = require(process.env.CODEX_CANVAS_MODULE);
   const output = process.env.CODEX_ART_QA_DIR;
   mkdirSync(output, { recursive: true });
   const product = createCanvas(500, 650);
@@ -117,13 +143,18 @@ if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
   pc.fillStyle = "#e4c692"; pc.fillRect(140, 130, 220, 125);
   pc.fillStyle = "#ffffff"; pc.font = "bold 30px Arial"; pc.textAlign = "center"; pc.fillText("PRODUTO", 250, 350);
   pc.font = "22px Arial"; pc.fillText("EXEMPLO", 250, 390);
+  const commerceLogo = createCanvas(120, 120);
+  const lc = commerceLogo.getContext("2d");
+  lc.fillStyle = "#227460"; lc.fillRect(0, 0, 120, 120);
+  lc.fillStyle = "#ffffff"; lc.font = "bold 25px Arial"; lc.fillText("LOJA", 24, 68);
+  const portalLogo = await loadImage(path.resolve("images/img_padrao_site/logo_1.png"));
   for (const format of ["feed", "reels"]) {
     const height = format === "feed" ? 1080 : 1920;
     const sheet = createCanvas(1440, format === "feed" ? 720 : 1280);
     const sc = sheet.getContext("2d");
     sandbox.layouts.forEach((layout, index) => {
       const canvas = createCanvas(1080, height);
-      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format }, client, product, null, null, layout);
+      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
       writeFileSync(path.join(output, layout.key + "-" + format + ".png"), canvas.toBuffer("image/png"));
       sc.drawImage(canvas, index % 4 * 360, Math.floor(index / 4) * height / 3, 360, height / 3);
     });
