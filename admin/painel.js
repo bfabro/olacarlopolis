@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 758,
-  label: "v765",
+  numero: 759,
+  label: "v766",
   data: "2026-09-17",
-  nota: "Oito modelos de produtos para Feed e Reels sem exposição do campo de URL da imagem."
+  nota: "Oito variações cromáticas do modelo editorial de produtos para Feed e Reels."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24475,14 +24475,14 @@ async function baixarStoryComercial() {
 
 const POST_ART_LAYOUTS = {
   produto: [
-    { key: "produto-azul", nome: "01 · Azul Comercial", descricao: "Ondas azuis, vitrine clara e preço amarelo", variant: 0, reference: true, bg: "#f7faff", panel: "#ffffff", primary: "#0068ee", accent: "#ffda21", ink: "#06244c", shape: "podium" },
-    { key: "produto-bege", nome: "02 · Luxo Elegante", descricao: "Bege, curva escura e detalhes dourados", variant: 1, reference: true, bg: "#efe2ce", panel: "#f7eedf", primary: "#262019", accent: "#c99b57", ink: "#241b12", shape: "luxury", serif: true },
-    { key: "produto-preto", nome: "03 · Preto e Dourado", descricao: "Moldura premium, contraste escuro e ouro", variant: 1, reference: true, bg: "#101112", panel: "#1a1b1c", primary: "#e2bb64", accent: "#e2bb64", ink: "#ffffff", shape: "frame" },
-    { key: "produto-artesanal", nome: "04 · Artesanal", descricao: "Papel creme, madeira e foto estilo polaroid", variant: 0, reference: true, bg: "#f1e5ce", panel: "#fffaef", primary: "#703314", accent: "#555c2c", ink: "#4c2a16", shape: "polaroid", serif: true },
-    { key: "produto-vermelho", nome: "05 · Vermelho Impacto", descricao: "Vitrine circular e etiqueta amarela", variant: 3, reference: true, bg: "#c90808", panel: "#fffdfa", primary: "#ffffff", accent: "#ffde27", ink: "#ffffff", shape: "circle" },
-    { key: "produto-amarelo", nome: "06 · Amarelo Destaque", descricao: "Cores vivas, foto inclinada e preço claro", variant: 3, reference: true, bg: "#ffdf00", panel: "#fffdf5", primary: "#10181d", accent: "#ffffff", ink: "#10181d", shape: "tilted" },
-    { key: "produto-rosa", nome: "07 · Rosa Delicado", descricao: "Arco suave, detalhes rosados e elegância", variant: 0, reference: true, bg: "#ffe9ee", panel: "#fff7f8", primary: "#ae264c", accent: "#f8c4d2", ink: "#7e1836", shape: "arch", serif: true },
-    { key: "produto-laranja", nome: "08 · Laranja Vibrante", descricao: "Vitrine com pedestal e chamada intensa", variant: 3, reference: true, bg: "#ff6900", panel: "#fff9ee", primary: "#ffffff", accent: "#ffe695", ink: "#ffffff", shape: "podium" }
+    { key: "produto-azul", nome: "01 · Azul Marinho", descricao: "Editorial clássico em azul marinho e areia", variant: 0, reference: true, bg: "#f5f1e8", panel: "#fffdf8", primary: "#17324d", accent: "#c8a56a", ink: "#172a3a", shape: "fashion", serif: true },
+    { key: "produto-bege", nome: "02 · Nude Marrom", descricao: "Elegância em creme, nude e marrom", variant: 0, reference: true, bg: "#f7f0e4", panel: "#fffaf2", primary: "#542711", accent: "#b98243", ink: "#351b10", shape: "fashion", serif: true },
+    { key: "produto-preto", nome: "03 · Preto Dourado", descricao: "Contraste sofisticado em preto e dourado", variant: 0, reference: true, bg: "#111111", panel: "#1c1b19", primary: "#d7ad58", accent: "#f0d79b", ink: "#ffffff", shape: "fashion", serif: true, dark: true },
+    { key: "produto-artesanal", nome: "04 · Verde Esmeralda", descricao: "Editorial refinado em verde e champanhe", variant: 0, reference: true, bg: "#edf2e9", panel: "#f8fbf5", primary: "#1f5a43", accent: "#c5a86a", ink: "#173f31", shape: "fashion", serif: true },
+    { key: "produto-vermelho", nome: "05 · Vinho", descricao: "Presença marcante em vinho e rosé", variant: 0, reference: true, bg: "#35131b", panel: "#4a1b27", primary: "#c78697", accent: "#edc6ce", ink: "#ffffff", shape: "fashion", serif: true, dark: true },
+    { key: "produto-amarelo", nome: "06 · Terracota", descricao: "Tons quentes de terracota e creme", variant: 0, reference: true, bg: "#fbefe5", panel: "#fff9f2", primary: "#a84f2d", accent: "#d79a63", ink: "#5d2d1d", shape: "fashion", serif: true },
+    { key: "produto-rosa", nome: "07 · Rosé", descricao: "Visual delicado em rosé e bordô", variant: 0, reference: true, bg: "#fff0f3", panel: "#fff8f9", primary: "#a82d52", accent: "#e7a6b8", ink: "#70213c", shape: "fashion", serif: true },
+    { key: "produto-laranja", nome: "08 · Lavanda", descricao: "Composição contemporânea em lavanda e ameixa", variant: 0, reference: true, bg: "#f2edf8", panel: "#fbf8ff", primary: "#68457e", accent: "#bba1cf", ink: "#432c54", shape: "fashion", serif: true }
   ],
   promocao: [
     { key: "promocao-flash", nome: "Flash Sale", descricao: "Oferta limpa com preço grande e urgência visual", variant: 0, bg: "#fff7ed", panel: "#ffffff", primary: "#dc2626", accent: "#fde047", ink: "#2b1717" },
@@ -24821,136 +24821,83 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   const vertical = data.format === "reels";
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
-  const dark = layout.key === "produto-preto";
-  const rustic = layout.shape === "polaroid";
-  const luxury = layout.shape === "luxury";
-  const family = layout.serif ? "Georgia" : "Arial";
+  const dark = Boolean(layout.dark);
+  const family = "Georgia";
+  const textMuted = dark ? "rgba(255,255,255,.78)" : layout.ink;
+  const footerInk = dark ? "#17120b" : layout.panel;
   ctx.save();
   const background = ctx.createLinearGradient(0, 0, w, h);
   background.addColorStop(0, layout.bg);
-  background.addColorStop(1, dark ? "#030404" : layout.bg);
+  background.addColorStop(1, dark ? layout.panel : "#fffdf8");
   ctx.fillStyle = background;
   ctx.fillRect(0, 0, w, h);
+  ctx.globalAlpha = dark ? .1 : .16;
+  ctx.fillStyle = layout.accent;
+  ctx.beginPath(); ctx.ellipse(w - 18, 58, 230, 105, -.55, 0, Math.PI * 2); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(vertical ? 10 : 580, h - 90, 280, 115, .35, 0, Math.PI * 2); ctx.fill();
+  ctx.globalAlpha = 1;
 
-  // Each reference keeps its own framing, palette and decorative geometry.
-  ctx.fillStyle = rustic ? "#573019" : (luxury ? "#262019" : layout.primary);
-  if (luxury || rustic) {
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(vertical ? 360 : 350, 0);
-    ctx.quadraticCurveTo(vertical ? 470 : 570, h * .42, vertical ? 250 : 360, h);
-    ctx.lineTo(0, h);
-    ctx.closePath();
-    ctx.fill();
-    if (rustic) {
-      ctx.strokeStyle = "rgba(236,196,147,.18)";
-      ctx.lineWidth = 3;
-      for (let y = 10; y < h; y += 19) {
-        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(420, y + 8); ctx.stroke();
-      }
-    }
-  } else if (dark) {
-    ctx.fillStyle = "#202123";
-    ctx.beginPath(); ctx.moveTo(300, 0); ctx.lineTo(650, 0); ctx.lineTo(0, 900); ctx.lineTo(0, 470); ctx.closePath(); ctx.fill();
-  } else {
-    ctx.globalAlpha = layout.key === "produto-azul" ? 1 : .12;
-    ctx.beginPath(); ctx.ellipse(-90, h * .4, 650, h * .34, -.25, 0, Math.PI * 2); ctx.fill();
-    ctx.globalAlpha = .12;
-    ctx.beginPath(); ctx.ellipse(w + 60, 0, 380, 230, .4, 0, Math.PI * 2); ctx.fill();
-    ctx.globalAlpha = 1;
-  }
+  const photo = vertical ? { x: 70, y: 190, w: 940, h: 740 } : { x: 30, y: 34, w: 535, h: 865 };
+  const photoFill = dark ? "#272624" : "#f3efe8";
+  preencherRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.panel);
+  postArtDrawPhoto(ctx, image, { x: photo.x + 9, y: photo.y + 9, w: photo.w - 18, h: photo.h - 18 }, data.imageFit || "cover", 16, photoFill);
+  desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.accent, 3);
+  postArtDrawText(ctx, "PRODUTO EM DESTAQUE", photo.x + 36, photo.y + photo.h - 58, photo.w - 72, 2, vertical ? 18 : 15, "#ffffff", { min: 11, weight: 800 });
 
-  if (vertical) {
-    ctx.fillStyle = layout.bg;
-    ctx.fillRect(0, 900, w, h - 900);
-  }
+  const x = vertical ? 70 : 595;
+  const width = vertical ? 940 : 445;
+  const brandY = vertical ? 48 : 34;
+  const brandWidth = data.showSiteLogo && siteLogo ? (vertical ? 730 : 235) : width;
   postArtDrawBrand(ctx, client, logo, siteLogo, layout, {
-    x: 42, y: vertical ? 65 : 28, width: 565, dark: dark || luxury || rustic,
+    x, y: brandY, width: brandWidth, dark,
     showSiteLogo: data.showSiteLogo
   });
-  if (!vertical) postArtDrawText(ctx, "Conheça nossos produtos", 640, 61, 380, 2, 27, layout.ink, { family, weight: 600, min: 18 });
 
-  const photo = vertical ? { x: 90, y: 228, w: 900, h: 650 } : { x: 42, y: 182, w: 470, h: 690 };
-  ctx.save();
-  if (layout.shape === "tilted" || rustic) {
-    ctx.translate(photo.x + photo.w / 2, photo.y + photo.h / 2);
-    ctx.rotate(rustic ? -.045 : -.035);
-    ctx.translate(-photo.x - photo.w / 2, -photo.y - photo.h / 2);
-  }
-  const radius = layout.shape === "arch" ? Math.min(photo.w / 2, 220) : (dark ? 24 : 48);
-  const photoFill = dark ? "#202224" : "#f6f5f1";
-  if (layout.shape !== "circle") preencherRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, radius, photoFill);
-  if (layout.shape === "circle") {
-    ctx.beginPath();
-    ctx.ellipse(photo.x + photo.w / 2, photo.y + photo.h / 2, photo.w / 2, photo.h / 2, 0, 0, Math.PI * 2);
-    ctx.fillStyle = photoFill;
-    ctx.fill();
-    ctx.clip();
-  }
-  postArtDrawPhoto(ctx, image, { x: photo.x + 16, y: photo.y + 16, w: photo.w - 32, h: photo.h - 32 }, data.imageFit || "contain", Math.max(0, radius - 12), photoFill);
-  if (dark || luxury || layout.shape === "arch") desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, radius, layout.accent, 3);
-  if (rustic) {
-    desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 8, "#fff8e9", 18);
-    preencherRoundRect(ctx, photo.x + photo.w * .3, photo.y - 15, photo.w * .4, 36, 2, "#c69d69");
-  }
-  if (layout.shape === "podium" || layout.shape === "arch" || luxury) {
-    const pedestal = ctx.createLinearGradient(0, photo.y + photo.h - 80, 0, photo.y + photo.h + 10);
-    pedestal.addColorStop(0, "#ffffff"); pedestal.addColorStop(1, dark ? "#303030" : "#c5c7ca");
-    ctx.fillStyle = pedestal;
-    ctx.beginPath(); ctx.ellipse(photo.x + photo.w / 2, photo.y + photo.h - 15, photo.w * .49, 42, 0, 0, Math.PI * 2); ctx.fill();
-  }
-  ctx.restore();
+  const calloutY = vertical ? 970 : 164;
+  preencherRoundRect(ctx, x, calloutY, width, vertical ? 54 : 42, 24, layout.primary);
+  postArtDrawText(ctx, (data.callout || "PRODUTO EM DESTAQUE").toUpperCase(), x + width / 2, calloutY + (vertical ? 16 : 11), width - 36, 1, vertical ? 20 : 16, dark ? "#17130b" : "#ffffff", { align: "center", min: 11, weight: 800 });
 
-  const x = vertical ? 90 : 552;
-  const width = vertical ? 900 : 480;
-  const titleY = vertical ? 960 : 225;
-  const calloutY = vertical ? 906 : 172;
-  preencherRoundRect(ctx, x, calloutY, width * .75, 35, 18, layout.accent);
-  postArtDrawText(ctx, data.callout || "PRODUTO EM DESTAQUE", x + width * .375, calloutY + 9, width * .7, 1, 16, dark ? "#17130b" : (luxury ? "#241b12" : "#29200e"), { align: "center", min: 11 });
-  postArtDrawText(ctx, data.title, x, titleY, width, vertical ? 2 : 3, vertical ? 68 : 58, layout.ink, { family, min: vertical ? 34 : 29, lineHeight: vertical ? 72 : 61, blockHeight: vertical ? 152 : 187 });
-  const descriptionY = vertical ? 1134 : 425;
-  postArtDrawText(ctx, data.description, x, descriptionY, width, 3, vertical ? 29 : 23, dark ? "#d6d6d6" : layout.ink, { min: vertical ? 18 : 15, weight: 500, lineHeight: vertical ? 34 : 28 });
+  const titleY = vertical ? 1048 : 230;
+  postArtDrawText(ctx, data.title, x, titleY, width, vertical ? 2 : 3, vertical ? 67 : 55, layout.ink, { family, min: vertical ? 34 : 28, lineHeight: vertical ? 70 : 57, blockHeight: vertical ? 146 : 166 });
+  const descriptionY = vertical ? 1202 : 404;
+  postArtDrawText(ctx, data.description, x, descriptionY, width, 3, vertical ? 27 : 21, textMuted, { min: vertical ? 17 : 14, weight: 500, lineHeight: vertical ? 33 : 26 });
 
-  const priceY = vertical ? 1264 : 535;
-  const priceHeight = vertical ? 158 : 137;
-  const priceFill = luxury || dark ? "#191714" : (rustic ? "#a04b26" : layout.key === "produto-azul" ? layout.accent : layout.panel);
-  const priceInk = luxury || dark ? layout.accent : (rustic ? "#fff3df" : layout.key === "produto-vermelho" || layout.key === "produto-laranja" ? layout.bg : layout.ink);
-  preencherRoundRect(ctx, x, priceY, width, priceHeight, 30, priceFill);
-  if (luxury || dark) desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 30, layout.accent, 2);
-  postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 27, width - 48, 1, 15, priceInk, { min: 11, weight: 700 });
-  postArtDrawText(ctx, postArtMoney(data.price), x + width / 2, priceY + (vertical ? 121 : 104), width - 42, 1, vertical ? 74 : 56, priceInk, { family, min: 27, align: "center" });
-
-  const factsY = vertical ? 1450 : 693;
-  const factHeight = vertical ? 128 : 115;
+  const factsY = vertical ? 1342 : 525;
+  const factHeight = vertical ? 116 : 112;
   const facts = [["DETALHES", "Conheça o produto"], ["ATENDIMENTO", "Fale com a empresa"], ["PEDIDOS", "Consulte disponibilidade"]];
   facts.forEach(([label, detail], index) => {
-    const cardW = (width - 20) / 3;
-    const cardX = x + index * (cardW + 10);
-    preencherRoundRect(ctx, cardX, factsY, cardW, factHeight, rustic ? 40 : 18, dark ? "#171819" : layout.panel);
-    ctx.strokeStyle = luxury || dark || rustic ? layout.accent
-      : (["produto-vermelho", "produto-laranja"].includes(layout.key) ? layout.bg : layout.primary);
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(cardX + cardW / 2, factsY + 27, 13, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cardX + cardW / 2 - 6, factsY + 27); ctx.lineTo(cardX + cardW / 2 - 1, factsY + 32); ctx.lineTo(cardX + cardW / 2 + 7, factsY + 22); ctx.stroke();
-    const factInk = dark ? "#ffffff" : (luxury ? "#241b12" : rustic ? layout.ink : "#19212b");
-    postArtDrawText(ctx, label, cardX + cardW / 2, factsY + 61, cardW - 12, 1, vertical ? 18 : 14, factInk, { align: "center", min: 10 });
-    postArtDrawText(ctx, detail, cardX + cardW / 2, factsY + 86, cardW - 16, 2, vertical ? 18 : 13, factInk, { align: "center", min: 10, weight: 500, lineHeight: vertical ? 21 : 16 });
+    const cardW = (width - (vertical ? 36 : 18)) / 3;
+    const gap = vertical ? 18 : 9;
+    const cardX = x + index * (cardW + gap);
+    preencherRoundRect(ctx, cardX, factsY, cardW, factHeight, 20, layout.panel);
+    desenharBordaRoundRect(ctx, cardX, factsY, cardW, factHeight, 20, layout.accent, 2);
+    ctx.strokeStyle = layout.primary;
+    ctx.lineWidth = vertical ? 4 : 3;
+    ctx.beginPath(); ctx.arc(cardX + cardW / 2, factsY + 27, vertical ? 15 : 13, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(cardX + cardW / 2 - 7, factsY + 27); ctx.lineTo(cardX + cardW / 2 - 1, factsY + 33); ctx.lineTo(cardX + cardW / 2 + 8, factsY + 21); ctx.stroke();
+    const factInk = dark ? "#ffffff" : layout.ink;
+    postArtDrawText(ctx, label, cardX + cardW / 2, factsY + 55, cardW - 12, 1, vertical ? 17 : 13, factInk, { align: "center", min: 10 });
+    postArtDrawText(ctx, detail, cardX + cardW / 2, factsY + 79, cardW - 14, 2, vertical ? 16 : 12, factInk, { align: "center", min: 9, weight: 500, lineHeight: vertical ? 19 : 15 });
   });
 
-  const ctaY = vertical ? 1633 : 839;
-  const ctaFill = luxury ? "#d0ac72" : rustic ? "#555c2c" : "#079b42";
-  preencherRoundRect(ctx, x, ctaY, width, vertical ? 94 : 82, 40, ctaFill);
-  const ctaInk = luxury ? "#201910" : "#ffffff";
+  const priceY = vertical ? 1485 : 657;
+  const priceHeight = vertical ? 155 : 132;
+  preencherRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.primary);
+  desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.accent, 2);
+  postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 21, width - 48, 1, vertical ? 17 : 14, footerInk, { min: 10, weight: 700 });
+  postArtDrawText(ctx, postArtMoney(data.price), x + width / 2, priceY + (vertical ? 113 : 96), width - 38, 1, vertical ? 72 : 53, footerInk, { family, min: 26, align: "center" });
+
+  const ctaY = vertical ? 1668 : 817;
+  preencherRoundRect(ctx, x, ctaY, width, vertical ? 94 : 76, 40, "#079b42");
   ctx.save();
   ctx.translate(x + 47, ctaY + (vertical ? 47 : 41));
   ctx.scale(1.6, 1.6);
-  desenharIconeWhatsappCanvas(ctx, 0, 0, ctaInk);
+  desenharIconeWhatsappCanvas(ctx, 0, 0, "#ffffff");
   ctx.restore();
-  postArtDrawText(ctx, "FALE PELO WHATSAPP  ›", x + width / 2 + 30, ctaY + (vertical ? 60 : 51), width - 102, 1, vertical ? 34 : 25, ctaInk, { min: 17, align: "center" });
+  postArtDrawText(ctx, "FALE PELO WHATSAPP  ›", x + width / 2 + 30, ctaY + (vertical ? 59 : 47), width - 102, 1, vertical ? 32 : 23, "#ffffff", { min: 16, align: "center" });
 
-  const footerY = vertical ? 1772 : 969;
-  preencherRoundRect(ctx, 28, footerY, 1024, 94, 26, dark ? "#171819" : (rustic ? "#555c2c" : luxury ? "#262019" : layout.key === "produto-azul" ? "#06244c" : layout.panel));
-  const footerInk = dark || rustic || luxury || layout.key === "produto-azul" ? "#ffffff" : layout.key === "produto-rosa" ? layout.ink : "#19212b";
+  const footerY = vertical ? 1794 : 930;
+  preencherRoundRect(ctx, 28, footerY, 1024, vertical ? 98 : 122, 26, layout.primary);
   const instagram = String(client?.instagram || "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
   const address = [client?.endereco, client?.bairro, client?.cidade].filter(Boolean).join(" · ");
   const footerFields = [
@@ -24960,8 +24907,8 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   ];
   footerFields.forEach(([label, value], index) => {
     const fx = 49 + index * 338;
-    postArtDrawText(ctx, label, fx, footerY + 16, 306, 1, 13, footerInk, { min: 10, weight: 700 });
-    postArtDrawText(ctx, value, fx, footerY + 41, 306, 2, 19, footerInk, { min: 12, weight: 600, lineHeight: 22 });
+    postArtDrawText(ctx, label, fx, footerY + 17, 306, 1, 13, footerInk, { min: 10, weight: 700 });
+    postArtDrawText(ctx, value, fx, footerY + 44, 306, 2, vertical ? 18 : 17, footerInk, { min: 11, weight: 600, lineHeight: 21 });
   });
   ctx.restore();
 }

@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-09-17-oito-modelos-produtos-v813'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-09-17-modelo-editorial-produtos-v814'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

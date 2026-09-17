@@ -49,6 +49,12 @@ test("produtos oferecem os oito modelos de referencia sem alterar promocao e ser
   assert.equal(sandbox.layouts.length, 8);
   assert.equal(new Set(sandbox.layouts.map((layout) => layout.key)).size, 8);
   assert.ok(sandbox.layouts.every((layout) => layout.reference));
+  assert.ok(sandbox.layouts.every((layout) => layout.shape === "fashion"));
+  assert.equal(new Set(sandbox.layouts.map((layout) => layout.primary)).size, 8);
+  assert.equal(sandbox.layouts.map((layout) => layout.nome).join("|"), [
+    "01 · Azul Marinho", "02 · Nude Marrom", "03 · Preto Dourado", "04 · Verde Esmeralda",
+    "05 · Vinho", "06 · Terracota", "07 · Rosé", "08 · Lavanda"
+  ].join("|"));
   assert.match(source, /data\.type === "produto" && layout\.reference/);
   assert.match(source, /\$\{layouts\.length\} estilos adaptados/);
 });
