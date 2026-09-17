@@ -30,7 +30,7 @@ vm.runInContext(source.slice(source.indexOf("const POST_ART_LAYOUTS ="), source.
   + "\nglobalThis.layouts = POST_ART_LAYOUTS.produto;", sandbox);
 
 const client = { nome: "Loja Exemplo", categoria: "Comércio", cidade: "Carlópolis", endereco: "Rua Exemplo, 123", whatsapp: "(43) 99999-1234", instagram: "@lojaexemplo" };
-const data = { type: "produto", title: "Produto especial para o seu dia a dia", description: "Conheça as características deste produto e consulte detalhes e disponibilidade com a empresa.", price: "129,90", callout: "NOVIDADE", imageFit: "contain", showSiteLogo: false };
+const data = { type: "produto", title: "Produto especial para o seu dia a dia", description: "Conheça as características deste produto e consulte detalhes e disponibilidade com a empresa.", price: "129,90", callout: "NOVIDADE", imageFit: "contain", showSiteLogo: true, phoneFontSize: 24, addressFontSize: 24 };
 function mockContext(height) {
   const texts = [];
   const ctx = new Proxy({ canvas: { width: 1080, height }, texts }, {
@@ -74,8 +74,11 @@ test("todos os oito modelos desenham Feed e Reels com dados e textos dentro do c
       const ctx = mockContext(format === "feed" ? 1080 : 1920);
       sandbox.desenharPostArtProdutoReferencia(ctx, { ...data, format }, client, null, null, null, layout);
       assert.ok(ctx.texts.some((entry) => entry.value.includes("129,90")), layout.key);
-      assert.ok(ctx.texts.some((entry) => entry.value.includes("WHATSAPP")), layout.key);
-      assert.ok(ctx.texts.some((entry) => entry.value.includes("Loja Exemplo")), layout.key);
+      assert.ok(ctx.texts.some((entry) => entry.value.includes("Loja")), layout.key);
+      assert.ok(ctx.texts.some((entry) => entry.value.includes("Exemplo")), layout.key);
+      assert.ok(ctx.texts.some((entry) => entry.value.includes("99999-1234")), layout.key);
+      assert.ok(ctx.texts.some((entry) => entry.value.includes("Rua Exemplo")), layout.key);
+      assert.ok(!ctx.texts.some((entry) => /WHATSAPP|DETALHES|ATENDIMENTO|PEDIDOS|COMÉRCIO/.test(entry.value)), layout.key);
       assert.ok(ctx.texts.every((entry) => entry.y >= 0 && entry.y < ctx.canvas.height), layout.key);
     }
   }
@@ -84,10 +87,21 @@ test("todos os oito modelos desenham Feed e Reels com dados e textos dentro do c
 test("titulos longos descricoes e precos sob consulta cabem nos dois formatos", () => {
   for (const format of ["feed", "reels"]) {
     const ctx = mockContext(format === "feed" ? 1080 : 1920);
-    sandbox.desenharPostArtProdutoReferencia(ctx, { ...data, format, title: "Produto com nome completo e apresentação especial para todos os clientes da cidade", description: "Descrição completa do produto com as informações cadastradas pela empresa. Consulte os detalhes, opções e disponibilidade pelo contato informado. O texto pode ser alterado antes de baixar a postagem em imagem.", price: "Sob consulta" }, client, null, null, null, sandbox.layouts[0]);
-    assert.ok(ctx.texts.some((entry) => entry.value.includes("CONSULTA")));
+    sandbox.desenharPostArtProdutoReferencia(ctx, { ...data, format, title: "TITULO produto com nome completo e apresentação especial para todos os clientes da cidade", description: "DESCRICAO completa do produto com as informações cadastradas pela empresa. Consulte os detalhes, opções e disponibilidade pelo contato informado. O texto pode ser alterado antes de baixar a postagem em imagem.", price: "" }, client, null, null, null, sandbox.layouts[0]);
+    assert.ok(ctx.texts.some((entry) => entry.value.includes("CONSULTE")));
+    assert.ok(!ctx.texts.some((entry) => entry.value.includes("POR APENAS")));
+    const titleTop = ctx.texts.find((entry) => entry.value.includes("TITULO"))?.y;
+    const descriptionTop = ctx.texts.find((entry) => entry.value.includes("DESCRICAO"))?.y;
+    assert.ok(Number.isFinite(titleTop) && Number.isFinite(descriptionTop) && descriptionTop > titleTop + 40, `${format}: descrição não pode cobrir o título`);
     assert.ok(ctx.texts.every((entry) => entry.y < ctx.canvas.height));
   }
+});
+
+test("formulario oferece ajuste de fonte para telefone e endereco e fixa a logo do portal", () => {
+  assert.match(source, /id="postArtPhoneFontSize" type="range"/);
+  assert.match(source, /id="postArtAddressFontSize" type="range"/);
+  assert.match(source, /state\.postArtType === "produto" \|\|/);
+  assert.match(source, /editorial: true/);
 });
 
 // Optional local visual QA: uses the same production helpers with a real Canvas.

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 759,
-  label: "v766",
+  numero: 760,
+  label: "v767",
   data: "2026-09-17",
-  nota: "Oito variações cromáticas do modelo editorial de produtos para Feed e Reels."
+  nota: "Ajustes de identidade, descrição, preço e rodapé nos oito modelos editoriais de produtos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24596,6 +24596,16 @@ function postArtDrawBrand(ctx, client, logo, siteLogo, layout, options = {}) {
   const y = options.y || 38;
   const width = options.width || 560;
   const textColor = dark ? "#ffffff" : "#142033";
+  if (options.editorial) {
+    const logoSize = options.logoSize || 92;
+    const siteWidth = options.siteWidth || 138;
+    const nameX = x + logoSize + 20;
+    const siteX = x + width - siteWidth;
+    if (logo) desenharImagemContain(ctx, logo, x, y, logoSize, logoSize, 14, "rgba(255,255,255,0)");
+    postArtDrawText(ctx, client?.nome || "SUA EMPRESA", nameX, y + Math.round(logoSize * .31), Math.max(90, siteX - nameX - 18), 2, options.nameSize || 30, textColor, { min: 17, lineHeight: options.nameLineHeight || 31 });
+    if (siteLogo) desenharImagemContain(ctx, siteLogo, siteX, y, siteWidth, logoSize, 0, "rgba(255,255,255,0)");
+    return;
+  }
   const mutedColor = dark ? "rgba(255,255,255,.72)" : "#64748b";
   preencherRoundRect(ctx, x, y, width, 104, 28, dark ? "rgba(8,15,29,.78)" : "rgba(255,255,255,.94)");
   if (logo) desenharImagemContain(ctx, logo, x + 12, y + 12, 80, 80, 18, "rgba(255,255,255,0)");
@@ -24846,70 +24856,40 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
 
   const x = vertical ? 70 : 595;
   const width = vertical ? 940 : 445;
-  const brandY = vertical ? 48 : 34;
-  const brandWidth = data.showSiteLogo && siteLogo ? (vertical ? 730 : 235) : width;
+  const brandY = vertical ? 54 : 42;
   postArtDrawBrand(ctx, client, logo, siteLogo, layout, {
-    x, y: brandY, width: brandWidth, dark,
-    showSiteLogo: data.showSiteLogo
+    x, y: brandY, width, dark, editorial: true,
+    logoSize: vertical ? 110 : 92,
+    siteWidth: vertical ? 170 : 132,
+    nameSize: vertical ? 38 : 29,
+    nameLineHeight: vertical ? 40 : 31
   });
 
-  const calloutY = vertical ? 970 : 164;
-  preencherRoundRect(ctx, x, calloutY, width, vertical ? 54 : 42, 24, layout.primary);
-  postArtDrawText(ctx, (data.callout || "PRODUTO EM DESTAQUE").toUpperCase(), x + width / 2, calloutY + (vertical ? 16 : 11), width - 36, 1, vertical ? 20 : 16, dark ? "#17130b" : "#ffffff", { align: "center", min: 11, weight: 800 });
+  const titleY = vertical ? 1010 : 186;
+  const titleHeight = postArtDrawText(ctx, data.title, x, titleY, width, 3, vertical ? 72 : 55, layout.ink, { family, min: vertical ? 36 : 27, lineHeight: vertical ? 77 : 58 });
+  const descriptionY = titleY + titleHeight + (vertical ? 28 : 23);
+  postArtDrawText(ctx, data.description, x, descriptionY, width, 6, vertical ? 29 : 22, textMuted, { min: vertical ? 17 : 13, weight: 500, lineHeight: vertical ? 35 : 27 });
 
-  const titleY = vertical ? 1048 : 230;
-  postArtDrawText(ctx, data.title, x, titleY, width, vertical ? 2 : 3, vertical ? 67 : 55, layout.ink, { family, min: vertical ? 34 : 28, lineHeight: vertical ? 70 : 57, blockHeight: vertical ? 146 : 166 });
-  const descriptionY = vertical ? 1202 : 404;
-  postArtDrawText(ctx, data.description, x, descriptionY, width, 3, vertical ? 27 : 21, textMuted, { min: vertical ? 17 : 14, weight: 500, lineHeight: vertical ? 33 : 26 });
-
-  const factsY = vertical ? 1342 : 525;
-  const factHeight = vertical ? 116 : 112;
-  const facts = [["DETALHES", "Conheça o produto"], ["ATENDIMENTO", "Fale com a empresa"], ["PEDIDOS", "Consulte disponibilidade"]];
-  facts.forEach(([label, detail], index) => {
-    const cardW = (width - (vertical ? 36 : 18)) / 3;
-    const gap = vertical ? 18 : 9;
-    const cardX = x + index * (cardW + gap);
-    preencherRoundRect(ctx, cardX, factsY, cardW, factHeight, 20, layout.panel);
-    desenharBordaRoundRect(ctx, cardX, factsY, cardW, factHeight, 20, layout.accent, 2);
-    ctx.strokeStyle = layout.primary;
-    ctx.lineWidth = vertical ? 4 : 3;
-    ctx.beginPath(); ctx.arc(cardX + cardW / 2, factsY + 27, vertical ? 15 : 13, 0, Math.PI * 2); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(cardX + cardW / 2 - 7, factsY + 27); ctx.lineTo(cardX + cardW / 2 - 1, factsY + 33); ctx.lineTo(cardX + cardW / 2 + 8, factsY + 21); ctx.stroke();
-    const factInk = dark ? "#ffffff" : layout.ink;
-    postArtDrawText(ctx, label, cardX + cardW / 2, factsY + 55, cardW - 12, 1, vertical ? 17 : 13, factInk, { align: "center", min: 10 });
-    postArtDrawText(ctx, detail, cardX + cardW / 2, factsY + 79, cardW - 14, 2, vertical ? 16 : 12, factInk, { align: "center", min: 9, weight: 500, lineHeight: vertical ? 19 : 15 });
-  });
-
-  const priceY = vertical ? 1485 : 657;
-  const priceHeight = vertical ? 155 : 132;
+  const priceY = vertical ? 1505 : 640;
+  const priceHeight = vertical ? 165 : 145;
+  const hasPrice = numberFromMoney(data.price) > 0;
   preencherRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.primary);
   desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.accent, 2);
-  postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 21, width - 48, 1, vertical ? 17 : 14, footerInk, { min: 10, weight: 700 });
-  postArtDrawText(ctx, postArtMoney(data.price), x + width / 2, priceY + (vertical ? 113 : 96), width - 38, 1, vertical ? 72 : 53, footerInk, { family, min: 26, align: "center" });
+  if (hasPrice) postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
+  postArtDrawText(ctx, hasPrice ? postArtMoney(data.price) : "CONSULTE", x + width / 2, priceY + (hasPrice ? (vertical ? 117 : 105) : (vertical ? 102 : 90)), width - 38, 1, vertical ? 72 : 53, footerInk, { family, min: 26, align: "center" });
 
-  const ctaY = vertical ? 1668 : 817;
-  preencherRoundRect(ctx, x, ctaY, width, vertical ? 94 : 76, 40, "#079b42");
-  ctx.save();
-  ctx.translate(x + 47, ctaY + (vertical ? 47 : 41));
-  ctx.scale(1.6, 1.6);
-  desenharIconeWhatsappCanvas(ctx, 0, 0, "#ffffff");
-  ctx.restore();
-  postArtDrawText(ctx, "FALE PELO WHATSAPP  ›", x + width / 2 + 30, ctaY + (vertical ? 59 : 47), width - 102, 1, vertical ? 32 : 23, "#ffffff", { min: 16, align: "center" });
-
-  const footerY = vertical ? 1794 : 930;
-  preencherRoundRect(ctx, 28, footerY, 1024, vertical ? 98 : 122, 26, layout.primary);
-  const instagram = String(client?.instagram || "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
+  const footerY = vertical ? 1764 : 902;
+  const footerHeight = vertical ? 128 : 150;
+  preencherRoundRect(ctx, 28, footerY, 1024, footerHeight, 26, layout.primary);
+  const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte a empresa";
   const address = [client?.endereco, client?.bairro, client?.cidade].filter(Boolean).join(" · ");
-  const footerFields = [
-    ["CONTATO", telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte a empresa"],
-    ["INSTAGRAM", instagram || client?.nome || ""],
-    ["ENDEREÇO", address || client?.cidade || "Consulte a empresa"]
-  ];
-  footerFields.forEach(([label, value], index) => {
-    const fx = 49 + index * 338;
-    postArtDrawText(ctx, label, fx, footerY + 17, 306, 1, 13, footerInk, { min: 10, weight: 700 });
-    postArtDrawText(ctx, value, fx, footerY + 44, 306, 2, vertical ? 18 : 17, footerInk, { min: 11, weight: 600, lineHeight: 21 });
-  });
+  const phoneSize = Math.max(14, Math.min(36, Number(data.phoneFontSize) || 24));
+  const addressSize = Math.max(14, Math.min(36, Number(data.addressFontSize) || 24));
+  ctx.strokeStyle = dark ? "rgba(23,18,11,.35)" : "rgba(255,255,255,.35)";
+  ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.moveTo(520, footerY + 24); ctx.lineTo(520, footerY + footerHeight - 24); ctx.stroke();
+  postArtDrawText(ctx, phone, 274, footerY + 20, 440, 2, phoneSize, footerInk, { min: 12, weight: 700, lineHeight: phoneSize + 5, align: "center", blockHeight: footerHeight - 40 });
+  postArtDrawText(ctx, address || client?.cidade || "Consulte a empresa", 785, footerY + 20, 460, 3, addressSize, footerInk, { min: 12, weight: 700, lineHeight: addressSize + 5, align: "center", blockHeight: footerHeight - 40 });
   ctx.restore();
 }
 
@@ -24936,7 +24916,9 @@ function postArtFormData() {
     validity: $("postArtValidity")?.value || "",
     serviceMode: $("postArtServiceMode")?.value.trim() || "",
     imageFit: $("postArtImageFit")?.value || "cover",
-    showSiteLogo: $("postArtShowSiteLogo")?.checked !== false
+    showSiteLogo: state.postArtType === "produto" || $("postArtShowSiteLogo")?.checked !== false,
+    phoneFontSize: Number($("postArtPhoneFontSize")?.value) || 24,
+    addressFontSize: Number($("postArtAddressFontSize")?.value) || 24
   };
 }
 
@@ -24954,11 +24936,11 @@ function preencherFormularioPostArt() {
       : (item.descricao || [item.marca, item.modelo, item.tamanho].filter(Boolean).join(" • ") || "Produto disponível. Consulte detalhes e disponibilidade.");
   $("postArtPrice").value = item.preco || "";
   $("postArtOldPrice").value = isPromo ? (item.precoAntigo || "") : "";
-  $("postArtCallout").value = isPromo
-    ? (item.desconto || "PROMOÇÃO EM DESTAQUE")
-    : isService
-      ? (item.categoria || "SERVIÇO EM DESTAQUE")
-      : (item.categoria || item.setor || "PRODUTO EM DESTAQUE");
+  if ($("postArtCallout")) {
+    $("postArtCallout").value = isPromo
+      ? (item.desconto || "PROMOÇÃO EM DESTAQUE")
+      : (item.categoria || "SERVIÇO EM DESTAQUE");
+  }
   $("postArtValidity").value = isPromo ? (item.validadeFim || "") : "";
   $("postArtServiceMode").value = isService ? (item.atendimento || "") : "";
   state.postArtCustomImage = "";
@@ -25078,12 +25060,15 @@ function renderPostArtView() {
             <label class="wide">Descrição<textarea id="postArtDescription" rows="3" maxlength="220"></textarea></label>
             <label>${typeCopy.price}<input id="postArtPrice" placeholder="${type === "servico" ? "Ex.: A partir de 89,90 ou Sob consulta" : "Ex.: 89,90"}"></label>
             <label id="postArtOldPriceLabel" class="${type === "promocao" ? "" : "hidden"}">Preço anterior<input id="postArtOldPrice" placeholder="Ex.: 119,90"></label>
-            <label>${typeCopy.callout}<input id="postArtCallout" maxlength="48" placeholder="${type === "servico" ? "Ex.: Atendimento especializado" : "Ex.: Novidade ou 20% OFF"}"></label>
+            ${type === "produto" ? `
+              <label class="post-art-font-control">Tamanho do telefone no rodapé<span><input id="postArtPhoneFontSize" type="range" min="14" max="36" value="24"><output id="postArtPhoneFontSizeValue">24 px</output></span></label>
+              <label class="post-art-font-control">Tamanho do endereço no rodapé<span><input id="postArtAddressFontSize" type="range" min="14" max="36" value="24"><output id="postArtAddressFontSizeValue">24 px</output></span></label>
+            ` : `<label>${typeCopy.callout}<input id="postArtCallout" maxlength="48" placeholder="${type === "servico" ? "Ex.: Atendimento especializado" : "Ex.: Novidade ou 20% OFF"}"></label>`}
             <label id="postArtValidityLabel" class="${type === "promocao" ? "" : "hidden"}">Validade<input id="postArtValidity" type="date"></label>
             <label id="postArtServiceModeLabel" class="${type === "servico" ? "" : "hidden"}">Forma de atendimento<input id="postArtServiceMode" maxlength="52" placeholder="Ex.: Presencial, online ou a domicílio"></label>
             <label>Nova imagem para esta postagem<input id="postArtImageUpload" type="file" accept="image/*"></label>
             <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
-            <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
+            ${type === "produto" ? "" : `<label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>`}
           </div>
         </section>` : ""}
       </div>
@@ -25122,9 +25107,14 @@ function renderPostArtView() {
     mount.querySelectorAll("[data-post-art-layout]").forEach((item) => item.classList.toggle("active", item === button));
     atualizarPreviaPostArt();
   }));
-  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImageFit", "postArtShowSiteLogo"].forEach((id) => {
+  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImageFit", "postArtShowSiteLogo", "postArtPhoneFontSize", "postArtAddressFontSize"].forEach((id) => {
     $(id)?.addEventListener("input", agendarPreviaPostArt);
     $(id)?.addEventListener("change", agendarPreviaPostArt);
+  });
+  [["postArtPhoneFontSize", "postArtPhoneFontSizeValue"], ["postArtAddressFontSize", "postArtAddressFontSizeValue"]].forEach(([inputId, outputId]) => {
+    $(inputId)?.addEventListener("input", (event) => {
+      if ($(outputId)) $(outputId).textContent = `${event.target.value} px`;
+    });
   });
   $("postArtImageUpload")?.addEventListener("change", (event) => {
     const file = event.target.files?.[0];
