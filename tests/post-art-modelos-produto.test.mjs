@@ -84,11 +84,11 @@ test("todos os oito modelos desenham Feed e Reels com dados e textos dentro do c
   }
 });
 
-test("titulos longos descricoes e precos sob consulta cabem nos dois formatos", () => {
+test("titulos e descricoes longos cabem e ausencia de preco nao gera texto", () => {
   for (const format of ["feed", "reels"]) {
     const ctx = mockContext(format === "feed" ? 1080 : 1920);
     sandbox.desenharPostArtProdutoReferencia(ctx, { ...data, format, title: "TITULO produto com nome completo e apresentação especial para todos os clientes da cidade", description: "DESCRICAO completa do produto com as informações cadastradas pela empresa. Consulte os detalhes, opções e disponibilidade pelo contato informado. O texto pode ser alterado antes de baixar a postagem em imagem.", price: "" }, client, null, null, null, sandbox.layouts[0]);
-    assert.ok(ctx.texts.some((entry) => entry.value.includes("CONSULTE")));
+    assert.ok(!ctx.texts.some((entry) => /CONSULTE|POR APENAS/.test(entry.value)));
     assert.ok(!ctx.texts.some((entry) => entry.value.includes("POR APENAS")));
     const titleTop = ctx.texts.find((entry) => entry.value.includes("TITULO"))?.y;
     const descriptionTop = ctx.texts.find((entry) => entry.value.includes("DESCRICAO"))?.y;
@@ -106,6 +106,7 @@ test("formulario oferece fontes e controles opcionais da logo tarja e card", () 
   assert.match(source, /id="postArtShowHighlightCard" type="checkbox"/);
   assert.match(source, /id="postArtDescriptionFontSize" type="range"/);
   assert.match(source, /id="postArtHighlightFontSize" type="range"/);
+  assert.match(source, /id="postArtClientLogoSize" type="range"/);
   assert.match(source, /editorial: true/);
 });
 
@@ -152,6 +153,9 @@ test("nome fica maior e centralizado quando a logo do portal e removida", () => 
     return Number(ctx.texts[0].font.match(/(\d+)px/)[1]);
   });
   assert.ok(sizes[1] > sizes[0]);
+  const ctx = mockContext(1080);
+  sandbox.postArtDrawBrand(ctx, { nome: "Cliente" }, null, null, sandbox.layouts[0], { editorial: true, showSiteLogo: false, width: 445, logoSize: 120, nameColor: "#123456" });
+  assert.match(ctx.texts[0].font, /italic 900 .*Georgia/);
 });
 
 test("sem preco a descricao e o card aproveitam o espaco liberado", () => {
@@ -188,7 +192,7 @@ if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
     const sc = sheet.getContext("2d");
     sandbox.layouts.forEach((layout, index) => {
       const canvas = createCanvas(1080, height);
-      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, showSiteLogo: index % 2 === 0, price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
+      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, showSiteLogo: index % 2 === 0, clientLogoSize: index % 2 ? (format === "feed" ? 150 : 180) : (format === "feed" ? 92 : 110), price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
       writeFileSync(path.join(output, layout.key + "-" + format + ".png"), canvas.toBuffer("image/png"));
       sc.drawImage(canvas, index % 4 * 360, Math.floor(index / 4) * height / 3, 360, height / 3);
     });

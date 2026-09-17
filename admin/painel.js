@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 762,
-  label: "v769",
+  numero: 763,
+  label: "v770",
   data: "2026-09-17",
-  nota: "Tarja móvel, identidade ampliada e layout adaptativo de descrição e características com ou sem preço."
+  nota: "Nome editorial e logo do cliente ajustável, sem indicação de consulta quando o produto não possui preço."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24604,8 +24604,14 @@ function postArtDrawBrand(ctx, client, logo, siteLogo, layout, options = {}) {
     const siteX = x + width - siteWidth;
     if (logo) desenharImagemContain(ctx, logo, x, y, logoSize, logoSize, 14, "rgba(255,255,255,0)");
     const nameWidth = Math.max(90, siteX - nameX - 18);
-    const nameSize = (options.nameSize || 30) * (siteWidth ? 1 : 1.35);
-    postArtDrawText(ctx, client?.nome || "SUA EMPRESA", nameX + nameWidth / 2, y, nameWidth, 2, Math.round(nameSize), textColor, { min: 17, lineHeight: Math.round(nameSize * 1.08), align: "center", blockHeight: logoSize });
+    const nameSize = (options.nameSize || 30) * (siteWidth ? 1 : 1.5);
+    const editorialColor = !siteWidth && options.nameColor ? options.nameColor : textColor;
+    postArtDrawText(ctx, client?.nome || "SUA EMPRESA", nameX + nameWidth / 2, y, nameWidth, 2, Math.round(nameSize), editorialColor, { min: 17, lineHeight: Math.round(nameSize * 1.08), align: "center", blockHeight: logoSize, family: siteWidth ? "Arial" : "Georgia", weight: siteWidth ? 900 : "italic 900" });
+    if (!siteWidth) {
+      ctx.strokeStyle = options.accentColor || editorialColor;
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(nameX + nameWidth * .2, y + logoSize - 5); ctx.lineTo(nameX + nameWidth * .8, y + logoSize - 5); ctx.stroke();
+    }
     if (siteLogo && siteWidth) desenharImagemContain(ctx, siteLogo, siteX, y, siteWidth, logoSize, 0, "rgba(255,255,255,0)");
     return;
   }
@@ -24891,15 +24897,18 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   const x = vertical ? 70 : 595;
   const width = vertical ? 940 : 445;
   const brandY = vertical ? 54 : 42;
+  const clientLogoSize = Math.max(56, Math.min(vertical ? 180 : 150, Number(data.clientLogoSize) || (vertical ? 110 : 92)));
   postArtDrawBrand(ctx, client, logo, siteLogo, layout, {
     x, y: brandY, width, dark, editorial: true, showSiteLogo: data.showSiteLogo,
-    logoSize: vertical ? 110 : 92,
+    logoSize: clientLogoSize,
     siteWidth: vertical ? 170 : 132,
     nameSize: vertical ? 38 : 29,
-    nameLineHeight: vertical ? 40 : 31
+    nameLineHeight: vertical ? 40 : 31,
+    nameColor: dark ? layout.accent : layout.primary,
+    accentColor: layout.accent
   });
 
-  const titleY = vertical ? 1010 : 186;
+  const titleY = vertical ? 1010 : Math.max(186, brandY + clientLogoSize + 20);
   const titleHeight = postArtDrawText(ctx, data.title, x, titleY, width, 3, vertical ? 72 : 55, layout.ink, { family, min: vertical ? 36 : 27, lineHeight: vertical ? 77 : 58 });
   const descriptionY = titleY + titleHeight + (vertical ? 28 : 23);
   const hasPrice = numberFromMoney(data.price) > 0;
@@ -24924,12 +24933,10 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   }
   const priceHeight = vertical ? 140 : 126;
   if (hasPrice) {
-  preencherRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.primary);
-  desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.accent, 2);
-  if (hasPrice) postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
-  postArtDrawText(ctx, hasPrice ? postArtMoney(data.price) : "CONSULTE", x + width / 2, priceY + (hasPrice ? (vertical ? 117 : 105) : (vertical ? 102 : 90)), width - 38, 1, vertical ? 72 : 53, footerInk, { family, min: 26, align: "center" });
-  } else {
-    postArtDrawText(ctx, "CONSULTE", x + width / 2, contentBottom + 30, width - 38, 1, 20, layout.ink, { family, align: "center", min: 14 });
+    preencherRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.primary);
+    desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.accent, 2);
+    postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
+    postArtDrawText(ctx, postArtMoney(data.price), x + width / 2, priceY + (vertical ? 117 : 105), width - 38, 1, vertical ? 72 : 53, footerInk, { family, min: 26, align: "center" });
   }
 
   const footerY = vertical ? 1764 : 902;
@@ -24979,6 +24986,7 @@ function postArtFormData() {
     serviceMode: $("postArtServiceMode")?.value.trim() || "",
     imageFit: $("postArtImageFit")?.value || "cover",
     showSiteLogo: $("postArtShowSiteLogo")?.checked !== false,
+    clientLogoSize: Number($("postArtClientLogoSize")?.value) || (state.postArtFormat === "reels" ? 110 : 92),
     showHighlightBanner: $("postArtShowHighlightBanner")?.checked === true,
     highlightBannerColor: $("postArtHighlightBannerColor")?.value || "#e8b84b",
     bannerX: Number($("postArtBannerX")?.value ?? (state.postArtFormat === "reels" ? 50 : 9)),
@@ -25144,6 +25152,7 @@ function renderPostArtView() {
               <label>Posição vertical da tarja<input id="postArtBannerY" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 45 : 80}"></label>
               <small class="wide">Com a tarja ativa, arraste-a diretamente na prévia ou use os controles de posição.</small>
               <label class="post-art-font-control">Fonte da descrição (ajustada para caber)<span><input id="postArtDescriptionFontSize" type="range" min="14" max="44" value="22"><output id="postArtDescriptionFontSizeValue">22 px</output></span></label>
+              <label class="post-art-font-control">Tamanho da logo do cliente<span><input id="postArtClientLogoSize" type="range" min="56" max="${format.key === "reels" ? 180 : 150}" value="${format.key === "reels" ? 110 : 92}"><output id="postArtClientLogoSizeValue">${format.key === "reels" ? 110 : 92} px</output></span></label>
               <label class="check-row wide"><input id="postArtShowHighlightCard" type="checkbox"> Exibir card Destaque do Produto</label>
               <datalist id="postArtHighlightOptions"></datalist>
               ${[1, 2, 3].map((index) => `<label class="wide">Característica ${index} (opcional)<input id="postArtHighlight${index}" list="postArtHighlightOptions" maxlength="120" placeholder="Escolha um detalhe cadastrado ou escreva o destaque"></label>`).join("")}
@@ -25194,11 +25203,11 @@ function renderPostArtView() {
     mount.querySelectorAll("[data-post-art-layout]").forEach((item) => item.classList.toggle("active", item === button));
     atualizarPreviaPostArt();
   }));
-  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImageFit", "postArtShowSiteLogo", "postArtPhoneFontSize", "postArtAddressFontSize", "postArtShowHighlightBanner", "postArtHighlightBannerColor", "postArtDescriptionFontSize", "postArtShowHighlightCard", "postArtHighlightFontSize", "postArtHighlight1", "postArtHighlight2", "postArtHighlight3"].forEach((id) => {
+  ["postArtTitle", "postArtDescription", "postArtPrice", "postArtOldPrice", "postArtCallout", "postArtValidity", "postArtServiceMode", "postArtImageFit", "postArtShowSiteLogo", "postArtClientLogoSize", "postArtPhoneFontSize", "postArtAddressFontSize", "postArtShowHighlightBanner", "postArtHighlightBannerColor", "postArtDescriptionFontSize", "postArtShowHighlightCard", "postArtHighlightFontSize", "postArtHighlight1", "postArtHighlight2", "postArtHighlight3"].forEach((id) => {
     $(id)?.addEventListener("input", agendarPreviaPostArt);
     $(id)?.addEventListener("change", agendarPreviaPostArt);
   });
-  [["postArtPhoneFontSize", "postArtPhoneFontSizeValue"], ["postArtAddressFontSize", "postArtAddressFontSizeValue"], ["postArtDescriptionFontSize", "postArtDescriptionFontSizeValue"], ["postArtHighlightFontSize", "postArtHighlightFontSizeValue"]].forEach(([inputId, outputId]) => {
+  [["postArtPhoneFontSize", "postArtPhoneFontSizeValue"], ["postArtAddressFontSize", "postArtAddressFontSizeValue"], ["postArtDescriptionFontSize", "postArtDescriptionFontSizeValue"], ["postArtClientLogoSize", "postArtClientLogoSizeValue"], ["postArtHighlightFontSize", "postArtHighlightFontSizeValue"]].forEach(([inputId, outputId]) => {
     $(inputId)?.addEventListener("input", (event) => {
       if ($(outputId)) $(outputId).textContent = `${event.target.value} px`;
     });
