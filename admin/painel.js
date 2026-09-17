@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 764,
-  label: "v771",
+  numero: 765,
+  label: "v772",
   data: "2026-09-17",
-  nota: "Tipografia ajustável do produto e do cliente, com organização responsiva da marca nos formatos Feed e Reels."
+  nota: "Enquadramento da imagem do produto por arraste na prévia, com recorte protegido e opção de centralizar."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24578,7 +24578,20 @@ function postArtDrawText(ctx, text, x, y, width, lines, size, color, options = {
   });
 }
 
-function postArtDrawPhoto(ctx, image, rect, fit = "cover", radius = 32, fill = "#edf2f7") {
+function postArtProductPhotoRect(format) {
+  return format === "reels" ? { x: 79, y: 199, w: 922, h: 722 } : { x: 39, y: 43, w: 517, h: 847 };
+}
+
+function postArtImageGeometry(image, rect, fit, position = {}) {
+  const scale = (fit === "contain" ? Math.min : Math.max)(rect.w / image.width, rect.h / image.height);
+  const w = image.width * scale;
+  const h = image.height * scale;
+  const px = Math.max(0, Math.min(1, Number(position.x ?? .5)));
+  const py = Math.max(0, Math.min(1, Number(position.y ?? .5)));
+  return { x: rect.x + (rect.w - w) * px, y: rect.y + (rect.h - h) * py, w, h };
+}
+
+function postArtDrawPhoto(ctx, image, rect, fit = "cover", radius = 32, fill = "#edf2f7", position = null) {
   preencherRoundRect(ctx, rect.x, rect.y, rect.w, rect.h, radius, fill);
   if (!image) {
     ctx.fillStyle = "#8292a5";
@@ -24587,7 +24600,14 @@ function postArtDrawPhoto(ctx, image, rect, fit = "cover", radius = 32, fill = "
     ctx.fillText("IMAGEM DO ITEM", rect.x + rect.w / 2, rect.y + rect.h / 2);
     return;
   }
-  if (fit === "contain") desenharImagemContain(ctx, image, rect.x, rect.y, rect.w, rect.h, radius, fill);
+  if (position) {
+    const frame = postArtImageGeometry(image, rect, fit, position);
+    ctx.save();
+    canvasRoundRect(ctx, rect.x, rect.y, rect.w, rect.h, radius);
+    ctx.clip();
+    ctx.drawImage(image, frame.x, frame.y, frame.w, frame.h);
+    ctx.restore();
+  } else if (fit === "contain") desenharImagemContain(ctx, image, rect.x, rect.y, rect.w, rect.h, radius, fill);
   else desenharImagemCover(ctx, image, rect.x, rect.y, rect.w, rect.h, radius);
 }
 
@@ -24891,7 +24911,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   const photo = vertical ? { x: 70, y: 190, w: 940, h: 740 } : { x: 30, y: 34, w: 535, h: 865 };
   const photoFill = dark ? "#272624" : "#f3efe8";
   preencherRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.panel);
-  postArtDrawPhoto(ctx, image, { x: photo.x + 9, y: photo.y + 9, w: photo.w - 18, h: photo.h - 18 }, data.imageFit || "cover", 16, photoFill);
+  postArtDrawPhoto(ctx, image, postArtProductPhotoRect(data.format), data.imageFit || "cover", 16, photoFill, data.imagePosition || { x: .5, y: .5 });
   desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.accent, 3);
 
   const x = vertical ? 70 : 595;
@@ -24987,6 +25007,7 @@ function postArtFormData() {
     validity: $("postArtValidity")?.value || "",
     serviceMode: $("postArtServiceMode")?.value.trim() || "",
     imageFit: $("postArtImageFit")?.value || "cover",
+    imagePosition: state.postArtImagePosition || { x: .5, y: .5 },
     showSiteLogo: $("postArtShowSiteLogo")?.checked !== false,
     clientLogoSize: Number($("postArtClientLogoSize")?.value) || (state.postArtFormat === "reels" ? 110 : 92),
     clientNameFont: $("postArtClientNameFont")?.value || "Georgia",
@@ -25031,6 +25052,7 @@ function preencherFormularioPostArt() {
   $("postArtValidity").value = isPromo ? (item.validadeFim || "") : "";
   $("postArtServiceMode").value = isService ? (item.atendimento || "") : "";
   state.postArtCustomImage = "";
+  state.postArtImagePosition = { x: .5, y: .5 };
   $("postArtOldPriceLabel")?.classList.toggle("hidden", !isPromo);
   $("postArtValidityLabel")?.classList.toggle("hidden", !isPromo);
   $("postArtServiceModeLabel")?.classList.toggle("hidden", !isService);
@@ -25170,6 +25192,7 @@ function renderPostArtView() {
             <label id="postArtServiceModeLabel" class="${type === "servico" ? "" : "hidden"}">Forma de atendimento<input id="postArtServiceMode" maxlength="52" placeholder="Ex.: Presencial, online ou a domicílio"></label>
             <label>Nova imagem para esta postagem<input id="postArtImageUpload" type="file" accept="image/*"></label>
             <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
+            ${type === "produto" ? `<div class="wide"><small>Arraste a foto na prévia para ajustar o enquadramento dentro da moldura. O movimento fica limitado ao recorte ou espaço disponível.</small><button id="postArtResetImagePosition" type="button" class="ghost-button">Centralizar imagem</button></div>` : ""}
             <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
           </div>
         </section>` : ""}
@@ -25224,35 +25247,52 @@ function renderPostArtView() {
     const reader = new FileReader();
     reader.onload = () => {
       state.postArtCustomImage = String(reader.result || "");
+      state.postArtImagePosition = { x: .5, y: .5 };
       atualizarPreviaPostArt();
     };
     reader.readAsDataURL(file);
   });
   $("postArtDownload")?.addEventListener("click", baixarPostArt);
   const previewCanvas = $("postArtCanvas");
-  const updateBannerInteraction = () => previewCanvas?.classList.toggle("is-banner-movable", type === "produto" && $("postArtShowHighlightBanner")?.checked === true);
+  const updateBannerInteraction = () => previewCanvas?.classList.toggle("is-banner-movable", type === "produto");
   $("postArtShowHighlightBanner")?.addEventListener("change", updateBannerInteraction);
   updateBannerInteraction();
   let bannerDrag = null;
+  let imageDrag = null;
   const canvasPoint = (event) => {
     const bounds = previewCanvas.getBoundingClientRect();
     return { x: (event.clientX - bounds.left) * previewCanvas.width / bounds.width, y: (event.clientY - bounds.top) * previewCanvas.height / bounds.height };
   };
   previewCanvas?.addEventListener("pointerdown", (event) => {
-    if (type !== "produto" || !$("postArtShowHighlightBanner")?.checked) return;
+    if (type !== "produto" || event.button !== 0) return;
     const point = canvasPoint(event);
     const rect = postArtBannerRect(postArtFormData(), previewCanvas.width, previewCanvas.height);
-    if (point.x < rect.x || point.x > rect.x + rect.w || point.y < rect.y || point.y > rect.y + rect.h) return;
-    bannerDrag = { x: point.x - rect.x, y: point.y - rect.y };
+    if ($("postArtShowHighlightBanner")?.checked && point.x >= rect.x && point.x <= rect.x + rect.w && point.y >= rect.y && point.y <= rect.y + rect.h) {
+      bannerDrag = { x: point.x - rect.x, y: point.y - rect.y };
+    } else {
+      const photo = postArtProductPhotoRect(state.postArtFormat);
+      if (!postArtPreviewAssets?.image || point.x < photo.x || point.x > photo.x + photo.w || point.y < photo.y || point.y > photo.y + photo.h) return;
+      const data = postArtFormData();
+      imageDrag = { point, position: { ...data.imagePosition }, photo, frame: postArtImageGeometry(postArtPreviewAssets.image, photo, data.imageFit, data.imagePosition) };
+    }
     previewCanvas.setPointerCapture(event.pointerId);
     event.preventDefault();
   });
   previewCanvas?.addEventListener("pointermove", (event) => {
-    if (!bannerDrag) return;
+    if (!bannerDrag && !imageDrag) return;
     const point = canvasPoint(event);
-    const rect = postArtBannerRect(postArtFormData(), previewCanvas.width, previewCanvas.height);
-    $("postArtBannerX").value = Math.max(0, Math.min(100, (point.x - bannerDrag.x) / (previewCanvas.width - rect.w) * 100));
-    $("postArtBannerY").value = Math.max(0, Math.min(100, (point.y - bannerDrag.y) / (previewCanvas.height - rect.h) * 100));
+    if (bannerDrag) {
+      const rect = postArtBannerRect(postArtFormData(), previewCanvas.width, previewCanvas.height);
+      $("postArtBannerX").value = Math.max(0, Math.min(100, (point.x - bannerDrag.x) / (previewCanvas.width - rect.w) * 100));
+      $("postArtBannerY").value = Math.max(0, Math.min(100, (point.y - bannerDrag.y) / (previewCanvas.height - rect.h) * 100));
+    } else {
+      const dx = imageDrag.photo.w - imageDrag.frame.w;
+      const dy = imageDrag.photo.h - imageDrag.frame.h;
+      state.postArtImagePosition = {
+        x: Math.abs(dx) < .01 ? .5 : Math.max(0, Math.min(1, imageDrag.position.x + (point.x - imageDrag.point.x) / dx)),
+        y: Math.abs(dy) < .01 ? .5 : Math.max(0, Math.min(1, imageDrag.position.y + (point.y - imageDrag.point.y) / dy))
+      };
+    }
     if (postArtPreviewAssets) {
       const assets = postArtPreviewAssets;
       desenharPostArtCanvas(previewCanvas.getContext("2d"), postArtFormData(), assets.client, assets.image, assets.logo, assets.siteLogo, postArtLayout());
@@ -25260,7 +25300,11 @@ function renderPostArtView() {
       agendarPreviaPostArt();
     }
   });
-  ["pointerup", "pointercancel", "lostpointercapture"].forEach((eventName) => previewCanvas?.addEventListener(eventName, () => { bannerDrag = null; }));
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach((eventName) => previewCanvas?.addEventListener(eventName, () => { bannerDrag = null; imageDrag = null; }));
+  $("postArtResetImagePosition")?.addEventListener("click", () => {
+    state.postArtImagePosition = { x: .5, y: .5 };
+    atualizarPreviaPostArt();
+  });
   ["postArtBannerX", "postArtBannerY"].forEach((id) => $(id)?.addEventListener("input", agendarPreviaPostArt));
   preencherFormularioPostArt();
   atualizarPreviaPostArt();

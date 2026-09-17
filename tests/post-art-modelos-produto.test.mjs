@@ -16,7 +16,7 @@ const helperNames = [
   "numberFromMoney", "canvasRoundRect", "preencherRoundRect", "desenharImagemCover",
   "desenharImagemContain", "linhasCanvas", "desenharTextoInteiroCanvas", "desenharBordaRoundRect",
   "postArtMoney", "postArtDrawText", "postArtDrawPhoto", "postArtDrawBrand", "desenharIconeWhatsappCanvas",
-  "postArtProductHighlights", "postArtDrawFittedText", "postArtBannerRect", "desenharPostArtProdutoReferencia", "postArtItemImage"
+  "postArtProductHighlights", "postArtDrawFittedText", "postArtBannerRect", "postArtProductPhotoRect", "postArtImageGeometry", "desenharPostArtProdutoReferencia", "postArtItemImage"
 ];
 const sandbox = {
   state: { postArtCustomImage: "" },
@@ -44,6 +44,35 @@ function mockContext(height) {
   });
   return ctx;
 }
+
+test("foto pode ser reenquadrada sem sair da moldura nos dois formatos", () => {
+  for (const format of ["feed", "reels"]) for (const fit of ["cover", "contain"]) {
+    const rect = sandbox.postArtProductPhotoRect(format);
+    const img = { width: 1400, height: 700 };
+    const frames = [0, .5, 1].map((position) => sandbox.postArtImageGeometry(img, rect, fit, { x: position, y: position }));
+    assert.ok(frames[0].x !== frames[2].x || frames[0].y !== frames[2].y);
+    for (const frame of frames) {
+      assert.equal(frame.w / frame.h, 2);
+      if (fit === "cover") {
+        assert.ok(frame.x <= rect.x + .01 && frame.x + frame.w >= rect.x + rect.w - .01);
+        assert.ok(frame.y <= rect.y + .01 && frame.y + frame.h >= rect.y + rect.h - .01);
+      } else {
+        assert.ok(frame.x >= rect.x - .01 && frame.x + frame.w <= rect.x + rect.w + .01);
+        assert.ok(frame.y >= rect.y - .01 && frame.y + frame.h <= rect.y + rect.h + .01);
+      }
+    }
+    const ctx = mockContext(format === "feed" ? 1080 : 1920);
+    const calls = [];
+    ctx.drawImage = (...args) => calls.push(args);
+    ctx.clip = () => calls.push("clip");
+    sandbox.postArtDrawPhoto(ctx, img, rect, fit, 16, "#fff", { x: 1, y: 0 });
+    assert.equal(calls[0], "clip");
+    assert.equal(calls[1][0], img);
+  }
+  assert.match(source, /id="postArtResetImagePosition"/);
+  assert.match(source, /let imageDrag = null/);
+  assert.match(source, /imagePosition: state\.postArtImagePosition/);
+});
 
 test("produtos oferecem os oito modelos de referencia sem alterar promocao e servico", () => {
   assert.equal(sandbox.layouts.length, 8);
