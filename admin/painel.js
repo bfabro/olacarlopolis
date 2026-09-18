@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 765,
-  label: "v772",
-  data: "2026-09-17",
-  nota: "Enquadramento da imagem do produto por arraste na prévia, com recorte protegido e opção de centralizar."
+  numero: 766,
+  label: "v773",
+  data: "2026-09-18",
+  nota: "Oito modelos de promoções com controles completos e tarja ampliada."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24485,10 +24485,14 @@ const POST_ART_LAYOUTS = {
     { key: "produto-laranja", nome: "08 · Lavanda", descricao: "Composição contemporânea em lavanda e ameixa", variant: 0, reference: true, bg: "#f2edf8", panel: "#fbf8ff", primary: "#68457e", accent: "#bba1cf", ink: "#432c54", shape: "fashion", serif: true }
   ],
   promocao: [
-    { key: "promocao-flash", nome: "Flash Sale", descricao: "Oferta limpa com preço grande e urgência visual", variant: 0, bg: "#fff7ed", panel: "#ffffff", primary: "#dc2626", accent: "#fde047", ink: "#2b1717" },
-    { key: "promocao-black", nome: "Black Neon", descricao: "Visual escuro usado em campanhas de alta conversão", variant: 1, bg: "#09090b", panel: "#18181b", primary: "#f43f5e", accent: "#a3e635", ink: "#ffffff" },
-    { key: "promocao-fullscreen", nome: "Oferta Fullscreen", descricao: "Foto em tela cheia com preço central dominante", variant: 2, bg: "#7c2d12", panel: "#ffffff", primary: "#f97316", accent: "#fef08a", ink: "#ffffff" },
-    { key: "promocao-cupom", nome: "Cupom Pop", descricao: "Composição jovem para descontos e tempo limitado", variant: 3, bg: "#4c1d95", panel: "#ffffff", primary: "#ec4899", accent: "#facc15", ink: "#ffffff" }
+    { key: "promocao-vermelho", nome: "01 · Vermelho Oferta", descricao: "Promoção marcante em vermelho e amarelo", reference: true, bg: "#fff1ee", panel: "#fffaf6", primary: "#b91c1c", accent: "#ffd23f", ink: "#721c18" },
+    { key: "promocao-preto", nome: "02 · Preto Dourado", descricao: "Oferta premium em preto e dourado", reference: true, bg: "#111111", panel: "#1c1b19", primary: "#d7ad58", accent: "#f0d79b", ink: "#ffffff", dark: true },
+    { key: "promocao-laranja", nome: "03 · Laranja", descricao: "Campanha vibrante em laranja e creme", reference: true, bg: "#fff0dd", panel: "#fffaf3", primary: "#b9470a", accent: "#ffcf60", ink: "#682d10" },
+    { key: "promocao-verde", nome: "04 · Verde", descricao: "Oferta em verde e champanhe", reference: true, bg: "#edf2e9", panel: "#f8fbf5", primary: "#1f5a43", accent: "#c5a86a", ink: "#173f31" },
+    { key: "promocao-azul", nome: "05 · Azul", descricao: "Campanha em azul marinho e amarelo", reference: true, bg: "#eef4fc", panel: "#f8fbff", primary: "#17324d", accent: "#ffd23f", ink: "#172a3a" },
+    { key: "promocao-vinho", nome: "06 · Vinho", descricao: "Contraste marcante em vinho e rosé", reference: true, bg: "#35131b", panel: "#4a1b27", primary: "#c78697", accent: "#edc6ce", ink: "#ffffff", dark: true },
+    { key: "promocao-rosa", nome: "07 · Rosé", descricao: "Promoção em rosé e bordô", reference: true, bg: "#fff0f3", panel: "#fff8f9", primary: "#a82d52", accent: "#e7a6b8", ink: "#70213c" },
+    { key: "promocao-roxo", nome: "08 · Roxo", descricao: "Oferta contemporânea em lavanda e roxo", reference: true, bg: "#f2edf8", panel: "#fbf8ff", primary: "#68457e", accent: "#bba1cf", ink: "#432c54" }
   ],
   servico: [
     { key: "servico-clean", nome: "Clean Professional", descricao: "Apresentação clara, confiável e objetiva", variant: 0, bg: "#eff6ff", panel: "#ffffff", primary: "#1d4ed8", accent: "#bfdbfe", ink: "#172554" },
@@ -24882,10 +24886,12 @@ function postArtDrawFittedText(ctx, text, x, top, width, height, requestedSize, 
 
 function postArtBannerRect(data, width, height) {
   const vertical = data.format === "reels";
-  const bannerWidth = vertical ? 896 : 491;
+  const promo = data.type === "promocao";
+  const bannerWidth = promo ? (vertical ? 922 : 517) : (vertical ? 896 : 491);
+  const bannerHeight = promo ? (vertical ? 140 : 120) : 68;
   const xPercent = Math.max(0, Math.min(100, Number(data.bannerX ?? (vertical ? 50 : 9))));
   const yPercent = Math.max(0, Math.min(100, Number(data.bannerY ?? (vertical ? 45 : 80))));
-  return { x: (width - bannerWidth) * xPercent / 100, y: (height - 68) * yPercent / 100, w: bannerWidth, h: 68 };
+  return { x: (width - bannerWidth) * xPercent / 100, y: (height - bannerHeight) * yPercent / 100, w: bannerWidth, h: bannerHeight };
 }
 
 function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLogo, layout) {
@@ -24946,7 +24952,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
     preencherRoundRect(ctx, x, cardY, width, cardHeight, 20, layout.panel);
     desenharBordaRoundRect(ctx, x, cardY, width, cardHeight, 20, layout.accent, 3);
     preencherRoundRect(ctx, x + 7, cardY + 7, width - 14, 44, 15, layout.primary);
-    postArtDrawText(ctx, "DESTAQUE DO PRODUTO", x + width / 2, cardY + 36, width - 40, 1, vertical ? 25 : 20, footerInk, { min: 13, align: "center" });
+    postArtDrawText(ctx, data.type === "promocao" ? "DESTAQUES DA OFERTA" : "DESTAQUE DO PRODUTO", x + width / 2, cardY + 36, width - 40, 1, vertical ? 25 : 20, footerInk, { min: 13, align: "center" });
     const rowHeight = (cardHeight - 65) / highlights.length;
     highlights.forEach((value, index) => {
       preencherRoundRect(ctx, x + 16, cardY + 60 + index * rowHeight, 5, rowHeight - 8, 3, layout.accent);
@@ -24957,12 +24963,18 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   if (hasPrice) {
     preencherRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.primary);
     desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.accent, 2);
-    postArtDrawText(ctx, "POR APENAS", x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
+    const oldPrice = data.type === "promocao" && numberFromMoney(data.oldPrice) > numberFromMoney(data.price) ? `DE ${postArtMoney(data.oldPrice)}` : "";
+    postArtDrawText(ctx, oldPrice || "POR APENAS", x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
+    if (oldPrice) {
+      ctx.strokeStyle = footerInk; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x + 24, priceY + 16); ctx.lineTo(x + 24 + Math.min(width - 48, ctx.measureText(oldPrice).width), priceY + 16); ctx.stroke();
+    }
     postArtDrawText(ctx, postArtMoney(data.price), x + width / 2, priceY + (vertical ? 117 : 105), width - 38, 1, vertical ? 72 : 53, footerInk, { family, min: 26, align: "center" });
   }
 
   const footerY = vertical ? 1764 : 902;
   const footerHeight = vertical ? 128 : 150;
+  if (data.type === "promocao" && data.validity) postArtDrawText(ctx, `VÁLIDA ATÉ ${formatDateBR(data.validity)}`, x + width / 2, footerY - 16, width, 1, vertical ? 22 : 14, layout.ink, { min: 11, align: "center" });
   preencherRoundRect(ctx, 28, footerY, 1024, footerHeight, 26, layout.primary);
   const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte a empresa";
   const address = [client?.endereco, client?.bairro, client?.cidade].filter(Boolean).join(" · ");
@@ -24979,13 +24991,16 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
     const rgb = [1, 3, 5].map((start) => parseInt(bannerColor.slice(start, start + 2), 16));
     const bannerInk = rgb[0] * .299 + rgb[1] * .587 + rgb[2] * .114 > 150 ? "#17120b" : "#ffffff";
     preencherRoundRect(ctx, banner.x, banner.y, banner.w, banner.h, 18, bannerColor);
-    postArtDrawText(ctx, "PRODUTO EM DESTAQUE", banner.x + banner.w / 2, banner.y + 42, banner.w - 28, 1, vertical ? 30 : 25, bannerInk, { align: "center", min: 16, weight: 900 });
+    const promo = data.type === "promocao";
+    const label = promo ? "EM PROMOÇÃO" : "PRODUTO EM DESTAQUE";
+    postArtDrawText(ctx, label, banner.x + banner.w / 2, banner.y + (promo ? banner.h * .57 : 42), banner.w - 28, 1, promo ? (vertical ? 64 : 48) : (vertical ? 30 : 25), bannerInk, { align: "center", min: 16, weight: 900 });
+    if (promo && data.callout) postArtDrawText(ctx, data.callout.toUpperCase(), banner.x + banner.w / 2, banner.y + banner.h - 15, banner.w - 30, 1, vertical ? 26 : 20, bannerInk, { align: "center", min: 12, weight: 800 });
   }
   ctx.restore();
 }
 
 function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout) {
-  if (data.type === "produto" && layout.reference) {
+  if (["produto", "promocao"].includes(data.type) && layout.reference) {
     desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLogo, layout);
     return;
   }
@@ -25171,17 +25186,18 @@ function renderPostArtView() {
             <label class="wide">Descrição<textarea id="postArtDescription" rows="3" maxlength="220"></textarea></label>
             <label>${typeCopy.price}<input id="postArtPrice" placeholder="${type === "servico" ? "Ex.: A partir de 89,90 ou Sob consulta" : "Ex.: 89,90"}"></label>
             <label id="postArtOldPriceLabel" class="${type === "promocao" ? "" : "hidden"}">Preço anterior<input id="postArtOldPrice" placeholder="Ex.: 119,90"></label>
-            ${type === "produto" ? `
-              <label class="check-row wide"><input id="postArtShowHighlightBanner" type="checkbox"> Exibir tarja Produto em Destaque</label>
+            ${["produto", "promocao"].includes(type) ? `
+              <label class="check-row wide"><input id="postArtShowHighlightBanner" type="checkbox" ${type === "promocao" ? "checked" : ""}> Exibir tarja ${type === "promocao" ? "Em Promoção" : "Produto em Destaque"}</label>
               <label>Cor da tarja<input id="postArtHighlightBannerColor" type="color" value="#e8b84b"></label>
               <label>Posição horizontal da tarja<input id="postArtBannerX" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 50 : 9}"></label>
               <label>Posição vertical da tarja<input id="postArtBannerY" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 45 : 80}"></label>
               <small class="wide">Com a tarja ativa, arraste-a diretamente na prévia ou use os controles de posição.</small>
+              ${type === "promocao" ? `<label class="wide">Chamada ou desconto<input id="postArtCallout" maxlength="48" placeholder="Ex.: 20% OFF ou Oferta especial"></label>` : ""}
               <label class="post-art-font-control">Fonte da descrição (ajustada para caber)<span><input id="postArtDescriptionFontSize" type="range" min="14" max="44" value="22"><output id="postArtDescriptionFontSizeValue">22 px</output></span></label>
               <label class="post-art-font-control">Tamanho da logo do cliente<span><input id="postArtClientLogoSize" type="range" min="56" max="${format.key === "reels" ? 180 : 150}" value="${format.key === "reels" ? 110 : 92}"><output id="postArtClientLogoSizeValue">${format.key === "reels" ? 110 : 92} px</output></span></label>
               <label class="post-art-font-control">Tamanho do nome do produto<span><input id="postArtTitleFontSize" type="range" min="${format.key === "reels" ? 32 : 24}" max="${format.key === "reels" ? 92 : 74}" value="${format.key === "reels" ? 72 : 55}"><output id="postArtTitleFontSizeValue">${format.key === "reels" ? 72 : 55} px</output></span></label>
               <label>Fonte do nome do cliente<select id="postArtClientNameFont"><option value="Georgia">Georgia</option><option value="Arial">Arial</option><option value="Trebuchet MS">Trebuchet</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option><option value="Impact">Impact</option><option value="Comic Sans MS">Comic Sans</option><option value="Palatino Linotype">Palatino</option><option value="Garamond">Garamond</option></select></label>
-              <label class="check-row wide"><input id="postArtShowHighlightCard" type="checkbox"> Exibir card Destaque do Produto</label>
+              <label class="check-row wide"><input id="postArtShowHighlightCard" type="checkbox"> Exibir card ${type === "promocao" ? "Destaques da Oferta" : "Destaque do Produto"}</label>
               <datalist id="postArtHighlightOptions"></datalist>
               ${[1, 2, 3].map((index) => `<label class="wide">Característica ${index} (opcional)<input id="postArtHighlight${index}" list="postArtHighlightOptions" maxlength="120" placeholder="Escolha um detalhe cadastrado ou escreva o destaque"></label>`).join("")}
               <label class="post-art-font-control wide">Fonte das características (ajustada para caber)<span><input id="postArtHighlightFontSize" type="range" min="14" max="36" value="22"><output id="postArtHighlightFontSizeValue">22 px</output></span></label>
@@ -25192,7 +25208,7 @@ function renderPostArtView() {
             <label id="postArtServiceModeLabel" class="${type === "servico" ? "" : "hidden"}">Forma de atendimento<input id="postArtServiceMode" maxlength="52" placeholder="Ex.: Presencial, online ou a domicílio"></label>
             <label>Nova imagem para esta postagem<input id="postArtImageUpload" type="file" accept="image/*"></label>
             <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
-            ${type === "produto" ? `<div class="wide"><small>Arraste a foto na prévia para ajustar o enquadramento dentro da moldura. O movimento fica limitado ao recorte ou espaço disponível.</small><button id="postArtResetImagePosition" type="button" class="ghost-button">Centralizar imagem</button></div>` : ""}
+            ${["produto", "promocao"].includes(type) ? `<div class="wide"><small>Arraste a foto na prévia para ajustar o enquadramento dentro da moldura. O movimento fica limitado ao recorte ou espaço disponível.</small><button id="postArtResetImagePosition" type="button" class="ghost-button">Centralizar imagem</button></div>` : ""}
             <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
           </div>
         </section>` : ""}
@@ -25254,7 +25270,7 @@ function renderPostArtView() {
   });
   $("postArtDownload")?.addEventListener("click", baixarPostArt);
   const previewCanvas = $("postArtCanvas");
-  const updateBannerInteraction = () => previewCanvas?.classList.toggle("is-banner-movable", type === "produto");
+  const updateBannerInteraction = () => previewCanvas?.classList.toggle("is-banner-movable", ["produto", "promocao"].includes(type));
   $("postArtShowHighlightBanner")?.addEventListener("change", updateBannerInteraction);
   updateBannerInteraction();
   let bannerDrag = null;
@@ -25264,7 +25280,7 @@ function renderPostArtView() {
     return { x: (event.clientX - bounds.left) * previewCanvas.width / bounds.width, y: (event.clientY - bounds.top) * previewCanvas.height / bounds.height };
   };
   previewCanvas?.addEventListener("pointerdown", (event) => {
-    if (type !== "produto" || event.button !== 0) return;
+    if (!["produto", "promocao"].includes(type) || event.button !== 0) return;
     const point = canvasPoint(event);
     const rect = postArtBannerRect(postArtFormData(), previewCanvas.width, previewCanvas.height);
     if ($("postArtShowHighlightBanner")?.checked && point.x >= rect.x && point.x <= rect.x + rect.w && point.y >= rect.y && point.y <= rect.y + rect.h) {

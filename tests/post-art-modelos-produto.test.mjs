@@ -22,12 +22,13 @@ const sandbox = {
   state: { postArtCustomImage: "" },
   normalizarImagemArteAdmin: (value) => value,
   telefoneArteAdmin: (value) => value,
+  formatDateBR: (value) => value.split("-").reverse().join("/"),
   $: () => { throw new Error("Não deve acessar campo de URL"); }
 };
 vm.createContext(sandbox);
 vm.runInContext(source.slice(source.indexOf("const POST_ART_LAYOUTS ="), source.indexOf("const POST_ART_FORMATS ="))
   + "\n" + helperNames.map(functionSource).join("\n")
-  + "\nglobalThis.layouts = POST_ART_LAYOUTS.produto;", sandbox);
+  + "\nglobalThis.layouts = POST_ART_LAYOUTS.produto; globalThis.promoLayouts = POST_ART_LAYOUTS.promocao;", sandbox);
 
 const client = { nome: "Loja Exemplo", categoria: "Comércio", cidade: "Carlópolis", endereco: "Rua Exemplo, 123", whatsapp: "(43) 99999-1234", instagram: "@lojaexemplo" };
 const data = { type: "produto", title: "Produto especial para o seu dia a dia", description: "Conheça as características deste produto e consulte detalhes e disponibilidade com a empresa.", price: "129,90", callout: "NOVIDADE", imageFit: "contain", showSiteLogo: true, phoneFontSize: 24, addressFontSize: 24 };
@@ -84,8 +85,26 @@ test("produtos oferecem os oito modelos de referencia sem alterar promocao e ser
     "01 · Azul Marinho", "02 · Nude Marrom", "03 · Preto Dourado", "04 · Verde Esmeralda",
     "05 · Vinho", "06 · Terracota", "07 · Rosé", "08 · Lavanda"
   ].join("|"));
-  assert.match(source, /data\.type === "produto" && layout\.reference/);
+  assert.match(source, /\["produto", "promocao"\]\.includes\(data\.type\) && layout\.reference/);
   assert.match(source, /\$\{layouts\.length\} estilos adaptados/);
+});
+
+test("promocoes oferecem oito cores e os mesmos ajustes em feed e reels", () => {
+  assert.equal(sandbox.promoLayouts.length, 8);
+  assert.equal(new Set(sandbox.promoLayouts.map((layout) => layout.key)).size, 8);
+  assert.equal(new Set(sandbox.promoLayouts.map((layout) => layout.primary)).size, 8);
+  for (const layout of sandbox.promoLayouts) for (const format of ["feed", "reels"]) {
+    const promo = { ...data, type: "promocao", format, oldPrice: "199,90", validity: "2026-09-30", showHighlightBanner: true, callout: "20% OFF", showHighlightCard: true, highlights: ["Serviço completo", "Atendimento agendado", "Oferta limitada"], descriptionFontSize: 44, titleFontSize: 74, clientLogoSize: 150, clientNameFont: "Impact", imagePosition: { x: 1, y: 0 } };
+    const ctx = mockContext(format === "feed" ? 1080 : 1920);
+    sandbox.desenharPostArtProdutoReferencia(ctx, promo, client, null, null, null, layout);
+    for (const expected of ["EM PROMOÇÃO", "20% OFF", "DESTAQUES DA OFERTA", "DE R$ 199,90", "VÁLIDA ATÉ 30/09/2026"]) assert.ok(ctx.texts.some((entry) => entry.value === expected), expected);
+    assert.ok(ctx.texts.every((entry) => entry.y >= 0 && entry.y < ctx.canvas.height));
+    const banner = sandbox.postArtBannerRect(promo, 1080, ctx.canvas.height);
+    assert.ok(banner.h >= 120);
+    const blank = mockContext(ctx.canvas.height);
+    sandbox.desenharPostArtProdutoReferencia(blank, { ...promo, price: "", showHighlightBanner: false }, client, null, null, null, layout);
+    assert.ok(!blank.texts.some((entry) => /CONSULTE|POR APENAS|DE R\$|EM PROMOÇÃO/.test(entry.value)));
+  }
 });
 
 test("campo Imagem usada e URL foram removidos mas foto cadastrada e upload permanecem", () => {
@@ -232,6 +251,9 @@ if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
   const require = createRequire(import.meta.url);
   const { createCanvas, loadImage } = require(process.env.CODEX_CANVAS_MODULE);
   const output = process.env.CODEX_ART_QA_DIR;
+  const qaPromotion = process.env.CODEX_ART_QA_TYPE === "promocao";
+  const qaLayouts = qaPromotion ? sandbox.promoLayouts : sandbox.layouts;
+  const qaData = qaPromotion ? { type: "promocao", callout: "20% OFF", oldPrice: "199,90", validity: "2026-09-30" } : {};
   mkdirSync(output, { recursive: true });
   const product = createCanvas(500, 650);
   const pc = product.getContext("2d");
@@ -249,9 +271,9 @@ if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
     const height = format === "feed" ? 1080 : 1920;
     const sheet = createCanvas(1440, format === "feed" ? 720 : 1280);
     const sc = sheet.getContext("2d");
-    sandbox.layouts.forEach((layout, index) => {
+    qaLayouts.forEach((layout, index) => {
       const canvas = createCanvas(1080, height);
-      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, format, showSiteLogo: index % 2 === 0, clientLogoSize: index % 2 ? (format === "feed" ? 150 : 180) : (format === "feed" ? 92 : 110), clientNameFont: ["Georgia", "Arial", "Trebuchet MS", "Verdana", "Times New Roman", "Courier New", "Impact", "Garamond"][index], titleFontSize: index % 2 ? (format === "feed" ? 68 : 86) : (format === "feed" ? 48 : 64), price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
+      sandbox.desenharPostArtProdutoReferencia(canvas.getContext("2d"), { ...data, ...qaData, format, showSiteLogo: index % 2 === 0, clientLogoSize: index % 2 ? (format === "feed" ? 150 : 180) : (format === "feed" ? 92 : 110), clientNameFont: ["Georgia", "Arial", "Trebuchet MS", "Verdana", "Times New Roman", "Courier New", "Impact", "Garamond"][index], titleFontSize: index % 2 ? (format === "feed" ? 68 : 86) : (format === "feed" ? 48 : 64), price: index % 2 ? "" : data.price, showHighlightBanner: true, highlightBannerColor: "#ffcc00", showHighlightCard: true, highlights: ["Marca: Exemplo", "Cor: Preto", "Tamanho: M"], descriptionFontSize: 36, highlightFontSize: 28 }, client, product, commerceLogo, portalLogo, layout);
       writeFileSync(path.join(output, layout.key + "-" + format + ".png"), canvas.toBuffer("image/png"));
       sc.drawImage(canvas, index % 4 * 360, Math.floor(index / 4) * height / 3, 360, height / 3);
     });
