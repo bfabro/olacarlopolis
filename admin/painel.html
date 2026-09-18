@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=473">
+  <link rel="stylesheet" href="painel.css?v=474">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -3004,7 +3004,7 @@
           <div class="section-head story-generator-head">
             <div>
               <span class="story-kicker">Estudio de criacao</span>
-              <h2>Artes comerciais premium</h2>
+              <h2>Artes institucionais dos comércios</h2>
               <p>Monte Stories e posts para o Feed com fotos reais dos clientes e mensagens que valorizam quem participa do Ola Carlopolis.</p>
             </div>
             <span id="storySizeBadge" class="story-size-badge"><i class="fa-brands fa-instagram"></i> Story 1080 x 1920</span>
@@ -3025,6 +3025,7 @@
                 <div class="story-step"><span>2</span><div><strong>Composicao e imagens</strong><small>No mosaico, escolha e enquadre cada foto separadamente.</small></div></div>
                 <div class="story-segmented story-composition-options" aria-label="Composicao da arte">
                   <button type="button" data-story-composition="spotlight"><i class="fa-regular fa-image"></i><strong>Destaque</strong><small>Uma foto principal</small></button>
+                  <button type="button" data-story-composition="duo"><i class="fa-solid fa-images"></i><strong>Duas imagens</strong><small>Uma dupla de fotos</small></button>
                   <button type="button" class="active" data-story-composition="mosaic"><i class="fa-solid fa-table-cells-large"></i><strong>Mosaico</strong><small>Quatro fotos</small></button>
                 </div>
                 <div id="storyImageSlots" class="story-image-slots"></div>
@@ -3041,20 +3042,21 @@
               </section>
 
               <section class="story-control-card">
-                <div class="story-step"><span>3</span><div><strong>Escolha o visual</strong><small>Sete estilos para transmitir sentimentos diferentes.</small></div></div>
+                <div class="story-step"><span>3</span><div><strong>Escolha o visual</strong><small>Oito modelos com composições diferentes para apresentar o comércio.</small></div></div>
                 <div id="storyTemplateGrid" class="story-template-grid">
-                  <button type="button" class="story-template-option active" data-story-template="vitrine"><span class="story-template-thumb template-vitrine"></span><strong>Vitrine</strong><small>Vibrante</small></button>
-                  <button type="button" class="story-template-option" data-story-template="humor"><span class="story-template-thumb template-humor"></span><strong>Humor</strong><small>Leve e divertido</small></button>
-                  <button type="button" class="story-template-option" data-story-template="seriedade"><span class="story-template-thumb template-seriedade"></span><strong>Seriedade</strong><small>Firme e confiavel</small></button>
-                  <button type="button" class="story-template-option" data-story-template="alegria"><span class="story-template-thumb template-alegria"></span><strong>Alegria</strong><small>Positivo e caloroso</small></button>
-                  <button type="button" class="story-template-option" data-story-template="marketing"><span class="story-template-thumb template-marketing"></span><strong>Marketing Pro</strong><small>Estrategico</small></button>
-                  <button type="button" class="story-template-option" data-story-template="acolhimento"><span class="story-template-thumb template-acolhimento"></span><strong>Acolhimento</strong><small>Proximo e humano</small></button>
-                  <button type="button" class="story-template-option" data-story-template="exclusivo"><span class="story-template-thumb template-exclusivo"></span><strong>Exclusivo</strong><small>Premium e sofisticado</small></button>
+                  <button type="button" class="story-template-option active" data-story-template="vitrine"><span class="story-template-thumb template-vitrine"></span><strong>Vitrine Institucional</strong><small>Foto principal e painel inferior</small></button>
+                  <button type="button" class="story-template-option" data-story-template="humor"><span class="story-template-thumb template-humor"></span><strong>Manifesto Local</strong><small>Mensagem no topo e fotos abaixo</small></button>
+                  <button type="button" class="story-template-option" data-story-template="seriedade"><span class="story-template-thumb template-seriedade"></span><strong>Editorial Dividido</strong><small>Texto lateral e imagem ampla</small></button>
+                  <button type="button" class="story-template-option" data-story-template="alegria"><span class="story-template-thumb template-alegria"></span><strong>Conexão Vibrante</strong><small>Curvas e composição central</small></button>
+                  <button type="button" class="story-template-option" data-story-template="marketing"><span class="story-template-thumb template-marketing"></span><strong>Painel Urbano</strong><small>Galeria vertical e coluna de texto</small></button>
+                  <button type="button" class="story-template-option" data-story-template="acolhimento"><span class="story-template-thumb template-acolhimento"></span><strong>Nossa História</strong><small>Mensagem em papel e galeria</small></button>
+                  <button type="button" class="story-template-option" data-story-template="exclusivo"><span class="story-template-thumb template-exclusivo"></span><strong>Assinatura Premium</strong><small>Retrato lateral e painel elegante</small></button>
+                  <button type="button" class="story-template-option" data-story-template="conexao"><span class="story-template-thumb template-conexao"></span><strong>Cartão da Cidade</strong><small>Foto ampla e cartão central</small></button>
                 </div>
               </section>
 
               <section class="story-control-card">
-                <div class="story-step"><span>4</span><div><strong>Mensagem que inspira</strong><small>Use uma frase pronta ou escreva livremente.</small></div></div>
+                <div class="story-step"><span>4</span><div><strong>Apresentação institucional</strong><small>A descrição curta é carregada do cliente e pode ser editada só para a arte.</small></div></div>
                 <label>Frase de efeito
                   <select id="storyPhrasePreset">
                     <option value="">Preenchimento manual</option>
@@ -3065,10 +3067,11 @@
                     <option value="participar">Faca parte do Ola Carlopolis</option>
                   </select>
                 </label>
-                <label>Chamada principal<textarea id="storyHeadline" rows="3" maxlength="90">Sua marca merece ser vista por toda Carlópolis.</textarea></label>
-                <label>Mensagem de apoio<textarea id="storyMessage" rows="3" maxlength="150">Comercio local forte e aquele que esta perto das pessoas, todos os dias.</textarea></label>
+                <label>Chamada principal<textarea id="storyHeadline" rows="3" maxlength="90">Conheça quem faz parte da nossa cidade.</textarea></label>
+                <label>Descrição institucional do comércio<textarea id="storyMessage" rows="5" maxlength="400" placeholder="Descrição curta preenchida pelo cliente. Você pode ajustar o texto só para esta arte."></textarea></label>
+                <button id="storyUseClientDescription" type="button" class="ghost-button">Restaurar descrição curta do cliente</button>
                 <div class="story-inline-fields">
-                  <label>Botao de acao<input id="storyCta" maxlength="32" value="Conheca este cliente"></label>
+                  <label>Chamada final<input id="storyCta" maxlength="32" value="Conheça no Olá Carlópolis"></label>
                   <label>Cor de destaque<input id="storyAccent" type="color" value="#f4b942"></label>
                 </div>
                 <label class="check-row"><input id="storyShowContact" type="checkbox" checked> Exibir contato e Instagram</label>
@@ -3414,6 +3417,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=704"></script>
+  <script type="module" src="painel.js?v=705"></script>
 </body>
 </html>

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 767,
-  label: "v774",
+  numero: 768,
+  label: "v775",
   data: "2026-09-18",
-  nota: "Oito layouts de serviços com controles completos, imagem reenquadrável e diferenciais de atendimento."
+  nota: "Stories institucionais com descrição curta do cliente, oito composições e opções de uma, duas ou quatro fotos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -23770,13 +23770,14 @@ async function uploadHomeBannerImages(files) {
 }
 
 const STORY_TEMPLATE_NAMES = {
-  vitrine: "Vitrine",
-  humor: "Humor",
-  seriedade: "Seriedade",
-  alegria: "Alegria",
-  marketing: "Marketing Pro",
-  acolhimento: "Acolhimento",
-  exclusivo: "Exclusivo"
+  vitrine: "Vitrine Institucional",
+  humor: "Manifesto Local",
+  seriedade: "Editorial Dividido",
+  alegria: "Conexão Vibrante",
+  marketing: "Painel Urbano",
+  acolhimento: "Nossa História",
+  exclusivo: "Assinatura Premium",
+  conexao: "Cartão da Cidade"
 };
 
 let storyPreviewRequest = 0;
@@ -23822,20 +23823,20 @@ function storyClientImages(client = {}) {
     .flatMap((item) => imovelImagensCandidatasAdmin(item));
   const urls = [
     client.imagem,
-    client.logo,
-    client.logoUrl,
     ...gallery,
     ...products,
     ...promotions,
     ...(Array.isArray(client.menuImages) ? client.menuImages : []),
     ...relatedVehicles,
-    ...relatedProperties
+    ...relatedProperties,
+    client.logo,
+    client.logoUrl
   ].map(normalizarImagemArteAdmin).filter(Boolean);
   return [...new Set(urls)];
 }
 
 function storySlotCount() {
-  return state.selectedStoryComposition === "mosaic" ? 4 : 1;
+  return state.selectedStoryComposition === "mosaic" ? 4 : state.selectedStoryComposition === "duo" ? 2 : 1;
 }
 
 function storyDefaultImageTransform() {
@@ -23966,6 +23967,16 @@ function endStoryCanvasDrag(event) {
   atualizarPreviaStory();
 }
 
+function fillStoryInstitutionalCopy(client = storyCurrentClient(), force = false) {
+  if (!client || !$("storyMessage")) return;
+  if (!force && $("storyMessage").dataset.clientId === client.id) return;
+  $("storyMessage").dataset.clientId = client.id;
+  $("storyMessage").value = String(client.descricaoCurta || client.shortDescription || "").trim();
+  if ($("storyHeadline")) $("storyHeadline").value = "Conheça quem faz parte da nossa cidade.";
+  if ($("storyCta")) $("storyCta").value = "Conheça no Olá Carlópolis";
+  if ($("storyPhrasePreset")) $("storyPhrasePreset").value = "";
+}
+
 function renderStoriesComerciaisView() {
   if (!isMaster() || !$("storyClient")) return;
   const clients = [...state.clientes].sort((a, b) => String(a.nome || a.id || "").localeCompare(String(b.nome || b.id || ""), "pt-BR"));
@@ -23974,6 +23985,7 @@ function renderStoriesComerciaisView() {
     ? clients.map((client) => `<option value="${escapeAttr(client.id)}">${escapeHtml(client.nome || client.id)}</option>`).join("")
     : `<option value="">Nenhum cliente cadastrado</option>`;
   if (previous && clients.some((client) => client.id === previous)) $("storyClient").value = previous;
+  fillStoryInstitutionalCopy(storyCurrentClient());
   fillStoryClientImages(storyCurrentClient());
   updateStoryEditorFormat();
   atualizarPreviaStory();
@@ -24256,7 +24268,8 @@ const STORY_TEMPLATE_PALETTES = {
   alegria: { bg: "#ef4e7b", panel: "#fff6dc", ink: "#6c2745", soft: "#8e536d", accent: "#ffcf4a", photo: "#fff4c7" },
   marketing: { bg: "#101828", panel: "#eaf0ff", ink: "#101828", soft: "#3b4a67", accent: "#64e572", photo: "#dce6ff" },
   acolhimento: { bg: "#9b4f3f", panel: "#f4eadc", ink: "#5a3028", soft: "#795b50", accent: "#f4b942", photo: "#f8efe4" },
-  exclusivo: { bg: "#090909", panel: "#252018", ink: "#f4ead2", soft: "#c3b89f", accent: "#c9a24f", photo: "#18140e" }
+  exclusivo: { bg: "#090909", panel: "#252018", ink: "#f4ead2", soft: "#c3b89f", accent: "#c9a24f", photo: "#18140e" },
+  conexao: { bg: "#164e63", panel: "#f0fdfa", ink: "#134e4a", soft: "#36686b", accent: "#6ee7b7", photo: "#dff6f1" }
 };
 
 const STORY_PHRASE_PRESETS = {
@@ -24361,61 +24374,102 @@ function storyDrawPositionedImage(ctx, img, rect, transform = {}, fill = "#e2e8f
   ctx.restore();
 }
 
+function storyInstitutionalLayout(template, composition, width, height) {
+  const unit = width / 1080;
+  const r = (x, y, w, h) => ({ x: x * unit, y, w: w * unit, h });
+  const layouts = {
+    vitrine: { media: r(48, 190, 984, height * .43), panel: r(48, height * .60, 984, height * .26), radius: 32 },
+    humor: { media: r(48, height * .49, 984, height * .36), panel: r(48, 190, 984, height * .31), radius: 48 },
+    seriedade: { media: r(470, 220, 562, height * .62), panel: r(48, 220, 390, height * .62), radius: 8 },
+    alegria: { media: r(92, height * .43, 896, height * .40), panel: r(48, 190, 984, height * .25), radius: 64 },
+    marketing: { media: r(48, 190, 620, height * .65), panel: r(704, 190, 328, height * .65), radius: 12 },
+    acolhimento: { media: r(48, height * .40, 984, height * .39), panel: r(98, 190, 884, height * .23), radius: 28 },
+    exclusivo: { media: r(48, 190, 480, height * .68), panel: r(574, 230, 458, height * .60), radius: 4 },
+    conexao: { media: r(28, 180, 1024, height * .40), panel: r(100, height * .55, 880, height * .29), radius: 40 }
+  };
+  const layout = layouts[template] || layouts.vitrine;
+  const box = layout.media;
+  const gap = 16 * unit;
+  const tile = (x, y, w, h) => ({ x: box.x + x, y: box.y + y, w, h });
+  const index = Object.keys(layouts).indexOf(template);
+  let photos;
+  if (composition === "spotlight") photos = [{ ...box }];
+  else if (composition === "duo") {
+    if (index % 2) photos = [tile(0, 0, box.w, (box.h - gap) * .6), tile(0, (box.h - gap) * .6 + gap, box.w, (box.h - gap) * .4)];
+    else photos = [tile(0, 0, (box.w - gap) * .6, box.h), tile((box.w - gap) * .6 + gap, 0, (box.w - gap) * .4, box.h)];
+  } else if (index % 3 === 1) {
+    const main = (box.w - gap) * .6;
+    const smallH = (box.h - gap * 2) / 3;
+    photos = [tile(0, 0, main, box.h), ...[0, 1, 2].map(i => tile(main + gap, i * (smallH + gap), box.w - main - gap, smallH))];
+  } else if (index % 3 === 2) {
+    const main = (box.h - gap) * .6;
+    const smallW = (box.w - gap * 2) / 3;
+    photos = [tile(0, 0, box.w, main), ...[0, 1, 2].map(i => tile(i * (smallW + gap), main + gap, smallW, box.h - main - gap))];
+  } else {
+    const cellW = (box.w - gap) / 2;
+    const cellH = (box.h - gap) / 2;
+    photos = [tile(0, 0, cellW, cellH), tile(cellW + gap, 0, cellW, cellH), tile(0, cellH + gap, cellW, cellH), tile(cellW + gap, cellH + gap, cellW, cellH)];
+  }
+  return { ...layout, photos };
+}
+
 function storyDrawCommercialArt(ctx, data, showSelection = true) {
-  const { client, logo, photos, headline, message, cta, accent, showContact, showProspect } = data;
+  const { client, logo, siteLogo, photos, headline, message, cta, accent, showContact, showProspect } = data;
   const { width, height } = ctx.canvas;
-  const isFeed = height < 1600;
   const template = state.selectedStoryTemplate || "vitrine";
   const palette = STORY_TEMPLATE_PALETTES[template] || STORY_TEMPLATE_PALETTES.vitrine;
   const highlight = accent || palette.accent;
-  const background = ctx.createLinearGradient(0, 0, width, height);
-  background.addColorStop(0, palette.bg);
-  background.addColorStop(1, template === "exclusivo" ? "#252018" : "#172033");
-  ctx.fillStyle = background;
+  const layout = storyInstitutionalLayout(template, state.selectedStoryComposition, width, height);
+  ctx.save();
+  ctx.fillStyle = palette.bg;
   ctx.fillRect(0, 0, width, height);
-
   ctx.fillStyle = highlight;
-  ctx.fillRect(0, 0, width, 16);
-  storyDrawLogo(ctx, logo, client, 50, 48, isFeed ? 105 : 125, "#ffffff");
-  storyDrawText(ctx, client.nome || "Cliente", isFeed ? 185 : 205, isFeed ? 83 : 92, 700, 2, "#ffffff", isFeed ? 34 : 39);
-  ctx.fillStyle = highlight;
-  ctx.textAlign = "right";
-  ctx.font = `900 ${isFeed ? 18 : 21}px Arial`;
-  ctx.fillText("CLIENTE EM DESTAQUE", width - 50, isFeed ? 101 : 112);
-
-  const rects = state.selectedStoryComposition === "mosaic"
-    ? storyMosaicRects(width, height)
-    : [storySpotlightRect(width, height)];
-  state.storyCanvasSlots = rects.map((rect) => ({ ...rect }));
-  rects.forEach((rect, index) => {
-    storyDrawPositionedImage(ctx, photos[index], rect, state.storyImageTransforms[index], palette.photo, state.selectedStoryComposition === "mosaic" ? 24 : 34);
-    desenharBordaRoundRect(ctx, rect.x, rect.y, rect.w, rect.h, state.selectedStoryComposition === "mosaic" ? 24 : 34, "rgba(255,255,255,.8)", 4);
+  if (template === "seriedade" || template === "marketing") ctx.fillRect(0, 0, 18, height);
+  else if (template === "alegria" || template === "humor") {
+    ctx.globalAlpha = .18;
+    ctx.beginPath(); ctx.arc(width - 60, height * .46, 240, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(0, height * .80, 170, 0, Math.PI * 2); ctx.fill();
+    ctx.globalAlpha = 1;
+  } else ctx.fillRect(48, 164, width - 96, template === "exclusivo" ? 2 : 8);
+  storyDrawLogo(ctx, logo, client, 48, 32, 108, highlight);
+  postArtDrawFittedText(ctx, client.nome || "Comércio local", 182, 36, width - 230, 96, 42, "#ffffff", { weight: 900 });
+  ctx.fillStyle = palette.soft;
+  const panel = layout.panel;
+  preencherRoundRect(ctx, panel.x, panel.y, panel.w, panel.h, layout.radius, palette.panel);
+  if (template === "exclusivo" || template === "acolhimento") desenharBordaRoundRect(ctx, panel.x, panel.y, panel.w, panel.h, layout.radius, highlight, 3);
+  const pad = panel.w < 500 ? 24 : 34;
+  const textX = panel.x + pad;
+  const textW = panel.w - pad * 2;
+  const titleH = panel.h * .27;
+  postArtDrawFittedText(ctx, headline, textX, panel.y + 26, textW, titleH, panel.w < 500 ? 42 : 54, palette.ink, { family: template === "exclusivo" || template === "acolhimento" ? "Georgia" : "Arial", weight: 900 });
+  const messageTop = panel.y + titleH + 42;
+  const actionHeight = 52;
+  const actionY = panel.y + panel.h - 70;
+  postArtDrawFittedText(ctx, message, textX, messageTop, textW, actionY - messageTop - 18, 30, palette.soft);
+  preencherRoundRect(ctx, textX, actionY, textW, actionHeight, template === "marketing" ? 6 : 24, highlight);
+  const rgb = [1, 3, 5].map(start => parseInt(highlight.slice(start, start + 2), 16));
+  const actionInk = rgb[0] * .299 + rgb[1] * .587 + rgb[2] * .114 > 150 ? "#111827" : "#ffffff";
+  postArtDrawFittedText(ctx, cta, textX + 16, actionY + 12, textW - 32, 32, 25, actionInk, { weight: 900 });
+  state.storyCanvasSlots = layout.photos.map(rect => ({ ...rect }));
+  layout.photos.forEach((rect, index) => {
+    storyDrawPositionedImage(ctx, photos[index], rect, state.storyImageTransforms[index], palette.photo, layout.radius);
+    desenharBordaRoundRect(ctx, rect.x, rect.y, rect.w, rect.h, layout.radius, template === "exclusivo" ? highlight : "rgba(255,255,255,.8)", template === "acolhimento" ? 10 : 3);
     if (showSelection && index === state.selectedStoryImageSlot) {
-      desenharBordaRoundRect(ctx, rect.x + 5, rect.y + 5, rect.w - 10, rect.h - 10, 20, highlight, 8);
-      preencherRoundRect(ctx, rect.x + 17, rect.y + 17, 52, 52, 18, highlight);
-      ctx.fillStyle = "#111827";
-      ctx.textAlign = "center";
-      ctx.font = "900 24px Arial";
-      ctx.fillText(String(index + 1), rect.x + 43, rect.y + 51);
+      desenharBordaRoundRect(ctx, rect.x + 5, rect.y + 5, rect.w - 10, rect.h - 10, layout.radius, highlight, 6);
+      preencherRoundRect(ctx, rect.x + 12, rect.y + 12, 46, 46, 14, highlight);
+      ctx.fillStyle = actionInk; ctx.font = "900 24px Arial"; ctx.textAlign = "center";
+      ctx.fillText(String(index + 1), rect.x + 35, rect.y + 44);
     }
   });
-
-  const panelY = isFeed ? 925 : 1240;
-  const panelH = height - panelY - 48;
-  preencherRoundRect(ctx, 48, panelY, width - 96, panelH, 36, palette.panel);
-  const ink = palette.ink;
-  storyDrawText(ctx, headline, 92, panelY + (isFeed ? 65 : 80), width - 184, isFeed ? 2 : 3, ink, isFeed ? 44 : 60);
-  storyDrawText(ctx, message, 92, panelY + (isFeed ? 170 : 275), width - 184, isFeed ? 2 : 3, palette.soft, isFeed ? 23 : 29, "left", 700);
-  preencherRoundRect(ctx, 92, panelY + panelH - (isFeed ? 104 : 142), isFeed ? 390 : 430, isFeed ? 66 : 78, 36, highlight);
-  storyDrawText(ctx, cta, 92 + (isFeed ? 195 : 215), panelY + panelH - (isFeed ? 82 : 116), isFeed ? 350 : 390, 1, "#111827", isFeed ? 22 : 25, "center");
-  storyDrawContact(ctx, client, showContact, width - 92, panelY + panelH - (isFeed ? 62 : 84), 430, ink, "right");
-
-  if (showProspect) {
-    ctx.fillStyle = ink;
-    ctx.textAlign = "right";
-    ctx.font = `900 ${isFeed ? 16 : 19}px Arial`;
-    ctx.fillText("Sua empresa também pode estar aqui • olacarlopolis.com", width - 92, panelY + panelH - 24);
-  }
+  const footerY = height - 154;
+  preencherRoundRect(ctx, 28, footerY, width - 56, 126, 22, "#ffffff");
+  if (siteLogo) desenharImagemContain(ctx, siteLogo, 48, footerY + 12, 120, 100, 0, "rgba(255,255,255,0)");
+  const footerX = siteLogo ? 192 : 56;
+  postArtDrawFittedText(ctx, "ESTÁ NO OLÁ CARLÓPOLIS", footerX, footerY + 13, width - footerX - 52, 34, 28, "#17324d", { weight: 900 });
+  postArtDrawFittedText(ctx, "olacarlopolis.com", footerX, footerY + 51, width - footerX - 52, 26, 23, "#17324d", { weight: 700 });
+  if (showContact) postArtDrawFittedText(ctx, storyContactLine(client), footerX, footerY + 84, width - footerX - 52, 25, 21, "#334155");
+  if (showProspect) postArtDrawFittedText(ctx, "Valorize o comércio local. Sua empresa também pode estar aqui.", 48, height - 24, width - 96, 20, 16, "#ffffff");
+  ctx.restore();
 }
 
 async function atualizarPreviaStory(showSelection = true) {
@@ -24425,25 +24479,27 @@ async function atualizarPreviaStory(showSelection = true) {
   const requestId = ++storyPreviewRequest;
   const ctx = canvas.getContext("2d");
   const selectedUrls = state.storyImageSlots.slice(0, storySlotCount());
-  const [photos, logo] = await Promise.all([
+  const [photos, logo, siteLogo] = await Promise.all([
     Promise.all(selectedUrls.map((url) => carregarImagemCanvas(url))),
-    carregarImagemCanvas(logoClienteImovelAdmin(client))
+    carregarImagemCanvas(logoClienteImovelAdmin(client)),
+    carregarImagemCanvas("../images/img_padrao_site/logo_1.png")
   ]);
   if (requestId !== storyPreviewRequest) return;
   const data = {
     photos,
     logo,
+    siteLogo,
     client,
-    headline: $("storyHeadline")?.value.trim() || "Sua marca merece ser vista.",
-    message: $("storyMessage")?.value.trim() || "Perto das pessoas, todos os dias.",
-    cta: $("storyCta")?.value.trim() || "Conheca este cliente",
+    headline: $("storyHeadline")?.value.trim() || "Conheça quem faz parte da nossa cidade.",
+    message: $("storyMessage")?.value.trim() || String(client.descricaoCurta || client.shortDescription || "Conheça este comércio no Olá Carlópolis.").trim(),
+    cta: $("storyCta")?.value.trim() || "Conheça no Olá Carlópolis",
     accent: $("storyAccent")?.value || "#f4b942",
     showContact: $("storyShowContact")?.checked !== false,
     showProspect: $("storyShowProspect")?.checked !== false
   };
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   storyDrawCommercialArt(ctx, data, showSelection);
-  const composition = state.selectedStoryComposition === "mosaic" ? "Mosaico" : "Destaque";
+  const composition = state.selectedStoryComposition === "mosaic" ? "Mosaico · 4 fotos" : state.selectedStoryComposition === "duo" ? "2 fotos" : "1 foto";
   const template = state.selectedStoryTemplate || "vitrine";
   if ($("storyPreviewModel")) $("storyPreviewModel").textContent = `${composition} • Modelo ${STORY_TEMPLATE_NAMES[template] || "Vitrine"}`;
 }
@@ -28363,6 +28419,7 @@ function bindEvents() {
     event.target.value = "";
   });
   $("storyClient")?.addEventListener("change", () => {
+    fillStoryInstitutionalCopy(storyCurrentClient(), true);
     state.storyCustomImage = "";
     state.storyImageSlots = [];
     state.storyImageTransforms = [];
@@ -28382,7 +28439,7 @@ function bindEvents() {
   });
   document.querySelectorAll("[data-story-composition]").forEach((button) => {
     button.addEventListener("click", () => {
-      state.selectedStoryComposition = button.dataset.storyComposition === "spotlight" ? "spotlight" : "mosaic";
+      state.selectedStoryComposition = ["spotlight", "duo", "mosaic"].includes(button.dataset.storyComposition) ? button.dataset.storyComposition : "spotlight";
       state.selectedStoryImageSlot = 0;
       updateStoryEditorFormat();
       fillStoryClientImages(storyCurrentClient(), true);
@@ -28415,8 +28472,13 @@ function bindEvents() {
     const preset = STORY_PHRASE_PRESETS[$("storyPhrasePreset")?.value];
     if (!preset) return;
     if ($("storyHeadline")) $("storyHeadline").value = preset.headline;
-    if ($("storyMessage")) $("storyMessage").value = preset.message;
     if ($("storyCta")) $("storyCta").value = preset.cta;
+    atualizarPreviaStory();
+  });
+  $("storyUseClientDescription")?.addEventListener("click", () => {
+    const client = storyCurrentClient();
+    if (!client || !$("storyMessage")) return;
+    $("storyMessage").value = String(client.descricaoCurta || client.shortDescription || "").trim();
     atualizarPreviaStory();
   });
   $("storyImageScale")?.addEventListener("input", () => {

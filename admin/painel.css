@@ -10102,6 +10102,9 @@ button.admin-button-loading::after {
 .story-template-option strong { font-size: 12px; }
 .story-template-option small { overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .story-template-thumb { display: block; height: 68px; overflow: hidden; border-radius: 8px; background-color: #ddd; }
+.story-composition-options { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.template-conexao { background: linear-gradient(to bottom, #164e63 12%, #6ee7b7 12% 52%, #f0fdfa 52% 85%, #164e63 85%); }
+@media (max-width: 520px) { .story-composition-options { grid-template-columns: 1fr; } }
 .template-vitrine { background: radial-gradient(circle at 70% 32%, #ffe8c2 0 18%, transparent 19%), linear-gradient(150deg, #ff5538 0 42%, #6d28d9 43% 70%, #ffca28 71%); }
 .template-humor { background: radial-gradient(circle at 25% 25%, #fff 0 8%, transparent 9%), linear-gradient(145deg, #24d4c4 0 46%, #ffe04b 47% 72%, #ff6b6b 73%); }
 .template-seriedade { background: linear-gradient(165deg, #081b33 0 64%, #d7e2ef 65% 84%, #3b82a0 85%); }
