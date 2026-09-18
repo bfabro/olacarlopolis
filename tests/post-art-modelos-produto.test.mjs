@@ -28,7 +28,7 @@ const sandbox = {
 vm.createContext(sandbox);
 vm.runInContext(source.slice(source.indexOf("const POST_ART_LAYOUTS ="), source.indexOf("const POST_ART_FORMATS ="))
   + "\n" + helperNames.map(functionSource).join("\n")
-  + "\nglobalThis.layouts = POST_ART_LAYOUTS.produto; globalThis.promoLayouts = POST_ART_LAYOUTS.promocao;", sandbox);
+  + "\nglobalThis.layouts = POST_ART_LAYOUTS.produto; globalThis.promoLayouts = POST_ART_LAYOUTS.promocao; globalThis.serviceLayouts = POST_ART_LAYOUTS.servico;", sandbox);
 
 const client = { nome: "Loja Exemplo", categoria: "Comércio", cidade: "Carlópolis", endereco: "Rua Exemplo, 123", whatsapp: "(43) 99999-1234", instagram: "@lojaexemplo" };
 const data = { type: "produto", title: "Produto especial para o seu dia a dia", description: "Conheça as características deste produto e consulte detalhes e disponibilidade com a empresa.", price: "129,90", callout: "NOVIDADE", imageFit: "contain", showSiteLogo: true, phoneFontSize: 24, addressFontSize: 24 };
@@ -85,7 +85,7 @@ test("produtos oferecem os oito modelos de referencia sem alterar promocao e ser
     "01 · Azul Marinho", "02 · Nude Marrom", "03 · Preto Dourado", "04 · Verde Esmeralda",
     "05 · Vinho", "06 · Terracota", "07 · Rosé", "08 · Lavanda"
   ].join("|"));
-  assert.match(source, /\["produto", "promocao"\]\.includes\(data\.type\) && layout\.reference/);
+  assert.match(source, /\["produto", "promocao", "servico"\]\.includes\(data\.type\) && layout\.reference/);
   assert.match(source, /\$\{layouts\.length\} estilos adaptados/);
 });
 
@@ -104,6 +104,26 @@ test("promocoes oferecem oito cores e os mesmos ajustes em feed e reels", () => 
     const blank = mockContext(ctx.canvas.height);
     sandbox.desenharPostArtProdutoReferencia(blank, { ...promo, price: "", showHighlightBanner: false }, client, null, null, null, layout);
     assert.ok(!blank.texts.some((entry) => /CONSULTE|POR APENAS|DE R\$|EM PROMOÇÃO/.test(entry.value)));
+  }
+});
+
+test("servicos possuem oito layouts proprios com fontes imagem tarja e diferenciais", () => {
+  assert.equal(sandbox.serviceLayouts.length, 8);
+  assert.equal(new Set(sandbox.serviceLayouts.map((layout) => layout.primary)).size, 8);
+  assert.equal(sandbox.postArtProductHighlights({ especialidade: "Pintura", atendimento: "A domicílio" }).join("|"), "Especialidade: Pintura|Atendimento: A domicílio");
+  for (const layout of sandbox.serviceLayouts) for (const format of ["feed", "reels"]) {
+    const service = { ...data, type: "servico", format, title: "SERVICO profissional de pintura e manutenção", callout: "PINTURA PROFISSIONAL", serviceMode: "A domicílio", clientLogoSize: format === "feed" ? 150 : 180, clientNameFont: "Impact", titleFontSize: 74, showHighlightBanner: true, showHighlightCard: true, highlights: ["Pintura", "Manutenção", "Agendamento", "QUARTO OMITIDO"], descriptionFontSize: 44 };
+    const ctx = mockContext(format === "feed" ? 1080 : 1920);
+    sandbox.desenharPostArtProdutoReferencia(ctx, service, client, null, null, null, layout);
+    for (const expected of ["SERVIÇO EM DESTAQUE", "DIFERENCIAIS DO SERVIÇO", "ATENDIMENTO: A domicílio", "VALOR DO SERVIÇO"]) assert.ok(ctx.texts.some((entry) => entry.value === expected));
+    assert.ok(!ctx.texts.some((entry) => /PRODUTO EM DESTAQUE|WHATSAPP|QUARTO OMITIDO/.test(entry.value)));
+    assert.ok(ctx.texts.every((entry) => entry.y >= 0 && entry.y < ctx.canvas.height));
+    const photo = sandbox.postArtProductPhotoRect(format, "servico");
+    assert.notEqual(photo.y, sandbox.postArtProductPhotoRect(format).y);
+    if (format === "feed") assert.ok(photo.x > 554, "imagem deve ficar à direita dos textos");
+    const blank = mockContext(ctx.canvas.height);
+    sandbox.desenharPostArtProdutoReferencia(blank, { ...service, price: "", showHighlightBanner: false, showHighlightCard: false }, client, null, null, null, layout);
+    assert.ok(!blank.texts.some((entry) => /VALOR DO SERVIÇO|POR APENAS|CONSULTE|DIFERENCIAIS DO SERVIÇO|SERVIÇO EM DESTAQUE/.test(entry.value)));
   }
 });
 
@@ -252,8 +272,9 @@ if (process.env.CODEX_ART_QA_DIR && process.env.CODEX_CANVAS_MODULE) {
   const { createCanvas, loadImage } = require(process.env.CODEX_CANVAS_MODULE);
   const output = process.env.CODEX_ART_QA_DIR;
   const qaPromotion = process.env.CODEX_ART_QA_TYPE === "promocao";
-  const qaLayouts = qaPromotion ? sandbox.promoLayouts : sandbox.layouts;
-  const qaData = qaPromotion ? { type: "promocao", callout: "20% OFF", oldPrice: "199,90", validity: "2026-09-30" } : {};
+  const qaService = process.env.CODEX_ART_QA_TYPE === "servico";
+  const qaLayouts = qaPromotion ? sandbox.promoLayouts : qaService ? sandbox.serviceLayouts : sandbox.layouts;
+  const qaData = qaPromotion ? { type: "promocao", callout: "20% OFF", oldPrice: "199,90", validity: "2026-09-30" } : qaService ? { type: "servico", title: "Serviço profissional para você", callout: "CUIDADO EM CADA DETALHE", serviceMode: "Presencial ou a domicílio" } : {};
   mkdirSync(output, { recursive: true });
   const product = createCanvas(500, 650);
   const pc = product.getContext("2d");

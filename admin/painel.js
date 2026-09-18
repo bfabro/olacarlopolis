@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 766,
-  label: "v773",
+  numero: 767,
+  label: "v774",
   data: "2026-09-18",
-  nota: "Oito modelos de promoções com controles completos e tarja ampliada."
+  nota: "Oito layouts de serviços com controles completos, imagem reenquadrável e diferenciais de atendimento."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24495,10 +24495,14 @@ const POST_ART_LAYOUTS = {
     { key: "promocao-roxo", nome: "08 · Roxo", descricao: "Oferta contemporânea em lavanda e roxo", reference: true, bg: "#f2edf8", panel: "#fbf8ff", primary: "#68457e", accent: "#bba1cf", ink: "#432c54" }
   ],
   servico: [
-    { key: "servico-clean", nome: "Clean Professional", descricao: "Apresentação clara, confiável e objetiva", variant: 0, bg: "#eff6ff", panel: "#ffffff", primary: "#1d4ed8", accent: "#bfdbfe", ink: "#172554" },
-    { key: "servico-personal", nome: "Personal Brand", descricao: "Estilo sofisticado para especialistas e consultores", variant: 1, bg: "#111827", panel: "#1f2937", primary: "#14b8a6", accent: "#fbbf24", ink: "#ffffff" },
-    { key: "servico-humano", nome: "Conexão Humana", descricao: "Imagem ampla para transmitir proximidade e confiança", variant: 2, bg: "#172554", panel: "#ffffff", primary: "#2563eb", accent: "#fde68a", ink: "#ffffff" },
-    { key: "servico-agenda", nome: "Agenda Digital", descricao: "Chamada moderna focada em pedidos e agendamentos", variant: 3, bg: "#164e63", panel: "#ffffff", primary: "#06b6d4", accent: "#fef08a", ink: "#ffffff" }
+    { key: "servico-azul", nome: "01 · Azul Profissional", descricao: "Apresentação profissional em azul e gelo", reference: true, bg: "#edf4fc", panel: "#ffffff", primary: "#174574", accent: "#79b8ef", ink: "#17324d" },
+    { key: "servico-verde", nome: "02 · Verde Confiança", descricao: "Serviço em verde e areia", reference: true, bg: "#edf4ef", panel: "#fbfffc", primary: "#206344", accent: "#94c6a7", ink: "#153b2b" },
+    { key: "servico-petroleo", nome: "03 · Petróleo", descricao: "Especialista em petróleo e turquesa", reference: true, bg: "#102c36", panel: "#183e4b", primary: "#64c8c5", accent: "#a5e1dc", ink: "#ffffff", dark: true },
+    { key: "servico-dourado", nome: "04 · Preto Premium", descricao: "Serviço premium em grafite e dourado", reference: true, bg: "#17191e", panel: "#252830", primary: "#d2ad68", accent: "#efd8ad", ink: "#ffffff", dark: true },
+    { key: "servico-roxo", nome: "05 · Roxo Criativo", descricao: "Apresentação moderna em roxo e lavanda", reference: true, bg: "#f2eefb", panel: "#fdfbff", primary: "#654096", accent: "#bba0e3", ink: "#382457" },
+    { key: "servico-terracota", nome: "06 · Terracota", descricao: "Serviço humanizado em terracota e creme", reference: true, bg: "#fbefe7", panel: "#fffaf5", primary: "#a85132", accent: "#e6b28e", ink: "#5d301f" },
+    { key: "servico-vinho", nome: "07 · Vinho", descricao: "Referência profissional em vinho e rosé", reference: true, bg: "#faedf1", panel: "#fff8fb", primary: "#922f50", accent: "#dca0b6", ink: "#542034" },
+    { key: "servico-grafite", nome: "08 · Grafite Moderno", descricao: "Composição técnica em grafite e prata", reference: true, bg: "#edf0f4", panel: "#ffffff", primary: "#35445b", accent: "#9bacbf", ink: "#273444" }
   ]
 };
 const POST_ART_FORMATS = {
@@ -24536,6 +24540,7 @@ function postArtItems(client, type = state.postArtType) {
       preco: client.servicoPreco || "",
       imagem: client.servicoImagem || client.imagem || client.imagens?.[0] || client.logo || "",
       categoria: client.servicoEspecialidade || client.categoria || "SERVIÇO EM DESTAQUE",
+      especialidade: client.servicoEspecialidade || "",
       atendimento: client.servicoAtendimento || client.cidade || ""
     }];
   }
@@ -24582,7 +24587,8 @@ function postArtDrawText(ctx, text, x, y, width, lines, size, color, options = {
   });
 }
 
-function postArtProductPhotoRect(format) {
+function postArtProductPhotoRect(format, type = "produto") {
+  if (type === "servico") return format === "reels" ? { x: 79, y: 279, w: 922, h: 632 } : { x: 619, y: 269, w: 402, h: 592 };
   return format === "reels" ? { x: 79, y: 199, w: 922, h: 722 } : { x: 39, y: 43, w: 517, h: 847 };
 }
 
@@ -24861,7 +24867,7 @@ function desenharPostArtReelsCanvas(ctx, data, client, image, logo, siteLogo, la
 }
 
 function postArtProductHighlights(item = {}) {
-  const fields = [["Marca", "marca"], ["Modelo", "modelo"], [item.tipoMedida || "Tamanho", "tamanho"], ["Cores", "cores"], ["Variações", "variacoes"], ["Condição", "condicao"], ["Disponibilidade", "disponibilidade"], ["Entrega / retirada", "entregaRetirada"], ["Informações", "informacoesEspecificas"], ["Observações", "observacoes"]];
+  const fields = [["Especialidade", "especialidade"], ["Atendimento", "atendimento"], ["Marca", "marca"], ["Modelo", "modelo"], [item.tipoMedida || "Tamanho", "tamanho"], ["Cores", "cores"], ["Variações", "variacoes"], ["Condição", "condicao"], ["Disponibilidade", "disponibilidade"], ["Entrega / retirada", "entregaRetirada"], ["Informações", "informacoesEspecificas"], ["Observações", "observacoes"]];
   return fields.filter(([, key]) => String(item[key] || "").trim()).map(([label, key]) => `${label}: ${String(item[key]).trim()}`);
 }
 
@@ -24887,9 +24893,9 @@ function postArtDrawFittedText(ctx, text, x, top, width, height, requestedSize, 
 function postArtBannerRect(data, width, height) {
   const vertical = data.format === "reels";
   const promo = data.type === "promocao";
-  const bannerWidth = promo ? (vertical ? 922 : 517) : (vertical ? 896 : 491);
+  const bannerWidth = promo ? (vertical ? 922 : 517) : (vertical ? 896 : data.type === "servico" ? 410 : 491);
   const bannerHeight = promo ? (vertical ? 140 : 120) : 68;
-  const xPercent = Math.max(0, Math.min(100, Number(data.bannerX ?? (vertical ? 50 : 9))));
+  const xPercent = Math.max(0, Math.min(100, Number(data.bannerX ?? (vertical ? 50 : data.type === "servico" ? 92 : 9))));
   const yPercent = Math.max(0, Math.min(100, Number(data.bannerY ?? (vertical ? 45 : 80))));
   return { x: (width - bannerWidth) * xPercent / 100, y: (height - bannerHeight) * yPercent / 100, w: bannerWidth, h: bannerHeight };
 }
@@ -24900,6 +24906,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   const h = ctx.canvas.height;
   const dark = Boolean(layout.dark);
   const family = "Georgia";
+  const service = data.type === "servico";
   const textMuted = dark ? "rgba(255,255,255,.78)" : layout.ink;
   const footerInk = dark ? "#17120b" : layout.panel;
   ctx.save();
@@ -24914,18 +24921,27 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   ctx.beginPath(); ctx.ellipse(vertical ? 10 : 580, h - 90, 280, 115, .35, 0, Math.PI * 2); ctx.fill();
   ctx.globalAlpha = 1;
 
-  const photo = vertical ? { x: 70, y: 190, w: 940, h: 740 } : { x: 30, y: 34, w: 535, h: 865 };
+  const photo = service
+    ? (vertical ? { x: 70, y: 270, w: 940, h: 650 } : { x: 610, y: 260, w: 420, h: 610 })
+    : (vertical ? { x: 70, y: 190, w: 940, h: 740 } : { x: 30, y: 34, w: 535, h: 865 });
+  if (service) {
+    ctx.fillStyle = layout.primary;
+    ctx.globalAlpha = .08;
+    ctx.fillRect(vertical ? 0 : 585, vertical ? 260 : 240, vertical ? w : 495, vertical ? 690 : 645);
+    ctx.globalAlpha = 1;
+    preencherRoundRect(ctx, vertical ? 70 : 54, vertical ? 938 : 234, vertical ? 120 : 80, 7, 3, layout.accent);
+  }
   const photoFill = dark ? "#272624" : "#f3efe8";
   preencherRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.panel);
-  postArtDrawPhoto(ctx, image, postArtProductPhotoRect(data.format), data.imageFit || "cover", 16, photoFill, data.imagePosition || { x: .5, y: .5 });
+  postArtDrawPhoto(ctx, image, postArtProductPhotoRect(data.format, data.type), data.imageFit || "cover", 16, photoFill, data.imagePosition || { x: .5, y: .5 });
   desenharBordaRoundRect(ctx, photo.x, photo.y, photo.w, photo.h, 22, layout.accent, 3);
 
-  const x = vertical ? 70 : 595;
-  const width = vertical ? 940 : 445;
+  const x = vertical ? 70 : service ? 54 : 595;
+  const width = vertical ? 940 : service ? 500 : 445;
   const clientLogoSize = Math.max(56, Math.min(vertical ? 180 : 150, Number(data.clientLogoSize) || (vertical ? 110 : 92)));
   const brandY = vertical ? Math.max(6, (photo.y - clientLogoSize) / 2) : 42;
   postArtDrawBrand(ctx, client, logo, siteLogo, layout, {
-    x, y: brandY, width, dark, editorial: true, showSiteLogo: data.showSiteLogo,
+    x, y: brandY, width: service && !vertical ? 972 : width, dark, editorial: true, showSiteLogo: data.showSiteLogo,
     logoSize: clientLogoSize,
     siteWidth: vertical ? 170 : 132,
     nameSize: vertical ? 38 : 29,
@@ -24936,8 +24952,9 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
   });
 
   const productTitleSize = Math.max(vertical ? 32 : 24, Math.min(vertical ? 92 : 74, Number(data.titleFontSize) || (vertical ? 72 : 55)));
-  const titleTop = vertical ? photo.y + photo.h + 25 : brandY + clientLogoSize + 30;
-  const titleHeight = postArtDrawFittedText(ctx, data.title, x, titleTop, width, vertical ? 205 : 190, productTitleSize, layout.ink, { family, weight: 900 });
+  const titleTop = vertical ? photo.y + photo.h + (service ? 35 : 25) : service ? Math.max(270, brandY + clientLogoSize + 70) : brandY + clientLogoSize + 30;
+  if (service && data.callout) postArtDrawText(ctx, data.callout.toUpperCase(), x, brandY + clientLogoSize + 32, service && !vertical ? 972 : width, 1, vertical ? 24 : 18, layout.ink, { min: 12, weight: 800 });
+  const titleHeight = postArtDrawFittedText(ctx, data.title, x, titleTop, width, vertical ? 205 : 190, productTitleSize, layout.ink, { family: service ? "Arial" : family, weight: 900 });
   const descriptionY = titleTop + titleHeight + (vertical ? 24 : 20);
   const hasPrice = numberFromMoney(data.price) > 0;
   const priceY = vertical ? 1595 : 746;
@@ -24952,7 +24969,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
     preencherRoundRect(ctx, x, cardY, width, cardHeight, 20, layout.panel);
     desenharBordaRoundRect(ctx, x, cardY, width, cardHeight, 20, layout.accent, 3);
     preencherRoundRect(ctx, x + 7, cardY + 7, width - 14, 44, 15, layout.primary);
-    postArtDrawText(ctx, data.type === "promocao" ? "DESTAQUES DA OFERTA" : "DESTAQUE DO PRODUTO", x + width / 2, cardY + 36, width - 40, 1, vertical ? 25 : 20, footerInk, { min: 13, align: "center" });
+    postArtDrawText(ctx, service ? "DIFERENCIAIS DO SERVIÇO" : data.type === "promocao" ? "DESTAQUES DA OFERTA" : "DESTAQUE DO PRODUTO", x + width / 2, cardY + 36, width - 40, 1, vertical ? 25 : 20, footerInk, { min: 13, align: "center" });
     const rowHeight = (cardHeight - 65) / highlights.length;
     highlights.forEach((value, index) => {
       preencherRoundRect(ctx, x + 16, cardY + 60 + index * rowHeight, 5, rowHeight - 8, 3, layout.accent);
@@ -24964,7 +24981,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
     preencherRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.primary);
     desenharBordaRoundRect(ctx, x, priceY, width, priceHeight, 28, layout.accent, 2);
     const oldPrice = data.type === "promocao" && numberFromMoney(data.oldPrice) > numberFromMoney(data.price) ? `DE ${postArtMoney(data.oldPrice)}` : "";
-    postArtDrawText(ctx, oldPrice || "POR APENAS", x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
+    postArtDrawText(ctx, oldPrice || (service ? (/a partir/i.test(data.price) ? "A PARTIR DE" : "VALOR DO SERVIÇO") : "POR APENAS"), x + 24, priceY + 23, width - 48, 1, vertical ? 18 : 15, footerInk, { min: 10, weight: 700 });
     if (oldPrice) {
       ctx.strokeStyle = footerInk; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(x + 24, priceY + 16); ctx.lineTo(x + 24 + Math.min(width - 48, ctx.measureText(oldPrice).width), priceY + 16); ctx.stroke();
@@ -24974,6 +24991,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
 
   const footerY = vertical ? 1764 : 902;
   const footerHeight = vertical ? 128 : 150;
+  if (service && data.serviceMode) postArtDrawText(ctx, `ATENDIMENTO: ${data.serviceMode}`, x + width / 2, footerY - 16, width, 1, vertical ? 22 : 14, layout.ink, { min: 11, align: "center" });
   if (data.type === "promocao" && data.validity) postArtDrawText(ctx, `VÁLIDA ATÉ ${formatDateBR(data.validity)}`, x + width / 2, footerY - 16, width, 1, vertical ? 22 : 14, layout.ink, { min: 11, align: "center" });
   preencherRoundRect(ctx, 28, footerY, 1024, footerHeight, 26, layout.primary);
   const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte a empresa";
@@ -24992,7 +25010,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
     const bannerInk = rgb[0] * .299 + rgb[1] * .587 + rgb[2] * .114 > 150 ? "#17120b" : "#ffffff";
     preencherRoundRect(ctx, banner.x, banner.y, banner.w, banner.h, 18, bannerColor);
     const promo = data.type === "promocao";
-    const label = promo ? "EM PROMOÇÃO" : "PRODUTO EM DESTAQUE";
+    const label = promo ? "EM PROMOÇÃO" : service ? "SERVIÇO EM DESTAQUE" : "PRODUTO EM DESTAQUE";
     postArtDrawText(ctx, label, banner.x + banner.w / 2, banner.y + (promo ? banner.h * .57 : 42), banner.w - 28, 1, promo ? (vertical ? 64 : 48) : (vertical ? 30 : 25), bannerInk, { align: "center", min: 16, weight: 900 });
     if (promo && data.callout) postArtDrawText(ctx, data.callout.toUpperCase(), banner.x + banner.w / 2, banner.y + banner.h - 15, banner.w - 30, 1, vertical ? 26 : 20, bannerInk, { align: "center", min: 12, weight: 800 });
   }
@@ -25000,7 +25018,7 @@ function desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLo
 }
 
 function desenharPostArtCanvas(ctx, data, client, image, logo, siteLogo, layout) {
-  if (["produto", "promocao"].includes(data.type) && layout.reference) {
+  if (["produto", "promocao", "servico"].includes(data.type) && layout.reference) {
     desenharPostArtProdutoReferencia(ctx, data, client, image, logo, siteLogo, layout);
     return;
   }
@@ -25029,7 +25047,7 @@ function postArtFormData() {
     titleFontSize: Number($("postArtTitleFontSize")?.value) || (state.postArtFormat === "reels" ? 72 : 55),
     showHighlightBanner: $("postArtShowHighlightBanner")?.checked === true,
     highlightBannerColor: $("postArtHighlightBannerColor")?.value || "#e8b84b",
-    bannerX: Number($("postArtBannerX")?.value ?? (state.postArtFormat === "reels" ? 50 : 9)),
+    bannerX: Number($("postArtBannerX")?.value ?? (state.postArtFormat === "reels" ? 50 : state.postArtType === "servico" ? 92 : 9)),
     bannerY: Number($("postArtBannerY")?.value ?? (state.postArtFormat === "reels" ? 45 : 80)),
     descriptionFontSize: Number($("postArtDescriptionFontSize")?.value) || 22,
     showHighlightCard: $("postArtShowHighlightCard")?.checked === true,
@@ -25186,18 +25204,19 @@ function renderPostArtView() {
             <label class="wide">Descrição<textarea id="postArtDescription" rows="3" maxlength="220"></textarea></label>
             <label>${typeCopy.price}<input id="postArtPrice" placeholder="${type === "servico" ? "Ex.: A partir de 89,90 ou Sob consulta" : "Ex.: 89,90"}"></label>
             <label id="postArtOldPriceLabel" class="${type === "promocao" ? "" : "hidden"}">Preço anterior<input id="postArtOldPrice" placeholder="Ex.: 119,90"></label>
-            ${["produto", "promocao"].includes(type) ? `
-              <label class="check-row wide"><input id="postArtShowHighlightBanner" type="checkbox" ${type === "promocao" ? "checked" : ""}> Exibir tarja ${type === "promocao" ? "Em Promoção" : "Produto em Destaque"}</label>
+            ${["produto", "promocao", "servico"].includes(type) ? `
+              <label class="check-row wide"><input id="postArtShowHighlightBanner" type="checkbox" ${type === "promocao" ? "checked" : ""}> Exibir tarja ${type === "promocao" ? "Em Promoção" : type === "servico" ? "Serviço em Destaque" : "Produto em Destaque"}</label>
               <label>Cor da tarja<input id="postArtHighlightBannerColor" type="color" value="#e8b84b"></label>
-              <label>Posição horizontal da tarja<input id="postArtBannerX" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 50 : 9}"></label>
+              <label>Posição horizontal da tarja<input id="postArtBannerX" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 50 : type === "servico" ? 92 : 9}"></label>
               <label>Posição vertical da tarja<input id="postArtBannerY" type="range" min="0" max="100" step="0.1" value="${format.key === "reels" ? 45 : 80}"></label>
               <small class="wide">Com a tarja ativa, arraste-a diretamente na prévia ou use os controles de posição.</small>
               ${type === "promocao" ? `<label class="wide">Chamada ou desconto<input id="postArtCallout" maxlength="48" placeholder="Ex.: 20% OFF ou Oferta especial"></label>` : ""}
+              ${type === "servico" ? `<label class="wide">Especialidade ou chamada<input id="postArtCallout" maxlength="48" placeholder="Ex.: Atendimento especializado"></label>` : ""}
               <label class="post-art-font-control">Fonte da descrição (ajustada para caber)<span><input id="postArtDescriptionFontSize" type="range" min="14" max="44" value="22"><output id="postArtDescriptionFontSizeValue">22 px</output></span></label>
               <label class="post-art-font-control">Tamanho da logo do cliente<span><input id="postArtClientLogoSize" type="range" min="56" max="${format.key === "reels" ? 180 : 150}" value="${format.key === "reels" ? 110 : 92}"><output id="postArtClientLogoSizeValue">${format.key === "reels" ? 110 : 92} px</output></span></label>
-              <label class="post-art-font-control">Tamanho do nome do produto<span><input id="postArtTitleFontSize" type="range" min="${format.key === "reels" ? 32 : 24}" max="${format.key === "reels" ? 92 : 74}" value="${format.key === "reels" ? 72 : 55}"><output id="postArtTitleFontSizeValue">${format.key === "reels" ? 72 : 55} px</output></span></label>
+              <label class="post-art-font-control">Tamanho do nome do ${type === "servico" ? "serviço" : "produto"}<span><input id="postArtTitleFontSize" type="range" min="${format.key === "reels" ? 32 : 24}" max="${format.key === "reels" ? 92 : 74}" value="${format.key === "reels" ? 72 : 55}"><output id="postArtTitleFontSizeValue">${format.key === "reels" ? 72 : 55} px</output></span></label>
               <label>Fonte do nome do cliente<select id="postArtClientNameFont"><option value="Georgia">Georgia</option><option value="Arial">Arial</option><option value="Trebuchet MS">Trebuchet</option><option value="Verdana">Verdana</option><option value="Times New Roman">Times New Roman</option><option value="Courier New">Courier New</option><option value="Impact">Impact</option><option value="Comic Sans MS">Comic Sans</option><option value="Palatino Linotype">Palatino</option><option value="Garamond">Garamond</option></select></label>
-              <label class="check-row wide"><input id="postArtShowHighlightCard" type="checkbox"> Exibir card ${type === "promocao" ? "Destaques da Oferta" : "Destaque do Produto"}</label>
+              <label class="check-row wide"><input id="postArtShowHighlightCard" type="checkbox"> Exibir card ${type === "promocao" ? "Destaques da Oferta" : type === "servico" ? "Diferenciais do Serviço" : "Destaque do Produto"}</label>
               <datalist id="postArtHighlightOptions"></datalist>
               ${[1, 2, 3].map((index) => `<label class="wide">Característica ${index} (opcional)<input id="postArtHighlight${index}" list="postArtHighlightOptions" maxlength="120" placeholder="Escolha um detalhe cadastrado ou escreva o destaque"></label>`).join("")}
               <label class="post-art-font-control wide">Fonte das características (ajustada para caber)<span><input id="postArtHighlightFontSize" type="range" min="14" max="36" value="22"><output id="postArtHighlightFontSizeValue">22 px</output></span></label>
@@ -25208,7 +25227,7 @@ function renderPostArtView() {
             <label id="postArtServiceModeLabel" class="${type === "servico" ? "" : "hidden"}">Forma de atendimento<input id="postArtServiceMode" maxlength="52" placeholder="Ex.: Presencial, online ou a domicílio"></label>
             <label>Nova imagem para esta postagem<input id="postArtImageUpload" type="file" accept="image/*"></label>
             <label>Ajuste da imagem<select id="postArtImageFit"><option value="cover">Preencher espaço</option><option value="contain">Mostrar imagem inteira</option></select></label>
-            ${["produto", "promocao"].includes(type) ? `<div class="wide"><small>Arraste a foto na prévia para ajustar o enquadramento dentro da moldura. O movimento fica limitado ao recorte ou espaço disponível.</small><button id="postArtResetImagePosition" type="button" class="ghost-button">Centralizar imagem</button></div>` : ""}
+            ${["produto", "promocao", "servico"].includes(type) ? `<div class="wide"><small>Arraste a foto na prévia para ajustar o enquadramento dentro da moldura. O movimento fica limitado ao recorte ou espaço disponível.</small><button id="postArtResetImagePosition" type="button" class="ghost-button">Centralizar imagem</button></div>` : ""}
             <label class="check-row wide"><input id="postArtShowSiteLogo" type="checkbox" checked> Exibir logo Olá Carlópolis</label>
           </div>
         </section>` : ""}
@@ -25270,7 +25289,7 @@ function renderPostArtView() {
   });
   $("postArtDownload")?.addEventListener("click", baixarPostArt);
   const previewCanvas = $("postArtCanvas");
-  const updateBannerInteraction = () => previewCanvas?.classList.toggle("is-banner-movable", ["produto", "promocao"].includes(type));
+  const updateBannerInteraction = () => previewCanvas?.classList.toggle("is-banner-movable", ["produto", "promocao", "servico"].includes(type));
   $("postArtShowHighlightBanner")?.addEventListener("change", updateBannerInteraction);
   updateBannerInteraction();
   let bannerDrag = null;
@@ -25280,13 +25299,13 @@ function renderPostArtView() {
     return { x: (event.clientX - bounds.left) * previewCanvas.width / bounds.width, y: (event.clientY - bounds.top) * previewCanvas.height / bounds.height };
   };
   previewCanvas?.addEventListener("pointerdown", (event) => {
-    if (!["produto", "promocao"].includes(type) || event.button !== 0) return;
+    if (!["produto", "promocao", "servico"].includes(type) || event.button !== 0) return;
     const point = canvasPoint(event);
     const rect = postArtBannerRect(postArtFormData(), previewCanvas.width, previewCanvas.height);
     if ($("postArtShowHighlightBanner")?.checked && point.x >= rect.x && point.x <= rect.x + rect.w && point.y >= rect.y && point.y <= rect.y + rect.h) {
       bannerDrag = { x: point.x - rect.x, y: point.y - rect.y };
     } else {
-      const photo = postArtProductPhotoRect(state.postArtFormat);
+      const photo = postArtProductPhotoRect(state.postArtFormat, type);
       if (!postArtPreviewAssets?.image || point.x < photo.x || point.x > photo.x + photo.w || point.y < photo.y || point.y > photo.y + photo.h) return;
       const data = postArtFormData();
       imageDrag = { point, position: { ...data.imagePosition }, photo, frame: postArtImageGeometry(postArtPreviewAssets.image, photo, data.imageFit, data.imagePosition) };
