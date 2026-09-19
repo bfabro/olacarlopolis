@@ -5736,7 +5736,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
           <div>
             <span><i class="fa-regular fa-bell"></i> Atualizações da cidade</span>
             <h1>Novidades</h1>
-            <p>Descubra o que acabou de chegar, mudar ou ganhar destaque em Carlópolis.</p>
+            <p>Toda atualização no portal você confere aqui!</p>
           </div>
           <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
         </header>

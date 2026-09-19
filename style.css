@@ -20381,7 +20381,7 @@ body.vaga-modal-open {
   padding: clamp(28px, 5vw, 58px);
   overflow: hidden;
   border-radius: 30px;
-  background: linear-gradient(135deg, #111827, #7f1d3a 58%, #e11d48);
+  background: linear-gradient(135deg, #a865ff, #6b22d6);
   color: #fff;
   box-shadow: 0 22px 50px rgba(15, 23, 42, .2);
 }

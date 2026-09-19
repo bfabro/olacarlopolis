@@ -34,10 +34,12 @@ test("menu lateral e rota compartilham a mesma tela de novidades", () => {
   const page = functionBody("mostrarNovidadesCidadePublicas");
   assert.match(page, /area\.dataset\.currentRoute = "novidades"/);
   assert.match(page, /class="novidades-public-page"/);
+  assert.match(page, /Toda atualização no portal você confere aqui!/);
   assert.match(page, /id="novidadesSemanaResumo"/);
   assert.match(page, /id="novidadesCidadeFeed"/);
   assert.match(page, /await montarNovidadesCidade\(\)/);
   assert.match(page, /window\.scrollTo\(\{ top: 0/);
   assert.match(css, /\.novidades-public-hero/);
+  assert.match(css, /background: linear-gradient\(135deg, #a865ff, #6b22d6\)/);
   assert.match(script, /#menuNovidadesCidade/);
 });
