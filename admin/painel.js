@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 769,
-  label: "v776",
-  data: "2026-09-18",
-  nota: "Grupos Amigos do Pet e Brechó Amigos do Pet publicados somente pelo cadastro do Firebase, sem cópias antigas."
+  numero: 770,
+  label: "v777",
+  data: "2026-09-19",
+  nota: "Novidades públicas em tela exclusiva, acessível pelo atalho da home, menu lateral e rota própria."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

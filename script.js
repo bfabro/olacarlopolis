@@ -4700,7 +4700,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   function botoesNovidadesCidade() {
     return [
-      ...document.querySelectorAll('[data-home-quick-action="novidades"], .botao-menu-topo[data-target="novidades-cidade"]')
+      ...document.querySelectorAll('[data-home-quick-action="novidades"], #menuNovidadesCidade')
     ];
   }
 
@@ -5719,6 +5719,49 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
   }
 
   try { window.montarNovidadesCidade = montarNovidadesCidade; } catch (e) { }
+
+  async function mostrarNovidadesCidadePublicas() {
+    if (location.hash !== "#novidades") history.pushState(null, "", `${location.pathname}${location.search}#novidades`);
+    prepararNavegacaoMenuEspecial();
+    atualizarVisibilidadeHomeQuickBanner();
+    if (typeof definirTelaContentArea === "function") definirTelaContentArea(null);
+    document.querySelectorAll(".sidebar .nav_link").forEach((link) => link.classList.remove("active"));
+    document.getElementById("menuNovidadesCidade")?.classList.add("active");
+    const area = document.querySelector(".content_area");
+    if (!area) return;
+    area.dataset.currentRoute = "novidades";
+    area.innerHTML = `
+      <section class="novidades-public-page">
+        <header class="novidades-public-hero">
+          <div>
+            <span><i class="fa-regular fa-bell"></i> Atualizações da cidade</span>
+            <h1>Novidades</h1>
+            <p>Descubra o que acabou de chegar, mudar ou ganhar destaque em Carlópolis.</p>
+          </div>
+          <i class="fa-solid fa-bullhorn" aria-hidden="true"></i>
+        </header>
+        <section class="novidades-cidade-wrap novidades-public-content">
+          <div class="novidades-cidade-resumo">
+            <strong id="novidadesSemanaResumo">🔥 0 novidades esta semana</strong>
+            <span>Tudo que foi adicionado ou atualizado recentemente.</span>
+          </div>
+          <div id="novidadesCidadeFeed" class="novidades-cidade-feed">
+            <div class="novidades-empty">Carregando novidades...</div>
+          </div>
+        </section>
+      </section>`;
+    window.__novidadesCidadeAbrindo = true;
+    await montarNovidadesCidade();
+    if (area.dataset.currentRoute !== "novidades") return;
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }
+
+  window.mostrarNovidadesCidadePublicas = mostrarNovidadesCidadePublicas;
+  document.getElementById("menuNovidadesCidade")?.addEventListener("click", (event) => {
+    event.preventDefault();
+    registrarCliqueMenuLateral("Novidades");
+    mostrarNovidadesCidadePublicas();
+  });
 
   function novidadeValorCampo(item, nomes = []) {
     for (const nome of nomes) {
@@ -25161,10 +25204,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         destinoId: "novidades",
         estabelecimento: "Novidades"
       });
-      window.__novidadesCidadeAbrindo = true;
-      limparRotaParaSecaoInicial();
-      document.querySelector('.botao-menu-topo[data-target="novidades-cidade"]')?.click();
-      rolarParaCardInicial("secao-novidades-cidade");
+      mostrarNovidadesCidadePublicas();
       return;
     }
     if (action === "cep") {
@@ -25206,13 +25246,12 @@ plotarPinsImoveis(stateImoveis.filtered);
   function renderizarTelaAtualComDadosAdmin() {
     try { montarCarrosselDivulgacao(); } catch (e) { console.warn("Nao foi possivel montar os destaques da home.", e); }
     try { montarGradeEventos(); } catch (e) { console.warn("Nao foi possivel montar os eventos da home.", e); }
-    try { montarNovidadesCidade(); } catch (e) { console.warn("Nao foi possivel montar as novidades da home.", e); }
-
     const h = (location.hash || "").toLowerCase();
     if (!h) return;
 
     try {
       if (h === "#eventos") return window.mostrarEventosPublicos?.();
+      if (h === "#novidades") return mostrarNovidadesCidadePublicas();
       if (h === "#ondecomer") return mostrarOndeComer();
       if (h === "#produtos") return mostrarProdutosPublicos();
       if (h === "#promocoes" || h.startsWith("#promocoes-")) return mostrarPromocoes(getPromoFiltroFromHash());
@@ -26830,6 +26869,7 @@ ${servicosIniciaisLoja.length ? `
     if (h === "#ondecomer") { return mostrarOndeComer(); }
     if (h === "#produtos") { return mostrarProdutosPublicos(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
+    if (h === "#novidades") { return mostrarNovidadesCidadePublicas(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
     if (h === "#canos") { return mostrarCanos(); }
@@ -27291,18 +27331,8 @@ ${servicosIniciaisLoja.length ? `
   document.querySelectorAll('.botao-menu-topo').forEach(btn => {
     btn.addEventListener('click', () => {
       const target = btn.dataset.target;
-      if (["divulgacao", "eventos", "novidades-cidade"].includes(target) && typeof limparRotaParaSecaoInicial === "function") {
+      if (["divulgacao", "eventos"].includes(target) && typeof limparRotaParaSecaoInicial === "function") {
         limparRotaParaSecaoInicial();
-      }
-      if (target === "novidades-cidade" && typeof marcarNovidadesCidadeComoVistas === "function") {
-        registrarCliqueNovidadeCidade("abrir-aba", {
-          id: "menu-topo-novidades",
-          titulo: "Botao Novidades",
-          destinoTipo: "novidades",
-          destinoId: "novidades",
-          estabelecimento: "Novidades"
-        });
-        window.__novidadesCidadeAbrindo = true;
       }
 
       // Remove classe ativo
@@ -27333,9 +27363,6 @@ ${servicosIniciaisLoja.length ? `
         if (target === "divulgacao" && window.swiperNovidades) {
           window.swiperNovidades.update();
           window.swiperNovidades.slideTo(0);
-        }
-        if (target === "novidades-cidade") {
-          montarNovidadesCidade();
         }
       }, 150);
     });

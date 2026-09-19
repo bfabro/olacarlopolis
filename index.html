@@ -121,7 +121,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=484" />
+   <link rel="stylesheet" href="style.css?v=485" />
    <link rel="stylesheet" href="casas-veraneio.css?v=9" />
    <link rel="stylesheet" href="loterias.css?v=8" />
    <link rel="stylesheet" href="client-gallery.css?v=3" />
@@ -1160,6 +1160,11 @@
                         <span class="navlink">Eventos</span>
                      </a>
 
+                     <a id="menuNovidadesCidade" href="#novidades" class="nav_link sublink">
+                        <span class="navlink_icon"><i style="color:#e11d48" class="fa-regular fa-bell"></i></span>
+                        <span class="navlink">Novidades</span>
+                     </a>
+
                      <a id="menuLoterias" href="#loterias" class="nav_link sublink">
                         <span class="navlink_icon"><i style="color:#16864b" class="fa-solid fa-clover"></i></span>
                         <span class="navlink">Loterias</span>
@@ -1364,7 +1369,7 @@
 
             </ul>
 
-            <div class="sidebar-version">Olá Carlópolis v506</div>
+            <div class="sidebar-version">Olá Carlópolis v507</div>
 
             <!-- Sidebar Open / Close -->
             <div class="bottom_content">
@@ -1441,9 +1446,6 @@
             </button>
             <button class="botao-menu-topo" data-target="eventos">
                <i class="fa-regular fa-calendar-days"></i> Eventos
-            </button>
-            <button class="botao-menu-topo" data-target="novidades-cidade">
-               <i class="fa-regular fa-bell"></i> Novidades
             </button>
          </div>
 
@@ -1540,19 +1542,7 @@
          <!-- Separador entre os carrosséis 
          <div class="separador"></div>-->
          <!-- Carrossel de Eventos -->
-         <div id="secao-novidades-cidade" class="carrossel-container">
-            <section class="novidades-cidade-wrap">
-               <div class="novidades-cidade-resumo">
-                  <strong id="novidadesSemanaResumo">🔥 0 novidades esta semana</strong>
-                  <span>Tudo que foi adicionado ou atualizado recentemente.</span>
-               </div>
-               <div id="novidadesCidadeFeed" class="novidades-cidade-feed">
-                  <div class="novidades-empty">Carregando novidades...</div>
-               </div>
-            </section>
-            <!--  <h2>Turismo</h2>-->
-            <div class="swiper-container swiper-turismo" style="display:none">
-
+         <div class="swiper-container swiper-turismo" style="display:none">
                <div class="swiper-wrapper">
                   <!-- Slides de Turismo -->
 
@@ -1583,10 +1573,6 @@
                <div class="swiper-button-next"></div>
                <div class="swiper-button-prev"></div>
             </div>
-
-
-
-         </div>
 
          <!-- Seção: Nível da Represa -->
          <div id="secao-nivel-represa" class="carrossel-container" style="display:none">
@@ -1703,7 +1689,7 @@
    </script>
 
    <!--  JavaScript -->
-   <script defer src="script.js?v=684"></script>
+   <script defer src="script.js?v=685"></script>
    <script defer src="loterias.js?v=11"></script>
    <script defer src="item-share.js?v=3"></script>
    <script defer src="eventos-page.js?v=7"></script>
@@ -1830,11 +1816,8 @@
       document.querySelectorAll('.botao-menu-topo').forEach(btn => {
          btn.addEventListener('click', () => {
             const target = btn.dataset.target;
-            if (["divulgacao", "eventos", "novidades-cidade"].includes(target) && typeof limparRotaParaSecaoInicial === "function") {
+            if (["divulgacao", "eventos"].includes(target) && typeof limparRotaParaSecaoInicial === "function") {
                limparRotaParaSecaoInicial();
-            }
-            if (target === "novidades-cidade" && typeof marcarNovidadesCidadeComoVistas === "function") {
-               window.__novidadesCidadeAbrindo = true;
             }
 
             // Remove destaque dos outros
@@ -1864,9 +1847,6 @@
             if (target === "divulgacao" && window.swiperNovidades) {
                swiperNovidades.update();
                swiperNovidades.slideTo(0);
-            }
-            if (target === "novidades-cidade" && typeof montarNovidadesCidade === "function") {
-               montarNovidadesCidade();
             }
          });
       });
