@@ -28876,6 +28876,45 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
 .clima-map-marker i { position: absolute; top: 6px; font-size: 13px; transform: rotate(var(--wind-angle)); transform-origin: 50% 25px; }
 .clima-map-marker strong { margin-top: 7px; font-size: 15px; }
 .clima-map-marker small { margin-top: -9px; font-size: 8px; font-weight: 800; }
+.clima-radar-controls {
+  display: grid;
+  grid-template-columns: auto minmax(120px, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px solid #d8e8ee;
+  border-radius: 14px;
+  background: #f4fafc;
+}
+.clima-radar-controls button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-width: 104px;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  background: var(--clima-blue);
+  font: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.clima-radar-controls button.is-playing { background: #0f766e; }
+.clima-radar-controls button:disabled { cursor: wait; opacity: .55; }
+.clima-radar-controls input { width: 100%; accent-color: var(--clima-blue); cursor: pointer; }
+.clima-radar-controls input:disabled { cursor: wait; opacity: .55; }
+.clima-radar-controls output {
+  min-width: 48px;
+  color: var(--clima-ink);
+  font-size: 12px;
+  font-weight: 850;
+  text-align: right;
+}
 .clima-map-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--clima-muted); font-size: 11px; }
 .clima-map-legend { display: flex; flex-wrap: wrap; gap: 9px; }
 .clima-map-legend span { display: inline-flex; align-items: center; gap: 4px; }
@@ -28958,6 +28997,9 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
   .clima-layer-switch { display: flex; margin-top: 12px; }
   .clima-layer-switch button { flex: 1; }
   .clima-map { height: 355px; border-radius: 14px; }
+  .clima-radar-controls { grid-template-columns: auto minmax(80px, 1fr) auto; gap: 8px; padding: 9px; }
+  .clima-radar-controls button { min-width: 38px; width: 38px; padding: 0; }
+  .clima-radar-controls button span { display: none; }
   .clima-map-footer { display: block; }
   .clima-map-legend { margin-top: 8px; }
   .clima-moon-content { display: block; }

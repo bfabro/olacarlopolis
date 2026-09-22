@@ -14,12 +14,23 @@ test("Clima do Dia combina radar de chuva e malha regional de vento", () => {
   assert.match(site, /api\.rainviewer\.com\/public\/weather-maps\.json/);
   assert.match(site, /current: "precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m"/);
   assert.match(site, /data-clima-layer="ambos"/);
-assert.match(site, /window\.addEventListener\("hashchange", renderizarRotaClima\)/);
+  assert.match(site, /window\.addEventListener\("hashchange", renderizarRotaClima\)/);
   assert.match(site, /id="climaMapa"/);
   assert.match(css, /\.clima-map \{/);
   assert.match(css, /\.clima-map-marker \{/);
 });
 
+test("radar de chuva anima a sequência temporal e oferece controles", () => {
+  assert.match(site, /radarResposta\?\.radar\?\.past/);
+  assert.match(site, /radarResposta\?\.radar\?\.nowcast/);
+  assert.match(site, /function mostrarQuadroRadar\(index\)/);
+  assert.match(site, /setInterval\(\(\) => \{/);
+  assert.match(site, /id="climaRadarPlay"/);
+  assert.match(site, /id="climaRadarTimeline"/);
+  assert.match(site, /id="climaRadarHorario"/);
+  assert.match(css, /\.clima-radar-controls \{/);
+  assert.match(site, /climaRadarTimer = setInterval/);
+});
 test("painel lunar e guia de meteoros consideram condições de observação", () => {
   assert.match(site, /class="moon-realistic"/);
   assert.match(site, /Taurídeas do Sul/);
@@ -30,14 +41,14 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 });
 
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v636/);
-  assert.match(html, /style\.css\?v=487/);
-  assert.match(html, /script\.js\?v=687/);
-  assert.match(html, /Olá Carlópolis v509/);
-  assert.match(panel, /numero: 772/);
-  assert.match(panel, /label: "v779"/);
+  assert.match(site, /Release do site v637/);
+  assert.match(html, /style\.css\?v=488/);
+  assert.match(html, /script\.js\?v=688/);
+  assert.match(html, /Olá Carlópolis v510/);
+  assert.match(panel, /numero: 773/);
+  assert.match(panel, /label: "v780"/);
   assert.match(panel, /data: "2026-09-22"/);
-  assert.match(panelHtml, /painel\.css\?v=478/);
-  assert.match(panelHtml, /painel\.js\?v=709/);
-  assert.match(worker, /2026-09-22-clima-mapa-lua-v827/);
+  assert.match(panelHtml, /painel\.css\?v=479/);
+  assert.match(panelHtml, /painel\.js\?v=710/);
+  assert.match(worker, /2026-09-22-clima-radar-animado-v828/);
 });

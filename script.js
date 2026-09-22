@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v636.
+// Release do site v637.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -27095,6 +27095,7 @@ ${servicosIniciaisLoja.length ? `
 
   let climaMapInstance = null;
   let climaMapLayers = null;
+  let climaRadarTimer = null;
 
   async function buscarMalhaClima() {
     const offsets = [
@@ -27133,10 +27134,15 @@ ${servicosIniciaisLoja.length ? `
   async function iniciarMapaClima() {
     const mapaEl = document.getElementById("climaMapa");
     const status = document.getElementById("climaMapaStatus");
+    const radarPlay = document.getElementById("climaRadarPlay");
+    const radarTimeline = document.getElementById("climaRadarTimeline");
+    const radarHorario = document.getElementById("climaRadarHorario");
     if (!mapaEl || typeof L === "undefined") {
       if (status) status.textContent = "Mapa indisponível neste dispositivo.";
       return;
     }
+    if (climaRadarTimer) clearInterval(climaRadarTimer);
+    climaRadarTimer = null;
     if (climaMapInstance) climaMapInstance.remove();
     climaMapInstance = L.map(mapaEl, { zoomControl: true, scrollWheelZoom: false }).setView([COORDS_CARLOPOLIS.lat, COORDS_CARLOPOLIS.lng], 8);
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -27146,6 +27152,7 @@ ${servicosIniciaisLoja.length ? `
 
     const ventoLayer = L.layerGroup().addTo(climaMapInstance);
     let radarLayer = null;
+    let radarVisivel = true;
     climaMapLayers = { vento: ventoLayer, radar: null };
 
     try {
@@ -27165,15 +27172,76 @@ ${servicosIniciaisLoja.length ? `
         L.marker([ponto.lat, ponto.lng], { icon: icone }).bindTooltip(tooltip, { direction: "top" }).addTo(ventoLayer);
       });
 
-      const frames = radarResposta?.radar?.past || [];
-      const frame = frames[frames.length - 1];
-      if (frame?.path) {
-        radarLayer = L.tileLayer("https://tilecache.rainviewer.com" + frame.path + "/256/{z}/{x}/{y}/2/1_1.png", {
-          opacity: .62, maxNativeZoom: 7, attribution: "Radar RainViewer"
-        }).addTo(climaMapInstance);
-        climaMapLayers.radar = radarLayer;
+      const frames = [
+        ...(radarResposta?.radar?.past || []),
+        ...(radarResposta?.radar?.nowcast || [])
+      ].filter((frame) => frame?.path);
+      const radarHost = radarResposta?.host || "https://tilecache.rainviewer.com";
+      const radarLayers = frames.map((frame) => L.tileLayer(radarHost + frame.path + "/256/{z}/{x}/{y}/2/1_1.png", {
+        opacity: .62,
+        maxNativeZoom: 7,
+        attribution: "Radar RainViewer"
+      }));
+      let radarFrameIndex = Math.max(0, frames.length - 1);
+
+      function pararRadar() {
+        if (climaRadarTimer) clearInterval(climaRadarTimer);
+        climaRadarTimer = null;
+        if (radarPlay) {
+          radarPlay.classList.remove("is-playing");
+          radarPlay.setAttribute("aria-label", "Reproduzir animação do radar");
+          radarPlay.innerHTML = '<i class="fa-solid fa-play"></i><span>Reproduzir</span>';
+        }
       }
 
+      function mostrarQuadroRadar(index) {
+        if (!frames.length) return;
+        radarFrameIndex = (index + frames.length) % frames.length;
+        if (radarLayer && climaMapInstance.hasLayer(radarLayer)) climaMapInstance.removeLayer(radarLayer);
+        radarLayer = radarLayers[radarFrameIndex];
+        climaMapLayers.radar = radarLayer;
+        if (radarVisivel) radarLayer.addTo(climaMapInstance);
+        if (radarTimeline) radarTimeline.value = String(radarFrameIndex);
+        if (radarHorario) {
+          const instante = new Date(Number(frames[radarFrameIndex].time) * 1000);
+          radarHorario.textContent = instante.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        }
+      }
+
+      function reproduzirRadar() {
+        if (frames.length < 2 || climaRadarTimer) return;
+        if (radarFrameIndex >= frames.length - 1) mostrarQuadroRadar(0);
+        if (radarPlay) {
+          radarPlay.classList.add("is-playing");
+          radarPlay.setAttribute("aria-label", "Pausar animação do radar");
+          radarPlay.innerHTML = '<i class="fa-solid fa-pause"></i><span>Pausar</span>';
+        }
+        climaRadarTimer = setInterval(() => {
+          if (!mapaEl.isConnected) return pararRadar();
+          mostrarQuadroRadar(radarFrameIndex + 1);
+        }, 850);
+      }
+
+      if (frames.length) {
+        if (radarTimeline) {
+          radarTimeline.max = String(frames.length - 1);
+          radarTimeline.disabled = frames.length < 2;
+          radarTimeline.oninput = () => {
+            pararRadar();
+            mostrarQuadroRadar(Number(radarTimeline.value));
+          };
+        }
+        if (radarPlay) {
+          radarPlay.disabled = frames.length < 2;
+          radarPlay.onclick = () => climaRadarTimer ? pararRadar() : reproduzirRadar();
+        }
+        mostrarQuadroRadar(radarFrameIndex);
+        if (frames.length > 1) reproduzirRadar();
+      } else {
+        if (radarHorario) radarHorario.textContent = "Radar indisponível";
+        if (radarPlay) radarPlay.disabled = true;
+        if (radarTimeline) radarTimeline.disabled = true;
+      }
       const atualizado = malha[0]?.time ? new Date(malha[0].time).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "agora";
       if (status) status.textContent = "Atualizado às " + atualizado + " • setas indicam a direção do vento; cores indicam chuva";
       document.querySelectorAll("[data-clima-layer]").forEach((button) => {
@@ -27181,12 +27249,14 @@ ${servicosIniciaisLoja.length ? `
         button.onclick = () => {
           const modo = button.dataset.climaLayer;
           document.querySelectorAll("[data-clima-layer]").forEach((item) => item.classList.toggle("is-active", item === button));
+          radarVisivel = modo !== "vento";
           if (radarLayer) {
-            if (modo === "vento") climaMapInstance.removeLayer(radarLayer);
-            else radarLayer.addTo(climaMapInstance);
+            if (!radarVisivel && climaMapInstance.hasLayer(radarLayer)) climaMapInstance.removeLayer(radarLayer);
+            else if (radarVisivel && !climaMapInstance.hasLayer(radarLayer)) radarLayer.addTo(climaMapInstance);
           }
-          if (modo === "chuva") climaMapInstance.removeLayer(ventoLayer);
-          else ventoLayer.addTo(climaMapInstance);
+          if (modo === "chuva" && climaMapInstance.hasLayer(ventoLayer)) climaMapInstance.removeLayer(ventoLayer);
+          else if (modo !== "chuva" && !climaMapInstance.hasLayer(ventoLayer)) ventoLayer.addTo(climaMapInstance);
+          if (modo === "vento") pararRadar();
         };
       });
     } catch (erro) {
@@ -27262,6 +27332,11 @@ ${servicosIniciaisLoja.length ? `
             </div>
           </div>
           <div id="climaMapa" class="clima-map" aria-label="Mapa interativo de chuva e vento em Carlópolis"></div>
+          <div class="clima-radar-controls" aria-label="Animação temporal do radar de chuva">
+            <button id="climaRadarPlay" type="button" disabled aria-label="Reproduzir animação do radar"><i class="fa-solid fa-play"></i><span>Reproduzir</span></button>
+            <input id="climaRadarTimeline" type="range" min="0" max="0" value="0" disabled aria-label="Escolher horário do radar">
+            <output id="climaRadarHorario" for="climaRadarTimeline">Carregando...</output>
+          </div>
           <div class="clima-map-footer">
             <span id="climaMapaStatus"><i class="fa-solid fa-spinner fa-spin"></i> Carregando radar e vento...</span>
             <div class="clima-map-legend"><span><i class="is-dry"></i>Sem chuva</span><span><i class="is-light"></i>Leve</span><span><i class="is-medium"></i>Moderada</span><span><i class="is-heavy"></i>Forte</span></div>
