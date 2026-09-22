@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v635.
+// Release do site v636.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -27016,33 +27016,185 @@ ${servicosIniciaisLoja.length ? `
   }
 
 
-  // === Clima diário (Open-Meteo) ===
-  // Retorna { tmax, tmin, wind, rainProb } para a data
+  // === Clima diário e condições atuais (Open-Meteo) ===
   async function buscarTempo(dateISO) {
     const { lat, lng } = COORDS_CARLOPOLIS;
     const base = "https://api.open-meteo.com/v1/forecast";
     const params = new URLSearchParams({
       latitude: lat,
       longitude: lng,
-      daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max",
+      current: "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,cloud_cover,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+      daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,uv_index_max,sunshine_duration",
+      hourly: "visibility",
       timezone: "America/Sao_Paulo",
       temperature_unit: "celsius",
       wind_speed_unit: "kmh",
       start_date: dateISO,
       end_date: dateISO
     });
-    const resp = await fetch(`${base}?${params.toString()}`);
+    const resp = await fetch(base + "?" + params.toString(), { cache: "no-store" });
     if (!resp.ok) throw new Error("Falha ao consultar clima");
     const j = await resp.json();
     if (!j?.daily) throw new Error("Resposta inválida (clima)");
 
-    const i = 0; // só 1 dia k
+    const i = 0;
+    const agora = Date.now();
+    const hourlyIndex = (j.hourly?.time || []).reduce((melhor, iso, index, lista) => {
+      if (!lista.length) return 0;
+      return Math.abs(new Date(iso).getTime() - agora) < Math.abs(new Date(lista[melhor]).getTime() - agora) ? index : melhor;
+    }, 0);
     return {
       tmax: j.daily.temperature_2m_max?.[i],
       tmin: j.daily.temperature_2m_min?.[i],
       wind: j.daily.wind_speed_10m_max?.[i],
-      rainProb: j.daily.precipitation_probability_max?.[i]
+      rainProb: j.daily.precipitation_probability_max?.[i],
+      rainTotal: j.daily.precipitation_sum?.[i],
+      uv: j.daily.uv_index_max?.[i],
+      sunshine: j.daily.sunshine_duration?.[i],
+      visibility: j.hourly?.visibility?.[hourlyIndex],
+      current: j.current || {}
     };
+  }
+
+  const WEATHER_CODES = {
+    0: ["Céu limpo", "fa-sun"], 1: ["Predomínio de sol", "fa-cloud-sun"],
+    2: ["Parcialmente nublado", "fa-cloud-sun"], 3: ["Nublado", "fa-cloud"],
+    45: ["Neblina", "fa-smog"], 48: ["Neblina com geada", "fa-smog"],
+    51: ["Garoa leve", "fa-cloud-rain"], 53: ["Garoa", "fa-cloud-rain"], 55: ["Garoa forte", "fa-cloud-showers-heavy"],
+    61: ["Chuva leve", "fa-cloud-rain"], 63: ["Chuva moderada", "fa-cloud-showers-heavy"], 65: ["Chuva forte", "fa-cloud-showers-heavy"],
+    80: ["Pancadas leves", "fa-cloud-rain"], 81: ["Pancadas de chuva", "fa-cloud-showers-heavy"], 82: ["Pancadas fortes", "fa-cloud-showers-heavy"],
+    95: ["Trovoadas", "fa-cloud-bolt"], 96: ["Trovoadas com granizo", "fa-cloud-bolt"], 99: ["Tempestade com granizo", "fa-cloud-bolt"]
+  };
+
+  function descricaoTempo(code) {
+    return WEATHER_CODES[Number(code)] || ["Condição variável", "fa-cloud-sun"];
+  }
+
+  function direcaoVento(graus) {
+    const pontos = ["N", "NE", "L", "SE", "S", "SO", "O", "NO"];
+    return pontos[Math.round((Number(graus) || 0) / 45) % 8];
+  }
+
+  function nivelUV(valor) {
+    const uv = Number(valor) || 0;
+    if (uv >= 11) return "Extremo";
+    if (uv >= 8) return "Muito alto";
+    if (uv >= 6) return "Alto";
+    if (uv >= 3) return "Moderado";
+    return "Baixo";
+  }
+
+  function recomendacaoClima(tempo) {
+    const atual = tempo.current || {};
+    if ((tempo.rainProb || 0) >= 60 || (tempo.rainTotal || 0) >= 5) return "Leve guarda-chuva e acompanhe o radar antes de sair.";
+    if ((atual.wind_gusts_10m || 0) >= 50) return "Atenção a rajadas fortes e objetos soltos.";
+    if ((tempo.uv || 0) >= 6) return "Use protetor solar, chapéu e evite exposição prolongada ao meio-dia.";
+    if ((atual.relative_humidity_2m || 100) <= 30) return "Umidade baixa: hidrate-se com frequência.";
+    return "Condições sem alerta relevante; confira as atualizações ao longo do dia.";
+  }
+
+  let climaMapInstance = null;
+  let climaMapLayers = null;
+
+  async function buscarMalhaClima() {
+    const offsets = [
+      [-.28, -.28], [-.28, 0], [-.28, .28],
+      [0, -.28], [0, 0], [0, .28],
+      [.28, -.28], [.28, 0], [.28, .28]
+    ];
+    const latitudes = offsets.map(([lat]) => (COORDS_CARLOPOLIS.lat + lat).toFixed(4)).join(",");
+    const longitudes = offsets.map(([, lng]) => (COORDS_CARLOPOLIS.lng + lng).toFixed(4)).join(",");
+    const params = new URLSearchParams({
+      latitude: latitudes,
+      longitude: longitudes,
+      current: "precipitation,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
+      wind_speed_unit: "kmh",
+      timezone: "America/Sao_Paulo",
+      forecast_days: "1"
+    });
+    const resposta = await fetch("https://api.open-meteo.com/v1/forecast?" + params.toString(), { cache: "no-store" });
+    if (!resposta.ok) throw new Error("Falha ao carregar a malha meteorológica");
+    const dados = await resposta.json();
+    return (Array.isArray(dados) ? dados : [dados]).map((item, index) => ({
+      lat: Number(item.latitude) || COORDS_CARLOPOLIS.lat + offsets[index][0],
+      lng: Number(item.longitude) || COORDS_CARLOPOLIS.lng + offsets[index][1],
+      ...item.current
+    }));
+  }
+
+  function corDaChuva(mm) {
+    if (mm >= 10) return "#7c3aed";
+    if (mm >= 5) return "#ef4444";
+    if (mm >= 1) return "#f59e0b";
+    if (mm > 0) return "#38bdf8";
+    return "#22c55e";
+  }
+
+  async function iniciarMapaClima() {
+    const mapaEl = document.getElementById("climaMapa");
+    const status = document.getElementById("climaMapaStatus");
+    if (!mapaEl || typeof L === "undefined") {
+      if (status) status.textContent = "Mapa indisponível neste dispositivo.";
+      return;
+    }
+    if (climaMapInstance) climaMapInstance.remove();
+    climaMapInstance = L.map(mapaEl, { zoomControl: true, scrollWheelZoom: false }).setView([COORDS_CARLOPOLIS.lat, COORDS_CARLOPOLIS.lng], 8);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18,
+      attribution: "&copy; OpenStreetMap"
+    }).addTo(climaMapInstance);
+
+    const ventoLayer = L.layerGroup().addTo(climaMapInstance);
+    let radarLayer = null;
+    climaMapLayers = { vento: ventoLayer, radar: null };
+
+    try {
+      const [malha, radarResposta] = await Promise.all([
+        buscarMalhaClima(),
+        fetch("https://api.rainviewer.com/public/weather-maps.json", { cache: "no-store" }).then((r) => r.ok ? r.json() : null).catch(() => null)
+      ]);
+
+      malha.forEach((ponto) => {
+        const chuva = Number(ponto.precipitation) || 0;
+        const vento = Math.round(Number(ponto.wind_speed_10m) || 0);
+        const direcao = Number(ponto.wind_direction_10m) || 0;
+        const cor = corDaChuva(chuva);
+        const html = '<div class="clima-map-marker" style="--marker-color:' + cor + ';--wind-angle:' + direcao + 'deg"><i class="fa-solid fa-arrow-up"></i><strong>' + vento + '</strong><small>' + chuva.toFixed(1) + ' mm</small></div>';
+        const icone = L.divIcon({ className: "clima-map-marker-wrap", html, iconSize: [66, 66], iconAnchor: [33, 33] });
+        const tooltip = "<strong>Vento " + vento + " km/h " + direcaoVento(direcao) + "</strong><br>Rajadas " + Math.round(ponto.wind_gusts_10m || 0) + " km/h<br>Chuva agora " + chuva.toFixed(1) + " mm";
+        L.marker([ponto.lat, ponto.lng], { icon: icone }).bindTooltip(tooltip, { direction: "top" }).addTo(ventoLayer);
+      });
+
+      const frames = radarResposta?.radar?.past || [];
+      const frame = frames[frames.length - 1];
+      if (frame?.path) {
+        radarLayer = L.tileLayer("https://tilecache.rainviewer.com" + frame.path + "/256/{z}/{x}/{y}/2/1_1.png", {
+          opacity: .62, maxNativeZoom: 7, attribution: "Radar RainViewer"
+        }).addTo(climaMapInstance);
+        climaMapLayers.radar = radarLayer;
+      }
+
+      const atualizado = malha[0]?.time ? new Date(malha[0].time).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "agora";
+      if (status) status.textContent = "Atualizado às " + atualizado + " • setas indicam a direção do vento; cores indicam chuva";
+      document.querySelectorAll("[data-clima-layer]").forEach((button) => {
+        button.disabled = false;
+        button.onclick = () => {
+          const modo = button.dataset.climaLayer;
+          document.querySelectorAll("[data-clima-layer]").forEach((item) => item.classList.toggle("is-active", item === button));
+          if (radarLayer) {
+            if (modo === "vento") climaMapInstance.removeLayer(radarLayer);
+            else radarLayer.addTo(climaMapInstance);
+          }
+          if (modo === "chuva") climaMapInstance.removeLayer(ventoLayer);
+          else ventoLayer.addTo(climaMapInstance);
+        };
+      });
+    } catch (erro) {
+      console.warn("Mapa do clima:", erro);
+      if (status) status.textContent = "Mapa-base disponível; dados meteorológicos temporariamente indisponíveis.";
+    }
+
+    setTimeout(() => climaMapInstance?.invalidateSize(), 80);
   }
 
 
@@ -27054,156 +27206,213 @@ ${servicosIniciaisLoja.length ? `
     const dataInicial = dateISO || hoje;
 
     area.innerHTML = `
-    <div class="page-header">
-      <h2 >🌞 Clima do Dia</h2>
-      <i class="fa-solid fa-share-nodes share-btn"
-         onclick="compartilharPagina('#climaDoDia','Nascer & Pôr do Sol','Veja o clima do Dia em Carlópolis')"></i>
-    </div>
-
-    <div class="sol-wrap">
-      <div class="sol-toolbar">
-        <label for="solData"><b>Escolha a data:</b></label>
-        <input id="solData" type="date" value="${dataInicial}">
-<!-- <button id="solAtualizar" class="btn-rank">Atualizar</button> -->
-      </div>
-
-       <div class="sol-card" style="margin-top:12px">
-  <div style="margin-bottom:10px"><b>☁️ Clima do dia em Carlópolis</b></div>
-  <div class="sol-row-4">
-  <div class="sol-box">
-      <h4>Temp. Mínima</h4>
-      <div class="time" id="wxMin">--°C</div>
-    </div>
-    <div class="sol-box">
-      <h4>Temp. Máxima</h4>
-      <div class="time" id="wxMax">--°C</div>
-    </div>
-    
-    <div class="sol-box">
-      <h4>Vento Máx</h4>
-      <div class="time" id="wxWind">-- km/h</div>
-    </div>
-    <div class="sol-box">
-      <h4>Prob. de Chuva</h4>
-      <div class="time" id="wxRain">--%</div>
-    </div>
-  </div>
-</div>
-
-      <div class="sol-card">
-        <div id="solStatus" style="margin-bottom:10px">⏳ Carregando horários...</div>
-        <div class="sol-row">
-          <div class="sol-box">
-            <h4>Nascer do Sol</h4>
-            <div class="time" id="solSunrise">--:--</div>
+      <section class="clima-page">
+        <header class="clima-hero">
+          <div class="clima-hero-copy">
+            <span class="clima-kicker"><i class="fa-solid fa-location-dot"></i> Carlópolis, Paraná</span>
+            <h1>Clima do Dia</h1>
+            <p>Condições atuais, chuva, vento e céu noturno em um só lugar.</p>
           </div>
-          <div class="sol-box">
-            <h4>Pôr do Sol</h4>
-            <div class="time" id="solSunset">--:--</div>
+          <div class="clima-hero-actions">
+            <label for="solData">Consultar data</label>
+            <div>
+              <input id="solData" type="date" value="${dataInicial}">
+              <button id="climaAtualizar" type="button" title="Atualizar dados atuais"><i class="fa-solid fa-rotate"></i><span>Atualizar</span></button>
+              <button type="button" class="clima-share" onclick="compartilharPagina('#climaDoDia','Clima do Dia','Veja o clima em Carlópolis')"><i class="fa-solid fa-share-nodes"></i></button>
+            </div>
           </div>
-          <div class="sol-box">
-            <h4>Meio-dia Solar</h4>
-            <div class="time" id="solNoon">--:--</div>
+        </header>
+
+        <div class="clima-current-card" aria-live="polite">
+          <div class="clima-current-main">
+            <div id="climaCurrentIcon" class="clima-current-icon"><i class="fa-solid fa-cloud-sun"></i></div>
+            <div>
+              <span id="climaCurrentTime">Condições atuais</span>
+              <strong id="climaCurrentTemp">--°</strong>
+              <p id="climaCurrentLabel">Carregando previsão...</p>
+            </div>
           </div>
-          <div class="sol-box">
-            <h4>Duração do dia</h4>
-            <div class="time" id="solDuracao">-</div>
+          <div class="clima-current-highlights">
+            <div><i class="fa-solid fa-temperature-half"></i><span>Sensação</span><strong id="wxFeels">--°C</strong></div>
+            <div><i class="fa-solid fa-droplet"></i><span>Umidade</span><strong id="wxHumidity">--%</strong></div>
+            <div><i class="fa-solid fa-wind"></i><span>Vento agora</span><strong id="wxWindNow">-- km/h</strong></div>
           </div>
         </div>
 
-       
-
-
-        <div style="margin-top:12px; font-size:13px; opacity:.85">
-          <span>📍 Coordenadas: ${COORDS_CARLOPOLIS.lat.toFixed(4)}, ${COORDS_CARLOPOLIS.lng.toFixed(4)}</span>
+        <div class="clima-metrics-grid">
+          <article><i class="fa-solid fa-temperature-arrow-down"></i><span>Mínima</span><strong id="wxMin">--°C</strong></article>
+          <article><i class="fa-solid fa-temperature-arrow-up"></i><span>Máxima</span><strong id="wxMax">--°C</strong></article>
+          <article><i class="fa-solid fa-cloud-rain"></i><span>Chance de chuva</span><strong id="wxRain">--%</strong><small id="wxRainTotal">-- mm previstos</small></article>
+          <article><i class="fa-solid fa-wind"></i><span>Rajadas</span><strong id="wxGust">-- km/h</strong><small id="wxWindDir">Direção --</small></article>
+          <article><i class="fa-solid fa-sun"></i><span>Índice UV</span><strong id="wxUv">--</strong><small id="wxUvLabel">--</small></article>
+          <article><i class="fa-solid fa-cloud"></i><span>Nebulosidade</span><strong id="wxCloud">--%</strong></article>
+          <article><i class="fa-solid fa-eye"></i><span>Visibilidade</span><strong id="wxVisibility">-- km</strong></article>
+          <article><i class="fa-solid fa-gauge-high"></i><span>Pressão</span><strong id="wxPressure">-- hPa</strong></article>
         </div>
 
-      </div>
-    </div>
-  `
+        <aside class="clima-advice"><i class="fa-solid fa-circle-info"></i><div><strong>Recomendação do dia</strong><span id="climaAdvice">Analisando as condições...</span></div></aside>
 
+        <section class="clima-panel clima-map-panel">
+          <div class="clima-section-heading">
+            <div><span>Monitoramento regional</span><h2>Chuva + vento em tempo real</h2><p>Combine o radar observado com a direção e intensidade do vento na região.</p></div>
+            <div class="clima-layer-switch" aria-label="Camadas do mapa">
+              <button type="button" data-clima-layer="ambos" class="is-active" disabled>Ambos</button>
+              <button type="button" data-clima-layer="chuva" disabled>Chuva</button>
+              <button type="button" data-clima-layer="vento" disabled>Vento</button>
+            </div>
+          </div>
+          <div id="climaMapa" class="clima-map" aria-label="Mapa interativo de chuva e vento em Carlópolis"></div>
+          <div class="clima-map-footer">
+            <span id="climaMapaStatus"><i class="fa-solid fa-spinner fa-spin"></i> Carregando radar e vento...</span>
+            <div class="clima-map-legend"><span><i class="is-dry"></i>Sem chuva</span><span><i class="is-light"></i>Leve</span><span><i class="is-medium"></i>Moderada</span><span><i class="is-heavy"></i>Forte</span></div>
+          </div>
+        </section>
 
+        <div class="clima-sky-grid">
+          <section class="clima-panel clima-moon-card">
+            <div class="clima-section-heading"><div><span>Céu noturno</span><h2>Lua de hoje</h2></div></div>
+            <div class="clima-moon-content">
+              <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
+              <div class="clima-moon-copy">
+                <strong id="lua-fase">Carregando fase...</strong>
+                <p id="lua-iluminacao">Iluminação aproximada: --</p>
+                <div class="clima-moon-facts">
+                  <span><small>Idade lunar</small><b id="lua-idade">-- dias</b></span>
+                  <span><small>Próximo marco</small><b id="lua-proxima">--</b></span>
+                  <span><small>Como observar</small><b id="lua-orientacao">--</b></span>
+                </div>
+              </div>
+            </div>
+          </section>
 
+          <section class="clima-panel clima-sun-card">
+            <div class="clima-section-heading"><div><span>Luz do dia</span><h2>Sol e claridade</h2></div></div>
+            <div id="solStatus" class="clima-loading-line">Carregando horários...</div>
+            <div class="clima-sun-times">
+              <div><i class="fa-solid fa-sun"></i><span>Nascer</span><strong id="solSunrise">--:--</strong></div>
+              <div><i class="fa-solid fa-cloud-sun"></i><span>Pôr do sol</span><strong id="solSunset">--:--</strong></div>
+              <div><i class="fa-regular fa-clock"></i><span>Meio-dia solar</span><strong id="solNoon">--:--</strong></div>
+              <div><i class="fa-solid fa-hourglass-half"></i><span>Duração</span><strong id="solDuracao">--</strong></div>
+            </div>
+          </section>
+        </div>
 
+        <section class="clima-panel clima-meteor-card">
+          <div class="clima-meteor-icon"><i class="fa-solid fa-meteor"></i></div>
+          <div class="clima-meteor-main">
+            <span>Guia de observação</span>
+            <h2>Chance de ver meteoros</h2>
+            <div class="clima-meter"><span id="meteor-meter-bar"></span></div>
+            <strong id="meteor-prob">Calculando visibilidade...</strong>
+            <p id="meteor-det">A estimativa considera atividade da chuva de meteoros, Lua e nebulosidade.</p>
+          </div>
+          <div class="clima-look-card">
+            <i id="meteor-compass" class="fa-regular fa-compass"></i>
+            <div><small>Para onde olhar</small><strong id="meteor-direcao">Região mais escura do céu</strong><span id="meteor-horario">Depois da meia-noite</span></div>
+          </div>
+        </section>
 
+        <footer class="clima-source-note">
+          <i class="fa-solid fa-database"></i>
+          <span>Previsão e vento: Open-Meteo • Radar: RainViewer • Mapa: OpenStreetMap. Dados meteorológicos são estimativas e podem mudar rapidamente.</span>
+        </footer>
+      </section>
+    `;
 
-    // após area.innerHTML = `...` em mostrarSol()
-    const luaCard = document.createElement("div");
-    luaCard.className = "lua-card";
-    luaCard.innerHTML = `
-  <div id="lua-desenho" class="lua-img" aria-hidden="true"></div>
-  <p id="lua-fase" class="lua-fase">Carregando fase da Lua...</p>
-  <p id="lua-iluminacao" class="lua-iluminacao"></p>
-  <hr style="border-color:#223;opacity:.35;margin:10px 0">
-  <div style="font-weight:700;margin-bottom:6px;">🌠 Meteoros</div>
-  <p id="meteor-prob" class="lua-fase">Calculando...</p>
-  <p id="meteor-det" class="lua-iluminacao"></p>
-`;
+    function atualizarCeu(dateStr, nebulosidade = 0) {
+      const dataLua = new Date(dateStr + "T12:00:00");
+      const fase = obterFaseLua(dataLua);
+      const iluminacao = iluminacaoPctDaFracao(fase.fraction);
+      const idade = fase.fraction * 29.530588861;
+      const ateMarco = fase.fraction < .5 ? (.5 - fase.fraction) * 29.530588861 : (1 - fase.fraction) * 29.530588861;
+      const marco = fase.fraction < .5 ? "Lua cheia" : "Lua nova";
+      const orientacao = fase.waxing ? "Procure a Lua a oeste após o pôr do sol" : "Observe a leste no fim da noite";
 
-    (area.querySelector(".sol-wrap") || area).appendChild(luaCard);
+      area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
+      area.querySelector("#lua-fase").textContent = rotuloFaseParaExibicao(fase.fraction, fase.name);
+      area.querySelector("#lua-iluminacao").textContent = "Iluminação aproximada: " + iluminacao + "%";
+      area.querySelector("#lua-idade").textContent = idade.toFixed(1) + " dias";
+      area.querySelector("#lua-proxima").textContent = marco + " em " + Math.max(1, Math.round(ateMarco)) + " dia(s)";
+      area.querySelector("#lua-orientacao").textContent = orientacao;
 
-    const fase = obterFaseLua(new Date());
-    const iluminacaoPct = Math.round((1 - Math.cos(2 * Math.PI * fase.fraction)) * 50);
+      const meteoros = calcularProbMeteoros(dataLua, fase.fraction, nebulosidade);
+      area.querySelector("#meteor-prob").textContent = meteoros.classe + " • índice de visibilidade " + meteoros.score + "/100";
+      area.querySelector("#meteor-det").textContent = meteoros.detalhe;
+      area.querySelector("#meteor-direcao").textContent = meteoros.direcao;
+      area.querySelector("#meteor-horario").textContent = meteoros.horario;
+      area.querySelector("#meteor-meter-bar").style.width = meteoros.score + "%";
+      area.querySelector("#meteor-compass").style.transform = "rotate(" + meteoros.azimute + "deg)";
+    }
 
-    area.querySelector("#lua-desenho").innerHTML = svgLua(fase.fraction, fase.waxing);
-    area.querySelector("#lua-fase").textContent = `Fase: ${rotuloFaseParaExibicao(fase.fraction, fase.name)}`;
-    area.querySelector("#lua-iluminacao").textContent = `Iluminação aproximada: ${iluminacaoPct}%`;
-
-    const met0 = calcularProbMeteoros(new Date(), fase.fraction);
-    area.querySelector("#meteor-prob").textContent = `Probabilidade: ${met0.classe} (${met0.score}%)`;
-    area.querySelector("#meteor-det").textContent = met0.detalhe + " • Obs.: sem nuvens/seeing";
-
-
-    // função interna para carregar/atualizar
-    // Dentro de mostrarSol(...), na função interna carregar(dateStr)
     async function carregar(dateStr) {
-      const st = document.getElementById("solStatus");
-      try {
-        st.textContent = "⏳ Carregando horários...";
-        const res = await buscarSol(dateStr);
-        document.getElementById("solSunrise").textContent = toHoraMinBR(res.sunrise);
-        document.getElementById("solSunset").textContent = toHoraMinBR(res.sunset);
-        document.getElementById("solNoon").textContent = toHoraMinBR(res.solar_noon);
-        document.getElementById("solDuracao").textContent = duracaoHumana(res.day_length);
+      const status = area.querySelector("#solStatus");
+      status.textContent = "Carregando horários...";
+      atualizarCeu(dateStr, 0);
 
-        const tempo = await buscarTempo(dateStr);
-        document.getElementById("wxMax").textContent = (tempo.tmax ?? "--") + "°C";
-        document.getElementById("wxMin").textContent = (tempo.tmin ?? "--") + "°C";
-        document.getElementById("wxWind").textContent = (tempo.wind ?? "--") + " km/h";
-        document.getElementById("wxRain").textContent = (tempo.rainProb ?? "--") + "%";
+      const [solResult, tempoResult] = await Promise.allSettled([buscarSol(dateStr), buscarTempo(dateStr)]);
 
-        // === Lua na DATA SELECIONADA ===
-        const dataLua = new Date(dateStr + "T12:00:00"); // meio-dia evita trocas por fuso
-        const f = obterFaseLua(dataLua);
-        const iluminacaoPctLua = Math.round((1 - Math.cos(2 * Math.PI * f.fraction)) * 50);
+      if (solResult.status === "fulfilled") {
+        const sol = solResult.value;
+        area.querySelector("#solSunrise").textContent = toHoraMinBR(sol.sunrise);
+        area.querySelector("#solSunset").textContent = toHoraMinBR(sol.sunset);
+        area.querySelector("#solNoon").textContent = toHoraMinBR(sol.solar_noon);
+        area.querySelector("#solDuracao").textContent = duracaoHumana(sol.day_length);
+        status.textContent = "Horários calculados para Carlópolis";
+      } else {
+        status.textContent = "Horários do Sol indisponíveis no momento.";
+      }
 
-        const slotLua = document.querySelector("#lua-desenho");
-        if (slotLua) slotLua.innerHTML = svgLua(f.fraction, f.waxing);
+      if (tempoResult.status === "fulfilled") {
+        const tempo = tempoResult.value;
+        const atual = tempo.current || {};
+        const [descricao, icone] = descricaoTempo(atual.weather_code);
+        const visibilidadeKm = Number.isFinite(Number(tempo.visibility)) ? (Number(tempo.visibility) / 1000).toFixed(1) : "--";
 
-        const lblFase = document.querySelector("#lua-fase");
-        const lblIlum = document.querySelector("#lua-iluminacao");
-        if (lblFase) lblFase.textContent = `Fase: ${rotuloFaseParaExibicao(f.fraction, f.name)}`;
-        if (lblIlum) lblIlum.textContent = `Iluminação aproximada: ${iluminacaoPctLua}%`;
-      } catch (e) {
-        st.textContent = "⚠️ Não foi possível carregar os dados.";
+        area.querySelector("#climaCurrentIcon").innerHTML = '<i class="fa-solid ' + icone + '"></i>';
+        area.querySelector("#climaCurrentTemp").textContent = (atual.temperature_2m ?? "--") + "°";
+        area.querySelector("#climaCurrentLabel").textContent = descricao;
+        area.querySelector("#climaCurrentTime").textContent = dateStr === hoje ? "Agora em Carlópolis" : "Previsão para " + new Date(dateStr + "T12:00:00").toLocaleDateString("pt-BR");
+        area.querySelector("#wxFeels").textContent = (atual.apparent_temperature ?? "--") + "°C";
+        area.querySelector("#wxHumidity").textContent = (atual.relative_humidity_2m ?? "--") + "%";
+        area.querySelector("#wxWindNow").textContent = (atual.wind_speed_10m ?? "--") + " km/h";
+        area.querySelector("#wxMin").textContent = (tempo.tmin ?? "--") + "°C";
+        area.querySelector("#wxMax").textContent = (tempo.tmax ?? "--") + "°C";
+        area.querySelector("#wxRain").textContent = (tempo.rainProb ?? "--") + "%";
+        area.querySelector("#wxRainTotal").textContent = (tempo.rainTotal ?? "--") + " mm previstos";
+        area.querySelector("#wxGust").textContent = (atual.wind_gusts_10m ?? tempo.wind ?? "--") + " km/h";
+        area.querySelector("#wxWindDir").textContent = "Direção " + direcaoVento(atual.wind_direction_10m);
+        area.querySelector("#wxUv").textContent = tempo.uv ?? "--";
+        area.querySelector("#wxUvLabel").textContent = nivelUV(tempo.uv);
+        area.querySelector("#wxCloud").textContent = (atual.cloud_cover ?? "--") + "%";
+        area.querySelector("#wxVisibility").textContent = visibilidadeKm + " km";
+        area.querySelector("#wxPressure").textContent = atual.surface_pressure ? Math.round(atual.surface_pressure) + " hPa" : "--";
+        area.querySelector("#climaAdvice").textContent = recomendacaoClima(tempo);
+        atualizarCeu(dateStr, Number(atual.cloud_cover) || 0);
+      } else {
+        area.querySelector("#climaCurrentLabel").textContent = "Não foi possível carregar a previsão.";
       }
     }
 
+    const inputData = area.querySelector("#solData");
+    inputData?.addEventListener("change", () => carregar(inputData.value || hoje));
+    area.querySelector("#climaAtualizar")?.addEventListener("click", () => {
+      carregar(inputData.value || hoje);
+      iniciarMapaClima();
+    });
 
-
-
-
-    // listeners
-    const inp = document.getElementById("solData");
-    const btn = document.getElementById("solAtualizar");
-    if (btn) btn.addEventListener("click", () => carregar(inp.value || hoje));
-    if (inp) inp.addEventListener("change", () => carregar(inp.value || hoje));
-
-    // carrega inicial
     carregar(dataInicial);
+    iniciarMapaClima();
   }
 
 
+
+
+  function renderizarRotaClima() {
+    if (location.hash === "#climaDoDia" && !document.querySelector(".clima-page")) mostrarSol();
+  }
+
+  window.addEventListener("hashchange", renderizarRotaClima);
+  setTimeout(renderizarRotaClima, 0);
 
 
   //// inicio validador nome imoveis
@@ -29037,64 +29246,52 @@ function rotuloFaseParaExibicao(fraction, nomeBasico) {
 // === SVG da Lua com CLIP correto e orientação do hemisfério Sul ===
 // 3) Desenho SVG com clip correto e orientação do hemisfério sul
 function svgLua(fraction, waxing) {
-  // % de iluminação física: p = (1 - cos(2πf)) / 2  →  0..1
   const p = (1 - Math.cos(2 * Math.PI * fraction)) / 2;
+  const uid = "lua-" + Math.round(fraction * 10000);
+  const shadowOffset = (waxing ? 1 : -1) * (1 - (2 * p)) * 92;
+  const aria = p < .04 ? "Lua nova" : p > .96 ? "Lua cheia" : "Lua parcialmente iluminada";
 
-  const R = 60, cx = 70, cy = 70;
-
-  const isNova = p <= 0.02;
-  const isCheia = p >= 0.98;
-
-  const baseDark = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#0c0f1a"/>`;
-  const grad = `
+  return `<svg viewBox="0 0 220 220" role="img" aria-label="${aria}" class="moon-realistic">
     <defs>
-      <radialGradient id="g" cx="50%" cy="45%">
-        <stop offset="0%"  stop-color="#e8e8ea"/>
-        <stop offset="70%" stop-color="#cfcfd4"/>
-        <stop offset="100%" stop-color="#bdbdc4"/>
+      <radialGradient id="${uid}-surface" cx="38%" cy="32%">
+        <stop offset="0%" stop-color="#fffdf0"/>
+        <stop offset="48%" stop-color="#e8e5d7"/>
+        <stop offset="82%" stop-color="#b9b8b2"/>
+        <stop offset="100%" stop-color="#777b86"/>
       </radialGradient>
-    </defs>`;
-
-  if (isNova) {
-    return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Nova">
-      ${baseDark}
-    </svg>`;
-  }
-
-  if (isCheia) {
-    return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Lua Cheia">
-      ${grad}
-      <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)"/>
-      <circle cx="${cx - 20}" cy="${cy - 20}" r="${R * 0.15}" fill="#ffffff20"/>
-    </svg>`;
-  }
-
-  // deslocamento do "círculo de sombra" proporcional à iluminação:
-  // dx = (1 - 2p) * R  →  p=0.5 (meia-lua) dá dx=0, p→1 aproxima dx→-R, p→0 aproxima dx→+R
-  const dxMag = (1 - 2 * p) * R;
-  // Hemisfério Sul: crescente (waxing) = luz à ESQUERDA, minguante = luz à DIREITA
-  const dx = (waxing ? +1 : -1) * dxMag;
-
-  // Máscara: começa tudo visível (retângulo branco + círculo branco),
-  // e “recorta” a parte escura com um círculo preto deslocado por dx.
-  return `<svg viewBox="0 0 140 140" width="140" height="140" role="img" aria-label="Fase da Lua">
-    ${grad}
-    <defs>
-      <mask id="m">
-        <rect x="0" y="0" width="140" height="140" fill="black"/>
-        <circle cx="${cx}" cy="${cy}" r="${R}" fill="white"/>
-        <circle cx="${cx + dx}" cy="${cy}" r="${R}" fill="black"/>
+      <radialGradient id="${uid}-earthshine" cx="36%" cy="34%">
+        <stop offset="0%" stop-color="#43506a"/>
+        <stop offset="75%" stop-color="#172033"/>
+        <stop offset="100%" stop-color="#070b14"/>
+      </radialGradient>
+      <filter id="${uid}-glow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="9"/>
+      </filter>
+      <clipPath id="${uid}-clip"><circle cx="110" cy="110" r="83"/></clipPath>
+      <mask id="${uid}-phase">
+        <rect width="220" height="220" fill="black"/>
+        <circle cx="110" cy="110" r="83" fill="white"/>
+        <circle cx="${110 + shadowOffset}" cy="110" r="83" fill="black"/>
       </mask>
     </defs>
-    ${baseDark}
-    <circle cx="${cx}" cy="${cy}" r="${R}" fill="url(#g)" mask="url(#m)"/>
+    <circle cx="110" cy="110" r="88" fill="#dce8ff" opacity="${.08 + p * .28}" filter="url(#${uid}-glow)"/>
+    <circle cx="110" cy="110" r="83" fill="url(#${uid}-earthshine)"/>
+    <g clip-path="url(#${uid}-clip)" mask="url(#${uid}-phase)">
+      <circle cx="110" cy="110" r="83" fill="url(#${uid}-surface)"/>
+      <g fill="#777a79" opacity=".32">
+        <circle cx="75" cy="76" r="17"/><circle cx="139" cy="63" r="11"/>
+        <circle cx="149" cy="119" r="19"/><circle cx="92" cy="137" r="13"/>
+        <circle cx="61" cy="122" r="8"/><circle cx="126" cy="157" r="9"/>
+      </g>
+      <g fill="none" stroke="#f7f3e6" stroke-width="3" opacity=".24">
+        <circle cx="75" cy="76" r="13"/><circle cx="149" cy="119" r="14"/>
+        <circle cx="92" cy="137" r="9"/><circle cx="139" cy="63" r="7"/>
+      </g>
+      <path d="M45 104c22-9 35-6 50 2s30 4 44-5 27-7 39 1" fill="none" stroke="#6f7273" stroke-width="7" opacity=".16"/>
+    </g>
+    <circle cx="110" cy="110" r="83" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
   </svg>`;
 }
-
-
-
-
-// === Utilitários: iluminação percentual e janelinhas de pico
 function iluminacaoPctDaFracao(frac) {
   // 0..1 -> 0..100 (simétrica em torno da Cheia)
   return Math.round(frac <= 0.5 ? frac * 2 * 100 : (1 - frac) * 2 * 100);
@@ -29111,18 +29308,17 @@ function rotuloFaseParaExibicao(fraction, nomeBase) {
 
 // Tabela mínima de chuvas de meteoros (valores típicos de ZHR; aproximação)
 const CHUVAS_METEOROS = [
-  { nome: "Quadrântidas", inicio: "01-01", pico: "01-03", fim: "01-05", zhr: 110, hemisferio: "N" },
-  { nome: "Líridas", inicio: "04-14", pico: "04-22", fim: "04-30", zhr: 18, hemisferio: "N" },
-  { nome: "Eta Aquáridas", inicio: "04-19", pico: "05-05", fim: "05-28", zhr: 50, hemisferio: "S" },
-  { nome: "Delta Aquáridas", inicio: "07-12", pico: "07-29", fim: "08-23", zhr: 20, hemisferio: "S" },
-  { nome: "Perseidas", inicio: "07-17", pico: "08-12", fim: "08-24", zhr: 100, hemisferio: "N" },
-  { nome: "Oriônidas", inicio: "10-02", pico: "10-21", fim: "11-07", zhr: 20, hemisferio: "ambos" },
-  { nome: "Taurídeas", inicio: "10-20", pico: "11-05", fim: "11-20", zhr: 10, hemisferio: "ambos" },
-  { nome: "Leônidas", inicio: "11-06", pico: "11-17", fim: "11-30", zhr: 15, hemisferio: "N" },
-  { nome: "Geminidas", inicio: "12-04", pico: "12-14", fim: "12-17", zhr: 120, hemisferio: "ambos" },
+  { nome: "Quadrântidas", inicio: "01-01", pico: "01-03", fim: "01-05", zhr: 110, hemisferio: "N", direcao: "Nordeste, próximo ao horizonte", horario: "Das 2h até o amanhecer", azimute: 35 },
+  { nome: "Líridas", inicio: "04-14", pico: "04-22", fim: "04-30", zhr: 18, hemisferio: "N", direcao: "Nordeste, na região de Lira", horario: "Depois da meia-noite", azimute: 45 },
+  { nome: "Eta Aquáridas", inicio: "04-19", pico: "05-05", fim: "05-28", zhr: 50, hemisferio: "S", direcao: "Leste, acima do horizonte", horario: "Das 3h até o amanhecer", azimute: 90 },
+  { nome: "Delta Aquáridas", inicio: "07-12", pico: "07-29", fim: "08-23", zhr: 20, hemisferio: "S", direcao: "Nordeste, em direção a Aquário", horario: "Da meia-noite às 4h", azimute: 55 },
+  { nome: "Perseidas", inicio: "07-17", pico: "08-12", fim: "08-24", zhr: 100, hemisferio: "N", direcao: "Norte a nordeste, baixo no céu", horario: "Antes do amanhecer", azimute: 20 },
+  { nome: "Épsilon Perseidas", inicio: "09-05", pico: "09-09", fim: "09-21", zhr: 5, hemisferio: "N", direcao: "Nordeste, baixo no horizonte", horario: "Depois das 23h", azimute: 35 },
+  { nome: "Taurídeas do Sul", inicio: "09-10", pico: "11-05", fim: "11-20", zhr: 7, hemisferio: "ambos", direcao: "Leste a nordeste, acompanhando Touro", horario: "Das 22h às 3h", azimute: 70 },
+  { nome: "Oriônidas", inicio: "10-02", pico: "10-21", fim: "11-07", zhr: 20, hemisferio: "ambos", direcao: "Leste, na região de Órion", horario: "Da meia-noite ao amanhecer", azimute: 90 },
+  { nome: "Leônidas", inicio: "11-06", pico: "11-17", fim: "11-30", zhr: 15, hemisferio: "N", direcao: "Nordeste, próximo a Leão", horario: "Depois das 2h", azimute: 45 },
+  { nome: "Gemínidas", inicio: "12-04", pico: "12-14", fim: "12-17", zhr: 120, hemisferio: "ambos", direcao: "Nordeste, na região de Gêmeos", horario: "A partir das 22h", azimute: 50 }
 ];
-
-// Carlópolis ~ Hemisfério Sul: penaliza levemente chuvas do Norte, e favorece as do Sul
 function fatorHemisphere(chuva) {
   if (chuva.hemisferio === "ambos") return 1.0;
   if (chuva.hemisferio === "S") return 1.0;
@@ -29150,44 +29346,50 @@ function fatorProximidadeDaData(date, chuva) {
 }
 
 // Calcula um “score” 0–100 baseado em (ZHR normalizada) × (céu escuro) × (hemisfério) × (proximidade do pico)
-function calcularProbMeteoros(date, fracLua) {
-  const ilum = iluminacaoPctDaFracao(fracLua) / 100; // 0..1
-  const ceuEscuro = 1 - ilum;                        // 1 = escuro, 0 = claro (lua cheia)
-  let melhor = { score: 0, detalhe: "Sem chuvas relevantes hoje." };
+function calcularProbMeteoros(date, fracLua, nebulosidade = 0) {
+  const iluminacao = iluminacaoPctDaFracao(fracLua) / 100;
+  const ceuEscuro = Math.max(.08, 1 - (iluminacao * .82));
+  const ceuLimpo = Math.max(.05, 1 - (Math.max(0, Math.min(100, nebulosidade)) / 100));
+  let melhor = null;
 
   for (const chuva of CHUVAS_METEOROS) {
-    const prox = fatorProximidadeDaData(date, chuva);
-    if (prox <= 0) continue;
+    const proximidade = fatorProximidadeDaData(date, chuva);
+    if (proximidade <= 0) continue;
 
-    const hemis = fatorHemisphere(chuva);
-    const zhrNorm = Math.min(1, chuva.zhr / 120); // 120 ~ Gemínidas como base alta
-    const score = Math.round(100 * zhrNorm * ceuEscuro * hemis * prox);
-
-    if (score > melhor.score) {
-      melhor = {
-        score,
-        detalhe: `${chuva.nome} • pico: ${chuva.pico} • céu: ${Math.round(ceuEscuro * 100)}% escuro`
-      };
-    }
+    const hemisferio = fatorHemisphere(chuva);
+    const atividade = Math.min(1, chuva.zhr / 120);
+    const score = Math.round(100 * (.12 + (.88 * atividade)) * ceuEscuro * ceuLimpo * hemisferio * proximidade);
+    if (!melhor || score > melhor.score) melhor = { ...chuva, score };
   }
 
-  // Classificação textual
-  let classe = "Baixa";
-  if (melhor.score >= 65) classe = "Alta";
-  else if (melhor.score >= 35) classe = "Média";
+  if (!melhor) {
+    const scoreEsporadico = Math.round(8 * ceuEscuro * ceuLimpo);
+    return {
+      score: scoreEsporadico,
+      classe: "Muito baixa",
+      detalhe: "Nenhuma chuva de meteoros importante está ativa. Ainda podem surgir meteoros esporádicos; procure um local escuro e aguarde pelo menos 20 minutos para os olhos se adaptarem.",
+      direcao: "Todo o céu, longe das luzes da cidade",
+      horario: "Preferencialmente entre 0h e 4h",
+      azimute: 0
+    };
+  }
 
-  return { score: melhor.score, classe, detalhe: melhor.detalhe };
+  let classe = "Muito baixa";
+  if (melhor.score >= 60) classe = "Alta";
+  else if (melhor.score >= 30) classe = "Moderada";
+  else if (melhor.score >= 12) classe = "Baixa";
+
+  const [mes, dia] = melhor.pico.split("-");
+  const bloqueioNuvens = nebulosidade >= 70 ? " Muitas nuvens podem impedir a observação." : "";
+  return {
+    score: melhor.score,
+    classe,
+    detalhe: melhor.nome + " ativa • pico em " + dia + "/" + mes + " • Lua " + Math.round(iluminacao * 100) + "% iluminada • céu " + Math.round(ceuLimpo * 100) + "% livre." + bloqueioNuvens + " O índice é uma estimativa de visibilidade, não uma probabilidade matemática.",
+    direcao: melhor.direcao,
+    horario: melhor.horario,
+    azimute: melhor.azimute
+  };
 }
-
-
-
-
-
-
-
-
-
-// Função para carregar dados da represa (simulação - você pode integrar com API real)
 async function carregarDadosRepresa() {
   const btn = document.querySelector('.btn-refresh');
   const original = btn ? btn.innerHTML : null;
