@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v637.
+// Release do site v638.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -27178,11 +27178,21 @@ ${servicosIniciaisLoja.length ? `
       ].filter((frame) => frame?.path);
       const radarHost = radarResposta?.host || "https://tilecache.rainviewer.com";
       const radarLayers = frames.map((frame) => L.tileLayer(radarHost + frame.path + "/256/{z}/{x}/{y}/2/1_1.png", {
-        opacity: .62,
+        opacity: 0,
         maxNativeZoom: 7,
+        className: "clima-radar-frame",
         attribution: "Radar RainViewer"
       }));
+      const RADAR_OPACITY = .62;
       let radarFrameIndex = Math.max(0, frames.length - 1);
+
+      function atualizarCamadasRadar() {
+        radarLayers.forEach((layer, index) => {
+          layer.setOpacity(radarVisivel && index === radarFrameIndex ? RADAR_OPACITY : 0);
+        });
+        radarLayer = radarLayers[radarFrameIndex] || null;
+        climaMapLayers.radar = radarLayer;
+      }
 
       function pararRadar() {
         if (climaRadarTimer) clearInterval(climaRadarTimer);
@@ -27197,10 +27207,7 @@ ${servicosIniciaisLoja.length ? `
       function mostrarQuadroRadar(index) {
         if (!frames.length) return;
         radarFrameIndex = (index + frames.length) % frames.length;
-        if (radarLayer && climaMapInstance.hasLayer(radarLayer)) climaMapInstance.removeLayer(radarLayer);
-        radarLayer = radarLayers[radarFrameIndex];
-        climaMapLayers.radar = radarLayer;
-        if (radarVisivel) radarLayer.addTo(climaMapInstance);
+        atualizarCamadasRadar();
         if (radarTimeline) radarTimeline.value = String(radarFrameIndex);
         if (radarHorario) {
           const instante = new Date(Number(frames[radarFrameIndex].time) * 1000);
@@ -27209,7 +27216,7 @@ ${servicosIniciaisLoja.length ? `
       }
 
       function reproduzirRadar() {
-        if (frames.length < 2 || climaRadarTimer) return;
+        if (frames.length < 2 || climaRadarTimer || !radarVisivel) return;
         if (radarFrameIndex >= frames.length - 1) mostrarQuadroRadar(0);
         if (radarPlay) {
           radarPlay.classList.add("is-playing");
@@ -27225,23 +27232,36 @@ ${servicosIniciaisLoja.length ? `
       if (frames.length) {
         if (radarTimeline) {
           radarTimeline.max = String(frames.length - 1);
-          radarTimeline.disabled = frames.length < 2;
+          radarTimeline.disabled = true;
           radarTimeline.oninput = () => {
             pararRadar();
             mostrarQuadroRadar(Number(radarTimeline.value));
           };
         }
         if (radarPlay) {
-          radarPlay.disabled = frames.length < 2;
+          radarPlay.disabled = true;
           radarPlay.onclick = () => climaRadarTimer ? pararRadar() : reproduzirRadar();
         }
+
+        const carregamentosRadar = radarLayers.map((layer, index) => new Promise((resolve) => {
+          layer.once("load", resolve);
+          layer.setZIndex(200 + index);
+          layer.addTo(climaMapInstance);
+        }));
         mostrarQuadroRadar(radarFrameIndex);
+        if (status) status.textContent = "Preparando animação contínua do radar...";
+
+        await Promise.all(carregamentosRadar);
+        if (!mapaEl.isConnected) return;
+        if (radarTimeline) radarTimeline.disabled = frames.length < 2;
+        if (radarPlay) radarPlay.disabled = frames.length < 2;
         if (frames.length > 1) reproduzirRadar();
       } else {
         if (radarHorario) radarHorario.textContent = "Radar indisponível";
         if (radarPlay) radarPlay.disabled = true;
         if (radarTimeline) radarTimeline.disabled = true;
       }
+
       const atualizado = malha[0]?.time ? new Date(malha[0].time).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) : "agora";
       if (status) status.textContent = "Atualizado às " + atualizado + " • setas indicam a direção do vento; cores indicam chuva";
       document.querySelectorAll("[data-clima-layer]").forEach((button) => {
@@ -27250,10 +27270,9 @@ ${servicosIniciaisLoja.length ? `
           const modo = button.dataset.climaLayer;
           document.querySelectorAll("[data-clima-layer]").forEach((item) => item.classList.toggle("is-active", item === button));
           radarVisivel = modo !== "vento";
-          if (radarLayer) {
-            if (!radarVisivel && climaMapInstance.hasLayer(radarLayer)) climaMapInstance.removeLayer(radarLayer);
-            else if (radarVisivel && !climaMapInstance.hasLayer(radarLayer)) radarLayer.addTo(climaMapInstance);
-          }
+          atualizarCamadasRadar();
+          if (radarPlay) radarPlay.disabled = !radarVisivel || frames.length < 2;
+          if (radarTimeline) radarTimeline.disabled = !radarVisivel || frames.length < 2;
           if (modo === "chuva" && climaMapInstance.hasLayer(ventoLayer)) climaMapInstance.removeLayer(ventoLayer);
           else if (modo !== "chuva" && !climaMapInstance.hasLayer(ventoLayer)) ventoLayer.addTo(climaMapInstance);
           if (modo === "vento") pararRadar();

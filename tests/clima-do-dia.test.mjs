@@ -30,6 +30,11 @@ test("radar de chuva anima a sequência temporal e oferece controles", () => {
   assert.match(site, /id="climaRadarHorario"/);
   assert.match(css, /\.clima-radar-controls \{/);
   assert.match(site, /climaRadarTimer = setInterval/);
+  assert.match(site, /const carregamentosRadar = radarLayers\.map/);
+  assert.match(site, /await Promise\.all\(carregamentosRadar\)/);
+  assert.match(site, /layer\.setOpacity\(radarVisivel && index === radarFrameIndex/);
+  assert.doesNotMatch(site, /climaMapInstance\.removeLayer\(radarLayer\)/);
+  assert.match(css, /\.clima-map \.clima-radar-frame \{ transition: opacity/);
 });
 test("painel lunar e guia de meteoros consideram condições de observação", () => {
   assert.match(site, /class="moon-realistic"/);
@@ -41,14 +46,14 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 });
 
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v637/);
-  assert.match(html, /style\.css\?v=488/);
-  assert.match(html, /script\.js\?v=688/);
-  assert.match(html, /Olá Carlópolis v510/);
-  assert.match(panel, /numero: 773/);
-  assert.match(panel, /label: "v780"/);
+  assert.match(site, /Release do site v638/);
+  assert.match(html, /style\.css\?v=489/);
+  assert.match(html, /script\.js\?v=689/);
+  assert.match(html, /Olá Carlópolis v511/);
+  assert.match(panel, /numero: 774/);
+  assert.match(panel, /label: "v781"/);
   assert.match(panel, /data: "2026-09-22"/);
-  assert.match(panelHtml, /painel\.css\?v=479/);
-  assert.match(panelHtml, /painel\.js\?v=710/);
-  assert.match(worker, /2026-09-22-clima-radar-animado-v828/);
+  assert.match(panelHtml, /painel\.css\?v=480/);
+  assert.match(panelHtml, /painel\.js\?v=711/);
+  assert.match(worker, /2026-09-22-clima-radar-continuo-v829/);
 });

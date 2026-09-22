@@ -28860,6 +28860,7 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
   border-radius: 17px;
   background: #dfeef2;
 }
+.clima-map .clima-radar-frame { transition: opacity .18s linear; will-change: opacity; }
 .clima-map-marker-wrap { background: transparent; border: 0; }
 .clima-map-marker {
   display: grid;
