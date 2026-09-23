@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=8/);
-  assert.match(html, /ola-pesca\.js\?v=8/);
+  assert.match(html, /ola-pesca\.css\?v=9/);
+  assert.match(html, /ola-pesca\.js\?v=9/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -148,9 +148,9 @@ test("v6 amplia as imagens nos recordes pessoais e no ranking", () => {
   assert.match(css, /\.pesca-fish-preview/);
 });
 
-test("v8 aumenta a faixa verde e mostra a espécie fisgada no salto acima de 6 kg", () => {
+test("v9 aumenta a faixa verde e mostra a espécie fisgada no salto acima de 6 kg", () => {
   assert.match(source, /function battleGreen/);
-  assert.match(source, /width=10\+tired\*24/);
+  assert.match(source, /width=14\+tired\*24/);
   assert.match(source, /b\.cursor>=z\.left&&b\.cursor<=z\.right/);
   assert.match(source, /g\.fish\.weight<=6/);
   assert.match(source, /jump=Math\.sin\(t\*Math\.PI\)/);
@@ -172,9 +172,10 @@ test("v6 provoca tentativas secas e anima a vara durante o arremesso", () => {
   assert.match(source, /g\.castAnimationAt=performance\.now\(\)/);
 });
 
-test("v7 consolida ranking e progresso mantendo o maior peixe por jogador", () => {
+test("v9 consolida todos os jogadores e mantém o maior peixe de cada identificador", () => {
   const ranking = [
     { id: "local-a", name: "Ana", speciesId: "pintado", speciesName: "Pintado", bestWeight: 12, bestLength: 90, captures: 4 },
+    { id: "local-a2", name: "Ana", speciesId: "traira", speciesName: "Traíra", bestWeight: 7, bestLength: 62, captures: 2 },
     { id: "local-b", name: "Beto", speciesId: "pacu", speciesName: "Pacu", bestWeight: 5, bestLength: 50, captures: 2 }
   ];
   const progress = [
@@ -182,12 +183,13 @@ test("v7 consolida ranking e progresso mantendo o maior peixe por jogador", () =
     { id: "uid-cida", userId: "uid-cida", playerName: "Cida", captures: [{ speciesId: "carpa", speciesName: "Carpa", weight: 8, length: 70, capturedAt: "2026-09-23T11:00:00.000Z" }], stats: { totalFishCaught: 3 } }
   ];
   const merged = core.mergeRankingEntries(ranking, progress);
-  assert.equal(merged.length, 3);
-  assert.deepEqual(Array.from(merged, item => item.name), ["Ana", "Cida", "Beto"]);
+  assert.equal(merged.length, 4);
+  assert.deepEqual(Array.from(merged, item => item.name), ["Ana", "Cida", "Ana", "Beto"]);
   assert.equal(merged[0].ownerUid, "uid-ana");
   assert.equal(merged[0].captures, 8);
   assert.match(source, /jogos\/olaPesca\/users/);
   assert.match(source, /rankingPlayerKey/);
+  assert.match(source, /a\.length===1\?"jogador":"jogadores"/);
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {
