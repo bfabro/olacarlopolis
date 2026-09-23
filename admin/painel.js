@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 780,
-  label: "v787",
+  numero: 781,
+  label: "v788",
   data: "2026-09-23",
-  nota: "Pesque e Solte com vistas coerentes da lancha, galhada vegetada, fala do pescador, captura mobile completa e ranking geral."
+  nota: "Pesque e Solte com fala no cenário, chances em porcentagem, peixes ampliáveis, batalha progressiva e arremesso animado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

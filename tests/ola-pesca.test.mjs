@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=5/);
-  assert.match(html, /ola-pesca\.js\?v=5/);
+  assert.match(html, /ola-pesca\.css\?v=6/);
+  assert.match(html, /ola-pesca\.js\?v=6/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -128,6 +128,44 @@ test("v5 usa modal mobile completo e ranking com o maior peixe de todos", () => 
   assert.match(source, /ref\("jogos\/olaPesca\/ranking"\)\.once\("value"\)/);
   assert.match(source, /Maior: \$\{esc\(x\.speciesName/);
   assert.match(source, /todos os participantes/);
+});
+
+test("v6 mostra a chance em porcentagem e fala no personagem após fechar", () => {
+  assert.match(source, /CHANCE_PERCENT=\{COMUM:"65%",INCOMUM:"23%",RARO:"9%",ÉPICO:"2,7%",LENDÁRIO:"0,3%"\}/);
+  assert.match(source, /Probabilidade aproximada de captura/);
+  assert.match(source, /g\.pendingCatchQuote=CATCH_QUOTES/);
+  assert.match(source, /setTimeout\(\(\)=>game===g&&characterSpeech\(g,quote\),120\)/);
+  assert.match(source, /function characterSpeech/);
+  assert.match(css, /\.pesca-message\.character-speech/);
+});
+
+test("v6 amplia as imagens nos recordes pessoais e no ranking", () => {
+  assert.match(source, /function openFishPreview/);
+  assert.match(source, /data-fish-preview/);
+  assert.match(source, /button\.className="pesca-record-fish"/);
+  assert.match(source, /class="pesca-rank-fish"/);
+  assert.match(source, /Referência máxima da espécie no jogo/);
+  assert.match(css, /\.pesca-fish-preview/);
+});
+
+test("v6 aumenta a faixa verde com o cansaço e faz peixes grandes saltarem", () => {
+  assert.match(source, /function battleGreen/);
+  assert.match(source, /width=10\+tired\*24/);
+  assert.match(source, /b\.cursor>=z\.left&&b\.cursor<=z\.right/);
+  assert.match(source, /g\.fish\.weight<=7/);
+  assert.match(source, /jump=Math\.sin\(t\*Math\.PI\)/);
+  assert.match(source, /drawFightingFish\(c,g,n,q\)/);
+});
+
+test("v6 provoca tentativas secas e anima a vara durante o arremesso", () => {
+  assert.match(source, /function dryCastTease/);
+  assert.match(source, /A árvore não morde a isca/);
+  assert.match(source, /No meio do nada/);
+  assert.match(source, /return characterSpeech\(g,dryCastTease\(g\)\)/);
+  assert.match(source, /e\.code!=="KeyA"\|\|g\.mode!=="explore"/);
+  assert.match(source, /g\.keys\.left=false;startCharge\(g\)/);
+  assert.match(source, /lift=charge\*36\+castSwing\*28/);
+  assert.match(source, /g\.castAnimationAt=performance\.now\(\)/);
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {
