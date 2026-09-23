@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=7/);
-  assert.match(html, /ola-pesca\.js\?v=7/);
+  assert.match(html, /ola-pesca\.css\?v=8/);
+  assert.match(html, /ola-pesca\.js\?v=8/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -148,12 +148,16 @@ test("v6 amplia as imagens nos recordes pessoais e no ranking", () => {
   assert.match(css, /\.pesca-fish-preview/);
 });
 
-test("v6 aumenta a faixa verde com o cansaço e faz peixes grandes saltarem", () => {
+test("v8 aumenta a faixa verde e mostra a espécie fisgada no salto acima de 6 kg", () => {
   assert.match(source, /function battleGreen/);
   assert.match(source, /width=10\+tired\*24/);
   assert.match(source, /b\.cursor>=z\.left&&b\.cursor<=z\.right/);
-  assert.match(source, /g\.fish\.weight<=7/);
+  assert.match(source, /g\.fish\.weight<=6/);
   assert.match(source, /jump=Math\.sin\(t\*Math\.PI\)/);
+  assert.match(source, /s=BY\[g\.fish\.speciesId\],img=fightingFishImage\(s\)/);
+  assert.match(source, /fightingFishImage\(BY\[g\.fish\.speciesId\]\)/);
+  assert.match(source, /if\(!img\?\.naturalWidth\)return/);
+  assert.match(source, /c\.drawImage\(img,\(s\.sprite%4\)\*sw/);
   assert.match(source, /drawFightingFish\(c,g,n,q\)/);
 });
 
