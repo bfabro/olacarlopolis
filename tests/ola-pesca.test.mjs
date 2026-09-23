@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=6/);
-  assert.match(html, /ola-pesca\.js\?v=6/);
+  assert.match(html, /ola-pesca\.css\?v=7/);
+  assert.match(html, /ola-pesca\.js\?v=7/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -166,6 +166,24 @@ test("v6 provoca tentativas secas e anima a vara durante o arremesso", () => {
   assert.match(source, /g\.keys\.left=false;startCharge\(g\)/);
   assert.match(source, /lift=charge\*36\+castSwing\*28/);
   assert.match(source, /g\.castAnimationAt=performance\.now\(\)/);
+});
+
+test("v7 consolida ranking e progresso mantendo o maior peixe por jogador", () => {
+  const ranking = [
+    { id: "local-a", name: "Ana", speciesId: "pintado", speciesName: "Pintado", bestWeight: 12, bestLength: 90, captures: 4 },
+    { id: "local-b", name: "Beto", speciesId: "pacu", speciesName: "Pacu", bestWeight: 5, bestLength: 50, captures: 2 }
+  ];
+  const progress = [
+    { id: "uid-ana", userId: "uid-ana", playerName: "Ana", captures: [{ speciesId: "pintado", speciesName: "Pintado", weight: 12, length: 90, capturedAt: "2026-09-23T10:00:00.000Z" }], stats: { totalFishCaught: 8 } },
+    { id: "uid-cida", userId: "uid-cida", playerName: "Cida", captures: [{ speciesId: "carpa", speciesName: "Carpa", weight: 8, length: 70, capturedAt: "2026-09-23T11:00:00.000Z" }], stats: { totalFishCaught: 3 } }
+  ];
+  const merged = core.mergeRankingEntries(ranking, progress);
+  assert.equal(merged.length, 3);
+  assert.deepEqual(Array.from(merged, item => item.name), ["Ana", "Cida", "Beto"]);
+  assert.equal(merged[0].ownerUid, "uid-ana");
+  assert.equal(merged[0].captures, 8);
+  assert.match(source, /jogos\/olaPesca\/users/);
+  assert.match(source, /rankingPlayerKey/);
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {
