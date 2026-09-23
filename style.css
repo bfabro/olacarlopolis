@@ -29011,3 +29011,256 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
   .clima-meteor-icon { width: 48px; height: 48px; border-radius: 14px; font-size: 21px; }
   .clima-meteor-main h2 { font-size: 17px; }
 }
+
+
+/* ===== Represa: comparação diária e evolução animada v639 ===== */
+.represa-day-comparison {
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid #cfe3f3;
+  border-radius: 17px;
+  background:
+    radial-gradient(circle at 100% 0, rgba(50, 164, 232, .12), transparent 34%),
+    linear-gradient(145deg, #f8fcff, #eef8ff);
+  box-shadow: 0 9px 24px rgba(29, 104, 153, .08);
+}
+
+.represa-day-comparison-head {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 11px;
+  border-bottom: 1px solid rgba(159, 202, 230, .45);
+}
+
+.represa-day-comparison-head > div:first-child span,
+.represa-day-comparison-head > div:first-child strong {
+  display: block;
+}
+
+.represa-day-comparison-head > div:first-child span {
+  margin-bottom: 3px;
+  color: #1676b3;
+  font-size: .66rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.represa-day-comparison-head > div:first-child span i { margin-right: 6px; }
+.represa-day-comparison-head > div:first-child strong { color: #173b55; font-size: .92rem; }
+
+.represa-day-range {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 10px;
+  border: 1px solid #c8dfef;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .76);
+  color: #42647b;
+  font-size: .7rem;
+}
+
+.represa-day-range i {
+  color: #1688f8;
+  animation: represaArrowMove 1.5s ease-in-out infinite;
+}
+
+.represa-day-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  padding: 12px;
+}
+
+.represa-day-change {
+  position: relative;
+  min-width: 0;
+  padding: 12px;
+  overflow: hidden;
+  border: 1px solid #dbe8f1;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, .86);
+}
+
+.represa-day-change::after {
+  content: "";
+  position: absolute;
+  inset: auto -12px -21px auto;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .055;
+}
+
+.represa-day-change > span,
+.represa-day-change > strong,
+.represa-day-change > small { display: block; }
+
+.represa-day-change > span {
+  overflow: hidden;
+  color: #6d8394;
+  font-size: .66rem;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.represa-day-change > span i { width: 17px; color: #2b85bd; }
+.represa-day-change > strong {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 7px 0 3px;
+  color: #25475e;
+  font-size: 1rem;
+}
+.represa-day-change > small { color: #7b8f9e; font-size: .64rem; }
+.represa-day-change.up > strong { color: #0b946a; }
+.represa-day-change.down > strong { color: #d64b5d; }
+.represa-day-change.stable > strong { color: #5f7487; }
+.represa-day-change.unavailable { opacity: .7; }
+
+.represa-day-comparison-empty {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 13px 15px;
+  border: 1px dashed #bfd5e5;
+  border-radius: 14px;
+  color: #607b8f;
+  background: #f7fbfe;
+  font-size: .76rem;
+}
+.represa-day-comparison-empty i { color: #1688f8; font-size: 1rem; }
+
+.represa-dashboard .represa-history-chart {
+  position: relative;
+  isolation: isolate;
+}
+
+.represa-dashboard .represa-history-chart::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 38%, rgba(73, 176, 239, .07) 50%, transparent 62%);
+  background-size: 220% 100%;
+  animation: represaChartShimmer 4.8s linear infinite;
+  pointer-events: none;
+}
+
+.represa-dashboard .represa-history-chart .represa-chart-level {
+  stroke: url(#represaLineGradient);
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation: represaLineDraw 1.55s cubic-bezier(.22, .78, .25, 1) forwards;
+}
+
+.represa-dashboard .represa-history-chart .represa-chart-volume {
+  animation: represaVolumeReveal .85s .7s ease-out both;
+}
+
+.represa-dashboard .represa-history-chart .represa-chart-area {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: represaAreaReveal .85s .35s ease-out both;
+}
+
+.represa-dashboard .represa-history-chart .represa-chart-point {
+  opacity: 0;
+  transform: scale(.3);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: represaPointIn .32s ease-out forwards;
+  animation-delay: calc(.35s + (var(--point-index) * 35ms));
+}
+
+.represa-chart-latest-ring {
+  fill: rgba(22, 136, 248, .1);
+  stroke: #1688f8;
+  stroke-width: 2;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: represaLatestPulse 1.8s 1.4s ease-out infinite;
+}
+
+.represa-dashboard .represa-history-chart .represa-chart-point.is-latest {
+  fill: #1688f8;
+  stroke: #fff;
+  stroke-width: 2.5;
+  filter: drop-shadow(0 2px 4px rgba(3, 92, 169, .38));
+}
+
+.represa-table-delta {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  padding: 4px 7px;
+  border-radius: 999px;
+  color: #60758b;
+  background: #f1f5f9;
+  font-size: .72rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+.represa-table-delta.up { color: #087c59; background: #eafaf4; }
+.represa-table-delta.down { color: #c23c50; background: #fff0f2; }
+.represa-table-delta.stable { color: #60758b; background: #f1f5f9; }
+.represa-table-delta.unavailable { color: #8a9aa7; background: #f6f8fa; }
+
+@keyframes represaLineDraw { to { stroke-dashoffset: 0; } }
+@keyframes represaVolumeReveal { from { opacity: 0; } to { opacity: .88; } }
+@keyframes represaAreaReveal {
+  from { opacity: 0; transform: scaleY(.12); }
+  to { opacity: 1; transform: scaleY(1); }
+}
+@keyframes represaPointIn {
+  from { opacity: 0; transform: scale(.3); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes represaLatestPulse {
+  0% { opacity: .75; transform: scale(.65); }
+  70%, 100% { opacity: 0; transform: scale(1.75); }
+}
+@keyframes represaChartShimmer {
+  from { background-position: 180% 0; }
+  to { background-position: -70% 0; }
+}
+@keyframes represaArrowMove {
+  0%, 100% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+}
+
+@media (max-width: 760px) {
+  .represa-day-comparison-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 520px) {
+  .represa-day-comparison-head { align-items: flex-start; flex-direction: column; gap: 9px; }
+  .represa-day-range { align-self: stretch; justify-content: center; }
+  .represa-day-comparison-grid { gap: 7px; padding: 9px; }
+  .represa-day-change { padding: 10px 9px; }
+  .represa-day-change > strong { font-size: .86rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .represa-day-range i,
+  .represa-dashboard .represa-history-chart::after,
+  .represa-dashboard .represa-history-chart .represa-chart-level,
+  .represa-dashboard .represa-history-chart .represa-chart-volume,
+  .represa-dashboard .represa-history-chart .represa-chart-area,
+  .represa-dashboard .represa-history-chart .represa-chart-point,
+  .represa-chart-latest-ring {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
+}

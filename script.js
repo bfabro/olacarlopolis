@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v638.
+// Release do site v639.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -2860,6 +2860,30 @@ function mediaCampoRepresa(registros, campo) {
   return valores.length ? valores.reduce((total, valor) => total + valor, 0) / valores.length : null;
 }
 
+function diferencaCampoRepresa(atual, anterior, campo) {
+  const valorAtual = atual?.[campo];
+  const valorAnterior = anterior?.[campo];
+  return Number.isFinite(valorAtual) && Number.isFinite(valorAnterior) ? valorAtual - valorAnterior : null;
+}
+
+function metaVariacaoRepresa(valor, tolerancia = 0.005) {
+  if (!Number.isFinite(valor)) return { classe: 'unavailable', icone: 'fa-minus', texto: 'Sem comparação' };
+  if (valor > tolerancia) return { classe: 'up', icone: 'fa-arrow-up', texto: 'Subiu' };
+  if (valor < -tolerancia) return { classe: 'down', icone: 'fa-arrow-down', texto: 'Baixou' };
+  return { classe: 'stable', icone: 'fa-minus', texto: 'Estável' };
+}
+
+function formatarVariacaoRepresa(valor, unidade, casas = 2) {
+  if (!Number.isFinite(valor)) return '—';
+  const sinal = valor > 0 ? '+' : '';
+  return `${sinal}${valor.toFixed(casas)} ${unidade}`;
+}
+
+function dataCurtaRepresa(item) {
+  if (item?.dataLabel) return item.dataLabel;
+  const data = new Date(item?.dataISO);
+  return Number.isNaN(data.getTime()) ? '—' : data.toLocaleDateString('pt-BR');
+}
 function agruparHistoricoRepresaPorMedia(registros = [], visualizacao = 'diaria') {
   if (visualizacao === 'diaria') return registros.map((item) => ({ ...item, rotuloCurto: item.dataLabel?.slice(0, 5) || '' }));
   const grupos = new Map();
@@ -2949,9 +2973,42 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visu
   const statusAtual = classificarCotaRepresa(cotaAtual);
   const tituloVisualizacao = visualizacao === 'mensal' ? 'Média mensal' : visualizacao === 'semanal' ? 'Média semanal' : 'Evolução diária';
   const descricaoVisualizacao = visualizacao === 'diaria'
-    ? 'Passe o cursor ou toque nos pontos para consultar cada medição.'
+    ? 'A linha se desenha na tela; passe o cursor ou toque nos pontos para consultar cada medição.'
     : `Cada ponto representa a média ${visualizacao === 'mensal' ? 'do mês' : 'da semana'} dentro do período selecionado.`;
 
+  const ultimoDia = dadosDiarios.at(-1) || null;
+  const diaAnterior = dadosDiarios.at(-2) || null;
+  const comparacoesDiarias = [
+    { campo: 'cota', titulo: 'Cota', unidade: 'm', casas: 2, icone: 'fa-ruler-vertical', tolerancia: .005 },
+    { campo: 'volume', titulo: 'Volume útil', unidade: 'p.p.', casas: 2, icone: 'fa-droplet', tolerancia: .005 },
+    { campo: 'afluencia', titulo: 'Afluência', unidade: 'm³/s', casas: 2, icone: 'fa-arrow-down-long', tolerancia: .05 },
+    { campo: 'defluencia', titulo: 'Defluência', unidade: 'm³/s', casas: 2, icone: 'fa-arrow-up-long', tolerancia: .05 }
+  ];
+  const cartoesComparacaoDiaria = comparacoesDiarias.map((config) => {
+    const diferenca = diferencaCampoRepresa(ultimoDia, diaAnterior, config.campo);
+    const meta = metaVariacaoRepresa(diferenca, config.tolerancia);
+    const detalhe = config.campo === 'cota' && Number.isFinite(diferenca)
+      ? `${meta.texto} ${Math.abs(diferenca * 100).toFixed(0)} cm`
+      : meta.texto;
+    return `
+      <div class="represa-day-change ${meta.classe}">
+        <span><i class="fa-solid ${config.icone}"></i>${config.titulo}</span>
+        <strong><i class="fa-solid ${meta.icone}"></i>${formatarVariacaoRepresa(diferenca, config.unidade, config.casas)}</strong>
+        <small>${detalhe}</small>
+      </div>
+    `;
+  }).join('');
+  const comparacaoDiariaMarkup = diaAnterior
+    ? `
+      <section class="represa-day-comparison" aria-label="Diferença entre os dois últimos dias com medição">
+        <div class="represa-day-comparison-head">
+          <div><span><i class="fa-solid fa-code-compare"></i> Comparação diária</span><strong>O que mudou de um dia para o outro</strong></div>
+          <div class="represa-day-range"><b>${dataCurtaRepresa(diaAnterior)}</b><i class="fa-solid fa-arrow-right"></i><b>${dataCurtaRepresa(ultimoDia)}</b></div>
+        </div>
+        <div class="represa-day-comparison-grid">${cartoesComparacaoDiaria}</div>
+      </section>
+    `
+    : '<div class="represa-day-comparison-empty"><i class="fa-regular fa-calendar-plus"></i> A comparação diária aparecerá após duas medições em dias diferentes.</div>';
   const largura = 760;
   const altura = 280;
   const margem = { top: 24, right: 38, bottom: 46, left: 58 };
@@ -2987,13 +3044,16 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visu
     const item = pontosVisiveis[index];
     return item ? `<text class="represa-chart-x-label" x="${xDoPonto(index)}" y="${altura - 15}" text-anchor="middle">${item.rotuloCurto || item.dataLabel?.slice(0, 5) || ''}</text>` : '';
   }).join('');
+  const ultimoPontoIndex = pontosVisiveis.reduce((ultimo, item, index) => Number.isFinite(item.cota) ? index : ultimo, -1);
   const marcadores = pontosVisiveis.map((item, index) => {
     if (!Number.isFinite(item.cota)) return '';
     const detalhe = `${item.dataLabel || ''}${item.horario ? ` às ${item.horario}` : ''}: ${item.cota.toFixed(2)} m${Number.isFinite(item.volume) ? `, volume ${item.volume.toFixed(2)}%` : ''}`;
     const status = classificarCotaRepresa(item.cota);
-    return `<circle class="represa-chart-point status-${status.id}" cx="${xDoPonto(index)}" cy="${yDaCota(item.cota)}" r="4" tabindex="0"><title>${detalhe} (${status.nome})</title></circle>`;
+    const ultimo = index === ultimoPontoIndex;
+    const x = xDoPonto(index);
+    const y = yDaCota(item.cota);
+    return `${ultimo ? `<circle class="represa-chart-latest-ring" cx="${x}" cy="${y}" r="10"></circle>` : ''}<circle class="represa-chart-point status-${status.id}${ultimo ? ' is-latest' : ''}" cx="${x}" cy="${y}" r="${ultimo ? 5 : 4}" tabindex="0" style="--point-index:${index}"><title>${detalhe} (${status.nome})</title></circle>`;
   }).join('');
-
   const legendaFaixas = REPRESA_FAIXAS_COTA.map((faixa) => `
     <tr class="status-${faixa.id}">
       <td><span class="represa-level-badge"><i></i>${faixa.nome}</span></td>
@@ -3002,6 +3062,7 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visu
     </tr>
   `).join('');
   box.innerHTML = `
+    ${comparacaoDiariaMarkup}
     <div class="represa-history-chart-card">
       <div class="represa-history-chart-title">
         <div><strong>${tituloVisualizacao}</strong><span>${descricaoVisualizacao}</span></div>
@@ -3012,6 +3073,7 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visu
         <svg viewBox="0 0 ${largura} ${altura}" role="img">
           <defs>
             <linearGradient id="represaAreaGradient" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#1688f8" stop-opacity=".28"></stop><stop offset="100%" stop-color="#1688f8" stop-opacity=".02"></stop></linearGradient>
+            <linearGradient id="represaLineGradient" x1="0" x2="1"><stop offset="0%" stop-color="#65b9ff"></stop><stop offset="58%" stop-color="#1688f8"></stop><stop offset="100%" stop-color="#075fb5"></stop></linearGradient>
           </defs>
           ${linhasGrade}
           ${rotulosVolume}
@@ -3051,17 +3113,23 @@ async function renderHistoricoRepresa(periodo = '30', registroAtual = null, visu
             <th>Nivel</th>
             <th>Volume</th>
             <th>Defluencia</th>
+            <th>Diferença</th>
           </tr>
         </thead>
         <tbody>
           ${dadosVisualizacao.slice().reverse().map((item) => {
             const status = classificarCotaRepresa(item.cota);
+            const indiceItem = dadosVisualizacao.indexOf(item);
+            const itemAnterior = indiceItem > 0 ? dadosVisualizacao[indiceItem - 1] : null;
+            const diferencaCota = diferencaCampoRepresa(item, itemAnterior, 'cota');
+            const metaDiferenca = metaVariacaoRepresa(diferencaCota);
             return `
             <tr>
               <td data-label="Período">${item.dataLabel}${item.horario ? `<small>${item.horario}</small>` : ''}${item.quantidade ? `<small>${item.quantidade} dia${item.quantidade > 1 ? 's' : ''} com dados</small>` : ''}</td>
               <td data-label="Nível"><span class="represa-table-level status-${status.id}">${Number.isFinite(item.cota) ? item.cota.toFixed(2) + ' m' : '-'}<small>${status.nome}</small></span></td>
               <td data-label="Volume">${Number.isFinite(item.volume) ? item.volume.toFixed(2) + '%' : '-'}</td>
               <td data-label="Defluência">${Number.isFinite(item.defluencia) ? item.defluencia.toFixed(2) + ' m³/s' : '-'}</td>
+              <td data-label="Diferença"><span class="represa-table-delta ${metaDiferenca.classe}"><i class="fa-solid ${metaDiferenca.icone}"></i>${formatarVariacaoRepresa(diferencaCota, 'm', 2)}</span></td>
             </tr>
           `}).join('')}
         </tbody>

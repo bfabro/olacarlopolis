@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 774,
-  label: "v781",
+  numero: 775,
+  label: "v782",
   data: "2026-09-22",
-  nota: "Animação do radar de chuva agora pré-carrega os quadros e faz transições contínuas, sem piscadas."
+  nota: "Nível da Represa agora compara os dois últimos dias e anima a evolução das medições."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

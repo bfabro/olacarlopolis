@@ -46,14 +46,14 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 });
 
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v638/);
-  assert.match(html, /style\.css\?v=489/);
-  assert.match(html, /script\.js\?v=689/);
-  assert.match(html, /Olá Carlópolis v511/);
-  assert.match(panel, /numero: 774/);
-  assert.match(panel, /label: "v781"/);
+  assert.match(site, /Release do site v639/);
+  assert.match(html, /style\.css\?v=490/);
+  assert.match(html, /script\.js\?v=690/);
+  assert.match(html, /Olá Carlópolis v512/);
+  assert.match(panel, /numero: 775/);
+  assert.match(panel, /label: "v782"/);
   assert.match(panel, /data: "2026-09-22"/);
-  assert.match(panelHtml, /painel\.css\?v=480/);
-  assert.match(panelHtml, /painel\.js\?v=711/);
-  assert.match(worker, /2026-09-22-clima-radar-continuo-v829/);
+  assert.match(panelHtml, /painel\.css\?v=481/);
+  assert.match(panelHtml, /painel\.js\?v=712/);
+  assert.match(worker, /2026-09-22-represa-comparacao-diaria-v830/);
 });
