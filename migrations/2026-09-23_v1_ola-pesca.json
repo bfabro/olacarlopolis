@@ -1,0 +1,22 @@
+{
+  "version": "2026-09-23_v1",
+  "feature": "ola-pesca",
+  "description": "Estrutura de progresso por usuario do minigame Ola Pesca. Rankings e torneios permanecem desativados no MVP.",
+  "realtimeDatabase": {
+    "path": "jogos/olaPesca/users/{uid}",
+    "ownerField": "userId",
+    "collections": {
+      "captures": "Ultimas 50 capturas mais favoritas preservadas",
+      "records": "Recorde permanente por speciesId",
+      "discovered": "Especies liberadas na PESCAdex",
+      "favorites": "IDs das capturas favoritas",
+      "stats": "Tentativas, capturas, fugas, recordes e tempo de jogo",
+      "player": "Posicao e direcao no mapa"
+    }
+  },
+  "visitorStorage": "ola_pesca_progress_v1",
+  "futureServerValidation": {
+    "requiredBeforePublicRankings": true,
+    "fields": ["uniqueSeed", "speciesId", "length", "weight", "rarity", "trophyClass", "fishingSpotId", "capturedAt"]
+  }
+}

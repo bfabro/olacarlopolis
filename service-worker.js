@@ -1,10 +1,12 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-09-22-represa-comparacao-diaria-v830'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-09-23-ola-pesca-v831'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
+  '/ola-pesca.css',
+  '/ola-pesca.js',
   '/casas-veraneio.css',
   '/loterias.css',
   '/loterias.js',

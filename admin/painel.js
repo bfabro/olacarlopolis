@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 775,
-  label: "v782",
-  data: "2026-09-22",
-  nota: "Nível da Represa agora compara os dois últimos dias e anima a evolução das medições."
+  numero: 776,
+  label: "v783",
+  data: "2026-09-23",
+  nota: "Novo minigame Olá Pesca com mapa, 11 espécies, batalhas, PESCAdex e recordes pessoais."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

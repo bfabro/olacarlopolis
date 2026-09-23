@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v639.
+// Release do site v640.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -7757,6 +7757,12 @@ carlopdiesel:"s",
     event?.preventDefault?.();
     event?.stopPropagation?.();
     event?.stopImmediatePropagation?.();
+    window.destroyOlaPesca?.();
+    if (jogo === "ola-pesca") {
+      if (location.hash !== "#ola-pesca") history.pushState(null, "", "#ola-pesca");
+      window.mostrarOlaPesca?.();
+      return false;
+    }
     if (jogo === "canos") {
       if (location.hash !== "#canos") history.pushState(null, "", "#canos");
       mostrarCanos();
@@ -7778,6 +7784,7 @@ carlopdiesel:"s",
   window.abrirJogoOlaCarlopolis = abrirJogoOlaCarlopolis;
 
   function mostrarJogos() {
+    window.destroyOlaPesca?.();
     if (window.xadrezTimerId) {
       clearInterval(window.xadrezTimerId);
       window.xadrezTimerId = null;
@@ -7793,6 +7800,16 @@ carlopdiesel:"s",
       <div class="games-list" aria-label="Jogos disponíveis">
        
 
+        <div class="game-item game-item-featured">
+          <div class="game-icon"><i class="fa-solid fa-fish" style="color:#0f766e"></i></div>
+          <div class="game-body">
+            <div class="game-title">Olá Pesca</div>
+            <div class="game-desc">Explore a margem da represa, fisgue 11 espécies e tente superar seus próprios recordes.</div>
+          </div>
+          <div class="game-actions">
+            <button id="btnJogarOlaPesca" class="btn-play" type="button" data-game="ola-pesca" onclick="return window.abrirJogoOlaCarlopolis(event, 'ola-pesca')">Jogar</button>
+          </div>
+        </div>
         <!-- Jogo 2: Capivarinha -->
         <div class="game-item">
           <div class="game-icon"><i class="fa-solid fa-water" style="color:#0ea5e9"></i></div>
@@ -7853,6 +7870,7 @@ carlopdiesel:"s",
     const area = document.querySelector(".content_area");
     area.innerHTML = html;
 
+    area.querySelector("#btnJogarOlaPesca")?.addEventListener("click", (e) => abrirJogoOlaCarlopolis(e, "ola-pesca"));
     area.querySelector("#btnJogarCapivarinha")?.addEventListener("click", (e) => abrirJogoOlaCarlopolis(e, "canos"));
     area.querySelector("#btnJogarXadrez")?.addEventListener("click", (e) => abrirJogoOlaCarlopolis(e, "xadrez"));
   }
@@ -9816,6 +9834,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   window.addEventListener("DOMContentLoaded", () => {
     const h = (location.hash || "").replace("#", "");
     if (h === "jogos") mostrarJogos();
+    else if (h === "ola-pesca") window.mostrarOlaPesca?.();
     else if (h === "tetrix") mostrarTetrix();
     else if (h === "canos") mostrarCanos();
     else if (h === "xadrez") mostrarXadrez();
@@ -9824,6 +9843,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   window.addEventListener("hashchange", () => {
     const h = (location.hash || "").replace("#", "");
     if (h === "jogos") mostrarJogos();
+    else if (h === "ola-pesca") window.mostrarOlaPesca?.();
     else if (h === "tetrix") mostrarTetrix();
     else if (h === "canos") mostrarCanos();
     else if (h === "xadrez") mostrarXadrez();
@@ -26929,6 +26949,7 @@ ${servicosIniciaisLoja.length ? `
 
   async function handleHashRoute() {
     const h = (location.hash || "").toLowerCase();
+    if (h !== "#ola-pesca") window.destroyOlaPesca?.();
     atualizarVisibilidadeHomeQuickBanner();
     if (!ADMIN_CLIENTES_LOADED) {
       aplicarDadosAdminClientesEmSegundoPlano(() => handleHashRoute());
@@ -26940,6 +26961,7 @@ ${servicosIniciaisLoja.length ? `
     if (h === "#novidades") { return mostrarNovidadesCidadePublicas(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
+    if (h === "#ola-pesca") { return window.mostrarOlaPesca?.(); }
     if (h === "#canos") { return mostrarCanos(); }
     if (h === "#xadrez") { return mostrarXadrez(); }
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
