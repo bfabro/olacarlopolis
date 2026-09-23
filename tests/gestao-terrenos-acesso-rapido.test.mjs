@@ -340,9 +340,9 @@ test("listagem de terrenos usa cards com galeria navegavel e ampliacao", () => {
 });
 
 test("ativos e versoes do novo fluxo evitam cache antigo", () => {
-  assert.match(panelHtml, /painel\.css\?v=491/);
-  assert.match(panelHtml, /painel\.js\?v=722/);
+  assert.match(panelHtml, /painel\.css\?v=492/);
+  assert.match(panelHtml, /painel\.js\?v=723/);
   assert.match(panelJs, /gestao-terrenos-schema\.js\?v=26/);
-  assert.match(panelJs, /numero: 785/);
-  assert.match(panelJs, /label: "v792"/);
+  assert.match(panelJs, /numero: 786/);
+  assert.match(panelJs, /label: "v793"/);
 });
