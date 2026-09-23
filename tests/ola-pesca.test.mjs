@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Olá Pesca integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=1/);
-  assert.match(html, /ola-pesca\.js\?v=1/);
+  assert.match(html, /ola-pesca\.css\?v=2/);
+  assert.match(html, /ola-pesca\.js\?v=2/);
   assert.match(site, /btnJogarOlaPesca/);
   assert.match(site, /#ola-pesca/);
   assert.match(source, /data-dir="up"/);
@@ -21,6 +21,28 @@ test("Olá Pesca integra mapa, controles e progresso na tela de Jogos", () => {
   assert.match(source, /localStorage\.setItem\(KEY/);
   assert.match(source, /jogos\/olaPesca\/users/);
   assert.match(css, /touch-action:none/);
+});
+
+test("v2 amplia a represa e permite pesca livre, barco e arremesso carregado", () => {
+  assert.equal(core.MAP.length, 20);
+  assert.equal(core.MAP[0].length, 32);
+  assert.match(source, /function waterDir/);
+  assert.doesNotMatch(source, /ponto amarelo/i);
+  assert.match(source, /g\.mode="charging"/);
+  assert.match(source, /performance\.now\(\)-g\.chargeAt/);
+  assert.match(source, /g\.player\.inBoat=true/);
+  assert.match(source, /Meio da represa/);
+});
+
+test("v2 mostra imagens, local da fisgada, fechamento e ranking exclusivo", () => {
+  assert.match(source, /peixes-sprites-v2\.png/);
+  assert.match(source, /data-catch-close/);
+  assert.match(source, /Por onde fisgou/);
+  assert.match(source, /jogos\/olaPesca\/ranking/);
+  assert.match(source, /data-panel="ranking"/);
+  assert.match(css, /\.fish-sprite/);
+  assert.match(css, /\.pesca-battle\{right:10px/);
+  assert.match(source, /quadraticCurveTo/);
 });
 
 test("catálogo inicial possui as 11 espécies e limites separados", () => {

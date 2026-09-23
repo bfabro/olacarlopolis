@@ -46,14 +46,14 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 });
 
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v640/);
-  assert.match(html, /style\.css\?v=491/);
-  assert.match(html, /script\.js\?v=691/);
-  assert.match(html, /Olá Carlópolis v513/);
-  assert.match(panel, /numero: 776/);
-  assert.match(panel, /label: "v783"/);
+  assert.match(site, /Release do site v641/);
+  assert.match(html, /style\.css\?v=492/);
+  assert.match(html, /script\.js\?v=692/);
+  assert.match(html, /Olá Carlópolis v514/);
+  assert.match(panel, /numero: 777/);
+  assert.match(panel, /label: "v784"/);
   assert.match(panel, /data: "2026-09-23"/);
-  assert.match(panelHtml, /painel\.css\?v=482/);
-  assert.match(panelHtml, /painel\.js\?v=713/);
-  assert.match(worker, /2026-09-23-ola-pesca-v831/);
+  assert.match(panelHtml, /painel\.css\?v=483/);
+  assert.match(panelHtml, /painel\.js\?v=714/);
+  assert.match(worker, /2026-09-23-ola-pesca-melhorias-v832/);
 });
