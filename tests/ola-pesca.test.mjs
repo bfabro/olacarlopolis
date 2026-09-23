@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=13/);
-  assert.match(html, /ola-pesca\.js\?v=13/);
+  assert.match(html, /ola-pesca\.css\?v=14/);
+  assert.match(html, /ola-pesca\.js\?v=14/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -60,7 +60,7 @@ test("catálogo possui as 14 espécies incluindo o lendário Tucunaré Dourado",
   }
 });
 
-test("v13 reinicia no estaleiro, reserva o Dourado à pedra e bloqueia a galhada", () => {
+test("v14 mantém o Dourado ao lado da pedra pequena no canto inferior direito", () => {
   const golden = core.SPECIES.find(item => item.id === "tucunare_dourado");
   assert.ok(golden);
   assert.equal(golden.image, "images/jogos/ola-pesca/tucunare-dourado-v13.png");
@@ -70,10 +70,14 @@ test("v13 reinicia no estaleiro, reserva o Dourado à pedra e bloqueia a galhada
   assert.equal(core.isGoldenZone({ x: core.GOLDEN_ROCK.x, y: core.GOLDEN_ROCK.y }), true);
   assert.equal(core.isGoldenZone({ x: core.GOLDEN_ROCK.x - core.GOLDEN_ROCK.zoneRadius - 1, y: core.GOLDEN_ROCK.y }), false);
   assert.equal(core.GOLDEN_ROCK.chance, 0.003);
+  assert.ok(core.GOLDEN_ROCK.x > 26 * 32);
+  assert.ok(core.GOLDEN_ROCK.y > 16 * 32);
+  assert.equal(core.GOLDEN_ROCK.radius, 0.4 * 32);
   assert.deepEqual({ ...core.emptyProgress().player }, { ...core.PLAYER_START });
   assert.match(source, /game\.player=\{\.\.\.PLAYER_START\}/);
   assert.match(source, /Math\.hypot\(x-SNAG\.x,y-SNAG\.y\)<SNAG\.radius\+14/);
   assert.match(source, /rarity:"LENDÁRIO",trophyClass:"MONSTRO"/);
+  assert.doesNotMatch(source, /strokeText\("PEDRA DOURADA"|fillText\("PEDRA DOURADA"/);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/tucunare-dourado-v13.png", import.meta.url)), true);
 });
 
