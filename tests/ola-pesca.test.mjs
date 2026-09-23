@@ -11,9 +11,11 @@ const context = { window: {}, console, Date, Math, setTimeout, clearTimeout, set
 vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
-test("Olá Pesca integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=3/);
-  assert.match(html, /ola-pesca\.js\?v=3/);
+test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
+  assert.match(html, /ola-pesca\.css\?v=4/);
+  assert.match(html, /ola-pesca\.js\?v=4/);
+  assert.match(site, /Pesque e Solte/);
+  assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
   assert.match(site, /#ola-pesca/);
   assert.match(source, /data-dir="up"/);
@@ -78,6 +80,31 @@ test("v3 mostra sprites dos tucunarés e imagem do peixe no ranking", () => {
   assert.match(source, /speciesId:better\?c\.speciesId/);
   assert.match(source, /pesca-rank-item[\s\S]*fish-sprite/);
   assert.match(css, /grid-template-columns:38px 66px 1fr auto/);
+});
+
+test("v4 orienta a lancha, desenha rastro, árvores e galhada produtiva", () => {
+  assert.match(source, /down:Math\.PI\/2/);
+  assert.match(source, /boat\(c,x,y\+5,g\.player\.facing,moving,n\)/);
+  assert.match(source, /rgba\(220,250,255,\.7\)/);
+  assert.match(source, /TREE_POSITIONS/);
+  assert.match(source, /function drawTree/);
+  assert.match(source, /function drawSnag/);
+  assert.equal(core.SNAG.radius, 72);
+  assert.match(source, /id:"galhada"/);
+  assert.match(source, /bonus:\.16/);
+});
+
+test("v4 afunda a boia na mordida e em cada puxada correta", () => {
+  assert.match(source, /g\.bobberAnimationAt=performance\.now\(\)/);
+  assert.match(source, /sink\*17/);
+  assert.match(source, /elapsed<560/);
+  assert.match(source, /g\.mode==="waiting"\|\|animating/);
+});
+
+test("v4 usa relação alométrica realista entre comprimento e peso", () => {
+  for (const item of core.SPECIES) {
+    assert.ok(item.power >= 2.9 && item.power <= 3.25, `${item.name}: expoente ${item.power}`);
+  }
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {

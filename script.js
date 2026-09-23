@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v642.
+// Release do site v643.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -7803,8 +7803,8 @@ carlopdiesel:"s",
         <div class="game-item game-item-featured">
           <div class="game-icon"><i class="fa-solid fa-fish" style="color:#0f766e"></i></div>
           <div class="game-body">
-            <div class="game-title">Olá Pesca</div>
-            <div class="game-desc">Explore a margem da represa, fisgue 11 espécies e tente superar seus próprios recordes.</div>
+            <div class="game-title">Pesque e Solte</div>
+            <div class="game-desc">Explore a represa, fisgue 13 espécies, encontre cardumes e supere seus recordes.</div>
           </div>
           <div class="game-actions">
             <button id="btnJogarOlaPesca" class="btn-play" type="button" data-game="ola-pesca" onclick="return window.abrirJogoOlaCarlopolis(event, 'ola-pesca')">Jogar</button>

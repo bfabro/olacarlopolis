@@ -23,9 +23,9 @@ test("formulario Minha empresa continua salvando pelo evento submit", () => {
 });
 
 test("versao corrigida do painel e carregada sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.js?v=715"));
-  assert.ok(panelJs.includes("numero: 778"));
-  assert.ok(panelJs.includes('label: "v785"'));
+  assert.ok(panelHtml.includes("painel.js?v=716"));
+  assert.ok(panelJs.includes("numero: 779"));
+  assert.ok(panelJs.includes('label: "v786"'));
 });
 
 test("cadastro master e painel do cliente salvam a opcao somente delivery", () => {
