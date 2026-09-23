@@ -139,8 +139,8 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 777,
-  label: "v784",
+  numero: 778,
+  label: "v785",
   data: "2026-09-23",
   nota: "Novo minigame Olá Pesca com mapa, 11 espécies, batalhas, PESCAdex e recordes pessoais."
 };

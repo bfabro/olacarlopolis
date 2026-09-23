@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Olá Pesca integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=2/);
-  assert.match(html, /ola-pesca\.js\?v=2/);
+  assert.match(html, /ola-pesca\.css\?v=3/);
+  assert.match(html, /ola-pesca\.js\?v=3/);
   assert.match(site, /btnJogarOlaPesca/);
   assert.match(site, /#ola-pesca/);
   assert.match(source, /data-dir="up"/);
@@ -45,13 +45,39 @@ test("v2 mostra imagens, local da fisgada, fechamento e ranking exclusivo", () =
   assert.match(source, /quadraticCurveTo/);
 });
 
-test("catálogo inicial possui as 11 espécies e limites separados", () => {
-  assert.equal(core.SPECIES.length, 11);
-  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare"]);
+test("catálogo possui as 13 espécies incluindo três tucunarés", () => {
+  assert.equal(core.SPECIES.length, 13);
+  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare", "tucunare_azulao", "tucunare_vermelho"]);
+  assert.equal(core.SPECIES.find(item => item.id === "tucunare").scientific, "Cichla kelberi");
+  assert.equal(core.SPECIES.find(item => item.id === "tucunare_azulao").scientific, "Cichla piquiti");
+  assert.equal(core.SPECIES.find(item => item.id === "tucunare_vermelho").scientific, "Cichla mirianae");
   for (const item of core.SPECIES) {
     assert.ok(item.maximoBiologicoReferencia >= item.maximoJogavel);
     assert.ok(item.maxW > item.minW);
   }
+});
+
+test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {
+  assert.match(source, /HOOK_POINTS=\["Pela boca"/);
+  assert.match(source, /hookPoint:HOOK_POINTS/);
+  assert.match(source, /b\.redHits>=2/);
+  assert.match(source, /LOSE_QUOTES/);
+  assert.match(source, /2 erros no vermelho = escapou/);
+});
+
+test("v3 mantém cardume por dois minutos e força uma única espécie", () => {
+  assert.match(source, /expiresAt:Date\.now\(\)\+120000/);
+  assert.match(source, /schoolSpeciesId:school/);
+  assert.match(source, /table:\{\[g\.cast\.schoolSpeciesId\]:1\}/);
+  assert.match(source, /function drawSchool/);
+});
+
+test("v3 mostra sprites dos tucunarés e imagem do peixe no ranking", () => {
+  assert.match(source, /tucunare-azulao-v3\.png/);
+  assert.match(source, /tucunare-vermelho-v3\.png/);
+  assert.match(source, /speciesId:better\?c\.speciesId/);
+  assert.match(source, /pesca-rank-item[\s\S]*fish-sprite/);
+  assert.match(css, /grid-template-columns:38px 66px 1fr auto/);
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {
