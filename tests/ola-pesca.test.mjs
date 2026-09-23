@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=12/);
-  assert.match(html, /ola-pesca\.js\?v=12/);
+  assert.match(html, /ola-pesca\.css\?v=13/);
+  assert.match(html, /ola-pesca\.js\?v=13/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -47,16 +47,34 @@ test("v2 mostra imagens, local da fisgada, fechamento e ranking exclusivo", () =
   assert.match(source, /quadraticCurveTo/);
 });
 
-test("catálogo possui as 13 espécies incluindo três tucunarés", () => {
-  assert.equal(core.SPECIES.length, 13);
-  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare", "tucunare_azulao", "tucunare_vermelho"]);
+test("catálogo possui as 14 espécies incluindo o lendário Tucunaré Dourado", () => {
+  assert.equal(core.SPECIES.length, 14);
+  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare", "tucunare_azulao", "tucunare_vermelho", "tucunare_dourado"]);
   assert.equal(core.SPECIES.find(item => item.id === "tucunare").scientific, "Cichla kelberi");
   assert.equal(core.SPECIES.find(item => item.id === "tucunare_azulao").scientific, "Cichla piquiti");
   assert.equal(core.SPECIES.find(item => item.id === "tucunare_vermelho").scientific, "Cichla mirianae");
+  assert.equal(core.SPECIES.find(item => item.id === "tucunare_dourado").scientific, "Cichla sp. aureus");
   for (const item of core.SPECIES) {
     assert.ok(item.maximoBiologicoReferencia >= item.maximoJogavel);
     assert.ok(item.maxW > item.minW);
   }
+});
+
+test("v13 reinicia no estaleiro, reserva o Dourado à pedra e bloqueia a galhada", () => {
+  const golden = core.SPECIES.find(item => item.id === "tucunare_dourado");
+  assert.ok(golden);
+  assert.equal(golden.image, "images/jogos/ola-pesca/tucunare-dourado-v13.png");
+  assert.ok(golden.minL >= 45 && golden.maxL >= 95);
+  assert.ok(golden.minW >= 3 && golden.maxW >= 14);
+  assert.equal(core.SPOTS.some(spot => Object.hasOwn(spot.table, "tucunare_dourado")), false);
+  assert.equal(core.isGoldenZone({ x: core.GOLDEN_ROCK.x, y: core.GOLDEN_ROCK.y }), true);
+  assert.equal(core.isGoldenZone({ x: core.GOLDEN_ROCK.x - core.GOLDEN_ROCK.zoneRadius - 1, y: core.GOLDEN_ROCK.y }), false);
+  assert.equal(core.GOLDEN_ROCK.chance, 0.003);
+  assert.deepEqual({ ...core.emptyProgress().player }, { ...core.PLAYER_START });
+  assert.match(source, /game\.player=\{\.\.\.PLAYER_START\}/);
+  assert.match(source, /Math\.hypot\(x-SNAG\.x,y-SNAG\.y\)<SNAG\.radius\+14/);
+  assert.match(source, /rarity:"LENDÁRIO",trophyClass:"MONSTRO"/);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/tucunare-dourado-v13.png", import.meta.url)), true);
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {

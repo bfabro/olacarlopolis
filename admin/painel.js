@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 787,
-  label: "v794",
+  numero: 788,
+  label: "v795",
   data: "2026-09-23",
-  nota: "Ranking do Pesque e Solte combina leituras sem cache, mostra a data da pescaria e permite novamente novos registros do JP."
+  nota: "Pesque e Solte reinicia no estaleiro, recebe o lendário Tucunaré Dourado na Pedra Dourada e bloqueia a lancha na galhada."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
