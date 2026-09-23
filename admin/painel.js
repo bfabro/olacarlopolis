@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 784,
-  label: "v791",
+  numero: 785,
+  label: "v792",
   data: "2026-09-23",
-  nota: "Pesque e Solte facilita a faixa verde e preserva todos os jogadores no ranking geral pelo identificador individual."
+  nota: "Pesque e Solte separa jogadores pelo ID local, classifica raridade por peso e tamanho e adiciona som de impacto da boia."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

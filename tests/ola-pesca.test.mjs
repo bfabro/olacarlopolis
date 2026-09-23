@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=9/);
-  assert.match(html, /ola-pesca\.js\?v=9/);
+  assert.match(html, /ola-pesca\.css\?v=10/);
+  assert.match(html, /ola-pesca\.js\?v=10/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -172,15 +172,16 @@ test("v6 provoca tentativas secas e anima a vara durante o arremesso", () => {
   assert.match(source, /g\.castAnimationAt=performance\.now\(\)/);
 });
 
-test("v9 consolida todos os jogadores e mantém o maior peixe de cada identificador", () => {
+test("v10 usa o ID local, migra a chave de autenticação e mantém todos os jogadores", () => {
   const ranking = [
     { id: "local-a", name: "Ana", speciesId: "pintado", speciesName: "Pintado", bestWeight: 12, bestLength: 90, captures: 4 },
     { id: "local-a2", name: "Ana", speciesId: "traira", speciesName: "Traíra", bestWeight: 7, bestLength: 62, captures: 2 },
-    { id: "local-b", name: "Beto", speciesId: "pacu", speciesName: "Pacu", bestWeight: 5, bestLength: 50, captures: 2 }
+    { id: "local-b", name: "Beto", speciesId: "pacu", speciesName: "Pacu", bestWeight: 5, bestLength: 50, captures: 2 },
+    { id: "uid-ana", ownerUid: "uid-ana", name: "Ana", speciesId: "tilapia", speciesName: "Tilápia", bestWeight: 4, bestLength: 55, captures: 1 }
   ];
   const progress = [
-    { id: "uid-ana", userId: "uid-ana", playerName: "Ana", captures: [{ speciesId: "pintado", speciesName: "Pintado", weight: 12, length: 90, capturedAt: "2026-09-23T10:00:00.000Z" }], stats: { totalFishCaught: 8 } },
-    { id: "uid-cida", userId: "uid-cida", playerName: "Cida", captures: [{ speciesId: "carpa", speciesName: "Carpa", weight: 8, length: 70, capturedAt: "2026-09-23T11:00:00.000Z" }], stats: { totalFishCaught: 3 } }
+    { id: "uid-ana", userId: "uid-ana", rankingPlayerId: "local-a", playerName: "Ana", captures: [{ speciesId: "pintado", speciesName: "Pintado", weight: 12, length: 90, capturedAt: "2026-09-23T10:00:00.000Z" }], stats: { totalFishCaught: 8 } },
+    { id: "uid-cida", userId: "uid-cida", rankingPlayerId: "local-c", playerName: "Cida", captures: [{ speciesId: "carpa", speciesName: "Carpa", weight: 8, length: 70, capturedAt: "2026-09-23T11:00:00.000Z" }], stats: { totalFishCaught: 3 } }
   ];
   const merged = core.mergeRankingEntries(ranking, progress);
   assert.equal(merged.length, 4);
@@ -188,8 +189,27 @@ test("v9 consolida todos os jogadores e mantém o maior peixe de cada identifica
   assert.equal(merged[0].ownerUid, "uid-ana");
   assert.equal(merged[0].captures, 8);
   assert.match(source, /jogos\/olaPesca\/users/);
-  assert.match(source, /rankingPlayerKey/);
+  assert.match(source, /function rankingPlayerKey\(\)\{return playerId\(\)\}/);
+  assert.match(source, /ranking\/\$\{localId\}/);
   assert.match(source, /a\.length===1\?"jogador":"jogadores"/);
+});
+
+test("v10 classifica lendário pelo peso e comprimento relativos da espécie", () => {
+  for (const species of core.SPECIES) {
+    assert.equal(core.rarityBySize(species, species.maxL, species.maxW), "LENDÁRIO");
+    assert.notEqual(core.rarityBySize(species, species.maxL, species.minW), "LENDÁRIO");
+    assert.notEqual(core.rarityBySize(species, species.minL, species.maxW), "LENDÁRIO");
+  }
+  assert.match(source, /lengthRatio>=\.94&&z\.weightRatio>=\.92/);
+  assert.match(source, /rarity:rarityBySize\(s,length,weight\)/);
+});
+
+test("v10 reproduz som de impacto quando a boia cai na água", () => {
+  assert.match(source, /function splashSound\(delay=\.3\)/);
+  assert.match(source, /createBuffer\(1,frames,a\.sampleRate\)/);
+  assert.match(source, /if\(a\.state==="suspended"\)a\.resume\(\)/);
+  assert.match(source, /filter\.type="lowpass"/);
+  assert.match(source, /if\(g\.mode==="waiting"\)splashSound\(\.3\)/);
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {
