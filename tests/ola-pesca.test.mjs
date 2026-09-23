@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=4/);
-  assert.match(html, /ola-pesca\.js\?v=4/);
+  assert.match(html, /ola-pesca\.css\?v=5/);
+  assert.match(html, /ola-pesca\.js\?v=5/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -82,13 +82,18 @@ test("v3 mostra sprites dos tucunarés e imagem do peixe no ranking", () => {
   assert.match(css, /grid-template-columns:38px 66px 1fr auto/);
 });
 
-test("v4 orienta a lancha, desenha rastro, árvores e galhada produtiva", () => {
-  assert.match(source, /down:Math\.PI\/2/);
+test("v5 desenha a lancha em vistas coerentes com motor, bancos e rastro", () => {
+  assert.match(source, /function drawBoatWake/);
   assert.match(source, /boat\(c,x,y\+5,g\.player\.facing,moving,n\)/);
-  assert.match(source, /rgba\(220,250,255,\.7\)/);
+  assert.match(source, /facing==="up"/);
+  assert.match(source, /else\{const up=facing==="up"/);
+  assert.match(source, /fillRect\(-12,up\?7:-12,24,5\)/);
+  assert.match(source, /fillRect\(-7,up\?23:-31,14,10\)/);
+  assert.match(source, /rgba\(220,250,255,\.72\)/);
   assert.match(source, /TREE_POSITIONS/);
   assert.match(source, /function drawTree/);
   assert.match(source, /function drawSnag/);
+  assert.match(source, /#326a38/);
   assert.equal(core.SNAG.radius, 72);
   assert.match(source, /id:"galhada"/);
   assert.match(source, /bonus:\.16/);
@@ -105,6 +110,24 @@ test("v4 usa relação alométrica realista entre comprimento e peso", () => {
   for (const item of core.SPECIES) {
     assert.ok(item.power >= 2.9 && item.power <= 3.25, `${item.name}: expoente ${item.power}`);
   }
+});
+
+test("v5 separa a fala do personagem e mostra somente a probabilidade na captura", () => {
+  assert.match(source, /const CATCH_QUOTES=\{lambari:/);
+  assert.match(source, /pesca-character-quote/);
+  assert.match(source, /Probabilidade de captura/);
+  assert.match(source, /CHANCE_LABEL\[c\.rarity\]/);
+  assert.match(css, /\.pesca-character-quote p:after/);
+  assert.match(css, /\.pesca-catch-probability/);
+});
+
+test("v5 usa modal mobile completo e ranking com o maior peixe de todos", () => {
+  assert.match(css, /@media\(max-width:600px\)\{\.pesca-catch\{position:fixed/);
+  assert.match(css, /min-height:100dvh/);
+  assert.match(source, /loadRanking=async function/);
+  assert.match(source, /ref\("jogos\/olaPesca\/ranking"\)\.once\("value"\)/);
+  assert.match(source, /Maior: \$\{esc\(x\.speciesName/);
+  assert.match(source, /todos os participantes/);
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {
