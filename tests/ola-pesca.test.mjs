@@ -12,8 +12,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=11/);
-  assert.match(html, /ola-pesca\.js\?v=11/);
+  assert.match(html, /ola-pesca\.css\?v=12/);
+  assert.match(html, /ola-pesca\.js\?v=12/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -212,21 +212,23 @@ test("v10 reproduz som de impacto quando a boia cai na água", () => {
   assert.match(source, /if\(g\.mode==="waiting"\)splashSound\(\.3\)/);
 });
 
-test("v11 carrega Duda e os demais jogadores diretamente do placar leve", () => {
+test("v12 carrega Duda, permite o retorno do JP e mostra a data da pescaria", () => {
   const ranking = [
-    { id: "mue998rs-viuinu4", name: "Bruno Fabro", bestWeight: 20.5, bestLength: 90.5, speciesId: "carpa", speciesName: "Carpa" },
-    { id: "muemyg23-n8ctz7u", name: "Duda", bestWeight: 12.15, bestLength: 95.6, speciesId: "pintado", speciesName: "Pintado" },
-    { id: "mue7bb2q-iroenw4", name: "JP", bestWeight: 5.291, bestLength: 88, speciesId: "pintado", speciesName: "Pintado" },
-    { id: "uid-bruno", ownerUid: "uid-bruno", name: "Bruno Fabro", bestWeight: 4.3, bestLength: 60, speciesId: "tilapia", speciesName: "Tilápia" }
+    { id: "mue998rs-viuinu4", name: "Bruno Fabro", bestWeight: 20.5, bestLength: 90.5, speciesId: "carpa", speciesName: "Carpa", bestAt: 1790180344040 },
+    { id: "muemyg23-n8ctz7u", name: "Duda", bestWeight: 12.15, bestLength: 95.6, speciesId: "pintado", speciesName: "Pintado", bestAt: 1790200469664 },
+    { id: "mue7bb2q-iroenw4", name: "JP", bestWeight: 5.291, bestLength: 88, speciesId: "pintado", speciesName: "Pintado", bestAt: 1790202000000 },
+    { id: "uid-bruno", ownerUid: "uid-bruno", name: "Bruno Fabro", bestWeight: 4.3, bestLength: 60, speciesId: "tilapia", speciesName: "Tilápia", bestAt: 1790201178170 }
   ];
   const merged = core.mergeRankingEntries(ranking);
-  assert.deepEqual(Array.from(merged, item => item.name), ["Bruno Fabro", "Duda"]);
+  assert.deepEqual(Array.from(merged, item => item.name), ["Bruno Fabro", "Duda", "JP"]);
   assert.equal(merged.find(item => item.name === "Duda")?.bestWeight, 12.15);
-  assert.equal(merged.some(item => item.name === "JP"), false);
-  assert.match(source, /RANKING_BLOCKED_IDS=new Set\(\["mue7bb2q-iroenw4"\]\)/);
-  assert.match(source, /if\(RANKING_BLOCKED_IDS\.has\(localId\)\)return/);
-  assert.match(source, /rankingSnap=await db\.ref\("jogos\/olaPesca\/ranking"\)\.once\("value"\)/);
-  assert.doesNotMatch(source, /\[rankingSnap,usersSnap\]=await Promise\.all/);
+  assert.equal(merged.some(item => item.name === "JP"), true);
+  assert.doesNotMatch(source, /RANKING_BLOCKED_IDS/);
+  assert.match(source, /function fetchRankingRows/);
+  assert.match(source, /ranking\.json\?ts=\$\{Date\.now\(\)\}/);
+  assert.match(source, /cache:"no-store"/);
+  assert.match(source, /rankingTimeout\(task,ms=3500\)/);
+  assert.match(source, /Pescado em \$\{rankingDate\(x\.bestAt\|\|x\.updatedAt\)\}/);
 });
 
 test("geração determinística mantém peso e comprimento correlacionados", () => {
