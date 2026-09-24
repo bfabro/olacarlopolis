@@ -14,8 +14,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=20/);
-  assert.match(html, /ola-pesca\.js\?v=20/);
+  assert.match(html, /ola-pesca\.css\?v=21/);
+  assert.match(html, /ola-pesca\.js\?v=21/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -251,6 +251,19 @@ test("v20 abre o cliente somente ao pressionar a ação diante do anúncio", () 
   assert.match(source, /textContent="CONHECER"/);
   assert.match(source, /function drawSponsorActionBadge/);
   assert.match(source, /fillText\("A",14,-15\)/);
+});
+
+test("v21 carrega imagens externas e só usa texto depois de falha real", () => {
+  assert.doesNotMatch(source, /crossOrigin="anonymous"/);
+  assert.match(source, /img\.sponsorState="loading"/);
+  assert.match(source, /img\.onload=\(\)=>\{img\.sponsorState="loaded"\}/);
+  assert.match(source, /img\.onerror=\(\)=>\{img\.sponsorState="error"\}/);
+  assert.match(source, /function preloadSponsorImages/);
+  assert.match(source, /else if\(result\.loading\)drawSponsorLoading/);
+  assert.deepEqual(
+    Array.from(core.sponsorSources({ image: "logo.png", images: ["produto.png", "logo.png"] })),
+    ["produto.png", "logo.png"]
+  );
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {
