@@ -14,8 +14,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=15/);
-  assert.match(html, /ola-pesca\.js\?v=15/);
+  assert.match(html, /ola-pesca\.css\?v=16/);
+  assert.match(html, /ola-pesca\.js\?v=16/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -112,6 +112,42 @@ test("v15 anima pescadores de margem e exibe somente logos financeiras sincroniz
   assert.equal(rules.rules.jogos[".read"], true);
   assert.match(rules.rules.jogos.olaPesca.sponsors[".write"], /role.*master.*role.*admin/);
   assert.equal(rules.rules.jogos.olaPesca.$other[".write"], true);
+});
+
+test("v16 mostra o peixe pendurado antes de abrir a ficha da captura", () => {
+  assert.match(source, /g\.mode="landing"/);
+  assert.match(source, /function drawLandedFish/);
+  assert.match(source, /Olha o peixe pendurado na vara/);
+  assert.match(source, /g\.landingTimer=setTimeout/);
+  assert.match(source, /g\.mode="caught";showCatch\(g,captured\)/);
+  assert.match(source, /1750/);
+});
+
+test("v16 mantém um casal de tucunarés em movimento e exige acerto preciso", () => {
+  const gameState = { tucunareCouple: { startedAt: 0, speciesId: "tucunare_azulao", hiddenIndex: null } };
+  const start = core.tucunareCouplePositions(gameState, 0);
+  const moved = core.tucunareCouplePositions(gameState, 1000);
+  assert.equal(start.length, 2);
+  assert.ok(Math.hypot(start[0].x - moved[0].x, start[0].y - moved[0].y) > 10);
+  assert.equal(core.tucunareCoupleHit(gameState, { x: start[0].x, y: start[0].y }, 0)?.index, 0);
+  assert.equal(core.tucunareCoupleHit(gameState, { x: start[0].x + core.TUCUNARE_COUPLE_HIT_RADIUS + 5, y: start[0].y }, 0), null);
+  assert.ok(core.TUCUNARE_COUPLE_HIT_RADIUS <= 20);
+  for (let elapsed = 0; elapsed <= 180000; elapsed += 250) {
+    for (const fish of core.tucunareCouplePositions(gameState, elapsed)) {
+      assert.equal(core.MAP[Math.floor(fish.y / 32)]?.[Math.floor(fish.x / 32)], "W", `sombra fora da água em ${elapsed} ms`);
+    }
+  }
+  assert.match(source, /g\.cast\.hitTucunareCouple=true/);
+  assert.match(source, /g\.cast\.schoolSpeciesId=g\.tucunareCouple\.speciesId/);
+  assert.match(source, /clearTimeout\(g\.waitTimer\)/);
+  assert.match(source, /drawTucunareCouple/);
+});
+
+test("v16 impede rolagem horizontal nos recordes pessoais", () => {
+  assert.match(css, /\.pesca-drawer,\.pesca-drawer>section,\.pesca-record-list\{max-width:100%;overflow-x:hidden\}/);
+  assert.match(css, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
+  assert.match(css, /\.pesca-record-list article,\.pesca-record-list article>\*\{min-width:0\}/);
+  assert.match(css, /@media\(max-width:600px\)\{\.pesca-record-list\{grid-template-columns:1fr\}/);
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {

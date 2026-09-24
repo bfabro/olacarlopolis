@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 790,
-  label: "v797",
+  numero: 791,
+  label: "v798",
   data: "2026-09-23",
-  nota: "Pesque e Solte ganha píer ampliado, duas lanchas com espécies favorecidas, pescadores de margem e logos dos comércios em dia."
+  nota: "Pesque e Solte mostra o peixe pendurado antes da ficha, corrige os recordes no celular e adiciona um casal de tucunarés móvel para pesca de precisão."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
