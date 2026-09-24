@@ -14,8 +14,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=18/);
-  assert.match(html, /ola-pesca\.js\?v=18/);
+  assert.match(html, /ola-pesca\.css\?v=19/);
+  assert.match(html, /ola-pesca\.js\?v=19/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -120,7 +120,7 @@ test("v16 mostra o peixe pendurado antes de abrir a ficha da captura", () => {
   assert.match(source, /Olha o peixe pendurado na vara/);
   assert.match(source, /g\.landingTimer=setTimeout/);
   assert.match(source, /g\.mode="caught";showCatch\(g,captured\)/);
-  assert.match(source, /1750/);
+  assert.match(source, /4000/);
 });
 
 test("v16 mantém um casal de tucunarés em movimento e exige acerto preciso", () => {
@@ -212,6 +212,35 @@ test("v18 adiciona fauna, reforça o casal de tucunarés e mostra horário no ra
   assert.match(source, /function rankingDateTime/);
   assert.match(source, /toLocaleTimeString\("pt-BR"/);
   assert.match(source, /Pescado em \$\{rankingDateTime/);
+});
+
+test("v19 explica a raridade por espécie e compartilha o jogo diretamente", () => {
+  assert.match(source, /data-help-tab="rarity"/);
+  assert.match(source, /mesma espécie/);
+  assert.match(source, /até um lambari pode ser lendário/);
+  assert.match(source, /data-share-game/);
+  assert.match(source, /navigator\.share/);
+  assert.match(source, /url\.hash="#ola-pesca"/);
+  assert.match(css, /\.pesca-help-tabs/);
+});
+
+test("v19 recolhe a linha nos arremessos longos e prolonga o peixe na vara", () => {
+  const state = {
+    cast: { power: 0.8, dir: "right", distance: 80, target: { x: 500, y: 200 } },
+    battle: { pulls: 2, need: 4 },
+    player: { x: 100, y: 200 }
+  };
+  assert.equal(core.queueReelStep(state), 40);
+  core.updateReelAnimation(state, 360);
+  assert.ok(state.cast.target.x < 500);
+  assert.match(source, /cast\.power<=\.5/);
+  assert.match(source, /remainingDistance/);
+  assert.match(source, /const reeling=g\.mode==="battle"/);
+  assert.match(source, /drawFightingFishV19\(c,g,n,q\)/);
+  assert.match(source, /"NA BORDA!"/);
+  assert.match(source, /setTimeout\(\(\)=>game===g&&g\.mode==="battle"&&caught\(g\),430\)/);
+  assert.match(source, /Olha o peixe pendurado na vara!",3600/);
+  assert.match(source, /showCatch\(g,captured\)\},4000/);
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {

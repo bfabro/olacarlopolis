@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 793,
-  label: "v800",
+  numero: 794,
+  label: "v801",
   data: "2026-09-24",
-  nota: "Pesque e Solte melhora a batalha, fixa cada apoiador em seu quadro, alterna imagens do próprio comércio e adiciona fauna e horário ao ranking."
+  nota: "Pesque e Solte explica a raridade por espécie, permite compartilhar o jogo, anima o recolhimento da linha e mantém a captura mais tempo na vara."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
