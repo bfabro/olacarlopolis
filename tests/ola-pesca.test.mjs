@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=31/);
-  assert.match(html, /ola-pesca\.js\?v=31/);
+  assert.match(html, /ola-pesca\.css\?v=32/);
+  assert.match(html, /ola-pesca\.js\?v=32/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 806/);
-  assert.match(panel, /label: "v813"/);
+  assert.match(panel, /numero: 807/);
+  assert.match(panel, /label: "v814"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -673,6 +673,19 @@ test("v31 preserva o nome digitado e reconhece códigos automáticos", () => {
   }]);
   assert.equal(rows[0].name, "Maria Silva");
   assert.match(source, /if\(ask&&\(!n\|\|isGeneratedFishingName\(n\)\)\)/);
+});
+
+test("v32 vira rosto e boné e oferece pistas falsas nos pescadores da margem", () => {
+  assert.match(source, /facing==="right"\)c\.fillRect\(x\+5,y-14,8,3\)/);
+  assert.match(source, /facing==="left"\)c\.fillRect\(x-13,y-14,8,3\)/);
+  assert.match(source, /facing==="down"\)\{c\.fillRect\(x-4,y-10,2,2\)/);
+  assert.equal(core.GOLDEN_FISHER_HINTS.length, core.SHORE_FISHERS.length);
+  assert.match(core.GOLDEN_FISHER_HINTS.join(" "), /Todo pescador é mentiroso/);
+  for (const hint of core.GOLDEN_FISHER_HINTS) assert.doesNotMatch(hint, /pedra|canto inferior|direito/i);
+  assert.match(source, /function nearestShoreFisher/);
+  assert.match(source, /APERTE A PARA OUVIR/);
+  assert.match(source, /shoreFisherSpeech\(g,fisher\)/);
+  assert.match(css, /\.pesca-message\.shore-fisher-speech/);
 });
 
 test("v28 protege configurações e arquivos do ranking para o Master", () => {

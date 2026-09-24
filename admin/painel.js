@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 806,
-  label: "v813",
+  numero: 807,
+  label: "v814",
   data: "2026-09-24",
-  nota: "Pesque e Solte preserva o nome real digitado no ranking e volta a solicitá-lo quando havia apenas um código automático."
+  nota: "Personagem do Pesque e Solte acompanha a direção do movimento e pescadores das margens oferecem pistas misteriosas sobre o Dourado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
