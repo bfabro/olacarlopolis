@@ -46,14 +46,14 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 });
 
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v655/);
-  assert.match(html, /style\.css\?v=506/);
-  assert.match(html, /script\.js\?v=706/);
-  assert.match(html, /Olá Carlópolis v528/);
-  assert.match(panel, /numero: 791/);
-  assert.match(panel, /label: "v798"/);
+  assert.match(site, /Release do site v656/);
+  assert.match(html, /style\.css\?v=507/);
+  assert.match(html, /script\.js\?v=707/);
+  assert.match(html, /Olá Carlópolis v529/);
+  assert.match(panel, /numero: 792/);
+  assert.match(panel, /label: "v799"/);
   assert.match(panel, /data: "2026-09-23"/);
-  assert.match(panelHtml, /painel\.css\?v=497/);
-  assert.match(panelHtml, /painel\.js\?v=728/);
-  assert.match(worker, /2026-09-23-pesque-solte-v846/);
+  assert.match(panelHtml, /painel\.css\?v=498/);
+  assert.match(panelHtml, /painel\.js\?v=729/);
+  assert.match(worker, /2026-09-23-pesque-solte-v847/);
 });

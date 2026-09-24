@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 791,
-  label: "v798",
+  numero: 792,
+  label: "v799",
   data: "2026-09-23",
-  nota: "Pesque e Solte mostra o peixe pendurado antes da ficha, corrige os recordes no celular e adiciona um casal de tucunarés móvel para pesca de precisão."
+  nota: "Pesque e Solte corrige píer, barcos e pescadores, anima o voo da boia até 100 metros e reforça a sincronização das logos em dia."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13795,13 +13795,26 @@ function fishingSponsorImage(client = {}) {
   ).trim();
 }
 
+function fishingSponsorPaymentCurrent(client, monthKey = currentMonthKey()) {
+  if (financePaymentStatusForMonth(client, monthKey) === "pago") return true;
+  if (effectivePaymentStatus(client) !== "pago" || !["semestral", "anual"].includes(client?.tipoPlano)) return false;
+  const validUntil = String(
+    client.vencimentoDataPlano
+    || client.dataVencimentoPlano
+    || client.solicitacaoPlano?.vencimentoDataPlano
+    || client.solicitacaoPlano?.periodoFim
+    || ""
+  ).slice(0, 10);
+  return /^\d{4}-\d{2}-\d{2}$/.test(validUntil) && validUntil >= dateKeyFromDate(new Date());
+}
+
 function fishingSponsorRows(clients = state.clientes, monthKey = currentMonthKey()) {
   return (Array.isArray(clients) ? clients : [])
     .filter((client) => (
       client?.id
       && client.status !== "inativo"
       && isBillableClientType(client)
-      && financePaymentStatusForMonth(client, monthKey) === "pago"
+      && fishingSponsorPaymentCurrent(client, monthKey)
       && fishingSponsorImage(client)
     ))
     .map((client) => ({
@@ -13868,6 +13881,12 @@ async function markFinanceClientPaid(client, monthKey = currentMonthKey()) {
     payload["solicitacaoPlano/confirmadoPor"] = state.user?.uid || "";
   }
   await update(ref(db, `clientesFinanceiro/${client.id}`), payload);
+  const financeSnapshot = await get(ref(db, `clientesFinanceiro/${client.id}`));
+  const finance = financeSnapshot.exists() ? financeSnapshot.val() : {};
+  state.clientesFinanceiro[client.id] = finance;
+  const current = state.clientes.find((item) => item.id === client.id);
+  if (current) upsertClientInState(client.id, mergeClientFinanceData(current, finance));
+  await syncFishingSponsors();
 }
 
 function financeInvoiceValueForMonth(client, monthKey = currentMonthKey()) {

@@ -14,8 +14,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=16/);
-  assert.match(html, /ola-pesca\.js\?v=16/);
+  assert.match(html, /ola-pesca\.css\?v=17/);
+  assert.match(html, /ola-pesca\.js\?v=17/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -84,7 +84,7 @@ test("v14 mantém o Dourado ao lado da pedra pequena no canto inferior direito",
 });
 
 test("v15 amplia o píer e oferece duas lanchas com espécies favorecidas diferentes", () => {
-  assert.equal(core.MAP[10].slice(2, 9), "PPPPPPP");
+  assert.equal(Array.from(core.MAP[10]).filter(tile => tile === "P").length, 6);
   assert.deepEqual(Array.from(core.BOATS, item => item.id), ["branca", "preta"]);
   const white = core.boatFishingTable("branca");
   const black = core.boatFishingTable("preta");
@@ -148,6 +148,40 @@ test("v16 impede rolagem horizontal nos recordes pessoais", () => {
   assert.match(css, /grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
   assert.match(css, /\.pesca-record-list article,\.pesca-record-list article>\*\{min-width:0\}/);
   assert.match(css, /@media\(max-width:600px\)\{\.pesca-record-list\{grid-template-columns:1fr\}/);
+});
+
+test("v17 mantém o píer ampliado dentro da água e a outra lancha estacionada", () => {
+  assert.equal(core.MAP[10].slice(7, 13), "PPPPPP");
+  assert.notEqual(core.MAP[10][6], "P");
+  assert.deepEqual({ ...core.PLAYER_START }, { x: 7.5 * 32, y: 10.5 * 32, facing: "right", inBoat: false });
+  assert.match(source, /const drawMapV17=drawMap/);
+  assert.match(source, /BOATS\.filter\(item=>item\.id!==selected\.id\)/);
+});
+
+test("v17 posiciona as linhas dos pescadores na água e as logos na borda verde", () => {
+  for (const fisher of core.SHORE_FISHERS) {
+    assert.equal(core.MAP[Math.floor(fisher.waterY / 32)]?.[Math.floor(fisher.waterX / 32)], "W");
+  }
+  for (const slot of core.SPONSOR_SLOTS) {
+    assert.equal(core.MAP[Math.floor(slot.y / 32)]?.[Math.floor(slot.x / 32)], "T");
+  }
+  assert.match(source, /waterX=p\.waterX-p\.x,waterY=p\.waterY-p\.y/);
+  assert.match(source, /SPONSOR_CACHE_KEY="ola_pesca_sponsors_v1"/);
+  assert.match(source, /sponsors\.json\?ts=\$\{Date\.now\(\)\}/);
+  assert.match(panel, /function fishingSponsorPaymentCurrent/);
+  assert.match(panel, /await syncFishingSponsors\(\)/);
+});
+
+test("v17 converte força em até 100 metros e anima o voo da boia", () => {
+  const player = { x: 7.5 * 32, y: 10.5 * 32, facing: "right", inBoat: false };
+  assert.equal(core.castTarget({ player }, { dir: "right" }, 0.25).meters, 25);
+  assert.equal(core.castTarget({ player }, { dir: "right" }, 0.5).meters, 50);
+  assert.equal(core.castTarget({ player }, { dir: "right" }, 1).meters, 100);
+  assert.equal(core.CAST_FLIGHT_DURATION, 1100);
+  assert.match(source, /g\.mode="casting"/);
+  assert.match(source, /function drawCastFlight/);
+  assert.match(source, /Math\.sin\(progress\*Math\.PI\)\*82/);
+  assert.match(source, /splashSound\(1\.1\)/);
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {
@@ -300,7 +334,7 @@ test("v10 reproduz som de impacto quando a boia cai na água", () => {
   assert.match(source, /createBuffer\(1,frames,a\.sampleRate\)/);
   assert.match(source, /if\(a\.state==="suspended"\)a\.resume\(\)/);
   assert.match(source, /filter\.type="lowpass"/);
-  assert.match(source, /if\(g\.mode==="waiting"\)splashSound\(\.3\)/);
+  assert.match(source, /if\(g\.mode==="waiting"\)splashSound\(1\.1\)/);
 });
 
 test("v12 carrega Duda, permite o retorno do JP e mostra a data da pescaria", () => {
