@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=32/);
-  assert.match(html, /ola-pesca\.js\?v=32/);
+  assert.match(html, /ola-pesca\.css\?v=33/);
+  assert.match(html, /ola-pesca\.js\?v=33/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 807/);
-  assert.match(panel, /label: "v814"/);
+  assert.match(panel, /numero: 808/);
+  assert.match(panel, /label: "v815"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -686,6 +686,19 @@ test("v32 vira rosto e boné e oferece pistas falsas nos pescadores da margem", 
   assert.match(source, /APERTE A PARA OUVIR/);
   assert.match(source, /shoreFisherSpeech\(g,fisher\)/);
   assert.match(css, /\.pesca-message\.shore-fisher-speech/);
+});
+
+test("v33 eleva margens, adiciona goiabas e anima peixe grande distante", () => {
+  assert.match(source, /function drawRaisedBanks/);
+  assert.ok(new Set(Array.from({ length: 12 }, (_, index) => core.bankHeight(index, index % 5))).size > 1);
+  assert.match(source, /for\(const\[fx,fy,r\]of\[\[-11,-2,3\]/);
+  assert.equal(core.DISTANT_JUMP_POINTS.length, 6);
+  const player = { player: { x: core.DISTANT_JUMP_POINTS[0].x, y: core.DISTANT_JUMP_POINTS[0].y } };
+  const point = core.chooseDistantJumpPoint(player, () => 0);
+  assert.ok(Math.hypot(point.x - player.player.x, point.y - player.player.y) >= 32 * 6);
+  assert.match(source, /function drawDistantFishJump/);
+  assert.match(source, /g\.player\.facing=Math\.abs\(dx\)>Math\.abs\(dy\)/);
+  assert.match(source, /startled\?Math\.abs\(Math\.sin/);
 });
 
 test("v28 protege configurações e arquivos do ranking para o Master", () => {

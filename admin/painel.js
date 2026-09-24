@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 807,
-  label: "v814",
+  numero: 808,
+  label: "v815",
   data: "2026-09-24",
-  nota: "Personagem do Pesque e Solte acompanha a direção do movimento e pescadores das margens oferecem pistas misteriosas sobre o Dourado."
+  nota: "Represa do Pesque e Solte ganha margens elevadas, goiabeiras e saltos ocasionais de peixes grandes com reação do personagem."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
