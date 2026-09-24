@@ -1,4 +1,4 @@
-/* Pesque e Solte v24 - minigame original do Olá Carlópolis. */
+/* Pesque e Solte v25 - minigame original do Olá Carlópolis. */
 (function(){"use strict";
 const KEY="ola_pesca_progress_v2",PID="ola_pesca_player_id",PNAME="ola_pesca_player_name",SPRITE="images/jogos/ola-pesca/peixes-sprites-v2.png",T=32,COLS=32,ROWS=20,MAX=50,BOAT={x:9.5*T,y:10.5*T},PLAYER_START={x:7.5*T,y:10.5*T,facing:"right",inBoat:false},DIR={up:[0,-1,"norte"],right:[1,0,"leste"],down:[0,1,"sul"],left:[-1,0,"oeste"]};
 function buildMap(){const m=Array.from({length:ROWS},(_,y)=>Array.from({length:COLS},(_,x)=>x===0||y===0||x===COLS-1||y===ROWS-1?"T":".")),a=[11,9,8,7,7,8,8,7,7,7,8,8,8,9,10,12],b=[25,27,28,29,29,29,28,29,29,29,28,29,29,28,27,25];for(let y=2;y<=17;y++)for(let x=a[y-2];x<=b[y-2];x++)m[y][x]="W";for(let x=7;x<=12;x++)m[10][x]="P";m[5][3]=m[5][4]=m[6][3]=m[6][4]="H";return m.map(r=>r.join(""))}const MAP=buildMap();
@@ -191,5 +191,6 @@ function shuffleSponsors(items,random=Math.random){const copy=[...items];for(let
 function updateSponsorRotation(g,now=performance.now(),random=Math.random){const sponsors=g?.sponsors||[];if(!sponsors.length){g.sponsorPage=[];return g.sponsorPage}const signature=sponsors.map(item=>item.id).join("|");if(!g.sponsorRotation||g.sponsorRotation.signature!==signature)g.sponsorRotation={signature,pool:shuffleSponsors(sponsors,random),nextAt:now};const rotation=g.sponsorRotation;if(g.sponsorPage?.length&&now<rotation.nextAt)return g.sponsorPage;if(!rotation.pool.length)rotation.pool=shuffleSponsors(sponsors,random);g.sponsorPage=rotation.pool.splice(0,SPONSOR_SLOTS.length);rotation.nextAt=now+60000;preloadSponsorImages(g.sponsorPage);return g.sponsorPage}
 const loopV23=loop;loop=function(g,n){updateSponsorRotation(g,n);loopV23(g,n)};
 // v24: imagens preenchem os quadros e a galeria sem faixas brancas.
+// v25: a modal preserva a proporção completa das imagens de cada cliente.
 window.OlaPescaCore={SPECIES:FISH,SPOTS,MAP,SNAG,GOLDEN_ROCK,PLAYER_START,BOATS,SHORE_FISHERS,SPONSOR_SLOTS,CAST_FLIGHT_DURATION,TUCUNARE_COUPLE_ROUTE,TUCUNARE_COUPLE_HIT_RADIUS,generateFish,validateFishDimensions,rarityFromPercentile:rarity,rarityBySize,fishSizeScore,trophyClass:trophy,captureFish:addCapture,emptyProgress:fresh,castTarget,isGoldenZone,bestProgressFish,mergeRankingEntries,boatFishingTable,normalizeFishingSponsors,tucunareCouplePositions,tucunareCoupleHit,queueReelStep,updateReelAnimation,sponsorSources,shuffleSponsors,updateSponsorRotation};window.mostrarOlaPesca=show;window.destroyOlaPesca=destroy;
 })();

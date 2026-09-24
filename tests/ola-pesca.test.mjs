@@ -19,8 +19,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=24/);
-  assert.match(html, /ola-pesca\.js\?v=24/);
+  assert.match(html, /ola-pesca\.css\?v=25/);
+  assert.match(html, /ola-pesca\.js\?v=25/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -231,14 +231,15 @@ test("v23 distribui 20 anúncios e troca rodadas sem repetir antes de todos pass
   assert.match(css, /\.pesca-sponsor-description/);
 });
 
-test("v24 amplia anúncios e preenche mapa e modal sem faixas brancas", () => {
+test("v25 amplia anúncios no mapa e mostra a imagem completa na modal", () => {
   assert.match(source, /function drawSponsorCover/);
   assert.match(source, /Math\.max\(innerW\/img\.naturalWidth,innerH\/img\.naturalHeight\)/);
   assert.match(source, /w=46,h=44/);
   assert.match(source, /strokeRect\(-25,-24,50,48\)/);
-  assert.match(css, /object-fit:cover/);
+  assert.match(css, /\.pesca-sponsor-gallery img\{[^}]*height:auto/);
+  assert.match(css, /\.pesca-sponsor-gallery img\{[^}]*object-fit:contain/);
   assert.match(css, /object-position:center/);
-  assert.doesNotMatch(css, /\.pesca-sponsor-gallery img\{[^}]*object-fit:contain/);
+  assert.doesNotMatch(css, /\.pesca-sponsor-gallery figure\{[^}]*height:150px/);
 });
 
 test("v18 adiciona fauna, reforça o casal de tucunarés e mostra horário no ranking", () => {
