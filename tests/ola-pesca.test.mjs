@@ -19,8 +19,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=25/);
-  assert.match(html, /ola-pesca\.js\?v=25/);
+  assert.match(html, /ola-pesca\.css\?v=26/);
+  assert.match(html, /ola-pesca\.js\?v=26/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -242,6 +242,38 @@ test("v25 amplia anúncios no mapa e mostra a imagem completa na modal", () => {
   assert.doesNotMatch(css, /\.pesca-sponsor-gallery figure\{[^}]*height:150px/);
 });
 
+test("v26 permite exemplares extraordinários acima do máximo comum", () => {
+  assert.equal(core.EXTRAORDINARY_CHANCE, 0.0025);
+  let extraordinary = null;
+  for (let seed = 1; seed <= 20000 && !extraordinary; seed += 1) {
+    const fish = core.generateFish(seed, core.SPOTS[3], 21);
+    if (fish.extraordinary) extraordinary = fish;
+  }
+  assert.ok(extraordinary);
+  const species = core.SPECIES.find(item => item.id === extraordinary.speciesId);
+  assert.ok(extraordinary.length > species.maxL);
+  assert.ok(extraordinary.length <= species.maximoBiologicoReferencia);
+  assert.ok(extraordinary.weight <= core.biologicalMaxWeight(species));
+  assert.equal(extraordinary.rarity, "LENDÁRIO");
+  assert.equal(extraordinary.trophyClass, "MONSTRO");
+  assert.equal(core.validateFishDimensions(extraordinary), true);
+  assert.match(source, /1 em cada 400 peixes/);
+  assert.match(source, /EXTRAORDINÁRIO/);
+});
+
+test("v26 registra e apresenta o Hall da Sorte do Tucunaré Dourado", () => {
+  const rows = core.normalizeGoldenHall({
+    ana: { name: "Ana", total: 1, bestWeight: 12, bestLength: 98, lastAt: 10 },
+    bia: { name: "Bia", total: 2, bestWeight: 10, bestLength: 91, lastAt: 20 }
+  });
+  assert.deepEqual(Array.from(rows, item => item.name), ["Bia", "Ana"]);
+  assert.match(source, /jogos\/olaPesca\/goldenHall\/\$\{localId\}/);
+  assert.match(source, /ref\("jogos\/olaPesca\/goldenHall"\)\.once\("value"\)/);
+  assert.match(source, /Hall da Sorte/);
+  assert.match(source, /c\?\.speciesId!=="tucunare_dourado"/);
+  assert.match(css, /\.pesca-golden-table/);
+});
+
 test("v18 adiciona fauna, reforça o casal de tucunarés e mostra horário no ranking", () => {
   assert.match(source, /function drawDuck/);
   assert.match(source, /function drawHeron/);
@@ -461,7 +493,7 @@ test("v10 classifica lendário pelo peso e comprimento relativos da espécie", (
     assert.notEqual(core.rarityBySize(species, species.minL, species.maxW), "LENDÁRIO");
   }
   assert.match(source, /lengthRatio>=\.94&&z\.weightRatio>=\.92/);
-  assert.match(source, /rarity:rarityBySize\(s,length,weight\)/);
+  assert.match(source, /rarity:extraordinary\?"LENDÁRIO":rarityBySize\(s,length,weight\)/);
 });
 
 test("v10 reproduz som de impacto quando a boia cai na água", () => {

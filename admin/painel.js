@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 800,
-  label: "v807",
+  numero: 801,
+  label: "v808",
   data: "2026-09-24",
-  nota: "Pesque e Solte corrige a modal dos clientes para mostrar cada imagem inteira e na proporção original."
+  nota: "Pesque e Solte adiciona exemplares extraordinários e o Hall da Sorte para capturas do Tucunaré Dourado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
