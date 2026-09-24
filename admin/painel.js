@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 804,
-  label: "v811",
+  numero: 805,
+  label: "v812",
   data: "2026-09-24",
-  nota: "Ranking do Pesque e Solte ganha explicação objetiva da pontuação e mantém em segredo onde encontrar o Tucunaré Dourado."
+  nota: "Ranking do Pesque e Solte destaca somente o jogador atual, mesmo quando registros antigos compartilham a mesma conta."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

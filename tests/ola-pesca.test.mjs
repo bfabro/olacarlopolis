@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=29/);
-  assert.match(html, /ola-pesca\.js\?v=29/);
+  assert.match(html, /ola-pesca\.css\?v=30/);
+  assert.match(html, /ola-pesca\.js\?v=30/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 804/);
-  assert.match(panel, /label: "v811"/);
+  assert.match(panel, /numero: 805/);
+  assert.match(panel, /label: "v812"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -647,6 +647,18 @@ test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", (
   assert.match(source, /o próximo nome neste Hall da Sorte pode ser o seu/);
   assert.match(source, /A pontuação é a soma dos tamanhos dos peixes/);
   assert.match(css, /\.pesca-ranking-explanation/);
+});
+
+test("v30 destaca somente um jogador quando registros compartilham a mesma conta", () => {
+  const rows = [
+    { id: "jp-local", name: "JP", ownerUid: "conta-compartilhada" },
+    { id: "bruno-local", name: "Bruno Fabro", ownerUid: "conta-compartilhada" }
+  ];
+  assert.equal(core.currentRankingPlayerId(rows, "bruno-local", "conta-compartilhada"), "bruno-local");
+  assert.equal(core.currentRankingPlayerId(rows, "outro-navegador", "conta-compartilhada"), "jp-local");
+  const selected = rows.filter(row => row.id === core.currentRankingPlayerId(rows, "bruno-local", "conta-compartilhada"));
+  assert.equal(selected.length, 1);
+  assert.equal(selected[0].name, "Bruno Fabro");
 });
 
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
