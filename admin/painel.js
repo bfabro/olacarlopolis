@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 802,
-  label: "v809",
+  numero: 803,
+  label: "v810",
   data: "2026-09-24",
-  nota: "Pesque e Solte passa a classificar jogadores pela soma dos maiores comprimentos de cada espécie."
+  nota: "Painel Master passa a controlar rodadas livres e campeonatos do Pesque e Solte com etapas e prêmios."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -295,6 +295,7 @@ let state = {
   combustiveisBusca: [],
   terrainManagement: { owners: {}, terrains: {}, developments: {}, photos: {}, inspections: {}, budgets: {}, services: {}, servicePhotos: {}, timeline: {} },
   sobreNos: {},
+  olaPescaConfig: {},
   xadrezConfig: {},
   beneficios: [],
   beneficiosUtilizacoes: [],
@@ -893,6 +894,7 @@ const views = {
   combustiveisConfig: $("combustiveisConfigView"),
   combustiveisPrecos: $("combustiveisPrecosView"),
   sobreNos: $("sobreNosView"),
+  pescaConfig: $("pescaConfigView"),
   xadrezConfig: $("xadrezConfigView"),
   storiesComerciais: $("storiesComerciaisView"),
   usuarios: $("usuariosView"),
@@ -932,6 +934,7 @@ const viewCopy = {
   combustiveisPrecos: ["Ajustar precos", "Atualize os valores de bomba do posto vinculado ao seu acesso."],
   combustiveisConfig: ["Preço Combustível", "Busque postos da ANP, selecione os publicados e atualize os preços de bomba."],
   sobreNos: ["Sobre nós", "Edite o conteúdo institucional apresentado no site público."],
+  pescaConfig: ["Pesque e Solte", "Gerencie rodadas, campeonatos, etapas e premiações."],
   xadrezConfig: ["Xadrez", "Configure campeonato e premio do jogo de xadrez."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
@@ -1255,7 +1258,7 @@ function canAccessView(viewName) {
     if (viewName === "combustiveisConfig") return isMaster();
     if (viewName === "novidadesConfig") return isMaster();
     if (viewName === "sobreNos") return isMaster();
-    if (viewName === "xadrezConfig") return isMaster();
+    if (viewName === "pescaConfig" || viewName === "xadrezConfig") return isMaster();
     if (viewName === "storiesComerciais") return isMaster();
     return true;
   }
@@ -2925,6 +2928,7 @@ async function loadAllData(onProgress = null) {
     terrainTimelineSnap,
     novidadesConfigSnap,
     sobreNosSnap,
+    olaPescaConfigSnap,
     xadrezConfigSnap,
     exclusoesSnap,
     cliquesBotoesSnap,
@@ -2968,6 +2972,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.timeline.path, { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/novidades"),
     getPanelSnapshot("configuracoes/sobreNos"),
+    getPanelSnapshot("jogos/olaPesca/config", { enabled: isMaster() }),
     getPanelSnapshot("jogos/xadrez/config"),
     getPanelSnapshot("auditoriaExclusoes", { enabled: isMaster() }),
     getPanelSnapshot("cliquesPorBotao", { enabled: false }),
@@ -3099,6 +3104,7 @@ async function loadAllData(onProgress = null) {
   await syncTerrainReminderStatuses();
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
+  state.olaPescaConfig = olaPescaConfigSnap.exists() ? olaPescaConfigSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
   state.exclusoes = [];
   if (exclusoesSnap.exists()) {
@@ -10283,6 +10289,7 @@ function switchView(name) {
   if (target === "combustiveisPrecos") renderFuelClientPrices();
   if (target === "novidadesConfig") renderNovidadesConfig();
   if (target === "sobreNos") renderSobreNosSettings();
+  if (target === "pescaConfig") renderFishingAdmin();
   if (target === "xadrezConfig") renderXadrezConfig();
   if (target === "storiesComerciais") renderStoriesComerciaisView();
   if (target === "beneficios") renderBenefitsView();
@@ -10760,6 +10767,155 @@ function renderSobreNosSettings() {
   renderSobreNosAdminPreview();
 }
 
+function fishingAdminDateInput(value) {
+  const date = new Date(Number(value || 0));
+  if (!Number.isFinite(+date)) return "";
+  const local = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+  return local.toISOString().slice(0, 16);
+}
+
+function fishingAdminStageRow(stage = {}, index = 0) {
+  const defaultName = "Etapa " + (index + 1);
+  return '<article class="fishing-stage-row" data-fishing-stage="' + escapeAttr(stage.id || "") + '">' +
+    '<div class="fishing-stage-order">' + (index + 1) + '</div>' +
+    '<label>Nome da etapa<input data-stage-field="name" maxlength="60" value="' + escapeAttr(stage.name || defaultName) + '" required></label>' +
+    '<label>Início<input data-stage-field="startAt" type="datetime-local" value="' + escapeAttr(fishingAdminDateInput(stage.startAt)) + '" required></label>' +
+    '<label>Fim<input data-stage-field="endAt" type="datetime-local" value="' + escapeAttr(fishingAdminDateInput(stage.endAt)) + '" required></label>' +
+    '<label class="fishing-stage-prize">Prêmio da etapa<input data-stage-field="prize" maxlength="180" value="' + escapeAttr(stage.prize || "") + '" placeholder="Ex.: Vale-compras de R$ 200"></label>' +
+    '<button type="button" class="danger-button fishing-remove-stage" aria-label="Remover etapa"><i class="fa-solid fa-trash"></i></button></article>';
+}
+
+function bindFishingStageRemove(button) {
+  button?.addEventListener("click", () => {
+    const list = $("fishingStagesList");
+    button.closest(".fishing-stage-row")?.remove();
+    const rows = [...(list?.querySelectorAll(".fishing-stage-row") || [])];
+    rows.forEach((row, index) => {
+      const badge = row.querySelector(".fishing-stage-order");
+      if (badge) badge.textContent = String(index + 1);
+    });
+    if (list && !rows.length) list.innerHTML = '<p class="empty-state">Adicione pelo menos uma etapa ao campeonato.</p>';
+  });
+}
+
+function renderFishingAdminStages(stages = []) {
+  const list = $("fishingStagesList");
+  if (!list) return;
+  const normalized = Array.isArray(stages) ? stages : Object.values(stages || {});
+  list.innerHTML = normalized.length ? normalized.map(fishingAdminStageRow).join("") : '<p class="empty-state">Adicione pelo menos uma etapa ao campeonato.</p>';
+  list.querySelectorAll(".fishing-remove-stage").forEach(bindFishingStageRemove);
+}
+
+function appendFishingAdminStage(stage = {}) {
+  const list = $("fishingStagesList");
+  if (!list) return;
+  list.querySelector(".empty-state")?.remove();
+  const index = list.querySelectorAll(".fishing-stage-row").length;
+  list.insertAdjacentHTML("beforeend", fishingAdminStageRow(stage, index));
+  bindFishingStageRemove(list.lastElementChild?.querySelector(".fishing-remove-stage"));
+}
+
+function readFishingAdminStages(championshipStart, championshipEnd) {
+  const rows = [...($("fishingStagesList")?.querySelectorAll(".fishing-stage-row") || [])];
+  if (!rows.length) throw new Error("Adicione pelo menos uma etapa.");
+  const stages = rows.map((row, index) => {
+    const name = row.querySelector('[data-stage-field="name"]')?.value.trim().slice(0, 60) || "Etapa " + (index + 1);
+    const startAt = new Date(row.querySelector('[data-stage-field="startAt"]')?.value || "").getTime();
+    const endAt = new Date(row.querySelector('[data-stage-field="endAt"]')?.value || "").getTime();
+    const prize = row.querySelector('[data-stage-field="prize"]')?.value.trim().slice(0, 180) || "";
+    if (!Number.isFinite(startAt) || !Number.isFinite(endAt) || startAt >= endAt) throw new Error("Confira o período da etapa " + (index + 1) + ".");
+    if (startAt < championshipStart || endAt > championshipEnd) throw new Error("A etapa " + (index + 1) + " precisa ficar dentro do período do campeonato.");
+    return { id: row.dataset.fishingStage || "etapa-" + (index + 1), name, startAt, endAt, prize, order: index + 1 };
+  }).sort((a, b) => a.startAt - b.startAt);
+  for (let index = 1; index < stages.length; index += 1) {
+    if (stages[index].startAt < stages[index - 1].endAt) throw new Error("As etapas não podem ter períodos sobrepostos.");
+  }
+  return stages;
+}
+
+async function loadFishingAdminMetrics(config = state.olaPescaConfig || {}) {
+  const championship = config.championship || {};
+  const id = championship.id || config.activeChampionshipId || "";
+  if (!id) return;
+  try {
+    const base = "jogos/olaPesca/championships/" + id;
+    const [participantsSnap, rankingSnap] = await Promise.all([get(ref(db, base + "/participants")), get(ref(db, base + "/ranking"))]);
+    if ($("fishingParticipantCount")) $("fishingParticipantCount").textContent = String(participantsSnap.numChildren());
+    if ($("fishingChampionshipRankingCount")) $("fishingChampionshipRankingCount").textContent = String(rankingSnap.numChildren());
+  } catch (error) {
+    console.warn("Não foi possível carregar os números do campeonato.", error);
+  }
+}
+
+function renderFishingAdmin() {
+  const form = $("fishingChampionshipForm");
+  if (!form) return;
+  const config = state.olaPescaConfig || {};
+  const championship = state.olaPescaDraft || config.championship || {};
+  form.dataset.championshipId = championship.id || "";
+  $("fishingChampionshipEnabled").checked = state.olaPescaDraft ? false : config.championshipEnabled === true;
+  $("fishingModeChoiceEnabled").checked = state.olaPescaDraft ? false : config.showModeChoice === true;
+  $("fishingChampionshipTitle").value = championship.title || "";
+  $("fishingChampionshipDescription").value = championship.description || "";
+  $("fishingChampionshipStart").value = fishingAdminDateInput(championship.startAt);
+  $("fishingChampionshipEnd").value = fishingAdminDateInput(championship.endAt);
+  $("fishingChampionshipPrize").value = championship.prize || "";
+  renderFishingAdminStages(championship.stages || []);
+  const now = Date.now();
+  const active = config.championshipEnabled === true && Number(championship.startAt) <= now && now <= Number(championship.endAt);
+  if ($("fishingChampionshipStatus")) {
+    $("fishingChampionshipStatus").textContent = active ? "Em andamento" : (config.championshipEnabled ? "Programado ou encerrado" : "Desativado");
+    $("fishingChampionshipStatus").classList.toggle("active", active);
+  }
+  if ($("fishingChampionshipName")) $("fishingChampionshipName").textContent = championship.title || "Nenhum ativo";
+  if ($("fishingFreeRoundLabel")) $("fishingFreeRoundLabel").textContent = String(config.freeRoundId || "legacy").replace(/^rodada-/, "");
+  if ($("fishingParticipantCount")) $("fishingParticipantCount").textContent = "0";
+  if ($("fishingChampionshipRankingCount")) $("fishingChampionshipRankingCount").textContent = "0";
+  if (!state.olaPescaDraft) loadFishingAdminMetrics(config);
+}
+
+async function saveFishingChampionship() {
+  if (!isMaster()) throw new Error("Somente o Admin Master pode alterar o campeonato.");
+  const title = $("fishingChampionshipTitle")?.value.trim().slice(0, 80) || "";
+  const startAt = new Date($("fishingChampionshipStart")?.value || "").getTime();
+  const endAt = new Date($("fishingChampionshipEnd")?.value || "").getTime();
+  if (!title) throw new Error("Informe o nome do campeonato.");
+  if (!Number.isFinite(startAt) || !Number.isFinite(endAt) || startAt >= endAt) throw new Error("Confira o período geral do campeonato.");
+  const currentId = $("fishingChampionshipForm")?.dataset.championshipId || "";
+  const id = currentId || (slugify(title) || "campeonato") + "-" + Date.now().toString(36);
+  const stages = readFishingAdminStages(startAt, endAt);
+  const championship = { id, title, description: $("fishingChampionshipDescription")?.value.trim().slice(0, 280) || "", startAt, endAt, prize: $("fishingChampionshipPrize")?.value.trim().slice(0, 180) || "", stages, updatedAt: Date.now(), updatedBy: state.user?.uid || "" };
+  const config = { ...(state.olaPescaConfig || {}), activeChampionshipId: id, championshipEnabled: $("fishingChampionshipEnabled")?.checked === true, showModeChoice: $("fishingModeChoiceEnabled")?.checked === true, freeRoundId: state.olaPescaConfig?.freeRoundId || "legacy", championship, updatedAt: Date.now(), updatedBy: state.user?.uid || "" };
+  const updates = { "jogos/olaPesca/config": config };
+  updates["jogos/olaPesca/championships/" + id + "/config"] = championship;
+  await firebaseUpdate(ref(db), updates);
+  state.olaPescaConfig = config;
+  state.olaPescaDraft = null;
+  renderFishingAdmin();
+  showToast("Campeonato salvo e publicado no Pesque e Solte.");
+}
+
+async function resetFishingFreeRanking() {
+  if (!isMaster()) return showToast("Somente o Admin Master pode iniciar uma nova rodada.");
+  if (!window.confirm("Arquivar e zerar o ranking da Pesca Livre? Os recordes pessoais e o Hall da Sorte serão mantidos.")) return;
+  if (window.prompt("Para confirmar a nova rodada, digite ZERAR:")?.trim().toUpperCase() !== "ZERAR") {
+    showToast("Operação cancelada.");
+    return;
+  }
+  const rankingSnap = await get(ref(db, "jogos/olaPesca/ranking"));
+  const now = Date.now();
+  const roundId = "rodada-" + now;
+  const updates = { ranking: null };
+  updates["rankingArchives/" + roundId] = { id: roundId, ranking: rankingSnap.exists() ? rankingSnap.val() : {}, archivedAt: now, archivedBy: state.user?.uid || "", reason: "Nova rodada iniciada pelo Admin Master" };
+  updates["config/freeRoundId"] = roundId;
+  updates["config/roundStartedAt"] = now;
+  updates["config/updatedAt"] = now;
+  updates["config/updatedBy"] = state.user?.uid || "";
+  await firebaseUpdate(ref(db, "jogos/olaPesca"), updates);
+  state.olaPescaConfig = { ...(state.olaPescaConfig || {}), freeRoundId: roundId, roundStartedAt: now };
+  renderFishingAdmin();
+  showToast("Ranking arquivado. A nova rodada começou zerada.");
+}
 function renderXadrezConfig() {
   if (!$("xadrezConfigForm")) return;
   const config = state.xadrezConfig || {};
@@ -28456,6 +28612,46 @@ function bindEvents() {
     state.sobreNos = payload;
     renderSobreNosSettings();
     showToast("Página Sobre nós salva e publicada.");
+  });
+  $("fishingChampionshipForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      await saveFishingChampionship();
+    } catch (error) {
+      console.error("Falha ao salvar campeonato de pesca.", error);
+      showToast(error?.message || "Não foi possível salvar o campeonato.");
+    }
+  });
+  $("fishingAddStage")?.addEventListener("click", () => {
+    const startAt = new Date($("fishingChampionshipStart")?.value || "").getTime();
+    const endAt = new Date($("fishingChampionshipEnd")?.value || "").getTime();
+    appendFishingAdminStage({
+      startAt: Number.isFinite(startAt) ? startAt : Date.now(),
+      endAt: Number.isFinite(endAt) ? endAt : Date.now() + 86400000
+    });
+  });
+  $("fishingNewChampionship")?.addEventListener("click", () => {
+    if (!isMaster()) return;
+    const startAt = Date.now() + 3600000;
+    const endAt = startAt + 7 * 86400000;
+    state.olaPescaDraft = {
+      title: "",
+      description: "",
+      startAt,
+      endAt,
+      prize: "",
+      stages: [{ id: "etapa-1", name: "Etapa 1", startAt, endAt, prize: "", order: 1 }]
+    };
+    renderFishingAdmin();
+    $("fishingChampionshipTitle")?.focus();
+  });
+  $("fishingResetRanking")?.addEventListener("click", async () => {
+    try {
+      await resetFishingFreeRanking();
+    } catch (error) {
+      console.error("Falha ao iniciar nova rodada de pesca.", error);
+      showToast("Não foi possível arquivar e zerar o ranking.");
+    }
   });
   $("xadrezConfigForm")?.addEventListener("submit", async (event) => {
     event.preventDefault();

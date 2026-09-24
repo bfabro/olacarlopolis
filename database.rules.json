@@ -473,8 +473,40 @@
             ".validate": "!newData.exists() || (newData.hasChildren(['name', 'image', 'updatedAt']) && newData.child('name').isString() && newData.child('image').isString() && newData.child('updatedAt').isNumber())"
           }
         },
-        "$other": {
+        "config": {
+          ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+        },
+        "ranking": {
           ".write": true
+        },
+        "users": {
+          ".write": true
+        },
+        "goldenHall": {
+          ".write": true
+        },
+        "rankingArchives": {
+          ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+        },
+        "championships": {
+          "$championshipId": {
+            "config": {
+              ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+            },
+            "participants": {
+              ".write": true
+            },
+            "ranking": {
+              ".write": true
+            },
+            "stages": {
+              "$stageId": {
+                "ranking": {
+                  ".write": true
+                }
+              }
+            }
+          }
         }
       },
       "$other": {

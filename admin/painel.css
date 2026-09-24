@@ -12876,3 +12876,22 @@ button.admin-button-loading::after {
   .terrain-dashboard-stats article { min-height: 100px; }
   .terrain-report-metrics { grid-template-columns: 1fr 1fr; }
 }
+
+/* Pesque e Solte: gestão Master de rodadas e campeonatos */
+.fishing-admin-hero{background:linear-gradient(135deg,#f3fbf7,#e7f4ee)}
+.fishing-admin-status{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:#e8ecea;color:#65736d;font-size:.75rem;font-weight:900}
+.fishing-admin-status.active{background:#d9f3e4;color:#197147}
+.fishing-admin-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+.fishing-admin-metrics article{display:flex;min-height:84px;flex-direction:column;justify-content:center;padding:14px;border:1px solid #d5e5dd;border-radius:12px;background:#fff}
+.fishing-admin-metrics small{color:#728078;font-size:.7rem;font-weight:800;text-transform:uppercase}
+.fishing-admin-metrics strong{margin-top:5px;color:#254b3b;font-size:1.05rem;overflow-wrap:anywhere}
+.fishing-stage-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px;border-top:1px solid #dce7e1}
+.fishing-stage-heading>div{display:flex;flex-direction:column;gap:3px}.fishing-stage-heading small{color:#74827b}
+.fishing-stages-list{display:grid;gap:10px}
+.fishing-stage-row{display:grid;grid-template-columns:38px minmax(150px,1fr) minmax(155px,.8fr) minmax(155px,.8fr) minmax(180px,1fr) 42px;align-items:end;gap:9px;padding:12px;border:1px solid #d6e3dc;border-radius:12px;background:#f8fbf9}
+.fishing-stage-row label{display:grid;gap:5px;color:#5e6d65;font-size:.72rem;font-weight:800}.fishing-stage-row input{width:100%}
+.fishing-stage-order{display:grid;width:32px;height:32px;place-items:center;margin-bottom:5px;border-radius:50%;background:#245b52;color:#fff;font-weight:900}
+.fishing-remove-stage{display:grid;width:40px;height:40px;place-items:center;padding:0}
+.fishing-reset-card{border-color:#e7c4c0;background:#fff8f7}.fishing-reset-card .danger-button{background:#a63d35;color:#fff}
+@media(max-width:1100px){.fishing-admin-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.fishing-stage-row{grid-template-columns:38px repeat(2,minmax(0,1fr)) 42px}.fishing-stage-prize{grid-column:2/4}}
+@media(max-width:680px){.fishing-admin-metrics{grid-template-columns:1fr 1fr}.fishing-stage-heading{align-items:stretch;flex-direction:column}.fishing-stage-row{grid-template-columns:34px minmax(0,1fr) 40px}.fishing-stage-row label,.fishing-stage-prize{grid-column:2}.fishing-remove-stage{grid-column:3;grid-row:1}.fishing-stage-order{grid-row:1}.fishing-admin-metrics article{min-height:76px}}

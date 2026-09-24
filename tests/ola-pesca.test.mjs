@@ -8,6 +8,8 @@ const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const site = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 const css = fs.readFileSync(new URL("../ola-pesca.css", import.meta.url), "utf8");
 const panel = fs.readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
+const panelHtml = fs.readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
+const panelCss = fs.readFileSync(new URL("../admin/painel.css", import.meta.url), "utf8");
 const rules = JSON.parse(fs.readFileSync(new URL("../database.rules.json", import.meta.url), "utf8"));
 class FakeImage {
   constructor() { this.complete = false; this.naturalWidth = 0; }
@@ -19,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=27/);
-  assert.match(html, /ola-pesca\.js\?v=27/);
+  assert.match(html, /ola-pesca\.css\?v=28/);
+  assert.match(html, /ola-pesca\.js\?v=28/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -116,7 +118,9 @@ test("v15 anima pescadores de margem e exibe somente logos financeiras sincroniz
   assert.match(panel, /"jogos\/olaPesca\/sponsors"/);
   assert.equal(rules.rules.jogos[".read"], true);
   assert.match(rules.rules.jogos.olaPesca.sponsors[".write"], /role.*master.*role.*admin/);
-  assert.equal(rules.rules.jogos.olaPesca.$other[".write"], true);
+  assert.equal(rules.rules.jogos.olaPesca.ranking[".write"], true);
+  assert.equal(rules.rules.jogos.olaPesca.users[".write"], true);
+  assert.equal(rules.rules.jogos.olaPesca.goldenHall[".write"], true);
 });
 
 test("v16 mostra o peixe pendurado antes de abrir a ficha da captura", () => {
@@ -580,4 +584,68 @@ test("v27 abre a coleção do jogador e explica a pontuação", () => {
   assert.match(source, /jogos\/olaPesca\/users\.json/);
   assert.match(css, /\.pesca-ranking-profile-list/);
   assert.match(css, /grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
+});
+
+test("v28 normaliza campeonato, período e etapa ativa", () => {
+  const config = core.normalizeFishingCompetitionConfig({
+    freeRoundId: "rodada-2",
+    championshipEnabled: true,
+    showModeChoice: true,
+    championship: {
+      id: "copa",
+      title: "Copa da Represa",
+      startAt: 100,
+      endAt: 500,
+      stages: [
+        { id: "final", name: "Final", startAt: 300, endAt: 500, prize: "Troféu" },
+        { id: "classificatoria", name: "Classificatória", startAt: 100, endAt: 299, prize: "Kit pesca" }
+      ]
+    }
+  });
+  assert.equal(config.freeRoundId, "rodada-2");
+  assert.deepEqual(Array.from(config.championship.stages, stage => stage.id), ["classificatoria", "final"]);
+  assert.equal(core.championshipAvailable(config, 250), true);
+  assert.equal(core.championshipAvailable(config, 600), false);
+  assert.equal(core.activeFishingStage(config, 350).id, "final");
+});
+
+test("v28 separa rodada livre, campeonato e ranking das etapas", () => {
+  assert.match(source, /data-mode-choice/);
+  assert.match(source, /config\.showModeChoice&&config\.championshipEnabled/);
+  assert.match(source, /Pesca Livre/);
+  assert.match(source, /Campeonato/);
+  assert.match(source, /championships\/"\+championship\.id/);
+  assert.match(source, /"\/stages\/"\+stage\.id\+"\/ranking"/);
+  assert.match(source, /roundId==="legacy"/);
+  assert.match(source, /Cada modalidade possui seu próprio ranking/);
+  assert.match(css, /\.pesca-mode-choice/);
+  assert.match(css, /\.pesca-mode-badge/);
+  assert.match(source, /ETAPA ATUAL/);
+  assert.match(css, /\.pesca-stage-banner/);
+});
+
+test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmada", () => {
+  assert.match(panelHtml, /data-view="pescaConfig"/);
+  assert.match(panelHtml, /id="fishingChampionshipForm"/);
+  assert.match(panelHtml, /id="fishingStagesList"/);
+  assert.match(panel, /Prêmio da etapa/);
+  assert.match(panelHtml, /id="fishingResetRanking"/);
+  assert.match(panel, /function saveFishingChampionship/);
+  assert.match(panel, /function resetFishingFreeRanking/);
+  assert.match(panel, /digite ZERAR/);
+  assert.match(panel, /rankingArchives\//);
+  assert.match(panel, /championships\//);
+  assert.match(panelCss, /\.fishing-stage-row/);
+  assert.match(panel, /numero: 803/);
+  assert.match(panel, /label: "v810"/);
+});
+
+test("v28 protege configurações e arquivos do ranking para o Master", () => {
+  const fishingRules = rules.rules.jogos.olaPesca;
+  assert.match(fishingRules.config[".write"], /master/);
+  assert.match(fishingRules.rankingArchives[".write"], /master/);
+  assert.equal(fishingRules.ranking[".write"], true);
+  assert.equal(fishingRules.championships.$championshipId.participants[".write"], true);
+  assert.equal(fishingRules.championships.$championshipId.ranking[".write"], true);
+  assert.equal(fishingRules.championships.$championshipId.stages.$stageId.ranking[".write"], true);
 });

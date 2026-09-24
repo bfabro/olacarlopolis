@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=508">
+  <link rel="stylesheet" href="painel.css?v=509">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -64,6 +64,7 @@
           <span class="nav-admin-group-title"><i class="fa-solid fa-puzzle-piece"></i> Módulos especiais</span>
           <button data-view="combustiveisConfig" data-master="true"><i class="fa-solid fa-gas-pump"></i> Preço de combustível</button>
           <button data-view="gestaoTerrenos" data-master="true"><i class="fa-solid fa-map-location-dot"></i> Gestão de terrenos</button>
+          <button data-view="pescaConfig" data-master="true"><i class="fa-solid fa-fish-fins"></i> Pesque e Solte</button>
           <button data-view="xadrezConfig" data-master="true"><i class="fa-solid fa-chess"></i> Xadrez</button>
         </section>
         <section class="nav-admin-group nav-theme-overview" data-role="staff">
@@ -3256,6 +3257,66 @@
         </section>
       </section>
 
+      <section id="pescaConfigView" class="panel-view hidden">
+        <section class="panel-card fishing-admin-hero">
+          <div class="section-head">
+            <div>
+              <h2>Pesque e Solte</h2>
+              <p>Controle as rodadas livres e organize campeonatos com etapas e premiações.</p>
+            </div>
+            <span id="fishingChampionshipStatus" class="fishing-admin-status">Modo livre</span>
+          </div>
+          <div class="fishing-admin-metrics">
+            <article><small>Campeonato</small><strong id="fishingChampionshipName">Nenhum ativo</strong></article>
+            <article><small>Participantes</small><strong id="fishingParticipantCount">0</strong></article>
+            <article><small>Jogadores no ranking</small><strong id="fishingChampionshipRankingCount">0</strong></article>
+            <article><small>Rodada livre</small><strong id="fishingFreeRoundLabel">Legado</strong></article>
+          </div>
+        </section>
+
+        <section class="panel-card">
+          <div class="section-head">
+            <div>
+              <h2>Configuração do campeonato</h2>
+              <p>Defina quando a opção Campeonato aparecerá na entrada do jogo.</p>
+            </div>
+            <button id="fishingNewChampionship" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Novo campeonato</button>
+          </div>
+          <form id="fishingChampionshipForm" class="grid-form">
+            <label class="check-row wide"><input id="fishingChampionshipEnabled" type="checkbox"> Campeonato ativo</label>
+            <label class="check-row wide"><input id="fishingModeChoiceEnabled" type="checkbox"> Mostrar “Pesca Livre ou Campeonato” ao abrir o jogo</label>
+            <label class="wide">Nome do campeonato
+              <input id="fishingChampionshipTitle" maxlength="80" placeholder="Ex.: Copa da Represa 2026" required>
+            </label>
+            <label class="wide">Descrição
+              <textarea id="fishingChampionshipDescription" rows="3" maxlength="280" placeholder="Explique a proposta e as regras principais."></textarea>
+            </label>
+            <label>Início do campeonato<input id="fishingChampionshipStart" type="datetime-local" required></label>
+            <label>Fim do campeonato<input id="fishingChampionshipEnd" type="datetime-local" required></label>
+            <label class="wide">Prêmio geral
+              <input id="fishingChampionshipPrize" maxlength="180" placeholder="Ex.: Troféu e vale-compra para o campeão">
+            </label>
+            <div class="wide fishing-stage-heading">
+              <div><strong>Etapas e prêmios</strong><small>O peixe pontua no campeonato e também na etapa vigente.</small></div>
+              <button id="fishingAddStage" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar etapa</button>
+            </div>
+            <div id="fishingStagesList" class="wide fishing-stages-list"></div>
+            <div class="form-actions wide">
+              <button type="submit"><i class="fa-solid fa-trophy"></i> Salvar campeonato</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel-card fishing-reset-card">
+          <div class="section-head">
+            <div>
+              <h2>Nova rodada da Pesca Livre</h2>
+              <p>Arquiva o ranking atual e inicia uma tabela vazia. Recordes pessoais e o Hall da Sorte não são apagados.</p>
+            </div>
+          </div>
+          <button id="fishingResetRanking" type="button" class="danger-button"><i class="fa-solid fa-rotate"></i> Arquivar e zerar ranking</button>
+        </section>
+      </section>
       <section id="xadrezConfigView" class="panel-view hidden">
         <section class="panel-card">
           <div class="section-head">
@@ -3417,6 +3478,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=739"></script>
+  <script type="module" src="painel.js?v=740"></script>
 </body>
 </html>
