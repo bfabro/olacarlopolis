@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 792,
-  label: "v799",
-  data: "2026-09-23",
-  nota: "Pesque e Solte corrige píer, barcos e pescadores, anima o voo da boia até 100 metros e reforça a sincronização das logos em dia."
+  numero: 793,
+  label: "v800",
+  data: "2026-09-24",
+  nota: "Pesque e Solte melhora a batalha, fixa cada apoiador em seu quadro, alterna imagens do próprio comércio e adiciona fauna e horário ao ranking."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13820,7 +13820,8 @@ function fishingSponsorRows(clients = state.clientes, monthKey = currentMonthKey
     .map((client) => ({
       id: client.id,
       name: String(client.nome || client.name || "Comércio local").trim(),
-      image: fishingSponsorImage(client)
+      image: fishingSponsorImage(client),
+      images: storyClientImages(client).slice(0, 12)
     }));
 }
 
@@ -13830,6 +13831,7 @@ async function syncFishingSponsors() {
   const sponsors = Object.fromEntries(fishingSponsorRows().map((item) => [item.id, {
     name: item.name,
     image: item.image,
+    images: item.images,
     updatedAt
   }]));
   await firebaseSet(ref(db, "jogos/olaPesca/sponsors"), sponsors);

@@ -14,8 +14,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=17/);
-  assert.match(html, /ola-pesca\.js\?v=17/);
+  assert.match(html, /ola-pesca\.css\?v=18/);
+  assert.match(html, /ola-pesca\.js\?v=18/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -182,6 +182,36 @@ test("v17 converte força em até 100 metros e anima o voo da boia", () => {
   assert.match(source, /function drawCastFlight/);
   assert.match(source, /Math\.sin\(progress\*Math\.PI\)\*82/);
   assert.match(source, /splashSound\(1\.1\)/);
+});
+
+test("v18 reposiciona a barra quando o pescador está na parte inferior", () => {
+  assert.match(source, /function positionBattlePanel/);
+  assert.match(source, /playerScreenY>g\.canvas\.height\*\.56/);
+  assert.match(source, /classList\.toggle\("battle-top"/);
+  assert.match(css, /\.pesca-battle\.battle-top\{top:10px;bottom:auto\}/);
+});
+
+test("v18 fixa um cliente por quadro e alterna somente imagens próprias", () => {
+  const sponsors = core.normalizeFishingSponsors({
+    loja: { name: "Loja", image: "logo.png", images: ["produto-a.png", "produto-b.png", "produto-a.png"] }
+  });
+  assert.deepEqual(Array.from(sponsors[0].images), ["produto-a.png", "produto-b.png", "logo.png"]);
+  assert.match(source, /function sponsorForSlot/);
+  assert.match(source, /Math\.floor\(n\/7000\)%images\.length/);
+  assert.match(source, /function showSponsorThanks/);
+  assert.match(source, /Vá conhecer/);
+  assert.match(panel, /images: storyClientImages\(client\)\.slice\(0, 12\)/);
+});
+
+test("v18 adiciona fauna, reforça o casal de tucunarés e mostra horário no ranking", () => {
+  assert.match(source, /function drawDuck/);
+  assert.match(source, /function drawHeron/);
+  assert.match(source, /function drawWildlife/);
+  assert.match(source, /drawTucunareShadow=function/);
+  assert.match(source, /\[-9,-2,6\]\.forEach/);
+  assert.match(source, /function rankingDateTime/);
+  assert.match(source, /toLocaleTimeString\("pt-BR"/);
+  assert.match(source, /Pescado em \$\{rankingDateTime/);
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {
