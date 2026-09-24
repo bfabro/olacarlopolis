@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 803,
-  label: "v810",
+  numero: 804,
+  label: "v811",
   data: "2026-09-24",
-  nota: "Painel Master passa a controlar rodadas livres e campeonatos do Pesque e Solte com etapas e prêmios."
+  nota: "Ranking do Pesque e Solte ganha explicação objetiva da pontuação e mantém em segredo onde encontrar o Tucunaré Dourado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=28/);
-  assert.match(html, /ola-pesca\.js\?v=28/);
+  assert.match(html, /ola-pesca\.css\?v=29/);
+  assert.match(html, /ola-pesca\.js\?v=29/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,17 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 803/);
-  assert.match(panel, /label: "v810"/);
+  assert.match(panel, /numero: 804/);
+  assert.match(panel, /label: "v811"/);
+});
+
+test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
+  assert.doesNotMatch(source, /Quem já encontrou o lendário Tucunaré Dourado na Pedra Dourada/);
+  assert.doesNotMatch(source, /O primeiro sortudo ainda está pescando perto da pedra/);
+  assert.match(source, /O lendário Tucunaré Dourado existe no jogo/);
+  assert.match(source, /o próximo nome neste Hall da Sorte pode ser o seu/);
+  assert.match(source, /A pontuação é a soma dos tamanhos dos peixes/);
+  assert.match(css, /\.pesca-ranking-explanation/);
 });
 
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
