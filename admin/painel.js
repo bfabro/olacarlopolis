@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 805,
-  label: "v812",
+  numero: 806,
+  label: "v813",
   data: "2026-09-24",
-  nota: "Ranking do Pesque e Solte destaca somente o jogador atual, mesmo quando registros antigos compartilham a mesma conta."
+  nota: "Pesque e Solte preserva o nome real digitado no ranking e volta a solicitá-lo quando havia apenas um código automático."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

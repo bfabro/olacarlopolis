@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=30/);
-  assert.match(html, /ola-pesca\.js\?v=30/);
+  assert.match(html, /ola-pesca\.css\?v=31/);
+  assert.match(html, /ola-pesca\.js\?v=31/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 805/);
-  assert.match(panel, /label: "v812"/);
+  assert.match(panel, /numero: 806/);
+  assert.match(panel, /label: "v813"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -659,6 +659,20 @@ test("v30 destaca somente um jogador quando registros compartilham a mesma conta
   const selected = rows.filter(row => row.id === core.currentRankingPlayerId(rows, "bruno-local", "conta-compartilhada"));
   assert.equal(selected.length, 1);
   assert.equal(selected[0].name, "Bruno Fabro");
+});
+
+test("v31 preserva o nome digitado e reconhece códigos automáticos", () => {
+  assert.equal(core.isGeneratedFishingName("Pescador GP7W"), true);
+  assert.equal(core.isGeneratedFishingName("Maria Silva"), false);
+  assert.equal(core.preferredFishingName("Maria Silva", "Pescador GP7W", "local-gp7w"), "Maria Silva");
+  assert.equal(core.preferredFishingName("Pescador GP7W", "Maria Silva", "local-gp7w"), "Maria Silva");
+  const rows = core.mergeScoreRankingEntries([{
+    id: "local-gp7w", name: "Maria Silva", speciesRecords: { piau: { speciesName: "Piau", length: 38, weight: 1.1 } }
+  }], [{
+    rankingPlayerId: "local-gp7w", playerName: "Pescador GP7W", records: { piau: { length: 38, weight: 1.1 } }
+  }]);
+  assert.equal(rows[0].name, "Maria Silva");
+  assert.match(source, /if\(ask&&\(!n\|\|isGeneratedFishingName\(n\)\)\)/);
 });
 
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
