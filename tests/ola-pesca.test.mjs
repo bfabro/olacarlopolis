@@ -14,8 +14,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=21/);
-  assert.match(html, /ola-pesca\.js\?v=21/);
+  assert.match(html, /ola-pesca\.css\?v=22/);
+  assert.match(html, /ola-pesca\.js\?v=22/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -120,7 +120,7 @@ test("v16 mostra o peixe pendurado antes de abrir a ficha da captura", () => {
   assert.match(source, /Olha o peixe pendurado na vara/);
   assert.match(source, /g\.landingTimer=setTimeout/);
   assert.match(source, /g\.mode="caught";showCatch\(g,captured\)/);
-  assert.match(source, /4000/);
+  assert.match(source, /showCatch\(g,captured\)\},3000/);
 });
 
 test("v16 mantém um casal de tucunarés em movimento e exige acerto preciso", () => {
@@ -199,7 +199,7 @@ test("v18 fixa um cliente por quadro e alterna somente imagens próprias", () =>
   assert.match(source, /function sponsorForSlot/);
   assert.match(source, /Math\.floor\(n\/7000\)%images\.length/);
   assert.match(source, /function showSponsorThanks/);
-  assert.match(source, /Vá conhecer/);
+  assert.match(source, /Conheça/);
   assert.match(panel, /images: storyClientImages\(client\)\.slice\(0, 12\)/);
 });
 
@@ -224,7 +224,7 @@ test("v19 explica a raridade por espécie e compartilha o jogo diretamente", () 
   assert.match(css, /\.pesca-help-tabs/);
 });
 
-test("v19 recolhe a linha nos arremessos longos e prolonga o peixe na vara", () => {
+test("v22 recolhe a linha acima de 10% e mantém o peixe na vara por 3 segundos", () => {
   const state = {
     cast: { power: 0.8, dir: "right", distance: 80, target: { x: 500, y: 200 } },
     battle: { pulls: 2, need: 4 },
@@ -233,14 +233,28 @@ test("v19 recolhe a linha nos arremessos longos e prolonga o peixe na vara", () 
   assert.equal(core.queueReelStep(state), 40);
   core.updateReelAnimation(state, 360);
   assert.ok(state.cast.target.x < 500);
-  assert.match(source, /cast\.power<=\.5/);
+  state.cast.power = 0.11;
+  state.cast.target = { x: 500, y: 200 };
+  state.battle.pulls = 1;
+  assert.equal(core.queueReelStep(state), 60);
+  state.cast.power = 0.1;
+  assert.equal(core.queueReelStep(state), null);
+  assert.match(source, /cast\.power<=\.1/);
   assert.match(source, /remainingDistance/);
   assert.match(source, /const reeling=g\.mode==="battle"/);
   assert.match(source, /drawFightingFishV19\(c,g,n,q\)/);
   assert.match(source, /"NA BORDA!"/);
   assert.match(source, /setTimeout\(\(\)=>game===g&&g\.mode==="battle"&&caught\(g\),430\)/);
-  assert.match(source, /Olha o peixe pendurado na vara!",3600/);
-  assert.match(source, /showCatch\(g,captured\)\},4000/);
+  assert.match(source, /Olha o peixe pendurado na vara!",2800/);
+  assert.match(source, /showCatch\(g,captured\)\},3000/);
+});
+
+test("v22 apresenta imagens e convite do próprio comércio sem apoio ao jogo", () => {
+  assert.match(source, /class="pesca-sponsor-gallery"/);
+  assert.match(source, /sponsorSources\(entry\.item\)/);
+  assert.match(source, /Conheça \$\{esc\(entry\.item\.name\)\} e prestigie o comércio local!/);
+  assert.doesNotMatch(source, /APOIO AO PESQUE E SOLTE/);
+  assert.match(css, /\.pesca-sponsor-gallery/);
 });
 
 test("v20 abre o cliente somente ao pressionar a ação diante do anúncio", () => {
