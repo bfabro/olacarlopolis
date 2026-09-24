@@ -9,13 +9,18 @@ const site = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 const css = fs.readFileSync(new URL("../ola-pesca.css", import.meta.url), "utf8");
 const panel = fs.readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
 const rules = JSON.parse(fs.readFileSync(new URL("../database.rules.json", import.meta.url), "utf8"));
-const context = { window: {}, console, Date, Math, setTimeout, clearTimeout, setInterval, clearInterval, performance: { now: () => 0 } };
+class FakeImage {
+  constructor() { this.complete = false; this.naturalWidth = 0; }
+  set src(value) { this.currentSrc = value; }
+  get src() { return this.currentSrc; }
+}
+const context = { window: {}, console, Date, Math, Image: FakeImage, setTimeout, clearTimeout, setInterval, clearInterval, performance: { now: () => 0 } };
 vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=22/);
-  assert.match(html, /ola-pesca\.js\?v=22/);
+  assert.match(html, /ola-pesca\.css\?v=23/);
+  assert.match(html, /ola-pesca\.js\?v=23/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -191,16 +196,39 @@ test("v18 reposiciona a barra quando o pescador está na parte inferior", () => 
   assert.match(css, /\.pesca-battle\.battle-top\{top:10px;bottom:auto\}/);
 });
 
-test("v18 fixa um cliente por quadro e alterna somente imagens próprias", () => {
+test("v23 mantém uma imagem fixa por cliente e preserva suas imagens na modal", () => {
   const sponsors = core.normalizeFishingSponsors({
-    loja: { name: "Loja", image: "logo.png", images: ["produto-a.png", "produto-b.png", "produto-a.png"] }
+    loja: { name: "Loja", description: "Descrição breve", image: "logo.png", images: ["produto-a.png", "produto-b.png", "produto-a.png"] }
   });
-  assert.deepEqual(Array.from(sponsors[0].images), ["produto-a.png", "produto-b.png", "logo.png"]);
+  assert.deepEqual(Array.from(sponsors[0].images), ["logo.png", "produto-a.png", "produto-b.png"]);
+  assert.equal(sponsors[0].description, "Descrição breve");
   assert.match(source, /function sponsorForSlot/);
-  assert.match(source, /Math\.floor\(n\/7000\)%images\.length/);
+  assert.doesNotMatch(source, /Math\.floor\(n\/7000\)%sources\.length/);
   assert.match(source, /function showSponsorThanks/);
   assert.match(source, /Conheça/);
+  assert.match(source, /pesca-sponsor-description/);
+  assert.match(source, /loading="lazy"/);
+  assert.match(panel, /description: String\(client\.descricaoCurta \|\| client\.shortDescription/);
   assert.match(panel, /images: storyClientImages\(client\)\.slice\(0, 12\)/);
+});
+
+test("v23 distribui 20 anúncios e troca rodadas sem repetir antes de todos passarem", () => {
+  assert.equal(core.SPONSOR_SLOTS.length, 20);
+  assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.x < 32).length, 5);
+  assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.x > 31 * 32).length, 5);
+  assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.y < 32).length, 5);
+  assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.y > 19 * 32).length, 5);
+  const gameState = { sponsors: Array.from({ length: 45 }, (_, index) => ({ id: `c${index}`, image: `${index}.png` })) };
+  const first = Array.from(core.updateSponsorRotation(gameState, 0, () => 0.42));
+  assert.equal(first.length, 20);
+  assert.deepEqual(Array.from(core.updateSponsorRotation(gameState, 59999, () => 0.42), item => item.id), first.map(item => item.id));
+  const second = Array.from(core.updateSponsorRotation(gameState, 60000, () => 0.42));
+  const third = Array.from(core.updateSponsorRotation(gameState, 120000, () => 0.42));
+  assert.equal(second.length, 20);
+  assert.equal(third.length, 5);
+  assert.equal(new Set([...first, ...second, ...third].map(item => item.id)).size, 45);
+  assert.match(source, /rotation\.nextAt=now\+60000/);
+  assert.match(css, /\.pesca-sponsor-description/);
 });
 
 test("v18 adiciona fauna, reforça o casal de tucunarés e mostra horário no ranking", () => {

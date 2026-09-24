@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 797,
-  label: "v804",
+  numero: 798,
+  label: "v805",
   data: "2026-09-24",
-  nota: "Pesque e Solte recolhe a linha acima de 10%, mantém o peixe na vara por 3 segundos e apresenta a galeria do comércio."
+  nota: "Pesque e Solte exibe 20 anúncios em rodadas aleatórias de um minuto e inclui a descrição breve do comércio."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13820,6 +13820,7 @@ function fishingSponsorRows(clients = state.clientes, monthKey = currentMonthKey
     .map((client) => ({
       id: client.id,
       name: String(client.nome || client.name || "Comércio local").trim(),
+      description: String(client.descricaoCurta || client.shortDescription || "").trim(),
       image: fishingSponsorImage(client),
       images: storyClientImages(client).slice(0, 12)
     }));
@@ -13830,6 +13831,7 @@ async function syncFishingSponsors() {
   const updatedAt = Date.now();
   const sponsors = Object.fromEntries(fishingSponsorRows().map((item) => [item.id, {
     name: item.name,
+    description: item.description,
     image: item.image,
     images: item.images,
     updatedAt
