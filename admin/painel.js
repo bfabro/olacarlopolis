@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 789,
-  label: "v796",
+  numero: 790,
+  label: "v797",
   data: "2026-09-23",
-  nota: "A pequena pedra do Tucunaré Dourado agora fica sem identificação visual no canto inferior direito da represa."
+  nota: "Pesque e Solte ganha píer ampliado, duas lanchas com espécies favorecidas, pescadores de margem e logos dos comércios em dia."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -2990,6 +2990,9 @@ async function loadAllData(onProgress = null) {
   progress(58, "Organizando clientes e acessos...");
   state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
   applyClientsSnapshot(clientesSnap, clientesFinanceiroSnap, financeClientId);
+  if (canManage) {
+    await syncFishingSponsors().catch((error) => console.warn("Falha ao sincronizar patrocinadores do Pesque e Solte.", error));
+  }
   let scopedClientMetrics = null;
   if (!canManage) {
     const client = currentClientRecord();
@@ -13778,6 +13781,45 @@ function financePaymentStatusForMonth(client, monthKey = currentMonthKey()) {
   }
   if (["em_aberto", "em_analise"].includes(invoiceStatus)) return invoiceStatus;
   return "em_aberto";
+}
+
+function fishingSponsorImage(client = {}) {
+  return String(
+    client.imagem
+    || client.profileImage
+    || client.imagemPerfil
+    || client.perfil
+    || client.logo
+    || client.logoUrl
+    || ""
+  ).trim();
+}
+
+function fishingSponsorRows(clients = state.clientes, monthKey = currentMonthKey()) {
+  return (Array.isArray(clients) ? clients : [])
+    .filter((client) => (
+      client?.id
+      && client.status !== "inativo"
+      && isBillableClientType(client)
+      && financePaymentStatusForMonth(client, monthKey) === "pago"
+      && fishingSponsorImage(client)
+    ))
+    .map((client) => ({
+      id: client.id,
+      name: String(client.nome || client.name || "Comércio local").trim(),
+      image: fishingSponsorImage(client)
+    }));
+}
+
+async function syncFishingSponsors() {
+  if (!canManageClients()) return;
+  const updatedAt = Date.now();
+  const sponsors = Object.fromEntries(fishingSponsorRows().map((item) => [item.id, {
+    name: item.name,
+    image: item.image,
+    updatedAt
+  }]));
+  await firebaseSet(ref(db, "jogos/olaPesca/sponsors"), sponsors);
 }
 
 function financePaidInvoicePayload(client, monthKey = currentMonthKey()) {

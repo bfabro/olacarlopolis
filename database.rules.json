@@ -464,9 +464,27 @@
       ".write": true
     },
 
+    "jogos": {
+      ".read": true,
+      "olaPesca": {
+        "sponsors": {
+          ".write": "auth != null && (root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master' || root.child('usuariosByUid').child(auth.uid).child('role').val() === 'admin')",
+          "$sponsorId": {
+            ".validate": "!newData.exists() || (newData.hasChildren(['name', 'image', 'updatedAt']) && newData.child('name').isString() && newData.child('image').isString() && newData.child('updatedAt').isNumber())"
+          }
+        },
+        "$other": {
+          ".write": true
+        }
+      },
+      "$other": {
+        ".write": true
+      }
+    },
+
     "$other": {
-      ".read": "$other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
-      ".write": "$other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
+      ".read": "$other !== 'jogos' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
+      ".write": "$other !== 'jogos' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
     }
   }
 }

@@ -7,13 +7,15 @@ const source = fs.readFileSync(new URL("../ola-pesca.js", import.meta.url), "utf
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const site = fs.readFileSync(new URL("../script.js", import.meta.url), "utf8");
 const css = fs.readFileSync(new URL("../ola-pesca.css", import.meta.url), "utf8");
+const panel = fs.readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
+const rules = JSON.parse(fs.readFileSync(new URL("../database.rules.json", import.meta.url), "utf8"));
 const context = { window: {}, console, Date, Math, setTimeout, clearTimeout, setInterval, clearInterval, performance: { now: () => 0 } };
 vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=14/);
-  assert.match(html, /ola-pesca\.js\?v=14/);
+  assert.match(html, /ola-pesca\.css\?v=15/);
+  assert.match(html, /ola-pesca\.js\?v=15/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -79,6 +81,37 @@ test("v14 mantém o Dourado ao lado da pedra pequena no canto inferior direito",
   assert.match(source, /rarity:"LENDÁRIO",trophyClass:"MONSTRO"/);
   assert.doesNotMatch(source, /strokeText\("PEDRA DOURADA"|fillText\("PEDRA DOURADA"/);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/tucunare-dourado-v13.png", import.meta.url)), true);
+});
+
+test("v15 amplia o píer e oferece duas lanchas com espécies favorecidas diferentes", () => {
+  assert.equal(core.MAP[10].slice(2, 9), "PPPPPPP");
+  assert.deepEqual(Array.from(core.BOATS, item => item.id), ["branca", "preta"]);
+  const white = core.boatFishingTable("branca");
+  const black = core.boatFishingTable("preta");
+  assert.ok(white.carpa > (black.carpa || 0));
+  assert.ok(black.pintado > (white.pintado || 0));
+  assert.ok(black.tucunare_azulao > (white.tucunare_azulao || 0));
+  assert.match(source, /function nearBoatOption/);
+  assert.match(source, /g\.player\.boatId=option\.id/);
+  assert.match(source, /Cada uma favorece espécies diferentes/);
+});
+
+test("v15 anima pescadores de margem e exibe somente logos financeiras sincronizadas", () => {
+  assert.equal(core.SHORE_FISHERS.length, 5);
+  assert.match(source, /function drawShoreFisher/);
+  assert.match(source, /cycle>10100&&cycle<11150/);
+  assert.match(source, /jogos\/olaPesca\/sponsors/);
+  assert.match(source, /function drawSponsors/);
+  assert.deepEqual(
+    Array.from(core.normalizeFishingSponsors({ a: { name: "Loja A", image: "a.png", updatedAt: 2 }, b: { name: "", image: "b.png" } }), item => item.id),
+    ["a"]
+  );
+  assert.match(panel, /function syncFishingSponsors/);
+  assert.match(panel, /financePaymentStatusForMonth\(client, monthKey\) === "pago"/);
+  assert.match(panel, /"jogos\/olaPesca\/sponsors"/);
+  assert.equal(rules.rules.jogos[".read"], true);
+  assert.match(rules.rules.jogos.olaPesca.sponsors[".write"], /role.*master.*role.*admin/);
+  assert.equal(rules.rules.jogos.olaPesca.$other[".write"], true);
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {
