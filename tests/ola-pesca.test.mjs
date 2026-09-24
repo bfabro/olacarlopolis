@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=33/);
-  assert.match(html, /ola-pesca\.js\?v=33/);
+  assert.match(html, /ola-pesca\.css\?v=34/);
+  assert.match(html, /ola-pesca\.js\?v=34/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 808/);
-  assert.match(panel, /label: "v815"/);
+  assert.match(panel, /numero: 809/);
+  assert.match(panel, /label: "v816"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -699,6 +699,21 @@ test("v33 eleva margens, adiciona goiabas e anima peixe grande distante", () => 
   assert.match(source, /function drawDistantFishJump/);
   assert.match(source, /g\.player\.facing=Math\.abs\(dx\)>Math\.abs\(dy\)/);
   assert.match(source, /startled\?Math\.abs\(Math\.sin/);
+});
+
+test("v34 preserva o píer original e faz a garça cruzar o cenário", () => {
+  assert.match(source, /MAP\[y\]\[x\]==="W"\|\|MAP\[y\]\[x\]==="P"/);
+  assert.equal(core.HERON_ROUTES.length, 2);
+  const route = core.HERON_ROUTES[0];
+  const resting = core.heronFlightState(0, route);
+  const flying = core.heronFlightState(29000, route);
+  const landed = core.heronFlightState(33000, route);
+  assert.equal(resting.flying, false);
+  assert.equal(flying.flying, true);
+  assert.equal(landed.flying, false);
+  assert.ok(flying.x > route.from.x && flying.x < route.to.x);
+  assert.equal(landed.x, route.to.x);
+  assert.match(source, /function drawFlyingHeron/);
 });
 
 test("v28 protege configurações e arquivos do ranking para o Master", () => {

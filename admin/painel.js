@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 808,
-  label: "v815",
+  numero: 809,
+  label: "v816",
   data: "2026-09-24",
-  nota: "Represa do Pesque e Solte ganha margens elevadas, goiabeiras e saltos ocasionais de peixes grandes com reação do personagem."
+  nota: "Píer do Pesque e Solte recupera o desenho original e garças passam a voar ocasionalmente entre as margens."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
