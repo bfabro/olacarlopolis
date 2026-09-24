@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 801,
-  label: "v808",
+  numero: 802,
+  label: "v809",
   data: "2026-09-24",
-  nota: "Pesque e Solte adiciona exemplares extraordinários e o Hall da Sorte para capturas do Tucunaré Dourado."
+  nota: "Pesque e Solte passa a classificar jogadores pela soma dos maiores comprimentos de cada espécie."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

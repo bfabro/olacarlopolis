@@ -19,8 +19,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=26/);
-  assert.match(html, /ola-pesca\.js\?v=26/);
+  assert.match(html, /ola-pesca\.css\?v=27/);
+  assert.match(html, /ola-pesca\.js\?v=27/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -548,4 +548,36 @@ test("capturas registram recorde, PESCAdex e histórico", () => {
   assert.equal(progress.stats.totalFishCaught, 1);
   assert.equal(progress.records[capture.speciesId].captureId, capture.id);
   globalThis.localStorage = originalLocalStorage;
+});
+
+test("v27 soma o maior comprimento de cada espécie no ranking", () => {
+  const ranking = [{
+    id: "ana",
+    name: "Ana",
+    speciesRecords: {
+      piau: { speciesName: "Piau", length: 38, weight: 1.1, capturedAt: 10 },
+      pacu: { speciesName: "Pacu", length: 72.5, weight: 9.2, capturedAt: 20 }
+    }
+  }, {
+    id: "bia",
+    name: "Bia",
+    speciesId: "pintado", speciesName: "Pintado", bestLength: 100, bestWeight: 18, bestAt: 30
+  }];
+  const progress = [{ rankingPlayerId: "ana", playerName: "Ana", records: { piau: { length: 41, weight: 1.2, recordDate: "2026-09-24T10:00:00.000Z" } } }];
+  const rows = core.mergeScoreRankingEntries(ranking, progress);
+  assert.deepEqual(Array.from(rows, row => row.name), ["Ana", "Bia"]);
+  assert.equal(rows[0].score, 113.5);
+  assert.equal(rows[0].speciesCount, 2);
+  assert.equal(rows[0].speciesRecords.piau.length, 41);
+  assert.deepEqual({ ...core.rankingScore(rows[0].speciesRecords) }, { score: 113.5, speciesCount: 2, totalWeight: 10.4 });
+});
+
+test("v27 abre a coleção do jogador e explica a pontuação", () => {
+  assert.match(source, /function openRankingProfile/);
+  assert.match(source, /data-ranking-player/);
+  assert.match(source, /1 cm = 1 ponto/);
+  assert.match(source, /Como funciona o ranking/);
+  assert.match(source, /jogos\/olaPesca\/users\.json/);
+  assert.match(css, /\.pesca-ranking-profile-list/);
+  assert.match(css, /grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 });
