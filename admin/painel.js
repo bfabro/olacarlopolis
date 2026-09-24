@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 798,
-  label: "v805",
+  numero: 799,
+  label: "v806",
   data: "2026-09-24",
-  nota: "Pesque e Solte exibe 20 anúncios em rodadas aleatórias de um minuto e inclui a descrição breve do comércio."
+  nota: "Pesque e Solte amplia os quadros dos clientes e preenche toda a área das imagens no mapa e na modal."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
