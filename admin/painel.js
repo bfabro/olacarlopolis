@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 794,
-  label: "v801",
+  numero: 795,
+  label: "v802",
   data: "2026-09-24",
-  nota: "Pesque e Solte explica a raridade por espécie, permite compartilhar o jogo, anima o recolhimento da linha e mantém a captura mais tempo na vara."
+  nota: "Pesque e Solte passa a abrir a apresentação do cliente somente quando o jogador pressiona a ação diante do anúncio."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

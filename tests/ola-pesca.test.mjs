@@ -14,8 +14,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=19/);
-  assert.match(html, /ola-pesca\.js\?v=19/);
+  assert.match(html, /ola-pesca\.css\?v=20/);
+  assert.match(html, /ola-pesca\.js\?v=20/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -241,6 +241,16 @@ test("v19 recolhe a linha nos arremessos longos e prolonga o peixe na vara", () 
   assert.match(source, /setTimeout\(\(\)=>game===g&&g\.mode==="battle"&&caught\(g\),430\)/);
   assert.match(source, /Olha o peixe pendurado na vara!",3600/);
   assert.match(source, /showCatch\(g,captured\)\},4000/);
+});
+
+test("v20 abre o cliente somente ao pressionar a ação diante do anúncio", () => {
+  assert.match(source, /checkSponsorVisit=function\(g\)\{g\.nearSponsor=g\.mode==="explore"\?nearestSponsor\(g\):null\}/);
+  assert.match(source, /const startChargeV20=startCharge/);
+  assert.match(source, /if\(sponsor\)\{showSponsorThanks\(g,sponsor\);return\}/);
+  assert.match(source, /APERTE A PARA CONHECER/);
+  assert.match(source, /textContent="CONHECER"/);
+  assert.match(source, /function drawSponsorActionBadge/);
+  assert.match(source, /fillText\("A",14,-15\)/);
 });
 
 test("v3 aplica fisgada corporal, duas falhas vermelhas e frases de fuga", () => {
