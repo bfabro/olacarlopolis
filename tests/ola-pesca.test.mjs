@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=46/);
-  assert.match(html, /ola-pesca\.js\?v=46/);
+  assert.match(html, /ola-pesca\.css\?v=47/);
+  assert.match(html, /ola-pesca\.js\?v=47/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 821/);
-  assert.match(panel, /label: "v828"/);
+  assert.match(panel, /numero: 822/);
+  assert.match(panel, /label: "v829"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 46);
+  assert.equal(core.FISHING_MAP_VERSION, 47);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small/);
@@ -971,6 +971,21 @@ test("v46 mantém os anúncios da lateral direita inteiros dentro do mapa", () =
   assert.match(source, /strokeRect\(-25,-24,50,48\)/);
 });
 
+test("v47 preserva o segredo do matinho, amplia o desembarque e contextualiza as piadas", () => {
+  assert.match(source, /Esse matinho pode ser o da sorte!/);
+  assert.doesNotMatch(source, /Aqui só aparecem peixes acima de 6 kg/);
+  const boatAt = (x, y) => ({ zone: "tributario", mode: "explore", player: { x, y, inBoat: true } });
+  const touchingEverySide = [
+    boatAt(8.15 * 32, 10.5 * 32),
+    boatAt(14.85 * 32, 10.5 * 32),
+    boatAt(11.5 * 32, 9.15 * 32),
+    boatAt(11.5 * 32, 11.85 * 32)
+  ];
+  assert.ok(touchingEverySide.every(core.nearIslandDock));
+  assert.equal(core.nearIslandDock(boatAt(6 * 32, 6 * 32)), false);
+  assert.equal(core.TRIBUTARY_GUESTS.length, 4);
+  assert.ok(core.TRIBUTARY_GUESTS.every(guest => guest.joke.includes("Represa de Chavantes")));
+});
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
   assert.match(fishingRules.config[".write"], /master/);
