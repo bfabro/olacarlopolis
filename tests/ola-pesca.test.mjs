@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=41/);
-  assert.match(html, /ola-pesca\.js\?v=41/);
+  assert.match(html, /ola-pesca\.css\?v=42/);
+  assert.match(html, /ola-pesca\.js\?v=42/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 816/);
-  assert.match(panel, /label: "v823"/);
+  assert.match(panel, /numero: 817/);
+  assert.match(panel, /label: "v824"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -889,14 +889,35 @@ test("v41 desenha tráfego e pescadores acima da lancha no Rio da Ponte", () => 
   assert.notEqual(before.x, after.x);
   assert.match(source, /drawPlayer=function\(c,g,n,cam\)\{drawPlayerV41\(c,g,n,cam\);if\(g\.zone==="ponte"\)drawBridgeDeck\(c,g,n,cam\)\}/);
   assert.match(source, /drawBridgeFisher/);
-  assert.match(source, /n\*\.055/);
-  assert.match(source, /n\*\.08/);
+  assert.match(source, /function drawBridgeCar/);
+  assert.match(source, /function drawBridgeMotorcycle/);
   assert.match(source, /Todos os peixes dividem este grande rio/);
   assert.deepEqual(Object.keys(core.BRIDGE_SPOT.table).sort(), Array.from(core.SPECIES, fish => fish.id).sort());
   for (let seed = 1; seed <= 400; seed += 1) {
     const fish = core.generateFish(seed, core.BRIDGE_SPOT, 15);
     assert.equal(core.validateFishDimensions(fish), true);
   }
+});
+test("v42 aprimora o dourado, a ilha e o cenário aquático da ponte", () => {
+  const riverGold = Array.from(core.SPECIES).find(fish => fish.id === "dourado_rio");
+  assert.equal(riverGold.scientific, "Salminus brasiliensis");
+  assert.equal(riverGold.image, "images/jogos/ola-pesca/dourado-rio-v42.png");
+  assert.equal(core.TRIBUTARY_MAP[4][18], "C");
+  assert.equal(core.TRIBUTARY_MAP[3].at(-1), "C");
+  const islandBoats = core.zoneBoatObstacles({ zone: "tributario" }, 0);
+  assert.deepEqual(Array.from(islandBoats, boat => boat.facing), ["left", "up"]);
+  assert.doesNotMatch(source, /CANAL LIBERADO/);
+  for (let y = 1; y < core.BRIDGE_ROWS - 1; y += 1) {
+    for (let x = 1; x < core.BRIDGE_COLS - 1; x += 1) {
+      assert.match(core.BRIDGE_MAP[y][x], /^[WC]$/);
+    }
+  }
+  assert.match(source, /function drawBridgeCar/);
+  assert.match(source, /function drawBridgeMotorcycle/);
+  assert.ok(source.includes('const cars=[{offset:80,lane:28'));
+  assert.ok(source.includes('{offset:510,lane:94'));
+  assert.equal(source.includes('for(const offset of[40,310,590])'), false);
+  assert.equal(source.includes('for(const offset of[170,480])'), false);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 816,
-  label: "v823",
+  numero: 817,
+  label: "v824",
   data: "2026-09-25",
-  nota: "Novo mapa da ponte amplia o rio, mantém a lancha atracada, aplica correnteza e colisão entre embarcações."
+  nota: "Dourado-do-rio ganha arte própria; correnteza, barcos apoitados e cenário aquático da ponte são refinados."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
