@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 814,
-  label: "v821",
+  numero: 815,
+  label: "v822",
   data: "2026-09-25",
-  nota: "Interruptor fica ao lado do píer e funciona após as 18h; peixes acima de 10 kg ganham comemoração sonora."
+  nota: "Pesque e Solte ganha pescadoras, compartilhamento lendário e novo mapa desbloqueável com correnteza e ilha."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

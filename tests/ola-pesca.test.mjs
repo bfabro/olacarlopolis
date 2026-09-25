@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=39/);
-  assert.match(html, /ola-pesca\.js\?v=39/);
+  assert.match(html, /ola-pesca\.css\?v=40/);
+  assert.match(html, /ola-pesca\.js\?v=40/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -56,9 +56,9 @@ test("v2 mostra imagens, local da fisgada, fechamento e ranking exclusivo", () =
   assert.match(source, /quadraticCurveTo/);
 });
 
-test("catálogo possui as 14 espécies incluindo o lendário Tucunaré Dourado", () => {
-  assert.equal(core.SPECIES.length, 14);
-  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare", "tucunare_azulao", "tucunare_vermelho", "tucunare_dourado"]);
+test("catálogo possui as 18 espécies incluindo o lendário Tucunaré Dourado", () => {
+  assert.equal(core.SPECIES.length, 18);
+  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare", "tucunare_azulao", "tucunare_vermelho", "tucunare_dourado", "dourado_rio", "piracanjuba", "cachara", "jau"]);
   assert.equal(core.SPECIES.find(item => item.id === "tucunare").scientific, "Cichla kelberi");
   assert.equal(core.SPECIES.find(item => item.id === "tucunare_azulao").scientific, "Cichla piquiti");
   assert.equal(core.SPECIES.find(item => item.id === "tucunare_vermelho").scientific, "Cichla mirianae");
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 814/);
-  assert.match(panel, /label: "v821"/);
+  assert.match(panel, /numero: 815/);
+  assert.match(panel, /label: "v822"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -808,6 +808,54 @@ test("v39 posiciona o interruptor na margem, libera às 18h e comemora peixões"
   assert.match(source, /function happyCatchSound/);
   assert.ok(source.includes('SpeechSynthesisUtterance("Uhul!")'));
   assert.ok(source.includes("if(captured.weight>10)happyCatchSound()"));
+});
+test("v40 adiciona pescadoras e compartilhamento de tucunaré lendário", () => {
+  const women = core.SHORE_FISHERS.filter(fisher => fisher.gender === "woman");
+  assert.equal(women.length, 2);
+  assert.deepEqual(Array.from(women, fisher => fisher.color), ["#ef6fa8", "#f2c94c"]);
+  assert.match(source, /p\.gender==="woman"/);
+  assert.match(source, /data-share-legendary/);
+  assert.match(source, /Compartilhar no Instagram/);
+  assert.match(source, /navigator\.share/);
+  assert.match(source, /new File\(\[blob\]/);
+  assert.match(source, /peixe mais raro e difícil de encontrar do jogo/);
+  assert.match(source, /FEITO INCRÍVEL!/);
+});
+
+test("v40 libera o Braço Selvagem depois de um lendário", () => {
+  assert.equal(core.TRIBUTARY_MAP.length, 20);
+  assert.equal(core.TRIBUTARY_MAP[0].length, 32);
+  assert.ok(core.TRIBUTARY_MAP.some(row => row.includes("C")));
+  assert.ok(core.TRIBUTARY_MAP.some(row => row.includes("I")));
+  assert.ok(core.TRIBUTARY_MAP.some(row => row.includes("P")));
+  assert.equal(core.hasLegendaryAccess({ stats: { legendaryCaught: 1 }, captures: [] }), true);
+  assert.equal(core.hasLegendaryAccess({ stats: {}, captures: [{ rarity: "LENDÁRIO" }] }), true);
+  assert.equal(core.hasLegendaryAccess({ stats: {}, captures: [{ rarity: "ÉPICO" }] }), false);
+  assert.ok(core.TRIBUTARY_SPOTS.current.table.dourado_rio > core.TRIBUTARY_SPOTS.river.table.dourado_rio);
+  for (const spot of Object.values(core.TRIBUTARY_SPOTS)) {
+    for (let seed = 1; seed <= 300; seed += 1) {
+      const fish = core.generateFish(seed, spot, 14);
+      assert.equal(core.validateFishDimensions(fish), true);
+      assert.ok(Object.hasOwn(spot.table, fish.speciesId));
+    }
+  }
+  const progress = core.emptyProgress();
+  const legendary = core.generateFish(1234, core.TRIBUTARY_SPOTS.current, 14);
+  legendary.rarity = "LENDÁRIO";
+  const originalLocalStorage = context.localStorage;
+  context.localStorage = { setItem() {} };
+  core.captureFish(progress, legendary);
+  assert.equal(progress.stats.legendaryCaught, 1);
+  context.localStorage = originalLocalStorage;
+  assert.equal(core.nearIslandDock({ zone: "tributario", mode: "explore", player: { x: core.ISLAND_DOCK.boatX, y: core.ISLAND_DOCK.boatY, inBoat: true } }), true);
+  assert.equal(core.TRIBUTARY_MAP[Math.floor(core.ISLAND_DOCK.boatY / 32)][Math.floor(core.ISLAND_DOCK.boatX / 32)], "W");
+  assert.equal(core.TRIBUTARY_GUESTS.length, 4);
+  assert.ok(core.TRIBUTARY_GUESTS.every(guest => /!/.test(guest.joke)));
+  assert.match(source, /function checkFishingMapTransition/);
+  assert.match(source, /g\.player\.inBoat/);
+  assert.match(source, /Ilha do Churrasco/);
+  assert.match(source, /PEGUE 1 PEIXE LENDÁRIO/);
+  assert.match(source, /Você desembarcou na Ilha do Churrasco/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
