@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 824,
-  label: "v831",
+  numero: 825,
+  label: "v832",
   data: "2026-09-25",
-  nota: "Mapa v49 alinha o bloqueio somente com pedras na borda direita, sem textos nem interferência na rota dos tucunarés."
+  nota: "Mapa v50 inicia o acesso após a água original, preserva tucunarés, garça e anúncios, e renova a arte realista do Dourado-do-rio."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
