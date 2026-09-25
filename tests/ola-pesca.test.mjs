@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=42/);
-  assert.match(html, /ola-pesca\.js\?v=42/);
+  assert.match(html, /ola-pesca\.css\?v=43/);
+  assert.match(html, /ola-pesca\.js\?v=43/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 817/);
-  assert.match(panel, /label: "v824"/);
+  assert.match(panel, /numero: 818/);
+  assert.match(panel, /label: "v825"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -918,6 +918,15 @@ test("v42 aprimora o dourado, a ilha e o cenário aquático da ponte", () => {
   assert.ok(source.includes('{offset:510,lane:94'));
   assert.equal(source.includes('for(const offset of[40,310,590])'), false);
   assert.equal(source.includes('for(const offset of[170,480])'), false);
+});
+test("v43 reposiciona o pescador para fora do acesso da correnteza", () => {
+  const fisher = core.SHORE_FISHERS[2];
+  assert.equal(fisher.x, 29.05 * 32);
+  assert.equal(fisher.y, 8.15 * 32);
+  assert.equal(fisher.waterX, 28.55 * 32);
+  assert.ok(fisher.y > 7 * 32);
+  assert.equal(core.MAP[Math.floor(fisher.y / 32)][Math.floor(fisher.x / 32)], ".");
+  assert.equal(core.MAP[Math.floor(fisher.waterY / 32)][Math.floor(fisher.waterX / 32)], "W");
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;

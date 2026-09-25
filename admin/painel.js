@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 817,
-  label: "v824",
+  numero: 818,
+  label: "v825",
   data: "2026-09-25",
-  nota: "Dourado-do-rio ganha arte própria; correnteza, barcos apoitados e cenário aquático da ponte são refinados."
+  nota: "Pescador da margem direita é reposicionado para não ficar cortado junto ao acesso da correnteza."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

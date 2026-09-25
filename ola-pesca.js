@@ -1,4 +1,4 @@
-/* Pesque e Solte v42 - minigame original do Olá Carlópolis. */
+/* Pesque e Solte v43 - minigame original do Olá Carlópolis. */
 (function(){"use strict";
 const KEY="ola_pesca_progress_v2",PID="ola_pesca_player_id",PNAME="ola_pesca_player_name",SPRITE="images/jogos/ola-pesca/peixes-sprites-v2.png",T=32,COLS=32,ROWS=20,MAX=50,BOAT={x:9.5*T,y:10.5*T},PLAYER_START={x:7.5*T,y:10.5*T,facing:"right",inBoat:false},DIR={up:[0,-1,"norte"],right:[1,0,"leste"],down:[0,1,"sul"],left:[-1,0,"oeste"]};
 function buildMap(){const m=Array.from({length:ROWS},(_,y)=>Array.from({length:COLS},(_,x)=>x===0||y===0||x===COLS-1||y===ROWS-1?"T":".")),a=[11,9,8,8,8,8,8,8,8,8,8,8,8,9,10,12],b=[25,27,28,28,28,28,28,28,28,28,28,28,28,28,27,25];for(let y=2;y<=17;y++)for(let x=a[y-2];x<=b[y-2];x++)m[y][x]="W";for(let x=7;x<=12;x++)m[10][x]="P";m[5][3]=m[5][4]=m[6][3]=m[6][4]="H";return m.map(r=>r.join(""))}const MAP=buildMap();
@@ -85,7 +85,7 @@ const BOATS=[
 ],SHORE_FISHERS=[
  {x:6.4*T,y:4.55*T,waterX:8.55*T,waterY:4.7*T,facing:1,color:"#d24c3f",offset:800},
  {x:6.35*T,y:14.7*T,waterX:8.65*T,waterY:14.35*T,facing:1,color:"#ef6fa8",gender:"woman",hair:"#57351f",offset:5200},
- {x:29.05*T,y:5.15*T,waterX:28.65*T,waterY:5.35*T,facing:-1,color:"#70519a",offset:2900},
+ {x:29.05*T,y:8.15*T,waterX:28.55*T,waterY:8.25*T,facing:-1,color:"#70519a",offset:2900},
  {x:29.05*T,y:11.6*T,waterX:28.7*T,waterY:11.55*T,facing:-1,color:"#f2c94c",gender:"woman",hair:"#37241d",offset:7600},
  {x:29.05*T,y:16.1*T,waterX:27.7*T,waterY:16*T,facing:-1,color:"#4c7d48",offset:10100}
 ],SPONSOR_SLOTS=[
