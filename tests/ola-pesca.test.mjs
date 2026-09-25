@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=45/);
-  assert.match(html, /ola-pesca\.js\?v=45/);
+  assert.match(html, /ola-pesca\.css\?v=46/);
+  assert.match(html, /ola-pesca\.js\?v=46/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -219,7 +219,7 @@ test("v23 mantém uma imagem fixa por cliente e preserva suas imagens na modal",
 test("v23 distribui 20 anúncios e troca rodadas sem repetir antes de todos passarem", () => {
   assert.equal(core.SPONSOR_SLOTS.length, 20);
   assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.x < 32).length, 5);
-  assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.x > 31 * 32).length, 5);
+  assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.x >= 31 * 32).length, 5);
   assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.y < 32).length, 5);
   assert.equal(core.SPONSOR_SLOTS.filter(slot => slot.y > 19 * 32).length, 5);
   const gameState = { sponsors: Array.from({ length: 45 }, (_, index) => ({ id: `c${index}`, image: `${index}.png` })) };
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 820/);
-  assert.match(panel, /label: "v827"/);
+  assert.match(panel, /numero: 821/);
+  assert.match(panel, /label: "v828"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 45);
+  assert.equal(core.FISHING_MAP_VERSION, 46);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small/);
@@ -961,6 +961,16 @@ test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", 
     assert.equal(core.validateFishDimensions(fish), true);
   }
 });
+test("v46 mantém os anúncios da lateral direita inteiros dentro do mapa", () => {
+  const canvasWidth = 32 * 32;
+  const rightSlots = core.SPONSOR_SLOTS.filter(slot => slot.x >= 31 * 32);
+  assert.equal(rightSlots.length, 5);
+  assert.ok(rightSlots.every(slot => slot.x === 31 * 32));
+  assert.ok(rightSlots.every(slot => slot.x + 23 <= canvasWidth));
+  assert.ok(rightSlots.every(slot => slot.x + 25 <= canvasWidth));
+  assert.match(source, /strokeRect\(-25,-24,50,48\)/);
+});
+
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
   assert.match(fishingRules.config[".write"], /master/);
