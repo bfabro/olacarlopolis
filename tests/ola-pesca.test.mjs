@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=40/);
-  assert.match(html, /ola-pesca\.js\?v=40/);
+  assert.match(html, /ola-pesca\.css\?v=41/);
+  assert.match(html, /ola-pesca\.js\?v=41/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 815/);
-  assert.match(panel, /label: "v822"/);
+  assert.match(panel, /numero: 816/);
+  assert.match(panel, /label: "v823"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -856,6 +856,47 @@ test("v40 libera o Braço Selvagem depois de um lendário", () => {
   assert.match(source, /Ilha do Churrasco/);
   assert.match(source, /PEGUE 1 PEIXE LENDÁRIO/);
   assert.match(source, /Você desembarcou na Ilha do Churrasco/);
+});
+test("v41 mantém a lancha na ilha e impede sobreposição de barcos", () => {
+  const obstacle = core.zoneBoatObstacles({ zone: "tributario" }, 0)[0];
+  const gameState = { zone: "tributario", player: { inBoat: true } };
+  assert.equal(core.boatObstacleCollision(gameState, obstacle.x, obstacle.y, 0), true);
+  assert.equal(core.boatObstacleCollision(gameState, 2 * 32, 18 * 32, 0), false);
+  assert.match(source, /g\.parkedBoat=\{x:g\.player\.x/);
+  assert.match(source, /drawParkedPlayerBoat/);
+  assert.match(source, /g\.parkedBoat=null/);
+  assert.match(source, /blockedV41\(g,x,y\)\|\|boatObstacleCollision/);
+});
+
+test("v41 mantém a correnteza natural e leva ao mapa ampliado da ponte", () => {
+  assert.equal(core.TRIBUTARY_MAP[3].at(-1), "C");
+  assert.doesNotMatch(source, /fillText\("CORRENTEZA"/);
+  assert.match(source, /tileType==="C"\?15:70/);
+  assert.match(source, /function applyCurrentDrift/);
+  assert.match(source, /dt\*\.012/);
+  assert.equal(core.BRIDGE_MAP.length, 24);
+  assert.equal(core.BRIDGE_MAP[0].length, 44);
+  assert.equal(core.activeFishingMap({ zone: "ponte" }), core.BRIDGE_MAP);
+  assert.match(source, /function enterBridgeMap/);
+  assert.match(source, /passe por baixo dela/i);
+});
+
+test("v41 desenha tráfego e pescadores acima da lancha no Rio da Ponte", () => {
+  assert.equal(core.BRIDGE_BOATS.length, 5);
+  const moving = core.BRIDGE_BOATS.find(item => item.range > 0);
+  const before = core.bridgeBoatPosition(moving, 0);
+  const after = core.bridgeBoatPosition(moving, 10000);
+  assert.notEqual(before.x, after.x);
+  assert.match(source, /drawPlayer=function\(c,g,n,cam\)\{drawPlayerV41\(c,g,n,cam\);if\(g\.zone==="ponte"\)drawBridgeDeck\(c,g,n,cam\)\}/);
+  assert.match(source, /drawBridgeFisher/);
+  assert.match(source, /n\*\.055/);
+  assert.match(source, /n\*\.08/);
+  assert.match(source, /Todos os peixes dividem este grande rio/);
+  assert.deepEqual(Object.keys(core.BRIDGE_SPOT.table).sort(), Array.from(core.SPECIES, fish => fish.id).sort());
+  for (let seed = 1; seed <= 400; seed += 1) {
+    const fish = core.generateFish(seed, core.BRIDGE_SPOT, 15);
+    assert.equal(core.validateFishDimensions(fish), true);
+  }
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 815,
-  label: "v822",
+  numero: 816,
+  label: "v823",
   data: "2026-09-25",
-  nota: "Pesque e Solte ganha pescadoras, compartilhamento lendário e novo mapa desbloqueável com correnteza e ilha."
+  nota: "Novo mapa da ponte amplia o rio, mantém a lancha atracada, aplica correnteza e colisão entre embarcações."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
