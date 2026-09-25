@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=48/);
-  assert.match(html, /ola-pesca\.js\?v=48/);
+  assert.match(html, /ola-pesca\.css\?v=49/);
+  assert.match(html, /ola-pesca\.js\?v=49/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 823/);
-  assert.match(panel, /label: "v830"/);
+  assert.match(panel, /numero: 824/);
+  assert.match(panel, /label: "v831"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -854,7 +854,7 @@ test("v40 libera o Braço Selvagem depois de um lendário", () => {
   assert.match(source, /function checkFishingMapTransition/);
   assert.match(source, /g\.player\.inBoat/);
   assert.match(source, /Ilha do Churrasco/);
-  assert.match(source, /PEGUE 1 PEIXE LENDÁRIO/);
+  assert.match(source, /EXPLORE OUTRO CAMINHO/);
   assert.match(source, /Você desembarcou na Ilha do Churrasco/);
 });
 test("v41 mantém a lancha na ilha e impede sobreposição de barcos", () => {
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 48);
+  assert.equal(core.FISHING_MAP_VERSION, 49);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small/);
@@ -994,6 +994,19 @@ test("v48 inicia a correnteza na borda direita sem cruzar a rota dos tucunarés"
   assert.match(source, /const current=x>=MAIN_CURRENT_START_COL/);
   assert.match(source, /current\?"#267c9e":"#287fa8"/);
   assert.match(source, /col>=MAIN_PASSAGE_START_COL&&col<COLS/);
+});
+test("v49 mantém somente pedras alinhadas na borda direita", () => {
+  assert.equal(core.MAIN_LOCK_ROCKS.length, 5);
+  assert.ok(core.MAIN_LOCK_ROCKS.every(([x]) => x === 31.5));
+  assert.ok(core.MAIN_LOCK_ROCKS.every(([x, , radius]) => x * 32 - radius >= 31 * 32 && x * 32 + radius <= 32 * 32));
+  const easternmostCouplePoint = Math.max(...core.TUCUNARE_COUPLE_ROUTE.map(point => point.x / 32));
+  assert.ok(core.MAIN_LOCK_ROCKS.every(([x, , radius]) => x - radius / 32 > easternmostCouplePoint));
+  const topEdge = Math.min(...core.MAIN_LOCK_ROCKS.map(([, y, radius]) => y * 32 - radius));
+  const bottomEdge = Math.max(...core.MAIN_LOCK_ROCKS.map(([, y, radius]) => y * 32 + radius));
+  assert.ok(topEdge <= 2 * 32 && bottomEdge >= 5 * 32);
+  assert.doesNotMatch(source, /EXIGE 1 LENDÁRIO/);
+  assert.doesNotMatch(source, /PEGUE 1 PEIXE LENDÁRIO/);
+  assert.match(source, /A passagem está fechada por pedras/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
