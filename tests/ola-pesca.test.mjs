@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=38/);
-  assert.match(html, /ola-pesca\.js\?v=38/);
+  assert.match(html, /ola-pesca\.css\?v=39/);
+  assert.match(html, /ola-pesca\.js\?v=39/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 813/);
-  assert.match(panel, /label: "v820"/);
+  assert.match(panel, /numero: 814/);
+  assert.match(panel, /label: "v821"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -772,8 +772,8 @@ test("v37 move o pato-guia livremente, amplia margens e adiciona luz noturna", (
   assert.match(source, /Peixes noturnos estão se aproximando/);
 });
 test("v38 refina patos, casal, Dourado e recolhimento do guia", () => {
-  assert.ok(core.PIER_LIGHT.switchX < 7 * 32);
-  assert.ok(Math.hypot(core.PIER_LIGHT.switchX - 7 * 32, core.PIER_LIGHT.switchY - 10.5 * 32) > 2 * 32);
+  assert.ok(core.PIER_LIGHT.switchX <= 7 * 32);
+  assert.ok(core.PIER_LIGHT.switchY > 11 * 32);
   assert.ok(source.includes('strokeStyle="rgba(255,244,166,.72)"'));
   assert.ok(source.includes("[-13,-3,7].forEach"));
   assert.ok(source.includes("scale=index?.69:.76"));
@@ -792,6 +792,22 @@ test("v38 refina patos, casal, Dourado e recolhimento do guia", () => {
   };
   assert.notEqual(core.queueReelStep(duckReel), null);
   assert.ok(duckReel.cast.reelAnimation.to.x < 320);
+});
+test("v39 posiciona o interruptor na margem, libera às 18h e comemora peixões", () => {
+  const row = Math.floor(core.PIER_LIGHT.switchY / 32);
+  const col = Math.floor(core.PIER_LIGHT.switchX / 32);
+  assert.equal(core.PIER_LIGHT.switchX, 7 * 32);
+  assert.equal(core.MAP[row][col], ".");
+  assert.equal(core.MAP[row][col + 1], "W");
+  assert.ok(Math.hypot(core.PIER_LIGHT.switchX - 7.5 * 32, core.PIER_LIGHT.switchY - 10.5 * 32) > 32);
+  assert.equal(core.isNightHour(17), false);
+  assert.equal(core.isNightHour(18), true);
+  assert.equal(core.isNightHour(5), true);
+  assert.equal(core.isNightHour(6), false);
+  assert.ok(source.includes("FUNCIONA DAS 18H ÀS 6H"));
+  assert.match(source, /function happyCatchSound/);
+  assert.ok(source.includes('SpeechSynthesisUtterance("Uhul!")'));
+  assert.ok(source.includes("if(captured.weight>10)happyCatchSound()"));
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;

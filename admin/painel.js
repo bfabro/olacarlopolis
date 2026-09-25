@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 813,
-  label: "v820",
+  numero: 814,
+  label: "v821",
   data: "2026-09-25",
-  nota: "Patos ganham desenho detalhado, pato-guia pousa na pedra e recolhe a cada acerto, casal fica menor e Dourado recebe faixas claras."
+  nota: "Interruptor fica ao lado do píer e funciona após as 18h; peixes acima de 10 kg ganham comemoração sonora."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
