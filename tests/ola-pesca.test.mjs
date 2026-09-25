@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=43/);
-  assert.match(html, /ola-pesca\.js\?v=43/);
+  assert.match(html, /ola-pesca\.css\?v=44/);
+  assert.match(html, /ola-pesca\.js\?v=44/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 818/);
-  assert.match(panel, /label: "v825"/);
+  assert.match(panel, /numero: 819/);
+  assert.match(panel, /label: "v826"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -927,6 +927,20 @@ test("v43 reposiciona o pescador para fora do acesso da correnteza", () => {
   assert.ok(fisher.y > 7 * 32);
   assert.equal(core.MAP[Math.floor(fisher.y / 32)][Math.floor(fisher.x / 32)], ".");
   assert.equal(core.MAP[Math.floor(fisher.waterY / 32)][Math.floor(fisher.waterX / 32)], "W");
+});
+test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento lendário", () => {
+  assert.equal(core.isMainReservoir({ zone: "represa" }), true);
+  assert.equal(core.isMainReservoir({}), true);
+  assert.equal(core.isMainReservoir({ zone: "tributario" }), false);
+  assert.equal(core.isMainReservoir({ zone: "ponte" }), false);
+  assert.ok(source.includes('g.player.inBoat&&isMainReservoir(g)&&(Math.hypot(x-SNAG.x'));
+  assert.ok(source.includes('nearSnag=isMainReservoir(g)&&Math.hypot(target.x-SNAG.x'));
+  assert.match(source, /data-share-legendary disabled/);
+  assert.match(source, /Preparando compartilhamento/);
+  assert.match(source, /prepareLegendaryShare\(capture\)\.then/);
+  assert.match(source, /navigator\.share\(shareData\)\.catch/);
+  assert.match(source, /fallbackLegendaryShare/);
+  assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;

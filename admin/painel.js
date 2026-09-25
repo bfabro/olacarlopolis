@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 818,
-  label: "v825",
+  numero: 819,
+  label: "v826",
   data: "2026-09-25",
-  nota: "Pescador da margem direita é reposicionado para não ficar cortado junto ao acesso da correnteza."
+  nota: "Galhada fica restrita à represa principal e compartilhamento de captura lendária é preparado antes do clique."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
