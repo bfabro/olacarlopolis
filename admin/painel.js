@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 812,
-  label: "v819",
+  numero: 813,
+  label: "v820",
   data: "2026-09-25",
-  nota: "Pato-guia de olho branco patrulha o alto da represa, margens têm passagem maior e o píer recebe luminária noturna."
+  nota: "Patos ganham desenho detalhado, pato-guia pousa na pedra e recolhe a cada acerto, casal fica menor e Dourado recebe faixas claras."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

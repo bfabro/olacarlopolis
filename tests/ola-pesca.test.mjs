@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=37/);
-  assert.match(html, /ola-pesca\.js\?v=37/);
+  assert.match(html, /ola-pesca\.css\?v=38/);
+  assert.match(html, /ola-pesca\.js\?v=38/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -283,7 +283,7 @@ test("v18 adiciona fauna, reforça o casal de tucunarés e mostra horário no ra
   assert.match(source, /function drawHeron/);
   assert.match(source, /function drawWildlife/);
   assert.match(source, /drawTucunareShadow=function/);
-  assert.match(source, /\[-9,-2,6\]\.forEach/);
+  assert.ok(source.includes("[-9,-3,4,11].forEach"));
   assert.match(source, /function rankingDateTime/);
   assert.match(source, /toLocaleTimeString\("pt-BR"/);
   assert.match(source, /Pescado em \$\{rankingDateTime/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 812/);
-  assert.match(panel, /label: "v819"/);
+  assert.match(panel, /numero: 813/);
+  assert.match(panel, /label: "v820"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -729,7 +729,7 @@ test("v35 oferece pistas verdadeiras, pato-guia e salto brilhante do Dourado", (
   assert.match(source, /hitGuideDuck/);
   assert.match(source, /g\.fish\?\.isGuideDuck.*drawGuideDuckBody/);
   assert.match(source, /Você não pescou um pato/);
-  assert.match(source, /to:\{x:GOLDEN_ROCK\.x-22,y:GOLDEN_ROCK\.y-24\}/);
+  assert.ok(source.includes("to:{...GUIDE_DUCK_PERCH}"));
   assert.match(source, /shadowColor="#ffd84d"/);
   assert.match(source, /BY[.]tucunare_dourado/);
   assert.match(css, /\.pesca-duck-catch/);
@@ -750,7 +750,8 @@ test("v37 move o pato-guia livremente, amplia margens e adiciona luz noturna", (
   const after = core.duckPosition(guide, 100001);
   assert.ok(Math.hypot(after.x - before.x, after.y - before.y) < 2);
   assert.equal(source.includes("step=(n*.012"), false);
-  assert.ok(source.includes('if(duck.catchable){c.fillStyle="#fff"'));
+  assert.ok(source.includes("if(whiteEye){c.fillStyle="));
+  assert.ok(source.includes("position.direction,duck.catchable,true,false"));
   assert.match(source, /returning:true/);
   assert.equal(core.MAP[5][28], "W");
   assert.equal(core.MAP[5][29], ".");
@@ -769,6 +770,28 @@ test("v37 move o pato-guia livremente, amplia margens e adiciona luz noturna", (
   assert.ok(source.includes("nearDock(g)||nearPierLightSwitch(g)"));
   assert.ok(source.includes("pierLightFishingTable(g.spot.table)"));
   assert.match(source, /Peixes noturnos estão se aproximando/);
+});
+test("v38 refina patos, casal, Dourado e recolhimento do guia", () => {
+  assert.ok(core.PIER_LIGHT.switchX < 7 * 32);
+  assert.ok(Math.hypot(core.PIER_LIGHT.switchX - 7 * 32, core.PIER_LIGHT.switchY - 10.5 * 32) > 2 * 32);
+  assert.ok(source.includes('strokeStyle="rgba(255,244,166,.72)"'));
+  assert.ok(source.includes("[-13,-3,7].forEach"));
+  assert.ok(source.includes("scale=index?.69:.76"));
+  assert.match(source, /bezierCurveTo/);
+  assert.equal(core.GUIDE_DUCK_PERCH.x, core.GOLDEN_ROCK.x);
+  assert.ok(core.GUIDE_DUCK_PERCH.y < core.GOLDEN_ROCK.y);
+  assert.ok(source.includes("drawGuideDuckBody(c,GUIDE_DUCK_PERCH.x,GUIDE_DUCK_PERCH.y"));
+  assert.match(source, /function drawDetailedDuck/);
+  assert.match(source, /body.addColorStop/);
+  assert.ok(source.includes("drawGuideDuckBody(c,130,70,0,3.2"));
+  const duckReel = {
+    cast: { power: 0.08, target: { x: 320, y: 320 }, distance: 8, dir: "right" },
+    battle: { pulls: 1, need: 4 },
+    fish: { isGuideDuck: true },
+    player: { x: 64, y: 64 }
+  };
+  assert.notEqual(core.queueReelStep(duckReel), null);
+  assert.ok(duckReel.cast.reelAnimation.to.x < 320);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
