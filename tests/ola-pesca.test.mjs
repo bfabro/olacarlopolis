@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=35/);
-  assert.match(html, /ola-pesca\.js\?v=35/);
+  assert.match(html, /ola-pesca\.css\?v=36/);
+  assert.match(html, /ola-pesca\.js\?v=36/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 810/);
-  assert.match(panel, /label: "v817"/);
+  assert.match(panel, /numero: 811/);
+  assert.match(panel, /label: "v818"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -730,11 +730,19 @@ test("v35 oferece pistas verdadeiras, pato-guia e salto brilhante do Dourado", (
   assert.match(source, /g\.fish\?\.isGuideDuck.*drawGuideDuckBody/);
   assert.match(source, /Você não pescou um pato/);
   assert.match(source, /to:\{x:GOLDEN_ROCK\.x-22,y:GOLDEN_ROCK\.y-24\}/);
-  assert.match(source, /shadowColor="#ffe873"/);
-  assert.match(source, /fillStyle="#f4bd22"/);
+  assert.match(source, /shadowColor="#ffd84d"/);
+  assert.match(source, /BY[.]tucunare_dourado/);
   assert.match(css, /\.pesca-duck-catch/);
 });
 
+test("v36 usa a arte detalhada do Tucunaré Dourado no salto", () => {
+  assert.ok(source.includes("s=BY.tucunare_dourado,img=fightingFishImage(s)"));
+  assert.ok(source.includes("c.drawImage(img,-40,-20,80,40)"));
+  assert.match(source, /createRadialGradient/);
+  assert.match(source, /globalCompositeOperation="screen"/);
+  assert.match(source, /const sweep=c.createLinearGradient/);
+  assert.match(source, /droplet=Math.sin/);
+});
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
   assert.match(fishingRules.config[".write"], /master/);

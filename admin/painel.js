@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 810,
-  label: "v817",
+  numero: 811,
+  label: "v818",
   data: "2026-09-25",
-  nota: "Pescadores dão pistas verdadeiras do Dourado, um pato-guia pode ser fisgado e o lendário salta brilhando na represa."
+  nota: "Salto do Tucunaré Dourado usa a arte detalhada do peixe, brilho animado e respingos mais naturais."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
