@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 819,
-  label: "v826",
+  numero: 820,
+  label: "v827",
   data: "2026-09-25",
-  nota: "Galhada fica restrita à represa principal e compartilhamento de captura lendária é preparado antes do clique."
+  nota: "Mapa v45 identifica a versão no botão de ajuda, preserva a lancha escolhida e adiciona árvores e pesca acima de 6 kg no matinho da ilha."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
