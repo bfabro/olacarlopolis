@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 825,
-  label: "v832",
+  numero: 826,
+  label: "v833",
   data: "2026-09-25",
-  nota: "Mapa v50 inicia o acesso após a água original, preserva tucunarés, garça e anúncios, e renova a arte realista do Dourado-do-rio."
+  nota: "Mapa v51 abre o canal sem árvore nem margem e anima tremor e pedras rolando ao capturar o primeiro lendário."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

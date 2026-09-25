@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=50/);
-  assert.match(html, /ola-pesca\.js\?v=50/);
+  assert.match(html, /ola-pesca\.css\?v=51/);
+  assert.match(html, /ola-pesca\.js\?v=51/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 825/);
-  assert.match(panel, /label: "v832"/);
+  assert.match(panel, /numero: 826/);
+  assert.match(panel, /label: "v833"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 50);
+  assert.equal(core.FISHING_MAP_VERSION, 51);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small/);
@@ -1023,7 +1023,7 @@ test("v50 começa o acesso após a água original e preserva fauna, anúncio e m
   assert.ok(routePointsNearAccess.every(point => point.x / 32 < core.mainPassageStartCol(Math.floor(point.y / 32))));
   const heronLanding = core.HERON_ROUTES[0].to;
   assert.ok(heronLanding.x / 32 < core.mainPassageStartCol(Math.floor(heronLanding.y / 32)));
-  assert.match(source, /if\(isMainReservoir\(g\)\)drawMainPassage\(c,g,n\);drawRaisedBanks/);
+  assert.match(source, /drawSnag\(c,n\);if\(isMainReservoir\(g\)\)drawMainPassage\(c,g,n\);drawSchool/);
   assert.match(source, /if\(g\.zone==="tributario"\)return drawTributaryMap\(c,n,cam,g\);return drawMapV40/);
   const rightSlots = core.SPONSOR_SLOTS.filter(slot => slot.x >= 31 * 32);
   assert.equal(rightSlots.length, 5);
@@ -1035,6 +1035,30 @@ test("v50 começa o acesso após a água original e preserva fauna, anúncio e m
   assert.equal(riverGoldPng.readUInt32BE(16) >= 1000, true);
   assert.equal(riverGoldPng.readUInt32BE(20) >= 500, true);
   assert.equal(riverGoldPng[25], 6);
+});
+test("v51 abre o canal limpo e anima as pedras no primeiro lendário", () => {
+  assert.equal(core.CHANNEL_UNLOCK_DURATION, 2600);
+  assert.equal(core.shouldUnlockChannel({ stats: { legendaryCaught: 0 }, captures: [] }, { rarity: "LENDÁRIO" }), true);
+  assert.equal(core.shouldUnlockChannel({ stats: { legendaryCaught: 1 }, captures: [] }, { rarity: "LENDÁRIO" }), false);
+  assert.equal(core.shouldUnlockChannel({ stats: { legendaryCaught: 0 }, captures: [] }, { rarity: "ÉPICO" }), false);
+  assert.equal(core.shouldUnlockChannel({ stats: { legendaryCaught: 0 }, captures: [] }, { rarity: "LENDÁRIO", isGuideDuck: true }), false);
+  const animation = { channelUnlock: { startedAt: 100, duration: 2600 } };
+  assert.equal(core.channelUnlockProgress(animation, 100), 0);
+  assert.equal(core.channelUnlockProgress(animation, 1400), 0.5);
+  assert.equal(core.channelUnlockProgress(animation, 2700), 1);
+  assert.equal(core.channelUnlockProgress({}, 100), null);
+  const baseDrawStart = source.indexOf("drawMap=function(c,n,cam,g)");
+  const bankIndex = source.indexOf("drawRaisedBanks(c,n)", baseDrawStart);
+  const treesIndex = source.indexOf("TREE_POSITIONS.forEach", baseDrawStart);
+  const channelIndex = source.indexOf("if(isMainReservoir(g))drawMainPassage(c,g,n)", baseDrawStart);
+  assert.ok(baseDrawStart >= 0 && bankIndex < channelIndex && treesIndex < channelIndex);
+  assert.match(source, /const travel=roll\*\(2\.1\+index\*\.12\)\*T/);
+  assert.match(source, /c\.rotate\(roll\*Math\.PI/);
+  assert.match(source, /channel-unlock-shake/);
+  assert.match(source, /A passagem se abriu! As pedras rolaram para a correnteza!/);
+  assert.match(source, /if\(isMainReservoir\(g\)&&g\.channelUnlock\)return\{x:COLS\*T-640,y:0\}/);
+  assert.match(css, /@keyframes pesca-channel-unlock-shake/);
+  assert.match(source, /clearTimeout\(game\.channelUnlockTimer\)/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
