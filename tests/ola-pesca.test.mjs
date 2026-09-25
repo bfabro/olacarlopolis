@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=36/);
-  assert.match(html, /ola-pesca\.js\?v=36/);
+  assert.match(html, /ola-pesca\.css\?v=37/);
+  assert.match(html, /ola-pesca\.js\?v=37/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 811/);
-  assert.match(panel, /label: "v818"/);
+  assert.match(panel, /numero: 812/);
+  assert.match(panel, /label: "v819"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -742,6 +742,33 @@ test("v36 usa a arte detalhada do Tucunaré Dourado no salto", () => {
   assert.match(source, /globalCompositeOperation="screen"/);
   assert.match(source, /const sweep=c.createLinearGradient/);
   assert.match(source, /droplet=Math.sin/);
+});
+test("v37 move o pato-guia livremente, amplia margens e adiciona luz noturna", () => {
+  const guide = core.DUCKS.find(duck => duck.catchable);
+  assert.equal(guide, core.DUCKS.reduce((top, duck) => duck.y < top.y ? duck : top));
+  const before = core.duckPosition(guide, 99999);
+  const after = core.duckPosition(guide, 100001);
+  assert.ok(Math.hypot(after.x - before.x, after.y - before.y) < 2);
+  assert.equal(source.includes("step=(n*.012"), false);
+  assert.ok(source.includes('if(duck.catchable){c.fillStyle="#fff"'));
+  assert.match(source, /returning:true/);
+  assert.equal(core.MAP[5][28], "W");
+  assert.equal(core.MAP[5][29], ".");
+  assert.equal(core.MAP[5][30], ".");
+  assert.ok(source.includes("distance<=T*1.1"));
+  assert.equal(core.isNightHour(23), true);
+  assert.equal(core.isNightHour(3), true);
+  assert.equal(core.isNightHour(12), false);
+  const lit = core.pierLightFishingTable({ jundia: 10, pintado: 8, traira: 6, corvina: 4, tilapia: 20 });
+  assert.ok(lit.jundia > 10 && lit.pintado > 8 && lit.traira > 6 && lit.corvina > 4);
+  const attracted = core.pierLightFishingTable({ tilapia: 20 });
+  assert.ok(attracted.jundia > 0 && attracted.pintado > 0 && attracted.traira > 0 && attracted.corvina > 0);
+  assert.equal(lit.tilapia, 20);
+  assert.equal(core.nearPierLightSwitch({ mode: "explore", player: { x: core.PIER_LIGHT.switchX, y: core.PIER_LIGHT.switchY, inBoat: false } }), true);
+  assert.match(source, /A PARA.*ACENDER/);
+  assert.ok(source.includes("nearDock(g)||nearPierLightSwitch(g)"));
+  assert.ok(source.includes("pierLightFishingTable(g.spot.table)"));
+  assert.match(source, /Peixes noturnos estão se aproximando/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
