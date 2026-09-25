@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 822,
-  label: "v829",
+  numero: 823,
+  label: "v830",
   data: "2026-09-25",
-  nota: "Mapa v47 oculta a vantagem do matinho, amplia o desembarque no píer da ilha e renova as piadas sobre a Represa de Chavantes."
+  nota: "Mapa v48 inicia a correnteza do mapa principal somente na borda direita e libera a rota do casal de tucunarés."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
