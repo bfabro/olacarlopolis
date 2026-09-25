@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=34/);
-  assert.match(html, /ola-pesca\.js\?v=34/);
+  assert.match(html, /ola-pesca\.css\?v=35/);
+  assert.match(html, /ola-pesca\.js\?v=35/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 809/);
-  assert.match(panel, /label: "v816"/);
+  assert.match(panel, /numero: 810/);
+  assert.match(panel, /label: "v817"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -714,6 +714,25 @@ test("v34 preserva o píer original e faz a garça cruzar o cenário", () => {
   assert.ok(flying.x > route.from.x && flying.x < route.to.x);
   assert.equal(landed.x, route.to.x);
   assert.match(source, /function drawFlyingHeron/);
+});
+
+test("v35 oferece pistas verdadeiras, pato-guia e salto brilhante do Dourado", () => {
+  const hints = core.GOLDEN_FISHER_HINTS.join(" ");
+  assert.match(hints, /140 metros para leste/);
+  assert.match(hints, /60 metros para o sul/);
+  assert.match(hints, /margem sudeste/);
+  assert.equal(core.DUCKS.filter(duck => duck.catchable).length, 1);
+  const guide = core.DUCKS.find(duck => duck.catchable);
+  const position = core.duckPosition(guide, 1000);
+  assert.equal(core.guideDuckHit(position, 1000).duck, guide);
+  assert.equal(core.guideDuckHit({ x: 0, y: 0 }, 1000), null);
+  assert.match(source, /hitGuideDuck/);
+  assert.match(source, /g\.fish\?\.isGuideDuck.*drawGuideDuckBody/);
+  assert.match(source, /Você não pescou um pato/);
+  assert.match(source, /to:\{x:GOLDEN_ROCK\.x-22,y:GOLDEN_ROCK\.y-24\}/);
+  assert.match(source, /shadowColor="#ffe873"/);
+  assert.match(source, /fillStyle="#f4bd22"/);
+  assert.match(css, /\.pesca-duck-catch/);
 });
 
 test("v28 protege configurações e arquivos do ranking para o Master", () => {

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 809,
-  label: "v816",
-  data: "2026-09-24",
-  nota: "Píer do Pesque e Solte recupera o desenho original e garças passam a voar ocasionalmente entre as margens."
+  numero: 810,
+  label: "v817",
+  data: "2026-09-25",
+  nota: "Pescadores dão pistas verdadeiras do Dourado, um pato-guia pode ser fisgado e o lendário salta brilhando na represa."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
