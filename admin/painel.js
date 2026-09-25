@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 826,
-  label: "v833",
+  numero: 827,
+  label: "v834",
   data: "2026-09-25",
-  nota: "Mapa v51 abre o canal sem árvore nem margem e anima tremor e pedras rolando ao capturar o primeiro lendário."
+  nota: "Mapa v52 amplia a área visível do jogo e reposiciona mensagens para não cobrir o personagem."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
