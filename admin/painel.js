@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 827,
-  label: "v834",
+  numero: 828,
+  label: "v835",
   data: "2026-09-25",
-  nota: "Mapa v52 amplia a área visível do jogo e reposiciona mensagens para não cobrir o personagem."
+  nota: "Mapa v53 corrige o recorte e melhora a nitidez do Dourado-do-rio no jogo e nas informações."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

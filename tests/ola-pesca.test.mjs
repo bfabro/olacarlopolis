@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=52/);
-  assert.match(html, /ola-pesca\.js\?v=52/);
+  assert.match(html, /ola-pesca\.css\?v=53/);
+  assert.match(html, /ola-pesca\.js\?v=53/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 827/);
-  assert.match(panel, /label: "v834"/);
+  assert.match(panel, /numero: 828/);
+  assert.match(panel, /label: "v835"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 52);
+  assert.equal(core.FISHING_MAP_VERSION, 53);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small/);
@@ -1070,6 +1070,16 @@ test("v52 amplia o jogo e posiciona mensagens longe do personagem", () => {
   assert.match(source, /classList\.toggle\("message-top",messagePanelAtTop\(g\)\)/);
   assert.equal(core.messagePanelAtTop({ player: { x: 320, y: 64 }, canvas: { width: 640, height: 448 } }), false);
   assert.equal(core.messagePanelAtTop({ player: { x: 960, y: 608 }, canvas: { width: 640, height: 448 } }), true);
+});
+test("v53 renderiza corretamente o Dourado-do-rio no jogo e nas informações", () => {
+  const riverGold = core.SPECIES.find(fish => fish.id === "dourado_rio");
+  assert.equal(riverGold.image, "images/jogos/ola-pesca/dourado-rio-v50.png");
+  assert.match(source, /--fish-custom:1/);
+  assert.match(css, /\.fish-sprite\[style\*="--fish-custom:1"\]\{background-size:contain!important;background-position:center!important\}/);
+  assert.doesNotMatch(css, /\.fish-sprite\[style\*="tucunare-"\]/);
+  assert.match(source, /function prepareFishContext\(c,s\)\{c\.imageSmoothingEnabled=!!s\?\.image/);
+  assert.match(source, /imageSmoothingQuality" in c\)c\.imageSmoothingQuality="high"/);
+  assert.ok((source.match(/prepareFishContext\(c,s\)/g) || []).length >= 4);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
