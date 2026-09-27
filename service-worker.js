@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-09-27-pesque-solte-v892'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-09-27-pesque-solte-v893'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
@@ -8,6 +8,7 @@ const PRECACHE_ASSETS = [
   '/ola-pesca.css',
   '/ola-pesca.js',
   '/images/jogos/ola-pesca/peixes-sprites-v2.png',
+  '/images/jogos/ola-pesca/pescador-sprites-v1.png',
   '/images/jogos/ola-pesca/tucunare-azulao-v3.png',
   '/images/jogos/ola-pesca/tucunare-vermelho-v3.png',
   '/images/jogos/ola-pesca/tucunare-dourado-v13.png',

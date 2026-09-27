@@ -10,6 +10,7 @@ const css = fs.readFileSync(new URL("../ola-pesca.css", import.meta.url), "utf8"
 const panel = fs.readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
 const panelHtml = fs.readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
 const panelCss = fs.readFileSync(new URL("../admin/painel.css", import.meta.url), "utf8");
+const serviceWorker = fs.readFileSync(new URL("../service-worker.js", import.meta.url), "utf8");
 const rules = JSON.parse(fs.readFileSync(new URL("../database.rules.json", import.meta.url), "utf8"));
 class FakeImage {
   constructor() { this.complete = false; this.naturalWidth = 0; }
@@ -21,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=62/);
-  assert.match(html, /ola-pesca\.js\?v=62/);
+  assert.match(html, /ola-pesca\.css\?v=63/);
+  assert.match(html, /ola-pesca\.js\?v=63/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 837/);
-  assert.match(panel, /label: "v844"/);
+  assert.match(panel, /numero: 838/);
+  assert.match(panel, /label: "v845"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -887,7 +888,7 @@ test("v41 desenha tráfego e pescadores acima da lancha no Rio da Ponte", () => 
   const before = core.bridgeBoatPosition(moving, 0);
   const after = core.bridgeBoatPosition(moving, 10000);
   assert.notEqual(before.x, after.x);
-  assert.match(source, /drawMainCharacterPixelV62\(c,g,n,cam\)/);
+  assert.match(source, /drawMainCharacterSpriteV63\(c,g,n,cam\)/);
   assert.match(source, /drawBridgeFisher/);
   assert.match(source, /function drawBridgeCar/);
   assert.match(source, /function drawBridgeMotorcycle/);
@@ -943,7 +944,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 62);
+  assert.equal(core.FISHING_MAP_VERSION, 63);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1198,11 +1199,22 @@ test("v62 encaixa o pescador na lancha e uniformiza os personagens", () => {
   assert.match(source, /function drawPixelFisherV62/);
   assert.match(source, /function drawMainCharacterPixelV62/);
   assert.match(source, /function drawPlayerBoatForegroundV62/);
-  assert.match(source, /drawMainCharacterPixelV62\(c,g,n,cam\);if\(g\.player\.inBoat\)drawPlayerBoatForegroundV62/);
+  assert.match(source, /drawMainCharacterSpriteV63\(c,g,n,cam\);if\(g\.player\.inBoat\)drawPlayerBoatForegroundV62/);
   assert.match(source, /drawBoatForegroundV62\(c,position\.x,position\.y,facing,item\.color,item\.accent\)/);
   assert.ok(source.includes('drawShoreFisher=function(c,n,p)'));
   assert.ok(source.includes('drawTributaryGuest=function(c,guest,n)'));
   assert.ok(source.includes('drawBridgeFisher=function(c,x,y,side,color,n,offset)'));
+});
+test("v63 usa uma folha de sprites transparente com oito poses", () => {
+  assert.match(source, /FISHER_SPRITE="images\/jogos\/ola-pesca\/pescador-sprites-v1\.png"/);
+  assert.match(source, /function fishermanFrameV63/);
+  assert.match(source, /row:seated\?1:0/);
+  assert.match(source, /image\.naturalWidth\/4/);
+  assert.match(source, /image\.naturalHeight\/2/);
+  assert.match(source, /c\.imageSmoothingEnabled=false/);
+  assert.match(source, /return drawMainCharacterPixelV62\(c,g,n,cam\)/);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescador-sprites-v1.png", import.meta.url)), true);
+  assert.match(serviceWorker, /pescador-sprites-v1\.png/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
