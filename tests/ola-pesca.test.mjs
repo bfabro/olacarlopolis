@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=57/);
-  assert.match(html, /ola-pesca\.js\?v=57/);
+  assert.match(html, /ola-pesca\.css\?v=58/);
+  assert.match(html, /ola-pesca\.js\?v=58/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 832/);
-  assert.match(panel, /label: "v839"/);
+  assert.match(panel, /numero: 833/);
+  assert.match(panel, /label: "v840"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -943,10 +943,10 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 57);
+  assert.equal(core.FISHING_MAP_VERSION, 58);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
-  assert.match(css, /\.pesca-help-version small/);
+  assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
   assert.ok(source.includes('docked=isMainReservoir(game)&&Math.hypot(x-BOATS[1].x'));
   assert.equal(core.TRIBUTARY_ISLAND_TREES.length, 3);
   assert.match(source, /TRIBUTARY_ISLAND_TREES\.forEach/);
