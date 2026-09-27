@@ -22,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=69/);
-  assert.match(html, /ola-pesca\.js\?v=69/);
+  assert.match(html, /ola-pesca\.css\?v=70/);
+  assert.match(html, /ola-pesca\.js\?v=70/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -637,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 844/);
-  assert.match(panel, /label: "v851"/);
+  assert.match(panel, /numero: 845/);
+  assert.match(panel, /label: "v852"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -811,10 +811,10 @@ test("v39 posiciona o interruptor na margem, libera às 18h e comemora peixões"
   assert.ok(source.includes("if(captured.weight>10)happyCatchSound()"));
 });
 test("v40 adiciona pescadoras e compartilhamento de tucunaré lendário", () => {
-  const women = core.SHORE_FISHERS.filter(fisher => fisher.gender === "woman");
+  const women = core.SHORE_FISHERS.filter(fisher => ["woman", "girl"].includes(fisher.gender));
   assert.equal(women.length, 2);
-  assert.deepEqual(Array.from(women, fisher => fisher.color), ["#ef6fa8", "#f2c94c"]);
-  assert.match(source, /p\.gender==="woman"/);
+  assert.deepEqual(Array.from(women, fisher => fisher.color), ["#f2c94c", "#ef6fa8"]);
+  assert.match(source, /woman:!!p\.gender/);
   assert.match(source, /data-share-legendary/);
   assert.match(source, /Compartilhar no Instagram/);
   assert.match(source, /navigator\.share/);
@@ -850,7 +850,7 @@ test("v40 libera o Braço Selvagem depois de um lendário", () => {
   context.localStorage = originalLocalStorage;
   assert.equal(core.nearIslandDock({ zone: "tributario", mode: "explore", player: { x: core.ISLAND_DOCK.boatX, y: core.ISLAND_DOCK.boatY, inBoat: true } }), true);
   assert.equal(core.TRIBUTARY_MAP[Math.floor(core.ISLAND_DOCK.boatY / 32)][Math.floor(core.ISLAND_DOCK.boatX / 32)], "W");
-  assert.equal(core.TRIBUTARY_GUESTS.length, 4);
+  assert.equal(core.TRIBUTARY_GUESTS.length, 2);
   assert.ok(core.TRIBUTARY_GUESTS.every(guest => /!/.test(guest.joke)));
   assert.match(source, /function checkFishingMapTransition/);
   assert.match(source, /g\.player\.inBoat/);
@@ -921,10 +921,10 @@ test("v42 aprimora o dourado, a ilha e o cenário aquático da ponte", () => {
   assert.equal(source.includes('for(const offset of[170,480])'), false);
 });
 test("v43 reposiciona o pescador para fora do acesso da correnteza", () => {
-  const fisher = core.SHORE_FISHERS[2];
-  assert.equal(fisher.x, 29.05 * 32);
+  const fisher = core.SHORE_FISHERS[3];
+  assert.equal(fisher.x, 29.7 * 32);
   assert.equal(fisher.y, 8.15 * 32);
-  assert.equal(fisher.waterX, 28.55 * 32);
+  assert.equal(fisher.waterX, 28.2 * 32);
   assert.ok(fisher.y > 7 * 32);
   assert.equal(core.MAP[Math.floor(fisher.y / 32)][Math.floor(fisher.x / 32)], ".");
   assert.equal(core.MAP[Math.floor(fisher.waterY / 32)][Math.floor(fisher.waterX / 32)], "W");
@@ -944,7 +944,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 69);
+  assert.equal(core.FISHING_MAP_VERSION, 70);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -984,7 +984,7 @@ test("v47 preserva o segredo do matinho, amplia o desembarque e contextualiza as
   ];
   assert.ok(touchingEverySide.every(core.nearIslandDock));
   assert.equal(core.nearIslandDock(boatAt(6 * 32, 6 * 32)), false);
-  assert.equal(core.TRIBUTARY_GUESTS.length, 4);
+  assert.equal(core.TRIBUTARY_GUESTS.length, 2);
   assert.ok(core.TRIBUTARY_GUESTS.every(guest => guest.joke.length > 40));
 });
 test("v48 inicia a correnteza na borda direita sem cruzar a rota dos tucunarés", () => {
@@ -1245,10 +1245,9 @@ test("v66 usa lanchas modernas em quatro vistas e identifica a preta", () => {
   assert.match(source, /retreat=Math\.round\(6\*phase\.amount\)/);
   assert.match(source, /width:60,height:60,y:-49/);
   assert.deepEqual(Array.from(core.TRIBUTARY_ISLAND_TREES, tree => tree[2]), [1.02, .94, 1.06]);
-  assert.match(core.TRIBUTARY_GUESTS[0].joke, /pacu/i);
+  assert.match(core.TRIBUTARY_GUESTS[0].joke, /jaú/i);
+  assert.match(core.TRIBUTARY_GUESTS[0].joke, /ilha era só a boia/i);
   assert.match(core.TRIBUTARY_GUESTS[1].joke, /piranha/i);
-  assert.match(core.TRIBUTARY_GUESTS[2].joke, /jaú/i);
-  assert.match(core.TRIBUTARY_GUESTS[3].joke, /tucunaré dourado/i);
   assert.match(source, /drawTributaryBigGrass=function/);
   assert.match(source, /count:17,color:"#3f8244"/);
   assert.match(source, /function drawIslandBrickBarbecueV67/);
@@ -1257,21 +1256,28 @@ test("v66 usa lanchas modernas em quatro vistas e identifica a preta", () => {
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ficticios-sprites-v3.png", import.meta.url)), true);
   assert.match(serviceWorker, /pescadores-ficticios-sprites-v3\.png/);
 });
-test("v69 aplica as quatro referências a todos os pescadores fictícios", () => {
-  assert.match(source, /FICTIONAL_REFERENCE_SPRITE="images\/jogos\/ola-pesca\/pescadores-referencias-sprites-v2\.png"/);
-  assert.match(source, /REFERENCE_FISHER_RECTS_V69=\[\{x:50,y:45,w:359,h:809\}/);
-  assert.match(source, /function drawReferenceFisherSpriteV69/);
-  assert.match(source, /index=Math\.max\(0,TRIBUTARY_GUESTS\.indexOf\(guest\)\)/);
-  assert.match(source, /drawReferenceFisherSpriteV69\(c,index,\{facing,width:60,height:60,y:-49\}\)/);
-  assert.match(source, /reel=g\.mode==="battle"\?g\.cast\?\.reelAnimation:null,pull=reel\?Math\.sin/);
-  assert.match(source, /n-reel\.startedAt\)\/reel\.duration/);
-  assert.match(source, /const drawLegacyFictionalFisherV69=drawFictionalFisherV64/);
-  assert.match(source, /drawFictionalFisherV64=function\(c,index,options=\{\}\)\{return drawReferenceFisherSpriteV69/);
-  assert.match(source, /p\.build==="large"\?drawLegacyFictionalFisherV69/);
-  assert.match(source, /sourceHeight=seated\?Math\.round\(rect\.h\*\.72\):rect\.h/);
-  assert.match(source, /drawWidth=Math\.min\(width,drawHeight\*\.72\)/);
-  assert.equal(core.TRIBUTARY_GUESTS.length, 4);
+test("v70 separa os elencos e mantém os pescadores do mapa 1 na margem verde", () => {
+  assert.match(source, /MAP1_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-mapa1-sprites-v1\.png"/);
+  assert.match(source, /MAP1_FISHER_RECTS_V70=\[\{x:46,y:112,w:395,h:747\}/);
+  assert.match(source, /function drawMapOneFisherSpriteV70/);
+  assert.equal(core.SHORE_FISHERS.length, 5);
+  assert.deepEqual(Array.from(core.SHORE_FISHERS, fisher => fisher.spriteSet), ["classic", "map1", "map1", "map1", "map1"]);
+  assert.deepEqual(Array.from(core.SHORE_FISHERS, fisher => fisher.spriteIndex), [0, 1, 2, 0, 3]);
+  assert.equal(core.SHORE_FISHERS[2].child, true);
+  assert.ok(core.SHORE_FISHERS.every(fisher => core.MAP[Math.floor(fisher.y / 32)][Math.floor(fisher.x / 32)] !== "W"));
+  assert.ok(core.SHORE_FISHERS.every(fisher => fisher.x / 32 <= 5.8 || fisher.x / 32 >= 29.7));
+  assert.equal(core.TRIBUTARY_GUESTS.length, 2);
+  assert.equal(core.TRIBUTARY_GUESTS[0].spriteSet, "legacy");
+  assert.equal(core.TRIBUTARY_GUESTS[0].build, "large");
+  assert.match(core.TRIBUTARY_GUESTS[0].joke, /ilha era só a boia/i);
+  assert.equal(core.TRIBUTARY_GUESTS[1].spriteSet, "classic");
+  assert.equal(core.TRIBUTARY_GUESTS[1].spriteIndex, 1);
+  assert.match(source, /drawFictionalFisherV64=drawLegacyFictionalFisherV69/);
+  assert.match(source, /p\.spriteSet==="classic"\?drawReferenceFisherSpriteV69/);
+  assert.match(source, /drawHeight=child\?48:height/);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-mapa1-sprites-v1.png", import.meta.url)), true);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-referencias-sprites-v2.png", import.meta.url)), true);
+  assert.match(serviceWorker, /pescadores-mapa1-sprites-v1\.png/);
   assert.match(serviceWorker, /pescadores-referencias-sprites-v2\.png/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {

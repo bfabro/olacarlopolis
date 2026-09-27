@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 844,
-  label: "v851",
+  numero: 845,
+  label: "v852",
   data: "2026-09-27",
-  nota: "Mapa v69 aplica as quatro referências aos pescadores das margens, ilha, ponte e lanchas, preservando o pescador gordo."
+  nota: "Mapa v70 separa os elencos da represa, ilha e ponte, adiciona quatro referências e mantém os pescadores sobre a margem verde."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
