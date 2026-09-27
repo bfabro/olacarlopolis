@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 830,
-  label: "v837",
+  numero: 831,
+  label: "v838",
   data: "2026-09-27",
-  nota: "Mapa v55 adiciona na ajuda os tamanhos máximos comuns e extraordinários, pesos aproximados e recordes pessoais de todas as espécies."
+  nota: "Mapa v56 adiciona fichas clicáveis na PESCAdex com habitat, comportamento na fisgada e curiosidades reais de cada espécie."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
