@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 833,
-  label: "v840",
+  numero: 834,
+  label: "v841",
   data: "2026-09-27",
-  nota: "Mapa v58 amplia discretamente a versão exibida no botão de ajuda para facilitar a leitura."
+  nota: "Mapa v59 amplia para 20 px a área de acerto da pedra e avisa o jogador antes da briga com o Tucunaré Dourado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
