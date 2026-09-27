@@ -22,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=66/);
-  assert.match(html, /ola-pesca\.js\?v=66/);
+  assert.match(html, /ola-pesca\.css\?v=67/);
+  assert.match(html, /ola-pesca\.js\?v=67/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -637,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 841/);
-  assert.match(panel, /label: "v848"/);
+  assert.match(panel, /numero: 842/);
+  assert.match(panel, /label: "v849"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -944,7 +944,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 66);
+  assert.equal(core.FISHING_MAP_VERSION, 67);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -985,7 +985,7 @@ test("v47 preserva o segredo do matinho, amplia o desembarque e contextualiza as
   assert.ok(touchingEverySide.every(core.nearIslandDock));
   assert.equal(core.nearIslandDock(boatAt(6 * 32, 6 * 32)), false);
   assert.equal(core.TRIBUTARY_GUESTS.length, 4);
-  assert.ok(core.TRIBUTARY_GUESTS.every(guest => guest.joke.includes("Represa de Chavantes")));
+  assert.ok(core.TRIBUTARY_GUESTS.every(guest => guest.joke.length > 40));
 });
 test("v48 inicia a correnteza na borda direita sem cruzar a rota dos tucunarés", () => {
   assert.equal(core.MAIN_PASSAGE_START_COL, 26);
@@ -1207,17 +1207,12 @@ test("v62 encaixa o pescador na lancha e uniformiza os personagens", () => {
 });
 test("v65 corrige poses, alerta a fisgada, destaca o gordão e refina lanchas", () => {
   assert.match(source, /FISHER_SPRITE="images\/jogos\/ola-pesca\/pescador-sprites-v3\.png"/);
-  assert.match(source, /NPC_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-ficticios-sprites-v2\.png"/);
   assert.match(source, /function fishermanFrameV65/);
   assert.match(source, /row:seated\?\(pulling\?3:2\):\(pulling\?1:0\)/);
-  assert.match(source, /function fishingPullPhaseV65/);
-  assert.match(source, /\["hooked","battle"\]\.includes\(g\.mode\)/);
-  assert.match(source, /Math\.floor\(n\/150\)%2===1/);
   assert.match(source, /MAIN_FISHER_ROWS_V65=\[0,\.284,\.548,\.77,1\]/);
   assert.match(source, /NPC_FISHER_ROWS_V65=\[0,\.279,\.558,\.767,1\]/);
   assert.match(source, /sourceY=MAIN_FISHER_ROWS_V65\[frame\.row\]\*image\.naturalHeight/);
   assert.match(source, /sourceY=NPC_FISHER_ROWS_V65\[frame\.row\]\*image\.naturalHeight/);
-  assert.match(source, /retreat=phase\.back\?5:0/);
   assert.match(source, /function drawHookAlertV65/);
   assert.match(source, /if\(g\.mode!==\"hooked\"\)return/);
   assert.match(source, /fillText\(\"!\",0,1\)/);
@@ -1226,10 +1221,9 @@ test("v65 corrige poses, alerta a fisgada, destaca o gordão e refina lanchas", 
   assert.match(source, /drawBoatForegroundV62=function/);
   assert.match(source, /const boatV65=boat/);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescador-sprites-v3.png", import.meta.url)), true);
-  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ficticios-sprites-v2.png", import.meta.url)), true);
   assert.match(serviceWorker, /pescador-sprites-v3\.png/);
-  assert.match(serviceWorker, /pescadores-ficticios-sprites-v2\.png/);
-});test("v66 usa lanchas modernas em quatro vistas e identifica a preta", () => {
+});
+test("v66 usa lanchas modernas em quatro vistas e identifica a preta", () => {
   assert.match(source, /BOAT_SPRITE="images\/jogos\/ola-pesca\/lanchas-sprites-v1\.png"/);
   assert.match(source, /BOAT_SPRITE_RECTS_V66/);
   assert.match(source, /branca:\{right:\[19,186,517,131\]/);
@@ -1244,7 +1238,26 @@ test("v65 corrige poses, alerta a fisgada, destaca o gordão e refina lanchas", 
   assert.match(source, /side\?36:96/);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/lanchas-sprites-v1.png", import.meta.url)), true);
   assert.match(serviceWorker, /lanchas-sprites-v1\.png/);
-});test("v28 protege configurações e arquivos do ranking para o Master", () => {
+});test("v67 sincroniza a puxada e renova a Ilha do Churrasco", () => {
+  assert.match(source, /NPC_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-ficticios-sprites-v3\.png"/);
+  assert.match(source, /const animation=g\.mode==="battle"\?g\.cast\?\.reelAnimation:null/);
+  assert.match(source, /amount:Math\.sin\(progress\*Math\.PI\)/);
+  assert.match(source, /retreat=Math\.round\(6\*phase\.amount\)/);
+  assert.match(source, /width:60,height:60,y:-49/);
+  assert.deepEqual(Array.from(core.TRIBUTARY_ISLAND_TREES, tree => tree[2]), [1.02, .94, 1.06]);
+  assert.match(core.TRIBUTARY_GUESTS[0].joke, /pacu/i);
+  assert.match(core.TRIBUTARY_GUESTS[1].joke, /piranha/i);
+  assert.match(core.TRIBUTARY_GUESTS[2].joke, /jaú/i);
+  assert.match(core.TRIBUTARY_GUESTS[3].joke, /tucunaré dourado/i);
+  assert.match(source, /drawTributaryBigGrass=function/);
+  assert.match(source, /count:17,color:"#3f8244"/);
+  assert.match(source, /function drawIslandBrickBarbecueV67/);
+  assert.match(source, /for\(const meat of/);
+  assert.match(source, /const drawTributaryMapV67=drawTributaryMap/);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ficticios-sprites-v3.png", import.meta.url)), true);
+  assert.match(serviceWorker, /pescadores-ficticios-sprites-v3\.png/);
+});
+test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
   assert.match(fishingRules.config[".write"], /master/);
   assert.match(fishingRules.rankingArchives[".write"], /master/);
