@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 828,
-  label: "v835",
-  data: "2026-09-25",
-  nota: "Mapa v53 corrige o recorte e melhora a nitidez do Dourado-do-rio no jogo e nas informações."
+  numero: 829,
+  label: "v836",
+  data: "2026-09-26",
+  nota: "Mapa v54 adiciona Piranha e Pacu-CD, melhora os controles no iPhone e reforça os efeitos do Dourado e do desbloqueio de mapas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

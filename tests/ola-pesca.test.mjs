@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=53/);
-  assert.match(html, /ola-pesca\.js\?v=53/);
+  assert.match(html, /ola-pesca\.css\?v=54/);
+  assert.match(html, /ola-pesca\.js\?v=54/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -56,9 +56,9 @@ test("v2 mostra imagens, local da fisgada, fechamento e ranking exclusivo", () =
   assert.match(source, /quadraticCurveTo/);
 });
 
-test("catálogo possui as 18 espécies incluindo o lendário Tucunaré Dourado", () => {
-  assert.equal(core.SPECIES.length, 18);
-  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare", "tucunare_azulao", "tucunare_vermelho", "tucunare_dourado", "dourado_rio", "piracanjuba", "cachara", "jau"]);
+test("catálogo possui as 20 espécies incluindo Piranha e Pacu-CD", () => {
+  assert.equal(core.SPECIES.length, 20);
+  assert.deepEqual(Array.from(core.SPECIES, item => item.id), ["lambari", "tilapia", "piau", "pacu", "traira", "curimbata", "carpa", "jundia", "pintado", "corvina", "tucunare", "tucunare_azulao", "tucunare_vermelho", "tucunare_dourado", "dourado_rio", "piracanjuba", "cachara", "jau", "piranha", "pacu_cd"]);
   assert.equal(core.SPECIES.find(item => item.id === "tucunare").scientific, "Cichla kelberi");
   assert.equal(core.SPECIES.find(item => item.id === "tucunare_azulao").scientific, "Cichla piquiti");
   assert.equal(core.SPECIES.find(item => item.id === "tucunare_vermelho").scientific, "Cichla mirianae");
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 828/);
-  assert.match(panel, /label: "v835"/);
+  assert.match(panel, /numero: 829/);
+  assert.match(panel, /label: "v836"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -891,8 +891,8 @@ test("v41 desenha tráfego e pescadores acima da lancha no Rio da Ponte", () => 
   assert.match(source, /drawBridgeFisher/);
   assert.match(source, /function drawBridgeCar/);
   assert.match(source, /function drawBridgeMotorcycle/);
-  assert.match(source, /Todos os peixes dividem este grande rio/);
-  assert.deepEqual(Object.keys(core.BRIDGE_SPOT.table).sort(), Array.from(core.SPECIES, fish => fish.id).sort());
+  assert.match(source, /Muitas espécies dividem este grande rio/);
+  assert.deepEqual(Object.keys(core.BRIDGE_SPOT.table).sort(), Array.from(core.SPECIES, fish => fish.id).filter(id => id !== "pacu_cd").sort());
   for (let seed = 1; seed <= 400; seed += 1) {
     const fish = core.generateFish(seed, core.BRIDGE_SPOT, 15);
     assert.equal(core.validateFishDimensions(fish), true);
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 53);
+  assert.equal(core.FISHING_MAP_VERSION, 54);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small/);
@@ -1080,6 +1080,36 @@ test("v53 renderiza corretamente o Dourado-do-rio no jogo e nas informações", 
   assert.match(source, /function prepareFishContext\(c,s\)\{c\.imageSmoothingEnabled=!!s\?\.image/);
   assert.match(source, /imageSmoothingQuality" in c\)c\.imageSmoothingQuality="high"/);
   assert.ok((source.match(/prepareFishContext\(c,s\)/g) || []).length >= 4);
+});
+test("v54 adiciona Piranha, restringe Pacu-CD aos píeres e melhora a experiência móvel", () => {
+  const piranha = core.SPECIES.find(fish => fish.id === "piranha");
+  const pacuCd = core.SPECIES.find(fish => fish.id === "pacu_cd");
+  assert.equal(piranha.scientific, "Serrasalmus maculatus");
+  assert.equal(piranha.image, "images/jogos/ola-pesca/piranha-v54.png");
+  assert.equal(pacuCd.scientific, "Metynnis maculatus");
+  assert.equal(pacuCd.image, "images/jogos/ola-pesca/pacu-cd-v54.png");
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/piranha-v54.png", import.meta.url)), true);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pacu-cd-v54.png", import.meta.url)), true);
+  assert.equal(core.SPOTS.every(spot => !Object.hasOwn(spot.table, "pacu_cd")), true);
+  assert.equal(Object.hasOwn(core.TRIBUTARY_SPOTS.river.table, "pacu_cd"), false);
+  assert.equal(Object.hasOwn(core.TRIBUTARY_SPOTS.current.table, "pacu_cd"), false);
+  assert.equal(Object.hasOwn(core.BRIDGE_SPOT.table, "pacu_cd"), false);
+  assert.ok(core.SPOTS[0].table.piranha > core.SPOTS[2].table.piranha);
+  assert.ok(core.TRIBUTARY_SPOTS.river.table.piranha > core.TRIBUTARY_SPOTS.current.table.piranha);
+  assert.equal(core.isPacuCdPierZone({ zone: "represa" }, { x: 10 * 32, y: 9.5 * 32 }), true);
+  assert.equal(core.isPacuCdPierZone({ zone: "represa" }, { x: 25 * 32, y: 15 * 32 }), false);
+  assert.equal(core.isPacuCdPierZone({ zone: "tributario" }, { x: 11 * 32, y: 10.5 * 32 }), true);
+  assert.equal(core.isPacuCdPierZone({ zone: "ponte" }, { x: 11 * 32, y: 10.5 * 32 }), false);
+  assert.equal(core.pacuCdPierTable({ piau: 4 }).pacu_cd, 22);
+  assert.match(css, /-webkit-user-select:none/);
+  assert.match(css, /-webkit-touch-callout:none/);
+  assert.match(css, /-webkit-tap-highlight-color:transparent/);
+  assert.match(css, /\.pesca-stage\.golden-fish-impact/);
+  assert.match(source, /speciesId==="tucunare_dourado"\)triggerGoldenFishImpact/);
+  assert.match(source, /Agora você pode navegar para os outros mapas/);
+  assert.match(source, /Piranhas preferem margens, canais e águas mais rasas/);
+  assert.match(source, /Pacu-CD vive exclusivamente nas águas próximas dos píeres/);
+  assert.equal(core.CHANNEL_UNLOCK_V54_DURATION, 3400);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
