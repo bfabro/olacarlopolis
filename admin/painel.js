@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 829,
-  label: "v836",
-  data: "2026-09-26",
-  nota: "Mapa v54 adiciona Piranha e Pacu-CD, melhora os controles no iPhone e reforça os efeitos do Dourado e do desbloqueio de mapas."
+  numero: 830,
+  label: "v837",
+  data: "2026-09-27",
+  nota: "Mapa v55 adiciona na ajuda os tamanhos máximos comuns e extraordinários, pesos aproximados e recordes pessoais de todas as espécies."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
