@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 840,
-  label: "v847",
+  numero: 841,
+  label: "v848",
   data: "2026-09-27",
-  nota: "Mapa v65 corrige pés e poses, anima a puxada com alerta de fisgada, destaca o pescador gordão e refina as lanchas."
+  nota: "Mapa v66 aplica novas lanchas de pesca em quatro vistas e identifica a lancha preta como Parana Fishing."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
