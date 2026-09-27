@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 831,
-  label: "v838",
+  numero: 832,
+  label: "v839",
   data: "2026-09-27",
-  nota: "Mapa v56 adiciona fichas clicáveis na PESCAdex com habitat, comportamento na fisgada e curiosidades reais de cada espécie."
+  nota: "Mapa v57 remove dicas diretas da ajuda, orienta a conversa com pescadores e exige acertar a boia diretamente na pedra para o Tucunaré Dourado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

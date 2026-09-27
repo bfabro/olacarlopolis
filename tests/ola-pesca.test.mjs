@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=56/);
-  assert.match(html, /ola-pesca\.js\?v=56/);
+  assert.match(html, /ola-pesca\.css\?v=57/);
+  assert.match(html, /ola-pesca\.js\?v=57/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -69,7 +69,7 @@ test("catálogo possui as 20 espécies incluindo Piranha e Pacu-CD", () => {
   }
 });
 
-test("v14 mantém o Dourado ao lado da pedra pequena no canto inferior direito", () => {
+test("v14 mantém o Dourado na pedra pequena no canto inferior direito", () => {
   const golden = core.SPECIES.find(item => item.id === "tucunare_dourado");
   assert.ok(golden);
   assert.equal(golden.image, "images/jogos/ola-pesca/tucunare-dourado-v13.png");
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 831/);
-  assert.match(panel, /label: "v838"/);
+  assert.match(panel, /numero: 832/);
+  assert.match(panel, /label: "v839"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 56);
+  assert.equal(core.FISHING_MAP_VERSION, 57);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small/);
@@ -1107,8 +1107,7 @@ test("v54 adiciona Piranha, restringe Pacu-CD aos píeres e melhora a experiênc
   assert.match(css, /\.pesca-stage\.golden-fish-impact/);
   assert.match(source, /speciesId==="tucunare_dourado"\)triggerGoldenFishImpact/);
   assert.match(source, /Agora você pode navegar para os outros mapas/);
-  assert.match(source, /Piranhas preferem margens, canais e águas mais rasas/);
-  assert.match(source, /Pacu-CD vive exclusivamente nas águas próximas dos píeres/);
+
   assert.equal(core.CHANNEL_UNLOCK_V54_DURATION, 3400);
 });
 test("v55 mostra limites comuns, extraordinários e recordes pessoais na ajuda", () => {
@@ -1156,6 +1155,16 @@ test("v56 abre fichas completas somente para espécies descobertas na PESCAdex",
   assert.match(source, /event\.key==="Escape"/);
   assert.match(css, /\.pesca-dex-fish-info\{position:fixed/);
   assert.match(css, /\.pesca-dex-grid article\.clickable/);
+});
+test("v57 exige acerto direto na pedra e limpa as dicas da ajuda", () => {
+  assert.equal(core.GOLDEN_ROCK.zoneRadius, core.GOLDEN_ROCK.radius);
+  assert.equal(core.isGoldenZone({ x: core.GOLDEN_ROCK.x + core.GOLDEN_ROCK.radius - 0.1, y: core.GOLDEN_ROCK.y }), true);
+  assert.equal(core.isGoldenZone({ x: core.GOLDEN_ROCK.x + core.GOLDEN_ROCK.radius + 0.1, y: core.GOLDEN_ROCK.y }), false);
+  assert.doesNotMatch(source, /só aparece ao lado da pequena pedra no canto inferior direito/);
+  assert.doesNotMatch(source, /Piranhas preferem margens, canais e águas mais rasas/);
+  assert.doesNotMatch(source, /Pacu-CD vive exclusivamente nas águas próximas dos píeres dos mapas da Represa e da Ilha/);
+  assert.match(source, /pescadores fictícios nas margens e aperte A para conversar/);
+  assert.match(source, /function isGoldenZone\(target\)\{return!!target&&Math\.hypot[^}]+<=GOLDEN_ROCK\.radius\}/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
