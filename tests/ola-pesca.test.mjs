@@ -21,8 +21,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=61/);
-  assert.match(html, /ola-pesca\.js\?v=61/);
+  assert.match(html, /ola-pesca\.css\?v=62/);
+  assert.match(html, /ola-pesca\.js\?v=62/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -636,8 +636,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 836/);
-  assert.match(panel, /label: "v843"/);
+  assert.match(panel, /numero: 837/);
+  assert.match(panel, /label: "v844"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -676,9 +676,9 @@ test("v31 preserva o nome digitado e reconhece códigos automáticos", () => {
 });
 
 test("v32 vira rosto e boné e oferece pistas falsas nos pescadores da margem", () => {
-  assert.match(source, /facing==="right"\)c\.fillRect\(x\+5,y-14,8,3\)/);
-  assert.match(source, /facing==="left"\)c\.fillRect\(x-13,y-14,8,3\)/);
-  assert.match(source, /facing==="down"\)\{c\.fillRect\(x-4,y-10,2,2\)/);
+  assert.match(source, /const side=facing==="left"\?-1:1,vertical=facing==="up"\|\|facing==="down"/);
+  assert.match(source, /if\(!vertical\)c\.scale\(side,1\)/);
+  assert.match(source, /if\(back\)\{c\.fillStyle=hair/);
   assert.equal(core.GOLDEN_FISHER_HINTS.length, core.SHORE_FISHERS.length);
   assert.match(core.GOLDEN_FISHER_HINTS.join(" "), /Todo pescador é mentiroso/);
   for (const hint of core.GOLDEN_FISHER_HINTS) assert.doesNotMatch(hint, /pedra|canto inferior|direito/i);
@@ -887,7 +887,7 @@ test("v41 desenha tráfego e pescadores acima da lancha no Rio da Ponte", () => 
   const before = core.bridgeBoatPosition(moving, 0);
   const after = core.bridgeBoatPosition(moving, 10000);
   assert.notEqual(before.x, after.x);
-  assert.match(source, /drawMainCharacterPixelV61\(c,g,n,cam\)/);
+  assert.match(source, /drawMainCharacterPixelV62\(c,g,n,cam\)/);
   assert.match(source, /drawBridgeFisher/);
   assert.match(source, /function drawBridgeCar/);
   assert.match(source, /function drawBridgeMotorcycle/);
@@ -943,7 +943,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 61);
+  assert.equal(core.FISHING_MAP_VERSION, 62);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1193,6 +1193,16 @@ test("v61 redesenha o protagonista em pixel art direcional", () => {
   assert.match(source, /const back=facing==="up"/);
   assert.match(source, /c\.imageSmoothingEnabled=false/);
   assert.match(source, /g\.mode==="battle"\?Math\.round\(Math\.sin\(n\/85\)\*2\):0/);
+});
+test("v62 encaixa o pescador na lancha e uniformiza os personagens", () => {
+  assert.match(source, /function drawPixelFisherV62/);
+  assert.match(source, /function drawMainCharacterPixelV62/);
+  assert.match(source, /function drawPlayerBoatForegroundV62/);
+  assert.match(source, /drawMainCharacterPixelV62\(c,g,n,cam\);if\(g\.player\.inBoat\)drawPlayerBoatForegroundV62/);
+  assert.match(source, /drawBoatForegroundV62\(c,position\.x,position\.y,facing,item\.color,item\.accent\)/);
+  assert.ok(source.includes('drawShoreFisher=function(c,n,p)'));
+  assert.ok(source.includes('drawTributaryGuest=function(c,guest,n)'));
+  assert.ok(source.includes('drawBridgeFisher=function(c,x,y,side,color,n,offset)'));
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
