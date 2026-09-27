@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 842,
-  label: "v849",
+  numero: 843,
+  label: "v850",
   data: "2026-09-27",
-  nota: "Mapa v67 sincroniza a puxada com cada acerto verde e renova personagens, vegetação e churrasqueira da ilha."
+  nota: "Mapa v68 aplica rostos personalizados aos convidados da ilha e sincroniza o recuo da vara com cada recolhimento."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

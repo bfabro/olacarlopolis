@@ -22,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=67/);
-  assert.match(html, /ola-pesca\.js\?v=67/);
+  assert.match(html, /ola-pesca\.css\?v=68/);
+  assert.match(html, /ola-pesca\.js\?v=68/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -637,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 842/);
-  assert.match(panel, /label: "v849"/);
+  assert.match(panel, /numero: 843/);
+  assert.match(panel, /label: "v850"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -944,7 +944,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 67);
+  assert.equal(core.FISHING_MAP_VERSION, 68);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1256,6 +1256,18 @@ test("v66 usa lanchas modernas em quatro vistas e identifica a preta", () => {
   assert.match(source, /const drawTributaryMapV67=drawTributaryMap/);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ficticios-sprites-v3.png", import.meta.url)), true);
   assert.match(serviceWorker, /pescadores-ficticios-sprites-v3\.png/);
+});
+test("v68 aplica os quatro rostos da ilha e sincroniza a vara com o recolhimento", () => {
+  assert.match(source, /ISLAND_GUEST_SPRITE="images\/jogos\/ola-pesca\/pescadores-ilha-sprites-v1\.png"/);
+  assert.match(source, /ISLAND_GUEST_RECTS_V68=\[\{x:50,y:45,w:359,h:809\}/);
+  assert.match(source, /function drawIslandGuestSpriteV68/);
+  assert.match(source, /index=Math\.max\(0,TRIBUTARY_GUESTS\.indexOf\(guest\)\)/);
+  assert.match(source, /drawIslandGuestSpriteV68\(c,index,\{facing,width:60,height:60,y:-49\}\)/);
+  assert.match(source, /reel=g\.mode==="battle"\?g\.cast\?\.reelAnimation:null,pull=reel\?Math\.sin/);
+  assert.match(source, /n-reel\.startedAt\)\/reel\.duration/);
+  assert.equal(core.TRIBUTARY_GUESTS.length, 4);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ilha-sprites-v1.png", import.meta.url)), true);
+  assert.match(serviceWorker, /pescadores-ilha-sprites-v1\.png/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
