@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 838,
-  label: "v845",
+  numero: 839,
+  label: "v846",
   data: "2026-09-27",
-  nota: "Mapa v63 integra uma folha de sprites própria com oito poses do protagonista em pixel art e composição dentro da lancha."
+  nota: "Mapa v64 renova protagonista e pescadores fictícios, anima os braços na puxada e remove o artefato escuro sobre o boné."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
