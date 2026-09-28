@@ -22,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=77/);
-  assert.match(html, /ola-pesca\.js\?v=77/);
+  assert.match(html, /ola-pesca\.css\?v=78/);
+  assert.match(html, /ola-pesca\.js\?v=78/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -637,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 852/);
-  assert.match(panel, /label: "v859"/);
+  assert.match(panel, /numero: 853/);
+  assert.match(panel, /label: "v860"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -946,7 +946,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 77);
+  assert.equal(core.FISHING_MAP_VERSION, 78);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1323,9 +1323,9 @@ test("v73 diferencia a Piracanjuba e reorganiza personagens e cenário", () => {
   assert.ok(core.SPONSOR_SLOTS.slice(5, 10).every(slot => slot.x === 31 * 32));
   assert.equal(core.SNAG.x, 18 * 32);
   assert.equal(core.SNAG.y, 2.8 * 32);
-  assert.match(panel, /numero: 852/);
-  assert.match(panel, /label: "v859"/);
-  assert.match(serviceWorker, /pesque-solte-v907/);
+  assert.match(panel, /numero: 853/);
+  assert.match(panel, /label: "v860"/);
+  assert.match(serviceWorker, /pesque-solte-v908/);
 });
 
 test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores em terra", () => {
@@ -1340,12 +1340,12 @@ test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores e
   for (const [x, y] of rightTrees) {
     assert.notEqual(core.MAP[Math.floor(y)]?.[Math.floor(x)], "W");
   }
-  assert.match(panel, /numero: 852/);
-  assert.match(panel, /label: "v859"/);
-  assert.match(serviceWorker, /2026-09-28-pesque-solte-v907/);
+  assert.match(panel, /numero: 853/);
+  assert.match(panel, /label: "v860"/);
+  assert.match(serviceWorker, /2026-09-28-pesque-solte-v908/);
 });
 test("v75 senta os pescadores no barranco e renova as identidades da ponte", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 77);
+  assert.equal(core.FISHING_MAP_VERSION, 78);
   assert.match(source, /BRIDGE_EXTRA_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-ponte-extras-v77\.png"/);
   assert.match(source, /function drawBankSeatBaseV75/);
   assert.match(source, /function drawMapOneSeatedFisherV75/);
@@ -1357,25 +1357,25 @@ test("v75 senta os pescadores no barranco e renova as identidades da ponte", () 
   assert.match(source, /drawBridgeExtraFisherV77\(c,identity,options\)\|\|drawBridgeIdentityV75Fallback/);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ponte-extras-v77.png", import.meta.url)), true);
   assert.match(serviceWorker, /pescadores-ponte-extras-v77\.png/);
-  assert.match(panel, /numero: 852/);
-  assert.match(panel, /label: "v859"/);
-  assert.match(serviceWorker, /2026-09-28-pesque-solte-v907/);
+  assert.match(panel, /numero: 853/);
+  assert.match(panel, /label: "v860"/);
+  assert.match(serviceWorker, /2026-09-28-pesque-solte-v908/);
 });
 test("v76 mostra pernas e pés dos pescadores sentados em bancos", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 77);
+  assert.equal(core.FISHING_MAP_VERSION, 78);
   assert.match(source, /function drawFishingBenchV76/);
   assert.match(source, /fillRect\(-21,-13,42,6\)/);
   assert.match(source, /fillRect\(-22,1,44,7\)/);
   assert.match(source, /function drawVisibleSeatedLegsV76/);
-  assert.match(source, /c\.ellipse\(side\*11,18,6,3/);
-  assert.match(source, /drawVisibleSeatedLegsV76\(c,dir,\{child:!!p\.child,woman:!!p\.gender\}\);drawPlantedRodV75/);
+  assert.match(source, /c\.fillRect\(11,15,11,6\)/);
+  assert.match(source, /drawVisibleSeatedLegsV76\(c,dir,\{child:!!p\.child,woman:!!p\.gender,pantsColor:p\.pantsColor,shoeColor:p\.shoeColor,accentColor:p\.legAccent\}\);drawPlantedRodV75/);
   assert.match(source, /const baseX=side\*27,baseY=17/);
-  assert.match(panel, /numero: 852/);
-  assert.match(panel, /label: "v859"/);
-  assert.match(serviceWorker, /2026-09-28-pesque-solte-v907/);
+  assert.match(panel, /numero: 853/);
+  assert.match(panel, /label: "v860"/);
+  assert.match(serviceWorker, /2026-09-28-pesque-solte-v908/);
 });
 test("v77 iguala os dois pescadores inferiores ao padrão visual dos superiores", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 77);
+  assert.equal(core.FISHING_MAP_VERSION, 78);
   assert.match(source, /BRIDGE_EXTRA_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-ponte-extras-v77\.png"/);
   assert.match(source, /BRIDGE_EXTRA_FISHER_RECTS_V77=\{river_guide:\{x:128,y:55,w:219,h:407\},gray_veteran:\{x:427,y:55,w:219,h:407\}\}/);
   assert.match(source, /function drawBridgeExtraFisherV77\(c,identity,\{facing="right",seated=false,width=68,height=68,y=-51\}=\{\}\)/);
@@ -1385,9 +1385,26 @@ test("v77 iguala os dois pescadores inferiores ao padrão visual dos superiores"
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ponte-extras-v77.png", import.meta.url)), true);
   assert.match(serviceWorker, /pescadores-ponte-extras-v77\.png/);
   assert.doesNotMatch(serviceWorker, /pescadores-ponte-extras-v75\.png/);
-  assert.match(panel, /numero: 852/);
-  assert.match(panel, /label: "v859"/);
-  assert.match(serviceWorker, /2026-09-28-pesque-solte-v907/);
+  assert.match(panel, /numero: 853/);
+  assert.match(panel, /label: "v860"/);
+  assert.match(serviceWorker, /2026-09-28-pesque-solte-v908/);
+});
+test("v78 encaixa as varas nas mãos e individualiza as pernas sentadas", () => {
+  assert.equal(core.FISHING_MAP_VERSION, 78);
+  assert.match(source, /function drawBridgeHeldRodV78/);
+  assert.match(source, /gripX=side\*15,gripY=-7,buttX=side\*7,buttY=-4/);
+  assert.match(source, /c\.arc\(side\*9,-6,2\.7/);
+  assert.match(source, /c\.arc\(gripX,gripY,2\.9/);
+  assert.match(source, /drawBridgeHeldRodV78\(c,side,\{bend,identity,lineX:side\*65,lineY:19\}\)/);
+  assert.match(source, /SHORE_FISHER_LEG_PALETTES_V78=\[/);
+  assert.equal(new Set(Array.from(core.SHORE_FISHERS, fisher => fisher.pantsColor)).size, 6);
+  assert.equal(new Set(Array.from(core.SHORE_FISHERS, fisher => fisher.shoeColor)).size, 6);
+  assert.ok(core.SHORE_FISHERS.every(fisher => fisher.legAccent));
+  assert.match(source, /function drawVisibleSeatedLegsV76\(c,side,\{child=false,woman=false,pantsColor=null,shoeColor=null,accentColor=null\}/);
+  assert.match(source, /pantsColor:p\.pantsColor,shoeColor:p\.shoeColor,accentColor:p\.legAccent/);
+  assert.match(panel, /numero: 853/);
+  assert.match(panel, /label: "v860"/);
+  assert.match(serviceWorker, /2026-09-28-pesque-solte-v908/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;

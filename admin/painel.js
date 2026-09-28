@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 852,
-  label: "v859",
+  numero: 853,
+  label: "v860",
   data: "2026-09-28",
-  nota: "Mapa v77 redesenha os dois pescadores inferiores da ponte no mesmo pixel art, proporção e escala visual dos personagens superiores."
+  nota: "Mapa v78 encaixa as varas nas duas mãos dos pescadores da ponte e redesenha as pernas dos personagens sentados com paletas individuais."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
