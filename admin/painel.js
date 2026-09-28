@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 853,
-  label: "v860",
+  numero: 854,
+  label: "v861",
   data: "2026-09-28",
-  nota: "Mapa v78 encaixa as varas nas duas mãos dos pescadores da ponte e redesenha as pernas dos personagens sentados com paletas individuais."
+  nota: "Mapa v79 redesenha e padroniza todos os pescadores fictícios, preserva as referências dos rostos e corrige a direção visual ao segurar a vara."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
