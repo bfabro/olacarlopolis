@@ -22,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=72/);
-  assert.match(html, /ola-pesca\.js\?v=72/);
+  assert.match(html, /ola-pesca\.css\?v=73/);
+  assert.match(html, /ola-pesca\.js\?v=73/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -637,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 847/);
-  assert.match(panel, /label: "v854"/);
+  assert.match(panel, /numero: 848/);
+  assert.match(panel, /label: "v855"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -946,7 +946,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 72);
+  assert.equal(core.FISHING_MAP_VERSION, 73);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1298,7 +1298,37 @@ test("v72 mantém nove identidades exclusivas no mapa 3 e reserva o gordo à ilh
   assert.match(source, /rosterIndex=5\+Math\.max\(0,positions\.indexOf\(offset\)\)/);
   assert.match(source, /identity==="river_guide"/);
   assert.match(source, /"gray_veteran"/);
-});test("v28 protege configurações e arquivos do ranking para o Master", () => {
+});
+
+test("v73 diferencia a Piracanjuba e reorganiza personagens e cenário", () => {
+  const piracanjuba = core.SPECIES.find(fish => fish.id === "piracanjuba");
+  const pacu = core.SPECIES.find(fish => fish.id === "pacu");
+  assert.equal(piracanjuba.image, "images/jogos/ola-pesca/piracanjuba-v73.png");
+  assert.notEqual(piracanjuba.image, pacu.image);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/piracanjuba-v73.png", import.meta.url)), true);
+  assert.match(serviceWorker, /piracanjuba-v73.png/);
+  assert.deepEqual(Array.from(core.TRIBUTARY_GUESTS, guest => guest.name), ["Gordo", "Felipe"]);
+  assert.deepEqual(Array.from(core.SHORE_FISHERS, fisher => fisher.name), ["Gustavinho", "Duda", "Ção", "Bia", "Zé", "Jurandir"]);
+  assert.equal(core.TRIBUTARY_GUEST_ROUTES_V73.length, 2);
+  assert.ok(core.TRIBUTARY_GUEST_ROUTES_V73.every(route => route.length >= 8));
+  assert.ok(core.TRIBUTARY_GUEST_ROUTES_V73.every(route => Math.max(...Array.from(route, point => point[0])) - Math.min(...Array.from(route, point => point[0])) > 6));
+  assert.deepEqual(Array.from(core.BRIDGE_FISHER_NAMES_V73), ["Nando", "Beto", "Tiago", "Marcos", "Renato", "Toninho", "Valdir", "Chico do Rio", "Seu Ari"]);
+  assert.equal(new Set(core.BRIDGE_FISHER_NAMES_V73).size, 9);
+  assert.ok(source.includes('entry.guest.name+": "+entry.guest.joke'));
+  assert.ok(source.includes('entry.fisher.name+": "+entry.hint'));
+  assert.ok(source.includes('moveTo(dir*8,-15)'));
+  assert.ok(source.includes('moveTo(side*8,-15)'));
+  assert.ok(!source.includes('c.scale(1.12,1.12)'));
+  assert.equal(core.SPONSOR_SLOTS[5].x, 31 * 32);
+  assert.ok(core.SPONSOR_SLOTS.slice(5, 10).every(slot => slot.x === 31 * 32));
+  assert.equal(core.SNAG.x, 18 * 32);
+  assert.equal(core.SNAG.y, 2.8 * 32);
+  assert.match(panel, /numero: 848/);
+  assert.match(panel, /label: "v855"/);
+  assert.match(serviceWorker, /pesque-solte-v903/);
+});
+
+test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
   assert.match(fishingRules.config[".write"], /master/);
   assert.match(fishingRules.rankingArchives[".write"], /master/);

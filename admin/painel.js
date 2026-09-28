@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 847,
-  label: "v854",
+  numero: 848,
+  label: "v855",
   data: "2026-09-27",
-  nota: "Mapa v72 dá identidade exclusiva aos nove pescadores do Rio da Ponte e mantém o pescador gordo somente na ilha."
+  nota: "Mapa v73 corrige a Piracanjuba, nomeia os pescadores, amplia a caminhada na ilha e reorganiza anúncios, varas e galhada."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
