@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 850,
-  label: "v857",
+  numero: 851,
+  label: "v858",
   data: "2026-09-28",
-  nota: "Mapa v75 coloca os pescadores das margens sentados com as varas apoiadas no barranco e renova os dois personagens antigos da ponte."
+  nota: "Mapa v76 coloca os pescadores fictícios sentados em bancos, com pernas e pés visíveis e a vara fincada ao lado."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
