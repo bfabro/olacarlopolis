@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 849,
-  label: "v856",
+  numero: 850,
+  label: "v857",
   data: "2026-09-28",
-  nota: "Mapa v74 corrige o nome da Yas, preserva as proporções dos pescadores, encaixa as varas nas mãos e mantém as árvores direitas em terra."
+  nota: "Mapa v75 coloca os pescadores das margens sentados com as varas apoiadas no barranco e renova os dois personagens antigos da ponte."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

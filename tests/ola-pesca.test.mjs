@@ -22,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=74/);
-  assert.match(html, /ola-pesca\.js\?v=74/);
+  assert.match(html, /ola-pesca\.css\?v=75/);
+  assert.match(html, /ola-pesca\.js\?v=75/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -637,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 849/);
-  assert.match(panel, /label: "v856"/);
+  assert.match(panel, /numero: 850/);
+  assert.match(panel, /label: "v857"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -946,7 +946,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 74);
+  assert.equal(core.FISHING_MAP_VERSION, 75);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1323,9 +1323,9 @@ test("v73 diferencia a Piracanjuba e reorganiza personagens e cenário", () => {
   assert.ok(core.SPONSOR_SLOTS.slice(5, 10).every(slot => slot.x === 31 * 32));
   assert.equal(core.SNAG.x, 18 * 32);
   assert.equal(core.SNAG.y, 2.8 * 32);
-  assert.match(panel, /numero: 849/);
-  assert.match(panel, /label: "v856"/);
-  assert.match(serviceWorker, /pesque-solte-v904/);
+  assert.match(panel, /numero: 850/);
+  assert.match(panel, /label: "v857"/);
+  assert.match(serviceWorker, /pesque-solte-v905/);
 });
 
 test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores em terra", () => {
@@ -1340,9 +1340,26 @@ test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores e
   for (const [x, y] of rightTrees) {
     assert.notEqual(core.MAP[Math.floor(y)]?.[Math.floor(x)], "W");
   }
-  assert.match(panel, /numero: 849/);
-  assert.match(panel, /label: "v856"/);
-  assert.match(serviceWorker, /2026-09-28-pesque-solte-v904/);
+  assert.match(panel, /numero: 850/);
+  assert.match(panel, /label: "v857"/);
+  assert.match(serviceWorker, /2026-09-28-pesque-solte-v905/);
+});
+test("v75 senta os pescadores no barranco e renova as identidades da ponte", () => {
+  assert.equal(core.FISHING_MAP_VERSION, 75);
+  assert.match(source, /BRIDGE_EXTRA_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-ponte-extras-v75\.png"/);
+  assert.match(source, /function drawBankSeatBaseV75/);
+  assert.match(source, /function drawMapOneSeatedFisherV75/);
+  assert.match(source, /function drawPlantedRodV75/);
+  assert.match(source, /seated:true,width:p\.child\?38:44/);
+  assert.match(source, /holdingRod:false/);
+  assert.match(source, /function drawBridgeExtraFisherV75/);
+  assert.match(source, /BRIDGE_EXTRA_FISHER_RECTS_V75=\{river_guide:/);
+  assert.match(source, /drawBridgeExtraFisherV75\(c,identity,options\)\|\|drawBridgeIdentityV75Fallback/);
+  assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ponte-extras-v75.png", import.meta.url)), true);
+  assert.match(serviceWorker, /pescadores-ponte-extras-v75\.png/);
+  assert.match(panel, /numero: 850/);
+  assert.match(panel, /label: "v857"/);
+  assert.match(serviceWorker, /2026-09-28-pesque-solte-v905/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
