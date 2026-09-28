@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 854,
-  label: "v861",
+  numero: 855,
+  label: "v862",
   data: "2026-09-28",
-  nota: "Mapa v79 redesenha e padroniza todos os pescadores fictícios, preserva as referências dos rostos e corrige a direção visual ao segurar a vara."
+  nota: "Mapa v80 restaura o modelo visual dos personagens da v71, preservando bancos, nomes, posições, movimentos e ajustes posteriores das varas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
