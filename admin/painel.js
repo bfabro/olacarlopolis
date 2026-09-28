@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 846,
-  label: "v853",
+  numero: 847,
+  label: "v854",
   data: "2026-09-27",
-  nota: "Mapa v71 distribui seis personagens na margem, incluindo duas mulheres adultas e a menina, com elencos próprios na ilha e ponte."
+  nota: "Mapa v72 dá identidade exclusiva aos nove pescadores do Rio da Ponte e mantém o pescador gordo somente na ilha."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

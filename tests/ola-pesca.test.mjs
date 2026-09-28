@@ -22,8 +22,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("Pesque e Solte integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /ola-pesca\.css\?v=71/);
-  assert.match(html, /ola-pesca\.js\?v=71/);
+  assert.match(html, /ola-pesca\.css\?v=72/);
+  assert.match(html, /ola-pesca\.js\?v=72/);
   assert.match(site, /Pesque e Solte/);
   assert.match(source, /PESQUE E SOLTE/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -637,8 +637,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 846/);
-  assert.match(panel, /label: "v853"/);
+  assert.match(panel, /numero: 847/);
+  assert.match(panel, /label: "v854"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -946,7 +946,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 71);
+  assert.equal(core.FISHING_MAP_VERSION, 72);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1282,7 +1282,23 @@ test("v71 separa os elencos e mantém seis pescadores na margem verde", () => {
   assert.match(serviceWorker, /pescadores-mapa1-sprites-v1\.png/);
   assert.match(serviceWorker, /pescadores-referencias-sprites-v2\.png/);
 });
-test("v28 protege configurações e arquivos do ranking para o Master", () => {
+test("v72 mantém nove identidades exclusivas no mapa 3 e reserva o gordo à ilha", () => {
+  const identities = Array.from(core.BRIDGE_FISHER_IDENTITIES_V72);
+  assert.equal(core.BRIDGE_BOATS.length, 5);
+  assert.equal(identities.length, 9);
+  assert.equal(new Set(identities).size, 9);
+  assert.equal(identities.includes(4), false);
+  assert.deepEqual(identities.slice(0, 7), [0, 1, 2, 3, 5, 6, 7]);
+  assert.deepEqual(identities.slice(7), ["river_guide", "gray_veteran"]);
+  assert.equal(core.TRIBUTARY_GUESTS.filter(guest => guest.spriteIndex === 4).length, 1);
+  assert.equal(core.TRIBUTARY_GUESTS.find(guest => guest.spriteIndex === 4)?.build, "large");
+  assert.equal(core.SHORE_FISHERS.some(fisher => fisher.spriteIndex === 4), false);
+  assert.match(source, /function drawBridgeIdentityV72/);
+  assert.match(source, /rosterIndex=Math\.max\(0,BRIDGE_BOATS\.indexOf\(item\)\)/);
+  assert.match(source, /rosterIndex=5\+Math\.max\(0,positions\.indexOf\(offset\)\)/);
+  assert.match(source, /identity==="river_guide"/);
+  assert.match(source, /"gray_veteran"/);
+});test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
   assert.match(fishingRules.config[".write"], /master/);
   assert.match(fishingRules.rankingArchives[".write"], /master/);
