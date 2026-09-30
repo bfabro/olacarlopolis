@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 856,
-  label: "v863",
-  data: "2026-09-28",
-  nota: "Mapa v81 mantém nove pescadores exclusivos, encaixa as varas nas mãos e adiciona calçadas laterais à ponte sem bloquear o tráfego."
+  numero: 857,
+  label: "v864",
+  data: "2026-09-30",
+  nota: "Mapa v82 corrige os nomes das pescadoras da margem: a moça de rosa passa a se chamar Ção e a menininha, Yas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
