@@ -15146,8 +15146,8 @@ tr[data-inativo="true"] {
 }
 
 .home-quick-actions [data-home-quick-action="novidades"] .novidades-alert-badge {
-  top: 6px;
-  right: 8px;
+  top: -10px;
+  right: -10px;
   z-index: 5;
   min-width: 26px;
   height: 26px;

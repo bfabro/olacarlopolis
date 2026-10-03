@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 858,
-  label: "v865",
+  numero: 859,
+  label: "v866",
   data: "2026-10-03",
-  nota: "A tela inicial passa a carregar automaticamente o marcador de Novidades no Acesso rápido e posiciona o contador dentro do botão."
+  nota: "O marcador de Novidades volta a ficar alinhado sobre o canto superior direito do botão no Acesso rápido."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
