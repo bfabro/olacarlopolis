@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 857,
-  label: "v864",
-  data: "2026-09-30",
-  nota: "Mapa v82 corrige os nomes das pescadoras da margem: a moça de rosa passa a se chamar Ção e a menininha, Yas."
+  numero: 858,
+  label: "v865",
+  data: "2026-10-03",
+  nota: "A tela inicial passa a carregar automaticamente o marcador de Novidades no Acesso rápido e posiciona o contador dentro do botão."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

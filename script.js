@@ -5788,6 +5788,16 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   try { window.montarNovidadesCidade = montarNovidadesCidade; } catch (e) { }
 
+  function inicializarAvisoNovidadesCidade() {
+    if (!botoesNovidadesCidade().length) return;
+    carregarNovidadesCidade().catch((error) => {
+      console.warn("Nao foi possivel inicializar o marcador de novidades.", error);
+      renderAvisoNovidadesCidade(0);
+    });
+  }
+
+  try { window.inicializarAvisoNovidadesCidade = inicializarAvisoNovidadesCidade; } catch (e) { }
+  inicializarAvisoNovidadesCidade();
   async function mostrarNovidadesCidadePublicas() {
     if (location.hash !== "#novidades") history.pushState(null, "", `${location.pathname}${location.search}#novidades`);
     prepararNavegacaoMenuEspecial();

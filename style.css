@@ -15141,6 +15141,23 @@ tr[data-inativo="true"] {
   text-shadow: 0 2px 8px rgba(0,0,0,.18);
 }
 
+.home-quick-actions [data-home-quick-action="novidades"] {
+  overflow: visible;
+}
+
+.home-quick-actions [data-home-quick-action="novidades"] .novidades-alert-badge {
+  top: 6px;
+  right: 8px;
+  z-index: 5;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 7px;
+  border-width: 2px;
+  color: #fff;
+  font-size: 12px;
+  line-height: 22px;
+  text-shadow: none;
+}
 @media (hover: hover) {
   .home-quick-actions button:hover {
     transform: translateY(-3px);
