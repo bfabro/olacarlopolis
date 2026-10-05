@@ -12895,7 +12895,7 @@ button.admin-button-loading::after {
 .fishing-reset-card{border-color:#e7c4c0;background:#fff8f7}.fishing-reset-card .danger-button{background:#a63d35;color:#fff}
 @media(max-width:1100px){.fishing-admin-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.fishing-stage-row{grid-template-columns:38px repeat(2,minmax(0,1fr)) 42px}.fishing-stage-prize{grid-column:2/4}}
 @media(max-width:680px){.fishing-admin-metrics{grid-template-columns:1fr 1fr}.fishing-stage-heading{align-items:stretch;flex-direction:column}.fishing-stage-row{grid-template-columns:34px minmax(0,1fr) 40px}.fishing-stage-row label,.fishing-stage-prize{grid-column:2}.fishing-remove-stage{grid-column:3;grid-row:1}.fishing-stage-order{grid-row:1}.fishing-admin-metrics article{min-height:76px}}
-/* Client workflow v868 */
+/* Client workflow v869 */
 .client-workflow-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px;background:linear-gradient(135deg,#0f3d36 0%,#176b5d 58%,#1f8a70 100%);color:#fff;overflow:hidden;position:relative}
 .client-workflow-hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-70px;top:-120px;background:rgba(255,255,255,.09)}
 .client-workflow-hero>div,.client-workflow-hero>button{position:relative;z-index:1}
@@ -12956,5 +12956,6 @@ button.admin-button-loading::after {
 .client-workflow-prospect{border:1px solid #dce7e3;border-radius:14px;padding:15px;background:#fbfdfc}
 .client-workflow-prospect h3{margin:0 0 4px;color:#183b34}.client-workflow-prospect p{margin:4px 0;color:#647a73;font-size:13px}
 .client-workflow-prospect-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}.client-workflow-prospect-actions button{padding:8px 10px;font-size:12px}
+[data-client-workflow-page="prospects"] .section-head>button{white-space:nowrap}
 @media (max-width:1100px){.client-workflow-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.client-workflow-prospect-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:700px){.client-workflow-hero{align-items:flex-start;flex-direction:column}.client-workflow-hero>button{width:100%}.client-workflow-stats{grid-template-columns:1fr 1fr}.client-workflow-stats article{grid-template-columns:34px 1fr;padding:13px}.client-workflow-stats article>i{width:34px;height:34px}.client-workflow-toolbar{align-items:stretch;flex-direction:column}.client-workflow-toolbar select{width:100%}.client-workflow-prospect-grid{grid-template-columns:1fr}.client-workflow-board{grid-template-columns:repeat(5,82vw)}}
+@media (max-width:700px){[data-client-workflow-page="prospects"] .section-head>button{width:100%}.client-workflow-hero{align-items:flex-start;flex-direction:column}.client-workflow-hero>button{width:100%}.client-workflow-stats{grid-template-columns:1fr 1fr}.client-workflow-stats article{grid-template-columns:34px 1fr;padding:13px}.client-workflow-stats article>i{width:34px;height:34px}.client-workflow-toolbar{align-items:stretch;flex-direction:column}.client-workflow-toolbar select{width:100%}.client-workflow-prospect-grid{grid-template-columns:1fr}.client-workflow-board{grid-template-columns:repeat(5,82vw)}}

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 861,
-  label: "v868",
+  numero: 862,
+  label: "v869",
   data: "2026-10-05",
-  nota: "O acompanhamento de clientes ganha comentários por etapa, histórico, exclusão após conclusão, novos ciclos e alerta de prazos."
+  nota: "A aba de visitas e novos acessos agora gera um roteiro completo para impressão ou PDF e acompanhamento fora do sistema."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13874,6 +13874,43 @@ function renderClientWorkflowProspects(clients = clientWorkflowNoAccessClients()
   }).join("") : '<div class="list-meta">Todos os clientes não institucionais já possuem um usuário ativo.</div>';
 }
 
+function clientWorkflowVisitListAddress(client = {}) {
+  return [client.endereco || client.address, client.numero, client.bairro, client.cidade, client.estado]
+    .map((value) => String(value || "").trim())
+    .filter(Boolean)
+    .join(", ") || "Endereço não cadastrado";
+}
+
+function clientWorkflowVisitListPlan(clientId) {
+  return state.clientWorkflowTasks
+    .filter((task) => task.clientId === clientId && task.status !== "concluido" && ["visita", "criar_usuario"].includes(task.type))
+    .sort((a, b) => String(a.dueDate || "9999-12-31").localeCompare(String(b.dueDate || "9999-12-31")))
+    .map((task) => (CLIENT_WORKFLOW_TYPES[task.type] || "Tarefa") + ": " + (task.title || "Sem título") + (task.dueDate ? " — " + clientWorkflowDueLabel(task.dueDate) : ""))
+    .join(" · ") || "Sem tarefa planejada";
+}
+
+function printClientWorkflowVisitList() {
+  const clients = clientWorkflowNoAccessClients();
+  if (!clients.length) return showToast("Não há clientes pendentes para gerar a lista.");
+  const generatedAt = new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+  const rows = clients.map((client, index) => {
+    const contacts = normalizeClientContactDetails(client)
+      .map((item) => formatPhoneMask(item.numero) + (item.referencia ? " (" + item.referencia + ")" : "") + (item.whatsapp ? " — WhatsApp" : ""))
+      .join(" | ") || "Contato não cadastrado";
+    return '<tr><td class="number">' + (index + 1) + '</td><td><strong>' + escapeHtml(client.nome || client.id) + '</strong><small>' + escapeHtml(clientDisclosureTypeLabel(client.tipoCliente || client.tipo || "outro")) + ' · ' + escapeHtml(client.categoria || "Sem categoria") + '</small></td><td><span>' + escapeHtml(clientWorkflowVisitListAddress(client)) + '</span><small>' + escapeHtml(contacts) + '</small></td><td><span>' + escapeHtml(clientWorkflowVisitListPlan(client.id)) + '</span><small>Financeiro: ' + escapeHtml(paymentLabel(financeClientFilterStatus(client))) + '</small></td><td class="checklist"><label>□ Visitado</label><label>□ Usuário criado</label><label>□ Retornar</label><div>Data: ____/____/______</div></td><td class="notes"><div></div><div></div><div></div></td></tr>';
+  }).join("");
+  const printWindow = window.open("", "lista-visitas-clientes", "width=1200,height=800");
+  if (!printWindow) return showToast("O navegador bloqueou a lista. Permita pop-ups e tente novamente.");
+  printWindow.opener = null;
+  printWindow.document.open();
+  printWindow.document.write(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><title>Lista de visitas aos clientes</title><style>
+    @page{size:A4 landscape;margin:10mm}*{box-sizing:border-box}body{font-family:Arial,sans-serif;color:#17352f;margin:0}header{display:flex;justify-content:space-between;gap:24px;align-items:flex-end;border-bottom:3px solid #176b5d;padding-bottom:10px;margin-bottom:12px}h1{font-size:22px;margin:0 0 4px}header p{margin:0;color:#58706a;font-size:12px}.summary{text-align:right;font-weight:700}.instructions{background:#eef7f4;border:1px solid #c9e2da;border-radius:7px;padding:8px 10px;margin-bottom:10px;font-size:11px}table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:9px}th{background:#176b5d;color:#fff;text-align:left;padding:7px 5px}td{border:1px solid #aebfba;padding:6px 5px;vertical-align:top;height:68px}tbody tr{break-inside:avoid}th:nth-child(1),td.number{width:3%;text-align:center}th:nth-child(2){width:18%}th:nth-child(3){width:25%}th:nth-child(4){width:23%}th:nth-child(5){width:17%}th:nth-child(6){width:14%}td strong,td span{display:block}td small{display:block;color:#526761;margin-top:4px;line-height:1.3}.checklist label{display:block;margin-bottom:4px;font-weight:700}.checklist div{margin-top:7px}.notes div{height:17px;border-bottom:1px solid #9eaaa7}footer{display:flex;justify-content:space-between;margin-top:8px;font-size:9px;color:#687b76}.no-print{display:block;position:fixed;right:14px;bottom:14px;background:#176b5d;color:#fff;border:0;border-radius:8px;padding:10px 16px;font-weight:700;cursor:pointer}@media print{.no-print{display:none}}
+  </style></head><body><header><div><h1>Roteiro de visitas e novos acessos</h1><p>Olá Carlópolis · Acompanhamento de clientes</p></div><div class="summary">${clients.length} cliente${clients.length === 1 ? "" : "s"}<br><small>Gerado em ${escapeHtml(generatedAt)}</small></div></header><div class="instructions">Use esta lista durante as visitas. Marque o andamento à mão e, ao retornar, atualize as tarefas no painel para manter o histórico digital.</div><table><thead><tr><th>#</th><th>Cliente</th><th>Local e contato</th><th>Planejamento</th><th>Acompanhamento</th><th>Anotações</th></tr></thead><tbody>${rows}</tbody></table><footer><span>Total: ${clients.length} cliente${clients.length === 1 ? "" : "s"} sem usuário ativo.</span><span>Responsável: ______________________________</span></footer><button class="no-print" type="button" onclick="window.print()">Imprimir ou salvar em PDF</button></body></html>`);
+  printWindow.document.close();
+  printWindow.focus();
+  setTimeout(() => printWindow.print(), 300);
+}
+
 function switchClientWorkflowTab(tab = "board") {
   const selected = ["board", "access", "prospects"].includes(tab) ? tab : "board";
   state.clientWorkflowTab = selected;
@@ -13916,6 +13953,8 @@ function handleClientWorkflowClick(event) {
   if (duplicateButton) return duplicateClientWorkflowTask(duplicateButton.dataset.clientWorkflowDuplicate);
   const removeButton = event.target.closest("[data-client-workflow-delete]");
   if (removeButton) return deleteClientWorkflowTask(removeButton.dataset.clientWorkflowDelete);
+  const printVisits = event.target.closest("[data-client-workflow-print-visits]");
+  if (printVisits) return printClientWorkflowVisitList();
   const newUser = event.target.closest("[data-client-workflow-new-user]");
   if (newUser) return openClientWorkflowUserForm(newUser.dataset.clientWorkflowNewUser);
   const editUser = event.target.closest("[data-client-workflow-edit-user]");
