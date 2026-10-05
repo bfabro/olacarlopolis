@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=565">
+  <link rel="stylesheet" href="painel.css?v=566">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -106,6 +106,7 @@
         </section>
         <section class="nav-admin-group nav-theme-management" data-role="staff">
           <span class="nav-admin-group-title"><i class="fa-solid fa-chart-simple"></i> Gestão e relatórios</span>
+          <button data-view="acompanhamentoClientes" data-master="true"><i class="fa-solid fa-list-check"></i> Acompanhamento de clientes</button>
           <button data-view="financeiro" data-role="staff"><i class="fa-solid fa-file-invoice-dollar"></i> Financeiro</button>
           <button data-view="relatorioAcessos" data-role="staff"><i class="fa-solid fa-chart-line"></i> Relatório de acessos</button>
           <button data-view="relatorioFinanceiro" data-role="staff"><i class="fa-solid fa-chart-pie"></i> Relatório financeiro</button>
@@ -216,6 +217,113 @@
         </div>
       </section>
 
+      <section id="acompanhamentoClientesView" class="panel-view hidden">
+        <section class="panel-card client-workflow-hero">
+          <div>
+            <span class="client-workflow-eyebrow"><i class="fa-solid fa-list-check"></i> Central de relacionamento</span>
+            <h2>Organização dos clientes</h2>
+            <p>Planeje postagens, acompanhe acessos e organize visitas aos clientes que ainda não possuem usuário.</p>
+          </div>
+          <button id="clientWorkflowNewTask" type="button"><i class="fa-solid fa-plus"></i> Nova tarefa</button>
+        </section>
+
+        <div class="client-workflow-stats">
+          <article><i class="fa-solid fa-circle-dollar-to-slot"></i><span>Pagantes</span><strong id="clientWorkflowPaidCount">0</strong><small>aptos para divulgação</small></article>
+          <article><i class="fa-solid fa-right-to-bracket"></i><span>Com acesso</span><strong id="clientWorkflowLoginCount">0</strong><small>clientes com usuário ativo</small></article>
+          <article><i class="fa-solid fa-store"></i><span>Sem acesso</span><strong id="clientWorkflowNoLoginCount">0</strong><small>não institucionais</small></article>
+          <article><i class="fa-solid fa-clipboard-check"></i><span>Pendências</span><strong id="clientWorkflowOpenTaskCount">0</strong><small>tarefas não concluídas</small></article>
+        </div>
+
+        <nav class="client-workflow-tabs" aria-label="Áreas do acompanhamento de clientes">
+          <button type="button" class="active" data-client-workflow-tab="board"><i class="fa-solid fa-table-columns"></i> Quadro de tarefas</button>
+          <button type="button" data-client-workflow-tab="access"><i class="fa-solid fa-user-check"></i> Clientes com acesso</button>
+          <button type="button" data-client-workflow-tab="prospects"><i class="fa-solid fa-route"></i> Visitas e novos acessos</button>
+        </nav>
+
+        <section id="clientWorkflowTaskFormCard" class="panel-card client-workflow-form hidden">
+          <div class="section-head">
+            <div><h2 id="clientWorkflowTaskFormTitle">Nova tarefa</h2><p>Registre o próximo passo e acompanhe até a conclusão.</p></div>
+            <button id="clientWorkflowCloseTask" type="button" class="ghost-button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+          </div>
+          <form id="clientWorkflowTaskForm" class="grid-form">
+            <input id="clientWorkflowTaskId" type="hidden">
+            <label>Cliente
+              <select id="clientWorkflowTaskClient" required></select>
+            </label>
+            <label>Tipo
+              <select id="clientWorkflowTaskType">
+                <option value="postagem">Postagem</option>
+                <option value="visita">Visita</option>
+                <option value="criar_usuario">Criar usuário</option>
+                <option value="atualizacao">Atualizar cadastro</option>
+                <option value="contato">Contato</option>
+              </select>
+            </label>
+            <label class="wide">O que precisa ser feito?
+              <input id="clientWorkflowTaskTitle" maxlength="120" required placeholder="Ex.: preparar postagem da promoção da semana">
+            </label>
+            <label>Status
+              <select id="clientWorkflowTaskStatus">
+                <option value="backlog">A organizar</option>
+                <option value="planejado">Planejado</option>
+                <option value="fazendo">Em produção</option>
+                <option value="aguardando">Aguardando cliente</option>
+                <option value="concluido">Concluído</option>
+              </select>
+            </label>
+            <label>Prioridade
+              <select id="clientWorkflowTaskPriority">
+                <option value="normal">Normal</option>
+                <option value="alta">Alta</option>
+                <option value="urgente">Urgente</option>
+              </select>
+            </label>
+            <label>Prazo
+              <input id="clientWorkflowTaskDue" type="date">
+            </label>
+            <label class="wide">Observações
+              <textarea id="clientWorkflowTaskNotes" rows="3" maxlength="500" placeholder="Materiais pendentes, ideia da postagem, retorno combinado..."></textarea>
+            </label>
+            <div class="form-actions wide">
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar tarefa</button>
+              <button id="clientWorkflowCancelTask" type="button" class="ghost-button">Cancelar</button>
+            </div>
+          </form>
+        </section>
+
+        <section data-client-workflow-page="board">
+          <section class="panel-card client-workflow-toolbar">
+            <label><i class="fa-solid fa-magnifying-glass"></i><input id="clientWorkflowSearch" type="search" placeholder="Buscar cliente ou tarefa"></label>
+            <select id="clientWorkflowTypeFilter" aria-label="Filtrar por tipo de tarefa">
+              <option value="todos">Todos os tipos</option>
+              <option value="postagem">Postagens</option>
+              <option value="visita">Visitas</option>
+              <option value="criar_usuario">Criação de usuário</option>
+              <option value="atualizacao">Atualizações</option>
+              <option value="contato">Contatos</option>
+            </select>
+          </section>
+          <section class="panel-card client-workflow-paid-queue">
+            <div class="section-head compact"><div><h2>Fila dos clientes pagantes</h2><p>Use esta lista para manter a produção de conteúdo distribuída entre os clientes em dia.</p></div></div>
+            <div id="clientWorkflowPaidQueue" class="client-workflow-client-strip"></div>
+          </section>
+          <div id="clientWorkflowBoard" class="client-workflow-board"></div>
+        </section>
+
+        <section data-client-workflow-page="access" class="hidden">
+          <section class="panel-card">
+            <div class="section-head"><div><h2>Clientes com acesso</h2><p>Usuários vinculados, situação do acesso e último login registrado no painel.</p></div></div>
+            <div id="clientWorkflowAccessList" class="client-workflow-table-wrap"></div>
+          </section>
+        </section>
+
+        <section data-client-workflow-page="prospects" class="hidden">
+          <section class="panel-card">
+            <div class="section-head"><div><h2>Clientes para visitar e criar acesso</h2><p>Somente clientes não institucionais sem usuário ativo vinculado.</p></div></div>
+            <div id="clientWorkflowProspectList" class="client-workflow-prospect-grid"></div>
+          </section>
+        </section>
+      </section>
       <section id="gestaoTerrenosView" class="panel-view hidden">
         <nav class="terrain-module-nav" aria-label="Navegação da Gestão de Terrenos">
           <button type="button" class="active" data-terrain-tab="quick" aria-current="page"><i class="fa-solid fa-bolt"></i> Acesso rápido</button>
@@ -3478,6 +3586,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=796"></script>
+  <script type="module" src="painel.js?v=797"></script>
 </body>
 </html>

@@ -464,6 +464,10 @@
       ".write": true
     },
 
+    "acompanhamentoClientes": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+    },
     "jogos": {
       ".read": true,
       "olaPesca": {
@@ -515,8 +519,8 @@
     },
 
     "$other": {
-      ".read": "$other !== 'jogos' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
-      ".write": "$other !== 'jogos' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
+      ".read": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
+      ".write": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
     }
   }
 }

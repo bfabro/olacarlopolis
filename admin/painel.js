@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 859,
-  label: "v866",
-  data: "2026-10-03",
-  nota: "O marcador de Novidades volta a ficar alinhado sobre o canto superior direito do botão no Acesso rápido."
+  numero: 860,
+  label: "v867",
+  data: "2026-10-05",
+  nota: "O Admin Master ganha um quadro de acompanhamento para postagens, acessos, visitas e criação de usuários dos clientes."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -273,6 +273,8 @@ let state = {
   clientes: [],
   clientesFinanceiro: {},
   usuarios: [],
+  clientWorkflowTasks: [],
+  clientWorkflowTab: "board",
   eventos: [],
   noticias: [],
   noticiaExtraImages: [],
@@ -428,6 +430,7 @@ const NOVIDADES_TOPICS = {
 const AUDIT_CATEGORY_LABELS = {
   clientes: "Clientes",
   clientesFinanceiro: "Financeiro",
+  acompanhamentoClientes: "Acompanhamento de clientes",
   usuarios: "Usuarios",
   usuariosByUid: "Usuarios",
   categorias: "Categorias",
@@ -867,6 +870,7 @@ const views = {
   dashboard: $("dashboardView"),
   artesPostagem: $("artesPostagemView"),
   clientes: $("clientesView"),
+  acompanhamentoClientes: $("acompanhamentoClientesView"),
   promocoesClientes: $("promocoesClientesView"),
   produtosServicosClientes: $("produtosServicosClientesView"),
   categorias: $("categoriasView"),
@@ -906,6 +910,7 @@ const viewCopy = {
   dashboard: ["Visao geral", "Resumo do ambiente administrativo."],
   artesPostagem: ["Gerar postagem", "Crie postagens de produtos, promocoes e servicos com previa antes de baixar."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
+  acompanhamentoClientes: ["Acompanhamento de clientes", "Organize postagens, acessos, visitas e próximos passos de cada cliente."],
   promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
   produtosServicosClientes: ["Produtos e serviços", "Acesse diretamente as vitrines e os atendimentos cadastrados por cliente."],
   categorias: ["Categorias", "Organize categorias, subcategorias e icones do menu."],
@@ -1247,6 +1252,7 @@ function canAccessView(viewName) {
     return !isBenefitPartner() && (canManageClients() || hasPermission("gerar_imagens_promocoes"));
   }
   if (viewName === "relatorioExclusoes") return isMaster();
+  if (viewName === "acompanhamentoClientes") return isMaster();
   if (viewName === "gestaoTerrenos") return isMaster();
   if (viewName === "dashboard") return canManageClients();
   if (viewName === "eventos") return canManageClients() || hasPermission("eventos");
@@ -2905,6 +2911,7 @@ async function loadAllData(onProgress = null) {
     clientesSnap,
     clientesFinanceiroSnap,
     usersSnap,
+    clientWorkflowSnap,
     eventosSnap,
     imoveisSnap,
     automoveisSnap,
@@ -2949,6 +2956,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("clientes", { required: true }),
     getPanelSnapshot(financePath, { enabled: canReadFinance }),
     getPanelSnapshot("usuariosByUid", { enabled: canManage }),
+    getPanelSnapshot("acompanhamentoClientes/tarefas", { enabled: isMaster() }),
     getPanelSnapshot("eventos"),
     getPanelSnapshot("conteudosInformativos/imoveis"),
     getPanelSnapshot("conteudosInformativos/automoveis"),
@@ -3017,6 +3025,13 @@ async function loadAllData(onProgress = null) {
     });
   }
   state.usuarios.sort((a, b) => String(a.email || "").localeCompare(String(b.email || "")));
+  state.clientWorkflowTasks = [];
+  if (clientWorkflowSnap.exists()) {
+    clientWorkflowSnap.forEach((child) => {
+      state.clientWorkflowTasks.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
   const scriptImoveis = await loadScriptImoveisForPanel();
   const firebaseImoveis = [];
   if (imoveisSnap.exists()) {
@@ -3209,6 +3224,7 @@ async function loadAllData(onProgress = null) {
   renderTerrainManagement();
   renderClientsList();
   renderUsersList();
+  if (isMaster()) renderClientWorkflow();
   renderCategoriesList();
   fillClientCategorySelect();
   fillCategoryParentSelect();
@@ -10279,6 +10295,10 @@ function switchView(name) {
   if (target === "artesPostagem") renderPostArtView();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
+  if (target === "acompanhamentoClientes") {
+    renderClientWorkflow();
+    loadAuditLogs().then(renderClientWorkflow);
+  }
   if (target === "gestaoTerrenos") {
     switchTerrainManagementTab("quick");
     renderTerrainManagement();
@@ -13483,6 +13503,302 @@ function isFuelTechnicalUser(user = {}) {
   return String(user.email || "").toLowerCase().endsWith("@acesso.olacarlopolis.com");
 }
 
+const CLIENT_WORKFLOW_COLUMNS = [
+  { id: "backlog", label: "A organizar" },
+  { id: "planejado", label: "Planejado" },
+  { id: "fazendo", label: "Em produção" },
+  { id: "aguardando", label: "Aguardando cliente" },
+  { id: "concluido", label: "Concluído" }
+];
+const CLIENT_WORKFLOW_TYPES = {
+  postagem: "Postagem",
+  visita: "Visita",
+  criar_usuario: "Criar usuário",
+  atualizacao: "Atualizar cadastro",
+  contato: "Contato"
+};
+
+function clientWorkflowPaidClients() {
+  return state.clientes
+    .filter((client) => client.status !== "inativo" && isBillableClientType(client) && financeClientFilterStatus(client) === "pago")
+    .sort((a, b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
+}
+
+function clientWorkflowUsers() {
+  return state.usuarios
+    .filter((user) => user.clienteId && user.role === "cliente")
+    .map((user) => ({ user, client: state.clientes.find((client) => client.id === user.clienteId) }))
+    .filter((entry) => entry.client)
+    .sort((a, b) => String(a.client.nome || a.client.id).localeCompare(String(b.client.nome || b.client.id), "pt-BR"));
+}
+
+function clientWorkflowNoAccessClients() {
+  const activeClientIds = new Set(clientWorkflowUsers().filter(({ user }) => user.status !== "inativo").map(({ user }) => user.clienteId));
+  return state.clientes
+    .filter((client) => client.status !== "inativo")
+    .filter((client) => normalizeName(client.tipoCliente || client.tipo || "") !== "institucional")
+    .filter((client) => !activeClientIds.has(client.id))
+    .sort((a, b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
+}
+
+function clientWorkflowLastLogin(user = {}) {
+  return state.auditLogs
+    .filter((log) => log.action === "Login" && (log.uid === user.uid || normalizeName(log.email) === normalizeName(user.email)))
+    .reduce((latest, log) => Math.max(latest, Number(log.createdAt || 0)), 0);
+}
+
+function clientWorkflowDateTime(timestamp) {
+  const value = Number(timestamp || 0);
+  if (!value) return "Nunca registrado";
+  return new Date(value).toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+}
+
+function clientWorkflowDueLabel(value = "") {
+  if (!value) return "Sem prazo";
+  const date = new Date(String(value).slice(0, 10) + "T12:00:00");
+  return Number.isNaN(date.getTime()) ? "Sem prazo" : date.toLocaleDateString("pt-BR");
+}
+
+function clientWorkflowTaskIsOverdue(task = {}) {
+  return task.status !== "concluido" && task.dueDate && task.dueDate < new Date().toISOString().slice(0, 10);
+}
+
+function fillClientWorkflowTaskClients(selectedId = "") {
+  const select = $("clientWorkflowTaskClient");
+  if (!select) return;
+  const clients = [...state.clientes]
+    .filter((client) => client.status !== "inativo")
+    .sort((a, b) => String(a.nome || a.id).localeCompare(String(b.nome || b.id), "pt-BR"));
+  select.innerHTML = '<option value="">Selecione o cliente...</option>' + clients.map((client) =>
+    '<option value="' + escapeAttr(client.id) + '"' + (client.id === selectedId ? " selected" : "") + ">" + escapeHtml(client.nome || client.id) + "</option>"
+  ).join("");
+}
+
+function resetClientWorkflowTaskForm() {
+  $("clientWorkflowTaskForm")?.reset();
+  if ($("clientWorkflowTaskId")) $("clientWorkflowTaskId").value = "";
+  if ($("clientWorkflowTaskStatus")) $("clientWorkflowTaskStatus").value = "backlog";
+  if ($("clientWorkflowTaskPriority")) $("clientWorkflowTaskPriority").value = "normal";
+  if ($("clientWorkflowTaskFormTitle")) $("clientWorkflowTaskFormTitle").textContent = "Nova tarefa";
+  fillClientWorkflowTaskClients();
+  $("clientWorkflowTaskFormCard")?.classList.add("hidden");
+}
+
+function openClientWorkflowTaskForm(clientId = "", type = "postagem", task = null) {
+  if (!isMaster()) return;
+  fillClientWorkflowTaskClients(task?.clientId || clientId);
+  if ($("clientWorkflowTaskId")) $("clientWorkflowTaskId").value = task?.id || "";
+  if ($("clientWorkflowTaskClient")) $("clientWorkflowTaskClient").value = task?.clientId || clientId || "";
+  if ($("clientWorkflowTaskType")) $("clientWorkflowTaskType").value = task?.type || type || "postagem";
+  if ($("clientWorkflowTaskTitle")) $("clientWorkflowTaskTitle").value = task?.title || (type === "visita" ? "Visitar cliente e apresentar o acesso" : type === "criar_usuario" ? "Criar usuário do cliente" : "");
+  if ($("clientWorkflowTaskStatus")) $("clientWorkflowTaskStatus").value = task?.status || "backlog";
+  if ($("clientWorkflowTaskPriority")) $("clientWorkflowTaskPriority").value = task?.priority || "normal";
+  if ($("clientWorkflowTaskDue")) $("clientWorkflowTaskDue").value = task?.dueDate || "";
+  if ($("clientWorkflowTaskNotes")) $("clientWorkflowTaskNotes").value = task?.notes || "";
+  if ($("clientWorkflowTaskFormTitle")) $("clientWorkflowTaskFormTitle").textContent = task ? "Editar tarefa" : "Nova tarefa";
+  $("clientWorkflowTaskFormCard")?.classList.remove("hidden");
+  $("clientWorkflowTaskFormCard")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  setTimeout(() => $("clientWorkflowTaskTitle")?.focus(), 100);
+}
+
+async function saveClientWorkflowTask(event) {
+  event.preventDefault();
+  if (!isMaster()) return;
+  const clientId = $("clientWorkflowTaskClient")?.value || "";
+  const client = state.clientes.find((item) => item.id === clientId);
+  const title = $("clientWorkflowTaskTitle")?.value.trim().slice(0, 120) || "";
+  if (!client || !title) return showToast("Selecione o cliente e informe a tarefa.");
+  const editingId = $("clientWorkflowTaskId")?.value || "";
+  const id = editingId || push(ref(db, "acompanhamentoClientes/tarefas")).key;
+  if (!id) return showToast("Não foi possível identificar a nova tarefa.");
+  const previous = state.clientWorkflowTasks.find((task) => task.id === id) || {};
+  const status = $("clientWorkflowTaskStatus")?.value || "backlog";
+  const now = Date.now();
+  const payload = {
+    clientId,
+    clientName: client.nome || client.id,
+    title,
+    type: $("clientWorkflowTaskType")?.value || "postagem",
+    status,
+    priority: $("clientWorkflowTaskPriority")?.value || "normal",
+    dueDate: $("clientWorkflowTaskDue")?.value || "",
+    notes: $("clientWorkflowTaskNotes")?.value.trim().slice(0, 500) || "",
+    createdAt: Number(previous.createdAt || now),
+    createdBy: previous.createdBy || state.user?.uid || "",
+    updatedAt: now,
+    updatedBy: state.user?.uid || "",
+    completedAt: status === "concluido" ? Number(previous.completedAt || now) : 0
+  };
+  const button = event.submitter;
+  setBusy(button, true, "Salvando...");
+  try {
+    await firebaseSet(ref(db, "acompanhamentoClientes/tarefas/" + id), payload);
+    const index = state.clientWorkflowTasks.findIndex((task) => task.id === id);
+    const next = { id, ...payload };
+    if (index >= 0) state.clientWorkflowTasks[index] = next;
+    else state.clientWorkflowTasks.push(next);
+    await registrarLogAuditoria(editingId ? "Editar" : "Criar", "Acompanhamento de clientes", title, clientId);
+    resetClientWorkflowTaskForm();
+    renderClientWorkflow();
+    showToast("Tarefa salva no acompanhamento.");
+  } catch (error) {
+    console.error("Falha ao salvar tarefa do acompanhamento.", error);
+    showToast("Não foi possível salvar a tarefa.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+async function updateClientWorkflowTaskStatus(taskId, status) {
+  const task = state.clientWorkflowTasks.find((item) => item.id === taskId);
+  if (!task || !CLIENT_WORKFLOW_COLUMNS.some((column) => column.id === status)) return;
+  const payload = { status, updatedAt: Date.now(), updatedBy: state.user?.uid || "", completedAt: status === "concluido" ? Date.now() : 0 };
+  try {
+    await firebaseUpdate(ref(db, "acompanhamentoClientes/tarefas/" + taskId), payload);
+    Object.assign(task, payload);
+    renderClientWorkflow();
+  } catch (error) {
+    console.error("Falha ao mover tarefa.", error);
+    showToast("Não foi possível mover a tarefa.");
+  }
+}
+
+async function deleteClientWorkflowTask(taskId) {
+  const task = state.clientWorkflowTasks.find((item) => item.id === taskId);
+  if (!task || !confirm('Excluir a tarefa "' + task.title + '"?')) return;
+  try {
+    await firebaseRemove(ref(db, "acompanhamentoClientes/tarefas/" + taskId));
+    state.clientWorkflowTasks = state.clientWorkflowTasks.filter((item) => item.id !== taskId);
+    renderClientWorkflow();
+    showToast("Tarefa excluída.");
+  } catch (error) {
+    console.error("Falha ao excluir tarefa.", error);
+    showToast("Não foi possível excluir a tarefa.");
+  }
+}
+
+function openClientWorkflowUserForm(clientId) {
+  const client = state.clientes.find((item) => item.id === clientId);
+  if (!client) return;
+  switchView("usuarios");
+  resetUserForm();
+  if ($("newUserRole")) $("newUserRole").value = "cliente";
+  if ($("newUserClientSearch")) $("newUserClientSearch").value = client.nome || "";
+  fillUserClientSelect(client.id);
+  if ($("newUserClient")) $("newUserClient").value = client.id;
+  syncUserLinkFields();
+  openFormForEdit("userForm");
+  setTimeout(() => $("newUserEmail")?.focus(), 100);
+}
+
+function clientWorkflowTaskCard(task) {
+  const client = state.clientes.find((item) => item.id === task.clientId);
+  const overdue = clientWorkflowTaskIsOverdue(task);
+  return '<article class="client-workflow-task' + (overdue ? " is-overdue" : "") + '">' +
+    '<div class="client-workflow-task-head"><span>' + escapeHtml(CLIENT_WORKFLOW_TYPES[task.type] || "Tarefa") + '</span><b class="client-workflow-priority ' + escapeAttr(task.priority || "normal") + '">' + escapeHtml(task.priority || "normal") + '</b></div>' +
+    '<h4>' + escapeHtml(task.title || "Tarefa sem título") + '</h4>' +
+    '<small>' + escapeHtml(client?.nome || task.clientName || task.clientId || "Cliente") + '</small>' +
+    (task.notes ? '<p>' + escapeHtml(task.notes) + '</p>' : "") +
+    '<div class="client-workflow-task-meta"><span><i class="fa-regular fa-calendar"></i> ' + escapeHtml(clientWorkflowDueLabel(task.dueDate)) + '</span>' + (overdue ? '<strong>Prazo vencido</strong>' : "") + '</div>' +
+    '<select data-client-workflow-status="' + escapeAttr(task.id) + '" aria-label="Mover tarefa">' + CLIENT_WORKFLOW_COLUMNS.map((column) => '<option value="' + column.id + '"' + (column.id === task.status ? " selected" : "") + ">" + column.label + "</option>").join("") + '</select>' +
+    '<div class="client-workflow-task-actions"><button type="button" class="ghost-button" data-client-workflow-edit="' + escapeAttr(task.id) + '"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" class="danger-button" data-client-workflow-delete="' + escapeAttr(task.id) + '" aria-label="Excluir tarefa"><i class="fa-solid fa-trash"></i></button></div>' +
+    "</article>";
+}
+
+function renderClientWorkflowBoard() {
+  const board = $("clientWorkflowBoard");
+  if (!board) return;
+  const search = normalizeName($("clientWorkflowSearch")?.value || "");
+  const type = $("clientWorkflowTypeFilter")?.value || "todos";
+  const tasks = state.clientWorkflowTasks
+    .filter((task) => type === "todos" || task.type === type)
+    .filter((task) => !search || normalizeName([task.title, task.clientName, task.notes, CLIENT_WORKFLOW_TYPES[task.type]].join(" ")).includes(search))
+    .sort((a, b) => {
+      const dueA = a.dueDate || "9999-12-31";
+      const dueB = b.dueDate || "9999-12-31";
+      if (dueA !== dueB) return dueA.localeCompare(dueB);
+      return Number(b.updatedAt || 0) - Number(a.updatedAt || 0);
+    });
+  board.innerHTML = CLIENT_WORKFLOW_COLUMNS.map((column) => {
+    const items = tasks.filter((task) => (task.status || "backlog") === column.id);
+    return '<section class="client-workflow-column" data-status="' + column.id + '"><header><h3>' + column.label + '</h3><span>' + items.length + '</span></header><div class="client-workflow-task-list">' + (items.length ? items.map(clientWorkflowTaskCard).join("") : '<div class="client-workflow-empty">Nenhuma tarefa nesta etapa.</div>') + "</div></section>";
+  }).join("");
+}
+
+function renderClientWorkflowPaidQueue(paidClients = clientWorkflowPaidClients()) {
+  const mount = $("clientWorkflowPaidQueue");
+  if (!mount) return;
+  mount.innerHTML = paidClients.length ? paidClients.map((client) => {
+    const openPosts = state.clientWorkflowTasks.filter((task) => task.clientId === client.id && task.type === "postagem" && task.status !== "concluido").length;
+    return '<article class="client-workflow-client-pill"><strong>' + escapeHtml(client.nome || client.id) + '</strong><small>' + openPosts + (openPosts === 1 ? " postagem pendente" : " postagens pendentes") + '</small><button type="button" data-client-workflow-create="' + escapeAttr(client.id) + '" data-workflow-type="postagem" title="Criar tarefa de postagem"><i class="fa-solid fa-plus"></i></button></article>';
+  }).join("") : '<div class="list-meta">Nenhum cliente pagante identificado na competência atual.</div>';
+}
+
+function renderClientWorkflowAccess(users = clientWorkflowUsers()) {
+  const mount = $("clientWorkflowAccessList");
+  if (!mount) return;
+  mount.innerHTML = users.length ? '<table class="client-workflow-table"><thead><tr><th>Cliente</th><th>Usuário</th><th>Acesso</th><th>Último login</th><th></th></tr></thead><tbody>' + users.map(({ user, client }) => {
+    const lastLogin = clientWorkflowLastLogin(user);
+    return "<tr><td><strong>" + escapeHtml(client.nome || client.id) + "</strong><br><small>" + escapeHtml(client.categoria || "Sem categoria") + "</small></td><td>" + escapeHtml(user.email || user.uid) + "</td><td><span class=\"client-workflow-access-status " + (user.status === "inativo" ? "inativo" : "") + "\">" + escapeHtml(statusLabel(user.status || "ativo")) + "</span></td><td>" + escapeHtml(clientWorkflowDateTime(lastLogin)) + '</td><td><button type="button" class="ghost-button" data-client-workflow-edit-user="' + escapeAttr(user.uid) + '"><i class="fa-solid fa-user-gear"></i> Abrir</button></td></tr>';
+  }).join("") + "</tbody></table>" : '<div class="list-meta">Nenhum cliente com usuário vinculado.</div>';
+}
+
+function renderClientWorkflowProspects(clients = clientWorkflowNoAccessClients()) {
+  const mount = $("clientWorkflowProspectList");
+  if (!mount) return;
+  mount.innerHTML = clients.length ? clients.map((client) => {
+    const payment = financeClientFilterStatus(client);
+    return '<article class="client-workflow-prospect"><h3>' + escapeHtml(client.nome || client.id) + '</h3><p>' + escapeHtml(clientDisclosureTypeLabel(client.tipoCliente || client.tipo || "outro")) + ' · ' + escapeHtml(client.categoria || "Sem categoria") + '</p><p><strong>Financeiro:</strong> ' + escapeHtml(paymentLabel(payment)) + '</p><div class="client-workflow-prospect-actions"><button type="button" data-client-workflow-create="' + escapeAttr(client.id) + '" data-workflow-type="visita"><i class="fa-solid fa-location-dot"></i> Agendar visita</button><button type="button" class="ghost-button" data-client-workflow-create="' + escapeAttr(client.id) + '" data-workflow-type="criar_usuario"><i class="fa-solid fa-clipboard-list"></i> Criar tarefa</button><button type="button" class="ghost-button" data-client-workflow-new-user="' + escapeAttr(client.id) + '"><i class="fa-solid fa-user-plus"></i> Novo usuário</button></div></article>';
+  }).join("") : '<div class="list-meta">Todos os clientes não institucionais já possuem um usuário ativo.</div>';
+}
+
+function switchClientWorkflowTab(tab = "board") {
+  const selected = ["board", "access", "prospects"].includes(tab) ? tab : "board";
+  state.clientWorkflowTab = selected;
+  document.querySelectorAll("[data-client-workflow-tab]").forEach((button) => button.classList.toggle("active", button.dataset.clientWorkflowTab === selected));
+  document.querySelectorAll("[data-client-workflow-page]").forEach((page) => page.classList.toggle("hidden", page.dataset.clientWorkflowPage !== selected));
+}
+
+function renderClientWorkflow() {
+  if (!isMaster() || !$("acompanhamentoClientesView")) return;
+  const paidClients = clientWorkflowPaidClients();
+  const users = clientWorkflowUsers();
+  const prospects = clientWorkflowNoAccessClients();
+  if ($("clientWorkflowPaidCount")) $("clientWorkflowPaidCount").textContent = String(paidClients.length);
+  if ($("clientWorkflowLoginCount")) $("clientWorkflowLoginCount").textContent = String(new Set(users.filter(({ user }) => user.status !== "inativo").map(({ client }) => client.id)).size);
+  if ($("clientWorkflowNoLoginCount")) $("clientWorkflowNoLoginCount").textContent = String(prospects.length);
+  if ($("clientWorkflowOpenTaskCount")) $("clientWorkflowOpenTaskCount").textContent = String(state.clientWorkflowTasks.filter((task) => task.status !== "concluido").length);
+  fillClientWorkflowTaskClients($("clientWorkflowTaskClient")?.value || "");
+  renderClientWorkflowPaidQueue(paidClients);
+  renderClientWorkflowBoard();
+  renderClientWorkflowAccess(users);
+  renderClientWorkflowProspects(prospects);
+  switchClientWorkflowTab(state.clientWorkflowTab);
+}
+
+function handleClientWorkflowClick(event) {
+  const tab = event.target.closest("[data-client-workflow-tab]");
+  if (tab) return switchClientWorkflowTab(tab.dataset.clientWorkflowTab);
+  const create = event.target.closest("[data-client-workflow-create]");
+  if (create) return openClientWorkflowTaskForm(create.dataset.clientWorkflowCreate, create.dataset.workflowType || "postagem");
+  const edit = event.target.closest("[data-client-workflow-edit]");
+  if (edit) {
+    const task = state.clientWorkflowTasks.find((item) => item.id === edit.dataset.clientWorkflowEdit);
+    if (task) openClientWorkflowTaskForm(task.clientId, task.type, task);
+    return;
+  }
+  const removeButton = event.target.closest("[data-client-workflow-delete]");
+  if (removeButton) return deleteClientWorkflowTask(removeButton.dataset.clientWorkflowDelete);
+  const newUser = event.target.closest("[data-client-workflow-new-user]");
+  if (newUser) return openClientWorkflowUserForm(newUser.dataset.clientWorkflowNewUser);
+  const editUser = event.target.closest("[data-client-workflow-edit-user]");
+  if (editUser) {
+    const user = state.usuarios.find((item) => item.uid === editUser.dataset.clientWorkflowEditUser);
+    if (!user) return;
+    switchView("usuarios");
+    fillUserForm(user);
+  }
+}
 function renderUsersList() {
   const box = $("usersList");
   if (!box) return;
@@ -28765,6 +29081,17 @@ function bindEvents() {
   });
   $("storyRefreshPreview")?.addEventListener("click", atualizarPreviaStory);
   $("storyDownload")?.addEventListener("click", baixarStoryComercial);
+  $("clientWorkflowNewTask")?.addEventListener("click", () => openClientWorkflowTaskForm());
+  $("clientWorkflowCloseTask")?.addEventListener("click", resetClientWorkflowTaskForm);
+  $("clientWorkflowCancelTask")?.addEventListener("click", resetClientWorkflowTaskForm);
+  $("clientWorkflowTaskForm")?.addEventListener("submit", saveClientWorkflowTask);
+  $("clientWorkflowSearch")?.addEventListener("input", renderClientWorkflowBoard);
+  $("clientWorkflowTypeFilter")?.addEventListener("change", renderClientWorkflowBoard);
+  $("acompanhamentoClientesView")?.addEventListener("click", handleClientWorkflowClick);
+  $("acompanhamentoClientesView")?.addEventListener("change", (event) => {
+    const select = event.target.closest("[data-client-workflow-status]");
+    if (select) updateClientWorkflowTaskStatus(select.dataset.clientWorkflowStatus, select.value);
+  });
   $("newUserButton")?.addEventListener("click", () => {
     resetUserForm();
     openFormForEdit("userForm");
