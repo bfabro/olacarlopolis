@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 860,
-  label: "v867",
+  numero: 861,
+  label: "v868",
   data: "2026-10-05",
-  nota: "O Admin Master ganha um quadro de acompanhamento para postagens, acessos, visitas e criação de usuários dos clientes."
+  nota: "O acompanhamento de clientes ganha comentários por etapa, histórico, exclusão após conclusão, novos ciclos e alerta de prazos."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -13563,6 +13563,39 @@ function clientWorkflowTaskIsOverdue(task = {}) {
   return task.status !== "concluido" && task.dueDate && task.dueDate < new Date().toISOString().slice(0, 10);
 }
 
+function clientWorkflowStatusLabel(status = "backlog") {
+  return CLIENT_WORKFLOW_COLUMNS.find((column) => column.id === status)?.label || "A organizar";
+}
+
+function clientWorkflowHistoryEntries(task = {}) {
+  const history = Array.isArray(task.history) ? task.history : Object.values(task.history || {});
+  return history.filter(Boolean).sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
+}
+
+function clientWorkflowHistoryEntry(status, comment = "", type = "comment") {
+  const now = Date.now();
+  return {
+    id: now + "-" + Math.random().toString(36).slice(2, 8),
+    type,
+    status,
+    statusLabel: clientWorkflowStatusLabel(status),
+    comment: String(comment || "").trim().slice(0, 500),
+    createdAt: now,
+    createdBy: state.user?.uid || "",
+    author: state.profile?.nome || state.user?.email || "Admin Master"
+  };
+}
+
+function clientWorkflowTaskIsDueSoon(task = {}) {
+  if (task.status === "concluido" || !task.dueDate) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const limit = new Date(today);
+  limit.setDate(limit.getDate() + 3);
+  const due = new Date(String(task.dueDate).slice(0, 10) + "T12:00:00");
+  return !Number.isNaN(due.getTime()) && due >= today && due <= limit;
+}
+
 function fillClientWorkflowTaskClients(selectedId = "") {
   const select = $("clientWorkflowTaskClient");
   if (!select) return;
@@ -13614,6 +13647,16 @@ async function saveClientWorkflowTask(event) {
   const previous = state.clientWorkflowTasks.find((task) => task.id === id) || {};
   const status = $("clientWorkflowTaskStatus")?.value || "backlog";
   const now = Date.now();
+  const history = { ...(previous.history || {}) };
+  if (!editingId) {
+    const entry = clientWorkflowHistoryEntry(status, "Tarefa criada.", "status");
+    history[entry.id] = entry;
+  } else if ((previous.status || "backlog") !== status) {
+    const stageComment = window.prompt("Comentário ao mover para " + clientWorkflowStatusLabel(status) + " (opcional):", "");
+    if (stageComment === null) return;
+    const entry = clientWorkflowHistoryEntry(status, stageComment || ("Movida de " + clientWorkflowStatusLabel(previous.status) + " para " + clientWorkflowStatusLabel(status) + "."), "status");
+    history[entry.id] = entry;
+  }
   const payload = {
     clientId,
     clientName: client.nome || client.id,
@@ -13623,6 +13666,7 @@ async function saveClientWorkflowTask(event) {
     priority: $("clientWorkflowTaskPriority")?.value || "normal",
     dueDate: $("clientWorkflowTaskDue")?.value || "",
     notes: $("clientWorkflowTaskNotes")?.value.trim().slice(0, 500) || "",
+    history,
     createdAt: Number(previous.createdAt || now),
     createdBy: previous.createdBy || state.user?.uid || "",
     updatedAt: now,
@@ -13651,26 +13695,98 @@ async function saveClientWorkflowTask(event) {
 
 async function updateClientWorkflowTaskStatus(taskId, status) {
   const task = state.clientWorkflowTasks.find((item) => item.id === taskId);
-  if (!task || !CLIENT_WORKFLOW_COLUMNS.some((column) => column.id === status)) return;
-  const payload = { status, updatedAt: Date.now(), updatedBy: state.user?.uid || "", completedAt: status === "concluido" ? Date.now() : 0 };
+  if (!task || !CLIENT_WORKFLOW_COLUMNS.some((column) => column.id === status) || task.status === status) return;
+  const previousStatus = task.status || "backlog";
+  const comment = window.prompt("Comentário ao mover para " + clientWorkflowStatusLabel(status) + " (opcional):", "");
+  if (comment === null) return renderClientWorkflow();
+  const entry = clientWorkflowHistoryEntry(status, comment || ("Movida de " + clientWorkflowStatusLabel(previousStatus) + " para " + clientWorkflowStatusLabel(status) + "."), "status");
+  const payload = {
+    status,
+    updatedAt: entry.createdAt,
+    updatedBy: state.user?.uid || "",
+    completedAt: status === "concluido" ? entry.createdAt : 0,
+    ["history/" + entry.id]: entry
+  };
   try {
     await firebaseUpdate(ref(db, "acompanhamentoClientes/tarefas/" + taskId), payload);
-    Object.assign(task, payload);
+    task.status = status;
+    task.updatedAt = entry.createdAt;
+    task.updatedBy = state.user?.uid || "";
+    task.completedAt = status === "concluido" ? entry.createdAt : 0;
+    task.history = { ...(task.history || {}), [entry.id]: entry };
     renderClientWorkflow();
   } catch (error) {
     console.error("Falha ao mover tarefa.", error);
+    renderClientWorkflow();
     showToast("Não foi possível mover a tarefa.");
+  }
+}
+
+async function addClientWorkflowComment(taskId) {
+  const task = state.clientWorkflowTasks.find((item) => item.id === taskId);
+  if (!task) return;
+  const comment = window.prompt("Comentário em " + clientWorkflowStatusLabel(task.status) + ":", "");
+  if (!comment?.trim()) return;
+  const entry = clientWorkflowHistoryEntry(task.status || "backlog", comment, "comment");
+  try {
+    await firebaseUpdate(ref(db, "acompanhamentoClientes/tarefas/" + taskId), {
+      ["history/" + entry.id]: entry,
+      updatedAt: entry.createdAt,
+      updatedBy: state.user?.uid || ""
+    });
+    task.updatedAt = entry.createdAt;
+    task.history = { ...(task.history || {}), [entry.id]: entry };
+    renderClientWorkflow();
+    showToast("Comentário registrado na etapa.");
+  } catch (error) {
+    console.error("Falha ao comentar tarefa.", error);
+    showToast("Não foi possível registrar o comentário.");
+  }
+}
+
+async function duplicateClientWorkflowTask(taskId) {
+  const task = state.clientWorkflowTasks.find((item) => item.id === taskId);
+  if (!task || task.status !== "concluido") return;
+  const id = push(ref(db, "acompanhamentoClientes/tarefas")).key;
+  if (!id) return showToast("Não foi possível criar o novo ciclo.");
+  const entry = clientWorkflowHistoryEntry("backlog", "Nova tarefa criada a partir de uma tarefa concluída.", "status");
+  const payload = {
+    clientId: task.clientId || "",
+    clientName: task.clientName || "",
+    title: task.title || "Nova tarefa",
+    type: task.type || "postagem",
+    status: "backlog",
+    priority: task.priority || "normal",
+    dueDate: "",
+    notes: task.notes || "",
+    history: { [entry.id]: entry },
+    createdAt: entry.createdAt,
+    createdBy: state.user?.uid || "",
+    updatedAt: entry.createdAt,
+    updatedBy: state.user?.uid || "",
+    completedAt: 0
+  };
+  try {
+    await firebaseSet(ref(db, "acompanhamentoClientes/tarefas/" + id), payload);
+    state.clientWorkflowTasks.push({ id, ...payload });
+    renderClientWorkflow();
+    showToast("Novo ciclo criado em A organizar.");
+  } catch (error) {
+    console.error("Falha ao duplicar tarefa.", error);
+    showToast("Não foi possível criar o novo ciclo.");
   }
 }
 
 async function deleteClientWorkflowTask(taskId) {
   const task = state.clientWorkflowTasks.find((item) => item.id === taskId);
-  if (!task || !confirm('Excluir a tarefa "' + task.title + '"?')) return;
+  if (!task) return;
+  if (task.status !== "concluido") return showToast("Conclua a tarefa antes de excluí-la.");
+  if (!confirm('Excluir definitivamente a tarefa concluída "' + task.title + '"?')) return;
   try {
     await firebaseRemove(ref(db, "acompanhamentoClientes/tarefas/" + taskId));
     state.clientWorkflowTasks = state.clientWorkflowTasks.filter((item) => item.id !== taskId);
     renderClientWorkflow();
-    showToast("Tarefa excluída.");
+    showToast("Tarefa concluída excluída.");
   } catch (error) {
     console.error("Falha ao excluir tarefa.", error);
     showToast("Não foi possível excluir a tarefa.");
@@ -13694,6 +13810,11 @@ function openClientWorkflowUserForm(clientId) {
 function clientWorkflowTaskCard(task) {
   const client = state.clientes.find((item) => item.id === task.clientId);
   const overdue = clientWorkflowTaskIsOverdue(task);
+  const history = clientWorkflowHistoryEntries(task);
+  const historyMarkup = history.length ? '<details class="client-workflow-history"><summary>Histórico e comentários (' + history.length + ')</summary><div>' + history.slice(0, 12).map((entry) =>
+    '<article class="client-workflow-history-item"><span>' + escapeHtml(entry.statusLabel || clientWorkflowStatusLabel(entry.status)) + '</span><time>' + escapeHtml(clientWorkflowDateTime(entry.createdAt)) + '</time>' + (entry.comment ? '<p>' + escapeHtml(entry.comment) + '</p>' : "") + (entry.author ? '<small>Por ' + escapeHtml(entry.author) + '</small>' : "") + '</article>'
+  ).join("") + '</div></details>' : "";
+  const completedActions = task.status === "concluido" ? '<button type="button" class="ghost-button" data-client-workflow-duplicate="' + escapeAttr(task.id) + '"><i class="fa-solid fa-rotate"></i> Novo ciclo</button><button type="button" class="danger-button" data-client-workflow-delete="' + escapeAttr(task.id) + '"><i class="fa-solid fa-trash"></i> Excluir</button>' : "";
   return '<article class="client-workflow-task' + (overdue ? " is-overdue" : "") + '">' +
     '<div class="client-workflow-task-head"><span>' + escapeHtml(CLIENT_WORKFLOW_TYPES[task.type] || "Tarefa") + '</span><b class="client-workflow-priority ' + escapeAttr(task.priority || "normal") + '">' + escapeHtml(task.priority || "normal") + '</b></div>' +
     '<h4>' + escapeHtml(task.title || "Tarefa sem título") + '</h4>' +
@@ -13701,7 +13822,8 @@ function clientWorkflowTaskCard(task) {
     (task.notes ? '<p>' + escapeHtml(task.notes) + '</p>' : "") +
     '<div class="client-workflow-task-meta"><span><i class="fa-regular fa-calendar"></i> ' + escapeHtml(clientWorkflowDueLabel(task.dueDate)) + '</span>' + (overdue ? '<strong>Prazo vencido</strong>' : "") + '</div>' +
     '<select data-client-workflow-status="' + escapeAttr(task.id) + '" aria-label="Mover tarefa">' + CLIENT_WORKFLOW_COLUMNS.map((column) => '<option value="' + column.id + '"' + (column.id === task.status ? " selected" : "") + ">" + column.label + "</option>").join("") + '</select>' +
-    '<div class="client-workflow-task-actions"><button type="button" class="ghost-button" data-client-workflow-edit="' + escapeAttr(task.id) + '"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" class="danger-button" data-client-workflow-delete="' + escapeAttr(task.id) + '" aria-label="Excluir tarefa"><i class="fa-solid fa-trash"></i></button></div>' +
+    historyMarkup +
+    '<div class="client-workflow-task-actions"><button type="button" class="ghost-button" data-client-workflow-edit="' + escapeAttr(task.id) + '"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" class="ghost-button" data-client-workflow-comment="' + escapeAttr(task.id) + '"><i class="fa-regular fa-comment"></i> Comentar</button>' + completedActions + '</div>' +
     "</article>";
 }
 
@@ -13712,7 +13834,7 @@ function renderClientWorkflowBoard() {
   const type = $("clientWorkflowTypeFilter")?.value || "todos";
   const tasks = state.clientWorkflowTasks
     .filter((task) => type === "todos" || task.type === type)
-    .filter((task) => !search || normalizeName([task.title, task.clientName, task.notes, CLIENT_WORKFLOW_TYPES[task.type]].join(" ")).includes(search))
+    .filter((task) => !search || normalizeName([task.title, task.clientName, task.notes, CLIENT_WORKFLOW_TYPES[task.type], ...clientWorkflowHistoryEntries(task).map((entry) => entry.comment)].join(" ")).includes(search))
     .sort((a, b) => {
       const dueA = a.dueDate || "9999-12-31";
       const dueB = b.dueDate || "9999-12-31";
@@ -13768,6 +13890,7 @@ function renderClientWorkflow() {
   if ($("clientWorkflowLoginCount")) $("clientWorkflowLoginCount").textContent = String(new Set(users.filter(({ user }) => user.status !== "inativo").map(({ client }) => client.id)).size);
   if ($("clientWorkflowNoLoginCount")) $("clientWorkflowNoLoginCount").textContent = String(prospects.length);
   if ($("clientWorkflowOpenTaskCount")) $("clientWorkflowOpenTaskCount").textContent = String(state.clientWorkflowTasks.filter((task) => task.status !== "concluido").length);
+  if ($("clientWorkflowDueSoonCount")) $("clientWorkflowDueSoonCount").textContent = String(state.clientWorkflowTasks.filter(clientWorkflowTaskIsDueSoon).length);
   fillClientWorkflowTaskClients($("clientWorkflowTaskClient")?.value || "");
   renderClientWorkflowPaidQueue(paidClients);
   renderClientWorkflowBoard();
@@ -13787,6 +13910,10 @@ function handleClientWorkflowClick(event) {
     if (task) openClientWorkflowTaskForm(task.clientId, task.type, task);
     return;
   }
+  const commentButton = event.target.closest("[data-client-workflow-comment]");
+  if (commentButton) return addClientWorkflowComment(commentButton.dataset.clientWorkflowComment);
+  const duplicateButton = event.target.closest("[data-client-workflow-duplicate]");
+  if (duplicateButton) return duplicateClientWorkflowTask(duplicateButton.dataset.clientWorkflowDuplicate);
   const removeButton = event.target.closest("[data-client-workflow-delete]");
   if (removeButton) return deleteClientWorkflowTask(removeButton.dataset.clientWorkflowDelete);
   const newUser = event.target.closest("[data-client-workflow-new-user]");

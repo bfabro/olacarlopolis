@@ -12895,7 +12895,7 @@ button.admin-button-loading::after {
 .fishing-reset-card{border-color:#e7c4c0;background:#fff8f7}.fishing-reset-card .danger-button{background:#a63d35;color:#fff}
 @media(max-width:1100px){.fishing-admin-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.fishing-stage-row{grid-template-columns:38px repeat(2,minmax(0,1fr)) 42px}.fishing-stage-prize{grid-column:2/4}}
 @media(max-width:680px){.fishing-admin-metrics{grid-template-columns:1fr 1fr}.fishing-stage-heading{align-items:stretch;flex-direction:column}.fishing-stage-row{grid-template-columns:34px minmax(0,1fr) 40px}.fishing-stage-row label,.fishing-stage-prize{grid-column:2}.fishing-remove-stage{grid-column:3;grid-row:1}.fishing-stage-order{grid-row:1}.fishing-admin-metrics article{min-height:76px}}
-/* Client workflow v867 */
+/* Client workflow v868 */
 .client-workflow-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px;background:linear-gradient(135deg,#0f3d36 0%,#176b5d 58%,#1f8a70 100%);color:#fff;overflow:hidden;position:relative}
 .client-workflow-hero:after{content:"";position:absolute;width:240px;height:240px;border-radius:50%;right:-70px;top:-120px;background:rgba(255,255,255,.09)}
 .client-workflow-hero>div,.client-workflow-hero>button{position:relative;z-index:1}
@@ -12903,7 +12903,7 @@ button.admin-button-loading::after {
 .client-workflow-hero p{margin:0;max-width:720px;color:rgba(255,255,255,.82)}
 .client-workflow-hero button{background:#ffd166;color:#17352f;border:0;font-weight:800;white-space:nowrap}
 .client-workflow-eyebrow{display:inline-flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.09em;font-size:12px;font-weight:800;color:#b9f3df}
-.client-workflow-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}
+.client-workflow-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin:18px 0}
 .client-workflow-stats article{background:#fff;border:1px solid #dce8e4;border-radius:16px;padding:17px;display:grid;grid-template-columns:42px 1fr;grid-template-areas:"icon label" "icon value" "icon hint";column-gap:12px;box-shadow:0 8px 22px rgba(21,65,55,.06)}
 .client-workflow-stats article>i{grid-area:icon;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:#e4f5ef;color:#176b5d;font-size:18px}
 .client-workflow-stats span{grid-area:label;color:#5c6f69;font-size:12px;text-transform:uppercase;letter-spacing:.05em;font-weight:750}
@@ -12940,7 +12940,12 @@ button.admin-button-loading::after {
 .client-workflow-task h4{margin:0 0 5px;font-size:14px;color:#183b34}.client-workflow-task>small{color:#698079}.client-workflow-task p{font-size:12px;color:#536a64;margin:8px 0;white-space:pre-wrap}
 .client-workflow-task-meta{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0;color:#687d77;font-size:11px}
 .client-workflow-task select{width:100%;font-size:12px;padding:8px;margin:0}
-.client-workflow-task-actions{display:flex;gap:6px;margin-top:8px}.client-workflow-task-actions button{flex:1;padding:7px 8px;font-size:11px}.client-workflow-task-actions .danger-button{flex:0 0 auto}
+.client-workflow-history{margin-top:9px;border:1px solid #dce8e4;border-radius:9px;background:#f8fbfa}
+.client-workflow-history summary{cursor:pointer;padding:8px 9px;color:#35645a;font-size:11px;font-weight:750;user-select:none}
+.client-workflow-history>div{display:grid;gap:6px;padding:0 8px 8px}
+.client-workflow-history-item{display:grid;grid-template-columns:1fr auto;gap:3px 8px;padding:7px;border-left:3px solid #76bba8;background:#fff;border-radius:6px}
+.client-workflow-history-item span{font-size:10px;text-transform:uppercase;font-weight:800;color:#176b5d}.client-workflow-history-item time{font-size:9px;color:#788983}.client-workflow-history-item p{grid-column:1/-1;margin:2px 0;font-size:11px}.client-workflow-history-item small{grid-column:1/-1;color:#7a8d87;font-size:9px}
+.client-workflow-task-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.client-workflow-task-actions button{flex:1 1 calc(50% - 6px);padding:7px 8px;font-size:11px}.client-workflow-task-actions .danger-button{flex:1 1 calc(50% - 6px)}
 .client-workflow-empty{border:1px dashed #bccdc8;border-radius:11px;padding:20px 10px;text-align:center;color:#7b8d88;font-size:12px}
 .client-workflow-table-wrap{overflow:auto}
 .client-workflow-table{width:100%;border-collapse:collapse;min-width:760px}
