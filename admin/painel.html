@@ -1078,7 +1078,7 @@
                 </div>
                 <div class="profile-upload-row">
                   <img id="clientProfilePreview" src="" alt="Foto de perfil" loading="lazy" decoding="async">
-                  <label>Enviar foto de perfil<input id="clientProfileUpload" type="file" accept="image/*"></label>
+                  <label>Enviar foto de perfil<input id="clientProfileUpload" type="file" accept="image/*,.heic,.heif"></label>
                 </div>
                 <input id="clientImage" type="hidden">
                 <label class="profile-fit-field">Enquadramento na arte
@@ -1226,7 +1226,7 @@
                   <label>Link do cardapio<input id="clientMenuLink" placeholder="Link externo ou PDF enviado"></label>
                   <label class="check-row"><input id="clientMenuEnabled" type="checkbox"> Exibir botao Cardapio no site publico</label>
                 </div>
-                <input id="clientMenuUpload" type="file" accept="image/*,application/pdf" multiple>
+                <input id="clientMenuUpload" type="file" accept="image/*,.heic,.heif,application/pdf" multiple>
                 <div id="clientMenuPreview" class="image-grid"></div>
               </section>
               <section class="wide upload-panel">
@@ -1237,7 +1237,7 @@
                   </div>
                   <span id="clientImagesCount" class="badge">0/10</span>
                 </div>
-                <input id="clientImagesUpload" type="file" accept="image/*" multiple>
+                <input id="clientImagesUpload" type="file" accept="image/*,.heic,.heif" multiple>
                 <div class="manual-image-form">
                   <label>URL da imagem
                     <input id="clientImageUrl" placeholder="https://... ou images/...">
@@ -1281,7 +1281,7 @@
                   </fieldset>
                   <label class="wide">Observacao<textarea id="clientPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
                   <label class="wide">Mensagem abaixo do cliente / Instagram<textarea id="clientPromoInstagramMsg" rows="2" placeholder="Ex.: Siga no Instagram e fique por dentro das novidades!"></textarea></label>
-                  <label>Imagem da promocao<input id="clientPromoImageUpload" type="file" accept="image/*"></label>
+                  <label>Imagem da promocao<input id="clientPromoImageUpload" type="file" accept="image/*,.heic,.heif"></label>
                   <label>Ou URL da imagem<input id="clientPromoImageUrl" placeholder="https://..."></label>
                   <div class="promo-form-actions wide">
                     <button id="addClientPromoButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
@@ -1308,7 +1308,7 @@
                   <label class="checkbox-line"><input id="clientProductShowPrice" type="checkbox" checked> Mostrar preco?</label>
                   <label>Produto ativo<select id="clientProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
                   <label class="wide">Descricao curta<textarea id="clientProductDescription" rows="3" placeholder="Produto disponivel na loja. Consulte cores, tamanhos e disponibilidade pelo WhatsApp."></textarea></label>
-                  <label>Imagens do produto<input id="clientProductImageUpload" type="file" accept="image/*" multiple></label>
+                  <label>Imagens do produto<input id="clientProductImageUpload" type="file" accept="image/*,.heic,.heif" multiple></label>
                   <label>URLs das imagens<textarea id="clientProductImageUrl" rows="3" placeholder="Uma URL por linha. Maximo 4 imagens."></textarea></label>
                   <div class="form-section-title wide"><i class="fa-solid fa-circle-info"></i><div><strong>2. Mais informacoes - opcional</strong><span>Campos genericos para varios tipos de comercio.</span></div></div>
                   <label>Marca<input id="clientProductBrand" placeholder="Ex.: Nike, JBL, Mondial"></label>
@@ -1347,7 +1347,7 @@
                   <label class="wide">Descri&ccedil;&atilde;o completa<textarea id="clientServiceFullDescription" rows="4" maxlength="3000" placeholder="Explique diferenciais, etapas e condi&ccedil;&otilde;es"></textarea></label>
                   <label>&Iacute;cone (Font Awesome)<input id="clientServiceIcon" placeholder="fa-solid fa-screwdriver-wrench"></label>
                   <label>Tags para busca<input id="clientServiceTags" placeholder="Ex.: instala&ccedil;&atilde;o, limpeza, urgente"></label>
-                  <label>Imagens do servi&ccedil;o<input id="clientServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>Selecione at&eacute; 6 imagens. A primeira ser&aacute; usada como capa.</small></label>
+                  <label>Imagens do servi&ccedil;o<input id="clientServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif" multiple><small>Selecione at&eacute; 6 imagens. A primeira ser&aacute; usada como capa.</small></label>
                   <label>URLs das imagens<textarea id="clientServiceImageUrl" rows="3" placeholder="Uma URL por linha. M&aacute;ximo de 6 imagens."></textarea></label>
                   <div id="clientServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
                   <div class="form-section-title wide"><i class="fa-solid fa-money-bill-wave"></i><div><strong>2. Pre&ccedil;o</strong><span>Escolha como o valor ser&aacute; apresentado.</span></div></div>
@@ -3587,6 +3587,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=799"></script>
+  <script type="module" src="painel.js?v=870"></script>
 </body>
 </html>

@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 862,
-  label: "v869",
-  data: "2026-10-05",
-  nota: "A aba de visitas e novos acessos agora gera um roteiro completo para impressão ou PDF e acompanhamento fora do sistema."
+  numero: 863,
+  label: "v870",
+  data: "2026-10-09",
+  nota: "Fotos HEIC e HEIF enviadas por clientes agora são convertidas automaticamente para JPEG antes do upload."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -982,6 +982,71 @@ function inferFileContentType(file) {
 function uploadMetadataForFile(file) {
   const contentType = inferFileContentType(file);
   return contentType ? { contentType } : undefined;
+}
+
+const HEIC_CONVERTER_URL = "https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js";
+let heicConverterPromise = null;
+
+function isHeicImageFile(file) {
+  const type = String(file?.type || "").toLowerCase();
+  const name = String(file?.name || "");
+  return type === "image/heic" || type === "image/heif" || /\.(heic|heif)$/i.test(name);
+}
+
+function loadHeicConverter() {
+  if (typeof window.heic2any === "function") return Promise.resolve(window.heic2any);
+  if (heicConverterPromise) return heicConverterPromise;
+
+  heicConverterPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-heic-converter="heic2any"]');
+    const script = existing || document.createElement("script");
+    const handleLoad = () => {
+      if (typeof window.heic2any === "function") resolve(window.heic2any);
+      else reject(new Error("Conversor HEIC indisponivel."));
+    };
+    const handleError = () => reject(new Error("Nao foi possivel carregar o conversor HEIC."));
+    script.addEventListener("load", handleLoad, { once: true });
+    script.addEventListener("error", handleError, { once: true });
+    if (!existing) {
+      script.src = HEIC_CONVERTER_URL;
+      script.async = true;
+      script.crossOrigin = "anonymous";
+      script.referrerPolicy = "no-referrer";
+      script.dataset.heicConverter = "heic2any";
+      document.head.appendChild(script);
+    }
+  }).catch((error) => {
+    heicConverterPromise = null;
+    throw error;
+  });
+  return heicConverterPromise;
+}
+
+async function prepareClientImageFile(file) {
+  if (!isHeicImageFile(file)) return file;
+  const originalName = file?.name || "foto.heic";
+  setUploadProgress(5, "Convertendo foto do iPhone", originalName);
+  try {
+    const convert = await loadHeicConverter();
+    const conversion = await convert({ blob: file, toType: "image/jpeg", quality: 0.88 });
+    const blob = Array.isArray(conversion) ? conversion[0] : conversion;
+    if (!(blob instanceof Blob) || !blob.size) throw new Error("A conversao nao gerou uma imagem valida.");
+    const baseName = originalName.replace(/\.(heic|heif)$/i, "") || "foto";
+    const converted = new File([blob], `${baseName}.jpg`, {
+      type: "image/jpeg",
+      lastModified: file?.lastModified || Date.now()
+    });
+    setUploadProgress(100, "Foto convertida para JPEG", converted.name);
+    return converted;
+  } catch (error) {
+    hideUploadProgress(0);
+    document.querySelector('script[data-heic-converter="heic2any"]')?.remove();
+    heicConverterPromise = null;
+    console.error("Falha ao converter imagem HEIC/HEIF.", error);
+    const message = `Nao foi possivel converter ${originalName}. Tente novamente ou envie a foto em JPG.`;
+    showToast(message);
+    throw new Error(message);
+  }
 }
 
 function normalizeName(text) {
@@ -11689,9 +11754,9 @@ async function uploadSelectedServiceImage(prefix, scope, clientId) {
     input.value = "";
     return atuais;
   }
-  const validos = files.filter((file) => /^image\/(jpeg|png|webp|gif)$/i.test(file.type || "") && file.size <= 8 * 1024 * 1024).slice(0, disponiveis);
+  const validos = files.filter((file) => (/^image\/(jpeg|png|webp|gif)$/i.test(file.type || "") || isHeicImageFile(file)) && file.size <= 8 * 1024 * 1024).slice(0, disponiveis);
   if (!validos.length) {
-    showToast("Use imagens JPG, PNG, WEBP ou GIF de at\u00e9 8 MB cada.");
+    showToast("Use imagens JPG, PNG, WEBP, GIF, HEIC ou HEIF de at\u00e9 8 MB cada.");
     input.value = "";
     return atuais;
   }
@@ -11701,9 +11766,10 @@ async function uploadSelectedServiceImage(prefix, scope, clientId) {
   setBusy(input, true);
   try {
     for (let index = 0; index < validos.length; index += 1) {
-      const file = validos[index];
+      const originalFile = validos[index];
+      const file = await prepareClientImageFile(originalFile);
       const path = "clientes/" + id + "/servicos/" + Date.now() + "-" + index + "-" + slugify(file.name || "servico");
-      urls.push(await uploadFileWithProgress(storageRef(storage, path), file, "Enviando imagem " + (index + 1) + " de " + validos.length, file.name || "imagem"));
+      urls.push(await uploadFileWithProgress(storageRef(storage, path), file, "Enviando imagem " + (index + 1) + " de " + validos.length, originalFile.name || "imagem"));
     }
     const todas = normalizeServiceImagesInput([...atuais, ...urls]);
     target.value = todas.join("\n");
@@ -12191,12 +12257,16 @@ async function uploadClientImages(files) {
   }
 
   showToast("Enviando imagens...");
-  const urls = await uploadImagesForClient(currentId, selected);
-  state.clientImages.push(...urls.map((url) => ({ url, titulo: "", texto: "" })));
-
-  if (!$("clientImage").value && state.clientImages[0]) $("clientImage").value = imageUrl(state.clientImages[0]);
-  renderClientImagesPreview();
-  showToast("Imagens enviadas.");
+  try {
+    const urls = await uploadImagesForClient(currentId, selected);
+    state.clientImages.push(...urls.map((url) => ({ url, titulo: "", texto: "" })));
+    if (!$("clientImage").value && state.clientImages[0]) $("clientImage").value = imageUrl(state.clientImages[0]);
+    renderClientImagesPreview();
+    showToast("Imagens enviadas.");
+  } catch (error) {
+    console.error(error);
+    showToast(error?.message || "Nao foi possivel enviar as imagens.");
+  }
 }
 
 function isPdfFile(file) {
@@ -12205,11 +12275,12 @@ function isPdfFile(file) {
 
 async function uploadMenuFilesForClient(clientId, files) {
   const result = { images: [], pdf: "" };
-  for (const file of Array.from(files || [])) {
-    const kind = isPdfFile(file) ? "pdf" : "imagens";
+  for (const originalFile of Array.from(files || [])) {
+    const kind = isPdfFile(originalFile) ? "pdf" : "imagens";
+    const file = kind === "imagens" ? await prepareClientImageFile(originalFile) : originalFile;
     const path = `clientes/${clientId}/cardapio/${kind}/${Date.now()}-${slugify(file.name || "cardapio")}`;
     const fileRef = storageRef(storage, path);
-    const url = await uploadFileWithProgress(fileRef, file, "Enviando cardapio", `${file.name || "arquivo"} (${result.images.length + (result.pdf ? 1 : 0) + 1}/${Array.from(files || []).length})`);
+    const url = await uploadFileWithProgress(fileRef, file, "Enviando cardapio", `${originalFile.name || "arquivo"} (${result.images.length + (result.pdf ? 1 : 0) + 1}/${Array.from(files || []).length})`);
     if (kind === "pdf" && !result.pdf) {
       result.pdf = url;
     } else if (kind === "imagens") {
@@ -12280,9 +12351,10 @@ async function uploadClientMenuFiles(files) {
 }
 
 async function uploadProfileImageForClient(clientId, file) {
-  const path = `clientes/${clientId}/perfil/${Date.now()}-${slugify(file.name || "foto")}`;
+  const preparedFile = await prepareClientImageFile(file);
+  const path = `clientes/${clientId}/perfil/${Date.now()}-${slugify(preparedFile.name || "foto")}`;
   const fileRef = storageRef(storage, path);
-  return uploadFileWithProgress(fileRef, file, "Enviando foto de perfil", file.name || "foto");
+  return uploadFileWithProgress(fileRef, preparedFile, "Enviando foto de perfil", file.name || "foto");
 }
 
 async function saveProfileImageForCanonicalClient(client, targetId, url) {
@@ -12375,18 +12447,20 @@ function addClientImageFromUrl() {
 
 async function uploadImagesForClient(clientId, files) {
   const urls = [];
-  for (const file of Array.from(files || [])) {
-    const path = `clientes/${clientId}/imagens/${Date.now()}-${slugify(file.name)}`;
+  for (const originalFile of Array.from(files || [])) {
+    const file = await prepareClientImageFile(originalFile);
+    const path = `clientes/${clientId}/imagens/${Date.now()}-${slugify(file.name || "imagem")}`;
     const fileRef = storageRef(storage, path);
-    urls.push(await uploadFileWithProgress(fileRef, file, "Enviando imagens", `${file.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
+    urls.push(await uploadFileWithProgress(fileRef, file, "Enviando imagens", `${originalFile.name || "imagem"} (${urls.length + 1}/${Array.from(files || []).length})`));
   }
   return urls;
 }
 
 async function uploadPromoImageForClient(clientId, file) {
-  const path = `clientes/${clientId}/promocoes/${Date.now()}-${slugify(file.name || "promocao")}`;
+  const preparedFile = await prepareClientImageFile(file);
+  const path = `clientes/${clientId}/promocoes/${Date.now()}-${slugify(preparedFile.name || "promocao")}`;
   const fileRef = storageRef(storage, path);
-  return uploadFileWithProgress(fileRef, file, "Enviando imagem da promocao", file.name || "promocao");
+  return uploadFileWithProgress(fileRef, preparedFile, "Enviando imagem da promocao", file.name || "promocao");
 }
 
 async function uploadSelectedPromoImage(inputId, targetInputId, clientId) {
@@ -26396,7 +26470,7 @@ function serviceAdminFormHtml(prefix) {
     <label><span class="service-field-label">Nome do servi\u00e7o <span class="required-mark">*</span></span><input id="${prefix}ServiceName" maxlength="120"></label><label>Categoria<input id="${prefix}ServiceCategory" maxlength="80"></label>
     <label class="wide">Descri\u00e7\u00e3o curta<textarea id="${prefix}ServiceShortDescription" rows="2" maxlength="220"></textarea></label><label class="wide">Descri\u00e7\u00e3o completa<textarea id="${prefix}ServiceFullDescription" rows="4" maxlength="3000"></textarea></label>
     <label>\u00cdcone<input id="${prefix}ServiceIcon" placeholder="fa-solid fa-screwdriver-wrench"></label><label>Tags para busca<input id="${prefix}ServiceTags" placeholder="instala\u00e7\u00e3o, limpeza"></label>
-    <label>Imagens<input id="${prefix}ServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple><small>Selecione at\u00e9 6 imagens. A primeira ser\u00e1 a capa.</small></label>${imageUrlField}<div id="${prefix}ServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
+    <label>Imagens<input id="${prefix}ServiceImageUpload" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif" multiple><small>Selecione at\u00e9 6 imagens. Fotos HEIC do iPhone são convertidas automaticamente. A primeira ser\u00e1 a capa.</small></label>${imageUrlField}<div id="${prefix}ServiceImagePreview" class="service-image-preview wide"><span>Nenhuma imagem selecionada</span></div>
     <div class="form-section-title wide"><i class="fa-solid fa-money-bill-wave"></i><div><strong>Pre\u00e7o e cobran\u00e7a</strong><span>Como o valor ser\u00e1 exibido.</span></div></div>
     <label>Forma de pre\u00e7o<select id="${prefix}ServicePriceType"><option value="sob_consulta">Sob consulta</option><option value="fixo">Pre\u00e7o fixo</option><option value="a_partir">A partir de</option><option value="faixa">Faixa de pre\u00e7o</option><option value="gratuito">Gratuito</option></select></label><label>Valor inicial<input id="${prefix}ServicePrice" inputmode="decimal"></label><label>Valor final<input id="${prefix}ServicePriceTo" inputmode="decimal"></label><label>Unidade<input id="${prefix}ServiceBillingUnit" placeholder="por hora"></label><label class="wide">Observa\u00e7\u00e3o do pre\u00e7o<input id="${prefix}ServicePriceNote"></label>
     <div class="form-section-title wide"><i class="fa-solid fa-location-dot"></i><div><strong>Atendimento</strong><span>Onde, quando e como o servi\u00e7o \u00e9 realizado.</span></div></div>
@@ -26554,7 +26628,7 @@ function renderClientOnlyEditor() {
           </div>
           <div class="profile-upload-row">
             <img id="coProfilePreview" src="${escapeAttr(displayImageUrl(client.imagem || ""))}" alt="Foto de perfil" class="${client.imagem ? "" : "empty"}" ${lazyImageAttrs()} ${imageFallbackAttr()}>
-            <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*"></label>
+            <label>Enviar foto de perfil<input id="coProfileUpload" type="file" accept="image/*,.heic,.heif"></label>
           </div>
           <input id="coImage" type="hidden" value="${escapeAttr(client.imagem || "")}">
         </section>
@@ -26665,7 +26739,7 @@ function renderClientOnlyEditor() {
             <label>Link do cardapio<input id="coMenuLink" value="${escapeAttr(client.cardapioLink || "")}" placeholder="Link externo ou PDF enviado"></label>
             <label class="check-row"><input id="coMenuEnabled" type="checkbox" ${client.cardapioAtivo || client.menuAtivo || client.exibirCardapio || client.cardapioLink || menuImages.length ? "checked" : ""}> Exibir botao Cardapio no site publico</label>
           </div>
-          <input id="coMenuUpload" type="file" accept="image/*,application/pdf" multiple>
+          <input id="coMenuUpload" type="file" accept="image/*,.heic,.heif,application/pdf" multiple>
           <div id="coMenuPreview" class="image-grid">
             ${renderMenuImagesMarkup(menuImages, "comenu")}
           </div>
@@ -26681,7 +26755,7 @@ function renderClientOnlyEditor() {
             </div>
             <span id="coImagesCount" class="badge">${imagens.length}/10</span>
           </div>
-          <input id="coImagesUpload" type="file" accept="image/*" multiple>
+          <input id="coImagesUpload" type="file" accept="image/*,.heic,.heif" multiple>
           <div id="coImagesPreview" class="image-grid">
             ${renderImagesMarkup(imagens, "co")}
           </div>
@@ -26706,7 +26780,7 @@ function renderClientOnlyEditor() {
             <label class="checkbox-line"><input id="coProductShowPrice" type="checkbox" checked> Mostrar preco?</label>
             <label>Produto ativo<select id="coProductStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select></label>
             <label class="wide">Descricao curta<textarea id="coProductDescription" rows="3" placeholder="Produto disponivel na loja. Consulte cores, tamanhos e disponibilidade pelo WhatsApp."></textarea></label>
-            <label>Imagens do produto<input id="coProductImageUpload" type="file" accept="image/*" multiple></label>
+            <label>Imagens do produto<input id="coProductImageUpload" type="file" accept="image/*,.heic,.heif" multiple></label>
             <input id="coProductImageUrl" type="hidden">
             <div class="form-section-title wide"><i class="fa-solid fa-circle-info"></i><div><strong>2. Mais informacoes - opcional</strong><span>Campos genericos para varios tipos de comercio.</span></div></div>
             <label>Marca<input id="coProductBrand" placeholder="Ex.: Nike, JBL, Mondial"></label>
@@ -26785,7 +26859,7 @@ function renderClientOnlyEditor() {
             </fieldset>
             <label class="wide">Observacao<textarea id="coPromoObs" rows="3" placeholder="Detalhes da oferta"></textarea></label>
             <label class="wide">Mensagem abaixo do cliente / Instagram<textarea id="coPromoInstagramMsg" rows="2" placeholder="Ex.: Siga no Instagram e fique por dentro das novidades!"></textarea></label>
-            <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*"></label>
+            <label>Imagem da promocao<input id="coPromoImageUpload" type="file" accept="image/*,.heic,.heif"></label>
             <input id="coPromoImageUrl" type="hidden">
             <div class="promo-form-actions wide">
               <button id="coAddPromoButton" type="button" class="ghost-button"><i class="fa-solid fa-plus"></i> Adicionar promocao</button>
@@ -26955,19 +27029,26 @@ function renderClientOnlyEditor() {
       return;
     }
     showToast("Enviando imagens...");
-    const urls = await uploadImagesForClient(client.id, selected);
-    imagens.push(...urls.map((url) => ({ url, titulo: "", texto: "" })));
-    const imageUpdate = {
-      imagens,
-      imagem: $("coImage").value || imageUrl(imagens[0]) || "",
-      updatedAt: serverTimestamp(),
-      updatedBy: state.user.uid
-    };
-    await update(ref(db, `clientes/${client.id}`), imageUpdate);
-    await registrarAtualizacoesClienteNovidade(client.id, { ...client, ...imageUpdate }, client);
-    showToast("Imagens enviadas.");
-    await loadAllData();
-    renderClientOnlyEditor();
+    try {
+      const urls = await uploadImagesForClient(client.id, selected);
+      imagens.push(...urls.map((url) => ({ url, titulo: "", texto: "" })));
+      const imageUpdate = {
+        imagens,
+        imagem: $("coImage").value || imageUrl(imagens[0]) || "",
+        updatedAt: serverTimestamp(),
+        updatedBy: state.user.uid
+      };
+      await update(ref(db, `clientes/${client.id}`), imageUpdate);
+      await registrarAtualizacoesClienteNovidade(client.id, { ...client, ...imageUpdate }, client);
+      showToast("Imagens enviadas.");
+      await loadAllData();
+      renderClientOnlyEditor();
+    } catch (error) {
+      console.error(error);
+      showToast(error?.message || "Nao foi possivel enviar as imagens.");
+    } finally {
+      event.target.value = "";
+    }
   });
 
   mount.querySelector("#coMenuUpload")?.addEventListener("change", async (event) => {
