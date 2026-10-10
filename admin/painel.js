@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 863,
-  label: "v870",
-  data: "2026-10-09",
-  nota: "Fotos HEIC e HEIF enviadas por clientes agora são convertidas automaticamente para JPEG antes do upload."
+  numero: 864,
+  label: "v871",
+  data: "2026-10-10",
+  nota: "O Admin Master agora atualiza o preço de cada tipo de combustível em todos os postos de uma só vez, com confirmação e histórico."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -23574,6 +23574,140 @@ function fuelAdminFriendlyProductName(name = "") {
   return FUEL_ADMIN_MANUAL_CATALOG.find((item) => item.key === kind)?.nome || String(name || "").trim();
 }
 
+function fuelAdminBulkTargets(kind) {
+  const targets = [];
+  Object.entries(fuelAdminStationMap()).forEach(([stationId, station]) => {
+    Object.entries(fuelAdminProductMap(station)).forEach(([productId, product]) => {
+      if (product?.ativo === false || fuelAdminProductKind(productId, product) !== kind) return;
+      targets.push({ stationId, station, productId, product });
+    });
+  });
+  return targets;
+}
+
+function fuelAdminBulkPriceSummary(targets = []) {
+  const values = [...new Set(targets.map(({ product }) => fuelPanelPrice(product?.preco)).filter((price) => price > 0))].sort((a, b) => a - b);
+  if (!values.length) return "Sem valores publicados";
+  const format = (value) => `R$ ${value.toFixed(3).replace(".", ",")}`;
+  return values.length === 1 ? `Atual: ${format(values[0])}` : `Atuais: ${format(values[0])} a ${format(values[values.length - 1])}`;
+}
+
+function renderFuelAdminBulkPrices() {
+  const mount = $("fuelAdminBulkPrices");
+  if (!mount) return;
+  const catalog = FUEL_ADMIN_MANUAL_CATALOG.filter((item) => item.tipo === "combustivel");
+  mount.innerHTML = catalog.map((item) => {
+    const targets = fuelAdminBulkTargets(item.key);
+    const stationCount = new Set(targets.map((target) => target.stationId)).size;
+    const last = state.combustiveisConfig?.ultimaAtualizacaoMassa?.[item.key] || {};
+    const lastLabel = Number(last.atualizadoEmTimestamp || 0)
+      ? `Última aplicação coletiva: R$ ${Number(last.preco || 0).toFixed(3).replace(".", ",")} em ${fuelPanelDateTime(last.atualizadoEmTimestamp)}`
+      : "Ainda não aplicado coletivamente";
+    return `<article class="fuel-admin-bulk-item" data-fuel-bulk-kind="${escapeAttr(item.key)}">
+      <div class="fuel-admin-bulk-item-head"><span><i class="fa-solid fa-droplet"></i></span><div><strong>${escapeHtml(item.nome)}</strong><small>${stationCount} posto${stationCount === 1 ? "" : "s"} · ${escapeHtml(fuelAdminBulkPriceSummary(targets))}</small></div></div>
+      <label>Novo preço por litro (R$)<input data-fuel-bulk-price type="number" min="0.001" max="99.999" step="0.001" inputmode="decimal" placeholder="0,000" ${stationCount ? "" : "disabled"}></label>
+      <button type="button" data-apply-fuel-bulk="${escapeAttr(item.key)}" ${stationCount ? "" : "disabled"}><i class="fa-solid fa-check-double"></i> Aplicar em ${stationCount || 0}</button>
+      <p><i class="fa-regular fa-clock"></i> ${escapeHtml(lastLabel)}</p>
+    </article>`;
+  }).join("");
+  mount.querySelectorAll("[data-apply-fuel-bulk]").forEach((button) => button.addEventListener("click", () => applyFuelAdminBulkPrice(button.dataset.applyFuelBulk, button)));
+}
+
+async function applyFuelAdminBulkPrice(kind, button) {
+  if (!isMaster()) return showToast("Somente o Admin Master pode atualizar todos os postos.");
+  const catalogItem = FUEL_ADMIN_MANUAL_CATALOG.find((item) => item.key === kind && item.tipo === "combustivel");
+  const row = button?.closest("[data-fuel-bulk-kind]");
+  const price = fuelPanelPrice(row?.querySelector("[data-fuel-bulk-price]")?.value);
+  if (!catalogItem || !(price > 0 && price <= 99.999)) return showToast("Informe um preço válido entre R$ 0,001 e R$ 99,999.");
+  const targets = fuelAdminBulkTargets(kind);
+  const stationIds = [...new Set(targets.map((target) => target.stationId))];
+  if (!stationIds.length) return showToast(`Nenhum posto oferece ${catalogItem.nome}.`);
+  const promotionsToEnd = targets.filter(({ product }) => {
+    const promotion = fuelPanelPromotion(product?.promocao);
+    return promotion && promotion.preco >= price;
+  }).length;
+  const priceLabel = `R$ ${price.toFixed(3).replace(".", ",")}`;
+  const warning = promotionsToEnd ? ` ${promotionsToEnd} promoção(ões) com valor igual ou maior serão encerradas.` : "";
+  if (!confirm(`Aplicar ${priceLabel} para ${catalogItem.nome} em ${stationIds.length} posto(s)? O valor substituirá o preço atual em todos eles.${warning}`)) return;
+  setBusy(button, true, "Atualizando...");
+  try {
+    const timestamp = Date.now();
+    const date = fuelPanelSaoPauloDate(timestamp);
+    const responsible = String(state.profile?.nome || state.user?.email || "Admin Master").trim().slice(0, 80);
+    const updates = {};
+    const histories = new Map();
+    targets.forEach(({ stationId, station, productId, product }) => {
+      const promotion = fuelPanelPromotion(product?.promocao);
+      const clearPromotion = Boolean(promotion && promotion.preco >= price);
+      const base = `configuracoes/combustiveis/postos/${stationId}/combustiveis/${productId}`;
+      updates[`${base}/preco`] = price;
+      updates[`${base}/atualizadoEm`] = date;
+      updates[`${base}/atualizadoEmTimestamp`] = timestamp;
+      updates[`${base}/origemAtualizacao`] = "painel";
+      if (clearPromotion) updates[`${base}/promocao`] = null;
+      updates[`configuracoes/combustiveis/postos/${stationId}/updatedAt`] = timestamp;
+      updates[`configuracoes/combustiveis/postos/${stationId}/updatedBy`] = state.user?.uid || "";
+      if (!histories.has(stationId)) histories.set(stationId, { station, prices: {}, changes: {} });
+      const history = histories.get(stationId);
+      history.prices[productId] = price;
+      history.changes[productId] = {
+        nome: product.nome || catalogItem.nome,
+        precoAnterior: Number(product.preco || 0),
+        precoNovo: price,
+        promocaoAnterior: promotion,
+        promocaoNova: clearPromotion ? null : promotion
+      };
+    });
+    const historyEntries = [];
+    histories.forEach(({ station, prices, changes }, stationId) => {
+      const historyId = push(ref(db, `combustiveisHistorico/${stationId}`)).key;
+      if (!historyId) return;
+      const history = {
+        postoId: stationId,
+        postoNome: station.nomeExibicao || station.razaoSocial || "Posto",
+        origem: "admin-master-massa",
+        emMassa: true,
+        tipoCombustivel: kind,
+        viaLink: false,
+        responsavelNome: responsible,
+        uid: state.user?.uid || "",
+        email: state.user?.email || "",
+        atualizadoEm: date,
+        atualizadoEmTimestamp: timestamp,
+        precos: prices,
+        alteracoes: changes
+      };
+      updates[`combustiveisHistorico/${stationId}/${historyId}`] = history;
+      historyEntries.push({ stationId, historyId, history });
+    });
+    const bulkRecord = { tipo: kind, nome: catalogItem.nome, preco: price, postosAtualizados: stationIds.length, produtosAtualizados: targets.length, atualizadoEm: date, atualizadoEmTimestamp: timestamp, updatedBy: state.user?.uid || "" };
+    updates[`configuracoes/combustiveis/ultimaAtualizacaoMassa/${kind}`] = bulkRecord;
+    await update(ref(db), updates);
+    targets.forEach(({ stationId, productId, product }) => {
+      Object.assign(product, { preco: price, atualizadoEm: date, atualizadoEmTimestamp: timestamp, origemAtualizacao: "painel" });
+      const promotion = fuelPanelPromotion(product.promocao);
+      if (promotion && promotion.preco >= price) product.promocao = null;
+      const stateProduct = state.combustiveisConfig?.postos?.[stationId]?.combustiveis?.[productId];
+      if (stateProduct && stateProduct !== product) Object.assign(stateProduct, product);
+      const stateStation = state.combustiveisConfig?.postos?.[stationId];
+      if (stateStation) Object.assign(stateStation, { updatedAt: timestamp, updatedBy: state.user?.uid || "" });
+    });
+    state.combustiveisConfig.ultimaAtualizacaoMassa = { ...(state.combustiveisConfig.ultimaAtualizacaoMassa || {}), [kind]: bulkRecord };
+    state.combustiveisHistorico = state.combustiveisHistorico || {};
+    historyEntries.forEach(({ stationId, historyId, history }) => {
+      state.combustiveisHistorico[stationId] = { ...(state.combustiveisHistorico[stationId] || {}), [historyId]: history };
+    });
+    await registrarLogAuditoria("Atualizar em massa", "Combustíveis", `${catalogItem.nome}: ${priceLabel} em ${stationIds.length} posto(s)`, kind).catch((error) => console.warn("Falha ao registrar auditoria da atualização coletiva.", error));
+    renderFuelAdminSettings();
+    showToast(`${catalogItem.nome} atualizado para ${priceLabel} em ${stationIds.length} posto(s).`);
+  } catch (error) {
+    console.error("Falha ao atualizar preços de combustível em massa.", error);
+    showToast("Não foi possível atualizar todos os postos. Nenhum valor parcial foi publicado.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
 function fuelAdminManualOptions(station) {
   const existingKinds = new Set(Object.entries(fuelAdminProductMap(station)).map(([productId, product]) => fuelAdminProductKind(productId, product)).filter(Boolean));
   return FUEL_ADMIN_MANUAL_CATALOG.filter((item) => !existingKinds.has(item.key));
@@ -24117,6 +24251,7 @@ function renderFuelAdminSettings() {
     const text = syncStatus.querySelector("span");
     if (text) text.textContent = details;
   }
+  renderFuelAdminBulkPrices();
   renderFuelAdminSelectedStations();
   renderFuelAdminPromotions();
   bindFuelAdminWorkspaceTabs();
@@ -24350,7 +24485,7 @@ function renderFuelHistory(mountId, stationId = "", forceOpen = false) {
       <div class="fuel-history-table-wrap"><table class="fuel-history-table"><thead><tr>${fuelHistorySortHeader("time", "Data e horario", filters)}${fuelHistorySortHeader("responsible", "Responsavel", filters)}${stationId ? "" : fuelHistorySortHeader("station", "Posto", filters)}${fuelHistorySortHeader("product", "Combustivel", filters)}${fuelHistorySortHeader("before", "Anterior", filters)}${fuelHistorySortHeader("after", "Novo valor", filters)}${fuelHistorySortHeader("promo", "Promocao", filters)}</tr></thead><tbody>${visible.length ? visible.map((row) => {
         const change = row.change || {};
         const promo = fuelPanelPromotion(change.promocaoNova);
-        const sourceLabel = row.origem === "nota-parana" ? "Automatico Nota Parana" : (row.viaLink ? "Via link" : "Area do posto");
+        const sourceLabel = row.origem === "nota-parana" ? "Automático Nota Paraná" : (row.origem === "admin-master-massa" ? "Admin Master · atualização coletiva" : (row.viaLink ? "Via link" : "Área do posto"));
         return `<tr><td>${escapeHtml(fuelPanelDateTime(row.atualizadoEmTimestamp))}</td><td><strong>${escapeHtml(row.responsavelNome || "Nao informado")}</strong><small>${sourceLabel}</small></td>${stationId ? "" : `<td>${escapeHtml(row.postoNome || row.stationId || "Posto")}</td>`}<td>${escapeHtml(change.nome || row.productId)}</td><td>${change.precoAnterior === null || change.precoAnterior === undefined ? "-" : `R$ ${Number(change.precoAnterior).toFixed(3).replace(".", ",")}`}</td><td><strong>R$ ${Number(change.precoNovo ?? row.precos?.[row.productId] ?? 0).toFixed(3).replace(".", ",")}</strong></td><td>${promo ? `<span class="fuel-history-promo">R$ ${Number(promo.preco).toFixed(3).replace(".", ",")}<small>ate ${escapeHtml(fuelPanelDateTime(promo.fimEmTimestamp))}</small></span>` : "Sem promocao"}</td></tr>`;
       }).join("") : '<tr><td colspan="7" class="fuel-history-empty">Nenhuma alteracao encontrada para os filtros.</td></tr>'}</tbody></table></div>
     </div>

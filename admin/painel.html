@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=568">
+  <link rel="stylesheet" href="painel.css?v=569">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -3249,6 +3249,14 @@
               <i class="fa-solid fa-circle-info"></i>
               <span>A ANP fornece o cadastro dos postos. Os valores são verificados no intervalo escolhido no Menor Preço / Nota Paraná e também podem ser atualizados manualmente pelo link exclusivo de cada posto.</span>
             </div>
+            <section class="wide fuel-admin-bulk-card" aria-labelledby="fuelAdminBulkTitle">
+              <header>
+                <div><span><i class="fa-solid fa-layer-group"></i> Atualização coletiva</span><h3 id="fuelAdminBulkTitle">Um preço para todos os postos</h3><p>Informe o valor de um combustível e aplique de uma vez em todos os postos que oferecem esse tipo.</p></div>
+                <strong><i class="fa-solid fa-clock-rotate-left"></i> O último valor salvo prevalece</strong>
+              </header>
+              <div id="fuelAdminBulkPrices" class="fuel-admin-bulk-grid"></div>
+              <footer><i class="fa-solid fa-shield-halved"></i><span>Antes de atualizar, o painel informa quantos postos serão alterados e solicita sua confirmação.</span></footer>
+            </section>
             <div class="wide fuel-admin-workspace">
               <div class="fuel-admin-workspace-tabs" role="tablist" aria-label="Gest&atilde;o dos postos de combust&iacute;vel">
                 <button type="button" role="tab" data-fuel-admin-tab="stations" aria-controls="fuelAdminSelectedStations"><i class="fa-solid fa-gas-pump"></i> Postos</button>
@@ -3587,6 +3595,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=870"></script>
+  <script type="module" src="painel.js?v=871"></script>
 </body>
 </html>
