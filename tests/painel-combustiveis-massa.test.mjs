@@ -16,7 +16,7 @@ test("Admin Master exibe atualização coletiva separada por tipo de combustíve
   assert.match(panelJs, /function renderFuelAdminBulkPrices\(\)/);
   assert.match(panelJs, /FUEL_ADMIN_MANUAL_CATALOG\.filter\(\(item\) => item\.tipo === "combustivel"\)/);
   assert.match(panelJs, /data-apply-fuel-bulk/);
-  assert.match(panelCss, /\/\* Atualizacao coletiva de combustiveis - v871 \*\//);
+  assert.match(panelCss, /\/\* Atualizacao coletiva de combustiveis - v872 \*\//);
 });
 
 test("atualização coletiva alcança somente produtos habilitados do mesmo tipo", () => {
@@ -41,14 +41,14 @@ test("gravação em massa é atômica, mantém o último valor e registra histó
 test("promoção incompatível é encerrada e versões globais são atualizadas", () => {
   assert.match(panelJs, /promotion\.preco >= price/);
   assert.match(panelJs, /updates\[`\$\{base\}\/promocao`\] = null/);
-  assert.match(panelHtml, /painel\.css\?v=569/);
-  assert.match(panelHtml, /painel\.js\?v=871/);
-  assert.match(panelJs, /numero: 864/);
-  assert.match(panelJs, /label: "v871"/);
+  assert.match(panelHtml, /painel\.css\?v=570/);
+  assert.match(panelHtml, /painel\.js\?v=872/);
+  assert.match(panelJs, /numero: 865/);
+  assert.match(panelJs, /label: "v872"/);
   assert.match(panelJs, /data: "2026-10-10"/);
-  assert.match(indexHtml, /style\.css\?v=578/);
-  assert.match(indexHtml, /ola-pesca\.js\?v=88/);
-  assert.match(indexHtml, /script\.js\?v=778/);
-  assert.match(fishingJs, /FISHING_MAP_VERSION=88/);
-  assert.match(serviceWorker, /2026-10-10-pesque-solte-v918/);
+  assert.match(indexHtml, /style\.css\?v=579/);
+  assert.match(indexHtml, /ola-pesca\.js\?v=89/);
+  assert.match(indexHtml, /script\.js\?v=779/);
+  assert.match(fishingJs, /FISHING_MAP_VERSION=89/);
+  assert.match(serviceWorker, /2026-10-10-pesque-solte-v919/);
 });

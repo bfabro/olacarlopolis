@@ -12959,7 +12959,7 @@ button.admin-button-loading::after {
 [data-client-workflow-page="prospects"] .section-head>button{white-space:nowrap}
 @media (max-width:1100px){.client-workflow-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.client-workflow-prospect-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){[data-client-workflow-page="prospects"] .section-head>button{width:100%}.client-workflow-hero{align-items:flex-start;flex-direction:column}.client-workflow-hero>button{width:100%}.client-workflow-stats{grid-template-columns:1fr 1fr}.client-workflow-stats article{grid-template-columns:34px 1fr;padding:13px}.client-workflow-stats article>i{width:34px;height:34px}.client-workflow-toolbar{align-items:stretch;flex-direction:column}.client-workflow-toolbar select{width:100%}.client-workflow-prospect-grid{grid-template-columns:1fr}.client-workflow-board{grid-template-columns:repeat(5,82vw)}}
-/* Atualizacao coletiva de combustiveis - v871 */
+/* Atualizacao coletiva de combustiveis - v872 */
 .fuel-admin-bulk-card{display:grid;gap:15px;overflow:hidden;padding:18px;border:1px solid #bcd6ee;border-radius:17px;background:linear-gradient(145deg,#f7fbff,#edf6ff);box-shadow:0 8px 24px rgba(25,82,132,.08)}
 .fuel-admin-bulk-card>header{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
 .fuel-admin-bulk-card>header>div>span{display:inline-flex;align-items:center;gap:7px;color:#176dc1;font-size:.7rem;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
@@ -12974,3 +12974,4 @@ button.admin-button-loading::after {
 .fuel-admin-bulk-card>footer{display:flex;align-items:flex-start;gap:8px;color:#4d6c84;font-size:.7rem}.fuel-admin-bulk-card>footer i{margin-top:1px;color:#19835b}
 @media(max-width:1080px){.fuel-admin-bulk-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.fuel-admin-bulk-card{padding:14px}.fuel-admin-bulk-card>header{flex-direction:column}.fuel-admin-bulk-card>header>strong{white-space:normal}.fuel-admin-bulk-grid{grid-template-columns:1fr}.fuel-admin-bulk-item{grid-template-columns:1fr}.fuel-admin-bulk-item>button{width:100%}}
+/* Versao global do painel v872 */

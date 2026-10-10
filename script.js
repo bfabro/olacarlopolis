@@ -4806,6 +4806,99 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   try { window.marcarNovidadesCidadeComoVistas = marcarNovidadesCidadeComoVistas; } catch (e) { }
 
+  const PROMOCOES_CIDADE_ESTADO_KEY = "ola_carlopolis_promocoes_alerta_v1";
+
+  function lerEstadoAvisoPromocoesCidade() {
+    try {
+      const salvo = JSON.parse(localStorage.getItem(PROMOCOES_CIDADE_ESTADO_KEY) || "{}");
+      return {
+        ativos: salvo?.ativos && typeof salvo.ativos === "object" ? salvo.ativos : {},
+        pendentes: salvo?.pendentes && typeof salvo.pendentes === "object" ? salvo.pendentes : {}
+      };
+    } catch (e) {
+      return { ativos: {}, pendentes: {} };
+    }
+  }
+
+  function salvarEstadoAvisoPromocoesCidade(estado = {}) {
+    try {
+      localStorage.setItem(PROMOCOES_CIDADE_ESTADO_KEY, JSON.stringify({
+        ativos: estado.ativos || {},
+        pendentes: estado.pendentes || {}
+      }));
+    } catch (e) { }
+  }
+
+  function botoesPromocoesCidade() {
+    return [...document.querySelectorAll('[data-home-quick-action="promocoes"]')];
+  }
+
+  function renderAvisoPromocoesCidade(qtd) {
+    botoesPromocoesCidade().forEach((button) => {
+      let badge = button.querySelector(".promocoes-alert-badge");
+      if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "novidades-alert-badge promocoes-alert-badge";
+        badge.setAttribute("aria-label", "Promoções novas ou reativadas");
+        button.appendChild(badge);
+      }
+      if (qtd > 0) {
+        badge.textContent = qtd > 99 ? "99+" : String(qtd);
+        button.classList.add("tem-promocoes-novas");
+      } else {
+        badge.textContent = "";
+        button.classList.remove("tem-promocoes-novas");
+      }
+    });
+  }
+
+  function versaoAtivacaoPromocaoCidade(promo = {}) {
+    return String(novidadeCidadeMs(
+      promo.ativadoEm || promo.reativadoEm || promo.atualizadoEm || promo.updatedAt || promo.criadoEm || promo.createdAt
+    ) || "ativa");
+  }
+
+  function promocoesCidadeAtivasAgora() {
+    const ativas = {};
+    deduplicarPromocoesPublicas(coletarTodasPromocoes())
+      .filter((promo) => !promoExpirada(promo) && promoDisponivelHoje(promo))
+      .forEach((promo) => {
+        const chave = chavePromocaoPublica(promo);
+        if (chave) ativas[chave] = versaoAtivacaoPromocaoCidade(promo);
+      });
+    return ativas;
+  }
+
+  function sincronizarAvisoPromocoesCidade({ marcarComoVistas = false } = {}) {
+    if (!botoesPromocoesCidade().length) return;
+    const estadoAnterior = lerEstadoAvisoPromocoesCidade();
+    const ativos = promocoesCidadeAtivasAgora();
+    const pendentes = {};
+
+    if (!marcarComoVistas) {
+      Object.entries(ativos).forEach(([chave, versao]) => {
+        const ficouAtivaAgora = !estadoAnterior.ativos[chave];
+        const recebeuNovaVersao = versao !== "ativa"
+          && estadoAnterior.ativos[chave]
+          && estadoAnterior.ativos[chave] !== versao;
+        if (ficouAtivaAgora || recebeuNovaVersao || estadoAnterior.pendentes[chave]) {
+          pendentes[chave] = versao;
+        }
+      });
+    }
+
+    salvarEstadoAvisoPromocoesCidade({ ativos, pendentes });
+    renderAvisoPromocoesCidade(Object.keys(pendentes).length);
+  }
+
+  function marcarPromocoesCidadeComoVistas() {
+    sincronizarAvisoPromocoesCidade({ marcarComoVistas: true });
+  }
+
+  try {
+    window.sincronizarAvisoPromocoesCidade = sincronizarAvisoPromocoesCidade;
+    window.marcarPromocoesCidadeComoVistas = marcarPromocoesCidadeComoVistas;
+  } catch (e) { }
   function registrarCliqueNovidadeCidade(acao, item = {}) {
     if (typeof registrarCliqueBotao !== "function") return;
     const destinoId = normalizeName(item.estabelecimento || item.raw?.clienteNome || item.raw?.clienteId || item.destinoId || "novidades");
@@ -10113,7 +10206,9 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
         whatsapp: p.whatsapp || contexto.whatsapp || "",
         telefone: p.telefone || contexto.telefone || "",
         instagram: contexto.instagram || "",
-        criadoEm: p.criadoEm || p.createdAt || ""
+        criadoEm: p.criadoEm || p.createdAt || "",
+        atualizadoEm: p.atualizadoEm || p.updatedAt || p.dataAtualizacao || "",
+        ativadoEm: p.ativadoEm || p.reativadoEm || ""
       });
     };
     (categories || []).forEach(cat => {
@@ -15633,6 +15728,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   // Renderiza a página Promoções
   function mostrarPromocoes(filtroEstabId = "todos", opcoes = {}) {
+    marcarPromocoesCidadeComoVistas();
     const deveAtualizarAdmin = !opcoes.skipAdminRefresh
       && typeof aplicarDadosAdminClientes === "function"
       && (!ADMIN_CLIENTES_LOADED || (Date.now() - Number(ADMIN_CLIENTES_LAST_APPLIED || 0)) > 10000);
@@ -25026,11 +25122,13 @@ plotarPinsImoveis(stateImoveis.filtered);
     return aplicarDadosAdminClientes()
       .then(() => {
         ADMIN_CLIENTES_LOADED = true;
+        sincronizarAvisoPromocoesCidade();
         if (typeof callback === "function") callback();
         return true;
       })
       .catch((err) => {
         console.warn("Nao foi possivel atualizar dados do painel admin em segundo plano.", err);
+        sincronizarAvisoPromocoesCidade();
         return false;
       });
   }

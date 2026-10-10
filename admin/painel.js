@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 864,
-  label: "v871",
+  numero: 865,
+  label: "v872",
   data: "2026-10-10",
-  nota: "O Admin Master agora atualiza o preço de cada tipo de combustível em todos os postos de uma só vez, com confirmação e histórico."
+  nota: "O site público agora destaca no Acesso rápido a quantidade de promoções novas ou reativadas."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

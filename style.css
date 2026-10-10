@@ -2853,11 +2853,13 @@ screen and (width: 820px) {
   text-align: center;
 }
 
-.tem-novidades-novas {
+.tem-novidades-novas,
+.tem-promocoes-novas {
   animation: novidadesPulse 1.8s ease-in-out infinite;
 }
 
-.tem-novidades-novas .novidades-alert-badge {
+.tem-novidades-novas .novidades-alert-badge,
+.tem-promocoes-novas .promocoes-alert-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -15141,11 +15143,13 @@ tr[data-inativo="true"] {
   text-shadow: 0 2px 8px rgba(0,0,0,.18);
 }
 
-.home-quick-actions [data-home-quick-action="novidades"] {
+.home-quick-actions [data-home-quick-action="novidades"],
+.home-quick-actions [data-home-quick-action="promocoes"] {
   overflow: visible;
 }
 
-.home-quick-actions [data-home-quick-action="novidades"] .novidades-alert-badge {
+.home-quick-actions [data-home-quick-action="novidades"] .novidades-alert-badge,
+.home-quick-actions [data-home-quick-action="promocoes"] .promocoes-alert-badge {
   top: -10px;
   right: -10px;
   z-index: 5;
@@ -29281,3 +29285,5 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
     stroke-dashoffset: 0;
   }
 }
+
+/* Marcador de promocoes novas e reativadas - site v579 */
