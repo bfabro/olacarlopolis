@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 868,
-  label: "v875",
+  numero: 869,
+  label: "v876",
   data: "2026-10-11",
-  nota: "As imagens dos encartes agora recebem remoção de fundo, recorte, centralização e sombra diretamente no navegador."
+  nota: "Os encartes voltaram a usar as imagens originais cadastradas, preservando integralmente sua qualidade e composição."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -26334,7 +26334,7 @@ const FLYER_LAYOUTS = [
 const FLYER_MAX_ITEMS = 10;
 let flyerPreviewTimer = null;
 let flyerPreviewRequest = 0;
-const flyerPreparedImageCache = new WeakMap();
+
 
 function flyerClients() {
   return postArtClients();
@@ -26403,198 +26403,6 @@ function flyerDiscountPercent(item = {}) {
   return Math.max(1, Math.min(99, Math.round((oldPrice - price) * 100 / oldPrice)));
 }
 
-function flyerImageSize(image) {
-  return {
-    width: Number(image?.naturalWidth || image?.videoWidth || image?.width || 0),
-    height: Number(image?.naturalHeight || image?.videoHeight || image?.height || 0)
-  };
-}
-
-function flyerColorDistanceSquared(data, offset, color) {
-  const red = data[offset] - color.r;
-  const green = data[offset + 1] - color.g;
-  const blue = data[offset + 2] - color.b;
-  return red * red + green * green + blue * blue;
-}
-
-function flyerMedian(values = []) {
-  if (!values.length) return 0;
-  const sorted = [...values].sort((a, b) => a - b);
-  return sorted[Math.floor(sorted.length / 2)];
-}
-
-function flyerBorderBackground(data, width, height) {
-  const samples = [];
-  const cornerSize = Math.max(2, Math.min(10, Math.round(Math.min(width, height) * .025)));
-  const corners = [
-    [0, 0],
-    [Math.max(0, width - cornerSize), 0],
-    [0, Math.max(0, height - cornerSize)],
-    [Math.max(0, width - cornerSize), Math.max(0, height - cornerSize)]
-  ];
-  corners.forEach(([startX, startY]) => {
-    for (let y = startY; y < Math.min(height, startY + cornerSize); y += 1) {
-      for (let x = startX; x < Math.min(width, startX + cornerSize); x += 1) {
-        const offset = (y * width + x) * 4;
-        if (data[offset + 3] > 20) samples.push([data[offset], data[offset + 1], data[offset + 2]]);
-      }
-    }
-  });
-  if (!samples.length) return null;
-  return {
-    r: flyerMedian(samples.map((color) => color[0])),
-    g: flyerMedian(samples.map((color) => color[1])),
-    b: flyerMedian(samples.map((color) => color[2]))
-  };
-}
-
-function flyerBorderMatchRatio(data, width, height, background, toleranceSquared) {
-  let matches = 0;
-  let total = 0;
-  const step = Math.max(1, Math.floor(Math.min(width, height) / 120));
-  const inspect = (x, y) => {
-    const offset = (y * width + x) * 4;
-    total += 1;
-    if (data[offset + 3] < 20 || flyerColorDistanceSquared(data, offset, background) <= toleranceSquared) matches += 1;
-  };
-  for (let x = 0; x < width; x += step) {
-    inspect(x, 0);
-    if (height > 1) inspect(x, height - 1);
-  }
-  for (let y = step; y < height - 1; y += step) {
-    inspect(0, y);
-    if (width > 1) inspect(width - 1, y);
-  }
-  return total ? matches / total : 0;
-}
-
-function flyerRemoveConnectedBackground(image) {
-  const size = flyerImageSize(image);
-  if (!size.width || !size.height) return image;
-  const maxSide = 460;
-  const scale = Math.min(1, maxSide / Math.max(size.width, size.height));
-  const width = Math.max(1, Math.round(size.width * scale));
-  const height = Math.max(1, Math.round(size.height * scale));
-  const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true });
-  if (!ctx) return image;
-  ctx.drawImage(image, 0, 0, width, height);
-
-  let frame;
-  try {
-    frame = ctx.getImageData(0, 0, width, height);
-  } catch (error) {
-    console.warn("A imagem não permite remoção local do fundo; usando o arquivo original.", error);
-    return image;
-  }
-  const data = frame.data;
-  const background = flyerBorderBackground(data, width, height);
-  if (!background) return image;
-  const brightness = (background.r + background.g + background.b) / 3;
-  const tolerance = brightness > 215 ? 78 : brightness < 45 ? 56 : 66;
-  const toleranceSquared = tolerance * tolerance;
-  if (flyerBorderMatchRatio(data, width, height, background, toleranceSquared) < .58) return image;
-
-  const totalPixels = width * height;
-  const removed = new Uint8Array(totalPixels);
-  const queue = new Int32Array(totalPixels);
-  let head = 0;
-  let tail = 0;
-  const enqueue = (index) => {
-    if (removed[index]) return;
-    const offset = index * 4;
-    if (data[offset + 3] < 20 || flyerColorDistanceSquared(data, offset, background) <= toleranceSquared) {
-      removed[index] = 1;
-      queue[tail] = index;
-      tail += 1;
-    }
-  };
-  for (let x = 0; x < width; x += 1) {
-    enqueue(x);
-    enqueue((height - 1) * width + x);
-  }
-  for (let y = 1; y < height - 1; y += 1) {
-    enqueue(y * width);
-    enqueue(y * width + width - 1);
-  }
-
-  while (head < tail) {
-    const index = queue[head];
-    head += 1;
-    const x = index % width;
-    const y = Math.floor(index / width);
-    if (x > 0) enqueue(index - 1);
-    if (x + 1 < width) enqueue(index + 1);
-    if (y > 0) enqueue(index - width);
-    if (y + 1 < height) enqueue(index + width);
-  }
-
-  const removedRatio = tail / totalPixels;
-  if (removedRatio < .06 || removedRatio > .96) return image;
-  let minX = width;
-  let minY = height;
-  let maxX = -1;
-  let maxY = -1;
-  let foregroundPixels = 0;
-  for (let index = 0; index < totalPixels; index += 1) {
-    const offset = index * 4;
-    if (removed[index]) {
-      data[offset + 3] = 0;
-      continue;
-    }
-    if (data[offset + 3] < 20) continue;
-    foregroundPixels += 1;
-    const x = index % width;
-    const y = Math.floor(index / width);
-    minX = Math.min(minX, x);
-    minY = Math.min(minY, y);
-    maxX = Math.max(maxX, x);
-    maxY = Math.max(maxY, y);
-  }
-  if (foregroundPixels < totalPixels * .018 || maxX < minX || maxY < minY) return image;
-
-  for (let y = Math.max(1, minY); y < Math.min(height - 1, maxY + 1); y += 1) {
-    for (let x = Math.max(1, minX); x < Math.min(width - 1, maxX + 1); x += 1) {
-      const index = y * width + x;
-      if (removed[index]) continue;
-      if (removed[index - 1] || removed[index + 1] || removed[index - width] || removed[index + width]) {
-        data[index * 4 + 3] = Math.round(data[index * 4 + 3] * .72);
-      }
-    }
-  }
-  ctx.putImageData(frame, 0, 0);
-
-  const objectWidth = maxX - minX + 1;
-  const objectHeight = maxY - minY + 1;
-  const padding = Math.max(10, Math.round(Math.max(objectWidth, objectHeight) * .08));
-  const output = document.createElement("canvas");
-  output.width = objectWidth + padding * 2;
-  output.height = objectHeight + padding * 2;
-  const outputCtx = output.getContext("2d");
-  if (!outputCtx) return image;
-  outputCtx.save();
-  outputCtx.shadowColor = "rgba(8,20,35,.24)";
-  outputCtx.shadowBlur = Math.max(8, Math.round(padding * .8));
-  outputCtx.shadowOffsetY = Math.max(4, Math.round(padding * .25));
-  outputCtx.drawImage(canvas, minX, minY, objectWidth, objectHeight, padding, padding, objectWidth, objectHeight);
-  outputCtx.restore();
-  return output;
-}
-
-function flyerPrepareProductImage(image) {
-  if (!image) return null;
-  if (flyerPreparedImageCache.has(image)) return flyerPreparedImageCache.get(image);
-  let result = image;
-  try {
-    result = flyerRemoveConnectedBackground(image);
-  } catch (error) {
-    console.warn("Não foi possível tratar a imagem do produto; usando o arquivo original.", error);
-  }
-  flyerPreparedImageCache.set(image, result);
-  return result;
-}
 function flyerDrawDecoration(ctx, layout) {
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
@@ -26909,9 +26717,8 @@ async function updateFlyerPreview() {
   ]);
   if (requestId !== flyerPreviewRequest) return;
   const ctx = canvas.getContext("2d");
-  const preparedImages = assets.slice(1).map((image) => flyerPrepareProductImage(image));
-  drawFlyerCanvas(ctx, data, client, items, preparedImages, assets[0], flyerLayout());
-  if ($("flyerPreviewMeta")) $("flyerPreviewMeta").textContent = items.length + " de " + FLYER_MAX_ITEMS + " itens • fundo tratado no navegador";
+  drawFlyerCanvas(ctx, data, client, items, assets.slice(1), assets[0], flyerLayout());
+  if ($("flyerPreviewMeta")) $("flyerPreviewMeta").textContent = items.length + " de " + FLYER_MAX_ITEMS + " itens • 1080 × 1350 px";
   if ($("flyerDownload")) $("flyerDownload").disabled = !items.length;
 }
 
@@ -26996,7 +26803,7 @@ function renderFlyerView() {
     FLYER_LAYOUTS.map((layout) => '<button type="button" data-flyer-layout="' + layout.key + '" class="flyer-layout-card layout-' + layout.variant + ' ' + (state.flyerLayout === layout.key ? "active" : "") + '" style="--flyer-bg:' + layout.bg + ';--flyer-panel:' + layout.panel + ';--flyer-primary:' + layout.primary + ';--flyer-accent:' + layout.accent + '"><span><i></i><b></b><em></em></span><strong>' + escapeHtml(layout.nome) + '</strong><small>' + escapeHtml(layout.descricao) + '</small><i class="fa-solid fa-circle-check"></i></button>').join(""),
     '</div></section>',
     '<section class="panel-card flyer-step"><div class="post-art-step-title"><span>4</span><div><strong>Texto e preços</strong><small>Esses ajustes alteram somente a imagem gerada.</small></div></div><div class="flyer-fields"><label class="wide">Título do encarte<input id="flyerTitle" maxlength="55" value="' + escapeAttr(state.flyerTitle) + '"></label><label class="wide">Frase de apoio<input id="flyerSubtitle" maxlength="90" value="' + escapeAttr(state.flyerSubtitle) + '"></label><label class="check-row wide"><input id="flyerShowPrices" type="checkbox" ' + (state.flyerShowPrices ? "checked" : "") + '> Mostrar os preços dos itens no encarte</label></div></section>',
-    '</div><aside class="panel-card flyer-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span id="flyerPreviewMeta">' + selectedCount + ' de ' + FLYER_MAX_ITEMS + ' itens • 1080 × 1350 px</span></div><span class="post-art-live"><i></i> Ao vivo</span></div><div class="flyer-canvas-shell"><canvas id="flyerCanvas" width="1080" height="1350" aria-label="Prévia do encarte"></canvas></div><button id="flyerDownload" type="button" class="post-art-download" ' + (!selectedCount ? "disabled" : "") + '><i class="fa-solid fa-download"></i> Baixar encarte em PNG</button><p class="post-art-preview-note flyer-treatment-note"><i class="fa-solid fa-wand-magic-sparkles"></i> As imagens são tratadas no seu navegador: fundos uniformes são removidos, o produto é recortado e centralizado. Quando não for seguro remover, a foto original é preservada.</p></aside></section>'
+    '</div><aside class="panel-card flyer-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span id="flyerPreviewMeta">' + selectedCount + ' de ' + FLYER_MAX_ITEMS + ' itens • 1080 × 1350 px</span></div><span class="post-art-live"><i></i> Ao vivo</span></div><div class="flyer-canvas-shell"><canvas id="flyerCanvas" width="1080" height="1350" aria-label="Prévia do encarte"></canvas></div><button id="flyerDownload" type="button" class="post-art-download" ' + (!selectedCount ? "disabled" : "") + '><i class="fa-solid fa-download"></i> Baixar encarte em PNG</button><p class="post-art-preview-note"><i class="fa-solid fa-circle-info"></i> A logo, as imagens originais, descrições e preços vêm do cadastro atual do cliente.</p></aside></section>'
   ].join("");
 
   $("flyerClient")?.addEventListener("change", (event) => {
