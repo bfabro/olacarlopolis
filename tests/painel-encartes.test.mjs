@@ -33,8 +33,8 @@ test("encarte oferece seis layouts, identidade do comércio e exportação PNG",
   assert.match(panelJs, /carregarImagemCanvas\(flyerItemImage\(item\)\)/);
   assert.match(panelJs, /canvasParaBlob\(canvas\)/);
   assert.match(panelJs, /baixarBlobCanvas\(blob, "encarte-"/);
-  assert.match(panelHtml, /painel\.css\?v=572/);
-  assert.match(panelHtml, /painel\.js\?v=874/);
+  assert.match(panelHtml, /painel\.css\?v=573/);
+  assert.match(panelHtml, /painel\.js\?v=875/);
 });
 
 test("seis modelos reproduzem composições profissionais usando os dados reais do cliente", () => {
@@ -55,6 +55,20 @@ test("seis modelos reproduzem composições profissionais usando os dados reais 
   assert.match(panelJs, /client\?\.nome \|\| "Nome do seu negócio"/);
   assert.match(panelJs, /telefoneArteAdmin\(client\?\.whatsapp/);
   assert.match(panelJs, /items\.slice\(0, Math\.min\(10, FLYER_MAX_ITEMS\)\)/);
+});
+test("imagens são tratadas localmente com remoção segura de fundo e fallback", () => {
+  assert.match(panelJs, /const flyerPreparedImageCache = new WeakMap\(\)/);
+  assert.match(panelJs, /function flyerBorderBackground\(/);
+  assert.match(panelJs, /function flyerBorderMatchRatio\(/);
+  assert.match(panelJs, /function flyerRemoveConnectedBackground\(/);
+  assert.match(panelJs, /const queue = new Int32Array\(totalPixels\)/);
+  assert.match(panelJs, /removedRatio < \.06 \|\| removedRatio > \.96/);
+  assert.match(panelJs, /shadowColor = "rgba\(8,20,35,\.24\)"/);
+  assert.match(panelJs, /function flyerPrepareProductImage\(/);
+  assert.match(panelJs, /usando o arquivo original/);
+  assert.match(panelJs, /assets\.slice\(1\)\.map\(\(image\) => flyerPrepareProductImage\(image\)\)/);
+  assert.match(panelJs, /fundos uniformes são removidos, o produto é recortado e centralizado/);
+  assert.match(panelCss, /\.flyer-treatment-note\{/);
 });
 test("gerador de encartes tem composição responsiva e prévia em formato 4 por 5", () => {
   assert.match(panelCss, /\.flyer-workspace/);

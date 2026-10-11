@@ -41,14 +41,14 @@ test("gravação em massa é atômica, mantém o último valor e registra histó
 test("promoção incompatível é encerrada e versões globais são atualizadas", () => {
   assert.match(panelJs, /promotion\.preco >= price/);
   assert.match(panelJs, /updates\[`\$\{base\}\/promocao`\] = null/);
-  assert.match(panelHtml, /painel\.css\?v=572/);
-  assert.match(panelHtml, /painel\.js\?v=874/);
-  assert.match(panelJs, /numero: 867/);
-  assert.match(panelJs, /label: "v874"/);
+  assert.match(panelHtml, /painel\.css\?v=573/);
+  assert.match(panelHtml, /painel\.js\?v=875/);
+  assert.match(panelJs, /numero: 868/);
+  assert.match(panelJs, /label: "v875"/);
   assert.match(panelJs, /data: "2026-10-11"/);
-  assert.match(indexHtml, /style\.css\?v=581/);
-  assert.match(indexHtml, /ola-pesca\.js\?v=91/);
-  assert.match(indexHtml, /script\.js\?v=781/);
-  assert.match(fishingJs, /FISHING_MAP_VERSION=91/);
-  assert.match(serviceWorker, /2026-10-11-pesque-solte-v921/);
+  assert.match(indexHtml, /style\.css\?v=582/);
+  assert.match(indexHtml, /ola-pesca\.js\?v=92/);
+  assert.match(indexHtml, /script\.js\?v=782/);
+  assert.match(fishingJs, /FISHING_MAP_VERSION=92/);
+  assert.match(serviceWorker, /2026-10-11-pesque-solte-v922/);
 });
