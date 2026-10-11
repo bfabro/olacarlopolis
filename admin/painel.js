@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 865,
-  label: "v872",
-  data: "2026-10-10",
-  nota: "O site público agora destaca no Acesso rápido a quantidade de promoções novas ou reativadas."
+  numero: 866,
+  label: "v873",
+  data: "2026-10-11",
+  nota: "O painel agora gera encartes de produtos e promoções com até 10 itens, preços opcionais e seis layouts."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -380,6 +380,14 @@ let state = {
   postArtLayout: "produto-minimal",
   postArtFormat: "feed",
   postArtCustomImage: "",
+  flyerClientId: "",
+  flyerType: "produto",
+  flyerLayout: "catalogo",
+  flyerSelectedIds: new Set(),
+  flyerSelectionContext: "",
+  flyerShowPrices: true,
+  flyerTitle: "",
+  flyerSubtitle: "",
   selectedAutomovelArtId: "",
   selectedAutomovelArtIds: new Set(),
   selectedAutomovelArtLayout: "showroom",
@@ -869,6 +877,7 @@ function updateClientShortDescriptionCount() {
 const views = {
   dashboard: $("dashboardView"),
   artesPostagem: $("artesPostagemView"),
+  encartes: $("encartesView"),
   clientes: $("clientesView"),
   acompanhamentoClientes: $("acompanhamentoClientesView"),
   promocoesClientes: $("promocoesClientesView"),
@@ -909,6 +918,7 @@ const views = {
 const viewCopy = {
   dashboard: ["Visao geral", "Resumo do ambiente administrativo."],
   artesPostagem: ["Gerar postagem", "Crie postagens de produtos, promocoes e servicos com previa antes de baixar."],
+  encartes: ["Gerar encarte", "Monte encartes de produtos e promoções com até 10 itens e seis opções de layout."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   acompanhamentoClientes: ["Acompanhamento de clientes", "Organize postagens, acessos, visitas e próximos passos de cada cliente."],
   promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
@@ -1313,7 +1323,7 @@ function canAccessView(viewName) {
   if (viewName === "produtosServicosClientes") return canManageClients();
   if (viewName === "notaFalecimento") return canManageDeathNotices();
   if (viewName === "gruposWhatsapp") return canManageWhatsappGroups();
-  if (viewName === "artesPostagem") {
+  if (viewName === "artesPostagem" || viewName === "encartes") {
     return !isBenefitPartner() && (canManageClients() || hasPermission("gerar_imagens_promocoes"));
   }
   if (viewName === "relatorioExclusoes") return isMaster();
@@ -10358,6 +10368,7 @@ function switchView(name) {
     renderClientOnlyEditor();
   }
   if (target === "artesPostagem") renderPostArtView();
+  if (target === "encartes") renderFlyerView();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
   if (target === "acompanhamentoClientes") {
@@ -26311,6 +26322,337 @@ function renderPostArtView() {
   ["postArtBannerX", "postArtBannerY"].forEach((id) => $(id)?.addEventListener("input", agendarPreviaPostArt));
   preencherFormularioPostArt();
   atualizarPreviaPostArt();
+}
+const FLYER_LAYOUTS = [
+  { key: "catalogo", nome: "Catálogo moderno", descricao: "Azul, branco e cartões organizados", bg: "#eef5ff", panel: "#ffffff", primary: "#1457a6", accent: "#ffb703", ink: "#102a43", variant: 0 },
+  { key: "oferta", nome: "Oferta vibrante", descricao: "Vermelho e amarelo para promoções", bg: "#fff4df", panel: "#fffdf7", primary: "#c81d25", accent: "#ffd23f", ink: "#5d1116", variant: 1 },
+  { key: "premium", nome: "Premium", descricao: "Preto e dourado com visual elegante", bg: "#101114", panel: "#1d1f24", primary: "#d4a84f", accent: "#f5df9b", ink: "#ffffff", variant: 2, dark: true },
+  { key: "natural", nome: "Natural", descricao: "Verde e creme para um visual leve", bg: "#edf5eb", panel: "#fbfff9", primary: "#276749", accent: "#b7d36b", ink: "#173d2d", variant: 3 },
+  { key: "oceano", nome: "Oceano", descricao: "Azul intenso com detalhes em ciano", bg: "#e8f7fb", panel: "#f9feff", primary: "#006d8f", accent: "#54d2d2", ink: "#073b4c", variant: 4 },
+  { key: "mosaico", nome: "Mosaico criativo", descricao: "Roxo, rosa e blocos alternados", bg: "#f4efff", panel: "#fffaff", primary: "#6d3cc7", accent: "#f08bb4", ink: "#3f246d", variant: 5 }
+];
+const FLYER_MAX_ITEMS = 10;
+let flyerPreviewTimer = null;
+let flyerPreviewRequest = 0;
+
+function flyerClients() {
+  return postArtClients();
+}
+
+function flyerCurrentClient() {
+  const clients = flyerClients();
+  const requested = canManageClients() ? state.flyerClientId : currentClientId();
+  return clients.find((client) => client.id === requested) || clients[0] || null;
+}
+
+function flyerItems(client = flyerCurrentClient(), type = state.flyerType) {
+  const items = type === "promocao" ? normalizePromocoes(client?.promocoes) : normalizeProdutos(client?.produtos);
+  return items.filter((item) => item.ativo !== false && item.status !== "inativo");
+}
+
+function flyerItemImage(item = {}) {
+  return normalizarImagemArteAdmin(item.imagem || item.imagens?.[0] || "");
+}
+
+function flyerItemDescription(item = {}, type = state.flyerType) {
+  const value = type === "promocao"
+    ? (item.obs || item.desconto || item.instagramMensagem || item.descricao || "Oferta especial por tempo limitado.")
+    : (item.descricao || item.observacoes || [item.marca, item.modelo, item.tamanho, item.disponibilidade].filter(Boolean).join(" • ") || "Produto disponível.");
+  return textoCurtoArte(value, 92);
+}
+
+function flyerLayout() {
+  return FLYER_LAYOUTS.find((layout) => layout.key === state.flyerLayout) || FLYER_LAYOUTS[0];
+}
+
+function flyerEnsureSelection(client, items) {
+  const context = String(client?.id || "") + "|" + state.flyerType;
+  const validIds = new Set(items.map((item) => String(item.id)));
+  if (state.flyerSelectionContext !== context) {
+    state.flyerSelectionContext = context;
+    state.flyerSelectedIds = new Set(items.slice(0, Math.min(6, FLYER_MAX_ITEMS)).map((item) => String(item.id)));
+    state.flyerTitle = state.flyerType === "promocao" ? "Ofertas especiais" : "Produtos em destaque";
+    state.flyerSubtitle = state.flyerType === "promocao" ? "Aproveite enquanto durarem os estoques" : "Escolhas preparadas para você";
+    return;
+  }
+  state.flyerSelectedIds = new Set([...state.flyerSelectedIds].filter((id) => validIds.has(String(id))).slice(0, FLYER_MAX_ITEMS));
+}
+
+function flyerSelectedItems(client = flyerCurrentClient()) {
+  return flyerItems(client).filter((item) => state.flyerSelectedIds.has(String(item.id))).slice(0, FLYER_MAX_ITEMS);
+}
+
+function flyerFormData() {
+  return {
+    title: $("flyerTitle")?.value.trim() || (state.flyerType === "promocao" ? "Ofertas especiais" : "Produtos em destaque"),
+    subtitle: $("flyerSubtitle")?.value.trim() || "",
+    showPrices: $("flyerShowPrices")?.checked !== false
+  };
+}
+
+function flyerDrawDecoration(ctx, layout) {
+  const w = ctx.canvas.width;
+  const h = ctx.canvas.height;
+  const gradient = ctx.createLinearGradient(0, 0, w, h);
+  gradient.addColorStop(0, layout.bg);
+  gradient.addColorStop(1, layout.dark ? "#252832" : layout.panel);
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, w, h);
+  ctx.globalAlpha = layout.dark ? .15 : .12;
+  ctx.fillStyle = layout.accent;
+  if (layout.variant === 1) {
+    ctx.beginPath(); ctx.arc(1000, 30, 280, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(30, 1320, 210, 0, Math.PI * 2); ctx.fill();
+  } else if (layout.variant === 2) {
+    for (let x = -100; x < 1200; x += 170) {
+      ctx.save(); ctx.translate(x, 0); ctx.rotate(-.18); ctx.fillRect(0, 0, 44, h + 240); ctx.restore();
+    }
+  } else if (layout.variant === 3) {
+    for (let i = 0; i < 7; i += 1) {
+      ctx.beginPath(); ctx.ellipse(80 + i * 180, 100 + (i % 2) * 1120, 110, 42, -.35, 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (layout.variant === 4) {
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, 0); ctx.lineTo(w, 125); ctx.lineTo(0, 195); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(w, h); ctx.lineTo(w, h - 130); ctx.lineTo(0, h - 70); ctx.closePath(); ctx.fill();
+  } else if (layout.variant === 5) {
+    for (let y = 0; y < h; y += 180) {
+      for (let x = 0; x < w; x += 180) {
+        if ((x / 180 + y / 180) % 2 === 0) ctx.fillRect(x, y, 90, 90);
+      }
+    }
+  } else {
+    ctx.beginPath(); ctx.arc(1010, 40, 250, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+}
+
+function flyerDrawHeader(ctx, data, client, logo, layout) {
+  const dark = Boolean(layout.dark);
+  const headerFill = layout.variant === 1 || layout.variant === 4 ? layout.primary : (dark ? "rgba(7,8,11,.86)" : "rgba(255,255,255,.93)");
+  preencherRoundRect(ctx, 34, 28, 1012, 158, 28, headerFill);
+  desenharBordaRoundRect(ctx, 34, 28, 1012, 158, 28, layout.accent, layout.variant === 2 ? 3 : 2);
+  if (logo) desenharImagemContain(ctx, logo, 54, 47, 118, 118, 19, "rgba(255,255,255,.96)");
+  const lightHeader = layout.variant === 1 || layout.variant === 4 || dark;
+  const titleColor = lightHeader ? "#ffffff" : layout.ink;
+  const detailColor = lightHeader ? "rgba(255,255,255,.82)" : layout.primary;
+  postArtDrawText(ctx, client?.nome || "Sua empresa", 196, 47, 500, 1, 28, detailColor, { min: 17, weight: 800 });
+  postArtDrawText(ctx, data.title, 196, 82, 650, 2, 42, titleColor, { min: 24, lineHeight: 43 });
+  if (data.subtitle) postArtDrawText(ctx, data.subtitle, 196, 142, 650, 1, 18, detailColor, { min: 12, weight: 700 });
+  preencherRoundRect(ctx, 864, 56, 150, 78, 20, layout.accent);
+  postArtDrawText(ctx, state.flyerType === "promocao" ? "OFERTAS" : "ENCARTE", 939, 80, 126, 2, 22, layout.dark ? "#15120a" : "#18202c", { min: 13, align: "center", blockHeight: 40 });
+}
+
+function flyerDrawCard(ctx, item, image, card, index, data, layout) {
+  const dark = Boolean(layout.dark);
+  const alternate = layout.variant === 5 && index % 2 === 1;
+  const cardFill = alternate ? layout.primary : layout.panel;
+  const cardInk = alternate ? "#ffffff" : layout.ink;
+  preencherRoundRect(ctx, card.x, card.y, card.w, card.h, 22, cardFill);
+  desenharBordaRoundRect(ctx, card.x, card.y, card.w, card.h, 22, alternate ? layout.accent : (dark ? layout.primary : "rgba(20,54,88,.14)"), layout.variant === 2 ? 3 : 2);
+
+  const imageW = Math.min(card.w * .37, Math.max(112, card.h - 28));
+  const imageH = Math.max(96, card.h - 28);
+  const imageRight = layout.variant === 1 || (layout.variant === 3 && index % 2 === 1);
+  const imageX = imageRight ? card.x + card.w - imageW - 14 : card.x + 14;
+  const imageRadius = layout.variant === 2 ? Math.min(52, imageH / 2) : 16;
+  postArtDrawPhoto(ctx, image, { x: imageX, y: card.y + 14, w: imageW, h: imageH }, "contain", imageRadius, "#ffffff");
+  desenharBordaRoundRect(ctx, imageX, card.y + 14, imageW, imageH, imageRadius, alternate ? "rgba(255,255,255,.45)" : layout.accent, 2);
+
+  const textX = imageRight ? card.x + 18 : imageX + imageW + 18;
+  const textRight = imageRight ? imageX - 14 : card.x + card.w - 18;
+  const textW = Math.max(100, textRight - textX);
+  const titleSize = card.h < 220 ? 23 : 29;
+  postArtDrawText(ctx, item.titulo || item.nome || "Item", textX, card.y + 22, textW, 2, titleSize, cardInk, { min: 16, lineHeight: titleSize + 2 });
+  const descriptionY = card.y + (card.h < 220 ? 78 : 92);
+  const priceSpace = data.showPrices ? 54 : 12;
+  postArtDrawText(ctx, flyerItemDescription(item), textX, descriptionY, textW, 3, card.h < 220 ? 15 : 18, alternate ? "rgba(255,255,255,.82)" : (dark ? "#d5d8df" : "#5f6f82"), { min: 11, weight: 600, lineHeight: card.h < 220 ? 18 : 22, blockHeight: Math.max(34, card.h - (descriptionY - card.y) - priceSpace) });
+
+  if (data.showPrices) {
+    const price = String(item.preco || "").trim();
+    const priceText = price ? postArtMoney(price) : "CONSULTE";
+    const pillW = Math.min(textW, Math.max(126, priceText.length * 17 + 34));
+    preencherRoundRect(ctx, textX, card.y + card.h - 50, pillW, 36, 18, alternate ? layout.accent : layout.primary);
+    postArtDrawText(ctx, priceText, textX + pillW / 2, card.y + card.h - 42, pillW - 18, 1, 20, alternate && !layout.dark ? layout.ink : "#ffffff", { min: 13, align: "center", weight: 900 });
+  }
+
+  preencherRoundRect(ctx, card.x + card.w - 42, card.y + 10, 30, 30, 15, layout.accent);
+  postArtDrawText(ctx, String(index + 1).padStart(2, "0"), card.x + card.w - 27, card.y + 18, 24, 1, 12, "#1d2430", { min: 9, align: "center" });
+}
+
+function flyerDrawFooter(ctx, client, layout) {
+  const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte a empresa";
+  const instagram = String(client?.instagram || "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
+  preencherRoundRect(ctx, 34, 1252, 1012, 70, 24, layout.primary);
+  postArtDrawText(ctx, phone, 60, 1271, 450, 1, 20, "#ffffff", { min: 13, weight: 800 });
+  postArtDrawText(ctx, instagram || "Compre no comércio local", 1020, 1271, 450, 1, 19, layout.dark ? layout.accent : "#ffffff", { min: 12, align: "right", weight: 800 });
+}
+
+function drawFlyerCanvas(ctx, data, client, items, images, logo, layout) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  flyerDrawDecoration(ctx, layout);
+  flyerDrawHeader(ctx, data, client, logo, layout);
+  if (!items.length) {
+    postArtDrawText(ctx, "Selecione até 10 itens para montar o encarte.", 540, 610, 820, 2, 34, layout.ink, { min: 20, align: "center", blockHeight: 90 });
+    flyerDrawFooter(ctx, client, layout);
+    return;
+  }
+  const columns = items.length === 1 ? 1 : 2;
+  const rows = Math.ceil(items.length / columns);
+  const gap = 14;
+  const bodyTop = 214;
+  const bodyBottom = 1232;
+  const areaHeight = bodyBottom - bodyTop;
+  const cardW = columns === 1 ? 820 : (1012 - gap) / 2;
+  const cardH = Math.min(items.length <= 2 ? 500 : 310, (areaHeight - gap * (rows - 1)) / rows);
+  const gridHeight = cardH * rows + gap * (rows - 1);
+  const startY = bodyTop + Math.max(0, (areaHeight - gridHeight) / 2);
+  items.forEach((item, index) => {
+    const row = Math.floor(index / columns);
+    const col = index % columns;
+    const x = columns === 1 ? (1080 - cardW) / 2 : 34 + col * (cardW + gap);
+    const y = startY + row * (cardH + gap);
+    flyerDrawCard(ctx, item, images[index], { x, y, w: cardW, h: cardH }, index, data, layout);
+  });
+  flyerDrawFooter(ctx, client, layout);
+}
+
+async function updateFlyerPreview() {
+  const canvas = $("flyerCanvas");
+  const client = flyerCurrentClient();
+  if (!canvas || !client) return;
+  const items = flyerSelectedItems(client);
+  const data = flyerFormData();
+  state.flyerTitle = data.title;
+  state.flyerSubtitle = data.subtitle;
+  state.flyerShowPrices = data.showPrices;
+  const requestId = ++flyerPreviewRequest;
+  const assets = await Promise.all([
+    carregarImagemCanvas(logoClienteImovelAdmin(client)),
+    ...items.map((item) => carregarImagemCanvas(flyerItemImage(item)))
+  ]);
+  if (requestId !== flyerPreviewRequest) return;
+  const ctx = canvas.getContext("2d");
+  drawFlyerCanvas(ctx, data, client, items, assets.slice(1), assets[0], flyerLayout());
+  if ($("flyerPreviewMeta")) $("flyerPreviewMeta").textContent = items.length + " de " + FLYER_MAX_ITEMS + " itens • 1080 × 1350 px";
+  if ($("flyerDownload")) $("flyerDownload").disabled = !items.length;
+}
+
+function scheduleFlyerPreview() {
+  window.clearTimeout(flyerPreviewTimer);
+  flyerPreviewTimer = window.setTimeout(updateFlyerPreview, 160);
+}
+
+function flyerRefreshSelectionUi() {
+  const count = state.flyerSelectedIds.size;
+  if ($("flyerSelectedCount")) $("flyerSelectedCount").textContent = count + "/" + FLYER_MAX_ITEMS + " selecionados";
+  document.querySelectorAll("[data-flyer-item]").forEach((card) => {
+    const input = card.querySelector("input");
+    card.classList.toggle("selected", Boolean(input?.checked));
+  });
+  scheduleFlyerPreview();
+}
+
+async function downloadFlyer() {
+  const canvas = $("flyerCanvas");
+  const client = flyerCurrentClient();
+  const items = flyerSelectedItems(client);
+  if (!canvas || !client || !items.length) return showToast("Selecione ao menos um item para gerar o encarte.");
+  const button = $("flyerDownload");
+  if (button) button.disabled = true;
+  try {
+    window.clearTimeout(flyerPreviewTimer);
+    await updateFlyerPreview();
+    const blob = await canvasParaBlob(canvas);
+    baixarBlobCanvas(blob, "encarte-" + state.flyerType + "-" + slugify(client.nome || client.id) + "-" + flyerLayout().key + ".png");
+    showToast("Encarte gerado em PNG.");
+  } catch (error) {
+    console.error("Falha ao gerar encarte.", error);
+    showToast("Não foi possível gerar o encarte.");
+  } finally {
+    if (button) button.disabled = false;
+  }
+}
+
+function renderFlyerView() {
+  const mount = $("flyerMount");
+  if (!mount) return;
+  const clients = flyerClients();
+  if (!clients.length) {
+    mount.innerHTML = '<section class="panel-card"><div class="empty-state">Nenhuma empresa vinculada a este acesso.</div></section>';
+    return;
+  }
+  const client = flyerCurrentClient();
+  state.flyerClientId = client.id;
+  if (!["produto", "promocao"].includes(state.flyerType)) state.flyerType = "produto";
+  const items = flyerItems(client);
+  flyerEnsureSelection(client, items);
+  if (!FLYER_LAYOUTS.some((layout) => layout.key === state.flyerLayout)) state.flyerLayout = FLYER_LAYOUTS[0].key;
+  const selectedCount = state.flyerSelectedIds.size;
+  const logo = displayImageUrl(logoClienteImovelAdmin(client)) || "../images/img_padrao_site/logo_1.png";
+  const typeLabel = state.flyerType === "promocao" ? "promoções" : "produtos";
+
+  const itemCards = items.length ? items.map((item) => {
+    const id = String(item.id);
+    const selected = state.flyerSelectedIds.has(id);
+    const image = displayImageUrl(flyerItemImage(item));
+    return '<label class="flyer-item-card ' + (selected ? "selected" : "") + '" data-flyer-item="' + escapeAttr(id) + '">' +
+      '<input type="checkbox" value="' + escapeAttr(id) + '" ' + (selected ? "checked" : "") + '>' +
+      (image ? '<img src="' + escapeAttr(image) + '" alt="' + escapeAttr(item.titulo || item.nome || "Item") + '" ' + lazyImageAttrs() + ' ' + imageFallbackAttr() + '>' : '<span class="flyer-item-placeholder"><i class="fa-solid fa-image"></i></span>') +
+      '<span class="flyer-item-copy"><strong>' + escapeHtml(item.titulo || item.nome || "Item") + '</strong><small>' + escapeHtml(flyerItemDescription(item)) + '</small><b>' + escapeHtml(item.preco ? postArtMoney(item.preco) : "Sem preço cadastrado") + '</b></span>' +
+      '<i class="fa-solid fa-circle-check"></i></label>';
+  }).join("") : '<div class="post-art-empty"><i class="fa-solid fa-circle-info"></i> Nenhum ' + typeLabel + ' cadastrado para este comércio.</div>';
+
+  mount.innerHTML = [
+    '<section class="panel-card flyer-hero"><div class="section-head"><div><span class="feature-kicker">Encarte do comércio</span><h2>Gerar encarte de produtos e promoções</h2><p>Escolha até 10 itens cadastrados e baixe uma imagem pronta com a identidade do cliente.</p></div><span class="badge"><i class="fa-solid fa-image"></i> PNG 1080 × 1350</span></div>',
+    canManageClients()
+      ? '<label class="post-art-client-select">Cliente<select id="flyerClient">' + clients.map((item) => '<option value="' + escapeAttr(item.id) + '" ' + (item.id === client.id ? "selected" : "") + '>' + escapeHtml(item.nome || item.id) + '</option>').join("") + '</select></label>'
+      : '<div class="post-art-client-identity"><img src="' + escapeAttr(logo) + '" alt=""><div><span>Encarte de</span><strong>' + escapeHtml(client.nome || client.id) + '</strong></div></div>',
+    '</section>',
+    '<section class="flyer-workspace"><div class="flyer-editor-column">',
+    '<section class="panel-card flyer-step"><div class="post-art-step-title"><span>1</span><div><strong>Tipo de encarte</strong><small>Os itens são carregados diretamente do cadastro do comércio.</small></div></div><div class="flyer-type-toggle">',
+    '<button type="button" data-flyer-type="produto" class="' + (state.flyerType === "produto" ? "active" : "") + '"><i class="fa-solid fa-box-open"></i><strong>Produtos</strong><span>Itens da vitrine</span></button>',
+    '<button type="button" data-flyer-type="promocao" class="' + (state.flyerType === "promocao" ? "active" : "") + '"><i class="fa-solid fa-tags"></i><strong>Promoções</strong><span>Ofertas cadastradas</span></button>',
+    '</div></section>',
+    '<section class="panel-card flyer-step"><div class="flyer-selection-head"><div class="post-art-step-title"><span>2</span><div><strong>Escolha os itens</strong><small>Selecione no máximo 10 ' + typeLabel + '.</small></div></div><b id="flyerSelectedCount">' + selectedCount + '/' + FLYER_MAX_ITEMS + ' selecionados</b></div><div class="flyer-items-grid">' + itemCards + '</div></section>',
+    '<section class="panel-card flyer-step"><div class="post-art-step-title"><span>3</span><div><strong>Layout do encarte</strong><small>Seis composições diferentes para escolher.</small></div></div><div class="flyer-layout-grid">',
+    FLYER_LAYOUTS.map((layout) => '<button type="button" data-flyer-layout="' + layout.key + '" class="flyer-layout-card layout-' + layout.variant + ' ' + (state.flyerLayout === layout.key ? "active" : "") + '" style="--flyer-bg:' + layout.bg + ';--flyer-panel:' + layout.panel + ';--flyer-primary:' + layout.primary + ';--flyer-accent:' + layout.accent + '"><span><i></i><b></b><em></em></span><strong>' + escapeHtml(layout.nome) + '</strong><small>' + escapeHtml(layout.descricao) + '</small><i class="fa-solid fa-circle-check"></i></button>').join(""),
+    '</div></section>',
+    '<section class="panel-card flyer-step"><div class="post-art-step-title"><span>4</span><div><strong>Texto e preços</strong><small>Esses ajustes alteram somente a imagem gerada.</small></div></div><div class="flyer-fields"><label class="wide">Título do encarte<input id="flyerTitle" maxlength="55" value="' + escapeAttr(state.flyerTitle) + '"></label><label class="wide">Frase de apoio<input id="flyerSubtitle" maxlength="90" value="' + escapeAttr(state.flyerSubtitle) + '"></label><label class="check-row wide"><input id="flyerShowPrices" type="checkbox" ' + (state.flyerShowPrices ? "checked" : "") + '> Mostrar os preços dos itens no encarte</label></div></section>',
+    '</div><aside class="panel-card flyer-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span id="flyerPreviewMeta">' + selectedCount + ' de ' + FLYER_MAX_ITEMS + ' itens • 1080 × 1350 px</span></div><span class="post-art-live"><i></i> Ao vivo</span></div><div class="flyer-canvas-shell"><canvas id="flyerCanvas" width="1080" height="1350" aria-label="Prévia do encarte"></canvas></div><button id="flyerDownload" type="button" class="post-art-download" ' + (!selectedCount ? "disabled" : "") + '><i class="fa-solid fa-download"></i> Baixar encarte em PNG</button><p class="post-art-preview-note"><i class="fa-solid fa-circle-info"></i> A logo, as imagens, descrições e preços vêm do cadastro atual do cliente.</p></aside></section>'
+  ].join("");
+
+  $("flyerClient")?.addEventListener("change", (event) => {
+    state.flyerClientId = event.target.value;
+    state.flyerSelectionContext = "";
+    renderFlyerView();
+  });
+  mount.querySelectorAll("[data-flyer-type]").forEach((button) => button.addEventListener("click", () => {
+    state.flyerType = button.dataset.flyerType;
+    state.flyerSelectionContext = "";
+    renderFlyerView();
+  }));
+  mount.querySelectorAll("[data-flyer-item] input").forEach((input) => input.addEventListener("change", (event) => {
+    const id = String(event.currentTarget.value);
+    if (event.currentTarget.checked && state.flyerSelectedIds.size >= FLYER_MAX_ITEMS) {
+      event.currentTarget.checked = false;
+      showToast("O encarte aceita no máximo 10 itens.");
+      return;
+    }
+    if (event.currentTarget.checked) state.flyerSelectedIds.add(id);
+    else state.flyerSelectedIds.delete(id);
+    flyerRefreshSelectionUi();
+  }));
+  mount.querySelectorAll("[data-flyer-layout]").forEach((button) => button.addEventListener("click", () => {
+    state.flyerLayout = button.dataset.flyerLayout;
+    mount.querySelectorAll("[data-flyer-layout]").forEach((item) => item.classList.toggle("active", item === button));
+    scheduleFlyerPreview();
+  }));
+  ["flyerTitle", "flyerSubtitle", "flyerShowPrices"].forEach((id) => {
+    $(id)?.addEventListener("input", scheduleFlyerPreview);
+    $(id)?.addEventListener("change", scheduleFlyerPreview);
+  });
+  $("flyerDownload")?.addEventListener("click", downloadFlyer);
+  updateFlyerPreview();
 }
 function renderStaffPromocoesView() {
   const mount = $("staffPromocoesMount");

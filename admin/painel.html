@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=570">
+  <link rel="stylesheet" href="painel.css?v=571">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -74,6 +74,7 @@
         <section class="nav-admin-group nav-theme-creation" data-post-art-nav-group="true">
           <span class="nav-admin-group-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Criar e divulgar</span>
           <button data-view="artesPostagem" data-post-art-nav="true"><i class="fa-solid fa-wand-magic-sparkles"></i> Gerar postagem</button>
+          <button data-view="encartes" data-post-art-nav="true"><i class="fa-solid fa-table-cells-large"></i> Gerar encarte</button>
           <button data-view="storiesComerciais" data-master="true"><i class="fa-solid fa-mobile-screen-button"></i> Stories comerciais</button>
         </section>
         <section class="nav-admin-group nav-theme-registry" data-role="staff">
@@ -2532,6 +2533,10 @@
         <div id="postArtMount"></div>
       </section>
 
+      <section id="encartesView" class="panel-view hidden">
+        <div id="flyerMount"></div>
+      </section>
+
       <section id="imoveisArtesView" class="panel-view hidden">
         <section class="panel-card imovel-art-screen-card" data-permission="gerar_imagens_imoveis">
           <div class="section-head">
@@ -3595,6 +3600,6 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=872"></script>
+  <script type="module" src="painel.js?v=873"></script>
 </body>
 </html>
