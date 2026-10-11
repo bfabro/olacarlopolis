@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 866,
-  label: "v873",
+  numero: 867,
+  label: "v874",
   data: "2026-10-11",
-  nota: "O painel agora gera encartes de produtos e promoções com até 10 itens, preços opcionais e seis layouts."
+  nota: "Os seis modelos de encarte agora seguem composições profissionais e usam os dados cadastrados de cada cliente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -26324,12 +26324,12 @@ function renderPostArtView() {
   atualizarPreviaPostArt();
 }
 const FLYER_LAYOUTS = [
-  { key: "catalogo", nome: "Catálogo moderno", descricao: "Azul, branco e cartões organizados", bg: "#eef5ff", panel: "#ffffff", primary: "#1457a6", accent: "#ffb703", ink: "#102a43", variant: 0 },
-  { key: "oferta", nome: "Oferta vibrante", descricao: "Vermelho e amarelo para promoções", bg: "#fff4df", panel: "#fffdf7", primary: "#c81d25", accent: "#ffd23f", ink: "#5d1116", variant: 1 },
-  { key: "premium", nome: "Premium", descricao: "Preto e dourado com visual elegante", bg: "#101114", panel: "#1d1f24", primary: "#d4a84f", accent: "#f5df9b", ink: "#ffffff", variant: 2, dark: true },
-  { key: "natural", nome: "Natural", descricao: "Verde e creme para um visual leve", bg: "#edf5eb", panel: "#fbfff9", primary: "#276749", accent: "#b7d36b", ink: "#173d2d", variant: 3 },
-  { key: "oceano", nome: "Oceano", descricao: "Azul intenso com detalhes em ciano", bg: "#e8f7fb", panel: "#f9feff", primary: "#006d8f", accent: "#54d2d2", ink: "#073b4c", variant: 4 },
-  { key: "mosaico", nome: "Mosaico criativo", descricao: "Roxo, rosa e blocos alternados", bg: "#f4efff", panel: "#fffaff", primary: "#6d3cc7", accent: "#f08bb4", ink: "#3f246d", variant: 5 }
+  { key: "catalogo", nome: "Qualidade todo dia", descricao: "Vermelho e amarelo, ideal para mercados", bg: "#f20d19", panel: "#ffffff", primary: "#e40714", accent: "#ffd326", ink: "#161616", variant: 0, eyebrow: "QUALIDADE E ECONOMIA", cta: "APROVEITE AGORA" },
+  { key: "oferta", nome: "Tecnologia premium", descricao: "Preto e dourado, ideal para eletrônicos", bg: "#07090d", panel: "#f7f7f5", primary: "#111318", accent: "#f4c642", ink: "#101318", variant: 1, dark: true, eyebrow: "TECNOLOGIA QUE TRANSFORMA", cta: "VER TODAS AS OFERTAS" },
+  { key: "premium", nome: "Ofertas relâmpago", descricao: "Vermelho e amarelo com grandes destaques", bg: "#7e0000", panel: "#fffdf5", primary: "#d60000", accent: "#ffd31a", ink: "#18100c", variant: 2, dark: true, eyebrow: "OFERTAS RELÂMPAGO", cta: "EU QUERO" },
+  { key: "natural", nome: "Tudo em um só lugar", descricao: "Azul e branco para moda e variedades", bg: "#f5f8fb", panel: "#ffffff", primary: "#1768c4", accent: "#72b9f2", ink: "#111820", variant: 3, eyebrow: "TUDO PARA O SEU ESTILO", cta: "CONFIRA MAIS OFERTAS" },
+  { key: "oceano", nome: "Mais estilo", descricao: "Bege natural com composição editorial", bg: "#f2ede3", panel: "#fffaf1", primary: "#675333", accent: "#d2b27d", ink: "#282318", variant: 4, eyebrow: "MAIS ESTILO PARA O SEU DIA", cta: "VER CATÁLOGO COMPLETO" },
+  { key: "mosaico", nome: "Festival de promoções", descricao: "Azul, roxo e amarelo com clima de campanha", bg: "#142bc9", panel: "#ffffff", primary: "#142bc9", accent: "#ffdf00", ink: "#10143d", variant: 5, dark: true, eyebrow: "FESTIVAL DE PROMOÇÕES", cta: "VER MAIS PROMOÇÕES" }
 ];
 const FLYER_MAX_ITEMS = 10;
 let flyerPreviewTimer = null;
@@ -26356,7 +26356,7 @@ function flyerItemImage(item = {}) {
 
 function flyerItemDescription(item = {}, type = state.flyerType) {
   const value = type === "promocao"
-    ? (item.obs || item.desconto || item.instagramMensagem || item.descricao || "Oferta especial por tempo limitado.")
+    ? (item.obs || item.desconto || item.instagramMensagem || item.descricao || [item.volume, item.embalagem, item.unidade].filter(Boolean).join(" • ") || "Oferta especial por tempo limitado.")
     : (item.descricao || item.observacoes || [item.marca, item.modelo, item.tamanho, item.disponibilidade].filter(Boolean).join(" • ") || "Produto disponível.");
   return textoCurtoArte(value, 92);
 }
@@ -26370,9 +26370,9 @@ function flyerEnsureSelection(client, items) {
   const validIds = new Set(items.map((item) => String(item.id)));
   if (state.flyerSelectionContext !== context) {
     state.flyerSelectionContext = context;
-    state.flyerSelectedIds = new Set(items.slice(0, Math.min(6, FLYER_MAX_ITEMS)).map((item) => String(item.id)));
-    state.flyerTitle = state.flyerType === "promocao" ? "Ofertas especiais" : "Produtos em destaque";
-    state.flyerSubtitle = state.flyerType === "promocao" ? "Aproveite enquanto durarem os estoques" : "Escolhas preparadas para você";
+    state.flyerSelectedIds = new Set(items.slice(0, Math.min(10, FLYER_MAX_ITEMS)).map((item) => String(item.id)));
+    state.flyerTitle = "";
+    state.flyerSubtitle = state.flyerType === "promocao" ? "Ofertas especiais por tempo limitado" : "Produtos selecionados para você";
     return;
   }
   state.flyerSelectedIds = new Set([...state.flyerSelectedIds].filter((id) => validIds.has(String(id))).slice(0, FLYER_MAX_ITEMS));
@@ -26383,147 +26383,331 @@ function flyerSelectedItems(client = flyerCurrentClient()) {
 }
 
 function flyerFormData() {
+  const layout = flyerLayout();
   return {
-    title: $("flyerTitle")?.value.trim() || (state.flyerType === "promocao" ? "Ofertas especiais" : "Produtos em destaque"),
+    title: $("flyerTitle")?.value.trim() || layout.eyebrow,
     subtitle: $("flyerSubtitle")?.value.trim() || "",
     showPrices: $("flyerShowPrices")?.checked !== false
   };
+}
+
+function flyerOldPrice(item = {}) {
+  return String(item.precoAntigo || item.precoAnterior || item.valorAnterior || "").trim();
+}
+
+function flyerDiscountPercent(item = {}) {
+  const oldPrice = numberFromMoney(flyerOldPrice(item));
+  const price = numberFromMoney(item.preco);
+  if (!(oldPrice > price && price > 0)) return 0;
+  return Math.max(1, Math.min(99, Math.round((oldPrice - price) * 100 / oldPrice)));
 }
 
 function flyerDrawDecoration(ctx, layout) {
   const w = ctx.canvas.width;
   const h = ctx.canvas.height;
   const gradient = ctx.createLinearGradient(0, 0, w, h);
-  gradient.addColorStop(0, layout.bg);
-  gradient.addColorStop(1, layout.dark ? "#252832" : layout.panel);
+  if (layout.variant === 0) {
+    gradient.addColorStop(0, "#ff241f");
+    gradient.addColorStop(.62, "#d4000b");
+    gradient.addColorStop(1, "#8e0004");
+  } else if (layout.variant === 1) {
+    gradient.addColorStop(0, "#05070a");
+    gradient.addColorStop(.7, "#15181e");
+    gradient.addColorStop(1, "#050608");
+  } else if (layout.variant === 2) {
+    gradient.addColorStop(0, "#3c0000");
+    gradient.addColorStop(.45, "#c00000");
+    gradient.addColorStop(1, "#ff5a00");
+  } else if (layout.variant === 3) {
+    gradient.addColorStop(0, "#ffffff");
+    gradient.addColorStop(1, "#e8f2fb");
+  } else if (layout.variant === 4) {
+    gradient.addColorStop(0, "#fffdf7");
+    gradient.addColorStop(1, "#e9dfce");
+  } else {
+    gradient.addColorStop(0, "#1229c6");
+    gradient.addColorStop(.5, "#3812a5");
+    gradient.addColorStop(1, "#6920c8");
+  }
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, w, h);
-  ctx.globalAlpha = layout.dark ? .15 : .12;
-  ctx.fillStyle = layout.accent;
-  if (layout.variant === 1) {
-    ctx.beginPath(); ctx.arc(1000, 30, 280, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.arc(30, 1320, 210, 0, Math.PI * 2); ctx.fill();
+
+  ctx.save();
+  if (layout.variant === 0) {
+    ctx.fillStyle = "#ffd326";
+    ctx.beginPath(); ctx.moveTo(0, 220); ctx.lineTo(500, 0); ctx.lineTo(720, 0); ctx.lineTo(0, 360); ctx.closePath(); ctx.fill();
+    ctx.globalAlpha = .2; ctx.fillStyle = "#ffffff";
+    for (let x = -100; x < 1100; x += 150) { ctx.save(); ctx.translate(x, 0); ctx.rotate(-.38); ctx.fillRect(0, -80, 22, 460); ctx.restore(); }
+  } else if (layout.variant === 1) {
+    ctx.strokeStyle = "rgba(244,198,66,.23)"; ctx.lineWidth = 2;
+    for (let x = -200; x < 1300; x += 120) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x + 380, 430); ctx.stroke(); }
+    ctx.fillStyle = "rgba(244,198,66,.12)"; ctx.beginPath(); ctx.arc(910, 160, 245, 0, Math.PI * 2); ctx.fill();
   } else if (layout.variant === 2) {
-    for (let x = -100; x < 1200; x += 170) {
-      ctx.save(); ctx.translate(x, 0); ctx.rotate(-.18); ctx.fillRect(0, 0, 44, h + 240); ctx.restore();
+    ctx.fillStyle = "#ffd31a";
+    for (let x = 45; x < 1080; x += 180) {
+      ctx.beginPath(); ctx.moveTo(x, 30); ctx.lineTo(x + 36, 30); ctx.lineTo(x + 12, 88); ctx.lineTo(x + 55, 88); ctx.lineTo(x - 8, 166); ctx.lineTo(x + 8, 106); ctx.lineTo(x - 28, 106); ctx.closePath(); ctx.fill();
     }
+    ctx.globalAlpha = .18; ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(160, 160, 155, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(940, 85, 100, 0, Math.PI * 2); ctx.fill();
   } else if (layout.variant === 3) {
-    for (let i = 0; i < 7; i += 1) {
-      ctx.beginPath(); ctx.ellipse(80 + i * 180, 100 + (i % 2) * 1120, 110, 42, -.35, 0, Math.PI * 2); ctx.fill();
-    }
+    ctx.fillStyle = "rgba(23,104,196,.08)";
+    ctx.beginPath(); ctx.ellipse(160, 180, 250, 100, -.3, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(950, 80, 210, 80, .25, 0, Math.PI * 2); ctx.fill();
   } else if (layout.variant === 4) {
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, 0); ctx.lineTo(w, 125); ctx.lineTo(0, 195); ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(0, h); ctx.lineTo(w, h); ctx.lineTo(w, h - 130); ctx.lineTo(0, h - 70); ctx.closePath(); ctx.fill();
-  } else if (layout.variant === 5) {
-    for (let y = 0; y < h; y += 180) {
-      for (let x = 0; x < w; x += 180) {
-        if ((x / 180 + y / 180) % 2 === 0) ctx.fillRect(x, y, 90, 90);
-      }
-    }
+    ctx.strokeStyle = "rgba(71,92,50,.25)"; ctx.lineWidth = 5;
+    ctx.beginPath(); ctx.moveTo(955, -20); ctx.bezierCurveTo(900, 80, 1030, 165, 910, 310); ctx.stroke();
+    ctx.fillStyle = "rgba(87,111,57,.34)";
+    [[940,45,-.5],[990,95,.4],[930,145,-.4],[980,205,.55],[900,250,-.35]].forEach((leaf) => {
+      ctx.save(); ctx.translate(leaf[0], leaf[1]); ctx.rotate(leaf[2]); ctx.beginPath(); ctx.ellipse(0, 0, 48, 18, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    });
   } else {
-    ctx.beginPath(); ctx.arc(1010, 40, 250, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#ffdf00";
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(420, 0); ctx.lineTo(285, 260); ctx.lineTo(0, 310); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = "#ff2a5f";
+    ctx.beginPath(); ctx.moveTo(1080, 0); ctx.lineTo(760, 0); ctx.lineTo(880, 255); ctx.lineTo(1080, 290); ctx.closePath(); ctx.fill();
+    const colors = ["#ffdf00", "#1ee3cf", "#ff5470", "#ffffff"];
+    for (let i = 0; i < 28; i += 1) {
+      ctx.fillStyle = colors[i % colors.length];
+      ctx.save(); ctx.translate(40 + (i * 151) % 1020, 35 + (i * 73) % 230); ctx.rotate(i * .43); ctx.fillRect(-7, -2, 14, 4); ctx.restore();
+    }
   }
-  ctx.globalAlpha = 1;
+  ctx.restore();
 }
 
-function flyerDrawHeader(ctx, data, client, logo, layout) {
-  const dark = Boolean(layout.dark);
-  const headerFill = layout.variant === 1 || layout.variant === 4 ? layout.primary : (dark ? "rgba(7,8,11,.86)" : "rgba(255,255,255,.93)");
-  preencherRoundRect(ctx, 34, 28, 1012, 158, 28, headerFill);
-  desenharBordaRoundRect(ctx, 34, 28, 1012, 158, 28, layout.accent, layout.variant === 2 ? 3 : 2);
-  if (logo) desenharImagemContain(ctx, logo, 54, 47, 118, 118, 19, "rgba(255,255,255,.96)");
-  const lightHeader = layout.variant === 1 || layout.variant === 4 || dark;
-  const titleColor = lightHeader ? "#ffffff" : layout.ink;
-  const detailColor = lightHeader ? "rgba(255,255,255,.82)" : layout.primary;
-  postArtDrawText(ctx, client?.nome || "Sua empresa", 196, 47, 500, 1, 28, detailColor, { min: 17, weight: 800 });
-  postArtDrawText(ctx, data.title, 196, 82, 650, 2, 42, titleColor, { min: 24, lineHeight: 43 });
-  if (data.subtitle) postArtDrawText(ctx, data.subtitle, 196, 142, 650, 1, 18, detailColor, { min: 12, weight: 700 });
-  preencherRoundRect(ctx, 864, 56, 150, 78, 20, layout.accent);
-  postArtDrawText(ctx, state.flyerType === "promocao" ? "OFERTAS" : "ENCARTE", 939, 80, 126, 2, 22, layout.dark ? "#15120a" : "#18202c", { min: 13, align: "center", blockHeight: 40 });
+function flyerDrawBrand(ctx, client, logo, layout, options = {}) {
+  const x = options.x || 34;
+  const y = options.y || 24;
+  const logoSize = options.logoSize || 84;
+  const maxWidth = options.maxWidth || 430;
+  const light = Boolean(options.light);
+  if (logo) {
+    preencherRoundRect(ctx, x, y, logoSize, logoSize, 16, "#ffffff");
+    desenharImagemContain(ctx, logo, x + 6, y + 6, logoSize - 12, logoSize - 12, 11, "#ffffff");
+  } else {
+    preencherRoundRect(ctx, x, y, logoSize, logoSize, 16, "#ffffff");
+    postArtDrawText(ctx, "LOGO", x + logoSize / 2, y + logoSize / 2 - 9, logoSize - 10, 1, 14, layout.primary, { min: 10, align: "center" });
+  }
+  postArtDrawText(ctx, client?.nome || "Nome do seu negócio", x + logoSize + 18, y + 12, maxWidth, 2, options.nameSize || 24, light ? "#ffffff" : layout.ink, { min: 15, lineHeight: (options.nameSize || 24) + 2 });
+  postArtDrawText(ctx, state.flyerType === "promocao" ? "OFERTAS DO COMÉRCIO" : "PRODUTOS DO COMÉRCIO", x + logoSize + 18, y + logoSize - 24, maxWidth, 1, 13, light ? layout.accent : layout.primary, { min: 10, weight: 800 });
+}
+
+function flyerDrawTrustStrip(ctx, layout, y, light = false) {
+  const labels = ["QUALIDADE", "ENTREGA RÁPIDA", "COMPRA SEGURA"];
+  labels.forEach((label, index) => {
+    const x = 590 + index * 155;
+    ctx.strokeStyle = light ? "rgba(255,255,255,.8)" : layout.primary;
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(x, y + 13, 12, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x - 5, y + 13); ctx.lineTo(x, y + 18); ctx.lineTo(x + 7, y + 7); ctx.stroke();
+    postArtDrawText(ctx, label, x + 20, y + 4, 126, 2, 11, light ? "#ffffff" : layout.ink, { min: 8, lineHeight: 12 });
+  });
+}
+
+function flyerDrawHeroImage(ctx, image, rect, layout) {
+  if (!rect || !image) return;
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,.28)";
+  ctx.shadowBlur = 20;
+  ctx.shadowOffsetY = 10;
+  postArtDrawPhoto(ctx, image, rect, "contain", 22, "rgba(255,255,255,.08)");
+  ctx.restore();
+}
+
+function flyerDrawHeader(ctx, data, client, logo, layout, heroItem, heroImage) {
+
+  if (layout.variant === 0) {
+    flyerDrawBrand(ctx, client, logo, layout, { x: 36, y: 24, logoSize: 80, maxWidth: 400, light: false });
+    postArtDrawText(ctx, data.title.toUpperCase(), 38, 125, 565, 3, 52, "#ffffff", { min: 29, lineHeight: 50 });
+    if (data.subtitle) postArtDrawText(ctx, data.subtitle.toUpperCase(), 42, 282, 480, 2, 19, "#ffffff", { min: 13, lineHeight: 22 });
+    preencherRoundRect(ctx, 450, 224, 162, 112, 56, layout.accent);
+    postArtDrawText(ctx, state.flyerType === "promocao" ? "OFERTAS\nESPECIAIS" : "ESCOLHAS\nPARA VOCÊ", 531, 246, 140, 2, 18, "#17120b", { min: 12, align: "center", lineHeight: 20 });
+    flyerDrawHeroImage(ctx, heroImage, { x: 630, y: 92, w: 390, h: 275 }, layout);
+  } else if (layout.variant === 1) {
+    flyerDrawBrand(ctx, client, logo, layout, { x: 34, y: 26, logoSize: 76, maxWidth: 330, light: true });
+    postArtDrawText(ctx, data.title.toUpperCase(), 38, 128, 455, 3, 45, layout.accent, { min: 27, lineHeight: 45 });
+    if (data.subtitle) postArtDrawText(ctx, data.subtitle, 42, 275, 405, 2, 18, "#ffffff", { min: 12, lineHeight: 21 });
+    flyerDrawHeroImage(ctx, heroImage, { x: 500, y: 70, w: 300, h: 285 }, layout);
+    if (heroItem) {
+      postArtDrawText(ctx, heroItem.titulo || heroItem.nome, 812, 120, 225, 3, 21, "#ffffff", { min: 14, lineHeight: 23 });
+      if (data.showPrices) postArtDrawText(ctx, heroItem.preco ? postArtMoney(heroItem.preco) : "CONSULTE", 812, 235, 225, 2, 31, layout.accent, { min: 19, lineHeight: 32 });
+    }
+    flyerDrawTrustStrip(ctx, layout, 318, true);
+  } else if (layout.variant === 2) {
+    flyerDrawBrand(ctx, client, logo, layout, { x: 34, y: 22, logoSize: 72, maxWidth: 340, light: true });
+    postArtDrawText(ctx, data.title.toUpperCase(), 540, 102, 860, 2, 58, "#ffffff", { min: 34, align: "center", lineHeight: 58 });
+    postArtDrawText(ctx, data.subtitle || "Preços especiais por tempo limitado", 540, 223, 680, 1, 18, layout.accent, { min: 12, align: "center" });
+    preencherRoundRect(ctx, 848, 22, 196, 64, 16, layout.accent);
+    postArtDrawText(ctx, "SOMENTE HOJE!", 946, 44, 174, 1, 17, "#341000", { min: 12, align: "center" });
+  } else if (layout.variant === 3) {
+    flyerDrawBrand(ctx, client, logo, layout, { x: 36, y: 24, logoSize: 82, maxWidth: 420, light: false });
+    flyerDrawTrustStrip(ctx, layout, 45, false);
+    postArtDrawText(ctx, data.title.toUpperCase(), 42, 138, 760, 2, 48, "#111820", { min: 29, lineHeight: 49 });
+    preencherRoundRect(ctx, 42, 205, Math.min(650, Math.max(260, data.title.length * 22)), 46, 5, layout.primary);
+    postArtDrawText(ctx, data.subtitle || "Qualidade, conforto e praticidade com preços especiais.", 54, 217, 700, 1, 17, "#ffffff", { min: 11, weight: 800 });
+  } else if (layout.variant === 4) {
+    flyerDrawBrand(ctx, client, logo, layout, { x: 34, y: 24, logoSize: 76, maxWidth: 390, light: false });
+    postArtDrawText(ctx, data.title, 40, 125, 650, 3, 52, layout.ink, { min: 31, lineHeight: 50, family: "Georgia" });
+    postArtDrawText(ctx, data.subtitle || "Produtos selecionados com qualidade e bom gosto.", 44, 276, 630, 2, 17, layout.primary, { min: 11, lineHeight: 20 });
+    preencherRoundRect(ctx, 705, 125, 170, 120, 60, "rgba(210,178,125,.55)");
+    postArtDrawText(ctx, "BELEZA\nCONFORTO\nQUALIDADE", 790, 148, 140, 3, 16, layout.ink, { min: 11, align: "center", lineHeight: 19 });
+  } else {
+    flyerDrawBrand(ctx, client, logo, layout, { x: 34, y: 22, logoSize: 72, maxWidth: 350, light: false });
+    preencherRoundRect(ctx, 48, 119, 100, 100, 50, "#ff2a5f");
+    postArtDrawText(ctx, "%", 98, 141, 70, 1, 48, "#ffffff", { min: 34, align: "center" });
+    postArtDrawText(ctx, data.title.toUpperCase(), 185, 118, 700, 2, 55, layout.accent, { min: 32, lineHeight: 54 });
+    preencherRoundRect(ctx, 842, 118, 200, 92, 14, layout.accent);
+    postArtDrawText(ctx, data.subtitle || "Grandes produtos com preços para aproveitar", 942, 137, 170, 3, 15, "#1f1951", { min: 10, align: "center", lineHeight: 17 });
+  }
+}
+
+function flyerCardRects(layout, count) {
+  const gap = 12;
+  if (layout.variant === 2 && count > 2) {
+    const rects = [];
+    const featured = Math.min(2, count);
+    const featuredW = (1012 - gap) / 2;
+    for (let i = 0; i < featured; i += 1) rects.push({ x: 34 + i * (featuredW + gap), y: 295, w: featuredW, h: 282, featured: true });
+    const rest = count - featured;
+    const cols = Math.min(4, rest);
+    const rows = Math.ceil(rest / cols);
+    const cardW = (1012 - gap * (cols - 1)) / cols;
+    const cardH = (646 - gap * (rows - 1)) / rows;
+    for (let i = 0; i < rest; i += 1) {
+      const row = Math.floor(i / cols);
+      const itemsInRow = Math.min(cols, rest - row * cols);
+      const rowWidth = itemsInRow * cardW + (itemsInRow - 1) * gap;
+      const col = i % cols;
+      rects.push({ x: 34 + (1012 - rowWidth) / 2 + col * (cardW + gap), y: 590 + row * (cardH + gap), w: cardW, h: cardH, featured: false });
+    }
+    return rects;
+  }
+  if (layout.variant === 5 && count > 3) {
+    const rects = [];
+    const featured = Math.min(3, count);
+    const featuredW = (1012 - gap * 2) / 3;
+    for (let i = 0; i < featured; i += 1) rects.push({ x: 34 + i * (featuredW + gap), y: 275, w: featuredW, h: 300, featured: true });
+    const rest = count - featured;
+    const cols = Math.min(4, rest);
+    const rows = Math.ceil(rest / cols);
+    const cardW = (1012 - gap * (cols - 1)) / cols;
+    const cardH = (646 - gap * (rows - 1)) / rows;
+    for (let i = 0; i < rest; i += 1) {
+      const row = Math.floor(i / cols);
+      const itemsInRow = Math.min(cols, rest - row * cols);
+      const rowWidth = itemsInRow * cardW + (itemsInRow - 1) * gap;
+      const col = i % cols;
+      rects.push({ x: 34 + (1012 - rowWidth) / 2 + col * (cardW + gap), y: 590 + row * (cardH + gap), w: cardW, h: cardH, featured: false });
+    }
+    return rects;
+  }
+
+  const top = layout.variant === 0 ? 390 : layout.variant === 1 ? 390 : layout.variant === 4 ? 320 : 275;
+  const available = 1236 - top;
+  const cols = count <= 2 ? count : Math.min(5, count);
+  const rows = Math.ceil(count / cols);
+  const cardW = Math.min(count <= 2 ? 470 : 250, (1012 - gap * (cols - 1)) / cols);
+  const cardH = Math.min(count <= 2 ? 560 : 410, (available - gap * (rows - 1)) / rows);
+  const rects = [];
+  for (let i = 0; i < count; i += 1) {
+    const row = Math.floor(i / cols);
+    const itemsInRow = Math.min(cols, count - row * cols);
+    const rowWidth = itemsInRow * cardW + (itemsInRow - 1) * gap;
+    const col = i % cols;
+    rects.push({ x: 34 + (1012 - rowWidth) / 2 + col * (cardW + gap), y: top + row * (cardH + gap), w: cardW, h: cardH, featured: count <= 2 });
+  }
+  return rects;
 }
 
 function flyerDrawCard(ctx, item, image, card, index, data, layout) {
-  const dark = Boolean(layout.dark);
-  const alternate = layout.variant === 5 && index % 2 === 1;
-  const cardFill = alternate ? layout.primary : layout.panel;
-  const cardInk = alternate ? "#ffffff" : layout.ink;
-  preencherRoundRect(ctx, card.x, card.y, card.w, card.h, 22, cardFill);
-  desenharBordaRoundRect(ctx, card.x, card.y, card.w, card.h, 22, alternate ? layout.accent : (dark ? layout.primary : "rgba(20,54,88,.14)"), layout.variant === 2 ? 3 : 2);
+  const featured = Boolean(card.featured);
+  const promoStyle = [0, 2, 5].includes(layout.variant);
+  const border = layout.variant === 0 ? "#f10f18" : layout.variant === 1 ? "#d2a936" : layout.variant === 2 ? "#ffcc18" : layout.variant === 3 ? "#dce5ec" : layout.variant === 4 ? "#dfd1ba" : "#ffcf00";
+  const fill = layout.variant === 1 && featured ? "#15171c" : layout.panel;
+  const ink = layout.variant === 1 && featured ? "#ffffff" : layout.ink;
+  preencherRoundRect(ctx, card.x, card.y, card.w, card.h, featured ? 20 : 14, fill);
+  desenharBordaRoundRect(ctx, card.x, card.y, card.w, card.h, featured ? 20 : 14, border, featured ? 3 : 2);
 
-  const imageW = Math.min(card.w * .37, Math.max(112, card.h - 28));
-  const imageH = Math.max(96, card.h - 28);
-  const imageRight = layout.variant === 1 || (layout.variant === 3 && index % 2 === 1);
-  const imageX = imageRight ? card.x + card.w - imageW - 14 : card.x + 14;
-  const imageRadius = layout.variant === 2 ? Math.min(52, imageH / 2) : 16;
-  postArtDrawPhoto(ctx, image, { x: imageX, y: card.y + 14, w: imageW, h: imageH }, "contain", imageRadius, "#ffffff");
-  desenharBordaRoundRect(ctx, imageX, card.y + 14, imageW, imageH, imageRadius, alternate ? "rgba(255,255,255,.45)" : layout.accent, 2);
+  const pad = featured ? 16 : 10;
+  const imageHeight = Math.max(82, card.h * (featured ? .56 : .52));
+  postArtDrawPhoto(ctx, image, { x: card.x + pad, y: card.y + pad, w: card.w - pad * 2, h: imageHeight }, "contain", featured ? 15 : 10, "#ffffff");
 
-  const textX = imageRight ? card.x + 18 : imageX + imageW + 18;
-  const textRight = imageRight ? imageX - 14 : card.x + card.w - 18;
-  const textW = Math.max(100, textRight - textX);
-  const titleSize = card.h < 220 ? 23 : 29;
-  postArtDrawText(ctx, item.titulo || item.nome || "Item", textX, card.y + 22, textW, 2, titleSize, cardInk, { min: 16, lineHeight: titleSize + 2 });
-  const descriptionY = card.y + (card.h < 220 ? 78 : 92);
-  const priceSpace = data.showPrices ? 54 : 12;
-  postArtDrawText(ctx, flyerItemDescription(item), textX, descriptionY, textW, 3, card.h < 220 ? 15 : 18, alternate ? "rgba(255,255,255,.82)" : (dark ? "#d5d8df" : "#5f6f82"), { min: 11, weight: 600, lineHeight: card.h < 220 ? 18 : 22, blockHeight: Math.max(34, card.h - (descriptionY - card.y) - priceSpace) });
+  const titleY = card.y + pad + imageHeight + 10;
+  const titleSize = featured ? 22 : (card.w < 220 ? 15 : 18);
+  postArtDrawText(ctx, item.titulo || item.nome || "Item", card.x + pad, titleY, card.w - pad * 2, featured ? 2 : 2, titleSize, ink, { min: 11, lineHeight: titleSize + 2, weight: 900 });
 
-  if (data.showPrices) {
-    const price = String(item.preco || "").trim();
-    const priceText = price ? postArtMoney(price) : "CONSULTE";
-    const pillW = Math.min(textW, Math.max(126, priceText.length * 17 + 34));
-    preencherRoundRect(ctx, textX, card.y + card.h - 50, pillW, 36, 18, alternate ? layout.accent : layout.primary);
-    postArtDrawText(ctx, priceText, textX + pillW / 2, card.y + card.h - 42, pillW - 18, 1, 20, alternate && !layout.dark ? layout.ink : "#ffffff", { min: 13, align: "center", weight: 900 });
+  const description = flyerItemDescription(item);
+  const descriptionY = titleY + (featured ? 54 : 38);
+  const priceArea = data.showPrices ? (featured ? 72 : 56) : 14;
+  if (description && card.h - (descriptionY - card.y) > priceArea + 20) {
+    postArtDrawText(ctx, description, card.x + pad, descriptionY, card.w - pad * 2, featured ? 2 : 1, featured ? 15 : 12, layout.variant === 1 && featured ? "#d4d7dc" : "#5f6470", { min: 9, lineHeight: featured ? 18 : 14, weight: 600 });
   }
 
-  preencherRoundRect(ctx, card.x + card.w - 42, card.y + 10, 30, 30, 15, layout.accent);
-  postArtDrawText(ctx, String(index + 1).padStart(2, "0"), card.x + card.w - 27, card.y + 18, 24, 1, 12, "#1d2430", { min: 9, align: "center" });
+  if (data.showPrices) {
+    const oldPrice = flyerOldPrice(item);
+    const price = String(item.preco || "").trim();
+    const priceText = price ? postArtMoney(price) : "CONSULTE";
+    const priceY = card.y + card.h - (featured ? 46 : 35);
+    if (oldPrice) {
+      const oldText = postArtMoney(oldPrice);
+      postArtDrawText(ctx, oldText, card.x + pad, priceY - (featured ? 28 : 22), card.w - pad * 2, 1, featured ? 14 : 11, layout.variant === 1 && featured ? "#c8c8c8" : "#6f6f6f", { min: 9, weight: 600 });
+      ctx.strokeStyle = layout.variant === 1 && featured ? layout.accent : layout.primary;
+      ctx.lineWidth = 2;
+      const strikeW = Math.min(card.w - pad * 2, oldText.length * (featured ? 8 : 6.2));
+      ctx.beginPath(); ctx.moveTo(card.x + pad, priceY - (featured ? 19 : 15)); ctx.lineTo(card.x + pad + strikeW, priceY - (featured ? 19 : 15)); ctx.stroke();
+    }
+    postArtDrawText(ctx, priceText, card.x + pad, priceY, card.w - pad * 2, 1, featured ? 29 : (card.w < 220 ? 19 : 23), promoStyle ? "#e31319" : (layout.variant === 1 && featured ? layout.accent : layout.primary), { min: 13, weight: 900 });
+  }
+
+  const discount = flyerDiscountPercent(item);
+  if (discount) {
+    const radius = featured ? 30 : 23;
+    ctx.fillStyle = layout.variant === 5 ? "#ff315f" : layout.primary;
+    ctx.beginPath(); ctx.arc(card.x + card.w - radius - 6, card.y + radius + 7, radius, 0, Math.PI * 2); ctx.fill();
+    postArtDrawText(ctx, discount + "%\nOFF", card.x + card.w - radius - 6, card.y + radius - 8, radius * 1.55, 2, featured ? 17 : 12, "#ffffff", { min: 9, align: "center", lineHeight: featured ? 17 : 12 });
+  } else {
+    preencherRoundRect(ctx, card.x + card.w - 35, card.y + 8, 27, 27, 13, layout.accent);
+    postArtDrawText(ctx, String(index + 1).padStart(2, "0"), card.x + card.w - 21.5, card.y + 15, 22, 1, 10, "#1d2430", { min: 8, align: "center" });
+  }
 }
 
 function flyerDrawFooter(ctx, client, layout) {
   const phone = telefoneArteAdmin(client?.whatsapp || client?.contato || "") || "Consulte a empresa";
   const instagram = String(client?.instagram || "").replace(/^https?:\/\/(www\.)?instagram\.com\//i, "@").replace(/\/$/, "");
-  preencherRoundRect(ctx, 34, 1252, 1012, 70, 24, layout.primary);
-  postArtDrawText(ctx, phone, 60, 1271, 450, 1, 20, "#ffffff", { min: 13, weight: 800 });
-  postArtDrawText(ctx, instagram || "Compre no comércio local", 1020, 1271, 450, 1, 19, layout.dark ? layout.accent : "#ffffff", { min: 12, align: "right", weight: 800 });
+  const darkFooter = [0, 1, 3, 4].includes(layout.variant);
+  const footerFill = layout.variant === 0 ? "#121212" : layout.variant === 3 ? "#111111" : layout.variant === 4 ? "#4c402e" : layout.variant === 5 ? "#1026a5" : layout.primary;
+  preencherRoundRect(ctx, 22, 1248, 1036, 82, 18, footerFill);
+  ctx.fillStyle = layout.variant === 5 ? "#25d366" : layout.accent;
+  ctx.beginPath(); ctx.arc(61, 1289, 24, 0, Math.PI * 2); ctx.fill();
+  postArtDrawText(ctx, "☎", 61, 1275, 38, 1, 23, layout.variant === 5 ? "#ffffff" : "#161616", { min: 18, align: "center" });
+  postArtDrawText(ctx, phone, 98, 1268, 275, 1, 18, "#ffffff", { min: 12, weight: 900 });
+  postArtDrawText(ctx, instagram || "Prestigie o comércio local", 98, 1293, 300, 1, 12, "rgba(255,255,255,.78)", { min: 9, weight: 600 });
+  preencherRoundRect(ctx, 418, 1263, 350, 52, 26, layout.accent);
+  postArtDrawText(ctx, layout.cta, 593, 1278, 320, 1, 16, "#1b1720", { min: 11, align: "center", weight: 900 });
+  postArtDrawText(ctx, darkFooter ? "PAGAMENTO SEGURO  •  ENTREGA RÁPIDA" : "QUALIDADE  •  CONFIANÇA", 1032, 1275, 235, 2, 11, "#ffffff", { min: 8, align: "right", lineHeight: 13 });
 }
 
 function drawFlyerCanvas(ctx, data, client, items, images, logo, layout) {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
   flyerDrawDecoration(ctx, layout);
-  flyerDrawHeader(ctx, data, client, logo, layout);
+  flyerDrawHeader(ctx, data, client, logo, layout, items[0], images[0]);
   if (!items.length) {
-    postArtDrawText(ctx, "Selecione até 10 itens para montar o encarte.", 540, 610, 820, 2, 34, layout.ink, { min: 20, align: "center", blockHeight: 90 });
+    postArtDrawText(ctx, "Selecione até 10 itens para montar o encarte.", 540, 610, 820, 2, 34, layout.variant === 1 ? "#ffffff" : layout.ink, { min: 20, align: "center", blockHeight: 90 });
     flyerDrawFooter(ctx, client, layout);
     return;
   }
-  const columns = items.length === 1 ? 1 : 2;
-  const rows = Math.ceil(items.length / columns);
-  const gap = 14;
-  const bodyTop = 214;
-  const bodyBottom = 1232;
-  const areaHeight = bodyBottom - bodyTop;
-  const cardW = columns === 1 ? 820 : (1012 - gap) / 2;
-  const cardH = Math.min(items.length <= 2 ? 500 : 310, (areaHeight - gap * (rows - 1)) / rows);
-  const gridHeight = cardH * rows + gap * (rows - 1);
-  const startY = bodyTop + Math.max(0, (areaHeight - gridHeight) / 2);
-  items.forEach((item, index) => {
-    const row = Math.floor(index / columns);
-    const col = index % columns;
-    const x = columns === 1 ? (1080 - cardW) / 2 : 34 + col * (cardW + gap);
-    const y = startY + row * (cardH + gap);
-    flyerDrawCard(ctx, item, images[index], { x, y, w: cardW, h: cardH }, index, data, layout);
-  });
+  const cards = flyerCardRects(layout, items.length);
+  items.forEach((item, index) => flyerDrawCard(ctx, item, images[index], cards[index], index, data, layout));
   flyerDrawFooter(ctx, client, layout);
 }
-
 async function updateFlyerPreview() {
   const canvas = $("flyerCanvas");
   const client = flyerCurrentClient();
   if (!canvas || !client) return;
   const items = flyerSelectedItems(client);
   const data = flyerFormData();
-  state.flyerTitle = data.title;
-  state.flyerSubtitle = data.subtitle;
+  state.flyerTitle = $("flyerTitle")?.value.trim() || "";
+  state.flyerSubtitle = $("flyerSubtitle")?.value.trim() || "";
   state.flyerShowPrices = data.showPrices;
   const requestId = ++flyerPreviewRequest;
   const assets = await Promise.all([

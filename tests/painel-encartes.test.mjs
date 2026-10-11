@@ -33,10 +33,29 @@ test("encarte oferece seis layouts, identidade do comércio e exportação PNG",
   assert.match(panelJs, /carregarImagemCanvas\(flyerItemImage\(item\)\)/);
   assert.match(panelJs, /canvasParaBlob\(canvas\)/);
   assert.match(panelJs, /baixarBlobCanvas\(blob, "encarte-"/);
-  assert.match(panelHtml, /painel\.css\?v=571/);
-  assert.match(panelHtml, /painel\.js\?v=873/);
+  assert.match(panelHtml, /painel\.css\?v=572/);
+  assert.match(panelHtml, /painel\.js\?v=874/);
 });
 
+test("seis modelos reproduzem composições profissionais usando os dados reais do cliente", () => {
+  [
+    "Qualidade todo dia",
+    "Tecnologia premium",
+    "Ofertas relâmpago",
+    "Tudo em um só lugar",
+    "Mais estilo",
+    "Festival de promoções"
+  ].forEach((name) => assert.ok(panelJs.includes(name)));
+  assert.match(panelJs, /function flyerDrawBrand\(/);
+  assert.match(panelJs, /function flyerDrawTrustStrip\(/);
+  assert.match(panelJs, /function flyerDrawHeroImage\(/);
+  assert.match(panelJs, /function flyerCardRects\(/);
+  assert.match(panelJs, /function flyerDiscountPercent\(/);
+  assert.match(panelJs, /item\.precoAntigo/);
+  assert.match(panelJs, /client\?\.nome \|\| "Nome do seu negócio"/);
+  assert.match(panelJs, /telefoneArteAdmin\(client\?\.whatsapp/);
+  assert.match(panelJs, /items\.slice\(0, Math\.min\(10, FLYER_MAX_ITEMS\)\)/);
+});
 test("gerador de encartes tem composição responsiva e prévia em formato 4 por 5", () => {
   assert.match(panelCss, /\.flyer-workspace/);
   assert.match(panelCss, /\.flyer-items-grid/);
