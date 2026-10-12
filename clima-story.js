@@ -506,22 +506,22 @@
     });
     ctx.fillStyle = "#fff";
     ctx.font = "800 27px Arial";
-    ctx.fillText("▣  " + dateLabel + "   |   ◷  " + timeLabel + "  (gerado)", 52, 270);
+    ctx.fillText("▣  " + dateLabel + "   |   ◷  " + timeLabel, 52, 270);
 
     rounded(ctx, 20, 420, 625, 270, 24, "rgba(0,53,102,.94)", "rgba(80,197,255,.60)");
     ctx.fillStyle = "#55ddff";
-    ctx.font = "900 23px Arial";
+    ctx.font = "900 25px Arial";
     ctx.fillText("CONDIÇÃO ATUAL", 46, 462);
     ctx.fillStyle = "#fff";
     ctx.font = "900 86px Arial";
     ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 44, 575);
     ctx.font = "46px Arial";
     ctx.fillText(weatherEmoji(forecast.current.weather_code), 50, 646);
-    ctx.font = "850 27px Arial";
+    ctx.font = "850 30px Arial";
     wrapped(ctx, weatherText(forecast.current.weather_code), 112, 638, 210, 31, 2);
     ctx.strokeStyle = "rgba(126,217,255,.45)";
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(345, 452); ctx.lineTo(345, 660); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(360, 452); ctx.lineTo(360, 660); ctx.stroke();
     ctx.fillStyle = "#dcefff";
     ctx.font = "700 22px Arial";
     const currentDetails = [
@@ -534,14 +534,14 @@
     currentDetails.forEach(([label, value], index) => {
       const y = 505 + index * 36;
       ctx.fillStyle = "#7fddff";
-      ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 372, y);
+      ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 382, y);
       ctx.fillStyle = "#dcefff";
-      ctx.font = "700 19px Arial";
-      ctx.fillText(label, 407, y);
+      ctx.font = "700 20px Arial";
+      ctx.fillText(label, 416, y);
       ctx.fillStyle = "#fff";
-      ctx.font = "900 20px Arial";
+      ctx.font = "900 22px Arial";
       ctx.textAlign = "right";
-      ctx.fillText(value, 620, y);
+      ctx.fillText(value, 628, y);
       ctx.textAlign = "left";
       ctx.font = "700 22px Arial";
     });
@@ -549,17 +549,11 @@
     rounded(ctx, 665, 420, 395, 270, 24, "#fff7e3", "rgba(255,198,85,.9)");
     rounded(ctx, 680, 434, 365, 48, 17, "#ffb52e");
     ctx.fillStyle = "#073663";
-    ctx.font = "900 20px Arial";
+    ctx.font = "900 22px Arial";
     ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 699, 466);
-    ctx.fillStyle = "#e93155";
-    ctx.font = "36px Arial";
-    ctx.fillText("▣", 700, 525);
     ctx.fillStyle = "#092e56";
-    ctx.font = "900 25px Arial";
-    wrapped(ctx, dayCelebration.title, 750, 520, 280, 29, 4);
-    ctx.fillStyle = "#244667";
-    ctx.font = "650 19px Arial";
-    wrapped(ctx, dayCelebration.description, 700, 646, 330, 23, 2);
+    ctx.font = "900 32px Arial";
+    wrapped(ctx, dayCelebration.title, 700, 530, 330, 38, 4);
 
     rounded(ctx, 20, 712, 1040, 330, 24, "rgba(0,58,104,.93)", "rgba(46,183,242,.72)");
     ctx.fillStyle = "#d8efff";
