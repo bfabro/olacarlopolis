@@ -451,13 +451,16 @@
     wrapped(ctx, detail, x + 28, 840, 236, 27, 2);
   }
 
-  async function createCanvas(dateText) {
+  async function createCanvas(dateText, fontScale = 1) {
     const date = new Date(dateText + "T12:00:00");
     const [forecast, lake, logo, background, moonVisual, dayCelebration] = await Promise.all([
       weather(dateText), reservoir(), image(LOGO), image(BACKGROUND), screenMoonImage(), celebration(date)
     ]);
     const phase = moon(date);
     const meteors = meteor(date, phase, forecast.current.cloud_cover);
+    const safeFontScale = Math.max(1, Math.min(1.25, Number(fontScale) || 1));
+    const cardFont = (weight, size) => weight + " " + Math.round(size * safeFontScale) + "px Arial";
+    const cardLine = (size) => Math.round(size * safeFontScale);
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
     canvas.height = 1920;
@@ -506,26 +509,27 @@
     });
     ctx.fillStyle = "#fff";
     ctx.font = "800 27px Arial";
-    ctx.fillText("▣  " + dateLabel + "   |   ◷  " + timeLabel, 52, 270);
+    ctx.fillText("▣  " + dateLabel, 52, 258);
+    ctx.fillText("◷  " + timeLabel, 52, 298);
 
-    rounded(ctx, 20, 420, 625, 270, 24, "rgba(0,53,102,.94)", "rgba(80,197,255,.60)");
+    rounded(ctx, 20, 420, 1040, 270, 24, "rgba(0,53,102,.94)", "rgba(80,197,255,.60)");
     ctx.fillStyle = "#55ddff";
-    ctx.font = "900 25px Arial";
+    ctx.font = cardFont(900, 25);
     ctx.fillText("CONDIÇÃO ATUAL", 46, 462);
     ctx.fillStyle = "#fff";
     ctx.font = "900 86px Arial";
     ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 44, 575);
     ctx.font = "46px Arial";
     ctx.fillText(weatherEmoji(forecast.current.weather_code), 50, 646);
-    ctx.font = "850 30px Arial";
-    wrapped(ctx, weatherText(forecast.current.weather_code), 112, 638, 210, 31, 2);
+    ctx.font = cardFont(850, 30);
+    wrapped(ctx, weatherText(forecast.current.weather_code), 112, 638, 210, cardLine(31), 2);
     ctx.strokeStyle = "rgba(126,217,255,.45)";
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(360, 452); ctx.lineTo(360, 660); ctx.stroke();
     ctx.fillStyle = "#dcefff";
-    ctx.font = "700 22px Arial";
+    ctx.font = cardFont(700, 22);
     const currentDetails = [
-      ["Sensação térmica", (forecast.current.apparent_temperature ?? "—") + "°C"],
+      ["Sensação", (forecast.current.apparent_temperature ?? "—") + "°C"],
       ["Umidade", (forecast.current.relative_humidity_2m ?? "—") + "%"],
       ["Vento", (forecast.current.wind_speed_10m ?? "—") + " km/h " + windDirection(forecast.current.wind_direction_10m)],
       ["Rajadas", (forecast.current.wind_gusts_10m ?? "—") + " km/h"],
@@ -534,30 +538,30 @@
     currentDetails.forEach(([label, value], index) => {
       const y = 505 + index * 36;
       ctx.fillStyle = "#7fddff";
-      ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 382, y);
+      ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 405, y);
       ctx.fillStyle = "#dcefff";
-      ctx.font = "700 20px Arial";
-      ctx.fillText(label, 416, y);
+      ctx.font = cardFont(700, 20);
+      ctx.fillText(label, 445, y);
       ctx.fillStyle = "#fff";
-      ctx.font = "900 22px Arial";
+      ctx.font = cardFont(900, 22);
       ctx.textAlign = "right";
-      ctx.fillText(value, 628, y);
+      ctx.fillText(value, 1015, y);
       ctx.textAlign = "left";
-      ctx.font = "700 22px Arial";
+      ctx.font = cardFont(700, 22);
     });
 
-    rounded(ctx, 665, 420, 395, 270, 24, "#fff7e3", "rgba(255,198,85,.9)");
-    rounded(ctx, 680, 434, 365, 48, 17, "#ffb52e");
+    rounded(ctx, 610, 282, 450, 128, 22, "#fff7e3", "rgba(255,198,85,.9)");
+    rounded(ctx, 625, 294, 420, 40, 15, "#ffb52e");
     ctx.fillStyle = "#073663";
-    ctx.font = "900 22px Arial";
-    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 699, 466);
+    ctx.font = cardFont(900, 18);
+    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 643, 321);
     ctx.fillStyle = "#092e56";
-    ctx.font = "900 32px Arial";
-    wrapped(ctx, dayCelebration.title, 700, 530, 330, 38, 4);
+    ctx.font = cardFont(900, 25);
+    wrapped(ctx, dayCelebration.title, 630, 361, 400, cardLine(29), 2);
 
     rounded(ctx, 20, 712, 1040, 330, 24, "rgba(0,58,104,.93)", "rgba(46,183,242,.72)");
     ctx.fillStyle = "#d8efff";
-    ctx.font = "900 25px Arial";
+    ctx.font = cardFont(900, 25);
     ctx.fillText("PREVISÃO PARA O DIA", 42, 750);
     const forecastCards = [
       ...forecast.periods,
@@ -569,13 +573,13 @@
       rounded(ctx, x, 774, 190, 245, 20, "rgba(41,118,175,.72)", "rgba(170,226,255,.34)");
       ctx.textAlign = "center";
       ctx.fillStyle = "#e8f6ff";
-      ctx.font = "900 20px Arial";
+      ctx.font = cardFont(900, 20);
       ctx.fillText(period.label, x + 95, 811);
       if (period.sun) {
         ctx.font = "48px Arial";
         ctx.fillText("☀️", x + 95, 873);
         ctx.fillStyle = "#fff";
-        ctx.font = "800 19px Arial";
+        ctx.font = cardFont(800, 19);
         ctx.fillText("Nascer " + formatClock(forecast.sunrise), x + 95, 926);
         ctx.fillText("Pôr " + formatClock(forecast.sunset), x + 95, 970);
       } else if (period.uv) {
@@ -583,9 +587,9 @@
         ctx.fillText("☀️", x + 95, 873);
         rounded(ctx, x + 43, 897, 104, 43, 20, Number(forecast.uv) >= 6 ? "#ff7047" : "#28a86b");
         ctx.fillStyle = "#fff";
-        ctx.font = "900 24px Arial";
+        ctx.font = cardFont(900, 24);
         ctx.fillText("UV " + (forecast.uv ?? "—"), x + 95, 927);
-        ctx.font = "800 19px Arial";
+        ctx.font = cardFont(800, 19);
         ctx.fillText(uvLabel(forecast.uv), x + 95, 970);
       } else {
         ctx.font = "50px Arial";
@@ -593,10 +597,10 @@
         ctx.fillStyle = "#fff";
         ctx.font = "900 43px Arial";
         ctx.fillText((period.temperature ?? "—") + "°C", x + 95, 927);
-        ctx.font = "700 16px Arial";
-        wrapped(ctx, weatherText(period.code), x + 95, 959, 150, 20, 2);
+        ctx.font = cardFont(700, 16);
+        wrapped(ctx, weatherText(period.code), x + 95, 959, 150, cardLine(20), 2);
         ctx.fillStyle = "#b9e8ff";
-        ctx.font = "750 16px Arial";
+        ctx.font = cardFont(750, 16);
         ctx.fillText("Chuva " + (period.rain ?? "—") + "%", x + 95, 1000);
       }
       ctx.textAlign = "left";
@@ -604,54 +608,54 @@
 
     rounded(ctx, 20, 1062, 390, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
     ctx.fillStyle = "#83ddff";
-    ctx.font = "900 19px Arial";
+    ctx.font = cardFont(900, 19);
     ctx.fillText("MÍNIMA", 62, 1104);
     ctx.fillStyle = "#fff";
     ctx.font = "900 42px Arial";
     ctx.fillText((forecast.min ?? "—") + "°C", 62, 1152);
     ctx.fillStyle = "#ff735a";
-    ctx.font = "900 19px Arial";
+    ctx.font = cardFont(900, 19);
     ctx.fillText("MÁXIMA", 228, 1104);
     ctx.fillStyle = "#fff";
     ctx.font = "900 42px Arial";
     ctx.fillText((forecast.max ?? "—") + "°C", 228, 1152);
     ctx.fillStyle = "#c7eaff";
-    ctx.font = "650 17px Arial";
+    ctx.font = cardFont(650, 17);
     ctx.fillText("Temperaturas previstas", 62, 1195);
 
     rounded(ctx, 425, 1062, 220, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
     ctx.font = "46px Arial";
     ctx.fillText("🌧️", 450, 1126);
     ctx.fillStyle = "#7de0ff";
-    ctx.font = "900 19px Arial";
+    ctx.font = cardFont(900, 19);
     ctx.fillText("CHUVA", 520, 1099);
     ctx.fillStyle = "#fff";
     ctx.font = "900 42px Arial";
     ctx.fillText((forecast.rain ?? "—") + "%", 520, 1146);
     ctx.fillStyle = "#c7eaff";
-    ctx.font = "650 17px Arial";
+    ctx.font = cardFont(650, 17);
     ctx.fillText((forecast.rainTotal ?? "—") + " mm previstos", 448, 1194);
 
     rounded(ctx, 660, 1062, 400, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
     drawMoon(ctx, 727, 1145, 60, phase, moonVisual);
     ctx.fillStyle = "#7ee4ff";
-    ctx.font = "900 18px Arial";
+    ctx.font = cardFont(900, 18);
     ctx.fillText("LUA ATUAL", 805, 1098);
     ctx.fillStyle = "#fff";
     ctx.font = "900 35px Arial";
     wrapped(ctx, phase.name, 805, 1138, 225, 36, 2);
     ctx.fillStyle = "#d3edff";
-    ctx.font = "700 17px Arial";
+    ctx.font = cardFont(700, 17);
     ctx.fillText("Iluminação " + phase.light + "%", 805, 1190);
-    ctx.font = "650 14px Arial";
+    ctx.font = cardFont(650, 14);
     ctx.fillText("Meteoros " + meteors.label + " • olhe " + meteors.direction, 805, 1213);
 
     rounded(ctx, 20, 1248, 1040, 265, 24, "#f5fbff", "rgba(157,222,255,.8)");
     ctx.fillStyle = "#0b4e8c";
-    ctx.font = "900 25px Arial";
+    ctx.font = cardFont(900, 25);
     ctx.fillText("≋  REPRESA DE CHAVANTES", 48, 1290);
     ctx.fillStyle = "#6c8095";
-    ctx.font = "850 17px Arial";
+    ctx.font = cardFont(850, 17);
     ctx.fillText("NÍVEL ATUAL", 50, 1331);
     ctx.fillText("LIMITE NORMAL", 345, 1331);
     ctx.fillStyle = "#073663";
@@ -665,30 +669,30 @@
       ? (Math.abs(centimeters) < .5 ? "Estável desde ontem" : (centimeters > 0 ? "▲ Subiu " : "▼ Baixou ") + Math.abs(centimeters).toFixed(0) + " cm em 1 dia")
       : "Comparação diária indisponível";
     ctx.fillStyle = Number.isFinite(centimeters) && centimeters > .5 ? "#159b58" : Number.isFinite(centimeters) && centimeters < -.5 ? "#e13f46" : "#59728b";
-    ctx.font = "900 22px Arial";
+    ctx.font = cardFont(900, 22);
     ctx.fillText(variation, 50, 1436);
     ctx.fillStyle = "#60758a";
-    ctx.font = "700 17px Arial";
+    ctx.font = cardFont(700, 17);
     const lakeDate = lake.date ? new Date(lake.date).toLocaleDateString("pt-BR") : "medição mais recente";
     ctx.fillText("Volume útil: " + (Number.isFinite(lake.volume) ? lake.volume.toFixed(2).replace(".", ",") + "%" : "não informado") + " • " + lakeDate, 345, 1434);
     drawReservoirChart(ctx, lake.history, 665, 1325, 350, 105);
 
     rounded(ctx, 20, 1532, 1040, 178, 24, "#eef8ff", "rgba(157,222,255,.8)");
     ctx.fillStyle = "#0b4e8c";
-    ctx.font = "900 22px Arial";
+    ctx.font = cardFont(900, 22);
     ctx.fillText("📣  FIQUE ATENTO HOJE", 50, 1575);
     ctx.fillStyle = "#294c6f";
-    ctx.font = "700 21px Arial";
-    wrapped(ctx, advice(forecast), 50, 1612, 505, 29, 3);
+    ctx.font = cardFont(700, 21);
+    wrapped(ctx, advice(forecast), 50, 1612, 505, cardLine(29), 3);
     ctx.strokeStyle = "#8bbbd8";
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(585, 1562); ctx.lineTo(585, 1680); ctx.stroke();
     ctx.fillStyle = "#0b4e8c";
-    ctx.font = "900 20px Arial";
+    ctx.font = cardFont(900, 20);
     ctx.fillText("☀  MENSAGEM DO DIA", 620, 1575);
     ctx.fillStyle = "#294c6f";
-    ctx.font = "750 20px Arial";
-    wrapped(ctx, "“" + dailyMotivation(date) + "”", 620, 1612, 390, 27, 3);
+    ctx.font = cardFont(750, 20);
+    wrapped(ctx, "“" + dailyMotivation(date) + "”", 620, 1612, 390, cardLine(27), 3);
 
     ctx.drawImage(logo, 285, 1740, 110, 110);
     ctx.fillStyle = "#fff";
@@ -697,28 +701,59 @@
     ctx.textAlign = "left";
     return canvas;
   }
-  function openPreview(canvas) {
+  function openPreview(canvas, dateText) {
     document.querySelector(".clima-story-modal")?.remove();
     const modal = document.createElement("div");
     modal.className = "clima-story-modal";
     modal.innerHTML = `<div class="clima-story-dialog" role="dialog" aria-modal="true" aria-labelledby="climaStoryTitle">
       <button type="button" class="clima-story-close" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
-      <div class="clima-story-heading"><span>Instagram Stories • 1080 × 1920</span><h2 id="climaStoryTitle">Postagem do Clima do Dia</h2><p>Confira a arte e compartilhe diretamente ou salve no aparelho.</p></div>
+      <div class="clima-story-heading"><span>Instagram Stories • 1080 × 1920</span><h2 id="climaStoryTitle">Postagem do Clima do Dia</h2><p>Confira a arte e compartilhe diretamente ou salve no aparelho.</p>
+        <div class="clima-story-font-control"><label for="climaStoryFontSize">Tamanho da fonte dos cards</label><div><input id="climaStoryFontSize" type="range" min="100" max="125" step="5" value="100"><output for="climaStoryFontSize">100%</output></div><small>Arraste para aumentar a leitura dos cards.</small></div>
+      </div>
       <img alt="Prévia da postagem do Clima do Dia">
       <footer><button type="button" class="clima-story-download"><i class="fa-solid fa-download"></i> Baixar imagem</button><button type="button" class="clima-story-share"><i class="fa-brands fa-instagram"></i> Compartilhar</button></footer>
     </div>`;
-    const dataUrl = canvas.toDataURL("image/png", 1);
-    modal.querySelector("img").src = dataUrl;
+    let currentCanvas = canvas;
+    let dataUrl = "";
+    const preview = modal.querySelector("img");
+    const updatePreview = () => {
+      dataUrl = currentCanvas.toDataURL("image/png", 1);
+      preview.src = dataUrl;
+    };
+    updatePreview();
     const close = () => modal.remove();
     modal.querySelector(".clima-story-close").onclick = close;
     modal.onclick = (event) => { if (event.target === modal) close(); };
+    const fontInput = modal.querySelector("#climaStoryFontSize");
+    const fontOutput = modal.querySelector(".clima-story-font-control output");
+    let renderTimer = 0;
+    let renderToken = 0;
+    fontInput.oninput = () => {
+      fontOutput.value = fontInput.value + "%";
+      clearTimeout(renderTimer);
+      renderTimer = setTimeout(async () => {
+        const token = ++renderToken;
+        modal.classList.add("is-rendering");
+        try {
+          const updatedCanvas = await createCanvas(dateText, Number(fontInput.value) / 100);
+          if (token !== renderToken) return;
+          currentCanvas = updatedCanvas;
+          updatePreview();
+        } catch (error) {
+          console.error("Erro ao ajustar a fonte da arte.", error);
+          window.mostrarToast?.("Não foi possível ajustar a fonte agora.");
+        } finally {
+          if (token === renderToken) modal.classList.remove("is-rendering");
+        }
+      }, 180);
+    };
     modal.querySelector(".clima-story-download").onclick = () => {
       const link = document.createElement("a");
       link.download = "clima-do-dia-ola-carlopolis-" + new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" }) + ".png";
       link.href = dataUrl;
       link.click();
     };
-    modal.querySelector(".clima-story-share").onclick = () => canvas.toBlob(async (blob) => {
+    modal.querySelector(".clima-story-share").onclick = () => currentCanvas.toBlob(async (blob) => {
       if (!blob) return window.mostrarToast?.("Não foi possível preparar a imagem.");
       const file = new File([blob], "clima-do-dia-ola-carlopolis.png", { type: "image/png" });
       try {
@@ -742,7 +777,7 @@
     button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i><span>Gerando...</span>';
     try {
       const date = document.querySelector(".clima-page #solData")?.value || new Date().toLocaleDateString("en-CA", { timeZone: "America/Sao_Paulo" });
-      openPreview(await createCanvas(date));
+      openPreview(await createCanvas(date), date);
     } catch (error) {
       console.error("Erro ao gerar Story do clima.", error);
       window.mostrarToast?.("Não foi possível gerar a postagem agora.");

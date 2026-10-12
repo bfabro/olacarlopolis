@@ -48,7 +48,7 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 
 test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(site, /id="climaStoryTrigger"/);
-  assert.match(html, /clima-story\.js\?v=6/);
+  assert.match(html, /clima-story\.js\?v=7/);
   assert.match(story, /canvas\.width = 1080/);
   assert.match(story, /canvas\.height = 1920/);
   assert.match(story, /REPRESA DE CHAVANTES/);
@@ -76,8 +76,16 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.doesNotMatch(story, /CLIMA DO DIA • CARLÓPOLIS, PR/);
   assert.match(story, /LIMITE NORMAL/);
   assert.doesNotMatch(story, /wrapped\(ctx, dayCelebration\.description/);
-  assert.match(story, /wrapped\(ctx, dayCelebration\.title, 700, 530, 330, 38, 4\)/);
+  assert.match(story, /wrapped\(ctx, dayCelebration\.title, 630, 361, 400, cardLine\(29\), 2\)/);
   assert.match(story, /ctx\.moveTo\(360, 452\)/);
+  assert.match(story, /\["Sensação",/);
+  assert.match(story, /ctx\.fillText\("▣  " \+ dateLabel, 52, 258\)/);
+  assert.match(story, /ctx\.fillText\("◷  " \+ timeLabel, 52, 298\)/);
+  assert.match(story, /rounded\(ctx, 610, 282, 450, 128/);
+  assert.match(story, /id="climaStoryFontSize"/);
+  assert.match(story, /createCanvas\(dateText, fontScale = 1\)/);
+  assert.match(story, /Math\.min\(1\.25/);
+  assert.match(css, /\.clima-story-font-control/);
   assert.doesNotMatch(story, /const footerItems/);
   assert.match(story, /pt\.wikipedia\.org\/w\/api\.php/);
   assert.match(story, /function celebration\(date\)/);
@@ -89,14 +97,14 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(worker, /clima-story\.js/);
 });
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v662/);
-  assert.match(html, /style\.css\?v=589/);
-  assert.match(html, /script\.js\?v=789/);
-  assert.match(html, /Olá Carlópolis v535/);
-  assert.match(panel, /numero: 875/);
-  assert.match(panel, /label: "v882"/);
+  assert.match(site, /Release do site v663/);
+  assert.match(html, /style\.css\?v=590/);
+  assert.match(html, /script\.js\?v=790/);
+  assert.match(html, /Olá Carlópolis v536/);
+  assert.match(panel, /numero: 876/);
+  assert.match(panel, /label: "v883"/);
   assert.match(panel, /data: "2026-10-12"/);
-  assert.match(panelHtml, /painel\.css\?v=580/);
-  assert.match(panelHtml, /painel\.js\?v=882/);
-  assert.match(worker, /2026-10-12-pesque-solte-v929/);
+  assert.match(panelHtml, /painel\.css\?v=581/);
+  assert.match(panelHtml, /painel\.js\?v=883/);
+  assert.match(worker, /2026-10-12-pesque-solte-v930/);
 });
