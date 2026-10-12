@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 870,
-  label: "v877",
+  numero: 871,
+  label: "v878",
   data: "2026-10-12",
-  nota: "O Clima do Dia agora gera uma arte vertical para Stories com clima, Lua e comparação diária da Represa de Chavantes."
+  nota: "A arte do Clima do Dia ganhou saudação, fontes maiores, Lua realista, motivação diária e comparação entre a cota atual e a referência da represa."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

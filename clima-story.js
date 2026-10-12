@@ -146,6 +146,32 @@
     return "Condições sem alerta relevante; acompanhe as atualizações ao longo do dia.";
   }
 
+  function greeting() {
+    const hour = Number(new Intl.DateTimeFormat("pt-BR", {
+      timeZone: "America/Sao_Paulo", hour: "2-digit", hour12: false
+    }).format(new Date()));
+    if (hour >= 5 && hour < 12) return "Bom dia";
+    if (hour >= 12 && hour < 18) return "Boa tarde";
+    return "Boa noite";
+  }
+
+  function dailyMotivation(date) {
+    const messages = [
+      "Que hoje não faltem motivos para sorrir e seguir em frente.",
+      "Comece o dia acreditando: coisas boas também encontram quem não desiste.",
+      "Cada manhã traz uma nova chance de fazer acontecer.",
+      "Leve leveza no coração e coragem para todos os caminhos.",
+      "Seu melhor passo de hoje é aquele que você decide dar.",
+      "Que o dia seja produtivo, tranquilo e cheio de boas notícias.",
+      "Espalhe gentileza: ela sempre encontra um jeito de voltar.",
+      "Respire fundo, confie no caminho e faça deste dia um bom dia.",
+      "Grandes mudanças começam com pequenas atitudes.",
+      "Hoje é um ótimo dia para transformar planos em movimento.",
+      "Valorize cada conquista, inclusive aquelas que só você percebe.",
+      "Que nunca faltem esperança, saúde e vontade de recomeçar."
+    ];
+    return messages[Math.abs(Math.floor(date.getTime() / 86400000)) % messages.length];
+  }
   function meteor(date, phase, clouds) {
     const monthDay = Number(String(date.getMonth() + 1).padStart(2, "0") + String(date.getDate()).padStart(2, "0"));
     const showers = [
@@ -163,34 +189,87 @@
   }
 
   function drawMoon(ctx, x, y, radius, phase) {
-    ctx.save();
-    ctx.shadowColor = "rgba(184,220,255,.55)";
-    ctx.shadowBlur = 34;
-    ctx.fillStyle = "#edf1e8";
-    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.fill();
-    ctx.shadowBlur = 0;
-    if (phase.light < 99) {
-      const offset = (phase.fraction < .5 ? -1 : 1) * radius * (1.8 * phase.light / 100 - .9);
-      ctx.fillStyle = "rgba(5,12,31,.94)";
-      ctx.beginPath(); ctx.arc(x + offset, y, radius * .98, 0, Math.PI * 2); ctx.fill();
+    const size = Math.ceil(radius * 2.35);
+    const moonCanvas = document.createElement("canvas");
+    moonCanvas.width = size;
+    moonCanvas.height = size;
+    const moonCtx = moonCanvas.getContext("2d");
+    const frame = moonCtx.createImageData(size, size);
+    const center = size / 2;
+    const sunX = -Math.sin(phase.fraction * Math.PI * 2);
+    const sunZ = -Math.cos(phase.fraction * Math.PI * 2);
+
+    for (let py = 0; py < size; py += 1) {
+      for (let px = 0; px < size; px += 1) {
+        const nx = (px - center) / radius;
+        const ny = (py - center) / radius;
+        const distance = nx * nx + ny * ny;
+        if (distance > 1) continue;
+        const nz = Math.sqrt(Math.max(0, 1 - distance));
+        const sunlight = Math.max(0, nx * sunX + nz * sunZ);
+        const limb = .42 + .58 * nz;
+        const texture = .94 + .035 * Math.sin(px * .17) + .025 * Math.cos(py * .13) + .018 * Math.sin((px + py) * .09);
+        const earthshine = 14 + 19 * nz;
+        const brightness = Math.min(244, earthshine + 218 * Math.pow(sunlight, .62) * limb * texture);
+        const index = (py * size + px) * 4;
+        frame.data[index] = Math.round(brightness * 1.02);
+        frame.data[index + 1] = Math.round(brightness);
+        frame.data[index + 2] = Math.round(brightness * .94);
+        frame.data[index + 3] = Math.round(255 * Math.min(1, (1 - distance) * 18));
+      }
     }
-    ctx.strokeStyle = "rgba(255,255,255,.4)";
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.arc(x, y, radius, 0, Math.PI * 2); ctx.stroke();
+    moonCtx.putImageData(frame, 0, 0);
+    moonCtx.save();
+    moonCtx.beginPath();
+    moonCtx.arc(center, center, radius - 2, 0, Math.PI * 2);
+    moonCtx.clip();
+    const craters = [
+      [-.34, -.28, .16], [.26, -.38, .10], [.38, .16, .18],
+      [-.15, .34, .12], [-.48, .20, .08], [.12, .46, .07]
+    ];
+    craters.forEach(([cx, cy, cr]) => {
+      const gradient = moonCtx.createRadialGradient(
+        center + cx * radius - cr * radius * .25,
+        center + cy * radius - cr * radius * .25,
+        1,
+        center + cx * radius,
+        center + cy * radius,
+        cr * radius
+      );
+      gradient.addColorStop(0, "rgba(255,255,245,.10)");
+      gradient.addColorStop(.58, "rgba(58,63,66,.18)");
+      gradient.addColorStop(1, "rgba(245,243,220,.08)");
+      moonCtx.fillStyle = gradient;
+      moonCtx.beginPath();
+      moonCtx.arc(center + cx * radius, center + cy * radius, cr * radius, 0, Math.PI * 2);
+      moonCtx.fill();
+    });
+    moonCtx.restore();
+
+    ctx.save();
+    ctx.shadowColor = "rgba(184,220,255,.58)";
+    ctx.shadowBlur = 34;
+    ctx.drawImage(moonCanvas, x - size / 2, y - size / 2);
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = "rgba(255,255,255,.34)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.stroke();
     ctx.restore();
   }
 
   function card(ctx, x, label, value, detail, color) {
-    rounded(ctx, x, 670, 292, 190, 28, "rgba(255,255,255,.11)", "rgba(255,255,255,.17)");
+    rounded(ctx, x, 690, 292, 190, 28, "rgba(255,255,255,.11)", "rgba(255,255,255,.17)");
     ctx.fillStyle = color;
-    ctx.font = "800 23px Arial";
-    ctx.fillText(label.toUpperCase(), x + 28, 712);
+    ctx.font = "800 25px Arial";
+    ctx.fillText(label.toUpperCase(), x + 28, 734);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 50px Arial";
-    ctx.fillText(value, x + 28, 773);
+    ctx.font = "900 58px Arial";
+    ctx.fillText(value, x + 28, 800);
     ctx.fillStyle = "rgba(235,247,255,.72)";
-    ctx.font = "600 20px Arial";
-    wrapped(ctx, detail, x + 28, 807, 236, 25, 2);
+    ctx.font = "650 22px Arial";
+    wrapped(ctx, detail, x + 28, 840, 236, 27, 2);
   }
 
   async function createCanvas(dateText) {
@@ -216,82 +295,96 @@
     rounded(ctx, 760, 64, 250, 230, 34, "#fff");
     ctx.drawImage(logo, 783, 80, 204, 204);
 
+    const greetingText = greeting().toUpperCase();
     ctx.fillStyle = "#8de5ff";
-    ctx.font = "800 25px Arial";
-    ctx.fillText("CARLÓPOLIS • PR", 70, 94);
+    ctx.font = "900 24px Arial";
+    ctx.fillText("CLIMA DO DIA • CARLÓPOLIS, PR", 70, 92);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 78px Arial";
-    ctx.fillText("CLIMA", 70, 177);
-    ctx.fillText("DO DIA", 70, 258);
-    ctx.fillStyle = "rgba(255,255,255,.78)";
-    ctx.font = "700 29px Arial";
-    ctx.fillText(date.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }), 70, 312);
+    ctx.font = "900 62px Arial";
+    ctx.fillText(greetingText + ",", 70, 172);
+    ctx.font = "900 66px Arial";
+    ctx.fillText("CARLÓPOLIS!", 70, 244);
+    ctx.fillStyle = "rgba(255,255,255,.82)";
+    ctx.font = "750 31px Arial";
+    ctx.fillText(date.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }), 70, 306);
 
-    rounded(ctx, 70, 362, 940, 274, 38, "rgba(255,255,255,.12)");
+    rounded(ctx, 70, 350, 940, 305, 38, "rgba(255,255,255,.12)");
+    ctx.fillStyle = "#8de5ff";
+    ctx.font = "900 25px Arial";
+    ctx.fillText("CONDIÇÃO ATUAL", 105, 404);
+    const temperatureText = (forecast.current.temperature_2m ?? "—") + "°";
     ctx.fillStyle = "#fff";
-    ctx.font = "900 142px Arial";
-    ctx.fillText((forecast.current.temperature_2m ?? "—") + "°", 105, 522);
-    ctx.font = "900 42px Arial";
-    ctx.fillText(weatherText(forecast.current.weather_code), 430, 450);
-    ctx.fillStyle = "rgba(237,248,255,.78)";
-    ctx.font = "700 25px Arial";
-    ctx.fillText("Sensação " + (forecast.current.apparent_temperature ?? "—") + "°C", 430, 500);
-    ctx.fillText("Umidade " + (forecast.current.relative_humidity_2m ?? "—") + "%", 430, 541);
-    ctx.fillText("Vento " + (forecast.current.wind_speed_10m ?? "—") + " km/h " + windDirection(forecast.current.wind_direction_10m), 430, 582);
+    ctx.font = "900 128px Arial";
+    ctx.fillText(temperatureText, 105, 550);
+    ctx.font = "900 48px Arial";
+    wrapped(ctx, weatherText(forecast.current.weather_code), 525, 438, 430, 54, 2);
+    ctx.fillStyle = "rgba(237,248,255,.84)";
+    ctx.font = "750 28px Arial";
+    ctx.fillText("Sensação " + (forecast.current.apparent_temperature ?? "—") + "°C", 525, 548);
+    ctx.fillText("Umidade " + (forecast.current.relative_humidity_2m ?? "—") + "%", 525, 591);
+    ctx.fillText("Vento " + (forecast.current.wind_speed_10m ?? "—") + " km/h " + windDirection(forecast.current.wind_direction_10m), 525, 634);
 
     card(ctx, 70, "Mínima", (forecast.min ?? "—") + "°C", "Temperatura prevista", "#9de7ff");
     card(ctx, 394, "Máxima", (forecast.max ?? "—") + "°C", "Temperatura prevista", "#ffd47b");
     card(ctx, 718, "Chuva", (forecast.rain ?? "—") + "%", (forecast.rainTotal ?? "—") + " mm previstos", "#86d8ff");
 
-    rounded(ctx, 70, 900, 940, 320, 38, "rgba(3,12,31,.42)");
-    drawMoon(ctx, 234, 1060, 100, phase);
+    rounded(ctx, 70, 920, 940, 350, 38, "rgba(3,12,31,.42)");
+    drawMoon(ctx, 245, 1095, 122, phase);
     ctx.fillStyle = "#82d9ff";
-    ctx.font = "800 23px Arial";
-    ctx.fillText("LUA ATUAL", 410, 954);
+    ctx.font = "900 25px Arial";
+    ctx.fillText("LUA ATUAL", 430, 978);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 43px Arial";
-    ctx.fillText(phase.name, 410, 1012);
-    ctx.fillStyle = "rgba(239,246,255,.78)";
-    ctx.font = "700 24px Arial";
-    ctx.fillText(phase.light + "% iluminada", 410, 1057);
-    ctx.fillText("Meteoros: " + meteors.label + " • " + meteors.score + "/100", 410, 1100);
-    ctx.font = "600 21px Arial";
-    wrapped(ctx, "Olhe para " + meteors.direction + ", " + meteors.time + ".", 410, 1142, 535, 27, 3);
+    ctx.font = "900 58px Arial";
+    wrapped(ctx, phase.name, 430, 1040, 515, 55, 2);
+    ctx.fillStyle = "rgba(239,246,255,.84)";
+    ctx.font = "750 28px Arial";
+    ctx.fillText(phase.light + "% iluminada", 430, 1122);
+    ctx.fillText("Meteoros: " + meteors.label + " • " + meteors.score + "/100", 430, 1166);
+    ctx.font = "650 23px Arial";
+    wrapped(ctx, "Olhe para " + meteors.direction + ", " + meteors.time + ".", 430, 1206, 515, 29, 2);
 
-    rounded(ctx, 70, 1260, 940, 282, 38, "rgba(255,255,255,.12)");
+    rounded(ctx, 70, 1310, 940, 295, 38, "rgba(255,255,255,.12)");
     ctx.fillStyle = "#82e7d1";
-    ctx.font = "800 23px Arial";
-    ctx.fillText("REPRESA DE CHAVANTES", 105, 1313);
+    ctx.font = "900 25px Arial";
+    ctx.fillText("REPRESA DE CHAVANTES", 105, 1362);
+    ctx.fillStyle = "rgba(239,246,255,.72)";
+    ctx.font = "800 22px Arial";
+    ctx.fillText("VALOR ATUAL", 105, 1410);
+    ctx.fillText("VALOR DE REFERÊNCIA", 570, 1410);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 75px Arial";
-    ctx.fillText(Number.isFinite(lake.level) ? lake.level.toFixed(2) + " m" : "Nível indisponível", 105, 1400);
+    ctx.font = "900 62px Arial";
+    ctx.fillText(Number.isFinite(lake.level) ? lake.level.toFixed(2).replace(".", ",") + " m" : "Indisponível", 105, 1482);
+    ctx.fillText("474,00 m", 570, 1482);
     const centimeters = Number.isFinite(lake.delta) ? lake.delta * 100 : null;
     const variation = Number.isFinite(centimeters)
       ? (Math.abs(centimeters) < .5 ? "Estável desde ontem" : (centimeters > 0 ? "Subiu " : "Baixou ") + Math.abs(centimeters).toFixed(0) + " cm em 1 dia")
       : "Comparação diária indisponível";
-    ctx.fillStyle = Number.isFinite(centimeters) && centimeters > .5 ? "#7ff0c7" : Number.isFinite(centimeters) && centimeters < -.5 ? "#ffaeae" : "rgba(239,246,255,.8)";
-    ctx.font = "800 28px Arial";
-    ctx.fillText(variation, 105, 1452);
+    ctx.fillStyle = Number.isFinite(centimeters) && centimeters > .5 ? "#7ff0c7" : Number.isFinite(centimeters) && centimeters < -.5 ? "#ffaeae" : "rgba(239,246,255,.84)";
+    ctx.font = "850 29px Arial";
+    ctx.fillText(variation, 105, 1535);
     ctx.fillStyle = "rgba(239,246,255,.72)";
-    ctx.font = "700 23px Arial";
+    ctx.font = "750 23px Arial";
     const lakeDate = lake.date ? new Date(lake.date).toLocaleDateString("pt-BR") : "medição mais recente";
-    ctx.fillText("Volume útil: " + (Number.isFinite(lake.volume) ? lake.volume.toFixed(2) + "%" : "não informado") + " • " + lakeDate, 105, 1497);
+    ctx.fillText("Volume útil: " + (Number.isFinite(lake.volume) ? lake.volume.toFixed(2).replace(".", ",") + "%" : "não informado") + " • " + lakeDate, 105, 1580);
 
+    ctx.fillStyle = "#ffd47b";
+    ctx.font = "900 25px Arial";
+    ctx.fillText("MENSAGEM DO DIA", 70, 1660);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 27px Arial";
-    ctx.fillText("RECOMENDAÇÃO DO DIA", 70, 1608);
-    ctx.fillStyle = "rgba(237,248,255,.82)";
-    ctx.font = "650 25px Arial";
-    wrapped(ctx, advice(forecast), 70, 1652, 940, 34, 3);
+    ctx.font = "800 32px Arial";
+    wrapped(ctx, "“" + dailyMotivation(date) + "”", 70, 1710, 940, 40, 2);
+    ctx.fillStyle = "rgba(237,248,255,.72)";
+    ctx.font = "650 23px Arial";
+    wrapped(ctx, "Dica: " + advice(forecast), 70, 1802, 940, 29, 2);
     ctx.strokeStyle = "rgba(255,255,255,.18)";
-    ctx.beginPath(); ctx.moveTo(70, 1780); ctx.lineTo(1010, 1780); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(70, 1850); ctx.lineTo(1010, 1850); ctx.stroke();
     ctx.fillStyle = "#fff";
-    ctx.font = "900 28px Arial";
-    ctx.fillText("olacarlopolis.com", 70, 1840);
+    ctx.font = "900 26px Arial";
+    ctx.fillText("olacarlopolis.com", 70, 1893);
     ctx.textAlign = "right";
     ctx.fillStyle = "rgba(237,248,255,.65)";
-    ctx.font = "600 20px Arial";
-    ctx.fillText("Dados meteorológicos são estimativas", 1010, 1840);
+    ctx.font = "650 19px Arial";
+    ctx.fillText("Clima e níveis podem mudar ao longo do dia", 1010, 1893);
     ctx.textAlign = "left";
     return canvas;
   }
