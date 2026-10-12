@@ -8,6 +8,7 @@ const css = readFileSync(new URL("../style.css", import.meta.url), "utf8");
 const panel = readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
 const panelHtml = readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
 const worker = readFileSync(new URL("../service-worker.js", import.meta.url), "utf8");
+const story = readFileSync(new URL("../clima-story.js", import.meta.url), "utf8");
 
 test("Clima do Dia combina radar de chuva e malha regional de vento", () => {
   assert.match(html, /leaflet@1\.9\.4\/dist\/leaflet\.js/);
@@ -45,15 +46,29 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
   assert.match(css, /\.clima-moon-card/);
 });
 
+test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
+  assert.match(site, /id="climaStoryTrigger"/);
+  assert.match(html, /clima-story\.js\?v=1/);
+  assert.match(story, /canvas\.width = 1080/);
+  assert.match(story, /canvas\.height = 1920/);
+  assert.match(story, /REPRESA DE CHAVANTES/);
+  assert.match(story, /cm em 1 dia/);
+  assert.match(story, /LUA ATUAL/);
+  assert.match(story, /navigator\.share/);
+  assert.match(story, /logo-ola-carlopolis\.png\.png/);
+  assert.match(css, /\.clima-story-trigger/);
+  assert.match(css, /\.clima-story-modal/);
+  assert.match(worker, /clima-story\.js/);
+});
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v656/);
-  assert.match(html, /style\.css\?v=583/);
-  assert.match(html, /script\.js\?v=783/);
-  assert.match(html, /Olá Carlópolis v529/);
-  assert.match(panel, /numero: 869/);
-  assert.match(panel, /label: "v876"/);
-  assert.match(panel, /data: "2026-10-11"/);
-  assert.match(panelHtml, /painel\.css\?v=574/);
-  assert.match(panelHtml, /painel\.js\?v=876/);
-  assert.match(worker, /2026-10-11-pesque-solte-v923/);
+  assert.match(site, /Release do site v657/);
+  assert.match(html, /style\.css\?v=584/);
+  assert.match(html, /script\.js\?v=784/);
+  assert.match(html, /Olá Carlópolis v530/);
+  assert.match(panel, /numero: 870/);
+  assert.match(panel, /label: "v877"/);
+  assert.match(panel, /data: "2026-10-12"/);
+  assert.match(panelHtml, /painel\.css\?v=575/);
+  assert.match(panelHtml, /painel\.js\?v=877/);
+  assert.match(worker, /2026-10-12-pesque-solte-v924/);
 });

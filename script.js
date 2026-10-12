@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v656.
+// Release do site v657.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -27495,6 +27495,7 @@ ${servicosIniciaisLoja.length ? `
     area.innerHTML = `
       <section class="clima-page">
         <header class="clima-hero">
+          <button id="climaStoryTrigger" class="clima-story-trigger" type="button" title="Gerar imagem para Stories" aria-label="Gerar imagem do Clima do Dia para Stories"><i class="fa-solid fa-wand-magic-sparkles"></i><span>Gerar Story</span></button>
           <div class="clima-hero-copy">
             <span class="clima-kicker"><i class="fa-solid fa-location-dot"></i> Carlópolis, Paraná</span>
             <h1>Clima do Dia</h1>

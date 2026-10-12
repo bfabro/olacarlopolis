@@ -29288,4 +29288,44 @@ body.home-quick-banner-route-hidden .fuel-home-ticker { display: none !important
 
 /* Marcador de promocoes novas e reativadas - site v579 */
 
-/* Versao global do site v583 */
+/* Versao global do site v584 */
+
+/* ===== Clima do Dia: gerador discreto de Story ===== */
+.clima-hero{position:relative}
+.clima-story-trigger{
+  position:absolute;right:12px;bottom:10px;z-index:2;display:flex;align-items:center;gap:7px;
+  min-width:34px;height:34px;padding:0 9px;border:1px solid rgba(255,255,255,.2);border-radius:999px;
+  background:rgba(4,25,48,.12);color:rgba(255,255,255,.3);font-size:.7rem;font-weight:800;
+  opacity:.22;cursor:pointer;transition:opacity .2s,background .2s,color .2s,transform .2s
+}
+.clima-story-trigger span{max-width:0;overflow:hidden;white-space:nowrap;opacity:0;transition:max-width .25s,opacity .2s}
+.clima-story-trigger:hover,.clima-story-trigger:focus-visible,.clima-story-trigger.is-loading{
+  opacity:1;background:rgba(4,25,48,.78);color:#fff;transform:translateY(-1px)
+}
+.clima-story-trigger:hover span,.clima-story-trigger:focus-visible span,.clima-story-trigger.is-loading span{max-width:95px;opacity:1}
+.clima-story-modal{
+  position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:18px;
+  background:rgba(1,12,27,.82);backdrop-filter:blur(7px)
+}
+.clima-story-dialog{
+  position:relative;display:grid;grid-template-columns:minmax(0,300px) minmax(230px,360px);
+  gap:18px;width:min(760px,100%);max-height:calc(100vh - 36px);padding:22px;border:1px solid rgba(255,255,255,.18);
+  border-radius:24px;background:linear-gradient(145deg,#f8fcff,#eaf6ff);box-shadow:0 24px 80px rgba(0,0,0,.45);overflow:auto
+}
+.clima-story-heading{align-self:center}
+.clima-story-heading>span{display:block;color:#0877b9;font-size:.72rem;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+.clima-story-heading h2{margin:7px 0 8px;color:#0a3151;font-size:1.55rem;line-height:1.08}
+.clima-story-heading p{margin:0;color:#577087;font-size:.86rem;line-height:1.5}
+.clima-story-dialog>img{grid-column:2;grid-row:1 / span 2;display:block;width:100%;max-height:calc(100vh - 82px);object-fit:contain;border-radius:16px;background:#082641;box-shadow:0 12px 30px rgba(6,39,67,.2)}
+.clima-story-dialog footer{align-self:end;display:grid;gap:9px}
+.clima-story-dialog footer button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:0;border-radius:12px;font-weight:850;cursor:pointer}
+.clima-story-download{background:#dcecf7;color:#174b6d}
+.clima-story-share{background:linear-gradient(135deg,#7c3aed,#db2777,#f97316);color:#fff;box-shadow:0 8px 20px rgba(190,24,93,.2)}
+.clima-story-close{position:absolute;top:10px;right:10px;z-index:2;width:36px;height:36px;border:0;border-radius:50%;background:rgba(4,25,48,.78);color:#fff;cursor:pointer}
+@media(max-width:620px){
+  .clima-story-trigger{opacity:.3}
+  .clima-story-dialog{display:flex;flex-direction:column;padding:16px}
+  .clima-story-heading{padding-right:34px}
+  .clima-story-dialog>img{order:2;width:min(72vw,320px);max-height:56vh;margin:auto}
+  .clima-story-dialog footer{order:3;grid-template-columns:1fr 1fr}
+}
