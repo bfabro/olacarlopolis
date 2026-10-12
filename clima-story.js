@@ -23,6 +23,25 @@
     });
   }
 
+  async function screenMoonImage() {
+    const moonSvg = document.querySelector("#lua-desenho svg");
+    if (!moonSvg) return null;
+    const clone = moonSvg.cloneNode(true);
+    clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    clone.setAttribute("width", "320");
+    clone.setAttribute("height", "320");
+    const source = new XMLSerializer().serializeToString(clone);
+    const url = URL.createObjectURL(new Blob([source], { type: "image/svg+xml;charset=utf-8" }));
+    try {
+      return await image(url);
+    } catch (error) {
+      console.warn("Não foi possível reutilizar a Lua da tela na arte:", error);
+      return null;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
   function rounded(ctx, x, y, width, height, radius, fill, stroke = "") {
     ctx.beginPath();
     ctx.roundRect(x, y, width, height, radius);
@@ -188,7 +207,22 @@
     return { score, label: score >= 50 ? "Alta" : score >= 25 ? "Moderada" : score >= 10 ? "Baixa" : "Muito baixa", direction: active?.[3] || "todo o céu", time: active?.[4] || "entre 0h e 4h" };
   }
 
-  function drawMoon(ctx, x, y, radius, phase) {
+  function drawMoon(ctx, x, y, radius, phase, moonVisual) {
+    if (moonVisual) {
+      const size = radius * 2.22;
+      ctx.save();
+      ctx.shadowColor = "rgba(184,220,255,.58)";
+      ctx.shadowBlur = 34;
+      ctx.drawImage(moonVisual, x - size / 2, y - size / 2, size, size);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = "rgba(255,255,255,.34)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+      return;
+    }
     const size = Math.ceil(radius * 2.35);
     const moonCanvas = document.createElement("canvas");
     moonCanvas.width = size;
@@ -273,7 +307,7 @@
   }
 
   async function createCanvas(dateText) {
-    const [forecast, lake, logo] = await Promise.all([weather(dateText), reservoir(), image(LOGO)]);
+    const [forecast, lake, logo, moonVisual] = await Promise.all([weather(dateText), reservoir(), image(LOGO), screenMoonImage()]);
     const date = new Date(dateText + "T12:00:00");
     const phase = moon(date);
     const meteors = meteor(date, phase, forecast.current.cloud_cover);
@@ -299,14 +333,35 @@
     ctx.fillStyle = "#8de5ff";
     ctx.font = "900 24px Arial";
     ctx.fillText("CLIMA DO DIA • CARLÓPOLIS, PR", 70, 92);
-    ctx.fillStyle = "#fff";
+    const greetingGradient = ctx.createLinearGradient(70, 118, 680, 250);
+    greetingGradient.addColorStop(0, "#ffffff");
+    greetingGradient.addColorStop(.55, "#fff1a8");
+    greetingGradient.addColorStop(1, "#ffad45");
+    ctx.fillStyle = greetingGradient;
     ctx.font = "900 62px Arial";
     ctx.fillText(greetingText + ",", 70, 172);
     ctx.font = "900 66px Arial";
     ctx.fillText("CARLÓPOLIS!", 70, 244);
+    ctx.strokeStyle = "#ffd45e";
+    ctx.lineWidth = 8;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(74, 264);
+    ctx.bezierCurveTo(210, 288, 470, 272, 650, 250);
+    ctx.stroke();
+    ctx.fillStyle = "#ffe37b";
+    [[682, 152, 7], [716, 190, 5], [668, 220, 4]].forEach(([sparkX, sparkY, sparkRadius]) => {
+      ctx.beginPath();
+      ctx.arc(sparkX, sparkY, sparkRadius, 0, Math.PI * 2);
+      ctx.fill();
+    });
     ctx.fillStyle = "rgba(255,255,255,.82)";
     ctx.font = "750 31px Arial";
-    ctx.fillText(date.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" }), 70, 306);
+    const dateLabel = date.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" });
+    const timeLabel = new Date().toLocaleTimeString("pt-BR", {
+      timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit"
+    });
+    ctx.fillText(dateLabel + " • " + timeLabel, 70, 316);
 
     rounded(ctx, 70, 350, 940, 305, 38, "rgba(255,255,255,.12)");
     ctx.fillStyle = "#8de5ff";
@@ -329,7 +384,7 @@
     card(ctx, 718, "Chuva", (forecast.rain ?? "—") + "%", (forecast.rainTotal ?? "—") + " mm previstos", "#86d8ff");
 
     rounded(ctx, 70, 920, 940, 350, 38, "rgba(3,12,31,.42)");
-    drawMoon(ctx, 245, 1095, 122, phase);
+    drawMoon(ctx, 245, 1095, 122, phase, moonVisual);
     ctx.fillStyle = "#82d9ff";
     ctx.font = "900 25px Arial";
     ctx.fillText("LUA ATUAL", 430, 978);

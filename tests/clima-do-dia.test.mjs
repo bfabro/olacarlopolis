@@ -48,13 +48,19 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 
 test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(site, /id="climaStoryTrigger"/);
-  assert.match(html, /clima-story\.js\?v=2/);
+  assert.match(html, /clima-story\.js\?v=3/);
   assert.match(story, /canvas\.width = 1080/);
   assert.match(story, /canvas\.height = 1920/);
   assert.match(story, /REPRESA DE CHAVANTES/);
   assert.match(story, /cm em 1 dia/);
   assert.match(story, /LUA ATUAL/);
   assert.match(story, /function greeting\(\)/);
+  assert.match(story, /document\.querySelector\("#lua-desenho svg"\)/);
+  assert.match(story, /new XMLSerializer\(\)/);
+  assert.match(story, /screenMoonImage\(\)/);
+  assert.match(story, /toLocaleTimeString\("pt-BR"/);
+  assert.match(story, /greetingGradient/);
+  assert.match(story, /bezierCurveTo/);
   assert.match(story, /CARLÓPOLIS!/);
   assert.match(story, /function dailyMotivation\(date\)/);
   assert.match(story, /createImageData\(size, size\)/);
@@ -69,14 +75,14 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(worker, /clima-story\.js/);
 });
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v658/);
-  assert.match(html, /style\.css\?v=585/);
-  assert.match(html, /script\.js\?v=785/);
-  assert.match(html, /Olá Carlópolis v531/);
-  assert.match(panel, /numero: 871/);
-  assert.match(panel, /label: "v878"/);
+  assert.match(site, /Release do site v659/);
+  assert.match(html, /style\.css\?v=586/);
+  assert.match(html, /script\.js\?v=786/);
+  assert.match(html, /Olá Carlópolis v532/);
+  assert.match(panel, /numero: 872/);
+  assert.match(panel, /label: "v879"/);
   assert.match(panel, /data: "2026-10-12"/);
-  assert.match(panelHtml, /painel\.css\?v=576/);
-  assert.match(panelHtml, /painel\.js\?v=878/);
-  assert.match(worker, /2026-10-12-pesque-solte-v925/);
+  assert.match(panelHtml, /painel\.css\?v=577/);
+  assert.match(panelHtml, /painel\.js\?v=879/);
+  assert.match(worker, /2026-10-12-pesque-solte-v926/);
 });
