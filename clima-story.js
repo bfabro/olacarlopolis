@@ -550,14 +550,14 @@
       ctx.font = cardFont(700, 22);
     });
 
-    rounded(ctx, 610, 282, 450, 128, 22, "#fff7e3", "rgba(255,198,85,.9)");
-    rounded(ctx, 625, 294, 420, 40, 15, "#ffb52e");
+    rounded(ctx, 20, 310, 590, 105, 22, "#fff7e3", "rgba(255,198,85,.9)");
+    rounded(ctx, 35, 320, 560, 30, 15, "#ffb52e");
     ctx.fillStyle = "#073663";
     ctx.font = cardFont(900, 18);
-    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 643, 321);
+    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 50, 342);
     ctx.fillStyle = "#092e56";
-    ctx.font = cardFont(900, 25);
-    wrapped(ctx, dayCelebration.title, 630, 361, 400, cardLine(29), 2);
+    ctx.font = cardFont(900, 23);
+    wrapped(ctx, dayCelebration.title, 40, 375, 550, cardLine(27), 2);
 
     rounded(ctx, 20, 712, 1040, 330, 24, "rgba(0,58,104,.93)", "rgba(46,183,242,.72)");
     ctx.fillStyle = "#d8efff";
@@ -674,7 +674,7 @@
     ctx.fillStyle = "#60758a";
     ctx.font = cardFont(700, 17);
     const lakeDate = lake.date ? new Date(lake.date).toLocaleDateString("pt-BR") : "medição mais recente";
-    ctx.fillText("Volume útil: " + (Number.isFinite(lake.volume) ? lake.volume.toFixed(2).replace(".", ",") + "%" : "não informado") + " • " + lakeDate, 345, 1434);
+    ctx.fillText("Volume útil: " + (Number.isFinite(lake.volume) ? lake.volume.toFixed(2).replace(".", ",") + "%" : "não informado") + " • " + lakeDate, 50, 1473);
     drawReservoirChart(ctx, lake.history, 665, 1325, 350, 105);
 
     rounded(ctx, 20, 1532, 1040, 178, 24, "#eef8ff", "rgba(157,222,255,.8)");
