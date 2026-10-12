@@ -484,18 +484,15 @@
     ctx.fillRect(0, 280, 1080, 190);
 
     const greetingText = greeting().toUpperCase();
-    ctx.fillStyle = "#d7efff";
-    ctx.font = "900 24px Arial";
-    ctx.fillText("CLIMA DO DIA • CARLÓPOLIS, PR", 48, 58);
     ctx.fillStyle = "#fff";
     ctx.font = "900 84px Arial";
-    ctx.fillText(greetingText + ",", 48, 150);
-    const titleGradient = ctx.createLinearGradient(48, 165, 690, 245);
+    ctx.fillText(greetingText + ",", 48, 118);
+    const titleGradient = ctx.createLinearGradient(48, 132, 690, 212);
     titleGradient.addColorStop(0, "#ffe268");
     titleGradient.addColorStop(1, "#ffbb2f");
     ctx.fillStyle = titleGradient;
     ctx.font = "900 82px Arial";
-    ctx.fillText("CARLÓPOLIS!", 48, 238);
+    ctx.fillText("CARLÓPOLIS!", 48, 206);
 
     ctx.save();
     ctx.shadowColor = "rgba(0,29,60,.52)";
@@ -509,14 +506,14 @@
     });
     ctx.fillStyle = "#fff";
     ctx.font = "800 27px Arial";
-    ctx.fillText("▣  " + dateLabel + "   |   ◷  " + timeLabel + "  (atualizado)", 52, 294);
+    ctx.fillText("▣  " + dateLabel + "   |   ◷  " + timeLabel + "  (gerado)", 52, 270);
 
     rounded(ctx, 20, 420, 625, 270, 24, "rgba(0,53,102,.94)", "rgba(80,197,255,.60)");
     ctx.fillStyle = "#55ddff";
     ctx.font = "900 23px Arial";
     ctx.fillText("CONDIÇÃO ATUAL", 46, 462);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 96px Arial";
+    ctx.font = "900 86px Arial";
     ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 44, 575);
     ctx.font = "46px Arial";
     ctx.fillText(weatherEmoji(forecast.current.weather_code), 50, 646);
@@ -539,9 +536,10 @@
       ctx.fillStyle = "#7fddff";
       ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 372, y);
       ctx.fillStyle = "#dcefff";
+      ctx.font = "700 19px Arial";
       ctx.fillText(label, 407, y);
       ctx.fillStyle = "#fff";
-      ctx.font = "900 22px Arial";
+      ctx.font = "900 20px Arial";
       ctx.textAlign = "right";
       ctx.fillText(value, 620, y);
       ctx.textAlign = "left";
@@ -551,8 +549,8 @@
     rounded(ctx, 665, 420, 395, 270, 24, "#fff7e3", "rgba(255,198,85,.9)");
     rounded(ctx, 680, 434, 365, 48, 17, "#ffb52e");
     ctx.fillStyle = "#073663";
-    ctx.font = "900 22px Arial";
-    ctx.fillText("HOJE SE COMEMORA", 699, 466);
+    ctx.font = "900 20px Arial";
+    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 699, 466);
     ctx.fillStyle = "#e93155";
     ctx.font = "36px Arial";
     ctx.fillText("▣", 700, 525);
@@ -661,7 +659,7 @@
     ctx.fillStyle = "#6c8095";
     ctx.font = "850 17px Arial";
     ctx.fillText("NÍVEL ATUAL", 50, 1331);
-    ctx.fillText("VALOR DE REFERÊNCIA", 345, 1331);
+    ctx.fillText("LIMITE NORMAL", 345, 1331);
     ctx.fillStyle = "#073663";
     const lakeLevelText = Number.isFinite(lake.level) ? lake.level.toFixed(2).replace(".", ",") + " m" : "Indisponível";
     ctx.font = Number.isFinite(lake.level) ? "900 55px Arial" : "900 38px Arial";
@@ -698,34 +696,10 @@
     ctx.font = "750 20px Arial";
     wrapped(ctx, "“" + dailyMotivation(date) + "”", 620, 1612, 390, 27, 3);
 
-    ctx.drawImage(logo, 35, 1740, 105, 105);
+    ctx.drawImage(logo, 285, 1740, 110, 110);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 34px Arial";
-    ctx.fillText("olacarlopolis.com", 145, 1806);
-    const footerItems = [
-      ["🌤️", "Previsão", "do tempo"],
-      ["≋", "Nível da", "represa"],
-      ["▤", "Notícias", "da cidade"],
-      ["⌂", "Comércios", "e serviços"]
-    ];
-    footerItems.forEach(([icon, line1, line2], index) => {
-      const x = 440 + index * 150;
-      ctx.strokeStyle = "rgba(77,194,245,.65)";
-      ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(x, 1788, 31, 0, Math.PI * 2); ctx.stroke();
-      ctx.fillStyle = "#fff";
-      ctx.font = "26px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText(icon, x, 1798);
-      ctx.textAlign = "left";
-      ctx.font = "700 15px Arial";
-      ctx.fillText(line1, x + 40, 1782);
-      ctx.fillText(line2, x + 40, 1804);
-    });
-    ctx.textAlign = "center";
-    ctx.fillStyle = "rgba(224,243,255,.68)";
-    ctx.font = "650 15px Arial";
-    ctx.fillText("Dados: Open-Meteo • Represa de Chavantes • Datas comemorativas: Wikipédia • Atualizações podem ocorrer ao longo do dia", 540, 1885);
+    ctx.font = "900 36px Arial";
+    ctx.fillText("olacarlopolis.com", 420, 1808);
     ctx.textAlign = "left";
     return canvas;
   }
