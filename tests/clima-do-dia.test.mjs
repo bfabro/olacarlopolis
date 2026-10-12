@@ -48,7 +48,7 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 
 test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(site, /id="climaStoryTrigger"/);
-  assert.match(html, /clima-story\.js\?v=3/);
+  assert.match(html, /clima-story\.js\?v=4/);
   assert.match(story, /canvas\.width = 1080/);
   assert.match(story, /canvas\.height = 1920/);
   assert.match(story, /REPRESA DE CHAVANTES/);
@@ -59,8 +59,8 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(story, /new XMLSerializer\(\)/);
   assert.match(story, /screenMoonImage\(\)/);
   assert.match(story, /toLocaleTimeString\("pt-BR"/);
-  assert.match(story, /greetingGradient/);
-  assert.match(story, /bezierCurveTo/);
+  assert.match(story, /titleGradient/);
+  assert.match(story, /drawImageCover/);
   assert.match(story, /CARLÓPOLIS!/);
   assert.match(story, /function dailyMotivation\(date\)/);
   assert.match(story, /createImageData\(size, size\)/);
@@ -69,20 +69,27 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(story, /474,00 m/);
   assert.match(story, /CONDIÇÃO ATUAL/);
   assert.match(story, /navigator\.share/);
-  assert.match(story, /logo-ola-carlopolis\.png\.png/);
+  assert.match(story, /logo_1\.png/);
+  assert.match(story, /images\/turismo\/ponte\.jpg/);
+  assert.match(story, /HOJE SE COMEMORA/);
+  assert.match(story, /pt\.wikipedia\.org\/w\/api\.php/);
+  assert.match(story, /function celebration\(date\)/);
+  assert.match(story, /hourly: "temperature_2m,precipitation_probability,weather_code"/);
+  assert.match(story, /drawReservoirChart/);
+  assert.match(story, /history: days\.slice\(-7\)/);
   assert.match(css, /\.clima-story-trigger/);
   assert.match(css, /\.clima-story-modal/);
   assert.match(worker, /clima-story\.js/);
 });
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v659/);
-  assert.match(html, /style\.css\?v=586/);
-  assert.match(html, /script\.js\?v=786/);
-  assert.match(html, /Olá Carlópolis v532/);
-  assert.match(panel, /numero: 872/);
-  assert.match(panel, /label: "v879"/);
+  assert.match(site, /Release do site v660/);
+  assert.match(html, /style\.css\?v=587/);
+  assert.match(html, /script\.js\?v=787/);
+  assert.match(html, /Olá Carlópolis v533/);
+  assert.match(panel, /numero: 873/);
+  assert.match(panel, /label: "v880"/);
   assert.match(panel, /data: "2026-10-12"/);
-  assert.match(panelHtml, /painel\.css\?v=577/);
-  assert.match(panelHtml, /painel\.js\?v=879/);
-  assert.match(worker, /2026-10-12-pesque-solte-v926/);
+  assert.match(panelHtml, /painel\.css\?v=578/);
+  assert.match(panelHtml, /painel\.js\?v=880/);
+  assert.match(worker, /2026-10-12-pesque-solte-v927/);
 });

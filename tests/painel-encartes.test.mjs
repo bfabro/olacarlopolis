@@ -33,8 +33,8 @@ test("encarte oferece seis layouts, identidade do comércio e exportação PNG",
   assert.match(panelJs, /carregarImagemCanvas\(flyerItemImage\(item\)\)/);
   assert.match(panelJs, /canvasParaBlob\(canvas\)/);
   assert.match(panelJs, /baixarBlobCanvas\(blob, "encarte-"/);
-  assert.match(panelHtml, /painel\.css\?v=577/);
-  assert.match(panelHtml, /painel\.js\?v=879/);
+  assert.match(panelHtml, /painel\.css\?v=578/);
+  assert.match(panelHtml, /painel\.js\?v=880/);
 });
 
 test("seis modelos reproduzem composições profissionais usando os dados reais do cliente", () => {

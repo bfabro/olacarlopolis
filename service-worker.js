@@ -1,12 +1,13 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-10-12-pesque-solte-v926'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-10-12-pesque-solte-v927'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/clima-story.js',
-  '/images/img_padrao_site/logo-ola-carlopolis.png.png',
+  '/images/img_padrao_site/logo_1.png',
+  '/images/turismo/ponte.jpg',
   '/ola-pesca.css',
   '/ola-pesca.js',
   '/images/jogos/ola-pesca/peixes-sprites-v2.png',
