@@ -83,6 +83,28 @@
     };
   }
 
+  function consistentTemperatureRange(data) {
+    const temperatures = (data.hourly?.temperature_2m || [])
+      .filter((value) => value !== null && value !== "" && Number.isFinite(Number(value)))
+      .map(Number);
+    const dailyDate = String(data.daily?.time?.[0] || "");
+    const currentDate = String(data.current?.time || "").split("T")[0];
+    const currentRaw = data.current?.temperature_2m;
+    const currentTemperature = currentRaw === null || currentRaw === "" ? null : Number(currentRaw);
+    if (dailyDate && dailyDate === currentDate && Number.isFinite(currentTemperature)) {
+      temperatures.push(currentTemperature);
+    }
+    const dailyMinRaw = data.daily?.temperature_2m_min?.[0];
+    const dailyMaxRaw = data.daily?.temperature_2m_max?.[0];
+    const dailyMin = dailyMinRaw === null || dailyMinRaw === "" ? null : Number(dailyMinRaw);
+    const dailyMax = dailyMaxRaw === null || dailyMaxRaw === "" ? null : Number(dailyMaxRaw);
+    if (Number.isFinite(dailyMin)) temperatures.push(dailyMin);
+    if (Number.isFinite(dailyMax)) temperatures.push(dailyMax);
+    return {
+      min: temperatures.length ? Math.min(...temperatures) : null,
+      max: temperatures.length ? Math.max(...temperatures) : null
+    };
+  }
   async function weather(date) {
     const query = new URLSearchParams({
       latitude: COORDS.lat,
@@ -95,10 +117,11 @@
     const response = await fetch(WEATHER_API + "?" + query, { cache: "no-store" });
     if (!response.ok) throw new Error("Clima indisponível");
     const data = await response.json();
+    const temperatureRange = consistentTemperatureRange(data);
     return {
       current: data.current || {},
-      min: data.daily?.temperature_2m_min?.[0],
-      max: data.daily?.temperature_2m_max?.[0],
+      min: temperatureRange.min,
+      max: temperatureRange.max,
       rain: data.daily?.precipitation_probability_max?.[0],
       rainTotal: data.daily?.precipitation_sum?.[0],
       uv: data.daily?.uv_index_max?.[0],

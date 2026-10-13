@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 884,
-  label: "v891",
+  numero: 885,
+  label: "v892",
   data: "2026-10-13",
-  nota: "A imagem do Clima do Dia agora oferece 366 mensagens motivacionais únicas, com humor leve e uma frase para cada dia do calendário."
+  nota: "Máxima e mínima do Clima do Dia agora consideram também os horários e a temperatura atual, evitando valores contraditórios."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v671.
+// Release do site v672.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -27215,6 +27215,27 @@ ${servicosIniciaisLoja.length ? `
 
 
   // === Clima diário e condições atuais (Open-Meteo) ===
+  function intervaloTemperaturaConsistente(data) {
+    const temperaturas = (data.hourly?.temperature_2m || [])
+      .filter((value) => value !== null && value !== "" && Number.isFinite(Number(value)))
+      .map(Number);
+    const dataDiaria = String(data.daily?.time?.[0] || "");
+    const dataAtual = String(data.current?.time || "").split("T")[0];
+    const atualRaw = data.current?.temperature_2m;
+    const atual = atualRaw === null || atualRaw === "" ? null : Number(atualRaw);
+    if (dataDiaria && dataDiaria === dataAtual && Number.isFinite(atual)) temperaturas.push(atual);
+    const minimaRaw = data.daily?.temperature_2m_min?.[0];
+    const maximaRaw = data.daily?.temperature_2m_max?.[0];
+    const minima = minimaRaw === null || minimaRaw === "" ? null : Number(minimaRaw);
+    const maxima = maximaRaw === null || maximaRaw === "" ? null : Number(maximaRaw);
+    if (Number.isFinite(minima)) temperaturas.push(minima);
+    if (Number.isFinite(maxima)) temperaturas.push(maxima);
+    return {
+      min: temperaturas.length ? Math.min(...temperaturas) : null,
+      max: temperaturas.length ? Math.max(...temperaturas) : null
+    };
+  }
+
   async function buscarTempo(dateISO) {
     const { lat, lng } = COORDS_CARLOPOLIS;
     const base = "https://api.open-meteo.com/v1/forecast";
@@ -27223,7 +27244,7 @@ ${servicosIniciaisLoja.length ? `
       longitude: lng,
       current: "temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,rain,weather_code,cloud_cover,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m",
       daily: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,precipitation_sum,wind_speed_10m_max,uv_index_max,sunshine_duration",
-      hourly: "visibility",
+      hourly: "visibility,temperature_2m",
       timezone: "America/Sao_Paulo",
       temperature_unit: "celsius",
       wind_speed_unit: "kmh",
@@ -27236,14 +27257,15 @@ ${servicosIniciaisLoja.length ? `
     if (!j?.daily) throw new Error("Resposta inválida (clima)");
 
     const i = 0;
+    const intervaloTemperatura = intervaloTemperaturaConsistente(j);
     const agora = Date.now();
     const hourlyIndex = (j.hourly?.time || []).reduce((melhor, iso, index, lista) => {
       if (!lista.length) return 0;
       return Math.abs(new Date(iso).getTime() - agora) < Math.abs(new Date(lista[melhor]).getTime() - agora) ? index : melhor;
     }, 0);
     return {
-      tmax: j.daily.temperature_2m_max?.[i],
-      tmin: j.daily.temperature_2m_min?.[i],
+      tmax: intervaloTemperatura.max,
+      tmin: intervaloTemperatura.min,
       wind: j.daily.wind_speed_10m_max?.[i],
       rainProb: j.daily.precipitation_probability_max?.[i],
       rainTotal: j.daily.precipitation_sum?.[i],
@@ -28452,7 +28474,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ REGISTRO DO SERVICE WORKER
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js?v=938', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('/service-worker.js?v=939', { updateViaCache: 'none' })
     .then(reg => {
       reg.update();
       console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);
