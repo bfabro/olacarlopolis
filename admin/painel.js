@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 883,
-  label: "v890",
+  numero: 884,
+  label: "v891",
   data: "2026-10-13",
-  nota: "O desenho da Lua agora representa corretamente a parte iluminada e é idêntico na tela do Clima e na arte para Stories."
+  nota: "A imagem do Clima do Dia agora oferece 366 mensagens motivacionais únicas, com humor leve e uma frase para cada dia do calendário."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

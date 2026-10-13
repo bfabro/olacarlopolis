@@ -45,8 +45,8 @@ test("submenus do cliente alternam cores e preservam contraste nos estados", () 
 });
 
 test("ativos do painel usam as novas versoes sem cache antigo", () => {
-  assert.ok(panelHtml.includes("painel.css?v=588"));
-  assert.ok(panelHtml.includes("painel.js?v=890"));
+  assert.ok(panelHtml.includes("painel.css?v=589"));
+  assert.ok(panelHtml.includes("painel.js?v=891"));
 });
 
 test("mantem a area do parceiro visivel para o perfil correspondente", () => {

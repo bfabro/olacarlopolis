@@ -328,21 +328,52 @@
   }
 
   function dailyMotivation(date) {
-    const messages = [
-      "Que hoje não faltem motivos para sorrir e seguir em frente.",
-      "Comece o dia acreditando: coisas boas também encontram quem não desiste.",
-      "Cada manhã traz uma nova chance de fazer acontecer.",
-      "Leve leveza no coração e coragem para todos os caminhos.",
-      "Seu melhor passo de hoje é aquele que você decide dar.",
-      "Que o dia seja produtivo, tranquilo e cheio de boas notícias.",
-      "Espalhe gentileza: ela sempre encontra um jeito de voltar.",
-      "Respire fundo, confie no caminho e faça deste dia um bom dia.",
-      "Grandes mudanças começam com pequenas atitudes.",
-      "Hoje é um ótimo dia para transformar planos em movimento.",
-      "Valorize cada conquista, inclusive aquelas que só você percebe.",
-      "Que nunca faltem esperança, saúde e vontade de recomeçar."
+    const openings = [
+      "Hoje é dia de colocar os planos para andar", "Comece devagar, mas comece",
+      "Leve coragem na bagagem de hoje", "Dê uma chance para as coisas boas",
+      "Faça deste dia um bom capítulo", "Respire fundo e siga confiante",
+      "Hoje vale insistir um pouquinho mais", "Abra espaço para uma boa surpresa",
+      "Transforme vontade em movimento", "Vá com calma, alegria e propósito",
+      "Acredite no próximo passo", "Espalhe bom humor por onde passar",
+      "Que o dia renda boas histórias"
     ];
-    return messages[Math.abs(Math.floor(date.getTime() / 86400000)) % messages.length];
+    const endings = [
+      "o café ajuda, mas o primeiro passo ainda é por sua conta.",
+      "até a previsão muda, então você também pode mudar o rumo.",
+      "se chover, a gente chama de irrigação dos sonhos.",
+      "se o plano falhar, finja que era aquecimento.",
+      "ninguém precisa bater recorde antes do café.",
+      "a pressa espanta até peixe curioso.",
+      "um sorriso pesa menos que qualquer preocupação.",
+      "se aparecer vento contrário, ajuste a vela imaginária.",
+      "o importante é não deixar a coragem no modo soneca.",
+      "todo grande resultado já foi uma ideia meio teimosa.",
+      "até a represa sobe gota por gota.",
+      "se der errado, pelo menos vira uma boa história.",
+      "o sol não cobra ingresso para iluminar seu caminho.",
+      "quem vai com constância chega antes da desculpa.",
+      "problema grande também fica menor depois de um café.",
+      "hoje a sorte pode estar só esperando você sair de casa.",
+      "não consulte a preguiça; ela sempre vota para ficar.",
+      "faça o possível e deixe o impossível pegar fila.",
+      "dia bonito começa no jeito de olhar pela janela.",
+      "se a inspiração atrasar, comece sem ela mesmo.",
+      "até história de pescador começa com alguém tentando.",
+      "o bom humor não resolve tudo, mas melhora a reunião.",
+      "uma pausa é descanso, não abandono do plano.",
+      "quem planta paciência colhe menos dor de cabeça.",
+      "o caminho pode ser longo, mas não precisa ser sem graça.",
+      "se o céu fechar, abra o guarda-chuva e mantenha o plano.",
+      "o despertador venceu a primeira batalha; aproveite.",
+      "seja persistente, mas aceite uma paradinha para o café.",
+      "hoje pode surpreender mais que peixe grande em linha fina."
+    ];
+    const yearStart = Date.UTC(date.getFullYear(), 0, 1);
+    const currentDay = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+    const dayIndex = Math.floor((currentDay - yearStart) / 86400000);
+    const opening = openings[dayIndex % openings.length];
+    const ending = endings[Math.floor(dayIndex / openings.length) % endings.length];
+    return `${opening} — ${ending}`;
   }
   function meteor(date, phase, clouds) {
     const monthDay = Number(String(date.getMonth() + 1).padStart(2, "0") + String(date.getDate()).padStart(2, "0"));

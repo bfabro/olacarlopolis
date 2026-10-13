@@ -54,7 +54,7 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 
 test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(site, /id="climaStoryTrigger"/);
-  assert.match(html, /clima-story\.js\?v=14/);
+  assert.match(html, /clima-story\.js\?v=15/);
   assert.match(story, /canvas\.width = 1080/);
   assert.match(story, /canvas\.height = 1920/);
   assert.match(story, /REPRESA DE CHAVANTES/);
@@ -119,21 +119,31 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(css, /\.clima-story-trigger/);
   assert.match(css, /\.clima-story-modal/);
   assert.match(worker, /clima-story\.js/);
-  assert.match(html, /service-worker\.js\?v=937/);
+  assert.match(html, /service-worker\.js\?v=938/);
   assert.match(html, /updateViaCache: 'none'/);
   assert.match(html, /controllerchange/);
-  assert.match(site, /service-worker\.js\?v=937/);
+  assert.match(site, /service-worker\.js\?v=938/);
   assert.match(site, /reg\.update\(\)/);
 });
+test("mensagem motivacional oferece uma frase bem-humorada para cada dia do ano", () => {
+  const source = story.match(/function dailyMotivation\(date\) \{[\s\S]*?\n  \}(?=\n  function meteor)/);
+  assert.ok(source, "função diária não encontrada");
+  const motivation = new Function(`${source[0]}; return dailyMotivation;`)();
+  const messages = Array.from({ length: 366 }, (_, index) => motivation(new Date(2028, 0, index + 1, 12)));
+  assert.equal(new Set(messages).size, 366);
+  assert.ok(messages.every((message) => message.includes("—")));
+  assert.equal(motivation(new Date(2028, 1, 29, 8)), motivation(new Date(2028, 1, 29, 20)));
+  assert.doesNotMatch(source[0], /Math\.random/);
+});
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v670/);
-  assert.match(html, /style\.css\?v=597/);
-  assert.match(html, /script\.js\?v=797/);
-  assert.match(html, /Olá Carlópolis v543/);
-  assert.match(panel, /numero: 883/);
-  assert.match(panel, /label: "v890"/);
+  assert.match(site, /Release do site v671/);
+  assert.match(html, /style\.css\?v=598/);
+  assert.match(html, /script\.js\?v=798/);
+  assert.match(html, /Olá Carlópolis v544/);
+  assert.match(panel, /numero: 884/);
+  assert.match(panel, /label: "v891"/);
   assert.match(panel, /data: "2026-10-13"/);
-  assert.match(panelHtml, /painel\.css\?v=588/);
-  assert.match(panelHtml, /painel\.js\?v=890/);
-  assert.match(worker, /2026-10-13-pesque-solte-v937/);
+  assert.match(panelHtml, /painel\.css\?v=589/);
+  assert.match(panelHtml, /painel\.js\?v=891/);
+  assert.match(worker, /2026-10-13-pesque-solte-v938/);
 });
