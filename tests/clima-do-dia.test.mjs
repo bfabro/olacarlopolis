@@ -48,7 +48,7 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 
 test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(site, /id="climaStoryTrigger"/);
-  assert.match(html, /clima-story\.js\?v=12/);
+  assert.match(html, /clima-story\.js\?v=13/);
   assert.match(story, /canvas\.width = 1080/);
   assert.match(story, /canvas\.height = 1920/);
   assert.match(story, /REPRESA DE CHAVANTES/);
@@ -87,7 +87,14 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(story, /id="climaStoryFontSize"/);
   assert.match(story, /createCanvas\(dateText, fontScale = 1\)/);
   assert.match(story, /Math\.min\(1\.25/);
-  assert.match(story, /const adviceTextX = Math\.max/);
+  assert.match(story, /const cardFont = \(weight, size\) => weight \+ " " \+ size \+ "px Arial"/);
+  assert.match(story, /const detailFont = \(weight, size\).*safeFontScale/);
+  assert.match(story, /rounded\(ctx, 36, 758, 708, 102/);
+  assert.match(story, /description\(750, 20, advice\(forecast\), 390, 825, 650, 20, 2\)/);
+  assert.doesNotMatch(story, /adviceTextX/);
+  assert.match(story, /while \(size >= 8\)/);
+  assert.match(story, /if \(lines.length <= maxLines\) break/);
+  assert.match(story, /description\(650, 14, "Meteoros:/);
   assert.match(story, /drawMoon\(ctx, 925, 1010, 52/);
   assert.doesNotMatch(story, /Compartilhe com quem/);
   assert.match(css, /\.clima-story-font-control/);
@@ -106,21 +113,21 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(css, /\.clima-story-trigger/);
   assert.match(css, /\.clima-story-modal/);
   assert.match(worker, /clima-story\.js/);
-  assert.match(html, /service-worker\.js\?v=935/);
+  assert.match(html, /service-worker\.js\?v=936/);
   assert.match(html, /updateViaCache: 'none'/);
   assert.match(html, /controllerchange/);
-  assert.match(site, /service-worker\.js\?v=935/);
+  assert.match(site, /service-worker\.js\?v=936/);
   assert.match(site, /reg\.update\(\)/);
 });
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v668/);
-  assert.match(html, /style\.css\?v=595/);
-  assert.match(html, /script\.js\?v=795/);
-  assert.match(html, /Olá Carlópolis v541/);
-  assert.match(panel, /numero: 881/);
-  assert.match(panel, /label: "v888"/);
+  assert.match(site, /Release do site v669/);
+  assert.match(html, /style\.css\?v=596/);
+  assert.match(html, /script\.js\?v=796/);
+  assert.match(html, /Olá Carlópolis v542/);
+  assert.match(panel, /numero: 882/);
+  assert.match(panel, /label: "v889"/);
   assert.match(panel, /data: "2026-10-13"/);
-  assert.match(panelHtml, /painel\.css\?v=586/);
-  assert.match(panelHtml, /painel\.js\?v=888/);
-  assert.match(worker, /2026-10-13-pesque-solte-v935/);
+  assert.match(panelHtml, /painel\.css\?v=587/);
+  assert.match(panelHtml, /painel\.js\?v=889/);
+  assert.match(worker, /2026-10-13-pesque-solte-v936/);
 });

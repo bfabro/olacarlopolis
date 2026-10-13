@@ -467,12 +467,35 @@
     const phase = moon(date);
     const meteors = meteor(date, phase, forecast.current.cloud_cover);
     const safeFontScale = Math.max(1, Math.min(1.25, Number(fontScale) || 1));
-    const cardFont = (weight, size) => weight + " " + Math.round(size * safeFontScale) + "px Arial";
-    const cardLine = (size) => Math.round(size * safeFontScale);
+    const cardFont = (weight, size) => weight + " " + size + "px Arial";
+    const cardLine = (size) => size;
+    const detailFont = (weight, size) => weight + " " + Math.round(size * safeFontScale) + "px Arial";
+    const detailLine = (size) => Math.round(size * safeFontScale);
     const canvas = document.createElement("canvas");
     canvas.width = 1080;
     canvas.height = 1920;
     const ctx = canvas.getContext("2d");
+    const description = (weight, baseSize, text, x, y, width, lineBase, maxLines) => {
+      const words = String(text || "").split(/\s+/).filter(Boolean);
+      let size = Math.round(baseSize * safeFontScale);
+      let lines = [];
+      while (size >= 8) {
+        ctx.font = weight + " " + size + "px Arial";
+        lines = [];
+        let current = "";
+        words.forEach((word) => {
+          const candidate = current ? current + " " + word : word;
+          if (!current || ctx.measureText(candidate).width <= width) current = candidate;
+          else { lines.push(current); current = word; }
+        });
+        if (current) lines.push(current);
+        if (lines.length <= maxLines) break;
+        size -= 1;
+      }
+      const lineHeight = Math.min(Math.round(lineBase * safeFontScale), Math.max(lineBase, Math.round(size * 1.12)));
+      lines.forEach((line, index) => ctx.fillText(line, x, y + index * lineHeight));
+      return lines.length;
+    };
 
     const base = ctx.createLinearGradient(0, 0, 0, 1920);
     base.addColorStop(0, "#063f70");
@@ -572,15 +595,16 @@
     ctx.strokeStyle = "rgba(152,225,255,.45)";
     ctx.beginPath(); ctx.moveTo(455, 650); ctx.lineTo(455, 745); ctx.stroke();
     ctx.fillStyle = "#fff";
-    ctx.font = cardFont(700, 20);
-    wrapped(ctx, weatherText(forecast.current.weather_code) + ", com chance de chuva ao longo do dia.", 485, 675, 225, cardLine(29), 3);
-    rounded(ctx, 36, 770, 708, 80, 22, "#ffe47a", "#fff1a9");
+    ctx.font = detailFont(700, 20);
+    description(700, 20, weatherText(forecast.current.weather_code) + ", com chance de chuva ao longo do dia.", 485, 675, 225, 21, 3);
+    rounded(ctx, 36, 758, 708, 102, 22, "#ffe47a", "#fff1a9");
     ctx.fillStyle = "#083e70";
     ctx.font = cardFont(900, 22);
-    ctx.fillText("☂  DICA DO DIA:", 62, 819);
-    const adviceTextX = Math.max(245, 62 + ctx.measureText("☂  DICA DO DIA:").width + 22);
-    ctx.font = cardFont(750, 20);
-    wrapped(ctx, advice(forecast), adviceTextX, 802, 716 - adviceTextX, cardLine(25), 2);
+    ctx.textAlign = "center";
+    ctx.fillText("☂  DICA DO DIA:", 390, 790);
+    ctx.font = detailFont(750, 20);
+    description(750, 20, advice(forecast), 390, 825, 650, 20, 2);
+    ctx.textAlign = "left";
 
     rounded(ctx, 780, 432, 280, 443, 25, "rgba(0,60,110,.91)", "rgba(90,210,255,.78)");
     rounded(ctx, 795, 445, 250, 48, 15, "rgba(87,187,236,.34)");
@@ -593,8 +617,8 @@
     ctx.fillStyle = "#fff";
     ctx.font = "900 58px Arial";
     ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 920, 656);
-    ctx.font = cardFont(750, 20);
-    wrapped(ctx, weatherText(forecast.current.weather_code), 920, 691, 230, cardLine(25), 2);
+    ctx.font = detailFont(750, 20);
+    description(750, 20, weatherText(forecast.current.weather_code), 920, 691, 230, 20, 2);
     ctx.textAlign = "left";
     ctx.strokeStyle = "rgba(152,225,255,.42)";
     ctx.beginPath(); ctx.moveTo(806, 738); ctx.lineTo(1035, 738); ctx.stroke();
@@ -642,8 +666,8 @@
         ctx.fillStyle = "#fff";
         ctx.font = "900 35px Arial";
         ctx.fillText((period.temperature ?? "—") + "°C", x + 84, 1104);
-        ctx.font = cardFont(750, 15);
-        wrapped(ctx, weatherText(period.code), x + 84, 1137, 132, cardLine(18), 2);
+        ctx.font = detailFont(750, 15);
+        description(750, 15, weatherText(period.code), x + 84, 1128, 132, 17, 2);
         ctx.fillStyle = "#bceaff";
         ctx.font = cardFont(800, 14);
         ctx.fillText("Chuva " + (period.rain ?? "—") + "%", x + 84, 1170);
@@ -658,13 +682,13 @@
     drawMoon(ctx, 925, 1010, 52, phase, moonVisual);
     ctx.textAlign = "center";
     ctx.fillStyle = "#fff";
-    ctx.font = cardFont(900, 25);
-    wrapped(ctx, phase.name, 925, 1077, 230, cardLine(25), 2);
+    ctx.font = detailFont(900, 25);
+    description(900, 25, phase.name, 925, 1077, 230, 25, 2);
     ctx.fillStyle = "#d1edff";
-    ctx.font = cardFont(700, 17);
-    ctx.fillText("Iluminação " + phase.light + "%", 925, 1142);
-    ctx.font = cardFont(650, 14);
-    wrapped(ctx, "Meteoros: " + meteors.label + " • olhe " + meteors.direction, 925, 1173, 225, cardLine(15), 2);
+    ctx.font = detailFont(700, 17);
+    description(700, 17, "Iluminação " + phase.light + "%", 925, 1142, 225, 17, 1);
+    ctx.font = detailFont(650, 14);
+    description(650, 14, "Meteoros: " + meteors.label + " • olhe " + meteors.direction, 925, 1173, 225, 15, 2);
     ctx.textAlign = "left";
 
     rounded(ctx, 20, 1225, 1040, 275, 24, "#f6fbff", "rgba(174,228,255,.9)");
@@ -711,11 +735,11 @@
     ctx.font = cardFont(900, 23);
     ctx.fillText("▣  HOJE SE COMEMORA", 48, 1561);
     ctx.fillStyle = "#123e68";
-    ctx.font = cardFont(800, 19);
+    ctx.font = detailFont(800, 19);
     const celebrationItems = String(dayCelebration.title || "").split(" • ").filter(Boolean).slice(0, 2);
     celebrationItems.forEach((item, index) => {
-      ctx.fillText("•", 52, 1607 + index * 54);
-      wrapped(ctx, item, 76, 1607 + index * 54, 425, cardLine(24), 2);
+      ctx.fillText("•", 52, 1607 + index * 62);
+      description(800, 19, item, 76, 1607 + index * 62, 425, 20, 2);
     });
 
     ctx.save();
@@ -731,12 +755,12 @@
     ctx.font = cardFont(900, 23);
     ctx.fillText("☁  MENSAGEM DO DIA", 578, 1561);
     ctx.fillStyle = "#173f68";
-    ctx.font = cardFont(850, 24);
+    ctx.font = detailFont(850, 24);
     ctx.textAlign = "center";
-    wrapped(ctx, "“" + dailyMotivation(date) + "”", 805, 1612, 425, cardLine(31), 3);
+    description(850, 24, "“" + dailyMotivation(date) + "”", 805, 1612, 425, 24, 3);
     ctx.strokeStyle = "#f1c52b";
     ctx.lineWidth = 4;
-    ctx.beginPath(); ctx.moveTo(700, 1685); ctx.quadraticCurveTo(805, 1668, 910, 1685); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(700, 1699); ctx.quadraticCurveTo(805, 1682, 910, 1699); ctx.stroke();
     ctx.textAlign = "left";
 
     rounded(ctx, 20, 1738, 1040, 142, 24, "rgba(0,48,91,.90)", "rgba(80,190,240,.45)");
