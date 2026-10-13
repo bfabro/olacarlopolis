@@ -39,6 +39,12 @@ test("radar de chuva anima a sequência temporal e oferece controles", () => {
 });
 test("painel lunar e guia de meteoros consideram condições de observação", () => {
   assert.match(site, /class="moon-realistic"/);
+  assert.match(site, /function caminhoIluminadoLua\(fraction, waxing\)/);
+  assert.match(site, /Math\.cos\(2 \* Math\.PI \* fase\)/);
+  assert.match(story, /Math\.cos\(2 \* Math\.PI \* fraction\)/);
+  assert.match(site, /clipPath id="\$\{uid\}-light"/);
+  assert.doesNotMatch(site, /const shadowOffset = \(waxing/);
+  assert.doesNotMatch(site, /mask id="\$\{uid\}-phase"/);
   assert.match(site, /Taurídeas do Sul/);
   assert.match(site, /function calcularProbMeteoros\(date, fracLua, nebulosidade = 0\)/);
   assert.match(site, /id="meteor-direcao"/);
@@ -48,7 +54,7 @@ test("painel lunar e guia de meteoros consideram condições de observação", (
 
 test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(site, /id="climaStoryTrigger"/);
-  assert.match(html, /clima-story\.js\?v=13/);
+  assert.match(html, /clima-story\.js\?v=14/);
   assert.match(story, /canvas\.width = 1080/);
   assert.match(story, /canvas\.height = 1920/);
   assert.match(story, /REPRESA DE CHAVANTES/);
@@ -113,21 +119,21 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(css, /\.clima-story-trigger/);
   assert.match(css, /\.clima-story-modal/);
   assert.match(worker, /clima-story\.js/);
-  assert.match(html, /service-worker\.js\?v=936/);
+  assert.match(html, /service-worker\.js\?v=937/);
   assert.match(html, /updateViaCache: 'none'/);
   assert.match(html, /controllerchange/);
-  assert.match(site, /service-worker\.js\?v=936/);
+  assert.match(site, /service-worker\.js\?v=937/);
   assert.match(site, /reg\.update\(\)/);
 });
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v669/);
-  assert.match(html, /style\.css\?v=596/);
-  assert.match(html, /script\.js\?v=796/);
-  assert.match(html, /Olá Carlópolis v542/);
-  assert.match(panel, /numero: 882/);
-  assert.match(panel, /label: "v889"/);
+  assert.match(site, /Release do site v670/);
+  assert.match(html, /style\.css\?v=597/);
+  assert.match(html, /script\.js\?v=797/);
+  assert.match(html, /Olá Carlópolis v543/);
+  assert.match(panel, /numero: 883/);
+  assert.match(panel, /label: "v890"/);
   assert.match(panel, /data: "2026-10-13"/);
-  assert.match(panelHtml, /painel\.css\?v=587/);
-  assert.match(panelHtml, /painel\.js\?v=889/);
-  assert.match(worker, /2026-10-13-pesque-solte-v936/);
+  assert.match(panelHtml, /painel\.css\?v=588/);
+  assert.match(panelHtml, /painel\.js\?v=890/);
+  assert.match(worker, /2026-10-13-pesque-solte-v937/);
 });

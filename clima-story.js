@@ -285,7 +285,7 @@
     let days = (Math.floor(utc / 86400000) + 2440587.5 - epoch) % period;
     if (days < 0) days += period;
     const fraction = days / period;
-    const light = Math.round((fraction <= .5 ? fraction * 2 : (1 - fraction) * 2) * 100);
+    const light = Math.round(((1 - Math.cos(2 * Math.PI * fraction)) / 2) * 100);
     let name = "Lua Nova";
     if (light >= 90) name = light === 100 ? "Lua Cheia" : "Quase Cheia";
     else if (fraction < .22) name = "Lua Crescente";
@@ -362,17 +362,9 @@
 
   function drawMoon(ctx, x, y, radius, phase, moonVisual) {
     if (moonVisual) {
-      const size = radius * 2.22;
+      const size = radius * (220 / 83);
       ctx.save();
-      ctx.shadowColor = "rgba(184,220,255,.58)";
-      ctx.shadowBlur = 34;
       ctx.drawImage(moonVisual, x - size / 2, y - size / 2, size, size);
-      ctx.shadowBlur = 0;
-      ctx.strokeStyle = "rgba(255,255,255,.34)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.stroke();
       ctx.restore();
       return;
     }

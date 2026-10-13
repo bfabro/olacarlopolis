@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v669.
+// Release do site v670.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -28452,7 +28452,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ REGISTRO DO SERVICE WORKER
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js?v=936', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('/service-worker.js?v=937', { updateViaCache: 'none' })
     .then(reg => {
       reg.update();
       console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);
@@ -29539,10 +29539,33 @@ function rotuloFaseParaExibicao(fraction, nomeBasico) {
 
 // === SVG da Lua com CLIP correto e orientação do hemisfério Sul ===
 // 3) Desenho SVG com clip correto e orientação do hemisfério sul
+function caminhoIluminadoLua(fraction, waxing) {
+  const fase = ((Number(fraction) % 1) + 1) % 1;
+  const centro = 110;
+  const raio = 83;
+  const cossenoFase = Math.cos(2 * Math.PI * fase);
+  const pontosBorda = [];
+  const pontosTerminador = [];
+  const etapas = 80;
+
+  for (let indice = 0; indice <= etapas; indice += 1) {
+    const y = centro - raio + (2 * raio * indice / etapas);
+    const alcance = Math.sqrt(Math.max(0, raio * raio - Math.pow(y - centro, 2)));
+    const bordaX = waxing ? centro - alcance : centro + alcance;
+    const terminadorX = waxing
+      ? centro - cossenoFase * alcance
+      : centro + cossenoFase * alcance;
+    pontosBorda.push([bordaX, y]);
+    pontosTerminador.unshift([terminadorX, y]);
+  }
+
+  const pontos = pontosBorda.concat(pontosTerminador);
+  return pontos.map(([x, y], indice) => `${indice ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`).join(" ") + " Z";
+}
 function svgLua(fraction, waxing) {
   const p = (1 - Math.cos(2 * Math.PI * fraction)) / 2;
   const uid = "lua-" + Math.round(fraction * 10000);
-  const shadowOffset = (waxing ? 1 : -1) * (1 - (2 * p)) * 92;
+  const caminhoIluminado = caminhoIluminadoLua(fraction, waxing);
   const aria = p < .04 ? "Lua nova" : p > .96 ? "Lua cheia" : "Lua parcialmente iluminada";
 
   return `<svg viewBox="0 0 220 220" role="img" aria-label="${aria}" class="moon-realistic">
@@ -29562,15 +29585,12 @@ function svgLua(fraction, waxing) {
         <feGaussianBlur stdDeviation="9"/>
       </filter>
       <clipPath id="${uid}-clip"><circle cx="110" cy="110" r="83"/></clipPath>
-      <mask id="${uid}-phase">
-        <rect width="220" height="220" fill="black"/>
-        <circle cx="110" cy="110" r="83" fill="white"/>
-        <circle cx="${110 + shadowOffset}" cy="110" r="83" fill="black"/>
-      </mask>
+      <clipPath id="${uid}-light"><path d="${caminhoIluminado}"/></clipPath>
     </defs>
     <circle cx="110" cy="110" r="88" fill="#dce8ff" opacity="${.08 + p * .28}" filter="url(#${uid}-glow)"/>
     <circle cx="110" cy="110" r="83" fill="url(#${uid}-earthshine)"/>
-    <g clip-path="url(#${uid}-clip)" mask="url(#${uid}-phase)">
+    <g clip-path="url(#${uid}-clip)">
+      <g clip-path="url(#${uid}-light)">
       <circle cx="110" cy="110" r="83" fill="url(#${uid}-surface)"/>
       <g fill="#777a79" opacity=".32">
         <circle cx="75" cy="76" r="17"/><circle cx="139" cy="63" r="11"/>
@@ -29582,13 +29602,15 @@ function svgLua(fraction, waxing) {
         <circle cx="92" cy="137" r="9"/><circle cx="139" cy="63" r="7"/>
       </g>
       <path d="M45 104c22-9 35-6 50 2s30 4 44-5 27-7 39 1" fill="none" stroke="#6f7273" stroke-width="7" opacity=".16"/>
+      </g>
     </g>
     <circle cx="110" cy="110" r="83" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.5"/>
   </svg>`;
 }
 function iluminacaoPctDaFracao(frac) {
   // 0..1 -> 0..100 (simétrica em torno da Cheia)
-  return Math.round(frac <= 0.5 ? frac * 2 * 100 : (1 - frac) * 2 * 100);
+  const fase = ((Number(frac) % 1) + 1) % 1;
+  return Math.round(((1 - Math.cos(2 * Math.PI * fase)) / 2) * 100);
 }
 
 // Usa a iluminação para “suavizar” o nome mostrado ao usuário
