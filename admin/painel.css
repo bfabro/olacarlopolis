@@ -12974,9 +12974,9 @@ button.admin-button-loading::after {
 .fuel-admin-bulk-card>footer{display:flex;align-items:flex-start;gap:8px;color:#4d6c84;font-size:.7rem}.fuel-admin-bulk-card>footer i{margin-top:1px;color:#19835b}
 @media(max-width:1080px){.fuel-admin-bulk-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){.fuel-admin-bulk-card{padding:14px}.fuel-admin-bulk-card>header{flex-direction:column}.fuel-admin-bulk-card>header>strong{white-space:normal}.fuel-admin-bulk-grid{grid-template-columns:1fr}.fuel-admin-bulk-item{grid-template-columns:1fr}.fuel-admin-bulk-item>button{width:100%}}
-/* Versao global do painel v885 */
+/* Versao global do painel v886 */
 
-/* ===== Gerador de encartes v885 ===== */
+/* ===== Gerador de encartes v886 ===== */
 .flyer-hero{overflow:hidden;border-color:#c9d9ee;background:radial-gradient(circle at 94% 5%,rgba(14,116,144,.14),transparent 30%),linear-gradient(135deg,#fff,#f4f9ff)}
 .flyer-hero .feature-kicker{display:block;margin-bottom:5px;color:#0e7490;font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
 .flyer-workspace{display:grid;grid-template-columns:minmax(0,1.22fr) minmax(370px,.78fr);gap:18px;align-items:start;margin-top:18px}

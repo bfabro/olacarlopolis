@@ -243,14 +243,22 @@
     const min = Math.min(...levels);
     const max = Math.max(...levels);
     const range = Math.max(.12, max - min);
+    const axisWidth = 48;
+    const plotX = x + axisWidth;
+    const plotWidth = width - axisWidth;
     ctx.strokeStyle = "rgba(26,102,164,.18)";
     ctx.lineWidth = 1;
     for (let line = 0; line < 4; line += 1) {
       const lineY = y + line * height / 3;
-      ctx.beginPath(); ctx.moveTo(x, lineY); ctx.lineTo(x + width, lineY); ctx.stroke();
+      const axisValue = max - (line / 3) * range;
+      ctx.beginPath(); ctx.moveTo(plotX, lineY); ctx.lineTo(x + width, lineY); ctx.stroke();
+      ctx.fillStyle = "#64758a";
+      ctx.font = "700 12px Arial";
+      ctx.textAlign = "right";
+      ctx.fillText(axisValue.toFixed(2).replace(".", ","), plotX - 7, lineY + 4);
     }
     const coordinates = points.map((item, index) => ({
-      x: x + index * width / Math.max(1, points.length - 1),
+      x: plotX + index * plotWidth / Math.max(1, points.length - 1),
       y: y + height - ((item.level - min) / range * (height - 26)) - 13,
       item
     }));
@@ -473,18 +481,18 @@
     ctx.fillStyle = base;
     ctx.fillRect(0, 0, 1080, 1920);
 
-    drawImageCover(ctx, background, 0, 0, 1080, 460);
+    drawImageCover(ctx, background, 0, 0, 1080, 710);
     const heroOverlay = ctx.createLinearGradient(0, 0, 1080, 0);
-    heroOverlay.addColorStop(0, "rgba(0,53,101,.96)");
-    heroOverlay.addColorStop(.58, "rgba(0,63,111,.52)");
-    heroOverlay.addColorStop(1, "rgba(0,41,77,.10)");
+    heroOverlay.addColorStop(0, "rgba(0,53,101,.82)");
+    heroOverlay.addColorStop(.50, "rgba(0,63,111,.28)");
+    heroOverlay.addColorStop(1, "rgba(0,41,77,.04)");
     ctx.fillStyle = heroOverlay;
-    ctx.fillRect(0, 0, 1080, 460);
-    const heroFade = ctx.createLinearGradient(0, 300, 0, 470);
+    ctx.fillRect(0, 0, 1080, 710);
+    const heroFade = ctx.createLinearGradient(0, 535, 0, 715);
     heroFade.addColorStop(0, "rgba(0,55,93,0)");
     heroFade.addColorStop(1, "#004873");
     ctx.fillStyle = heroFade;
-    ctx.fillRect(0, 280, 1080, 190);
+    ctx.fillRect(0, 525, 1080, 190);
 
     const greetingText = greeting().toUpperCase();
     ctx.fillStyle = "#fff";
@@ -512,20 +520,20 @@
     ctx.fillText("▣  " + dateLabel, 52, 258);
     ctx.fillText("◷  " + timeLabel, 52, 298);
 
-    rounded(ctx, 20, 420, 1040, 270, 24, "rgba(0,53,102,.94)", "rgba(80,197,255,.60)");
+    rounded(ctx, 380, 325, 680, 365, 24, "rgba(0,53,102,.80)", "rgba(80,197,255,.72)");
     ctx.fillStyle = "#55ddff";
     ctx.font = cardFont(900, 25);
-    ctx.fillText("CONDIÇÃO ATUAL", 46, 462);
+    ctx.fillText("CONDIÇÃO ATUAL", 406, 367);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 86px Arial";
-    ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 44, 575);
+    ctx.font = "900 76px Arial";
+    ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 404, 466);
     ctx.font = "46px Arial";
-    ctx.fillText(weatherEmoji(forecast.current.weather_code), 50, 646);
-    ctx.font = cardFont(850, 30);
-    wrapped(ctx, weatherText(forecast.current.weather_code), 112, 638, 210, cardLine(31), 2);
+    ctx.fillText(weatherEmoji(forecast.current.weather_code), 408, 535);
+    ctx.font = cardFont(850, 25);
+    wrapped(ctx, weatherText(forecast.current.weather_code), 470, 526, 205, cardLine(29), 2);
     ctx.strokeStyle = "rgba(126,217,255,.45)";
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(360, 452); ctx.lineTo(360, 660); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(700, 355); ctx.lineTo(700, 655); ctx.stroke();
     ctx.fillStyle = "#dcefff";
     ctx.font = cardFont(700, 22);
     const currentDetails = [
@@ -536,28 +544,28 @@
       ["Chance de chuva", (forecast.rain ?? "—") + "%"]
     ];
     currentDetails.forEach(([label, value], index) => {
-      const y = 505 + index * 36;
+      const y = 400 + index * 51;
       ctx.fillStyle = "#7fddff";
-      ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 405, y);
+      ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 730, y);
       ctx.fillStyle = "#dcefff";
       ctx.font = cardFont(700, 20);
-      ctx.fillText(label, 445, y);
+      ctx.fillText(label, 765, y);
       ctx.fillStyle = "#fff";
       ctx.font = cardFont(900, 22);
       ctx.textAlign = "right";
-      ctx.fillText(value, 1015, y);
+      ctx.fillText(value, 1025, y);
       ctx.textAlign = "left";
       ctx.font = cardFont(700, 22);
     });
 
-    rounded(ctx, 20, 310, 590, 105, 22, "#fff7e3", "rgba(255,198,85,.9)");
-    rounded(ctx, 35, 320, 560, 30, 15, "#ffb52e");
+    rounded(ctx, 20, 325, 340, 365, 22, "rgba(255,247,227,.91)", "rgba(255,198,85,.95)");
+    rounded(ctx, 35, 340, 310, 54, 16, "#ffb52e");
     ctx.fillStyle = "#073663";
-    ctx.font = cardFont(900, 18);
-    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 50, 342);
+    ctx.font = cardFont(900, 17);
+    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 49, 374);
     ctx.fillStyle = "#092e56";
-    ctx.font = cardFont(900, 23);
-    wrapped(ctx, dayCelebration.title, 40, 375, 550, cardLine(27), 2);
+    ctx.font = cardFont(900, 27);
+    wrapped(ctx, dayCelebration.title, 45, 445, 290, cardLine(34), 6);
 
     rounded(ctx, 20, 712, 1040, 330, 24, "rgba(0,58,104,.93)", "rgba(46,183,242,.72)");
     ctx.fillStyle = "#d8efff";
@@ -566,7 +574,7 @@
     const forecastCards = [
       ...forecast.periods,
       { label: "SOL", sun: true },
-      { label: "ÍNDICE UV", uv: true }
+      { label: "CHUVA", rain: true }
     ];
     forecastCards.forEach((period, index) => {
       const x = 34 + index * 202;
@@ -582,15 +590,14 @@
         ctx.font = cardFont(800, 19);
         ctx.fillText("Nascer " + formatClock(forecast.sunrise), x + 95, 926);
         ctx.fillText("Pôr " + formatClock(forecast.sunset), x + 95, 970);
-      } else if (period.uv) {
+      } else if (period.rain) {
         ctx.font = "48px Arial";
-        ctx.fillText("☀️", x + 95, 873);
-        rounded(ctx, x + 43, 897, 104, 43, 20, Number(forecast.uv) >= 6 ? "#ff7047" : "#28a86b");
+        ctx.fillText("🌧️", x + 95, 873);
         ctx.fillStyle = "#fff";
-        ctx.font = cardFont(900, 24);
-        ctx.fillText("UV " + (forecast.uv ?? "—"), x + 95, 927);
-        ctx.font = cardFont(800, 19);
-        ctx.fillText(uvLabel(forecast.uv), x + 95, 970);
+        ctx.font = cardFont(900, 36);
+        ctx.fillText((forecast.rain ?? "—") + "%", x + 95, 927);
+        ctx.font = cardFont(800, 17);
+        ctx.fillText((forecast.rainTotal ?? "—") + " mm previstos", x + 95, 970);
       } else {
         ctx.font = "50px Arial";
         ctx.fillText(weatherEmoji(period.code, period.label), x + 95, 871);
@@ -623,32 +630,20 @@
     ctx.font = cardFont(650, 17);
     ctx.fillText("Temperaturas previstas", 62, 1195);
 
-    rounded(ctx, 425, 1062, 220, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
-    ctx.font = "46px Arial";
-    ctx.fillText("🌧️", 450, 1126);
-    ctx.fillStyle = "#7de0ff";
-    ctx.font = cardFont(900, 19);
-    ctx.fillText("CHUVA", 520, 1099);
-    ctx.fillStyle = "#fff";
-    ctx.font = "900 42px Arial";
-    ctx.fillText((forecast.rain ?? "—") + "%", 520, 1146);
-    ctx.fillStyle = "#c7eaff";
-    ctx.font = cardFont(650, 17);
-    ctx.fillText((forecast.rainTotal ?? "—") + " mm previstos", 448, 1194);
 
-    rounded(ctx, 660, 1062, 400, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
-    drawMoon(ctx, 727, 1145, 60, phase, moonVisual);
+    rounded(ctx, 425, 1062, 635, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
+    drawMoon(ctx, 520, 1145, 64, phase, moonVisual);
     ctx.fillStyle = "#7ee4ff";
-    ctx.font = cardFont(900, 18);
-    ctx.fillText("LUA ATUAL", 805, 1098);
+    ctx.font = cardFont(900, 20);
+    ctx.fillText("LUA ATUAL", 610, 1098);
     ctx.fillStyle = "#fff";
-    ctx.font = "900 35px Arial";
-    wrapped(ctx, phase.name, 805, 1138, 225, 36, 2);
+    ctx.font = "900 38px Arial";
+    wrapped(ctx, phase.name, 610, 1140, 410, 38, 2);
     ctx.fillStyle = "#d3edff";
-    ctx.font = cardFont(700, 17);
-    ctx.fillText("Iluminação " + phase.light + "%", 805, 1190);
-    ctx.font = cardFont(650, 14);
-    ctx.fillText("Meteoros " + meteors.label + " • olhe " + meteors.direction, 805, 1213);
+    ctx.font = cardFont(700, 18);
+    ctx.fillText("Iluminação " + phase.light + "%", 610, 1189);
+    ctx.font = cardFont(650, 16);
+    ctx.fillText("Meteoros " + meteors.label + " • olhe " + meteors.direction, 610, 1216);
 
     rounded(ctx, 20, 1248, 1040, 265, 24, "#f5fbff", "rgba(157,222,255,.8)");
     ctx.fillStyle = "#0b4e8c";
@@ -657,7 +652,7 @@
     ctx.fillStyle = "#6c8095";
     ctx.font = cardFont(850, 17);
     ctx.fillText("NÍVEL ATUAL", 50, 1331);
-    ctx.fillText("LIMITE NORMAL", 345, 1331);
+    ctx.fillText("LIMITE MÁXIMO NORMAL", 345, 1331);
     ctx.fillStyle = "#073663";
     const lakeLevelText = Number.isFinite(lake.level) ? lake.level.toFixed(2).replace(".", ",") + " m" : "Indisponível";
     ctx.font = Number.isFinite(lake.level) ? "900 55px Arial" : "900 38px Arial";
