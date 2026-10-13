@@ -232,7 +232,7 @@
     const points = (history || []).filter((item) => Number.isFinite(item.level));
     ctx.fillStyle = "#174c7e";
     ctx.font = "900 18px Arial";
-    ctx.fillText("ÚLTIMOS 7 DIAS", x, y - 12);
+    ctx.fillText("ÚLTIMOS 7 DIAS (m)", x, y - 12);
     if (points.length < 2) {
       ctx.fillStyle = "#5b7290";
       ctx.font = "700 17px Arial";
@@ -475,224 +475,291 @@
     const ctx = canvas.getContext("2d");
 
     const base = ctx.createLinearGradient(0, 0, 0, 1920);
-    base.addColorStop(0, "#075b96");
-    base.addColorStop(.48, "#004776");
-    base.addColorStop(1, "#002b4c");
+    base.addColorStop(0, "#063f70");
+    base.addColorStop(.55, "#00517f");
+    base.addColorStop(1, "#003a66");
     ctx.fillStyle = base;
     ctx.fillRect(0, 0, 1080, 1920);
 
-    drawImageCover(ctx, background, 0, 0, 1080, 710);
-    const heroOverlay = ctx.createLinearGradient(0, 0, 1080, 0);
-    heroOverlay.addColorStop(0, "rgba(0,53,101,.82)");
-    heroOverlay.addColorStop(.50, "rgba(0,63,111,.28)");
-    heroOverlay.addColorStop(1, "rgba(0,41,77,.04)");
-    ctx.fillStyle = heroOverlay;
-    ctx.fillRect(0, 0, 1080, 710);
-    const heroFade = ctx.createLinearGradient(0, 535, 0, 715);
-    heroFade.addColorStop(0, "rgba(0,55,93,0)");
-    heroFade.addColorStop(1, "#004873");
+    drawImageCover(ctx, background, 0, 0, 1080, 485);
+    const heroShade = ctx.createLinearGradient(0, 0, 1080, 0);
+    heroShade.addColorStop(0, "rgba(0,31,70,.80)");
+    heroShade.addColorStop(.48, "rgba(0,38,76,.34)");
+    heroShade.addColorStop(1, "rgba(0,31,63,.04)");
+    ctx.fillStyle = heroShade;
+    ctx.fillRect(0, 0, 1080, 485);
+    const heroFade = ctx.createLinearGradient(0, 255, 0, 490);
+    heroFade.addColorStop(0, "rgba(0,38,73,0)");
+    heroFade.addColorStop(1, "rgba(0,58,96,.96)");
     ctx.fillStyle = heroFade;
-    ctx.fillRect(0, 525, 1080, 190);
+    ctx.fillRect(0, 250, 1080, 240);
 
     const greetingText = greeting().toUpperCase();
     ctx.fillStyle = "#fff";
-    ctx.font = "900 84px Arial";
-    ctx.fillText(greetingText + ",", 48, 118);
-    const titleGradient = ctx.createLinearGradient(48, 132, 690, 212);
-    titleGradient.addColorStop(0, "#ffe268");
-    titleGradient.addColorStop(1, "#ffbb2f");
+    ctx.font = "900 86px Arial";
+    ctx.fillText(greetingText + ",", 48, 104);
+    const titleGradient = ctx.createLinearGradient(48, 118, 690, 205);
+    titleGradient.addColorStop(0, "#ffe36a");
+    titleGradient.addColorStop(1, "#ffbd30");
     ctx.fillStyle = titleGradient;
     ctx.font = "900 82px Arial";
-    ctx.fillText("CARLÓPOLIS!", 48, 206);
+    ctx.fillText("CARLÓPOLIS!", 48, 194);
+    ctx.strokeStyle = "#ffd52f";
+    ctx.lineWidth = 7;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(54, 214);
+    ctx.quadraticCurveTo(275, 197, 508, 216);
+    ctx.stroke();
 
     ctx.save();
-    ctx.shadowColor = "rgba(0,29,60,.52)";
-    ctx.shadowBlur = 14;
-    ctx.drawImage(logo, 812, 30, 225, 225);
+    ctx.shadowColor = "rgba(0,24,56,.58)";
+    ctx.shadowBlur = 18;
+    ctx.drawImage(logo, 810, 24, 225, 225);
     ctx.restore();
 
     const dateLabel = date.toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long" });
     const timeLabel = new Date().toLocaleTimeString("pt-BR", {
       timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit"
     });
+    const weekday = date.toLocaleDateString("pt-BR", { weekday: "long" });
+    const headline = Number(forecast.rain) >= 45
+      ? weekday.charAt(0).toUpperCase() + weekday.slice(1) + " com possibilidade de chuva em Carlópolis!"
+      : weekday.charAt(0).toUpperCase() + weekday.slice(1) + " com " + weatherText(forecast.current.weather_code).toLowerCase() + " em Carlópolis!";
     ctx.fillStyle = "#fff";
     ctx.font = "800 27px Arial";
-    ctx.fillText("▣  " + dateLabel, 52, 258);
-    ctx.fillText("◷  " + timeLabel, 52, 298);
+    ctx.fillText("▣  " + dateLabel + "   |   ◷  " + timeLabel, 52, 268);
+    ctx.font = "italic 700 29px Arial";
+    wrapped(ctx, headline, 52, 314, 635, 36, 2);
+    ctx.strokeStyle = "#ffe03f";
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(55, 387);
+    ctx.quadraticCurveTo(240, 360, 440, 384);
+    ctx.stroke();
 
-    rounded(ctx, 380, 325, 680, 365, 24, "rgba(0,53,102,.80)", "rgba(80,197,255,.72)");
-    ctx.fillStyle = "#55ddff";
-    ctx.font = cardFont(900, 25);
-    ctx.fillText("CONDIÇÃO ATUAL", 406, 367);
-    ctx.fillStyle = "#fff";
-    ctx.font = "900 76px Arial";
-    ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 404, 466);
-    ctx.font = "46px Arial";
-    ctx.fillText(weatherEmoji(forecast.current.weather_code), 408, 535);
-    ctx.font = cardFont(850, 25);
-    wrapped(ctx, weatherText(forecast.current.weather_code), 470, 526, 205, cardLine(29), 2);
-    ctx.strokeStyle = "rgba(126,217,255,.45)";
+    rounded(ctx, 20, 420, 740, 455, 26, "rgba(0,60,110,.91)", "rgba(90,210,255,.78)");
+    rounded(ctx, 34, 432, 712, 55, 18, "#ffda64", "rgba(255,244,175,.95)");
+    ctx.fillStyle = "#063c70";
+    ctx.font = cardFont(900, 28);
+    ctx.fillText("☁  COMO SERÁ O DIA EM CARLÓPOLIS?", 56, 470);
+
+    ctx.textAlign = "center";
+    ctx.font = "112px Arial";
+    ctx.fillText(weatherEmoji(forecast.current.weather_code), 150, 630);
+    ctx.textAlign = "left";
+    ctx.fillStyle = "#ff7764";
+    ctx.font = cardFont(900, 21);
+    ctx.fillText("MÁXIMA", 266, 540);
+    ctx.font = "900 48px Arial";
+    ctx.fillText((forecast.max ?? "—") + "°C", 266, 595);
+    ctx.fillStyle = "#72dfff";
+    ctx.font = cardFont(900, 21);
+    ctx.fillText("MÍNIMA", 510, 540);
+    ctx.font = "900 48px Arial";
+    ctx.fillText((forecast.min ?? "—") + "°C", 510, 595);
+    ctx.strokeStyle = "rgba(152,225,255,.40)";
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(700, 355); ctx.lineTo(700, 655); ctx.stroke();
-    ctx.fillStyle = "#dcefff";
-    ctx.font = cardFont(700, 22);
+    ctx.beginPath(); ctx.moveTo(245, 625); ctx.lineTo(700, 625); ctx.stroke();
+    ctx.fillStyle = "#76e5ff";
+    ctx.font = "54px Arial";
+    ctx.fillText("💧", 254, 717);
+    ctx.font = cardFont(900, 20);
+    ctx.fillText("CHUVA", 320, 673);
+    ctx.fillStyle = "#fff";
+    ctx.font = "900 48px Arial";
+    ctx.fillText((forecast.rain ?? "—") + "%", 318, 728);
+    ctx.strokeStyle = "rgba(152,225,255,.45)";
+    ctx.beginPath(); ctx.moveTo(455, 650); ctx.lineTo(455, 745); ctx.stroke();
+    ctx.fillStyle = "#fff";
+    ctx.font = cardFont(700, 20);
+    wrapped(ctx, weatherText(forecast.current.weather_code) + ", com chance de chuva ao longo do dia.", 485, 675, 225, cardLine(29), 3);
+    rounded(ctx, 36, 770, 708, 80, 22, "#ffe47a", "#fff1a9");
+    ctx.fillStyle = "#083e70";
+    ctx.font = cardFont(900, 22);
+    ctx.fillText("☂  DICA DO DIA:", 62, 819);
+    ctx.font = cardFont(750, 20);
+    wrapped(ctx, advice(forecast), 245, 816, 470, cardLine(25), 2);
+
+    rounded(ctx, 780, 432, 280, 443, 25, "rgba(0,60,110,.91)", "rgba(90,210,255,.78)");
+    rounded(ctx, 795, 445, 250, 48, 15, "rgba(87,187,236,.34)");
+    ctx.fillStyle = "#e8f7ff";
+    ctx.font = cardFont(900, 21);
+    ctx.fillText("◷  AGORA • ÀS " + timeLabel.slice(0, 2) + "H", 812, 477);
+    ctx.textAlign = "center";
+    ctx.font = "82px Arial";
+    ctx.fillText(weatherEmoji(forecast.current.weather_code), 920, 590);
+    ctx.fillStyle = "#fff";
+    ctx.font = "900 58px Arial";
+    ctx.fillText((forecast.current.temperature_2m ?? "—") + "°C", 920, 656);
+    ctx.font = cardFont(750, 20);
+    wrapped(ctx, weatherText(forecast.current.weather_code), 920, 691, 230, cardLine(25), 2);
+    ctx.textAlign = "left";
+    ctx.strokeStyle = "rgba(152,225,255,.42)";
+    ctx.beginPath(); ctx.moveTo(806, 738); ctx.lineTo(1035, 738); ctx.stroke();
     const currentDetails = [
-      ["Sensação", (forecast.current.apparent_temperature ?? "—") + "°C"],
-      ["Umidade", (forecast.current.relative_humidity_2m ?? "—") + "%"],
-      ["Vento", (forecast.current.wind_speed_10m ?? "—") + " km/h " + windDirection(forecast.current.wind_direction_10m)],
-      ["Rajadas", (forecast.current.wind_gusts_10m ?? "—") + " km/h"],
-      ["Chance de chuva", (forecast.rain ?? "—") + "%"]
+      ["♨", "Sensação", (forecast.current.apparent_temperature ?? "—") + "°C"],
+      ["●", "Umidade", (forecast.current.relative_humidity_2m ?? "—") + "%"],
+      ["≋", "Vento", (forecast.current.wind_speed_10m ?? "—") + " km/h " + windDirection(forecast.current.wind_direction_10m)]
     ];
-    currentDetails.forEach(([label, value], index) => {
-      const y = 400 + index * 51;
-      ctx.fillStyle = "#7fddff";
-      ctx.fillText(["♨", "●", "≋", "☁", "☂"][index], 730, y);
-      ctx.fillStyle = "#dcefff";
-      ctx.font = cardFont(700, 20);
-      ctx.fillText(label, 765, y);
+    currentDetails.forEach(([icon, label, value], index) => {
+      const y = 780 + index * 38;
+      ctx.fillStyle = "#72dfff";
+      ctx.font = cardFont(800, 19);
+      ctx.fillText(icon, 808, y);
+      ctx.fillStyle = "#e1f2ff";
+      ctx.fillText(label, 840, y);
       ctx.fillStyle = "#fff";
-      ctx.font = cardFont(900, 22);
+      ctx.font = cardFont(900, 18);
       ctx.textAlign = "right";
-      ctx.fillText(value, 1025, y);
+      ctx.fillText(value, 1035, y);
       ctx.textAlign = "left";
-      ctx.font = cardFont(700, 22);
     });
 
-    rounded(ctx, 20, 325, 340, 365, 22, "rgba(255,247,227,.91)", "rgba(255,198,85,.95)");
-    rounded(ctx, 35, 340, 310, 54, 16, "#ffb52e");
-    ctx.fillStyle = "#073663";
-    ctx.font = cardFont(900, 17);
-    ctx.fillText("DIA " + String(date.getDate()).padStart(2, "0") + " • HOJE SE COMEMORA", 49, 374);
-    ctx.fillStyle = "#092e56";
-    ctx.font = cardFont(900, 27);
-    wrapped(ctx, dayCelebration.title, 45, 445, 290, cardLine(34), 6);
-
-    rounded(ctx, 20, 712, 1040, 330, 24, "rgba(0,58,104,.93)", "rgba(46,183,242,.72)");
-    ctx.fillStyle = "#d8efff";
-    ctx.font = cardFont(900, 25);
-    ctx.fillText("PREVISÃO PARA O DIA", 42, 750);
-    const forecastCards = [
-      ...forecast.periods,
-      { label: "SOL", sun: true },
-      { label: "CHUVA", rain: true }
-    ];
+    rounded(ctx, 20, 895, 750, 310, 24, "rgba(0,63,111,.92)", "rgba(90,210,255,.68)");
+    ctx.fillStyle = "#fff";
+    ctx.font = cardFont(900, 26);
+    ctx.fillText("▥  PREVISÃO POR PERÍODO", 45, 936);
+    const forecastCards = [...forecast.periods, { label: "SOL", sun: true }];
     forecastCards.forEach((period, index) => {
-      const x = 34 + index * 202;
-      rounded(ctx, x, 774, 190, 245, 20, "rgba(41,118,175,.72)", "rgba(170,226,255,.34)");
+      const x = 38 + index * 181;
+      rounded(ctx, x, 957, 168, 226, 18, "rgba(40,126,184,.63)", "rgba(177,231,255,.30)");
       ctx.textAlign = "center";
-      ctx.fillStyle = "#e8f6ff";
-      ctx.font = cardFont(900, 20);
-      ctx.fillText(period.label, x + 95, 811);
+      ctx.fillStyle = "#eaf8ff";
+      ctx.font = cardFont(900, 18);
+      ctx.fillText(period.label, x + 84, 992);
       if (period.sun) {
         ctx.font = "48px Arial";
-        ctx.fillText("☀️", x + 95, 873);
+        ctx.fillText("☀️", x + 84, 1055);
         ctx.fillStyle = "#fff";
-        ctx.font = cardFont(800, 19);
-        ctx.fillText("Nascer " + formatClock(forecast.sunrise), x + 95, 926);
-        ctx.fillText("Pôr " + formatClock(forecast.sunset), x + 95, 970);
-      } else if (period.rain) {
-        ctx.font = "48px Arial";
-        ctx.fillText("🌧️", x + 95, 873);
-        ctx.fillStyle = "#fff";
-        ctx.font = cardFont(900, 36);
-        ctx.fillText((forecast.rain ?? "—") + "%", x + 95, 927);
         ctx.font = cardFont(800, 17);
-        ctx.fillText((forecast.rainTotal ?? "—") + " mm previstos", x + 95, 970);
+        ctx.fillText("Nascer " + formatClock(forecast.sunrise), x + 84, 1110);
+        ctx.fillText("Pôr " + formatClock(forecast.sunset), x + 84, 1148);
       } else {
-        ctx.font = "50px Arial";
-        ctx.fillText(weatherEmoji(period.code, period.label), x + 95, 871);
+        ctx.font = "46px Arial";
+        ctx.fillText(weatherEmoji(period.code, period.label), x + 84, 1053);
         ctx.fillStyle = "#fff";
-        ctx.font = "900 43px Arial";
-        ctx.fillText((period.temperature ?? "—") + "°C", x + 95, 927);
-        ctx.font = cardFont(700, 16);
-        wrapped(ctx, weatherText(period.code), x + 95, 959, 150, cardLine(20), 2);
-        ctx.fillStyle = "#b9e8ff";
-        ctx.font = cardFont(750, 16);
-        ctx.fillText("Chuva " + (period.rain ?? "—") + "%", x + 95, 1000);
+        ctx.font = "900 35px Arial";
+        ctx.fillText((period.temperature ?? "—") + "°C", x + 84, 1104);
+        ctx.font = cardFont(750, 15);
+        wrapped(ctx, weatherText(period.code), x + 84, 1137, 132, cardLine(18), 2);
+        ctx.fillStyle = "#bceaff";
+        ctx.font = cardFont(800, 14);
+        ctx.fillText("Chuva " + (period.rain ?? "—") + "%", x + 84, 1170);
       }
       ctx.textAlign = "left";
     });
 
-    rounded(ctx, 20, 1062, 390, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
-    ctx.fillStyle = "#83ddff";
-    ctx.font = cardFont(900, 19);
-    ctx.fillText("MÍNIMA", 62, 1104);
+    rounded(ctx, 790, 895, 270, 310, 24, "rgba(0,63,111,.92)", "rgba(90,210,255,.68)");
     ctx.fillStyle = "#fff";
-    ctx.font = "900 42px Arial";
-    ctx.fillText((forecast.min ?? "—") + "°C", 62, 1152);
-    ctx.fillStyle = "#ff735a";
-    ctx.font = cardFont(900, 19);
-    ctx.fillText("MÁXIMA", 228, 1104);
+    ctx.font = cardFont(900, 24);
+    ctx.fillText("☾  LUA ATUAL", 815, 936);
+    drawMoon(ctx, 925, 1026, 61, phase, moonVisual);
+    ctx.textAlign = "center";
     ctx.fillStyle = "#fff";
-    ctx.font = "900 42px Arial";
-    ctx.fillText((forecast.max ?? "—") + "°C", 228, 1152);
-    ctx.fillStyle = "#c7eaff";
-    ctx.font = cardFont(650, 17);
-    ctx.fillText("Temperaturas previstas", 62, 1195);
-
-
-    rounded(ctx, 425, 1062, 635, 165, 22, "rgba(20,91,143,.90)", "rgba(77,194,245,.55)");
-    drawMoon(ctx, 520, 1145, 64, phase, moonVisual);
-    ctx.fillStyle = "#7ee4ff";
-    ctx.font = cardFont(900, 20);
-    ctx.fillText("LUA ATUAL", 610, 1098);
-    ctx.fillStyle = "#fff";
-    ctx.font = "900 38px Arial";
-    wrapped(ctx, phase.name, 610, 1140, 410, 38, 2);
-    ctx.fillStyle = "#d3edff";
-    ctx.font = cardFont(700, 18);
-    ctx.fillText("Iluminação " + phase.light + "%", 610, 1189);
-    ctx.font = cardFont(650, 16);
-    ctx.fillText("Meteoros " + meteors.label + " • olhe " + meteors.direction, 610, 1216);
-
-    rounded(ctx, 20, 1248, 1040, 265, 24, "#f5fbff", "rgba(157,222,255,.8)");
-    ctx.fillStyle = "#0b4e8c";
     ctx.font = cardFont(900, 25);
-    ctx.fillText("≋  REPRESA DE CHAVANTES", 48, 1290);
+    wrapped(ctx, phase.name, 925, 1110, 230, cardLine(29), 2);
+    ctx.fillStyle = "#d1edff";
+    ctx.font = cardFont(700, 17);
+    ctx.fillText("Iluminação " + phase.light + "%", 925, 1162);
+    ctx.font = cardFont(650, 14);
+    wrapped(ctx, "Meteoros: " + meteors.label + " • olhe " + meteors.direction, 925, 1190, 225, cardLine(17), 2);
+    ctx.textAlign = "left";
+
+    rounded(ctx, 20, 1225, 1040, 275, 24, "#f6fbff", "rgba(174,228,255,.9)");
+    ctx.fillStyle = "#07518e";
+    ctx.font = cardFont(900, 27);
+    ctx.fillText("≋  REPRESA DE CHAVANTES", 48, 1268);
+    const referenceGap = Number.isFinite(lake.level) ? 474 - lake.level : null;
+    if (Number.isFinite(referenceGap)) {
+      rounded(ctx, 620, 1238, 415, 42, 16, "#e2f3ff");
+      ctx.fillStyle = "#245b88";
+      ctx.font = cardFont(800, 15);
+      ctx.textAlign = "center";
+      ctx.fillText("Está " + Math.abs(referenceGap).toFixed(2).replace(".", ",") + " m " + (referenceGap >= 0 ? "abaixo" : "acima") + " do limite máximo normal.", 827, 1266);
+      ctx.textAlign = "left";
+    }
     ctx.fillStyle = "#6c8095";
     ctx.font = cardFont(850, 17);
-    ctx.fillText("NÍVEL ATUAL", 50, 1331);
-    ctx.fillText("LIMITE MÁXIMO NORMAL", 345, 1331);
+    ctx.fillText("NÍVEL ATUAL", 50, 1320);
+    ctx.fillText("LIMITE MÁXIMO NORMAL", 358, 1320);
     ctx.fillStyle = "#073663";
     const lakeLevelText = Number.isFinite(lake.level) ? lake.level.toFixed(2).replace(".", ",") + " m" : "Indisponível";
-    ctx.font = Number.isFinite(lake.level) ? "900 55px Arial" : "900 38px Arial";
-    ctx.fillText(lakeLevelText, 48, 1393);
+    ctx.font = Number.isFinite(lake.level) ? "900 53px Arial" : "900 36px Arial";
+    ctx.fillText(lakeLevelText, 48, 1380);
     ctx.font = "900 37px Arial";
-    ctx.fillText("474,00 m", 345, 1391);
+    ctx.fillText("474,00 m", 358, 1378);
     const centimeters = Number.isFinite(lake.delta) ? lake.delta * 100 : null;
     const variation = Number.isFinite(centimeters)
       ? (Math.abs(centimeters) < .5 ? "Estável desde ontem" : (centimeters > 0 ? "▲ Subiu " : "▼ Baixou ") + Math.abs(centimeters).toFixed(0) + " cm em 1 dia")
       : "Comparação diária indisponível";
     ctx.fillStyle = Number.isFinite(centimeters) && centimeters > .5 ? "#159b58" : Number.isFinite(centimeters) && centimeters < -.5 ? "#e13f46" : "#59728b";
     ctx.font = cardFont(900, 22);
-    ctx.fillText(variation, 50, 1436);
+    ctx.fillText(variation, 50, 1423);
     ctx.fillStyle = "#60758a";
     ctx.font = cardFont(700, 17);
     const lakeDate = lake.date ? new Date(lake.date).toLocaleDateString("pt-BR") : "medição mais recente";
-    ctx.fillText("Volume útil: " + (Number.isFinite(lake.volume) ? lake.volume.toFixed(2).replace(".", ",") + "%" : "não informado") + " • " + lakeDate, 50, 1473);
-    drawReservoirChart(ctx, lake.history, 665, 1325, 350, 105);
+    ctx.fillText("Volume útil: " + (Number.isFinite(lake.volume) ? lake.volume.toFixed(2).replace(".", ",") + "%" : "não informado") + " • " + lakeDate, 50, 1462);
+    drawReservoirChart(ctx, lake.history, 660, 1335, 365, 100);
 
-    rounded(ctx, 20, 1532, 1040, 178, 24, "#eef8ff", "rgba(157,222,255,.8)");
-    ctx.fillStyle = "#0b4e8c";
-    ctx.font = cardFont(900, 22);
-    ctx.fillText("📣  FIQUE ATENTO HOJE", 50, 1575);
-    ctx.fillStyle = "#294c6f";
-    ctx.font = cardFont(700, 21);
-    wrapped(ctx, advice(forecast), 50, 1612, 505, cardLine(29), 3);
-    ctx.strokeStyle = "#8bbbd8";
+    const celebrationGradient = ctx.createLinearGradient(20, 1518, 535, 1718);
+    celebrationGradient.addColorStop(0, "#fff8d5");
+    celebrationGradient.addColorStop(1, "#f6c864");
+    rounded(ctx, 20, 1520, 515, 195, 24, celebrationGradient, "rgba(255,224,126,.95)");
+    ctx.fillStyle = "#0a4c84";
+    ctx.font = cardFont(900, 23);
+    ctx.fillText("▣  HOJE SE COMEMORA", 48, 1561);
+    ctx.fillStyle = "#123e68";
+    ctx.font = cardFont(800, 19);
+    const celebrationItems = String(dayCelebration.title || "").split(" • ").filter(Boolean).slice(0, 2);
+    celebrationItems.forEach((item, index) => {
+      ctx.fillText("•", 52, 1607 + index * 54);
+      wrapped(ctx, item, 76, 1607 + index * 54, 425, cardLine(24), 2);
+    });
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(550, 1520, 510, 195, 24);
+    ctx.clip();
+    drawImageCover(ctx, background, 550, 1520, 510, 195);
+    ctx.fillStyle = "rgba(255,255,255,.79)";
+    ctx.fillRect(550, 1520, 510, 195);
+    ctx.restore();
+    rounded(ctx, 550, 1520, 510, 195, 24, "", "rgba(174,228,255,.9)");
+    ctx.fillStyle = "#07518e";
+    ctx.font = cardFont(900, 23);
+    ctx.fillText("☁  MENSAGEM DO DIA", 578, 1561);
+    ctx.fillStyle = "#173f68";
+    ctx.font = cardFont(850, 24);
+    ctx.textAlign = "center";
+    wrapped(ctx, "“" + dailyMotivation(date) + "”", 805, 1612, 425, cardLine(31), 3);
+    ctx.strokeStyle = "#f1c52b";
+    ctx.lineWidth = 4;
+    ctx.beginPath(); ctx.moveTo(700, 1685); ctx.quadraticCurveTo(805, 1668, 910, 1685); ctx.stroke();
+    ctx.textAlign = "left";
+
+    rounded(ctx, 20, 1738, 1040, 142, 24, "rgba(0,48,91,.90)", "rgba(80,190,240,.45)");
+    ctx.strokeStyle = "rgba(148,218,250,.45)";
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(585, 1562); ctx.lineTo(585, 1680); ctx.stroke();
-    ctx.fillStyle = "#0b4e8c";
-    ctx.font = cardFont(900, 20);
-    ctx.fillText("☀  MENSAGEM DO DIA", 620, 1575);
-    ctx.fillStyle = "#294c6f";
-    ctx.font = cardFont(750, 20);
-    wrapped(ctx, "“" + dailyMotivation(date) + "”", 620, 1612, 390, cardLine(27), 3);
-
-    ctx.drawImage(logo, 285, 1740, 110, 110);
+    ctx.beginPath(); ctx.moveTo(360, 1760); ctx.lineTo(360, 1856); ctx.moveTo(800, 1760); ctx.lineTo(800, 1856); ctx.stroke();
     ctx.fillStyle = "#fff";
-    ctx.font = "900 36px Arial";
-    ctx.fillText("olacarlopolis.com", 420, 1808);
+    ctx.font = cardFont(800, 22);
+    ctx.fillText("Quer saber como está", 60, 1787);
+    ctx.fillText("o tempo ", 60, 1824);
+    ctx.fillStyle = "#ffd63f";
+    ctx.font = cardFont(900, 25);
+    ctx.fillText("AGORA?", 164, 1824);
+    ctx.fillStyle = "#dcefff";
+    ctx.font = cardFont(750, 19);
+    ctx.fillText("Acesse", 397, 1782);
+    rounded(ctx, 395, 1796, 365, 56, 24, "#ffda57");
+    ctx.fillStyle = "#073663";
+    ctx.font = "900 27px Arial";
+    ctx.fillText("olacarlopolis.com  ➜", 425, 1833);
+    ctx.fillStyle = "#fff";
+    ctx.font = cardFont(750, 19);
+    ctx.fillText("Compartilhe com quem", 835, 1791);
+    ctx.fillText("vai sair cedo! ♡", 835, 1827);
     ctx.textAlign = "left";
     return canvas;
   }

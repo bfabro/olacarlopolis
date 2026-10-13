@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v666.
+// Release do site v667.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -28452,7 +28452,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ REGISTRO DO SERVICE WORKER
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js?v=933', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('/service-worker.js?v=934', { updateViaCache: 'none' })
     .then(reg => {
       reg.update();
       console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);
