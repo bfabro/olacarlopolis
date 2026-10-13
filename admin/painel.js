@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 880,
-  label: "v887",
+  numero: 881,
+  label: "v888",
   data: "2026-10-13",
-  nota: "A arte do Clima do Dia ganhou um novo layout editorial inspirado no modelo de referência, mantendo clima, Lua, represa e comemorações atualizados."
+  nota: "A arte do Clima do Dia agora acomoda fontes ampliadas na dica e na Lua, com rodapé mais limpo e legível."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

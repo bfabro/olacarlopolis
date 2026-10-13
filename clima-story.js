@@ -578,8 +578,9 @@
     ctx.fillStyle = "#083e70";
     ctx.font = cardFont(900, 22);
     ctx.fillText("☂  DICA DO DIA:", 62, 819);
+    const adviceTextX = Math.max(245, 62 + ctx.measureText("☂  DICA DO DIA:").width + 22);
     ctx.font = cardFont(750, 20);
-    wrapped(ctx, advice(forecast), 245, 816, 470, cardLine(25), 2);
+    wrapped(ctx, advice(forecast), adviceTextX, 802, 716 - adviceTextX, cardLine(25), 2);
 
     rounded(ctx, 780, 432, 280, 443, 25, "rgba(0,60,110,.91)", "rgba(90,210,255,.78)");
     rounded(ctx, 795, 445, 250, 48, 15, "rgba(87,187,236,.34)");
@@ -654,16 +655,16 @@
     ctx.fillStyle = "#fff";
     ctx.font = cardFont(900, 24);
     ctx.fillText("☾  LUA ATUAL", 815, 936);
-    drawMoon(ctx, 925, 1026, 61, phase, moonVisual);
+    drawMoon(ctx, 925, 1010, 52, phase, moonVisual);
     ctx.textAlign = "center";
     ctx.fillStyle = "#fff";
     ctx.font = cardFont(900, 25);
-    wrapped(ctx, phase.name, 925, 1110, 230, cardLine(29), 2);
+    wrapped(ctx, phase.name, 925, 1077, 230, cardLine(25), 2);
     ctx.fillStyle = "#d1edff";
     ctx.font = cardFont(700, 17);
-    ctx.fillText("Iluminação " + phase.light + "%", 925, 1162);
+    ctx.fillText("Iluminação " + phase.light + "%", 925, 1142);
     ctx.font = cardFont(650, 14);
-    wrapped(ctx, "Meteoros: " + meteors.label + " • olhe " + meteors.direction, 925, 1190, 225, cardLine(17), 2);
+    wrapped(ctx, "Meteoros: " + meteors.label + " • olhe " + meteors.direction, 925, 1173, 225, cardLine(15), 2);
     ctx.textAlign = "left";
 
     rounded(ctx, 20, 1225, 1040, 275, 24, "#f6fbff", "rgba(174,228,255,.9)");
@@ -741,7 +742,7 @@
     rounded(ctx, 20, 1738, 1040, 142, 24, "rgba(0,48,91,.90)", "rgba(80,190,240,.45)");
     ctx.strokeStyle = "rgba(148,218,250,.45)";
     ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(360, 1760); ctx.lineTo(360, 1856); ctx.moveTo(800, 1760); ctx.lineTo(800, 1856); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(360, 1760); ctx.lineTo(360, 1856); ctx.stroke();
     ctx.fillStyle = "#fff";
     ctx.font = cardFont(800, 22);
     ctx.fillText("Quer saber como está", 60, 1787);
@@ -752,14 +753,11 @@
     ctx.fillStyle = "#dcefff";
     ctx.font = cardFont(750, 19);
     ctx.fillText("Acesse", 397, 1782);
-    rounded(ctx, 395, 1796, 365, 56, 24, "#ffda57");
+    rounded(ctx, 395, 1796, 630, 56, 24, "#ffda57");
     ctx.fillStyle = "#073663";
     ctx.font = "900 27px Arial";
-    ctx.fillText("olacarlopolis.com  ➜", 425, 1833);
-    ctx.fillStyle = "#fff";
-    ctx.font = cardFont(750, 19);
-    ctx.fillText("Compartilhe com quem", 835, 1791);
-    ctx.fillText("vai sair cedo! ♡", 835, 1827);
+    ctx.textAlign = "center";
+    ctx.fillText("olacarlopolis.com  ➜", 710, 1833);
     ctx.textAlign = "left";
     return canvas;
   }
