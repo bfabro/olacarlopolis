@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 886,
-  label: "v893",
+  numero: 887,
+  label: "v894",
   data: "2026-10-20",
-  nota: "Relatórios do Admin Master agora detalham os cliques em Comércios, Serviços e Setor Público, incluindo o caminho até cada categoria."
+  nota: "Novo Radar de decisão mostra quais comércios prospectar, quais precisam melhorar, pontos positivos, alertas e a próxima ação recomendada."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -20876,6 +20876,140 @@ function renderClickReportTable(rows, types, emptyMessage) {
   `;
 }
 
+function businessDecisionCompleteness(client = {}) {
+  const checks = [
+    { label: "imagem", ok: Boolean(client.imagem || client.image || client.profileImage || client.imagemPerfil || client.logo) },
+    { label: "descrição", ok: Boolean(String(client.descricaoCurta || client.shortDescription || client.descricao || "").trim()) },
+    { label: "contato", ok: normalizeClientContactDetails(client).length > 0 },
+    { label: "categoria", ok: Boolean(String(client.categoria || client.category || "").trim()) }
+  ];
+  const missing = checks.filter((item) => !item.ok).map((item) => item.label);
+  return { score: Math.round(((checks.length - missing.length) / checks.length) * 100), missing };
+}
+
+function businessDecisionContactClicks(types = new Map()) {
+  let total = 0;
+  types.forEach((count, type) => {
+    if (/whatsapp|telefone|contato|endereco|mapa|rota/.test(normalizeName(type))) total += Number(count || 0);
+  });
+  return total;
+}
+
+function buildBusinessDecisionRows(clients = [], accesses = new Map(), clickDetails = new Map()) {
+  const rawRows = clients
+    .filter((client) => client.status !== "inativo" && isReportClient(client))
+    .map((client) => {
+      const keys = clientMetricKeys(client);
+      const pageAccesses = sumMetricMapForClient(accesses, keys);
+      const types = aggregateButtonTypesForClient(clickDetails, keys);
+      const interactions = totalMetricMap(types);
+      const contacts = businessDecisionContactClicks(types);
+      return { client, pageAccesses, interactions, contacts, completeness: businessDecisionCompleteness(client) };
+    });
+  const maximums = rawRows.reduce((result, row) => ({
+    accesses: Math.max(result.accesses, row.pageAccesses),
+    interactions: Math.max(result.interactions, row.interactions),
+    contacts: Math.max(result.contacts, row.contacts)
+  }), { accesses: 0, interactions: 0, contacts: 0 });
+
+  return rawRows.map((row) => {
+    const { client, pageAccesses, interactions, contacts, completeness } = row;
+    const score = Math.round(
+      (maximums.accesses ? (pageAccesses / maximums.accesses) * 35 : 0)
+      + (maximums.interactions ? (interactions / maximums.interactions) * 25 : 0)
+      + (maximums.contacts ? (contacts / maximums.contacts) * 20 : 0)
+      + (completeness.score * 0.2)
+    );
+    const pros = [];
+    const cons = [];
+    if (pageAccesses > 0) pros.push("Já recebe visitas");
+    if (interactions > 0) pros.push("Gera interação");
+    if (contacts > 0) pros.push("Gera contato");
+    if (completeness.score === 100) pros.push("Cadastro completo");
+    if (!pageAccesses) cons.push("Sem acessos no período");
+    else if (!interactions) cons.push("Visitas sem ação");
+    if (pageAccesses > 0 && !contacts) cons.push("Não gerou contato");
+    if (completeness.missing.length) cons.push(`Falta ${completeness.missing.join(", ")}`);
+    if (!pros.length) pros.push("Potencial a desenvolver");
+    if (!cons.length) cons.push("Sem alerta relevante");
+
+    let priority = "manter";
+    let priorityLabel = "Manter e crescer";
+    let action = "Manter o cadastro atualizado e repetir as ações que geram contato.";
+    if (client.status === "pendente") {
+      priority = "prospectar";
+      priorityLabel = "Ir atrás";
+      action = "Visitar o comércio, concluir o cadastro e combinar a primeira divulgação.";
+    } else if (!pageAccesses && !interactions) {
+      priority = "critica";
+      priorityLabel = "Ação imediata";
+      action = "Revisar categoria, apresentação e divulgação para começar a gerar visitas.";
+    } else if (pageAccesses > 0 && !interactions) {
+      priority = "alta";
+      priorityLabel = "Melhorar conversão";
+      action = "Melhorar oferta, fotos e chamada para WhatsApp; há visitas, mas nenhuma ação.";
+    } else if (!contacts || completeness.score < 75) {
+      priority = "media";
+      priorityLabel = "Otimizar";
+      action = completeness.score < 75
+        ? "Completar os dados que faltam e reforçar uma chamada clara para contato."
+        : "Testar promoção, fotos e chamada mais forte para transformar interação em contato.";
+    }
+    return {
+      id: client.id,
+      name: client.nome || client.name || client.id,
+      category: client.categoria || client.category || "Sem categoria",
+      pageAccesses,
+      interactions,
+      contacts,
+      score,
+      pros,
+      cons,
+      priority,
+      priorityLabel,
+      action
+    };
+  }).sort((a, b) => {
+    const order = { prospectar: 0, critica: 1, alta: 2, media: 3, manter: 4 };
+    return order[a.priority] - order[b.priority] || a.score - b.score || a.name.localeCompare(b.name, "pt-BR");
+  });
+}
+
+function buildCategoryProspectingRows(groups = [], clients = []) {
+  const commerce = groups.find((group) => group.key === "comercios");
+  if (!commerce) return [];
+  const activeClients = clients.filter((client) => client.status !== "inativo" && isReportClient(client));
+  return commerce.categories.map((item) => {
+    const categoryKey = menuMetricIdentity(item.label);
+    const businesses = activeClients.filter((client) => {
+      const clientCategory = menuMetricIdentity(client.categoria || client.category || "");
+      return clientCategory === categoryKey || (categoryKey.length > 4 && (clientCategory.includes(categoryKey) || categoryKey.includes(clientCategory)));
+    });
+    const supply = businesses.length;
+    return {
+      category: item.label,
+      demand: Number(item.clicks || 0),
+      supply,
+      priority: supply === 0 ? "alta" : supply === 1 ? "media" : "monitorar",
+      reading: supply === 0 ? "Há procura, mas nenhum comércio ativo nessa categoria." : supply === 1 ? "Há procura e apenas uma opção cadastrada." : "A categoria já possui opções cadastradas.",
+      action: supply === 0 ? "Procurar e cadastrar um comércio dessa categoria." : supply === 1 ? "Buscar mais uma opção ou fortalecer o comércio atual." : "Comparar o desempenho dos cadastrados."
+    };
+  }).filter((row) => row.demand > 0).sort((a, b) => {
+    const order = { alta: 0, media: 1, monitorar: 2 };
+    return order[a.priority] - order[b.priority] || b.demand - a.demand || a.category.localeCompare(b.category, "pt-BR");
+  });
+}
+
+function renderBusinessDecisionTable(rows = []) {
+  if (!rows.length) return '<div class="list-meta">Ainda não há comércios com dados suficientes para análise.</div>';
+  return `<div class="report-table-wrap"><table class="report-click-table business-decision-table"><thead><tr><th>Prioridade</th><th>Comércio</th><th>Desempenho</th><th>Acessos</th><th>Interações</th><th>Contatos</th><th>Pontos positivos</th><th>Pontos de atenção</th><th>Próxima ação</th></tr></thead><tbody>${rows.map((row) => `<tr><td><span class="business-priority is-${escapeAttr(row.priority)}">${escapeHtml(row.priorityLabel)}</span></td><td><strong>${escapeHtml(row.name)}</strong><small>${escapeHtml(row.category)}</small></td><td><span class="business-score"><b>${row.score}</b>/100</span></td><td>${row.pageAccesses}</td><td>${row.interactions}</td><td>${row.contacts}</td><td><ul class="business-signal-list is-pro">${row.pros.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></td><td><ul class="business-signal-list is-con">${row.cons.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul></td><td class="business-next-action">${escapeHtml(row.action)}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
+function renderCategoryProspectingTable(rows = []) {
+  if (!rows.length) return '<div class="list-meta">Ainda não há procura por categorias suficiente para sugerir prospecção.</div>';
+  return `<div class="report-table-wrap"><table class="report-click-table category-prospecting-table"><thead><tr><th>Categoria procurada</th><th>Cliques no menu</th><th>Comércios ativos</th><th>Leitura</th><th>Ação sugerida</th></tr></thead><tbody>${rows.map((row) => `<tr><td><strong>${escapeHtml(row.category)}</strong><span class="business-priority is-${escapeAttr(row.priority)}">${row.priority === "alta" ? "Oportunidade" : row.priority === "media" ? "Pouca oferta" : "Monitorar"}</span></td><td><strong>${row.demand}</strong></td><td>${row.supply}</td><td>${escapeHtml(row.reading)}</td><td class="business-next-action">${escapeHtml(row.action)}</td></tr>`).join("")}</tbody></table></div>`;
+}
+
 function aggregateCidadesAcesso(data = {}) {
   const map = new Map();
   Object.values(data || {}).forEach((dia) => {
@@ -22976,6 +23110,14 @@ function renderReports(reportType = "") {
   const cliquesMenu = aggregateMenuDaily(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
   const menuAccessRows = buildMenuAccessRows(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
   const menuGroupBreakdown = buildMenuGroupBreakdown(menuAccessRows);
+  const businessDecisionRows = buildBusinessDecisionRows(reportClients, acessosClientes, cliquesBotoes.detalhes);
+  const categoryProspectingRows = buildCategoryProspectingRows(menuGroupBreakdown, reportClients);
+  const businessDecisionSummary = businessDecisionRows.reduce((summary, row) => {
+    if (row.priority === "prospectar") summary.prospect += 1;
+    else if (["critica", "alta", "media"].includes(row.priority)) summary.improve += 1;
+    else summary.healthy += 1;
+    return summary;
+  }, { prospect: 0, improve: 0, healthy: 0 });
   const lotteryMetrics = aggregateLotteryMetrics(filteredMetrics.loterias);
   const cliquesOndeComerCardapios = aggregateDailyWithDetails(
     filteredMetrics.ondeComerCardapios,
@@ -23197,6 +23339,26 @@ function renderReports(reportType = "") {
         <div class="access-report-detail-block">
           <h3>Detalhamento por estabelecimento ou serviço</h3>
           ${renderClickReportTable(getGeneralClickReport().rows, getGeneralClickReport().types, "Ainda não há acessos ou cliques por estabelecimento ou serviço.")}
+        </div>
+      `, true)}
+
+      ${isFinanceReport ? "" : renderFinanceReportSection("radar-gestao-comercios", "Radar de decisão dos comércios", periodRange, () => `
+        <p class="business-decision-intro">Uma leitura simples para decidir quem visitar, quem precisa melhorar e quem está performando bem. O desempenho combina visibilidade, interações, contatos e qualidade do cadastro dentro do período selecionado.</p>
+        <div class="access-report-kpi-strip business-decision-kpis">
+          <article><span>Ir atrás</span><strong>${businessDecisionSummary.prospect}</strong><small>Cadastros pendentes que pedem contato comercial</small></article>
+          <article><span>Precisam melhorar</span><strong>${businessDecisionSummary.improve}</strong><small>Comércios com pouca resposta ou cadastro incompleto</small></article>
+          <article><span>Bom desempenho</span><strong>${businessDecisionSummary.healthy}</strong><small>Comércios para manter e usar como referência</small></article>
+          <article><span>Categorias com procura</span><strong>${categoryProspectingRows.filter((row) => row.supply <= 1).length}</strong><small>Oportunidades com nenhuma ou pouca oferta cadastrada</small></article>
+        </div>
+        <div class="access-report-detail-block">
+          <h3><i class="fa-solid fa-chart-simple"></i> Prioridades por comércio</h3>
+          <p class="access-report-detail-copy">Comece pelas primeiras linhas: elas reúnem os casos que exigem contato ou melhoria mais rapidamente.</p>
+          ${renderBusinessDecisionTable(businessDecisionRows)}
+        </div>
+        <div class="access-report-detail-block">
+          <h3><i class="fa-solid fa-magnifying-glass-chart"></i> Categorias para prospecção</h3>
+          <p class="access-report-detail-copy">Cruza a procura no menu Comércios com a quantidade de opções ativas cadastradas.</p>
+          ${renderCategoryProspectingTable(categoryProspectingRows)}
         </div>
       `, true)}
 

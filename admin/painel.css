@@ -12407,6 +12407,28 @@ button.admin-button-loading::after {
 .menu-category-detail-table th, .menu-category-detail-table td { text-align: left !important; }
 @media (max-width: 900px) { .menu-group-breakdown-grid { grid-template-columns: 1fr; } }
 
+/* Radar gerencial de comercios - v415 */
+.business-decision-intro { margin: 0 0 14px; color: #475569; font-size: .82rem; line-height: 1.55; }
+.business-decision-kpis article:first-child { border-color: #fed7aa; background: #fff7ed; }
+.business-decision-table { min-width: 1420px; }
+.category-prospecting-table { min-width: 940px; }
+.business-decision-table th, .business-decision-table td, .category-prospecting-table th, .category-prospecting-table td { text-align: left !important; vertical-align: top; }
+.business-decision-table td > small { display: block; margin-top: 3px; color: #64748b; }
+.business-priority { display: inline-flex; align-items: center; width: max-content; min-height: 25px; padding: 4px 8px; border-radius: 999px; color: #475569; background: #f1f5f9; font-size: .66rem; font-weight: 850; white-space: nowrap; }
+.business-priority.is-prospectar, .business-priority.is-alta { color: #9a3412; background: #ffedd5; }
+.business-priority.is-critica { color: #b91c1c; background: #fee2e2; }
+.business-priority.is-media { color: #854d0e; background: #fef9c3; }
+.business-priority.is-manter, .business-priority.is-monitorar { color: #047857; background: #d1fae5; }
+.business-score { display: inline-flex; align-items: baseline; gap: 2px; color: #64748b; white-space: nowrap; }
+.business-score b { color: #0f172a; font-size: 1rem; }
+.business-signal-list { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.business-signal-list li { position: relative; padding-left: 13px; color: #475569; font-size: .68rem; line-height: 1.35; }
+.business-signal-list li::before { position: absolute; left: 0; font-weight: 900; content: "•"; }
+.business-signal-list.is-pro li::before { color: #16a34a; }
+.business-signal-list.is-con li::before { color: #ea580c; }
+.business-next-action { min-width: 230px; color: #334155; font-size: .71rem; line-height: 1.45; }
+.category-prospecting-table td:first-child { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
 /* Indicador de atualizacao em tempo real dos relatorios - v413 */
 .report-live-actions { display: flex; align-items: center; justify-content: flex-end; gap: 9px; flex-wrap: wrap; }
 .report-live-badge { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 6px 10px; border: 1px solid #bfe7d0; border-radius: 999px; color: #167247; background: #effcf5; font-size: .72rem; font-weight: 850; }
