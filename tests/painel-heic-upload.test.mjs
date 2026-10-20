@@ -33,6 +33,6 @@ test("seletores de cliente permitem HEIC explicitamente", () => {
 });
 
 test("painel carrega a versao com conversao HEIC", () => {
-  assert.ok(panelHtml.includes("painel.js?v=897"));
-  assert.ok(panelJs.includes('label: "v897"'));
+  assert.ok(panelHtml.includes("painel.js?v=898"));
+  assert.ok(panelJs.includes('label: "v898"'));
 });

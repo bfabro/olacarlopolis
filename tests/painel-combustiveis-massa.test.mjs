@@ -41,14 +41,14 @@ test("gravação em massa é atômica, mantém o último valor e registra histó
 test("promoção incompatível é encerrada e versões globais são atualizadas", () => {
   assert.match(panelJs, /promotion\.preco >= price/);
   assert.match(panelJs, /updates\[`\$\{base\}\/promocao`\] = null/);
-  assert.match(panelHtml, /painel\.css\?v=595/);
-  assert.match(panelHtml, /painel\.js\?v=897/);
-  assert.match(panelJs, /numero: 890/);
-  assert.match(panelJs, /label: "v897"/);
+  assert.match(panelHtml, /painel\.css\?v=596/);
+  assert.match(panelHtml, /painel\.js\?v=898/);
+  assert.match(panelJs, /numero: 891/);
+  assert.match(panelJs, /label: "v898"/);
   assert.match(panelJs, /data: "2026-10-20"/);
-  assert.match(indexHtml, /style\.css\?v=604/);
+  assert.match(indexHtml, /style\.css\?v=605/);
   assert.match(indexHtml, /ola-pesca\.js\?v=109/);
-  assert.match(indexHtml, /script\.js\?v=804/);
+  assert.match(indexHtml, /script\.js\?v=805/);
   assert.match(fishingJs, /FISHING_MAP_VERSION=109/);
-  assert.match(serviceWorker, /2026-10-20-novidades-por-do-sol-v944/);
+  assert.match(serviceWorker, /2026-10-20-novidades-refinadas-v945/);
 });

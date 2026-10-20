@@ -158,14 +158,14 @@ test("mensagem motivacional oferece uma frase bem-humorada para cada dia do ano"
   assert.doesNotMatch(source[0], /Math\.random/);
 });
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v677/);
-  assert.match(html, /style\.css\?v=604/);
-  assert.match(html, /script\.js\?v=804/);
-  assert.match(html, /Olá Carlópolis v550/);
-  assert.match(panel, /numero: 890/);
-  assert.match(panel, /label: "v897"/);
+  assert.match(site, /Release do site v678/);
+  assert.match(html, /style\.css\?v=605/);
+  assert.match(html, /script\.js\?v=805/);
+  assert.match(html, /Olá Carlópolis v551/);
+  assert.match(panel, /numero: 891/);
+  assert.match(panel, /label: "v898"/);
   assert.match(panel, /data: "2026-10-20"/);
-  assert.match(panelHtml, /painel\.css\?v=595/);
-  assert.match(panelHtml, /painel\.js\?v=897/);
-  assert.match(worker, /2026-10-20-novidades-por-do-sol-v944/);
+  assert.match(panelHtml, /painel\.css\?v=596/);
+  assert.match(panelHtml, /painel\.js\?v=898/);
+  assert.match(worker, /2026-10-20-novidades-refinadas-v945/);
 });
