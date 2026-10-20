@@ -55,7 +55,9 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
   assert.match(panel, /desenharImagemCover\(ctx, assets\.headerImage, 0, 0, format\.width, headerH\)/);
   assert.match(panel, /function drawWeeklyClientImage/);
-  assert.match(panel, /useContain = imageRatio/);
+  assert.match(panel, /ctx\.filter = "blur\(13px\) saturate\(1\.08\)"/);
+  assert.match(panel, /foregroundScale = Math\.min/);
+  assert.match(panel, /foregroundWidth = image\.width \* foregroundScale/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemTitle\(item\)/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemDescription\(item\)/);
   assert.match(panel, /function weeklyPostStatus/);
@@ -68,8 +70,8 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=596/);
-  assert.match(html, /painel\.js\?v=898/);
-  assert.match(panel, /numero: 891/);
-  assert.match(panel, /label: "v898"/);
+  assert.match(html, /painel\.css\?v=597/);
+  assert.match(html, /painel\.js\?v=899/);
+  assert.match(panel, /numero: 892/);
+  assert.match(panel, /label: "v899"/);
 });

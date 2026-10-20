@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 891,
-  label: "v898",
+  numero: 892,
+  label: "v899",
   data: "2026-10-20",
-  nota: "Arte semanal aprimora enquadramento das imagens, textos completos, logo transparente ampliada e rodapé profissional."
+  nota: "Imagens das novidades passam a usar moldura uniforme, exibição completa e fundo derivado da própria imagem."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -26715,18 +26715,32 @@ function drawWeeklyLogoTransparent(ctx, image, x, y, width, height) {
 
 function drawWeeklyClientImage(ctx, image, x, y, width, height, radius) {
   if (!image) return desenharImagemCover(ctx, image, x, y, width, height, radius);
-  const imageRatio = image.width / image.height;
-  const frameRatio = width / height;
-  const useContain = imageRatio > frameRatio * 1.65 || imageRatio < frameRatio * .58;
-  if (useContain) {
-    const background = ctx.createLinearGradient(x, y, x + width, y + height);
-    background.addColorStop(0, "#071c38");
-    background.addColorStop(1, "#0b4e7d");
-    preencherRoundRect(ctx, x, y, width, height, radius, background);
-    desenharImagemContain(ctx, image, x + 7, y + 7, width - 14, height - 14, Math.max(8, radius - 5), "rgba(255,255,255,.04)");
-    return;
-  }
-  desenharImagemCover(ctx, image, x, y, width, height, radius);
+  preencherRoundRect(ctx, x, y, width, height, radius, "#061d3a");
+  const backgroundScale = Math.max(width / image.width, height / image.height);
+  const backgroundWidth = image.width * backgroundScale;
+  const backgroundHeight = image.height * backgroundScale;
+  ctx.save();
+  canvasRoundRect(ctx, x, y, width, height, radius);
+  ctx.clip();
+  ctx.globalAlpha = .52;
+  ctx.filter = "blur(13px) saturate(1.08)";
+  ctx.drawImage(image, x + (width - backgroundWidth) / 2 - 10, y + (height - backgroundHeight) / 2 - 10, backgroundWidth + 20, backgroundHeight + 20);
+  ctx.filter = "none";
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = "rgba(3,24,54,.28)";
+  ctx.fillRect(x, y, width, height);
+  const inset = 10;
+  const foregroundScale = Math.min((width - inset * 2) / image.width, (height - inset * 2) / image.height);
+  const foregroundWidth = image.width * foregroundScale;
+  const foregroundHeight = image.height * foregroundScale;
+  ctx.shadowColor = "rgba(0,10,30,.38)";
+  ctx.shadowBlur = 10;
+  ctx.drawImage(image, x + (width - foregroundWidth) / 2, y + (height - foregroundHeight) / 2, foregroundWidth, foregroundHeight);
+  ctx.restore();
+  ctx.strokeStyle = "rgba(74,190,255,.9)";
+  ctx.lineWidth = 2;
+  canvasRoundRect(ctx, x, y, width, height, radius);
+  ctx.stroke();
 }
 
 function drawWeeklyPostHeader(ctx, assets, title, subtitle, format) {
@@ -26763,7 +26777,7 @@ function drawWeeklyPostCards(ctx, items, assets, format) {
   const footerSpace = vertical ? 270 : 146;
   const rows = Math.ceil(items.length / columns);
   const cardW = (format.width - 48 - gap * (columns - 1)) / columns;
-  const cardH = Math.min(vertical ? 350 : 198, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
+  const cardH = Math.min(vertical ? 365 : 198, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
   items.forEach((item, index) => {
     const col = index % columns;
     const row = Math.floor(index / columns);
@@ -26773,10 +26787,10 @@ function drawWeeklyPostCards(ctx, items, assets, format) {
     ctx.shadowColor = "rgba(0,17,49,.5)";
     ctx.shadowBlur = vertical ? 14 : 8;
     ctx.shadowOffsetY = 5;
-    preencherRoundRect(ctx, x, y, cardW, cardH - (vertical ? 55 : 34), 24, "#082c63");
+    preencherRoundRect(ctx, x, y, cardW, cardH - (vertical ? 50 : 34), 24, "#082c63");
     ctx.restore();
     const barH = vertical ? 90 : 58;
-    const descriptionH = vertical ? 55 : 34;
+    const descriptionH = vertical ? 50 : 34;
     const imageH = cardH - barH - descriptionH;
     const status = weeklyPostStatus(item);
     const badgeW = status.label === "Novo" ? (vertical ? 138 : 88) : (vertical ? 188 : 120);
