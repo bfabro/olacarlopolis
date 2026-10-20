@@ -48,18 +48,20 @@ test("artes oferecem Feed e Story, prévia e download PNG", () => {
 test("novidades da semana seguem o modelo editorial e levam a logo ao topo direito", () => {
   assert.match(panel, /function drawWeeklyPostHeader/);
   assert.match(panel, /const logoX = format\.width - logoSize/);
-  assert.match(panel, /const logoY = vertical \? 48 : 36/);
+  assert.match(panel, /const logoY = vertical \? 42 : 30/);
   assert.match(panel, /desenharImagemContain\(ctx, assets\.siteLogo, logoX, logoY/);
-  assert.match(panel, /O que mudou no portal/);
+  assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
+  assert.match(panel, /desenharImagemCover\(ctx, assets\.headerImage, 0, 0, format\.width, headerH\)/);
   assert.match(panel, /function weeklyPostStatus/);
   assert.match(panel, /label: "Novo"/);
   assert.match(panel, /label: "Atualizado"/);
-  assert.match(panel, /Acesse e acompanhe tudo em um só lugar/);
+  assert.match(panel, /Acesse agora/);
+  assert.match(panel, /www\.olacarlopolis\.com/);
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=594/);
-  assert.match(html, /painel\.js\?v=896/);
-  assert.match(panel, /numero: 889/);
-  assert.match(panel, /label: "v896"/);
+  assert.match(html, /painel\.css\?v=595/);
+  assert.match(html, /painel\.js\?v=897/);
+  assert.match(panel, /numero: 890/);
+  assert.match(panel, /label: "v897"/);
 });

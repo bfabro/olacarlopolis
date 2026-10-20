@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 889,
-  label: "v896",
+  numero: 890,
+  label: "v897",
   data: "2026-10-20",
-  nota: "Arte de novidades da semana redesenhada com identidade editorial, cards de destaque e logo no canto superior direito."
+  nota: "Arte semanal replica o novo layout de referência e reutiliza no cabeçalho o pôr do sol do Clima do Dia."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -26643,11 +26643,12 @@ function centralPostDrawBrand(ctx, width, height, siteLogo, vertical = false) {
 }
 
 async function centralPostAssets(items, imageGetter) {
-  const [siteLogo, ...images] = await Promise.all([
+  const [siteLogo, headerImage, ...images] = await Promise.all([
     carregarImagemCanvas("../images/img_padrao_site/logo_1.png"),
+    carregarImagemCanvas("../images/turismo/ponte.jpg"),
     ...items.map((item) => carregarImagemCanvas(imageGetter(item)))
   ]);
-  return { siteLogo, images };
+  return { siteLogo, headerImage, images };
 }
 
 function drawCentralPostHeader(ctx, width, title, subtitle, vertical) {
@@ -26701,120 +26702,122 @@ function weeklyPostStatus(item = {}) {
 
 function drawWeeklyPostHeader(ctx, assets, title, subtitle, format) {
   const vertical = format.key === "reels";
-  const logoSize = vertical ? 150 : 112;
-  const logoX = format.width - logoSize - (vertical ? 54 : 42);
-  const logoY = vertical ? 48 : 36;
+  const logoSize = vertical ? 148 : 104;
+  const logoX = format.width - logoSize - (vertical ? 48 : 36);
+  const logoY = vertical ? 42 : 30;
   ctx.save();
-  ctx.shadowColor = "rgba(0,28,69,.35)";
+  ctx.shadowColor = "rgba(0,20,60,.48)";
   ctx.shadowBlur = 22;
   preencherRoundRect(ctx, logoX - 8, logoY - 8, logoSize + 16, logoSize + 16, logoSize / 2, "rgba(255,255,255,.96)");
   ctx.restore();
   desenharImagemContain(ctx, assets.siteLogo, logoX, logoY, logoSize, logoSize, logoSize / 2, "#ffffff");
 
   ctx.textAlign = "left";
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `800 ${vertical ? 24 : 19}px Arial`;
-  ctx.fillText("CONTEÚDO REAL", 58, vertical ? 82 : 58);
-  ctx.fillStyle = "#ffd02b";
-  ctx.fillText("• OLÁ CARLÓPOLIS", vertical ? 267 : 223, vertical ? 82 : 58);
-
-  const titleY = vertical ? 138 : 105;
-  const titleWidth = format.width - (vertical ? 300 : 220);
-  const titleSize = vertical ? 86 : 60;
+  const titleY = vertical ? 142 : 94;
+  const titleWidth = format.width - (vertical ? 250 : 190);
+  const titleSize = vertical ? 94 : 64;
   const titleMatch = String(title || "").trim().match(/^(.*?)(\s+da\s+semana)$/i);
   if (titleMatch) {
-    postArtDrawText(ctx, titleMatch[1], 58, titleY, titleWidth, 1, titleSize, "#ffffff", { min: vertical ? 58 : 42, lineHeight: vertical ? 86 : 61 });
-    postArtDrawText(ctx, titleMatch[2].trim(), 58, titleY + (vertical ? 86 : 61), titleWidth, 1, titleSize, "#ffd02b", { min: vertical ? 58 : 42, lineHeight: vertical ? 86 : 61 });
+    ctx.save(); ctx.shadowColor = "rgba(0,27,76,.8)"; ctx.shadowBlur = 15; ctx.shadowOffsetY = 7;
+    postArtDrawText(ctx, titleMatch[1], 58, titleY, titleWidth, 1, titleSize, "#ffffff", { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
+    postArtDrawText(ctx, titleMatch[2].trim(), 58, titleY + (vertical ? 94 : 65), titleWidth, 1, titleSize, "#ffd126", { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
+    ctx.restore();
   } else {
-    postArtDrawText(ctx, title, 58, titleY, titleWidth, 2, titleSize, "#ffffff", { min: vertical ? 58 : 42, lineHeight: vertical ? 86 : 61 });
+    ctx.save(); ctx.shadowColor = "rgba(0,27,76,.8)"; ctx.shadowBlur = 15; ctx.shadowOffsetY = 7;
+    postArtDrawText(ctx, title, 58, titleY, titleWidth, 2, titleSize, "#ffffff", { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
+    ctx.restore();
   }
-  ctx.fillStyle = "#ffd02b";
-  preencherRoundRect(ctx, 58, vertical ? 308 : 215, vertical ? 570 : 420, vertical ? 13 : 10, 7, "#ffd02b");
-  postArtDrawText(ctx, subtitle, 58, vertical ? 342 : 242, format.width - 116, 2, vertical ? 30 : 23, "#eaf6ff", { min: 18, weight: 700, lineHeight: vertical ? 36 : 28 });
-
-  const bandY = vertical ? 438 : 302;
-  preencherRoundRect(ctx, 38, bandY, format.width - 76, vertical ? 74 : 58, 25, "rgba(0,45,98,.72)");
-  ctx.fillStyle = "#ffd02b";
-  ctx.font = `900 ${vertical ? 36 : 28}px Arial`;
-  ctx.fillText("⌂", 62, bandY + (vertical ? 49 : 40));
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `900 ${vertical ? 34 : 27}px Arial`;
-  ctx.fillText("O que mudou no portal", vertical ? 116 : 104, bandY + (vertical ? 49 : 40));
+  preencherRoundRect(ctx, 58, vertical ? 334 : 226, vertical ? 610 : 435, vertical ? 12 : 9, 7, "#ffd126");
+  postArtDrawText(ctx, subtitle, 58, vertical ? 374 : 249, vertical ? 700 : 600, 2, vertical ? 31 : 22, "#ffffff", { min: 18, weight: 800, lineHeight: vertical ? 37 : 27 });
 }
 
 function drawWeeklyPostCards(ctx, items, assets, format) {
   const vertical = format.key === "reels";
   const columns = items.length === 1 ? 1 : 2;
-  const gap = vertical ? 20 : 16;
-  const startY = vertical ? 532 : 374;
-  const footerSpace = vertical ? 276 : 156;
+  const gap = vertical ? 22 : 14;
+  const startY = vertical ? 540 : 316;
+  const footerSpace = vertical ? 260 : 142;
   const rows = Math.ceil(items.length / columns);
-  const cardW = (format.width - 76 - gap * (columns - 1)) / columns;
-  const cardH = Math.min(vertical ? 326 : 244, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
+  const cardW = (format.width - 48 - gap * (columns - 1)) / columns;
+  const cardH = Math.min(vertical ? 345 : 195, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
   items.forEach((item, index) => {
     const col = index % columns;
     const row = Math.floor(index / columns);
-    const x = 38 + col * (cardW + gap);
+    const x = 24 + col * (cardW + gap);
     const y = startY + row * (cardH + gap);
     ctx.save();
-    ctx.shadowColor = "rgba(0,25,65,.27)";
-    ctx.shadowBlur = vertical ? 16 : 10;
-    ctx.shadowOffsetY = 6;
-    preencherRoundRect(ctx, x, y, cardW, cardH, 24, "#ffffff");
+    ctx.shadowColor = "rgba(0,17,49,.5)";
+    ctx.shadowBlur = vertical ? 14 : 8;
+    ctx.shadowOffsetY = 5;
+    preencherRoundRect(ctx, x, y, cardW, cardH - (vertical ? 38 : 25), 24, "#082c63");
     ctx.restore();
-    const imageH = Math.max(vertical ? 145 : 94, cardH * .56);
-    desenharImagemCover(ctx, assets.images[index], x, y, cardW, imageH, 24);
+    const barH = vertical ? 72 : 45;
+    const descriptionH = vertical ? 38 : 25;
+    const imageH = cardH - barH - descriptionH;
     const status = weeklyPostStatus(item);
-    const badgeW = status.label === "Novo" ? (vertical ? 126 : 102) : (vertical ? 175 : 140);
-    preencherRoundRect(ctx, x + 18, y + 16, badgeW, vertical ? 42 : 32, 21, status.color);
+    const badgeW = status.label === "Novo" ? (vertical ? 148 : 94) : (vertical ? 205 : 130);
+    preencherRoundRect(ctx, x + 10, y + 10, badgeW, vertical ? 52 : 31, 26, status.color);
     ctx.fillStyle = "#ffffff";
-    ctx.font = `900 ${vertical ? 21 : 16}px Arial`;
+    ctx.font = `900 ${vertical ? 25 : 15}px Arial`;
     ctx.textAlign = "left";
-    ctx.fillText(`${status.symbol}  ${status.label}`, x + 31, y + (vertical ? 45 : 38));
-
-    const textY = y + imageH + (vertical ? 35 : 27);
-    ctx.fillStyle = status.color;
-    ctx.font = `900 ${vertical ? 19 : 15}px Arial`;
-    const category = String(item.categoria || item.tipo || (status.label === "Novo" ? "NOVIDADE" : "CONTEÚDO ATUALIZADO")).toUpperCase();
-    ctx.fillText(category.slice(0, 31), x + 20, textY);
-    postArtDrawText(ctx, weeklyPostItemTitle(item), x + 20, textY + (vertical ? 23 : 18), cardW - 40, 2, vertical ? 27 : 21, "#082b60", { min: vertical ? 18 : 14, lineHeight: vertical ? 29 : 23 });
-    const meta = item.estabelecimento || "Olá Carlópolis";
-    ctx.fillStyle = "#69809d";
-    ctx.font = `700 ${vertical ? 17 : 13}px Arial`;
-    ctx.fillText(textoCurtoArte(meta, 38), x + 20, y + cardH - (vertical ? 17 : 13));
+    ctx.fillText(`${status.symbol}  ${status.label}`, x + 23, y + (vertical ? 45 : 32));
+    const metaX = x + badgeW + (vertical ? 30 : 22);
+    ctx.strokeStyle = "rgba(255,255,255,.65)"; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(metaX - (vertical ? 14 : 10), y + 12); ctx.lineTo(metaX - (vertical ? 14 : 10), y + barH - 12); ctx.stroke();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `800 ${vertical ? 20 : 13}px Arial`;
+    ctx.fillText(textoCurtoArte(item.estabelecimento || "Olá Carlópolis", vertical ? 25 : 22), metaX, y + (vertical ? 29 : 20));
+    ctx.fillStyle = "#ffd126";
+    ctx.font = `900 ${vertical ? 21 : 13}px Arial`;
+    ctx.fillText(textoCurtoArte(weeklyPostItemTitle(item), vertical ? 29 : 25), metaX, y + (vertical ? 55 : 37));
+    desenharImagemCover(ctx, assets.images[index], x + 3, y + barH, cardW - 6, imageH, 18);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `500 ${vertical ? 18 : 12}px Arial`;
+    ctx.fillText(textoCurtoArte(weeklyPostItemDescription(item), vertical ? 55 : 48), x + 18, y + cardH - (vertical ? 10 : 7));
   });
 }
 
 function drawWeeklyPostFooter(ctx, format) {
   const vertical = format.key === "reels";
-  const ctaY = format.height - (vertical ? 224 : 126);
-  const ctaX = vertical ? 112 : 86;
-  const ctaW = format.width - ctaX * 2;
-  preencherRoundRect(ctx, ctaX, ctaY, ctaW, vertical ? 72 : 54, 36, "#ffd02b");
-  ctx.fillStyle = "#082b60";
-  ctx.textAlign = "center";
-  ctx.font = `900 ${vertical ? 27 : 21}px Arial`;
-  ctx.fillText("Acesse e acompanhe tudo em um só lugar  ›", format.width / 2, ctaY + (vertical ? 47 : 36));
+  const boxX = vertical ? 42 : 32;
+  const boxY = format.height - (vertical ? 218 : 122);
+  const boxW = format.width - boxX * 2;
+  preencherRoundRect(ctx, boxX, boxY, boxW, vertical ? 174 : 94, 34, "rgba(4,35,79,.96)");
   ctx.textAlign = "left";
   ctx.fillStyle = "#ffffff";
-  ctx.font = `900 ${vertical ? 31 : 23}px Arial`;
-  ctx.fillText("OLÁ CARLÓPOLIS", 58, format.height - (vertical ? 91 : 43));
-  ctx.fillStyle = "#a9d9ff";
-  ctx.font = `700 ${vertical ? 21 : 16}px Arial`;
-  ctx.fillText("Informação e comércio local em um só lugar", vertical ? 350 : 285, format.height - (vertical ? 91 : 43));
+  ctx.font = `900 ${vertical ? 31 : 22}px Arial`;
+  ctx.fillText("OLÁ CARLÓPOLIS", boxX + 32, boxY + (vertical ? 66 : 40));
+  ctx.fillStyle = "#9bdcff";
+  ctx.font = `700 ${vertical ? 18 : 13}px Arial`;
+  ctx.fillText("Informação e comércio local em um só lugar", boxX + 32, boxY + (vertical ? 96 : 62));
+  const ctaW = vertical ? 300 : 232;
+  const ctaH = vertical ? 68 : 46;
+  const ctaX = boxX + boxW - ctaW - (vertical ? 30 : 22);
+  const ctaY = boxY + (vertical ? 31 : 18);
+  preencherRoundRect(ctx, ctaX, ctaY, ctaW, ctaH, ctaH / 2, "#ffd126");
+  ctx.fillStyle = "#082b60";
+  ctx.textAlign = "center";
+  ctx.font = `900 ${vertical ? 25 : 17}px Arial`;
+  ctx.fillText("Acesse agora  ›", ctaX + ctaW / 2, ctaY + (vertical ? 44 : 31));
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `800 ${vertical ? 20 : 13}px Arial`;
+  ctx.fillText("www.olacarlopolis.com", ctaX + ctaW / 2, ctaY + ctaH + (vertical ? 31 : 20));
 }
 
 function drawWeeklyPostCanvas(ctx, items, assets, title, subtitle, format) {
-  const gradient = ctx.createLinearGradient(0, 0, format.width, format.height);
-  gradient.addColorStop(0, "#032f66");
-  gradient.addColorStop(.48, "#006fbd");
-  gradient.addColorStop(1, "#004679");
-  ctx.fillStyle = gradient;
+  const vertical = format.key === "reels";
+  const headerH = vertical ? 520 : 300;
+  ctx.fillStyle = "#006ca7";
   ctx.fillRect(0, 0, format.width, format.height);
-  ctx.fillStyle = "rgba(0,25,70,.2)";
-  ctx.beginPath(); ctx.moveTo(0, format.height * .18); ctx.lineTo(format.width * .72, 0); ctx.lineTo(format.width, 0); ctx.lineTo(format.width, format.height * .34); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = "rgba(0,166,200,.18)";
-  ctx.beginPath(); ctx.moveTo(0, format.height * .72); ctx.lineTo(format.width, format.height * .58); ctx.lineTo(format.width, format.height); ctx.lineTo(0, format.height); ctx.closePath(); ctx.fill();
+  desenharImagemCover(ctx, assets.headerImage, 0, 0, format.width, headerH);
+  const headerShade = ctx.createLinearGradient(0, 0, format.width, headerH);
+  headerShade.addColorStop(0, "rgba(0,35,86,.78)");
+  headerShade.addColorStop(.55, "rgba(0,43,91,.35)");
+  headerShade.addColorStop(1, "rgba(0,33,78,.08)");
+  ctx.fillStyle = headerShade; ctx.fillRect(0, 0, format.width, headerH);
+  const bodyShade = ctx.createLinearGradient(0, headerH, 0, format.height);
+  bodyShade.addColorStop(0, "#075493"); bodyShade.addColorStop(1, "#003b6c");
+  ctx.fillStyle = bodyShade; ctx.fillRect(0, headerH, format.width, format.height - headerH);
   drawWeeklyPostHeader(ctx, assets, title, subtitle, format);
   drawWeeklyPostCards(ctx, items, assets, format);
   drawWeeklyPostFooter(ctx, format);
