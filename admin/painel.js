@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 888,
-  label: "v895",
+  numero: 889,
+  label: "v896",
   data: "2026-10-20",
-  nota: "Nova Central de postagens cria resumos de novidades e vitrines com até seis comércios usando dados reais do portal."
+  nota: "Arte de novidades da semana redesenhada com identidade editorial, cards de destaque e logo no canto superior direito."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -26692,12 +26692,143 @@ function drawCentralPostCards(ctx, items, assets, format, kind) {
   });
 }
 
+function weeklyPostStatus(item = {}) {
+  const source = normalizeName(`${item.tipo || ""} ${item.acao || ""} ${item.titulo || ""}`);
+  return /novo|nova|cadast|inclu/.test(source)
+    ? { label: "Novo", color: "#18a83a", symbol: "★" }
+    : { label: "Atualizado", color: "#ff6418", symbol: "↻" };
+}
+
+function drawWeeklyPostHeader(ctx, assets, title, subtitle, format) {
+  const vertical = format.key === "reels";
+  const logoSize = vertical ? 150 : 112;
+  const logoX = format.width - logoSize - (vertical ? 54 : 42);
+  const logoY = vertical ? 48 : 36;
+  ctx.save();
+  ctx.shadowColor = "rgba(0,28,69,.35)";
+  ctx.shadowBlur = 22;
+  preencherRoundRect(ctx, logoX - 8, logoY - 8, logoSize + 16, logoSize + 16, logoSize / 2, "rgba(255,255,255,.96)");
+  ctx.restore();
+  desenharImagemContain(ctx, assets.siteLogo, logoX, logoY, logoSize, logoSize, logoSize / 2, "#ffffff");
+
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `800 ${vertical ? 24 : 19}px Arial`;
+  ctx.fillText("CONTEÚDO REAL", 58, vertical ? 82 : 58);
+  ctx.fillStyle = "#ffd02b";
+  ctx.fillText("• OLÁ CARLÓPOLIS", vertical ? 267 : 223, vertical ? 82 : 58);
+
+  const titleY = vertical ? 138 : 105;
+  const titleWidth = format.width - (vertical ? 300 : 220);
+  const titleSize = vertical ? 86 : 60;
+  const titleMatch = String(title || "").trim().match(/^(.*?)(\s+da\s+semana)$/i);
+  if (titleMatch) {
+    postArtDrawText(ctx, titleMatch[1], 58, titleY, titleWidth, 1, titleSize, "#ffffff", { min: vertical ? 58 : 42, lineHeight: vertical ? 86 : 61 });
+    postArtDrawText(ctx, titleMatch[2].trim(), 58, titleY + (vertical ? 86 : 61), titleWidth, 1, titleSize, "#ffd02b", { min: vertical ? 58 : 42, lineHeight: vertical ? 86 : 61 });
+  } else {
+    postArtDrawText(ctx, title, 58, titleY, titleWidth, 2, titleSize, "#ffffff", { min: vertical ? 58 : 42, lineHeight: vertical ? 86 : 61 });
+  }
+  ctx.fillStyle = "#ffd02b";
+  preencherRoundRect(ctx, 58, vertical ? 308 : 215, vertical ? 570 : 420, vertical ? 13 : 10, 7, "#ffd02b");
+  postArtDrawText(ctx, subtitle, 58, vertical ? 342 : 242, format.width - 116, 2, vertical ? 30 : 23, "#eaf6ff", { min: 18, weight: 700, lineHeight: vertical ? 36 : 28 });
+
+  const bandY = vertical ? 438 : 302;
+  preencherRoundRect(ctx, 38, bandY, format.width - 76, vertical ? 74 : 58, 25, "rgba(0,45,98,.72)");
+  ctx.fillStyle = "#ffd02b";
+  ctx.font = `900 ${vertical ? 36 : 28}px Arial`;
+  ctx.fillText("⌂", 62, bandY + (vertical ? 49 : 40));
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `900 ${vertical ? 34 : 27}px Arial`;
+  ctx.fillText("O que mudou no portal", vertical ? 116 : 104, bandY + (vertical ? 49 : 40));
+}
+
+function drawWeeklyPostCards(ctx, items, assets, format) {
+  const vertical = format.key === "reels";
+  const columns = items.length === 1 ? 1 : 2;
+  const gap = vertical ? 20 : 16;
+  const startY = vertical ? 532 : 374;
+  const footerSpace = vertical ? 276 : 156;
+  const rows = Math.ceil(items.length / columns);
+  const cardW = (format.width - 76 - gap * (columns - 1)) / columns;
+  const cardH = Math.min(vertical ? 326 : 244, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
+  items.forEach((item, index) => {
+    const col = index % columns;
+    const row = Math.floor(index / columns);
+    const x = 38 + col * (cardW + gap);
+    const y = startY + row * (cardH + gap);
+    ctx.save();
+    ctx.shadowColor = "rgba(0,25,65,.27)";
+    ctx.shadowBlur = vertical ? 16 : 10;
+    ctx.shadowOffsetY = 6;
+    preencherRoundRect(ctx, x, y, cardW, cardH, 24, "#ffffff");
+    ctx.restore();
+    const imageH = Math.max(vertical ? 145 : 94, cardH * .56);
+    desenharImagemCover(ctx, assets.images[index], x, y, cardW, imageH, 24);
+    const status = weeklyPostStatus(item);
+    const badgeW = status.label === "Novo" ? (vertical ? 126 : 102) : (vertical ? 175 : 140);
+    preencherRoundRect(ctx, x + 18, y + 16, badgeW, vertical ? 42 : 32, 21, status.color);
+    ctx.fillStyle = "#ffffff";
+    ctx.font = `900 ${vertical ? 21 : 16}px Arial`;
+    ctx.textAlign = "left";
+    ctx.fillText(`${status.symbol}  ${status.label}`, x + 31, y + (vertical ? 45 : 38));
+
+    const textY = y + imageH + (vertical ? 35 : 27);
+    ctx.fillStyle = status.color;
+    ctx.font = `900 ${vertical ? 19 : 15}px Arial`;
+    const category = String(item.categoria || item.tipo || (status.label === "Novo" ? "NOVIDADE" : "CONTEÚDO ATUALIZADO")).toUpperCase();
+    ctx.fillText(category.slice(0, 31), x + 20, textY);
+    postArtDrawText(ctx, weeklyPostItemTitle(item), x + 20, textY + (vertical ? 23 : 18), cardW - 40, 2, vertical ? 27 : 21, "#082b60", { min: vertical ? 18 : 14, lineHeight: vertical ? 29 : 23 });
+    const meta = item.estabelecimento || "Olá Carlópolis";
+    ctx.fillStyle = "#69809d";
+    ctx.font = `700 ${vertical ? 17 : 13}px Arial`;
+    ctx.fillText(textoCurtoArte(meta, 38), x + 20, y + cardH - (vertical ? 17 : 13));
+  });
+}
+
+function drawWeeklyPostFooter(ctx, format) {
+  const vertical = format.key === "reels";
+  const ctaY = format.height - (vertical ? 224 : 126);
+  const ctaX = vertical ? 112 : 86;
+  const ctaW = format.width - ctaX * 2;
+  preencherRoundRect(ctx, ctaX, ctaY, ctaW, vertical ? 72 : 54, 36, "#ffd02b");
+  ctx.fillStyle = "#082b60";
+  ctx.textAlign = "center";
+  ctx.font = `900 ${vertical ? 27 : 21}px Arial`;
+  ctx.fillText("Acesse e acompanhe tudo em um só lugar  ›", format.width / 2, ctaY + (vertical ? 47 : 36));
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `900 ${vertical ? 31 : 23}px Arial`;
+  ctx.fillText("OLÁ CARLÓPOLIS", 58, format.height - (vertical ? 91 : 43));
+  ctx.fillStyle = "#a9d9ff";
+  ctx.font = `700 ${vertical ? 21 : 16}px Arial`;
+  ctx.fillText("Informação e comércio local em um só lugar", vertical ? 350 : 285, format.height - (vertical ? 91 : 43));
+}
+
+function drawWeeklyPostCanvas(ctx, items, assets, title, subtitle, format) {
+  const gradient = ctx.createLinearGradient(0, 0, format.width, format.height);
+  gradient.addColorStop(0, "#032f66");
+  gradient.addColorStop(.48, "#006fbd");
+  gradient.addColorStop(1, "#004679");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, format.width, format.height);
+  ctx.fillStyle = "rgba(0,25,70,.2)";
+  ctx.beginPath(); ctx.moveTo(0, format.height * .18); ctx.lineTo(format.width * .72, 0); ctx.lineTo(format.width, 0); ctx.lineTo(format.width, format.height * .34); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = "rgba(0,166,200,.18)";
+  ctx.beginPath(); ctx.moveTo(0, format.height * .72); ctx.lineTo(format.width, format.height * .58); ctx.lineTo(format.width, format.height); ctx.lineTo(0, format.height); ctx.closePath(); ctx.fill();
+  drawWeeklyPostHeader(ctx, assets, title, subtitle, format);
+  drawWeeklyPostCards(ctx, items, assets, format);
+  drawWeeklyPostFooter(ctx, format);
+}
+
 function drawCentralPostCanvas(ctx, items, assets, title, subtitle, format, kind) {
   const { width, height } = format;
   const vertical = format.key === "reels";
+  if (kind === "weekly") {
+    drawWeeklyPostCanvas(ctx, items, assets, title, subtitle, format);
+    return;
+  }
   const gradient = ctx.createLinearGradient(0, 0, width, height);
-  if (kind === "commerce") { gradient.addColorStop(0, "#41196c"); gradient.addColorStop(.55, "#7934a5"); gradient.addColorStop(1, "#e74f73"); }
-  else { gradient.addColorStop(0, "#06345f"); gradient.addColorStop(.58, "#0b68a8"); gradient.addColorStop(1, "#13a47d"); }
+  gradient.addColorStop(0, "#41196c"); gradient.addColorStop(.55, "#7934a5"); gradient.addColorStop(1, "#e74f73");
   ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height);
   ctx.fillStyle = "rgba(255,255,255,.07)"; ctx.beginPath(); ctx.arc(width - 80, 110, 290, 0, Math.PI * 2); ctx.fill();
   drawCentralPostHeader(ctx, width, title, subtitle, vertical);

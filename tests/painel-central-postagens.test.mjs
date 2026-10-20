@@ -45,9 +45,21 @@ test("artes oferecem Feed e Story, prévia e download PNG", () => {
   assert.match(css, /@media \(max-width: 680px\)/);
 });
 
+test("novidades da semana seguem o modelo editorial e levam a logo ao topo direito", () => {
+  assert.match(panel, /function drawWeeklyPostHeader/);
+  assert.match(panel, /const logoX = format\.width - logoSize/);
+  assert.match(panel, /const logoY = vertical \? 48 : 36/);
+  assert.match(panel, /desenharImagemContain\(ctx, assets\.siteLogo, logoX, logoY/);
+  assert.match(panel, /O que mudou no portal/);
+  assert.match(panel, /function weeklyPostStatus/);
+  assert.match(panel, /label: "Novo"/);
+  assert.match(panel, /label: "Atualizado"/);
+  assert.match(panel, /Acesse e acompanhe tudo em um só lugar/);
+});
+
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=593/);
-  assert.match(html, /painel\.js\?v=895/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
+  assert.match(html, /painel\.css\?v=594/);
+  assert.match(html, /painel\.js\?v=896/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
 });

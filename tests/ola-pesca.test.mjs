@@ -638,8 +638,8 @@ test("v28 oferece ao Master campeonato, etapas, prêmios e nova rodada confirmad
   assert.match(panel, /rankingArchives\//);
   assert.match(panel, /championships\//);
   assert.match(panelCss, /\.fishing-stage-row/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
 });
 
 test("v29 preserva o mistério do Dourado e explica a pontuação do ranking", () => {
@@ -1324,9 +1324,9 @@ test("v73 diferencia a Piracanjuba e reorganiza personagens e cenário", () => {
   assert.ok(core.SPONSOR_SLOTS.slice(5, 10).every(slot => slot.x === 31 * 32));
   assert.equal(core.SNAG.x, 18 * 32);
   assert.equal(core.SNAG.y, 2.8 * 32);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /novidades-semana-v943/);
 });
 
 test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores em terra", () => {
@@ -1341,9 +1341,9 @@ test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores e
   for (const [x, y] of rightTrees) {
     assert.notEqual(core.MAP[Math.floor(y)]?.[Math.floor(x)], "W");
   }
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v75 senta os pescadores no barranco e renova as identidades da ponte", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1358,9 +1358,9 @@ test("v75 senta os pescadores no barranco e renova as identidades da ponte", () 
   assert.match(source, /drawBridgeExtraFisherV77\(c,identity,options\)\|\|drawBridgeIdentityV75Fallback/);
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ponte-extras-v77.png", import.meta.url)), true);
   assert.match(serviceWorker, /pescadores-ponte-extras-v77\.png/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v76 mostra pernas e pés dos pescadores sentados em bancos", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1371,9 +1371,9 @@ test("v76 mostra pernas e pés dos pescadores sentados em bancos", () => {
   assert.match(source, /c\.fillRect\(11,15,11,6\)/);
   assert.match(source, /drawVisibleSeatedLegsV76\(c,dir,\{child:!!p\.child,woman:!!p\.gender,pantsColor:p\.pantsColor,shoeColor:p\.shoeColor,accentColor:p\.legAccent\}\);drawPlantedRodV75/);
   assert.match(source, /const baseX=side\*27,baseY=17/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v77 iguala os dois pescadores inferiores ao padrão visual dos superiores", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1386,9 +1386,9 @@ test("v77 iguala os dois pescadores inferiores ao padrão visual dos superiores"
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/pescadores-ponte-extras-v77.png", import.meta.url)), true);
   assert.match(serviceWorker, /pescadores-ponte-extras-v77\.png/);
   assert.doesNotMatch(serviceWorker, /pescadores-ponte-extras-v75\.png/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v78 encaixa as varas nas mãos e individualiza as pernas sentadas", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1403,9 +1403,9 @@ test("v78 encaixa as varas nas mãos e individualiza as pernas sentadas", () => 
   assert.ok(core.SHORE_FISHERS.every(fisher => fisher.legAccent));
   assert.match(source, /function drawVisibleSeatedLegsV76\(c,side,\{child=false,woman=false,pantsColor=null,shoeColor=null,accentColor=null\}/);
   assert.match(source, /pantsColor:p\.pantsColor,shoeColor:p\.shoeColor,accentColor:p\.legAccent/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v28 protege configurações e arquivos do ranking para o Master", () => {
   const fishingRules = rules.rules.jogos.olaPesca;
@@ -1431,9 +1431,9 @@ test("v80 restaura o modelo visual dos personagens da v71", () => {
   assert.doesNotMatch(source, /CREATED_FISHER_SPRITE_V79/);
   assert.doesNotMatch(serviceWorker, /pescadores-referencias-v79\.png/);
   assert.doesNotMatch(serviceWorker, /pescadores-criados-v79\.png/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v81 separa pescadores, calçadas e tráfego no mapa 3", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1453,9 +1453,9 @@ test("v81 separa pescadores, calçadas e tráfego no mapa 3", () => {
   assert.match(source, /lane:97/);
   assert.match(source, /x-walk\/2,8\.5\*T/);
   assert.match(source, /x\+width\+walk\/2,10\.7\*T/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v82 corrige os nomes de Ção e Yas", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1463,10 +1463,10 @@ test("v82 corrige os nomes de Ção e Yas", () => {
   assert.equal(core.SHORE_FISHERS[2].gender, "woman");
   assert.equal(core.SHORE_FISHERS[3].name, "Yas");
   assert.equal(core.SHORE_FISHERS[3].child, true);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
   assert.match(panel, /data: "2026-10-20"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v83 inicializa o marcador de novidades no Acesso rápido", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1478,19 +1478,19 @@ test("v83 inicializa o marcador de novidades no Acesso rápido", () => {
   assert.match(html, /data-home-quick-action="novidades"/);
   assert.match(siteCss, /\.home-quick-actions \[data-home-quick-action="novidades"\] \.novidades-alert-badge/);
   assert.match(siteCss, /top: -10px/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
   assert.match(panel, /data: "2026-10-20"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v84 alinha o marcador no canto superior direito do botão Novidades", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
   assert.match(siteCss, /\.home-quick-actions \[data-home-quick-action="novidades"\],\s*\.home-quick-actions \[data-home-quick-action="promocoes"\] \{\s*overflow: visible/);
   assert.match(siteCss, /\.home-quick-actions \[data-home-quick-action="novidades"\] \.novidades-alert-badge,\s*\.home-quick-actions \[data-home-quick-action="promocoes"\] \.promocoes-alert-badge \{\s*top: -10px;\s*right: -10px;\s*z-index: 5/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
   assert.match(panel, /data: "2026-10-20"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 
 test("v85 adiciona acompanhamento de clientes exclusivo do Admin Master", () => {
@@ -1512,10 +1512,10 @@ test("v85 adiciona acompanhamento de clientes exclusivo do Admin Master", () => 
   assert.match(panelCss, /\/\* Client workflow v869 \*\//);
   assert.equal(rules.rules.acompanhamentoClientes[".read"].includes("master"), true);
   assert.equal(rules.rules.acompanhamentoClientes[".write"].includes("master"), true);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
   assert.match(panel, /data: "2026-10-20"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v86 acrescenta histórico, comentários e ciclo seguro ao acompanhamento", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1530,9 +1530,9 @@ test("v86 acrescenta histórico, comentários e ciclo seguro ao acompanhamento",
   assert.match(panel, /function clientWorkflowTaskIsDueSoon\(task = \{\}\)/);
   assert.match(panel, /clientWorkflowDueSoonCount/);
   assert.match(panelCss, /\/\* Client workflow v869 \*\//);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 test("v87 gera roteiro imprimível para visitas e novos acessos", () => {
   assert.equal(core.FISHING_MAP_VERSION, 109);
@@ -1548,9 +1548,9 @@ test("v87 gera roteiro imprimível para visitas e novos acessos", () => {
   assert.match(panel, /Imprimir ou salvar em PDF/);
   assert.match(panel, /printClientWorkflowVisitList\(\)/);
   assert.match(panelCss, /\/\* Client workflow v869 \*\//);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
 
 test("v89 mostra a quantidade de promoções novas ou reativadas no Acesso rápido", () => {
@@ -1568,8 +1568,8 @@ test("v89 mostra a quantidade de promoções novas ou reativadas no Acesso rápi
   assert.match(siteCss, /\.tem-promocoes-novas \.promocoes-alert-badge/);
   assert.match(siteCss, /\[data-home-quick-action="promocoes"\] \{\s*overflow: visible/);
   assert.match(siteCss, /\[data-home-quick-action="promocoes"\] \.promocoes-alert-badge/);
-  assert.match(panel, /numero: 888/);
-  assert.match(panel, /label: "v895"/);
+  assert.match(panel, /numero: 889/);
+  assert.match(panel, /label: "v896"/);
   assert.match(panel, /data: "2026-10-20"/);
-  assert.match(serviceWorker, /2026-10-20-central-postagens-v942/);
+  assert.match(serviceWorker, /2026-10-20-novidades-semana-v943/);
 });
