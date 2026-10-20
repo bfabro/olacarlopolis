@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 885,
-  label: "v892",
-  data: "2026-10-13",
-  nota: "Máxima e mínima do Clima do Dia agora consideram também os horários e a temperatura atual, evitando valores contraditórios."
+  numero: 886,
+  label: "v893",
+  data: "2026-10-20",
+  nota: "Relatórios do Admin Master agora detalham os cliques em Comércios, Serviços e Setor Público, incluindo o caminho até cada categoria."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -20546,6 +20546,65 @@ function menuTypeLabel(value = "") {
   return ({ categoria: "Categoria", grupo: "Grupo", pagina: "Página", item: "Item" })[value] || "Item";
 }
 
+const MENU_REPORT_GROUPS = [
+  { key: "comercios", label: "Comércios", icon: "fa-store", tone: "commerce" },
+  { key: "servicos", label: "Serviços", icon: "fa-screwdriver-wrench", tone: "services" },
+  { key: "setorpublico", label: "Setor Público", icon: "fa-building-columns", tone: "public" }
+];
+
+function menuReportGroupDefinition(value = "") {
+  const identity = menuMetricIdentity(value);
+  return MENU_REPORT_GROUPS.find((group) => group.key === identity) || null;
+}
+
+function buildMenuGroupBreakdown(rows = []) {
+  const groups = MENU_REPORT_GROUPS.map((group) => ({
+    ...group,
+    total: 0,
+    groupClicks: 0,
+    categoryClicks: 0,
+    categories: []
+  }));
+  const byKey = new Map(groups.map((group) => [group.key, group]));
+
+  rows.forEach((row) => {
+    const definition = menuReportGroupDefinition(row.type === "grupo" ? row.label : row.group);
+    if (!definition) return;
+    const group = byKey.get(definition.key);
+    const clicks = Number(row.total || 0);
+    group.total += clicks;
+    if (row.type === "grupo") {
+      group.groupClicks += clicks;
+      return;
+    }
+    group.categoryClicks += clicks;
+    group.categories.push({
+      ...row,
+      clicks,
+      path: `${group.label} → ${row.label}`
+    });
+  });
+
+  groups.forEach((group) => group.categories.sort((a, b) => b.clicks - a.clicks || a.label.localeCompare(b.label, "pt-BR")));
+  return groups;
+}
+
+function renderMenuGroupBreakdown(groups = []) {
+  return `<div class="menu-group-breakdown-grid">${groups.map((group) => `
+    <article class="menu-group-breakdown-card is-${escapeAttr(group.tone)}">
+      <header><span><i class="fa-solid ${escapeAttr(group.icon)}"></i></span><div><small>Menu principal</small><strong>${escapeHtml(group.label)}</strong></div><b>${group.total}</b></header>
+      <div class="menu-group-breakdown-stats"><span><b>${group.groupClicks}</b> cliques no grupo</span><span><b>${group.categoryClicks}</b> cliques nas opções</span></div>
+      <ol>${group.categories.length ? group.categories.slice(0, 8).map((item) => `<li><span>${escapeHtml(item.path)}</span><strong>${item.clicks}</strong></li>`).join("") : `<li class="is-empty"><span>Nenhuma opção acessada no período</span></li>`}</ol>
+    </article>
+  `).join("")}</div>`;
+}
+
+function renderMenuCategoryDetailTable(groups = []) {
+  const rows = groups.flatMap((group) => group.categories.map((item) => ({ ...item, groupLabel: group.label })));
+  if (!rows.length) return '<div class="list-meta">Ainda não há cliques nas categorias de Comércios, Serviços ou Setor Público.</div>';
+  return `<div class="report-table-wrap"><table class="report-click-table menu-category-detail-table"><thead><tr><th>Menu principal</th><th>Opção acessada</th><th>Caminho contabilizado</th><th>Tipo</th><th>Cliques</th></tr></thead><tbody>${rows.map((row) => `<tr><td><strong>${escapeHtml(row.groupLabel)}</strong></td><td>${escapeHtml(row.label)}</td><td>${escapeHtml(row.path)}</td><td><span class="report-table-tag">${escapeHtml(menuTypeLabel(row.type))}</span></td><td><strong>${row.clicks}</strong></td></tr>`).join("")}</tbody></table></div>`;
+}
+
 function renderMenuAccessTable(rows = [], total = 0) {
   if (!rows.length) return '<div class="list-meta">Ainda não há cliques de menu registrados.</div>';
   return `<div class="report-table-wrap"><table class="report-click-table menu-access-table"><thead><tr><th>#</th><th>Item do menu</th><th>Grupo</th><th>Tipo</th><th>Cliques</th><th>Participação</th></tr></thead><tbody>${rows.map((row, index) => `<tr><td>${index + 1}</td><td><strong>${escapeHtml(row.label)}</strong></td><td>${escapeHtml(row.group)}</td><td><span class="report-table-tag">${escapeHtml(menuTypeLabel(row.type))}</span></td><td><strong>${row.total}</strong></td><td>${total ? ((row.total / total) * 100).toLocaleString("pt-BR", { maximumFractionDigits: 1 }) : "0"}%</td></tr>`).join("")}</tbody></table></div>`;
@@ -22916,6 +22975,7 @@ function renderReports(reportType = "") {
 
   const cliquesMenu = aggregateMenuDaily(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
   const menuAccessRows = buildMenuAccessRows(filteredMetrics.cliquesMenu, filteredMetrics.cliquesPorMenuDetalhado);
+  const menuGroupBreakdown = buildMenuGroupBreakdown(menuAccessRows);
   const lotteryMetrics = aggregateLotteryMetrics(filteredMetrics.loterias);
   const cliquesOndeComerCardapios = aggregateDailyWithDetails(
     filteredMetrics.ondeComerCardapios,
@@ -23090,6 +23150,16 @@ function renderReports(reportType = "") {
           <article><span>Total de cliques</span><strong>${totalMenuClicks}</strong><small>Soma de todas as opções acessadas</small></article>
           <article><span>Item mais acessado</span><strong>${escapeHtml(topMenuItem?.label || "-")}</strong><small>${topMenuItem ? `${topMenuItem.total} cliques no período` : "Sem acessos no período"}</small></article>
           <article><span>Itens acessados</span><strong>${menuAccessRows.length}</strong><small>Categorias, grupos e páginas diferentes</small></article>
+        </div>
+        <div class="access-report-detail-block">
+          <h3><i class="fa-solid fa-sitemap"></i> Comércios, Serviços e Setor Público</h3>
+          <p class="access-report-detail-copy">Cada clique é associado ao menu principal e à opção escolhida. Exemplo: <strong>Comércios → Açaí</strong>.</p>
+          ${renderMenuGroupBreakdown(menuGroupBreakdown)}
+        </div>
+        <div class="access-report-detail-block">
+          <h3><i class="fa-solid fa-list-check"></i> Detalhamento por categoria</h3>
+          <p class="access-report-detail-copy">Mostra todas as categorias e serviços acessados dentro dos três menus principais.</p>
+          ${renderMenuCategoryDetailTable(menuGroupBreakdown)}
         </div>
         <div class="access-report-subsection report-wide"><h3><i class="fa-solid fa-table-list"></i> Todos os acessos do menu</h3><p>Tabela completa com cada item acessado, seu grupo e participação no período.</p>${renderMenuAccessTable(menuAccessRows, totalMenuClicks)}</div>
       `, true)}
