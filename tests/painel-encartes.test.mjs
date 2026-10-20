@@ -27,14 +27,15 @@ test("encarte usa produtos e promoções cadastrados com limite de dez itens", (
 });
 
 test("encarte oferece seis layouts, identidade do comércio e exportação PNG", () => {
-  const layouts = panelJs.match(/key: "(catalogo|oferta|premium|natural|oceano|mosaico)"/g) || [];
+  const flyerBlock = panelJs.match(/const FLYER_LAYOUTS = \[([\s\S]*?)\];\s*const FLYER_MAX_ITEMS/)?.[1] || "";
+  const layouts = flyerBlock.match(/key: "(catalogo|oferta|premium|natural|oceano|mosaico)"/g) || [];
   assert.equal(layouts.length, 6);
   assert.match(panelJs, /logoClienteImovelAdmin\(client\)/);
   assert.match(panelJs, /carregarImagemCanvas\(flyerItemImage\(item\)\)/);
   assert.match(panelJs, /canvasParaBlob\(canvas\)/);
   assert.match(panelJs, /baixarBlobCanvas\(blob, "encarte-"/);
-  assert.match(panelHtml, /painel\.css\?v=592/);
-  assert.match(panelHtml, /painel\.js\?v=894/);
+  assert.match(panelHtml, /painel\.css\?v=593/);
+  assert.match(panelHtml, /painel\.js\?v=895/);
 });
 
 test("seis modelos reproduzem composições profissionais usando os dados reais do cliente", () => {

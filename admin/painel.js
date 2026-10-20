@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 887,
-  label: "v894",
+  numero: 888,
+  label: "v895",
   data: "2026-10-20",
-  nota: "Novo Radar de decisão mostra quais comércios prospectar, quais precisam melhorar, pontos positivos, alertas e a próxima ação recomendada."
+  nota: "Nova Central de postagens cria resumos de novidades e vitrines com até seis comércios usando dados reais do portal."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -380,6 +380,17 @@ let state = {
   postArtLayout: "produto-minimal",
   postArtFormat: "feed",
   postArtCustomImage: "",
+  postArtCentralMode: "catalogo",
+  postArtCentralFormat: "feed",
+  weeklyPostDays: 7,
+  weeklyPostTitle: "Novidades da semana",
+  weeklyPostSubtitle: "Tudo o que movimentou Carlópolis em um só lugar",
+  weeklyPostSelectedIds: new Set(),
+  weeklyPostSelectionReady: false,
+  commercePostSelectedIds: new Set(),
+  commercePostLastRandomIds: [],
+  commercePostTitle: "Tem no Olá Carlópolis",
+  commercePostSubtitle: "Compre local. Encontre comércios e serviços da nossa cidade.",
   flyerClientId: "",
   flyerType: "produto",
   flyerLayout: "catalogo",
@@ -917,7 +928,7 @@ const views = {
 
 const viewCopy = {
   dashboard: ["Visao geral", "Resumo do ambiente administrativo."],
-  artesPostagem: ["Gerar postagem", "Crie postagens de produtos, promocoes e servicos com previa antes de baixar."],
+  artesPostagem: ["Central de postagens", "Crie artes com dados reais de novidades, comércios, produtos, promoções e serviços."],
   encartes: ["Gerar encarte", "Monte encartes de produtos e promoções com até 10 itens e seis opções de layout."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
   acompanhamentoClientes: ["Acompanhamento de clientes", "Organize postagens, acessos, visitas e próximos passos de cada cliente."],
@@ -3009,6 +3020,7 @@ async function loadAllData(onProgress = null) {
     terrainServicePhotosSnap,
     terrainTimelineSnap,
     novidadesConfigSnap,
+    novidadesSnap,
     sobreNosSnap,
     olaPescaConfigSnap,
     xadrezConfigSnap,
@@ -3054,6 +3066,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.servicePhotos.path, { enabled: isMaster() }),
     getPanelSnapshot(TERRAIN_MANAGEMENT_ENTITIES.timeline.path, { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/novidades"),
+    getPanelSnapshot("novidades", { enabled: isMaster() }),
     getPanelSnapshot("configuracoes/sobreNos"),
     getPanelSnapshot("jogos/olaPesca/config", { enabled: isMaster() }),
     getPanelSnapshot("jogos/xadrez/config"),
@@ -3193,6 +3206,14 @@ async function loadAllData(onProgress = null) {
   await syncTerrainTimelineBaselines();
   await syncTerrainReminderStatuses();
   state.novidadesConfig = novidadesConfigSnap.exists() ? novidadesConfigSnap.val() : {};
+  state.novidades = [];
+  if (novidadesSnap.exists()) {
+    novidadesSnap.forEach((child) => {
+      state.novidades.push({ id: child.key, ...child.val() });
+      return false;
+    });
+  }
+  state.novidades.sort((a, b) => Number(b.dataCriacao || b.createdAt || 0) - Number(a.dataCriacao || a.createdAt || 0));
   state.sobreNos = sobreNosSnap.exists() ? sobreNosSnap.val() : {};
   state.olaPescaConfig = olaPescaConfigSnap.exists() ? olaPescaConfigSnap.val() : {};
   state.xadrezConfig = xadrezConfigSnap.exists() ? xadrezConfigSnap.val() : {};
@@ -26350,9 +26371,9 @@ async function baixarPostArt() {
   }
 }
 
-function renderPostArtView() {
+function renderPostArtCatalogView() {
   postArtPreviewAssets = null;
-  const mount = $("postArtMount");
+  const mount = $("postArtCentralContent") || $("postArtMount");
   if (!mount) return;
   const clients = postArtClients();
   if (!clients.length) {
@@ -26554,6 +26575,249 @@ function renderPostArtView() {
   ["postArtBannerX", "postArtBannerY"].forEach((id) => $(id)?.addEventListener("input", agendarPreviaPostArt));
   preencherFormularioPostArt();
   atualizarPreviaPostArt();
+}
+
+const CENTRAL_POST_MAX_ITEMS = 6;
+let centralPostPreviewRequest = 0;
+let centralPostPreviewTimer = null;
+
+function centralPostFormat() {
+  return POST_ART_FORMATS[state.postArtCentralFormat] || POST_ART_FORMATS.feed;
+}
+
+function centralPostImage(item = {}) {
+  return normalizarImagemArteAdmin(item.imagem || item.image || item.foto || (Array.isArray(item.imagens) ? item.imagens[0] : "") || "");
+}
+
+function centralPostDate(value) {
+  const date = new Date(Number(value) || value || 0);
+  return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "");
+}
+
+function weeklyPostItems() {
+  const days = Math.max(7, Number(state.weeklyPostDays) || 7);
+  const limit = Date.now() - days * 86400000;
+  return (Array.isArray(state.novidades) ? state.novidades : [])
+    .filter((item) => item && item.ativo !== false && Number(item.dataCriacao || item.createdAt || 0) >= limit)
+    .sort((a, b) => Number(b.dataCriacao || b.createdAt || 0) - Number(a.dataCriacao || a.createdAt || 0));
+}
+
+function weeklyPostItemTitle(item = {}) {
+  return item.tituloConteudo || item.titulo || item.acao || "Novidade no Olá Carlópolis";
+}
+
+function weeklyPostItemDescription(item = {}) {
+  return item.descricao || item.acao || item.categoria || item.tipo || "Confira esta novidade";
+}
+
+function commercePostClients() {
+  return [...(state.clientes || [])]
+    .filter((client) => client && String(client.status || "ativo").toLowerCase() !== "inativo")
+    .sort((a, b) => String(a.nome || a.name || a.id).localeCompare(String(b.nome || b.name || b.id), "pt-BR"));
+}
+
+function commercePostClientImage(client = {}) {
+  return storyClientImages(client)[0] || normalizarImagemArteAdmin(client.imagem || client.logo || client.logoUrl || "");
+}
+
+function commercePostCategory(client = {}) {
+  return client.categoria || client.segmento || client.tipo || client.ramo || "Comércio local";
+}
+
+function centralPostSchedulePreview(kind) {
+  window.clearTimeout(centralPostPreviewTimer);
+  centralPostPreviewTimer = window.setTimeout(() => kind === "weekly" ? atualizarPreviaPostSemanal() : atualizarPreviaPostComercios(), 160);
+}
+
+function centralPostDrawBrand(ctx, width, height, siteLogo, vertical = false) {
+  const footerH = vertical ? 150 : 112;
+  preencherRoundRect(ctx, 44, height - footerH - 34, width - 88, footerH, 30, "rgba(8,33,64,.94)");
+  if (siteLogo) desenharImagemContain(ctx, siteLogo, 68, height - footerH - 15, vertical ? 104 : 76, vertical ? 104 : 76, 18, "#ffffff");
+  ctx.textAlign = "left";
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `900 ${vertical ? 34 : 28}px Arial`;
+  ctx.fillText("OLÁ CARLÓPOLIS", siteLogo ? (vertical ? 196 : 162) : 76, height - footerH + 28);
+  ctx.fillStyle = "#9bd6ff";
+  ctx.font = `700 ${vertical ? 24 : 20}px Arial`;
+  ctx.fillText("Informação e comércio local em um só lugar", siteLogo ? (vertical ? 196 : 162) : 76, height - footerH + 66);
+}
+
+async function centralPostAssets(items, imageGetter) {
+  const [siteLogo, ...images] = await Promise.all([
+    carregarImagemCanvas("../images/img_padrao_site/logo_1.png"),
+    ...items.map((item) => carregarImagemCanvas(imageGetter(item)))
+  ]);
+  return { siteLogo, images };
+}
+
+function drawCentralPostHeader(ctx, width, title, subtitle, vertical) {
+  const top = vertical ? 82 : 58;
+  ctx.fillStyle = "#ffcc31";
+  ctx.font = `900 ${vertical ? 23 : 20}px Arial`;
+  ctx.textAlign = "left";
+  ctx.fillText("CONTEÚDO REAL • OLÁ CARLÓPOLIS", 58, top);
+  postArtDrawText(ctx, title, 58, top + (vertical ? 62 : 48), width - 116, 2, vertical ? 68 : 55, "#ffffff", { min: 36, lineHeight: vertical ? 72 : 58 });
+  postArtDrawText(ctx, subtitle, 58, top + (vertical ? 214 : 168), width - 116, 2, vertical ? 28 : 23, "#cfe7ff", { min: 18, weight: 650, lineHeight: vertical ? 35 : 30 });
+}
+
+function drawCentralPostCards(ctx, items, assets, format, kind) {
+  const { width, height } = format;
+  const vertical = format.key === "reels";
+  const columns = items.length === 1 ? 1 : 2;
+  const gap = vertical ? 24 : 20;
+  const startY = vertical ? 430 : 300;
+  const footerSpace = vertical ? 232 : 180;
+  const rows = Math.ceil(items.length / columns);
+  const cardW = (width - 116 - gap * (columns - 1)) / columns;
+  const cardH = Math.min(vertical ? 330 : 278, (height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
+  items.forEach((item, index) => {
+    const col = index % columns;
+    const row = Math.floor(index / columns);
+    const x = 58 + col * (cardW + gap);
+    const y = startY + row * (cardH + gap);
+    preencherRoundRect(ctx, x, y, cardW, cardH, 26, "rgba(255,255,255,.98)");
+    const imageH = Math.max(92, cardH * (kind === "commerce" ? .57 : .49));
+    desenharImagemCover(ctx, assets.images[index], x, y, cardW, imageH, 26);
+    ctx.fillStyle = kind === "commerce" ? "#7a2c94" : "#0b6aa4";
+    ctx.font = `900 ${vertical ? 19 : 17}px Arial`;
+    ctx.textAlign = "left";
+    const label = kind === "commerce" ? commercePostCategory(item) : (item.tipo || item.categoria || "NOVIDADE");
+    ctx.fillText(String(label).toUpperCase().slice(0, 28), x + 18, y + imageH + 29);
+    const title = kind === "commerce" ? (item.nome || item.name || "Comércio local") : weeklyPostItemTitle(item);
+    postArtDrawText(ctx, title, x + 18, y + imageH + 49, cardW - 36, 2, vertical ? 28 : 24, "#17263b", { min: 18, lineHeight: vertical ? 31 : 27 });
+    if (kind === "weekly") {
+      const meta = item.estabelecimento || centralPostDate(item.dataCriacao || item.createdAt);
+      if (meta) { ctx.fillStyle = "#6a7d8e"; ctx.font = `700 ${vertical ? 18 : 16}px Arial`; ctx.fillText(textoCurtoArte(meta, 38), x + 18, y + cardH - 17); }
+    }
+  });
+}
+
+function drawCentralPostCanvas(ctx, items, assets, title, subtitle, format, kind) {
+  const { width, height } = format;
+  const vertical = format.key === "reels";
+  const gradient = ctx.createLinearGradient(0, 0, width, height);
+  if (kind === "commerce") { gradient.addColorStop(0, "#41196c"); gradient.addColorStop(.55, "#7934a5"); gradient.addColorStop(1, "#e74f73"); }
+  else { gradient.addColorStop(0, "#06345f"); gradient.addColorStop(.58, "#0b68a8"); gradient.addColorStop(1, "#13a47d"); }
+  ctx.fillStyle = gradient; ctx.fillRect(0, 0, width, height);
+  ctx.fillStyle = "rgba(255,255,255,.07)"; ctx.beginPath(); ctx.arc(width - 80, 110, 290, 0, Math.PI * 2); ctx.fill();
+  drawCentralPostHeader(ctx, width, title, subtitle, vertical);
+  drawCentralPostCards(ctx, items, assets, format, kind);
+  centralPostDrawBrand(ctx, width, height, assets.siteLogo, vertical);
+}
+
+async function atualizarPreviaPostSemanal() {
+  const canvas = $("weeklyPostCanvas");
+  if (!canvas) return;
+  const request = ++centralPostPreviewRequest;
+  const format = centralPostFormat();
+  const items = weeklyPostItems().filter((item) => state.weeklyPostSelectedIds.has(item.id)).slice(0, CENTRAL_POST_MAX_ITEMS);
+  canvas.width = format.width; canvas.height = format.height;
+  const assets = await centralPostAssets(items, centralPostImage);
+  if (request !== centralPostPreviewRequest || !$("weeklyPostCanvas")) return;
+  drawCentralPostCanvas(canvas.getContext("2d"), items, assets, state.weeklyPostTitle, state.weeklyPostSubtitle, format, "weekly");
+}
+
+async function atualizarPreviaPostComercios() {
+  const canvas = $("commercePostCanvas");
+  if (!canvas) return;
+  const request = ++centralPostPreviewRequest;
+  const format = centralPostFormat();
+  const clients = commercePostClients().filter((item) => state.commercePostSelectedIds.has(item.id)).slice(0, CENTRAL_POST_MAX_ITEMS);
+  canvas.width = format.width; canvas.height = format.height;
+  const assets = await centralPostAssets(clients, commercePostClientImage);
+  if (request !== centralPostPreviewRequest || !$("commercePostCanvas")) return;
+  drawCentralPostCanvas(canvas.getContext("2d"), clients, assets, state.commercePostTitle, state.commercePostSubtitle, format, "commerce");
+}
+
+async function downloadCentralPost(kind) {
+  const canvas = $(kind === "weekly" ? "weeklyPostCanvas" : "commercePostCanvas");
+  const button = $(kind === "weekly" ? "weeklyPostDownload" : "commercePostDownload");
+  if (!canvas) return;
+  const selected = kind === "weekly" ? state.weeklyPostSelectedIds : state.commercePostSelectedIds;
+  if (!selected.size) return showToast("Selecione ao menos um conteúdo para gerar a arte.");
+  if (button) button.disabled = true;
+  try {
+    if (kind === "weekly") await atualizarPreviaPostSemanal(); else await atualizarPreviaPostComercios();
+    baixarBlobCanvas(await canvasParaBlob(canvas), `${kind === "weekly" ? "resumo-semanal" : "comercios-ola-carlopolis"}-${state.postArtCentralFormat}.png`);
+    showToast("Arte pronta para postagem.");
+  } catch (error) {
+    console.error("Falha ao gerar arte da central de postagens.", error);
+    showToast("Não foi possível gerar a arte.");
+  } finally { if (button) button.disabled = false; }
+}
+
+function centralPostFormatButtons() {
+  const format = centralPostFormat();
+  return `<div class="post-art-format-toggle">${Object.values(POST_ART_FORMATS).map((item) => `<button type="button" data-central-post-format="${item.key}" class="${format.key === item.key ? "active" : ""}"><i class="${item.icon}"></i><strong>${item.nome}</strong><span>${item.width} × ${item.height}</span></button>`).join("")}</div>`;
+}
+
+function bindCentralPostFormats(render) {
+  document.querySelectorAll("[data-central-post-format]").forEach((button) => button.addEventListener("click", () => { state.postArtCentralFormat = button.dataset.centralPostFormat; render(); }));
+}
+
+function renderWeeklyPostView() {
+  const mount = $("postArtCentralContent");
+  if (!mount) return;
+  const items = weeklyPostItems();
+  if (!state.weeklyPostSelectionReady) { state.weeklyPostSelectedIds = new Set(items.slice(0, 4).map((item) => item.id)); state.weeklyPostSelectionReady = true; }
+  const selectedCount = items.filter((item) => state.weeklyPostSelectedIds.has(item.id)).length;
+  const format = centralPostFormat();
+  mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período e formato</strong><small>As novidades são lidas diretamente dos dados publicados.</small></div></div><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label>${centralPostFormatButtons()}</section>
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>2</span><div><strong>Textos da arte</strong><small>Ajuste a chamada sem alterar as notícias cadastradas.</small></div></div><div class="post-art-fields"><label class="wide">Título<input id="weeklyPostTitle" maxlength="72" value="${escapeAttr(state.weeklyPostTitle)}"></label><label class="wide">Subtítulo<textarea id="weeklyPostSubtitle" maxlength="140" rows="2">${escapeHtml(state.weeklyPostSubtitle)}</textarea></label></div></section>
+    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>3. Escolha as novidades</strong><p>Até ${CENTRAL_POST_MAX_ITEMS} itens • ${selectedCount} selecionado(s)</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list">${items.length ? items.map((item) => `<label class="post-central-data-card ${state.weeklyPostSelectedIds.has(item.id) ? "selected" : ""}"><input type="checkbox" data-weekly-post-id="${escapeAttr(item.id)}" ${state.weeklyPostSelectedIds.has(item.id) ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-newspaper"></i>`}</span><span><strong>${escapeHtml(weeklyPostItemTitle(item))}</strong><small>${escapeHtml(textoCurtoArte(weeklyPostItemDescription(item), 95))}</small><em>${escapeHtml(item.estabelecimento || "Olá Carlópolis")} • ${escapeHtml(centralPostDate(item.dataCriacao || item.createdAt))}</em></span></label>`).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período.</div>`}</div></section>
+    </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<div class="post-art-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
+  $("weeklyPostDays")?.addEventListener("change", (event) => { state.weeklyPostDays = Number(event.target.value); state.weeklyPostSelectionReady = false; renderWeeklyPostView(); });
+  bindCentralPostFormats(renderWeeklyPostView);
+  [["weeklyPostTitle", "weeklyPostTitle"], ["weeklyPostSubtitle", "weeklyPostSubtitle"]].forEach(([id, key]) => $(id)?.addEventListener("input", (event) => { state[key] = event.target.value; centralPostSchedulePreview("weekly"); }));
+  mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = input.dataset.weeklyPostId; if (input.checked && state.weeklyPostSelectedIds.size >= CENTRAL_POST_MAX_ITEMS) { input.checked = false; return showToast(`Selecione no máximo ${CENTRAL_POST_MAX_ITEMS} novidades.`); } if (input.checked) state.weeklyPostSelectedIds.add(id); else state.weeklyPostSelectedIds.delete(id); renderWeeklyPostView(); }));
+  $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
+  if (selectedCount) atualizarPreviaPostSemanal();
+}
+
+function randomCommercePostSelection() {
+  const clients = commercePostClients();
+  const previous = new Set(state.commercePostLastRandomIds || []);
+  const ranked = clients.map((client) => ({ client, score: Math.random() + (commercePostClientImage(client) ? 2 : 0) + (previous.has(client.id) ? -1.5 : 0) })).sort((a, b) => b.score - a.score);
+  const ids = ranked.slice(0, Math.min(CENTRAL_POST_MAX_ITEMS, clients.length)).map((entry) => entry.client.id);
+  state.commercePostSelectedIds = new Set(ids); state.commercePostLastRandomIds = ids;
+}
+
+function renderCommercePostView() {
+  const mount = $("postArtCentralContent");
+  if (!mount) return;
+  const clients = commercePostClients();
+  const query = String(state.commercePostSearch || "").trim().toLowerCase();
+  const filtered = clients.filter((client) => !query || `${client.nome || ""} ${commercePostCategory(client)}`.toLowerCase().includes(query));
+  const selectedCount = clients.filter((item) => state.commercePostSelectedIds.has(item.id)).length;
+  const format = centralPostFormat();
+  mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Formato e seleção</strong><small>Escolha manualmente ou deixe a central variar os destaques.</small></div></div>${centralPostFormatButtons()}<div class="post-central-actions"><button id="commercePostRandom" type="button" class="primary-button"><i class="fa-solid fa-shuffle"></i> Selecionar 6 aleatoriamente</button><button id="commercePostClear" type="button" class="ghost-button">Limpar seleção</button></div></section>
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>2</span><div><strong>Textos da arte</strong><small>Personalize a chamada para cada campanha.</small></div></div><div class="post-art-fields"><label class="wide">Título<input id="commercePostTitle" maxlength="72" value="${escapeAttr(state.commercePostTitle)}"></label><label class="wide">Subtítulo<textarea id="commercePostSubtitle" maxlength="140" rows="2">${escapeHtml(state.commercePostSubtitle)}</textarea></label></div></section>
+    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>3. Comércios e serviços</strong><p>Até ${CENTRAL_POST_MAX_ITEMS} empresas • ${selectedCount} selecionada(s)</p></div><span class="badge">Dados reais</span></div><label class="post-central-search"><i class="fa-solid fa-magnifying-glass"></i><input id="commercePostSearch" type="search" placeholder="Buscar por nome ou categoria" value="${escapeAttr(state.commercePostSearch || "")}"></label><div class="post-central-item-list">${filtered.length ? filtered.map((client) => `<label class="post-central-data-card ${state.commercePostSelectedIds.has(client.id) ? "selected" : ""}"><input type="checkbox" data-commerce-post-id="${escapeAttr(client.id)}" ${state.commercePostSelectedIds.has(client.id) ? "checked" : ""}><span class="post-central-data-image">${commercePostClientImage(client) ? `<img src="${escapeAttr(displayImageUrl(commercePostClientImage(client)))}" alt="">` : `<i class="fa-solid fa-store"></i>`}</span><span><strong>${escapeHtml(client.nome || client.name || client.id)}</strong><small>${escapeHtml(textoCurtoArte(client.descricaoCurta || client.descricao || client.infoAdicional || "Disponível no Olá Carlópolis", 95))}</small><em>${escapeHtml(commercePostCategory(client))}</em></span></label>`).join("") : `<div class="empty-state">Nenhuma empresa encontrada.</div>`}</div></section>
+    </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<div class="post-art-canvas-shell is-${format.key}"><canvas id="commercePostCanvas"></canvas></div><button id="commercePostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar vitrine em PNG</button>` : `<div class="post-art-preview-empty"><i class="fa-solid fa-store"></i><span>Selecione ou sorteie ao menos uma empresa.</span></div>`}</aside></section>`;
+  bindCentralPostFormats(renderCommercePostView);
+  [["commercePostTitle", "commercePostTitle"], ["commercePostSubtitle", "commercePostSubtitle"]].forEach(([id, key]) => $(id)?.addEventListener("input", (event) => { state[key] = event.target.value; centralPostSchedulePreview("commerce"); }));
+  $("commercePostSearch")?.addEventListener("input", (event) => { state.commercePostSearch = event.target.value; window.clearTimeout(centralPostPreviewTimer); centralPostPreviewTimer = window.setTimeout(renderCommercePostView, 180); });
+  $("commercePostRandom")?.addEventListener("click", () => { randomCommercePostSelection(); renderCommercePostView(); });
+  $("commercePostClear")?.addEventListener("click", () => { state.commercePostSelectedIds.clear(); renderCommercePostView(); });
+  mount.querySelectorAll("[data-commerce-post-id]").forEach((input) => input.addEventListener("change", () => { const id = input.dataset.commercePostId; if (input.checked && state.commercePostSelectedIds.size >= CENTRAL_POST_MAX_ITEMS) { input.checked = false; return showToast(`Selecione no máximo ${CENTRAL_POST_MAX_ITEMS} empresas.`); } if (input.checked) state.commercePostSelectedIds.add(id); else state.commercePostSelectedIds.delete(id); renderCommercePostView(); }));
+  $("commercePostDownload")?.addEventListener("click", () => downloadCentralPost("commerce"));
+  if (selectedCount) atualizarPreviaPostComercios();
+}
+
+function renderPostArtView() {
+  const mount = $("postArtMount");
+  if (!mount) return;
+  const modes = [
+    { key: "catalogo", icon: "fa-solid fa-box-open", title: "Produto, promoção ou serviço", text: "Crie uma arte individual a partir do cadastro da empresa." },
+    { key: "semanal", icon: "fa-regular fa-newspaper", title: "Resumo de novidades", text: "Reúna até seis novidades reais em uma postagem semanal." },
+    { key: "comercios", icon: "fa-solid fa-store", title: "Comércios no Olá Carlópolis", text: "Escolha ou sorteie até seis empresas para uma vitrine local." }
+  ];
+  mount.innerHTML = `<section class="panel-card post-central-hero"><div><span class="feature-kicker">Criação rápida com dados reais</span><h2>Central de postagens</h2><p>Cada ideia tem seu próprio fluxo, prévia e arquivo pronto para publicar no Instagram.</p></div><div class="post-central-shortcuts"><button type="button" data-post-central-view="encartes"><i class="fa-solid fa-table-cells-large"></i> Criar encarte</button>${isMaster() ? `<button type="button" data-post-central-view="storiesComerciais"><i class="fa-solid fa-mobile-screen-button"></i> Stories comerciais</button>` : ""}</div></section><nav class="post-central-tabs" aria-label="Tipos de postagem">${modes.map((mode) => `<button type="button" data-post-central-mode="${mode.key}" class="${state.postArtCentralMode === mode.key ? "active" : ""}"><i class="${mode.icon}"></i><span><strong>${mode.title}</strong><small>${mode.text}</small></span><i class="fa-solid fa-chevron-right"></i></button>`).join("")}</nav><div id="postArtCentralContent"></div>`;
+  mount.querySelectorAll("[data-post-central-mode]").forEach((button) => button.addEventListener("click", () => { state.postArtCentralMode = button.dataset.postCentralMode; renderPostArtView(); }));
+  mount.querySelectorAll("[data-post-central-view]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.postCentralView)));
+  if (state.postArtCentralMode === "semanal") renderWeeklyPostView(); else if (state.postArtCentralMode === "comercios") renderCommercePostView(); else renderPostArtCatalogView();
 }
 const FLYER_LAYOUTS = [
   { key: "catalogo", nome: "Qualidade todo dia", descricao: "Vermelho e amarelo, ideal para mercados", bg: "#f20d19", panel: "#ffffff", primary: "#e40714", accent: "#ffd326", ink: "#161616", variant: 0, eyebrow: "QUALIDADE E ECONOMIA", cta: "APROVEITE AGORA" },

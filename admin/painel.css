@@ -11709,7 +11709,52 @@ button.admin-button-loading::after {
   }
 }
 
-/* ===== Gerar postagem v399 ===== */
+/* ===== Central de postagens v400 ===== */
+.post-central-hero {
+  display: flex;
+  gap: 22px;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  border-color: #cbdcf8;
+  background: radial-gradient(circle at 88% 15%, rgba(124,58,237,.14), transparent 30%), linear-gradient(135deg, #fff, #f4f7ff);
+}
+.post-central-hero h2 { margin: 4px 0 7px; color: #172033; }
+.post-central-hero p { max-width: 680px; margin: 0; color: #627184; }
+.post-central-hero .feature-kicker { color: #5b35b5; font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.post-central-shortcuts { display: flex; flex-wrap: wrap; gap: 9px; justify-content: flex-end; }
+.post-central-shortcuts button { min-height: 41px; padding: 0 14px; border: 1px solid #cdd8ea; border-radius: 11px; color: #35455d; background: rgba(255,255,255,.88); font-weight: 800; }
+.post-central-shortcuts button:hover { border-color: #8266c7; color: #5b35b5; }
+.post-central-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 16px 0; }
+.post-central-tabs > button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; align-items: center; min-height: 96px; padding: 14px; border: 1px solid #dbe3ef; border-radius: 16px; color: #33445a; background: #fff; text-align: left; transition: .2s ease; }
+.post-central-tabs > button > i:first-child { display: grid; width: 46px; height: 46px; place-items: center; border-radius: 13px; color: #5d43aa; background: #f1edff; font-size: 19px; }
+.post-central-tabs span, .post-central-tabs strong, .post-central-tabs small { display: block; }
+.post-central-tabs small { margin-top: 4px; color: #78879a; font-size: 11px; line-height: 1.35; }
+.post-central-tabs > button > i:last-child { color: #9ba8b8; font-size: 11px; }
+.post-central-tabs > button:hover { transform: translateY(-2px); border-color: #a794db; box-shadow: 0 8px 20px rgba(57,42,100,.08); }
+.post-central-tabs > button.active { border-color: #6d4cc3; background: #f7f4ff; box-shadow: 0 0 0 3px rgba(109,76,195,.1); }
+.post-central-tabs > button.active > i:first-child { color: #fff; background: #6d4cc3; }
+.post-central-generator { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr); gap: 18px; align-items: start; }
+.post-central-controls { display: grid; gap: 16px; min-width: 0; }
+.post-central-field { display: grid; gap: 6px; margin-bottom: 14px; color: #475569; font-size: 12px; font-weight: 800; }
+.post-central-field select { width: 100%; min-height: 44px; }
+.post-central-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+.post-central-actions button { min-height: 42px; padding: 0 14px; border-radius: 11px; font-weight: 800; }
+.post-central-search { position: relative; display: block; margin: 12px 0; }
+.post-central-search i { position: absolute; top: 50%; left: 14px; color: #8090a3; transform: translateY(-50%); }
+.post-central-search input { width: 100%; min-height: 44px; padding-left: 40px; }
+.post-central-item-list { display: grid; gap: 9px; max-height: 590px; overflow: auto; padding-right: 3px; }
+.post-central-data-card { display: grid; grid-template-columns: auto 70px minmax(0, 1fr); gap: 12px; align-items: center; padding: 10px; border: 1px solid #dce4ee; border-radius: 14px; color: #334155; background: #fff; cursor: pointer; transition: .18s ease; }
+.post-central-data-card:hover { border-color: #a7b8ce; background: #fbfdff; }
+.post-central-data-card.selected { border-color: #6d4cc3; background: #f8f5ff; box-shadow: inset 3px 0 #6d4cc3; }
+.post-central-data-card > input { width: 18px; height: 18px; accent-color: #6d4cc3; }
+.post-central-data-image { display: grid; width: 70px; height: 62px; overflow: hidden; place-items: center; border-radius: 10px; color: #5d43aa; background: #e9eef7; font-size: 22px; }
+.post-central-data-image img { width: 100%; height: 100%; object-fit: cover; }
+.post-central-data-card strong, .post-central-data-card small, .post-central-data-card em { display: block; }
+.post-central-data-card strong { color: #213047; font-size: 13px; }
+.post-central-data-card small { margin-top: 3px; color: #6f7f92; font-size: 11px; line-height: 1.35; }
+.post-central-data-card em { margin-top: 5px; color: #6d4cc3; font-size: 10px; font-style: normal; font-weight: 800; }
+
 .post-art-intro {
   overflow: hidden;
   border-color: #cbdcf8;
@@ -12067,12 +12112,21 @@ button.admin-button-loading::after {
 .post-art-preview-empty i { color: #9aabc0; font-size: 42px; }
 
 @media (max-width: 1080px) {
+  .post-central-generator { grid-template-columns: 1fr; }
   .post-art-workspace { grid-template-columns: 1fr; }
   .post-art-preview-card { position: static; }
   .post-art-canvas-shell { max-width: 620px; margin-inline: auto; }
 }
 
 @media (max-width: 680px) {
+  .post-central-hero { align-items: flex-start; flex-direction: column; }
+  .post-central-shortcuts { width: 100%; justify-content: stretch; }
+  .post-central-shortcuts button { flex: 1; }
+  .post-central-tabs { grid-template-columns: 1fr; gap: 8px; }
+  .post-central-tabs > button { min-height: 80px; }
+  .post-central-generator, .post-central-controls { gap: 12px; }
+  .post-central-data-card { grid-template-columns: auto 58px minmax(0, 1fr); gap: 9px; }
+  .post-central-data-image { width: 58px; height: 54px; }
   .post-art-workspace { gap: 12px; margin-top: 12px; }
   .post-art-editor-column { gap: 12px; }
   .post-art-format-toggle,
