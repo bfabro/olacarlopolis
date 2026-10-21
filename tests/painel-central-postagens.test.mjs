@@ -4,13 +4,17 @@ import { readFileSync } from "node:fs";
 import {
   WEEKLY_POST_MIN_ITEMS,
   WEEKLY_POST_MAX_ITEMS,
+  WEEKLY_POST_TITLE_SCALE_MAX,
+  WEEKLY_POST_TITLE_SCALE_MIN,
   weeklyPostCardFields,
   weeklyPostDiverseItems,
+  weeklyPostEditableTitle,
   weeklyPostGridLayout,
   weeklyPostMoveOrder,
   weeklyPostPages,
   weeklyPostRecordReference,
   weeklyPostStatusKind,
+  weeklyPostTitleScale,
   weeklyPostUniqueItems
 } from "../admin/weekly-post-layout.js";
 
@@ -133,6 +137,25 @@ test("cards mantêm selo fora da foto, enquadramento inteligente e textos ajust�
   assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
 });
 
+test("título de cada card pode ser editado e ampliado manualmente na prévia", () => {
+  const item = { id: "n1", tituloConteudo: "Título original" };
+  assert.equal(weeklyPostEditableTitle(item, {}), "Título original");
+  assert.equal(weeklyPostEditableTitle(item, { n1: "  Chamada mais forte  " }), "Chamada mais forte");
+  assert.equal(WEEKLY_POST_TITLE_SCALE_MIN, 90);
+  assert.equal(WEEKLY_POST_TITLE_SCALE_MAX, 145);
+  assert.equal(weeklyPostTitleScale(80), 90);
+  assert.equal(weeklyPostTitleScale(125), 125);
+  assert.equal(weeklyPostTitleScale(180), 145);
+  assert.match(panel, /weeklyPostTitleOverrides: \{\}/);
+  assert.match(panel, /weeklyPostTitleScales: \{\}/);
+  assert.match(panel, /data-weekly-post-title-id/);
+  assert.match(panel, /data-weekly-post-title-scale-id/);
+  assert.match(panel, /data-weekly-post-title-reset-id/);
+  assert.match(panel, /centralPostSchedulePreview\("weekly"\)/);
+  assert.match(panel, /weight: 950, color: theme\.navy/);
+  assert.match(css, /\.weekly-post-title-editor/);
+});
+
 test("prévia e PNG usam o mesmo canvas nos formatos 1080 por 1920 e 1080 por 1350", () => {
   assert.match(panel, /weeklyPostFormatKey: "reels"/);
   assert.match(panel, /width: 1080, height: 1920/);
@@ -154,8 +177,8 @@ test("rodapé apresenta um único CTA textual sem botão falso", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=603/);
-  assert.match(html, /painel\.js\?v=905/);
-  assert.match(panel, /numero: 898/);
-  assert.match(panel, /label: "v905"/);
+  assert.match(html, /painel\.css\?v=604/);
+  assert.match(html, /painel\.js\?v=906/);
+  assert.match(panel, /numero: 899/);
+  assert.match(panel, /label: "v906"/);
 });

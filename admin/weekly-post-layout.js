@@ -1,6 +1,8 @@
 export const WEEKLY_POST_MIN_ITEMS = 4;
 export const WEEKLY_POST_MAX_ITEMS = 6;
 export const WEEKLY_POST_PAGE_SIZE = 6;
+export const WEEKLY_POST_TITLE_SCALE_MIN = 90;
+export const WEEKLY_POST_TITLE_SCALE_MAX = 145;
 
 function plainText(value) {
   return String(value ?? "").replace(/\s+/g, " ").trim();
@@ -41,6 +43,18 @@ export function weeklyPostCardFields(item = {}) {
   const client = normalized(rawClient) === normalized(rawTitle) ? "" : rawClient;
   const change = normalized(rawChange) === normalized(rawTitle) ? "" : rawChange;
   return { client, title: rawTitle, change };
+}
+
+export function weeklyPostEditableTitle(item = {}, overrides = {}) {
+  const id = plainText(item.id);
+  if (id && Object.prototype.hasOwnProperty.call(overrides, id)) return plainText(overrides[id]);
+  return weeklyPostCardFields(item).title;
+}
+
+export function weeklyPostTitleScale(value = 100) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric)) return 100;
+  return Math.max(WEEKLY_POST_TITLE_SCALE_MIN, Math.min(WEEKLY_POST_TITLE_SCALE_MAX, Math.round(numeric)));
 }
 
 export function weeklyPostStatusKind(item = {}) {
