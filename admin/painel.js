@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 895,
-  label: "v902",
+  numero: 896,
+  label: "v903",
   data: "2026-10-21",
-  nota: "Novidades da semana adotam composição editorial 4:5 com quatro a seis cards, clientes identificados e rodapé profissional."
+  nota: "Novidades da semana aceitam de uma a seis imagens e exibem cards limpos, sem logotipo do cliente ou seta lateral."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -26580,7 +26580,7 @@ function renderPostArtCatalogView() {
 }
 
 const CENTRAL_POST_MAX_ITEMS = 6;
-const WEEKLY_POST_MIN_ITEMS = 4;
+const WEEKLY_POST_MIN_ITEMS = 1;
 const WEEKLY_POST_MAX_ITEMS = 6;
 const WEEKLY_POST_FORMATS = {
   feed: { key: "feed", nome: "Feed 4:5", descricao: "Post vertical", width: 1080, height: 1350, icon: "fa-solid fa-table-cells-large" },
@@ -26673,27 +26673,6 @@ async function centralPostAssets(items, imageGetter) {
     ...items.map((item) => carregarImagemCanvas(imageGetter(item)))
   ]);
   return { siteLogo, headerImage, images };
-}
-
-function weeklyPostClient(item = {}) {
-  const candidates = [item.clienteId, item.destinoId, item.estabelecimentoId, item.estabelecimento]
-    .map((value) => normalizeName(value || ""))
-    .filter(Boolean);
-  return (state.clientes || []).find((client) => {
-    const identities = [client.id, client.nome, client.name, client.nomeNormalizado]
-      .map((value) => normalizeName(value || ""))
-      .filter(Boolean);
-    return identities.some((identity) => candidates.some((candidate) => identity === candidate || identity.includes(candidate) || candidate.includes(identity)));
-  }) || null;
-}
-
-async function weeklyPostAssets(items) {
-  const assets = await centralPostAssets(items, centralPostImage);
-  const logos = await Promise.all(items.map((item) => {
-    const client = weeklyPostClient(item);
-    return carregarImagemCanvas(client ? logoClienteImovelAdmin(client) : "../images/img_padrao_site/logo_1.png");
-  }));
-  return { ...assets, logos };
 }
 
 function drawCentralPostHeader(ctx, width, title, subtitle, vertical) {
@@ -26816,7 +26795,7 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
   const rows = Math.ceil(count / columns);
   const margin = vertical ? 38 : 38;
   const gap = vertical ? 18 : 14;
-  const cardW = (format.width - margin * 2 - gap) / 2;
+  const cardW = count === 1 ? Math.min(760, format.width - margin * 2) : (format.width - margin * 2 - gap) / 2;
   const cardH = (layout.cardEndY - layout.cardStartY - gap * Math.max(0, rows - 1)) / rows;
   items.forEach((item, index) => {
     const isLastCentered = count % 2 === 1 && index === count - 1;
@@ -26831,7 +26810,7 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
     ctx.shadowOffsetY = vertical ? 7 : 5;
     preencherRoundRect(ctx, x, y, cardW, cardH, radius, "#ffffff");
     ctx.restore();
-    const detailsH = vertical ? Math.min(142, Math.max(120, cardH * .34)) : Math.min(128, Math.max(106, cardH * .35));
+    const detailsH = vertical ? Math.min(144, Math.max(122, cardH * .34)) : Math.min(128, Math.max(106, cardH * .35));
     const imageH = cardH - detailsH;
     drawWeeklyClientImage(ctx, assets.images[index], x + 7, y + 7, cardW - 14, imageH - 7, radius - 5);
     const status = weeklyPostStatus(item);
@@ -26845,34 +26824,15 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
     ctx.fillText(`${status.symbol}  ${badgeText}`, x + 34, y + 17 + badgeH * .67);
 
     const detailsY = y + imageH;
-    const logoSize = vertical ? 52 : 43;
     const contentX = x + 18;
-    const logoY = detailsY + (vertical ? 12 : 10);
-    preencherRoundRect(ctx, contentX, logoY, logoSize, logoSize, logoSize / 2, "#f1f4f3");
-    if (assets.logos?.[index]) desenharImagemContain(ctx, assets.logos[index], contentX + 3, logoY + 3, logoSize - 6, logoSize - 6, 0, "transparent");
-    ctx.strokeStyle = "#dce4e2";
-    ctx.lineWidth = 1.5;
-    canvasRoundRect(ctx, contentX, logoY, logoSize, logoSize, logoSize / 2);
-    ctx.stroke();
-    ctx.strokeStyle = "#a9b9bb";
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(contentX + logoSize + 12, logoY + 5);
-    ctx.lineTo(contentX + logoSize + 12, logoY + logoSize - 5);
-    ctx.stroke();
-    const arrowSize = vertical ? 58 : 48;
-    const arrowX = x + cardW - arrowSize - 16;
-    const arrowY = detailsY + detailsH - arrowSize - (vertical ? 14 : 11);
-    preencherRoundRect(ctx, arrowX, arrowY, arrowSize, arrowSize, arrowSize / 2, "#eef2f1");
-    ctx.fillStyle = "#082b3d";
-    ctx.textAlign = "center";
-    ctx.font = `800 ${vertical ? 35 : 29}px Arial`;
-    ctx.fillText("→", arrowX + arrowSize / 2, arrowY + arrowSize * .68);
-    const nameX = contentX + logoSize + 24;
-    postArtDrawText(ctx, item.estabelecimento || "Olá Carlópolis", nameX, logoY + (vertical ? 11 : 9), arrowX - nameX - 8, 1, vertical ? 19 : 16, "#13243a", { min: vertical ? 13 : 11, weight: 850, lineHeight: vertical ? 21 : 18 });
-    const titleY = logoY + logoSize + (vertical ? 6 : 5);
-    postArtDrawText(ctx, weeklyPostItemTitle(item), contentX, titleY, arrowX - contentX - 8, 1, vertical ? 25 : 21, "#102039", { min: vertical ? 17 : 14, weight: 1000, lineHeight: vertical ? 28 : 23 });
-    postArtDrawText(ctx, weeklyPostItemDescription(item), contentX, titleY + (vertical ? 31 : 26), arrowX - contentX - 8, 1, vertical ? 17 : 14, "#27445a", { min: vertical ? 12 : 10, weight: 650, lineHeight: vertical ? 19 : 16 });
+    const contentWidth = cardW - 36;
+    const nameY = detailsY + (vertical ? 10 : 8);
+    postArtDrawText(ctx, item.estabelecimento || "Olá Carlópolis", x + cardW / 2, nameY, contentWidth, 1, vertical ? 19 : 16, "#375064", { min: vertical ? 13 : 11, weight: 800, lineHeight: vertical ? 21 : 18, align: "center" });
+    preencherRoundRect(ctx, x + cardW / 2 - (vertical ? 48 : 38), nameY + (vertical ? 26 : 21), vertical ? 96 : 76, vertical ? 4 : 3, 2, theme.accent);
+    const titleY = nameY + (vertical ? 36 : 29);
+    postArtDrawText(ctx, weeklyPostItemTitle(item), x + cardW / 2, titleY, contentWidth, 2, vertical ? 26 : 22, "#102039", { min: vertical ? 16 : 13, weight: 1000, lineHeight: vertical ? 27 : 22, align: "center" });
+    const descriptionY = titleY + (vertical ? 56 : 46);
+    postArtDrawText(ctx, weeklyPostItemDescription(item), x + cardW / 2, descriptionY, contentWidth, 1, vertical ? 17 : 14, "#27445a", { min: vertical ? 12 : 10, weight: 650, lineHeight: vertical ? 19 : 16, align: "center" });
     ctx.strokeStyle = "rgba(255,255,255,.88)";
     ctx.lineWidth = 2;
     canvasRoundRect(ctx, x, y, cardW, cardH, radius);
@@ -27002,7 +26962,7 @@ async function atualizarPreviaPostSemanal() {
   const format = weeklyPostFormat();
   const items = weeklyPostItems().filter((item) => state.weeklyPostSelectedIds.has(item.id)).slice(0, weeklyPostLimit());
   canvas.width = format.width; canvas.height = format.height;
-  const assets = await weeklyPostAssets(items);
+  const assets = await centralPostAssets(items, centralPostImage);
   if (request !== centralPostPreviewRequest || !$("weeklyPostCanvas")) return;
   drawCentralPostCanvas(canvas.getContext("2d"), items, assets, state.weeklyPostTitle, state.weeklyPostSubtitle, format, "weekly");
 }
