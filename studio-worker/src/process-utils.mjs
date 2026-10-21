@@ -1,5 +1,13 @@
 import { spawn } from "node:child_process";
 
+export function withTimeout(promise, milliseconds, label = "Operacao") {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} excedeu ${milliseconds} ms.`)), milliseconds);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
 export function runProcess(command, args, options = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, { cwd: options.cwd, windowsHide: true, env: { ...process.env, ...(options.env || {}) } });

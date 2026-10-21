@@ -78,6 +78,7 @@ async function processJob(job) {
 async function loop() {
   await fs.mkdir(workerConfig.workRoot, { recursive: true });
   console.log(`Olá Studio worker ${workerConfig.workerId} iniciado.`);
+  await wait(workerConfig.startupDelayMs);
   for (;;) {
     try {
       const candidate = await nextQueuedJob();

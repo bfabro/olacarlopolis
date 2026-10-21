@@ -3,6 +3,6 @@ import { getDatabase } from "firebase-admin/database";
 import { getStorage } from "firebase-admin/storage";
 import { workerConfig } from "./config.mjs";
 
-const app = getApps()[0] || initializeApp({ credential: applicationDefault(), databaseURL: workerConfig.databaseURL, storageBucket: workerConfig.storageBucket });
-export const database = getDatabase(app);
-export const bucket = getStorage(app).bucket();
+export const firebaseApp = getApps()[0] || initializeApp({ credential: applicationDefault(), databaseURL: workerConfig.databaseURL, storageBucket: workerConfig.storageBucket });
+export const database = getDatabase(firebaseApp);
+export const bucket = getStorage(firebaseApp).bucket();

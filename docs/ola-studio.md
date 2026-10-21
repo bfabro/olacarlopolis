@@ -47,10 +47,14 @@ Variáveis opcionais:
 
 - `FIREBASE_DATABASE_URL`
 - `FIREBASE_STORAGE_BUCKET`
+- `STUDIO_STARTUP_DELAY_MS`
 - `STUDIO_POLL_INTERVAL_MS`
+- `STUDIO_DATABASE_TIMEOUT_MS`
 - `STUDIO_MAX_ATTEMPTS`
 - `STUDIO_WORKER_ID`
 - `STUDIO_FONT_FILE`
+
+A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e `If-Match`, evitando que dois workers processem o mesmo trabalho. Leituras externas têm tempo limite para que uma conexão iniciada antes da rede do contêiner ficar pronta não bloqueie o worker indefinidamente.
 
 ## O que o motor faz
 

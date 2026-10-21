@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
 import { buildBrandingArgs, buildSegmentArgs, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
+import { withTimeout } from "../studio-worker/src/process-utils.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -43,4 +44,12 @@ test("branding prepara logo, textos, música com ducking e faststart", () => {
   assert.match(filters, /drawtext=/);
   assert.match(filters, /sidechaincompress/);
   assert.ok(args.includes("+faststart"));
+});
+
+test("operações externas travadas são interrompidas para permitir nova tentativa", async () => {
+  await assert.rejects(
+    withTimeout(new Promise(() => {}), 10, "Leitura de teste"),
+    /Leitura de teste excedeu 10 ms/
+  );
+  assert.equal(await withTimeout(Promise.resolve("ok"), 100, "Leitura de teste"), "ok");
 });

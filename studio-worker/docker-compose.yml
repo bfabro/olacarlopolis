@@ -9,7 +9,9 @@ services:
       FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET:-contadoracessos.firebasestorage.app}
       GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-service-account.json
       STUDIO_WORK_DIR: /tmp/ola-studio
+      STUDIO_STARTUP_DELAY_MS: 2000
       STUDIO_POLL_INTERVAL_MS: 4000
+      STUDIO_DATABASE_TIMEOUT_MS: 15000
     volumes:
       - ${FIREBASE_SERVICE_ACCOUNT_FILE}:/run/secrets/firebase-service-account.json:ro
       - ola-studio-work:/tmp/ola-studio

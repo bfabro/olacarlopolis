@@ -7,6 +7,7 @@ const storageRules = readFileSync(new URL("../storage.rules", import.meta.url), 
 const html = readFileSync(new URL("../estudio/index.html", import.meta.url), "utf8");
 const client = readFileSync(new URL("../estudio/studio.js", import.meta.url), "utf8");
 const panel = readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
+const workerQueue = readFileSync(new URL("../studio-worker/src/queue.mjs", import.meta.url), "utf8");
 
 test("Studio não é exposto na navegação pública e abre protegido pelo painel Master", () => {
   assert.match(panel, /data-master="true" href="\.\.\/estudio\/\?preview=1"/);
@@ -38,4 +39,11 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.match(client, /studioJobs\/\$\{state\.user\.uid\}/);
   assert.match(client, /onValue\(ref\(db, `studioJobs/);
   assert.doesNotMatch(client, /setInterval\([^)]*progress/i);
+});
+
+test("worker consulta e reserva a fila com autenticação e concorrência segura", () => {
+  assert.match(workerQueue, /Authorization: `Bearer \$\{token\.access_token\}`/);
+  assert.match(workerQueue, /"X-Firebase-ETag": "true"/);
+  assert.match(workerQueue, /"If-Match": currentResponse\.headers\.get\("etag"\)/);
+  assert.match(workerQueue, /claimResponse\.status === 412/);
 });
