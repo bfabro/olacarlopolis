@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 901,
-  label: "v908",
+  numero: 902,
+  label: "v909",
   data: "2026-10-21",
-  nota: "Site público otimizado para desktop com dependências adiadas, carregamento ocioso dos dados e cache eficiente."
+  nota: "Título inicial do banner alinhado à configuração publicada para eliminar a mudança visual na abertura."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -24917,7 +24917,7 @@ function renderHomePageSettings() {
   const config = state.paginaInicialSite || {};
   const imagens = Array.isArray(config.imagens) ? config.imagens.filter(Boolean) : [];
   $("homeBannerActive").checked = config.ativo !== false;
-  $("homeBannerTitle").value = config.titulo || "Carlópolis em tempo real";
+  $("homeBannerTitle").value = config.titulo || "Carlópolis em Tempo Real";
   $("homeBannerSubtitle").value = config.subtitulo || "Acesse os principais serviços, eventos, novidades e promoções da cidade.";
   const list = $("homeBannerImagesList");
   if (!list) return;
@@ -30604,7 +30604,7 @@ function bindEvents() {
     }
     const payload = {
       ativo: $("homeBannerActive")?.checked !== false,
-      titulo: $("homeBannerTitle")?.value.trim() || "Carlópolis em tempo real",
+      titulo: $("homeBannerTitle")?.value.trim() || "Carlópolis em Tempo Real",
       subtitulo: $("homeBannerSubtitle")?.value.trim() || "Acesse os principais serviços, eventos, novidades e promoções da cidade.",
       imagens: Array.isArray(state.paginaInicialSite?.imagens) ? state.paginaInicialSite.imagens.filter(Boolean) : [],
       updatedAt: serverTimestamp(),

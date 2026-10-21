@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v688.
+// Release do site v689.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -25140,7 +25140,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     document.body.classList.toggle("home-quick-banner-hidden", !ativo);
     if (!ativo) return;
 
-    const titulo = String(config.titulo || "").trim() || "Carlópolis em tempo real";
+    const titulo = String(config.titulo || "").trim() || "Carlópolis em Tempo Real";
     const subtitulo = String(config.subtitulo || "").trim() || "Acesse os principais serviços, eventos, novidades e promoções da cidade.";
     const imagens = Array.isArray(config.imagens) ? config.imagens.filter(Boolean) : [];
     const titleEl = document.getElementById("homeQuickBannerTitle");
@@ -28483,7 +28483,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ REGISTRO DO SERVICE WORKER
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js?v=943', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('/service-worker.js?v=944', { updateViaCache: 'none' })
     .then(reg => {
       reg.update();
       console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);

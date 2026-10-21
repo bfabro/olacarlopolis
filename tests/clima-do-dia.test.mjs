@@ -119,10 +119,10 @@ test("Clima do Dia gera arte vertical pronta para Instagram Stories", () => {
   assert.match(css, /\.clima-story-trigger/);
   assert.match(css, /\.clima-story-modal/);
   assert.match(worker, /clima-story\.js/);
-  assert.match(html, /service-worker\.js\?v=943/);
+  assert.match(html, /service-worker\.js\?v=944/);
   assert.match(html, /updateViaCache: 'none'/);
   assert.match(html, /controllerchange/);
-  assert.match(site, /service-worker\.js\?v=943/);
+  assert.match(site, /service-worker\.js\?v=944/);
   assert.match(site, /reg\.update\(\)/);
 });
 test("máxima e mínima incluem a temperatura atual sem misturar datas", () => {
@@ -158,14 +158,14 @@ test("mensagem motivacional oferece uma frase bem-humorada para cada dia do ano"
   assert.doesNotMatch(source[0], /Math\.random/);
 });
 test("versões de site, painel e service worker avançam juntas", () => {
-  assert.match(site, /Release do site v688/);
-  assert.match(html, /style\.css\?v=615/);
-  assert.match(html, /script\.js\?v=815/);
-  assert.match(html, /Olá Carlópolis v561/);
-  assert.match(panel, /numero: 901/);
-  assert.match(panel, /label: "v908"/);
+  assert.match(site, /Release do site v689/);
+  assert.match(html, /style\.css\?v=616/);
+  assert.match(html, /script\.js\?v=816/);
+  assert.match(html, /Olá Carlópolis v562/);
+  assert.match(panel, /numero: 902/);
+  assert.match(panel, /label: "v909"/);
   assert.match(panel, /data: "2026-10-21"/);
-  assert.match(panelHtml, /painel\.css\?v=606/);
-  assert.match(panelHtml, /painel\.js\?v=908/);
-  assert.match(worker, /2026-10-21-desempenho-desktop-v955/);
+  assert.match(panelHtml, /painel\.css\?v=607/);
+  assert.match(panelHtml, /painel\.js\?v=909/);
+  assert.match(worker, /2026-10-21-banner-sem-troca-v956/);
 });

@@ -39,3 +39,9 @@ test("arquivos versionados principais recebem cache longo no navegador", () => {
   assert.match(netlify, /for = "\/style\.css"[\s\S]*Cache-Control = "public, max-age=31536000, immutable"/);
   assert.match(netlify, /for = "\/images\/\*"[\s\S]*max-age=604800, stale-while-revalidate=86400/);
 });
+
+test("título inicial do banner coincide com a configuração padrão aplicada depois", () => {
+  assert.match(html, /id="homeQuickBannerTitle">Carlópolis em Tempo Real<\/h2>/);
+  assert.match(site, /\|\| "Carlópolis em Tempo Real"/);
+  assert.doesNotMatch(html, /Carlópolis em tempo real/);
+});
