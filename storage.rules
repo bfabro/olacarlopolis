@@ -22,6 +22,59 @@ service firebase.storage {
       return isNewImage() || isNewPdf();
     }
 
+    function isStudioMasterOwner(userId) {
+      return request.auth != null
+        && request.auth.uid == userId
+        && request.auth.token.email == 'bruno.4and@gmail.com';
+    }
+
+    function isStudioSource() {
+      return request.resource != null
+        && ((request.resource.size < 250 * 1024 * 1024
+            && request.resource.contentType.matches('video/(mp4|quicktime|webm)'))
+          || (request.resource.size < 20 * 1024 * 1024
+            && request.resource.contentType.matches('image/(jpeg|png|webp)')));
+    }
+
+    function isStudioAudio() {
+      return request.resource != null
+        && request.resource.size < 25 * 1024 * 1024
+        && request.resource.contentType.matches('audio/(mpeg|mp4|wav|ogg|x-wav)');
+    }
+
+    // Olá Studio: originais privados, separados pelo UID do proprietário.
+    match /studio/{userId}/originals/{projectId}/{fileName} {
+      allow read: if isStudioMasterOwner(userId);
+      allow create: if isStudioMasterOwner(userId) && isStudioSource();
+      allow update: if false;
+      allow delete: if isStudioMasterOwner(userId);
+    }
+
+    match /studio/{userId}/logos/{projectId}/{fileName} {
+      allow read: if isStudioMasterOwner(userId);
+      allow create: if isStudioMasterOwner(userId) && isNewImage();
+      allow update: if false;
+      allow delete: if isStudioMasterOwner(userId);
+    }
+
+    match /studio/{userId}/music/{projectId}/{fileName} {
+      allow read: if isStudioMasterOwner(userId);
+      allow create: if isStudioMasterOwner(userId) && isStudioAudio();
+      allow update: if false;
+      allow delete: if isStudioMasterOwner(userId);
+    }
+
+    // Planos e renders são gravados somente pelo worker com Firebase Admin.
+    match /studio/{userId}/plans/{allPaths=**} {
+      allow read: if isStudioMasterOwner(userId);
+      allow write: if false;
+    }
+
+    match /studio/{userId}/renders/{allPaths=**} {
+      allow read: if isStudioMasterOwner(userId);
+      allow write: if false;
+    }
+
     // Comprovantes financeiros: nunca publicos.
     // Nesta primeira etapa, qualquer usuario autenticado pode ler e gravar.
     // O isolamento por cliente exigira custom claims ou perfis no Firestore.

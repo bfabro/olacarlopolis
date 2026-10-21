@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#092b45">
+  <title>Olá Studio — edição automática de vídeos</title>
+  <link rel="icon" href="../images/img_padrao_site/logo_1.png">
+  <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="studio.css?v=1">
+</head>
+<body>
+  <main id="studioLoading" class="gate-view">
+    <section class="gate-card loading-card">
+      <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
+      <span class="spinner" aria-hidden="true"></span>
+      <h1>Preparando o Olá Studio</h1>
+      <p>Validando seu acesso protegido.</p>
+    </section>
+  </main>
+
+  <main id="studioLogin" class="gate-view hidden">
+    <section class="gate-card">
+      <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
+      <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
+      <span class="eyebrow">Ambiente protegido</span>
+      <h1>Entre para criar seus vídeos</h1>
+      <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
+      <form id="loginForm" class="login-form">
+        <label>E-mail<input id="loginEmail" type="email" autocomplete="username" required></label>
+        <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" required></label>
+        <button id="loginButton" type="submit"><i class="fa-solid fa-arrow-right-to-bracket"></i> Entrar no Studio</button>
+      </form>
+      <p id="loginMessage" class="form-message" role="alert"></p>
+    </section>
+  </main>
+
+  <main id="studioUnavailable" class="gate-view hidden">
+    <section class="gate-card">
+      <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
+      <i class="fa-solid fa-shield-halved gate-icon"></i>
+      <h1>Recurso em desenvolvimento</h1>
+      <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
+      <a class="primary-link" href="../admin/painel.html">Voltar ao painel</a>
+    </section>
+  </main>
+
+  <div id="studioApp" class="studio-shell hidden">
+    <aside class="studio-sidebar">
+      <a class="studio-brand" href="#projects" aria-label="Olá Studio">
+        <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
+        <span><strong>Olá</strong> Studio<small>MVP protegido</small></span>
+      </a>
+      <nav aria-label="Navegação do Studio">
+        <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
+        <button type="button" data-studio-view="editor"><i class="fa-solid fa-clapperboard"></i><span>Novo vídeo</span></button>
+        <button type="button" data-studio-view="usage"><i class="fa-solid fa-chart-pie"></i><span>Uso e créditos</span></button>
+      </nav>
+      <div class="sidebar-security"><i class="fa-solid fa-lock"></i><span><strong>Não publicado</strong>Feature flag desativada</span></div>
+      <a class="panel-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Painel Admin</a>
+    </aside>
+
+    <section class="studio-main">
+      <header class="studio-topbar">
+        <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
+        <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
+        <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
+      </header>
+
+      <div class="dev-banner"><i class="fa-solid fa-flask"></i><span><strong>Ambiente de desenvolvimento.</strong> O Studio está oculto do público e os pagamentos estão desativados.</span></div>
+
+      <section id="projectsView" class="studio-view">
+        <div class="hero-panel">
+          <div><span class="eyebrow">Crie sem editar quadro por quadro</span><h2>Transforme fotos e vídeos em uma peça pronta para publicar.</h2><p>Escolha um estilo, organize os arquivos e acompanhe cada etapa da renderização.</p><button type="button" data-new-project><i class="fa-solid fa-plus"></i> Criar novo vídeo</button></div>
+          <div class="hero-visual" aria-hidden="true"><i class="fa-solid fa-wand-magic-sparkles"></i><span class="frame frame-one"></span><span class="frame frame-two"></span></div>
+        </div>
+        <div class="section-heading"><div><span class="eyebrow">Histórico</span><h2>Projetos recentes</h2></div><button id="refreshProjects" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Atualizar</button></div>
+        <div id="projectsGrid" class="projects-grid"><div class="empty-state"><i class="fa-solid fa-film"></i><h3>Nenhum projeto ainda</h3><p>Seu primeiro vídeo aparecerá aqui.</p></div></div>
+      </section>
+
+      <section id="editorView" class="studio-view hidden">
+        <form id="projectForm" class="editor-layout">
+          <div class="editor-column">
+            <section class="studio-card upload-card">
+              <div class="card-heading"><span>1</span><div><h2>Arquivos do vídeo</h2><p>Envie até 10 fotos ou vídeos e organize a sequência.</p></div></div>
+              <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="Selecionar fotos e vídeos">
+                <input id="sourceFiles" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple hidden>
+                <i class="fa-solid fa-cloud-arrow-up"></i><strong>Arraste seus arquivos aqui</strong><span>ou clique para escolher • até 1 GB por projeto</span>
+              </div>
+              <div id="mediaLibrary" class="media-library"></div>
+            </section>
+
+            <section class="studio-card">
+              <div class="card-heading"><span>2</span><div><h2>Estilo da edição</h2><p>Cada estilo muda ritmo, duração dos cortes e transições.</p></div></div>
+              <div class="style-grid">
+                <label class="style-option"><input type="radio" name="editStyle" value="institucional" checked><span><i class="fa-solid fa-building"></i><strong>Institucional</strong><small>Elegante, suave e inspirador</small></span></label>
+                <label class="style-option"><input type="radio" name="editStyle" value="reels"><span><i class="fa-solid fa-bolt"></i><strong>Reels</strong><small>Dinâmico, vertical e acelerado</small></span></label>
+                <label class="style-option"><input type="radio" name="editStyle" value="comercial"><span><i class="fa-solid fa-bullhorn"></i><strong>Comercial</strong><small>Produtos, ofertas e chamada para ação</small></span></label>
+              </div>
+            </section>
+
+            <section class="studio-card">
+              <div class="card-heading"><span>3</span><div><h2>Formato e duração</h2><p>Defina onde o vídeo será publicado.</p></div></div>
+              <fieldset><legend>Proporção</legend><div class="format-grid">
+                <label><input type="radio" name="format" value="9:16" checked><span><b class="ratio vertical"></b><strong>9:16</strong><small>Stories e Reels</small></span></label>
+                <label><input type="radio" name="format" value="16:9"><span><b class="ratio horizontal"></b><strong>16:9</strong><small>YouTube e TV</small></span></label>
+                <label><input type="radio" name="format" value="1:1"><span><b class="ratio square"></b><strong>1:1</strong><small>Feed quadrado</small></span></label>
+              </div></fieldset>
+              <fieldset><legend>Duração</legend><div class="duration-grid">
+                <label><input type="radio" name="duration" value="15"><span>15s</span></label><label><input type="radio" name="duration" value="30" checked><span>30s</span></label><label><input type="radio" name="duration" value="60"><span>60s</span></label><label><input type="radio" name="duration" value="90"><span>90s</span></label>
+              </div></fieldset>
+            </section>
+
+            <section class="studio-card">
+              <div class="card-heading"><span>4</span><div><h2>Identidade e mensagem</h2><p>Todos os campos são opcionais.</p></div></div>
+              <div class="form-grid">
+                <label>Nome do projeto<input id="projectName" maxlength="100" placeholder="Ex.: Campanha de verão" required></label>
+                <label>Título no vídeo<input id="videoTitle" maxlength="120" placeholder="Sua mensagem principal"></label>
+                <label class="wide">Texto complementar<input id="videoSubtitle" maxlength="180" placeholder="Uma frase curta para contextualizar"></label>
+                <label class="wide">Chamada final<input id="videoCta" maxlength="100" placeholder="Ex.: Fale conosco pelo WhatsApp"></label>
+                <label class="file-field">Logo<input id="logoFile" type="file" accept="image/png,image/webp"><span id="logoFileLabel"><i class="fa-regular fa-image"></i> Escolher PNG ou WebP</span></label>
+                <label class="file-field">Música licenciada<input id="musicFile" type="file" accept="audio/mpeg,audio/mp4,audio/wav,audio/ogg"><span id="musicFileLabel"><i class="fa-solid fa-music"></i> Escolher áudio</span></label>
+                <label class="toggle-field wide"><input id="captionsEnabled" type="checkbox"><span></span><div><strong>Gerar legendas quando houver transcrição</strong><small>A transcrição só será usada quando um provedor estiver configurado no worker.</small></div></label>
+              </div>
+            </section>
+          </div>
+
+          <aside class="editor-summary">
+            <section class="studio-card sticky-card">
+              <span class="eyebrow">Resumo do projeto</span><h2>Pronto para criar?</h2>
+              <dl><div><dt>Arquivos</dt><dd id="summaryFiles">0</dd></div><div><dt>Estilo</dt><dd id="summaryStyle">Institucional</dd></div><div><dt>Formato</dt><dd id="summaryFormat">9:16</dd></div><div><dt>Duração</dt><dd id="summaryDuration">30 segundos</dd></div><div><dt>Estimativa</dt><dd id="summaryCredits">2 créditos</dd></div></dl>
+              <div class="cost-note"><i class="fa-solid fa-coins"></i><p><strong>Cobrança desativada</strong>A estimativa já é registrada para análise de custos.</p></div>
+              <button id="createVideoButton" class="create-button" type="submit"><i class="fa-solid fa-wand-magic-sparkles"></i> Criar meu vídeo</button>
+              <small class="preservation-note"><i class="fa-solid fa-shield"></i> Os arquivos originais serão preservados.</small>
+            </section>
+          </aside>
+        </form>
+      </section>
+
+      <section id="processingView" class="studio-view hidden">
+        <div class="processing-layout">
+          <section class="studio-card processing-card">
+            <div id="processingIcon" class="processing-icon"><i class="fa-solid fa-clapperboard"></i></div>
+            <span id="processingEyebrow" class="eyebrow">Enviando arquivos</span><h2 id="processingTitle">Seu vídeo está sendo preparado</h2><p id="processingMessage">Não feche esta tela durante o envio.</p>
+            <div class="progress-track"><span id="processingBar"></span></div><div class="progress-row"><strong id="processingPercent">0%</strong><span id="processingStage">Iniciando</span></div>
+            <ol class="process-steps"><li data-process-step="upload" class="active"><i class="fa-solid fa-cloud-arrow-up"></i><span>Upload</span></li><li data-process-step="queue"><i class="fa-solid fa-list-check"></i><span>Fila</span></li><li data-process-step="analysis"><i class="fa-solid fa-wave-square"></i><span>Análise</span></li><li data-process-step="render"><i class="fa-solid fa-film"></i><span>Renderização</span></li><li data-process-step="complete"><i class="fa-solid fa-circle-check"></i><span>Concluído</span></li></ol>
+          </section>
+          <section id="resultCard" class="studio-card result-card hidden">
+            <div class="card-heading"><span><i class="fa-solid fa-check"></i></span><div><h2>Vídeo concluído</h2><p>Confira o resultado antes de baixar.</p></div></div>
+            <video id="previewPlayer" controls playsinline></video>
+            <div class="result-actions"><a id="downloadVideo" class="create-button" href="#" download><i class="fa-solid fa-download"></i> Baixar MP4</a><button id="regenerateVideo" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Gerar outra versão</button></div>
+          </section>
+          <section id="errorCard" class="studio-card error-card hidden"><i class="fa-solid fa-triangle-exclamation"></i><div><h2>Não foi possível concluir</h2><p id="processingError"></p></div><button type="button" data-new-project>Tentar novamente</button></section>
+        </div>
+      </section>
+
+      <section id="usageView" class="studio-view hidden">
+        <div class="section-heading"><div><span class="eyebrow">Preparação comercial</span><h2>Uso, créditos e custos</h2></div></div>
+        <div class="usage-grid"><article><i class="fa-solid fa-coins"></i><span>Saldo de créditos</span><strong id="creditBalance">0</strong><small>Cobrança ainda não ativada</small></article><article><i class="fa-solid fa-film"></i><span>Vídeos processados</span><strong id="processedCount">0</strong><small id="processedMinutes">0 min renderizados</small></article><article><i class="fa-solid fa-server"></i><span>Unidades estimadas</span><strong id="processingUnits">0</strong><small>Base para custo futuro</small></article></div>
+        <section class="studio-card"><div class="card-heading"><span><i class="fa-solid fa-receipt"></i></span><div><h2>Histórico de consumo</h2><p>Ledger preparado para créditos, reservas e estornos.</p></div></div><div id="usageHistory" class="usage-history"><p class="empty-copy">Nenhum consumo registrado.</p></div></section>
+      </section>
+    </section>
+  </div>
+  <div id="studioToast" class="studio-toast hidden" role="status"></div>
+  <script type="module" src="studio.js?v=1"></script>
+</body>
+</html>

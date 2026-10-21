@@ -13112,6 +13112,23 @@ button.admin-button-loading::after {
 @media(max-width:680px){.fuel-admin-bulk-card{padding:14px}.fuel-admin-bulk-card>header{flex-direction:column}.fuel-admin-bulk-card>header>strong{white-space:normal}.fuel-admin-bulk-grid{grid-template-columns:1fr}.fuel-admin-bulk-item{grid-template-columns:1fr}.fuel-admin-bulk-item>button{width:100%}}
 /* Versao global do painel v892 */
 
+.nav-admin .studio-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  color: inherit;
+  text-decoration: none;
+  font-weight: 750;
+  background: linear-gradient(90deg, rgba(255, 187, 45, .14), rgba(36, 181, 214, .08));
+  border: 1px solid rgba(255, 187, 45, .24);
+}
+
+.nav-admin .studio-nav-link i { color: #ffbb2d; }
+.nav-admin .studio-nav-link small { margin-left: auto; font-size: 9px; letter-spacing: .08em; }
+
 /* ===== Gerador de encartes v892 ===== */
 .flyer-hero{overflow:hidden;border-color:#c9d9ee;background:radial-gradient(circle at 94% 5%,rgba(14,116,144,.14),transparent 30%),linear-gradient(135deg,#fff,#f4f9ff)}
 .flyer-hero .feature-kicker{display:block;margin-bottom:5px;color:#0e7490;font-size:11px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}

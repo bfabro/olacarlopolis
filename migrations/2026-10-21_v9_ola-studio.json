@@ -1,0 +1,10 @@
+{
+  "studioFeatureFlags": {
+    "enabled": false,
+    "environment": "development",
+    "semanticAiEnabled": false,
+    "billingEnabled": false,
+    "updatedAt": 1792580400000,
+    "note": "MVP protegido. Não publicar nem ativar sem validação do Admin Master."
+  }
+}

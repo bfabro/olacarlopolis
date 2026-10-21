@@ -42,6 +42,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/studio-config"
+  to = "/.netlify/functions/studio-config"
+  status = 200
+
+[[redirects]]
   from = "/old/*"
   to = "/"
   status = 301

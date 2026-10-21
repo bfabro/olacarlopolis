@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 902,
-  label: "v909",
+  numero: 903,
+  label: "v910",
   data: "2026-10-21",
-  nota: "Título inicial do banner alinhado à configuração publicada para eliminar a mudança visual na abertura."
+  nota: "Olá Studio integrado em ambiente protegido, com upload, fila e worker FFmpeg independente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

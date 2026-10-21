@@ -1,0 +1,23 @@
+services:
+  ola-studio-worker:
+    build:
+      context: ..
+      dockerfile: studio-worker/Dockerfile
+    restart: unless-stopped
+    environment:
+      FIREBASE_DATABASE_URL: ${FIREBASE_DATABASE_URL:-https://contadoracessos-default-rtdb.firebaseio.com}
+      FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET:-contadoracessos.firebasestorage.app}
+      GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-service-account.json
+      STUDIO_WORK_DIR: /tmp/ola-studio
+      STUDIO_POLL_INTERVAL_MS: 4000
+    volumes:
+      - ${FIREBASE_SERVICE_ACCOUNT_FILE}:/run/secrets/firebase-service-account.json:ro
+      - ola-studio-work:/tmp/ola-studio
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 4G
+
+volumes:
+  ola-studio-work:

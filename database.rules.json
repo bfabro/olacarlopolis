@@ -518,9 +518,62 @@
       }
     },
 
+    "studioFeatureFlags": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+    },
+
+    "studioProjects": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".write": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".indexOn": ["updatedAt", "status"],
+        "$projectId": {
+          ".validate": "!newData.exists() || (newData.child('ownerUid').val() === $uid && newData.child('name').isString() && newData.child('name').val().length <= 100 && newData.child('duration').isNumber() && newData.child('duration').val() <= 90)"
+        }
+      }
+    },
+
+    "studioJobs": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".write": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".indexOn": ["createdAt", "status"],
+        "$jobId": {
+          ".validate": "!newData.exists() || (newData.child('ownerUid').val() === $uid && newData.child('projectId').isString() && newData.child('status').isString())"
+        }
+      }
+    },
+
+    "studioUsage": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".write": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+      }
+    },
+
+    "studioCredits": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+      }
+    },
+
+    "studioCreditLedger": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+        ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'"
+      }
+    },
+
+    "studioAdminCosts": {
+      ".read": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      ".write": false
+    },
+
     "$other": {
-      ".read": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'",
-      ".write": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente'"
+      ".read": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente' && $other !== 'studioFeatureFlags' && $other !== 'studioProjects' && $other !== 'studioJobs' && $other !== 'studioUsage' && $other !== 'studioCredits' && $other !== 'studioCreditLedger' && $other !== 'studioAdminCosts'",
+      ".write": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente' && $other !== 'studioFeatureFlags' && $other !== 'studioProjects' && $other !== 'studioJobs' && $other !== 'studioUsage' && $other !== 'studioCredits' && $other !== 'studioCreditLedger' && $other !== 'studioAdminCosts'"
     }
   }
 }
