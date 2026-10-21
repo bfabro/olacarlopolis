@@ -124,6 +124,18 @@ import {
   terrainInteractiveHotspotNear,
   terrainInteractiveHotspots
 } from "./gestao-terrenos-hotspots.js?v=1";
+import {
+  WEEKLY_POST_MIN_ITEMS,
+  WEEKLY_POST_MAX_ITEMS,
+  weeklyPostCardFields,
+  weeklyPostDiverseItems,
+  weeklyPostGridLayout,
+  weeklyPostMoveOrder,
+  weeklyPostPages,
+  weeklyPostRecordReference,
+  weeklyPostStatusKind,
+  weeklyPostUniqueItems
+} from "./weekly-post-layout.js?v=1";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -139,10 +151,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 897,
-  label: "v904",
+  numero: 898,
+  label: "v905",
   data: "2026-10-21",
-  nota: "Novidades no Olacarlopolis ganham título contornado, logo ampliada, cards completos e chamada de acesso ao site."
+  nota: "Resumo de novidades modernizado com seleção real diversificada, ordenação, layouts Story e Feed e exportação profissional."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -382,10 +394,12 @@ let state = {
   postArtCustomImage: "",
   postArtCentralMode: "catalogo",
   postArtCentralFormat: "feed",
+  weeklyPostFormatKey: "reels",
   weeklyPostDays: 7,
   weeklyPostMaxItems: 4,
-  weeklyPostTheme: "sereno",
   weeklyPostSelectedIds: new Set(),
+  weeklyPostSelectedOrder: [],
+  weeklyPostLastGeneratedIds: [],
   weeklyPostSelectionReady: false,
   commercePostSelectedIds: new Set(),
   commercePostLastRandomIds: [],
@@ -26578,15 +26592,18 @@ function renderPostArtCatalogView() {
 }
 
 const CENTRAL_POST_MAX_ITEMS = 6;
-const WEEKLY_POST_MIN_ITEMS = 1;
-const WEEKLY_POST_MAX_ITEMS = 6;
 const WEEKLY_POST_FORMATS = {
   feed: { key: "feed", nome: "Feed 4:5", descricao: "Post vertical", width: 1080, height: 1350, icon: "fa-solid fa-table-cells-large" },
   reels: POST_ART_FORMATS.reels
 };
-const WEEKLY_POST_THEMES = {
-  sereno: { key: "sereno", nome: "Sereno", descricao: "Petróleo e dourado", bodyStart: "#075b70", bodyEnd: "#00384d", card: "#064b60", surface: "#ffffff", border: "#66a8b3", text: "#17353b", subtext: "#526c70", accent: "#ffb91f", footerStart: "#063e52", footerEnd: "#022d3e", shade: "rgba(4,39,58,.66)" },
-  claro: { key: "claro", nome: "Claro", descricao: "Grafite e dourado", bodyStart: "#57686c", bodyEnd: "#293d43", card: "#44585d", surface: "#ffffff", border: "#a8b0ad", text: "#293237", subtext: "#667177", accent: "#f1b631", footerStart: "#3b4c51", footerEnd: "#25363b", shade: "rgba(38,49,55,.52)" }
+const WEEKLY_POST_THEME = {
+  navy: "#092B45",
+  navyDeep: "#041C2D",
+  navySoft: "#123F5D",
+  accent: "#FFBB2D",
+  white: "#FFFFFF",
+  text: "#092B45",
+  muted: "#587083"
 };
 let centralPostPreviewRequest = 0;
 let centralPostPreviewTimer = null;
@@ -26596,11 +26613,11 @@ function centralPostFormat() {
 }
 
 function weeklyPostTheme() {
-  return WEEKLY_POST_THEMES[state.weeklyPostTheme] || WEEKLY_POST_THEMES.sereno;
+  return WEEKLY_POST_THEME;
 }
 
 function weeklyPostFormat() {
-  return WEEKLY_POST_FORMATS[state.postArtCentralFormat] || WEEKLY_POST_FORMATS.feed;
+  return WEEKLY_POST_FORMATS[state.weeklyPostFormatKey] || WEEKLY_POST_FORMATS.reels;
 }
 
 function weeklyPostLimit() {
@@ -26608,7 +26625,7 @@ function weeklyPostLimit() {
 }
 
 function centralPostImage(item = {}) {
-  return normalizarImagemArteAdmin(item.imagem || item.image || item.foto || (Array.isArray(item.imagens) ? item.imagens[0] : "") || "");
+  return normalizarImagemArteAdmin(item.imagemPrincipal || item.fotoPrincipal || item.imagem || item.image || item.foto || (Array.isArray(item.imagens) ? item.imagens[0] : "") || "");
 }
 
 function centralPostDate(value) {
@@ -26619,17 +26636,34 @@ function centralPostDate(value) {
 function weeklyPostItems() {
   const days = Math.max(7, Number(state.weeklyPostDays) || 7);
   const limit = Date.now() - days * 86400000;
-  return (Array.isArray(state.novidades) ? state.novidades : [])
-    .filter((item) => item && item.ativo !== false && Number(item.dataCriacao || item.createdAt || 0) >= limit)
-    .sort((a, b) => Number(b.dataCriacao || b.createdAt || 0) - Number(a.dataCriacao || a.createdAt || 0));
+  return weeklyPostUniqueItems((Array.isArray(state.novidades) ? state.novidades : [])
+    .filter((item) => item && item.ativo !== false && Number(item.dataCriacao || item.createdAt || item.updatedAt || 0) >= limit));
 }
 
 function weeklyPostItemTitle(item = {}) {
-  return item.tituloConteudo || item.titulo || item.acao || "Novidade no Olá Carlópolis";
+  return weeklyPostCardFields(item).title;
 }
 
-function weeklyPostItemDescription(item = {}) {
-  return item.acao || item.descricao || item.categoria || item.tipo || "Confira esta novidade";
+function weeklyPostSelectedItems(items = weeklyPostItems()) {
+  const byId = new Map(items.map((item) => [String(item.id), item]));
+  const orderedIds = [...state.weeklyPostSelectedOrder, ...state.weeklyPostSelectedIds]
+    .map(String)
+    .filter((id, index, list) => list.indexOf(id) === index && state.weeklyPostSelectedIds.has(id) && byId.has(id));
+  state.weeklyPostSelectedOrder = orderedIds;
+  return orderedIds.map((id) => byId.get(id)).filter(Boolean).slice(0, weeklyPostLimit());
+}
+
+function setWeeklyPostSelection(items = []) {
+  const ids = items.slice(0, weeklyPostLimit()).map((item) => String(item.id));
+  state.weeklyPostSelectedIds = new Set(ids);
+  state.weeklyPostSelectedOrder = ids;
+}
+
+function regenerateWeeklyPostSelection(items = weeklyPostItems()) {
+  const selected = weeklyPostDiverseItems(items, weeklyPostLimit(), state.weeklyPostLastGeneratedIds);
+  setWeeklyPostSelection(selected);
+  state.weeklyPostLastGeneratedIds = selected.map((item) => String(item.id));
+  state.weeklyPostSelectionReady = true;
 }
 
 function commercePostClients() {
@@ -26716,10 +26750,9 @@ function drawCentralPostCards(ctx, items, assets, format, kind) {
 }
 
 function weeklyPostStatus(item = {}) {
-  const source = normalizeName(`${item.tipo || ""} ${item.acao || ""} ${item.titulo || ""}`);
-  return /novo|nova|cadast|inclu/.test(source)
-    ? { label: "Novo", color: "#18a83a", symbol: "★" }
-    : { label: "Atualizado", color: "#ff6418", symbol: "↻" };
+  return weeklyPostStatusKind(item) === "new"
+    ? { label: "NOVO" }
+    : { label: "ATUALIZADO" };
 }
 
 function drawWeeklyLogoTransparent(ctx, image, x, y, width, height) {
@@ -26728,193 +26761,175 @@ function drawWeeklyLogoTransparent(ctx, image, x, y, width, height) {
   const drawWidth = image.width * scale;
   const drawHeight = image.height * scale;
   ctx.save();
-  ctx.shadowColor = "rgba(0,25,65,.5)";
-  ctx.shadowBlur = 16;
-  ctx.shadowOffsetY = 5;
+  ctx.shadowColor = "rgba(0,20,35,.32)";
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 3;
   ctx.drawImage(image, x + (width - drawWidth) / 2, y + (height - drawHeight) / 2, drawWidth, drawHeight);
   ctx.restore();
 }
 
-function drawWeeklyClientImage(ctx, image, x, y, width, height, radius) {
+function drawWeeklyClientImage(ctx, image, item, x, y, width, height, radius) {
+  if (!image) return false;
+  const focus = item?.imagePosition || item?.posicaoImagem || {};
+  const focusX = Math.max(0, Math.min(1, Number(focus.x ?? item?.focoX ?? .5)));
+  const focusY = Math.max(0, Math.min(1, Number(focus.y ?? item?.focoY ?? .5)));
+  const scale = Math.max(width / image.width, height / image.height);
+  const sourceWidth = width / scale;
+  const sourceHeight = height / scale;
+  const sourceX = Math.max(0, Math.min(image.width - sourceWidth, (image.width - sourceWidth) * focusX));
+  const sourceY = Math.max(0, Math.min(image.height - sourceHeight, (image.height - sourceHeight) * focusY));
   ctx.save();
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
-  desenharImagemCover(ctx, image, x, y, width, height, radius);
+  canvasRoundRect(ctx, x, y, width, height, radius);
+  ctx.clip();
+  ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
   ctx.restore();
+  return true;
 }
 
-function drawWeeklyPostHeader(ctx, assets, format, theme) {
-  const vertical = format.key === "reels";
-  const logoSize = vertical ? 244 : 184;
-  const logoX = format.width - logoSize - (vertical ? 42 : 34);
-  const logoY = vertical ? 36 : 24;
+function weeklyPostDrawFittedText(ctx, text, x, y, width, maxLines, preferredSize, options = {}) {
+  const content = String(text || "").replace(/\s+/g, " ").trim();
+  if (!content) return 0;
+  const minimum = options.minimum || Math.max(11, preferredSize - 6);
+  const weight = options.weight || 800;
+  const family = options.family || "Arial";
+  let fontSize = preferredSize;
+  let lines = [];
+  while (fontSize >= minimum) {
+    ctx.font = `${weight} ${fontSize}px ${family}`;
+    lines = linhasCanvas(ctx, content, width);
+    if (lines.length <= maxLines) break;
+    fontSize -= 1;
+  }
+  if (lines.length > maxLines) {
+    lines = lines.slice(0, maxLines);
+    let last = `${lines[maxLines - 1]}…`;
+    while (last.length > 2 && ctx.measureText(last).width > width) last = `${last.slice(0, -2).trim()}…`;
+    lines[maxLines - 1] = last;
+  }
+  const lineHeight = Math.round(fontSize * (options.lineHeight || 1.12));
+  ctx.fillStyle = options.color || WEEKLY_POST_THEME.text;
+  ctx.textAlign = options.align || "left";
+  lines.forEach((line, index) => ctx.fillText(line, x, y + fontSize + index * lineHeight, width));
+  return lines.length * lineHeight;
+}
+
+function drawWeeklyPostHeader(ctx, assets, format, theme, layout) {
+  const { story, headerHeight } = layout;
+  const logoSize = story ? 208 : 158;
+  const logoX = format.width - logoSize - (story ? 46 : 36);
+  const logoY = story ? 58 : 26;
   drawWeeklyLogoTransparent(ctx, assets.siteLogo, logoX, logoY, logoSize, logoSize);
-  ctx.textAlign = "left";
   ctx.save();
-  ctx.lineJoin = "round";
-  ctx.miterLimit = 2;
-  ctx.strokeStyle = "rgba(0,0,0,.94)";
-  ctx.lineWidth = vertical ? 12 : 9;
-  ctx.shadowColor = "rgba(0,0,0,.5)";
-  ctx.shadowBlur = vertical ? 14 : 10;
-  ctx.shadowOffsetY = vertical ? 6 : 4;
-  const x = vertical ? 58 : 52;
-  const firstBaseline = vertical ? 150 : 112;
-  const secondBaseline = vertical ? 246 : 190;
-  const fontSize = vertical ? 92 : 72;
-  ctx.font = `1000 ${fontSize}px Arial`;
-  ctx.strokeText("NOVIDADES NO", x, firstBaseline);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText("NOVIDADES NO", x, firstBaseline);
-  ctx.strokeText("OLACARLOPOLIS", x, secondBaseline);
-  ctx.fillStyle = theme.accent;
-  ctx.fillText("OLACARLOPOLIS", x, secondBaseline);
+  ctx.shadowColor = "rgba(0,18,32,.34)";
+  ctx.shadowBlur = story ? 8 : 6;
+  ctx.shadowOffsetY = 3;
+  const x = story ? 58 : 50;
+  const maxTitleWidth = logoX - x - (story ? 20 : 16);
+  weeklyPostDrawFittedText(ctx, "NOVIDADES NO", x, story ? 132 : 78, maxTitleWidth, 1, story ? 54 : 41, { minimum: story ? 45 : 34, weight: 900, color: theme.white });
+  weeklyPostDrawFittedText(ctx, "OLÁ CARLÓPOLIS", x, story ? 194 : 124, maxTitleWidth, 1, story ? 64 : 50, { minimum: story ? 50 : 39, weight: 900, color: theme.accent });
   ctx.restore();
-}
-
-function weeklyPostLayout(format) {
-  const vertical = format.key === "reels";
-  const headerH = vertical ? 390 : 270;
-  const footerH = vertical ? 158 : 108;
-  const footerY = format.height - footerH - (vertical ? 24 : 18);
-  const categoriesH = vertical ? 138 : 104;
-  const categoriesY = footerY - categoriesH - (vertical ? 18 : 12);
-  return { vertical, headerH, cardStartY: headerH + (vertical ? 18 : 12), cardEndY: categoriesY - (vertical ? 18 : 12), categoriesY, categoriesH, footerY, footerH };
+  ctx.fillStyle = theme.accent;
+  ctx.fillRect(story ? 58 : 50, headerHeight - (story ? 29 : 22), story ? 118 : 90, story ? 6 : 5);
 }
 
 function drawWeeklyPostCards(ctx, items, assets, format, theme) {
-  const layout = weeklyPostLayout(format);
-  const { vertical } = layout;
-  const count = Math.max(1, items.length);
-  const columns = count === 1 ? 1 : 2;
-  const rows = Math.ceil(count / columns);
-  const margin = vertical ? 38 : 38;
-  const gap = vertical ? 18 : 14;
-  const cardW = count === 1 ? Math.min(760, format.width - margin * 2) : (format.width - margin * 2 - gap) / 2;
-  const cardH = (layout.cardEndY - layout.cardStartY - gap * Math.max(0, rows - 1)) / rows;
+  const layout = weeklyPostGridLayout(format, items.length);
+  const { story, count, columns, rows, margin, gap, cardWidth: cardW, cardHeight: cardH } = layout;
   items.forEach((item, index) => {
     const isLastCentered = count % 2 === 1 && index === count - 1;
-    const col = index % 2;
+    const col = index % columns;
     const row = Math.floor(index / columns);
     const x = isLastCentered ? (format.width - cardW) / 2 : margin + col * (cardW + gap);
     const y = layout.cardStartY + row * (cardH + gap);
-    const radius = vertical ? 25 : 20;
+    const radius = story ? 24 : 20;
     ctx.save();
-    ctx.shadowColor = "rgba(0,20,35,.38)";
-    ctx.shadowBlur = vertical ? 18 : 12;
-    ctx.shadowOffsetY = vertical ? 7 : 5;
-    preencherRoundRect(ctx, x, y, cardW, cardH, radius, "#ffffff");
+    ctx.shadowColor = "rgba(0,17,29,.22)";
+    ctx.shadowBlur = story ? 14 : 10;
+    ctx.shadowOffsetY = story ? 6 : 4;
+    preencherRoundRect(ctx, x, y, cardW, cardH, radius, theme.white);
     ctx.restore();
-    const detailsH = vertical ? Math.min(144, Math.max(122, cardH * .34)) : Math.min(128, Math.max(106, cardH * .35));
-    const imageH = cardH - detailsH;
-    drawWeeklyClientImage(ctx, assets.images[index], x + 7, y + 7, cardW - 14, imageH - 7, radius - 5);
+    const badgeH = story ? 48 : 38;
     const status = weeklyPostStatus(item);
-    const badgeText = status.label.toUpperCase();
-    const badgeW = status.label === "Novo" ? (vertical ? 148 : 126) : (vertical ? 206 : 176);
-    const badgeH = vertical ? 52 : 43;
-    preencherRoundRect(ctx, x + 18, y + 17, badgeW, badgeH, badgeH / 2, theme.accent);
-    ctx.fillStyle = "#082b3d";
-    ctx.font = `1000 ${vertical ? 21 : 18}px Arial`;
+    ctx.fillStyle = theme.accent;
+    ctx.fillRect(x, y + badgeH - (story ? 4 : 3), cardW, story ? 4 : 3);
+    ctx.fillStyle = theme.navy;
+    ctx.font = `900 ${story ? 18 : 15}px Arial`;
     ctx.textAlign = "left";
-    ctx.fillText(`${status.symbol}  ${badgeText}`, x + 34, y + 17 + badgeH * .67);
+    ctx.fillText(status.label, x + (story ? 18 : 15), y + badgeH * .68);
 
-    const detailsY = y + imageH;
+    const hasImage = Boolean(assets.images[index]);
+    const compact = rows >= 3;
+    const detailsH = hasImage ? (story ? (compact ? 148 : 176) : (compact ? 112 : 150)) : cardH - badgeH;
+    const imageY = y + badgeH;
+    const imageH = hasImage ? Math.max(0, cardH - badgeH - detailsH) : 0;
+    if (hasImage) drawWeeklyClientImage(ctx, assets.images[index], item, x + 7, imageY + 7, cardW - 14, imageH - 7, story ? 15 : 12);
+
+    const detailsY = hasImage ? imageY + imageH : imageY;
     const contentX = x + 18;
     const contentWidth = cardW - 36;
-    const nameY = detailsY + (vertical ? 10 : 8);
-    postArtDrawText(ctx, item.estabelecimento || "Olá Carlópolis", x + cardW / 2, nameY, contentWidth, 1, vertical ? 19 : 16, "#375064", { min: vertical ? 13 : 11, weight: 800, lineHeight: vertical ? 21 : 18, align: "center" });
-    preencherRoundRect(ctx, x + cardW / 2 - (vertical ? 48 : 38), nameY + (vertical ? 26 : 21), vertical ? 96 : 76, vertical ? 4 : 3, 2, theme.accent);
-    const titleY = nameY + (vertical ? 36 : 29);
-    postArtDrawText(ctx, weeklyPostItemTitle(item), x + cardW / 2, titleY, contentWidth, 2, vertical ? 26 : 22, "#102039", { min: vertical ? 16 : 13, weight: 1000, lineHeight: vertical ? 27 : 22, align: "center" });
-    const descriptionY = titleY + (vertical ? 56 : 46);
-    postArtDrawText(ctx, weeklyPostItemDescription(item), x + cardW / 2, descriptionY, contentWidth, 1, vertical ? 17 : 14, "#27445a", { min: vertical ? 12 : 10, weight: 650, lineHeight: vertical ? 19 : 16, align: "center" });
-    ctx.strokeStyle = "rgba(255,255,255,.88)";
-    ctx.lineWidth = 2;
-    canvasRoundRect(ctx, x, y, cardW, cardH, radius);
-    ctx.stroke();
+    const fields = weeklyPostCardFields(item);
+    let textY = detailsY + (story ? 12 : 9);
+    if (fields.client) {
+      textY += weeklyPostDrawFittedText(ctx, fields.client.toUpperCase(), contentX, textY, contentWidth, 1, story ? 17 : 14, { minimum: story ? 13 : 11, weight: 850, color: theme.muted });
+      textY += story ? 3 : 2;
+    }
+    if (fields.title) {
+      textY += weeklyPostDrawFittedText(ctx, fields.title, contentX, textY, contentWidth, 2, story ? (compact ? 22 : 25) : (compact ? 18 : 22), { minimum: story ? 17 : 14, weight: 900, color: theme.text, lineHeight: 1.06 });
+      textY += story ? 4 : 3;
+    }
+    if (fields.change) {
+      weeklyPostDrawFittedText(ctx, fields.change, contentX, textY, contentWidth, compact ? 1 : 2, story ? 16 : 14, { minimum: story ? 12 : 11, weight: 650, color: theme.muted, lineHeight: 1.08 });
+    }
   });
+  return layout;
 }
 
-function drawWeeklyPostAccessLine(ctx, format, theme) {
-  const layout = weeklyPostLayout(format);
-  const { vertical, categoriesY, categoriesH } = layout;
-  const lead = "Confira muito mais acessando: ";
+function drawWeeklyPostFooter(ctx, format, theme, layout) {
+  const { story, ctaY, ctaHeight } = layout;
+  const boxX = story ? 42 : 38;
+  const boxW = format.width - boxX * 2;
+  const footerGradient = ctx.createLinearGradient(boxX, ctaY, boxX + boxW, ctaY);
+  footerGradient.addColorStop(0, theme.navyDeep);
+  footerGradient.addColorStop(1, theme.navySoft);
+  ctx.save();
+  ctx.shadowColor = "rgba(0,15,28,.2)";
+  ctx.shadowBlur = 10;
+  ctx.shadowOffsetY = 4;
+  preencherRoundRect(ctx, boxX, ctaY, boxW, ctaHeight, story ? 22 : 18, footerGradient);
+  ctx.restore();
+  const lead = "Veja todas as novidades em ";
   const url = "www.olacarlopolis.com";
-  ctx.textAlign = "left";
-  ctx.font = `900 ${vertical ? 30 : 24}px Arial`;
+  ctx.font = `850 ${story ? 25 : 21}px Arial`;
   const totalWidth = ctx.measureText(lead).width + ctx.measureText(url).width;
   const startX = (format.width - totalWidth) / 2;
-  const lineY = categoriesY + categoriesH / 2 + (vertical ? 10 : 8);
-  ctx.fillStyle = "#ffffff";
-  ctx.fillText(lead, startX, lineY);
-  ctx.fillStyle = theme.accent;
-  ctx.fillText(url, startX + ctx.measureText(lead).width, lineY);
-}
-
-function drawWeeklyPostFooter(ctx, format, theme) {
-  const layout = weeklyPostLayout(format);
-  const { vertical } = layout;
-  const boxX = vertical ? 34 : 28;
-  const boxY = layout.footerY;
-  const boxW = format.width - boxX * 2;
-  const boxH = layout.footerH;
-  const footerGradient = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
-  footerGradient.addColorStop(0, theme.footerStart);
-  footerGradient.addColorStop(.58, theme.card);
-  footerGradient.addColorStop(1, theme.footerEnd);
-  ctx.save();
-  ctx.shadowColor = "rgba(0,15,45,.42)";
-  ctx.shadowBlur = vertical ? 22 : 13;
-  ctx.shadowOffsetY = 7;
-  preencherRoundRect(ctx, boxX, boxY, boxW, boxH, vertical ? 30 : 24, footerGradient);
-  ctx.restore();
+  const baseline = ctaY + ctaHeight * .62;
   ctx.textAlign = "left";
-  preencherRoundRect(ctx, boxX + (vertical ? 36 : 30), boxY + (vertical ? 27 : 20), vertical ? 96 : 72, vertical ? 8 : 6, 4, theme.accent);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `1000 ${vertical ? 35 : 28}px Arial`;
-  ctx.fillText("OLÁ CARLÓPOLIS", boxX + (vertical ? 36 : 30), boxY + (vertical ? 78 : 62));
-  ctx.fillStyle = "#9bdcff";
-  ctx.font = `700 ${vertical ? 18 : 14}px Arial`;
-  ctx.fillText("Informação e comércio local em um só lugar", boxX + (vertical ? 36 : 30), boxY + (vertical ? 112 : 87));
-  const ctaW = vertical ? 320 : 286;
-  const ctaH = vertical ? 66 : 52;
-  const ctaX = boxX + boxW - ctaW - (vertical ? 30 : 24);
-  const ctaY = boxY + (vertical ? 25 : 16);
-  ctx.strokeStyle = "rgba(155,220,255,.38)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(ctaX - (vertical ? 24 : 18), boxY + (vertical ? 22 : 16));
-  ctx.lineTo(ctaX - (vertical ? 24 : 18), boxY + boxH - (vertical ? 22 : 16));
-  ctx.stroke();
-  preencherRoundRect(ctx, ctaX, ctaY, ctaW, ctaH, ctaH / 2, theme.accent);
-  ctx.fillStyle = "#082b60";
-  ctx.textAlign = "center";
-  ctx.font = `1000 ${vertical ? 25 : 21}px Arial`;
-  ctx.fillText("Acesse agora  →", ctaX + ctaW / 2, ctaY + ctaH * .65);
-  ctx.fillStyle = "#ffffff";
-  ctx.font = `850 ${vertical ? 20 : 16}px Arial`;
-  ctx.fillText("www.olacarlopolis.com", ctaX + ctaW / 2, boxY + boxH - (vertical ? 18 : 10));
+  ctx.fillStyle = theme.white;
+  ctx.fillText(lead, startX, baseline);
+  ctx.fillStyle = theme.accent;
+  ctx.fillText(url, startX + ctx.measureText(lead).width, baseline);
 }
 
 function drawWeeklyPostCanvas(ctx, items, assets, format) {
   const theme = weeklyPostTheme();
-  const layout = weeklyPostLayout(format);
-  const headerH = layout.headerH;
-  ctx.fillStyle = theme.footerEnd;
+  const layout = weeklyPostGridLayout(format, items.length);
+  const headerH = layout.headerHeight;
+  ctx.fillStyle = theme.navy;
   ctx.fillRect(0, 0, format.width, format.height);
   desenharImagemCover(ctx, assets.headerImage, 0, 0, format.width, headerH);
   const headerShade = ctx.createLinearGradient(0, 0, format.width, headerH);
-  headerShade.addColorStop(0, theme.shade);
-  headerShade.addColorStop(.56, "rgba(9,31,44,.12)");
-  headerShade.addColorStop(1, "rgba(0,35,51,.12)");
+  headerShade.addColorStop(0, "rgba(4,28,45,.86)");
+  headerShade.addColorStop(.56, "rgba(9,43,69,.42)");
+  headerShade.addColorStop(1, "rgba(9,43,69,.08)");
   ctx.fillStyle = headerShade; ctx.fillRect(0, 0, format.width, headerH);
   const bodyShade = ctx.createLinearGradient(0, headerH, 0, format.height);
-  bodyShade.addColorStop(0, theme.bodyStart); bodyShade.addColorStop(1, theme.bodyEnd);
+  bodyShade.addColorStop(0, theme.navySoft); bodyShade.addColorStop(1, theme.navyDeep);
   ctx.fillStyle = bodyShade; ctx.fillRect(0, headerH, format.width, format.height - headerH);
-  drawWeeklyPostHeader(ctx, assets, format, theme);
+  drawWeeklyPostHeader(ctx, assets, format, theme, layout);
   drawWeeklyPostCards(ctx, items, assets, format, theme);
-  drawWeeklyPostAccessLine(ctx, format, theme);
-  drawWeeklyPostFooter(ctx, format, theme);
+  drawWeeklyPostFooter(ctx, format, theme, layout);
 }
 
 function drawCentralPostCanvas(ctx, items, assets, title, subtitle, format, kind) {
@@ -26938,10 +26953,12 @@ async function atualizarPreviaPostSemanal() {
   if (!canvas) return;
   const request = ++centralPostPreviewRequest;
   const format = weeklyPostFormat();
-  const items = weeklyPostItems().filter((item) => state.weeklyPostSelectedIds.has(item.id)).slice(0, weeklyPostLimit());
+  const items = weeklyPostSelectedItems();
   canvas.width = format.width; canvas.height = format.height;
   const assets = await centralPostAssets(items, centralPostImage);
   if (request !== centralPostPreviewRequest || !$("weeklyPostCanvas")) return;
+  canvas.dataset.recordRefs = JSON.stringify(items.map(weeklyPostRecordReference));
+  canvas.dataset.pageCount = String(weeklyPostPages(items).length);
   drawCentralPostCanvas(canvas.getContext("2d"), items, assets, "", "", format, "weekly");
 }
 
@@ -26966,7 +26983,8 @@ async function downloadCentralPost(kind) {
   if (button) button.disabled = true;
   try {
     if (kind === "weekly") await atualizarPreviaPostSemanal(); else await atualizarPreviaPostComercios();
-    baixarBlobCanvas(await canvasParaBlob(canvas), `${kind === "weekly" ? "resumo-semanal" : "comercios-ola-carlopolis"}-${state.postArtCentralFormat}.png`);
+    const formatKey = kind === "weekly" ? weeklyPostFormat().key : state.postArtCentralFormat;
+    baixarBlobCanvas(await canvasParaBlob(canvas), `${kind === "weekly" ? "resumo-semanal" : "comercios-ola-carlopolis"}-${formatKey}.png`);
     showToast("Arte pronta para postagem.");
   } catch (error) {
     console.error("Falha ao gerar arte da central de postagens.", error);
@@ -26984,13 +27002,8 @@ function weeklyPostFormatButtons() {
   return `<div class="post-art-format-toggle">${Object.values(WEEKLY_POST_FORMATS).map((item) => `<button type="button" data-central-post-format="${item.key}" class="${format.key === item.key ? "active" : ""}"><i class="${item.icon}"></i><strong>${item.nome}</strong><span>${item.descricao} • ${item.width} × ${item.height}</span></button>`).join("")}</div>`;
 }
 
-function bindCentralPostFormats(render) {
-  document.querySelectorAll("[data-central-post-format]").forEach((button) => button.addEventListener("click", () => { state.postArtCentralFormat = button.dataset.centralPostFormat; render(); }));
-}
-
-function weeklyPostThemeButtons() {
-  const active = weeklyPostTheme();
-  return `<div class="post-central-theme-label">Fundo e cores</div><div class="post-art-format-toggle post-central-theme-toggle">${Object.values(WEEKLY_POST_THEMES).map((theme) => `<button type="button" data-weekly-post-theme="${theme.key}" class="${active.key === theme.key ? "active" : ""}"><i class="fa-solid fa-palette"></i><strong>${theme.nome}</strong><span>${theme.descricao}</span></button>`).join("")}</div>`;
+function bindCentralPostFormats(render, stateKey = "postArtCentralFormat") {
+  document.querySelectorAll("[data-central-post-format]").forEach((button) => button.addEventListener("click", () => { state[stateKey] = button.dataset.centralPostFormat; render(); }));
 }
 
 function renderWeeklyPostView() {
@@ -26998,26 +27011,31 @@ function renderWeeklyPostView() {
   if (!mount) return;
   const items = weeklyPostItems();
   const itemLimit = weeklyPostLimit();
-  if (!state.weeklyPostSelectionReady) { state.weeklyPostSelectedIds = new Set(items.slice(0, itemLimit).map((item) => item.id)); state.weeklyPostSelectionReady = true; }
-  if (state.weeklyPostSelectedIds.size > itemLimit) state.weeklyPostSelectedIds = new Set([...state.weeklyPostSelectedIds].slice(0, itemLimit));
-  const selectedCount = items.filter((item) => state.weeklyPostSelectedIds.has(item.id)).length;
+  if (!state.weeklyPostSelectionReady) regenerateWeeklyPostSelection(items);
+  const availableIds = new Set(items.map((item) => String(item.id)));
+  state.weeklyPostSelectedIds = new Set([...state.weeklyPostSelectedIds].map(String).filter((id) => availableIds.has(id)));
+  if (state.weeklyPostSelectedIds.size > itemLimit) setWeeklyPostSelection(weeklyPostSelectedItems(items).slice(0, itemLimit));
+  const selectedItems = weeklyPostSelectedItems(items);
+  const selectedCount = selectedItems.length;
+  const displayItems = [...selectedItems, ...items.filter((item) => !state.weeklyPostSelectedIds.has(String(item.id)))];
   const format = weeklyPostFormat();
   mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
-    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, quantidade, formato e cores</strong><small>As novidades são lidas diretamente dos dados publicados.</small></div></div><div class="post-central-inline-fields"><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label><label class="post-central-field">Quantidade na arte<select id="weeklyPostMaxItems">${Array.from({ length: WEEKLY_POST_MAX_ITEMS - WEEKLY_POST_MIN_ITEMS + 1 }, (_, index) => WEEKLY_POST_MIN_ITEMS + index).map((amount) => `<option value="${amount}" ${itemLimit === amount ? "selected" : ""}>${amount} novidades</option>`).join("")}</select></label></div>${weeklyPostFormatButtons()}${weeklyPostThemeButtons()}</section>
-    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>2. Escolha as novidades</strong><p>Até ${itemLimit} itens • ${selectedCount} selecionado(s)</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list">${items.length ? items.map((item) => `<label class="post-central-data-card ${state.weeklyPostSelectedIds.has(item.id) ? "selected" : ""}"><input type="checkbox" data-weekly-post-id="${escapeAttr(item.id)}" ${state.weeklyPostSelectedIds.has(item.id) ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-newspaper"></i>`}</span><span><strong>${escapeHtml(weeklyPostItemTitle(item))}</strong><small>${escapeHtml(textoCurtoArte(weeklyPostItemDescription(item), 95))}</small><em>${escapeHtml(item.estabelecimento || "Olá Carlópolis")} • ${escapeHtml(centralPostDate(item.dataCriacao || item.createdAt))}</em></span></label>`).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período.</div>`}</div></section>
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, quantidade e formato</strong><small>Seleção automática com novidades reais, recentes e variadas.</small></div></div><div class="post-central-inline-fields"><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label><label class="post-central-field">Quantidade na arte<select id="weeklyPostMaxItems">${Array.from({ length: WEEKLY_POST_MAX_ITEMS - WEEKLY_POST_MIN_ITEMS + 1 }, (_, index) => WEEKLY_POST_MIN_ITEMS + index).map((amount) => `<option value="${amount}" ${itemLimit === amount ? "selected" : ""}>${amount} novidades</option>`).join("")}</select></label></div>${weeklyPostFormatButtons()}<div class="post-central-actions"><button id="weeklyPostRegenerate" type="button" class="primary-button"><i class="fa-solid fa-arrows-rotate"></i> Regenerar arte</button></div></section>
+    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>2. Escolha e ordene as novidades</strong><p>${selectedCount} de ${itemLimit} selecionada(s)${items.length < WEEKLY_POST_MIN_ITEMS ? " • layout adaptado aos registros disponíveis" : ""}</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list weekly-post-item-list">${displayItems.length ? displayItems.map((item) => { const id = String(item.id); const selected = state.weeklyPostSelectedIds.has(id); const position = state.weeklyPostSelectedOrder.indexOf(id); const fields = weeklyPostCardFields(item); return `<article class="post-central-data-card weekly-post-data-card ${selected ? "selected" : ""}" data-weekly-record-id="${escapeAttr(id)}" data-weekly-record-link="${escapeAttr(item.link || item.url || "")}"><label class="weekly-post-data-select"><input type="checkbox" data-weekly-post-id="${escapeAttr(id)}" ${selected ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-image"></i>`}</span><span class="weekly-post-data-copy"><strong>${escapeHtml(fields.title || fields.client || "Registro sem título")}</strong>${fields.change ? `<small>${escapeHtml(textoCurtoArte(fields.change, 95))}</small>` : ""}<em>${[fields.client, centralPostDate(item.dataCriacao || item.createdAt || item.updatedAt)].filter(Boolean).map(escapeHtml).join(" • ")}</em></span></label>${selected ? `<span class="weekly-post-order-actions"><button type="button" data-weekly-post-move="-1" data-weekly-post-order-id="${escapeAttr(id)}" ${position <= 0 ? "disabled" : ""} aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-weekly-post-move="1" data-weekly-post-order-id="${escapeAttr(id)}" ${position >= selectedCount - 1 ? "disabled" : ""} aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button></span>` : ""}</article>`; }).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período. A arte não cria dados de demonstração.</div>`}</div></section>
     </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<div class="post-art-canvas-shell weekly-post-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
   $("weeklyPostDays")?.addEventListener("change", (event) => { state.weeklyPostDays = Number(event.target.value); state.weeklyPostSelectionReady = false; renderWeeklyPostView(); });
   $("weeklyPostMaxItems")?.addEventListener("change", (event) => {
     state.weeklyPostMaxItems = Number(event.target.value);
     const nextLimit = weeklyPostLimit();
-    const selected = items.filter((item) => state.weeklyPostSelectedIds.has(item.id));
-    const additions = items.filter((item) => !state.weeklyPostSelectedIds.has(item.id));
-    state.weeklyPostSelectedIds = new Set([...selected, ...additions].slice(0, nextLimit).map((item) => item.id));
+    const selected = weeklyPostSelectedItems(items);
+    const additions = weeklyPostDiverseItems(items.filter((item) => !state.weeklyPostSelectedIds.has(String(item.id))), nextLimit - selected.length);
+    setWeeklyPostSelection([...selected, ...additions].slice(0, nextLimit));
     renderWeeklyPostView();
   });
-  bindCentralPostFormats(renderWeeklyPostView);
-  mount.querySelectorAll("[data-weekly-post-theme]").forEach((button) => button.addEventListener("click", () => { state.weeklyPostTheme = button.dataset.weeklyPostTheme; renderWeeklyPostView(); }));
-  mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = input.dataset.weeklyPostId; if (input.checked && state.weeklyPostSelectedIds.size >= itemLimit) { input.checked = false; return showToast(`Selecione no máximo ${itemLimit} novidades.`); } if (input.checked) state.weeklyPostSelectedIds.add(id); else state.weeklyPostSelectedIds.delete(id); renderWeeklyPostView(); }));
+  bindCentralPostFormats(renderWeeklyPostView, "weeklyPostFormatKey");
+  $("weeklyPostRegenerate")?.addEventListener("click", () => { regenerateWeeklyPostSelection(items); renderWeeklyPostView(); });
+  mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = String(input.dataset.weeklyPostId); if (input.checked && state.weeklyPostSelectedIds.size >= itemLimit) { input.checked = false; return showToast(`Selecione no máximo ${itemLimit} novidades.`); } if (input.checked) { state.weeklyPostSelectedIds.add(id); state.weeklyPostSelectedOrder.push(id); } else { state.weeklyPostSelectedIds.delete(id); state.weeklyPostSelectedOrder = state.weeklyPostSelectedOrder.filter((current) => current !== id); } renderWeeklyPostView(); }));
+  mount.querySelectorAll("[data-weekly-post-order-id]").forEach((button) => button.addEventListener("click", () => { state.weeklyPostSelectedOrder = weeklyPostMoveOrder(state.weeklyPostSelectedOrder, button.dataset.weeklyPostOrderId, Number(button.dataset.weeklyPostMove)); renderWeeklyPostView(); }));
   $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
   if (selectedCount) atualizarPreviaPostSemanal();
 }

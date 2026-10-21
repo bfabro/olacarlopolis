@@ -1,6 +1,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import {
+  WEEKLY_POST_MIN_ITEMS,
+  WEEKLY_POST_MAX_ITEMS,
+  weeklyPostCardFields,
+  weeklyPostDiverseItems,
+  weeklyPostGridLayout,
+  weeklyPostMoveOrder,
+  weeklyPostPages,
+  weeklyPostRecordReference,
+  weeklyPostStatusKind,
+  weeklyPostUniqueItems
+} from "../admin/weekly-post-layout.js";
 
 const panel = readFileSync(new URL("../admin/painel.js", import.meta.url), "utf8");
 const html = readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
@@ -15,98 +27,135 @@ test("central de postagens separa cada ideia em um fluxo próprio", () => {
   assert.match(panel, /renderCommercePostView/);
 });
 
-test("resumo semanal usa novidades reais com período e limite seguro", () => {
+test("resumo semanal usa novidades reais, deduplicadas e entre quatro e seis itens", () => {
+  assert.equal(WEEKLY_POST_MIN_ITEMS, 4);
+  assert.equal(WEEKLY_POST_MAX_ITEMS, 6);
   assert.match(panel, /getPanelSnapshot\("novidades"/);
   assert.match(panel, /function weeklyPostItems/);
+  assert.match(panel, /weeklyPostUniqueItems/);
   assert.match(panel, /Últimos 7 dias/);
   assert.match(panel, /Últimos 14 dias/);
   assert.match(panel, /Últimos 30 dias/);
-  assert.match(panel, /const CENTRAL_POST_MAX_ITEMS = 6/);
-  assert.match(panel, /const WEEKLY_POST_MIN_ITEMS = 1/);
-  assert.match(panel, /const WEEKLY_POST_MAX_ITEMS = 6/);
   assert.match(panel, /id="weeklyPostMaxItems"/);
-  assert.match(panel, /function weeklyPostLimit/);
   assert.match(panel, /weeklyPostSelectedIds\.size >= itemLimit/);
-  assert.match(panel, /\.slice\(0, weeklyPostLimit\(\)\)/);
+  const items = [
+    { id: "n1", destinoTipo: "imovel", itemId: "casa-1", dataCriacao: 300 },
+    { id: "n2", destinoTipo: "imovel", itemId: "casa-1", dataCriacao: 200 },
+    { id: "n3", destinoTipo: "promocao", itemId: "promo-1", dataCriacao: 100 }
+  ];
+  assert.deepEqual(weeklyPostUniqueItems(items).map((item) => item.id), ["n1", "n3"]);
 });
 
-test("vitrine permite seleção manual e aleatória de comércios reais", () => {
-  assert.match(panel, /function commercePostClients/);
-  assert.match(panel, /storyClientImages\(client\)/);
-  assert.match(panel, /function randomCommercePostSelection/);
-  assert.match(panel, /Math\.random\(\)/);
-  assert.match(panel, /data-commerce-post-id/);
-  assert.match(panel, /commercePostSelectedIds\.size >= CENTRAL_POST_MAX_ITEMS/);
+test("seleção automática prioriza diversidade e regeneração sem criar dados", () => {
+  const items = [
+    { id: "1", tipo: "imovel", dataCriacao: 600 },
+    { id: "2", tipo: "imovel", dataCriacao: 500 },
+    { id: "3", tipo: "promocao", dataCriacao: 400 },
+    { id: "4", tipo: "servico", dataCriacao: 300 },
+    { id: "5", tipo: "automovel", dataCriacao: 200 },
+    { id: "6", tipo: "comercio", dataCriacao: 100 }
+  ];
+  const first = weeklyPostDiverseItems(items, 4);
+  assert.equal(first.length, 4);
+  assert.equal(new Set(first.map((item) => item.tipo)).size, 4);
+  const regenerated = weeklyPostDiverseItems(items, 4, first.map((item) => item.id));
+  assert.equal(regenerated.length, 4);
+  assert.match(panel, /id="weeklyPostRegenerate"/);
+  assert.match(panel, /regenerateWeeklyPostSelection/);
+  assert.match(panel, /Nenhuma novidade publicada neste período\. A arte não cria dados de demonstração/);
 });
 
-test("artes oferecem Feed e Story, prévia e download PNG", () => {
-  assert.match(panel, /width: 1080, height: 1080/);
+test("ordem manual e referências preservam ids e links para paginação futura", () => {
+  assert.deepEqual(weeklyPostMoveOrder(["a", "b", "c"], "b", -1), ["b", "a", "c"]);
+  assert.deepEqual(weeklyPostMoveOrder(["a", "b", "c"], "b", 1), ["a", "c", "b"]);
+  assert.deepEqual(weeklyPostPages([1, 2, 3, 4, 5, 6, 7], 6), [[1, 2, 3, 4, 5, 6], [7]]);
+  assert.deepEqual(weeklyPostRecordReference({ id: "n1", link: "/item", destinoTipo: "imovel", destinoId: "c1", itemId: "i1", dataCriacao: 123 }), {
+    id: "n1", recordKey: "imovel:i1", link: "/item", destinationType: "imovel", destinationId: "c1", itemId: "i1", timestamp: 123
+  });
+  assert.match(panel, /data-weekly-post-order-id/);
+  assert.match(panel, /canvas\.dataset\.recordRefs/);
+  assert.match(panel, /canvas\.dataset\.pageCount/);
+});
+
+test("layouts de story e feed se adaptam a quatro, cinco e seis cards", () => {
+  for (const count of [4, 5, 6]) {
+    const story = weeklyPostGridLayout({ key: "reels", width: 1080, height: 1920 }, count);
+    const feed = weeklyPostGridLayout({ key: "feed", width: 1080, height: 1350 }, count);
+    assert.equal(story.columns, 2);
+    assert.equal(feed.columns, 2);
+    assert.equal(story.rows, Math.ceil(count / 2));
+    assert.equal(feed.rows, Math.ceil(count / 2));
+    assert.ok(story.cardWidth > 450 && story.cardHeight > 300);
+    assert.ok(feed.cardWidth > 450 && feed.cardHeight > 280);
+    assert.ok(story.ctaY + story.ctaHeight <= 1920 - 250, "CTA respeita a área segura inferior do Story");
+  }
+  assert.match(panel, /const isLastCentered = count % 2 === 1/);
+});
+
+test("campos ausentes e duplicados são omitidos sem inventar informações", () => {
+  assert.deepEqual(weeklyPostCardFields({ estabelecimento: "Loja Real", tituloConteudo: "Produto X", acao: "Fotos atualizadas" }), {
+    client: "Loja Real", title: "Produto X", change: "Fotos atualizadas"
+  });
+  assert.deepEqual(weeklyPostCardFields({ tituloConteudo: "Serviço Y" }), { client: "", title: "Serviço Y", change: "" });
+  assert.deepEqual(weeklyPostCardFields({ estabelecimento: "Casa Azul", tituloConteudo: "Casa Azul", acao: "Casa Azul" }), {
+    client: "", title: "Casa Azul", change: ""
+  });
+  assert.equal(weeklyPostStatusKind({ acao: "Imóvel inserido" }), "new");
+  assert.equal(weeklyPostStatusKind({ acao: "Fotos atualizadas" }), "updated");
+  assert.doesNotMatch(panel, /item\.estabelecimento \|\| "Olá Carlópolis"/);
+});
+
+test("arte usa a identidade oficial, foto real e tipografia sem contorno pesado", () => {
+  assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/img_padrao_site\/logo_1\.png"\)/);
+  assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
+  assert.match(panel, /"NOVIDADES NO"/);
+  assert.match(panel, /"OLÁ CARLÓPOLIS"/);
+  assert.match(panel, /navy: "#092B45"/);
+  assert.match(panel, /accent: "#FFBB2D"/);
+  assert.match(panel, /white: "#FFFFFF"/);
+  assert.doesNotMatch(panel, /strokeText\("NOVIDADES/);
+  assert.match(panel, /const logoX = format\.width - logoSize/);
+  assert.match(panel, /drawWeeklyLogoTransparent\(ctx, assets\.siteLogo/);
+  assert.match(panel, /desenharImagemCover\(ctx, assets\.headerImage/);
+});
+
+test("cards mantêm selo fora da foto, enquadramento inteligente e textos ajustáveis", () => {
+  assert.match(panel, /ctx\.fillText\(status\.label/);
+  assert.match(panel, /const imageY = y \+ badgeH/);
+  assert.match(panel, /ctx\.imageSmoothingQuality = "high"/);
+  assert.match(panel, /const focusX = Math\.max/);
+  assert.match(panel, /ctx\.drawImage\(image, sourceX, sourceY, sourceWidth, sourceHeight/);
+  assert.match(panel, /function weeklyPostDrawFittedText/);
+  assert.match(panel, /lines = lines\.slice\(0, maxLines\)/);
+  assert.match(panel, /fields\.client/);
+  assert.match(panel, /fields\.title/);
+  assert.match(panel, /fields\.change/);
+  assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
+});
+
+test("prévia e PNG usam o mesmo canvas nos formatos 1080 por 1920 e 1080 por 1350", () => {
+  assert.match(panel, /weeklyPostFormatKey: "reels"/);
   assert.match(panel, /width: 1080, height: 1920/);
   assert.match(panel, /Feed 4:5/);
   assert.match(panel, /width: 1080, height: 1350/);
   assert.match(panel, /weeklyPostCanvas/);
-  assert.match(panel, /commercePostCanvas/);
-  assert.match(panel, /canvasParaBlob/);
+  assert.match(panel, /await atualizarPreviaPostSemanal\(\)/);
+  assert.match(panel, /canvasParaBlob\(canvas\)/);
   assert.match(panel, /baixarBlobCanvas/);
-  assert.match(css, /\.post-central-generator/);
-  assert.match(css, /@media \(max-width: 680px\)/);
-});
-
-test("novidades da semana seguem o modelo editorial e levam a logo ao topo direito", () => {
-  assert.match(panel, /function drawWeeklyPostHeader/);
-  assert.match(panel, /function drawWeeklyLogoTransparent/);
-  assert.match(panel, /ctx\.strokeText\("NOVIDADES NO"/);
-  assert.match(panel, /ctx\.strokeText\("OLACARLOPOLIS"/);
-  assert.match(panel, /const logoX = format\.width - logoSize/);
-  assert.match(panel, /const logoSize = vertical \? 244 : 184/);
-  assert.match(panel, /const logoY = vertical \? 36 : 24/);
-  assert.match(panel, /drawWeeklyLogoTransparent\(ctx, assets\.siteLogo, logoX, logoY/);
-  assert.doesNotMatch(panel, /preencherRoundRect\(ctx, logoX - 8/);
-  assert.match(panel, /ctx\.lineWidth = vertical \? 12 : 9/);
-  assert.doesNotMatch(panel, /id="weeklyPostSubtitle"/);
-  assert.doesNotMatch(panel, /id="weeklyPostTitle"/);
-  assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
-  assert.match(panel, /desenharImagemCover\(ctx, assets\.headerImage, 0, 0, format\.width, headerH\)/);
-  assert.match(panel, /function drawWeeklyClientImage/);
-  assert.match(panel, /ctx\.imageSmoothingQuality = "high"/);
-  assert.match(panel, /desenharImagemCover\(ctx, image, x, y, width, height, radius\)/);
-  assert.match(panel, /const columns = count === 1 \? 1 : 2/);
-  assert.match(panel, /const isLastCentered = count % 2 === 1/);
-  assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemTitle\(item\)/);
-  assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemDescription\(item\)/);
-  assert.match(panel, /return item\.acao \|\| item\.descricao/);
-  assert.match(panel, /function weeklyPostStatus/);
-  assert.match(panel, /label: "Novo"/);
-  assert.match(panel, /label: "Atualizado"/);
-  assert.match(panel, /Acesse agora/);
-  assert.doesNotMatch(panel, /PORTAL LOCAL/);
-  assert.doesNotMatch(panel, /preencherRoundRect\(ctx, 58, vertical \? 334 : 226/);
-  assert.match(panel, /const footerGradient = ctx\.createLinearGradient/);
-  assert.match(panel, /www\.olacarlopolis\.com/);
-  assert.match(panel, /Confira muito mais acessando: /);
-  assert.doesNotMatch(panel, /function drawWeeklyPostCategories/);
-  assert.doesNotMatch(panel, /function weeklyPostClient/);
-  assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
-  assert.doesNotMatch(panel, /const arrowSize =/);
-  assert.match(panel, /align: "center"/);
   assert.match(css, /\.weekly-post-canvas-shell\.is-feed canvas/);
+  assert.match(css, /\.post-art-canvas-shell\.is-reels canvas/);
 });
 
-test("novidades oferecem dois fundos suaves com paletas próprias", () => {
-  assert.match(panel, /const WEEKLY_POST_THEMES =/);
-  assert.match(panel, /sereno:/);
-  assert.match(panel, /claro:/);
-  assert.doesNotMatch(panel, /entardecer:/);
-  assert.match(panel, /data-weekly-post-theme/);
-  assert.match(panel, /Fundo e cores/);
-  assert.match(panel, /theme\.bodyStart/);
-  assert.match(panel, /theme\.footerStart/);
-  assert.match(css, /\.post-central-theme-toggle/);
+test("rodapé apresenta um único CTA textual sem botão falso", () => {
+  assert.match(panel, /Veja todas as novidades em /);
+  assert.match(panel, /www\.olacarlopolis\.com/);
+  assert.doesNotMatch(panel, /Acesse agora/);
+  assert.doesNotMatch(panel, /drawWeeklyPostAccessLine/);
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=602/);
-  assert.match(html, /painel\.js\?v=904/);
-  assert.match(panel, /numero: 897/);
-  assert.match(panel, /label: "v904"/);
+  assert.match(html, /painel\.css\?v=603/);
+  assert.match(html, /painel\.js\?v=905/);
+  assert.match(panel, /numero: 898/);
+  assert.match(panel, /label: "v905"/);
 });
