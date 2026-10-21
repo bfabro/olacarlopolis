@@ -11738,6 +11738,8 @@ button.admin-button-loading::after {
 .post-central-controls { display: grid; gap: 16px; min-width: 0; }
 .post-central-field { display: grid; gap: 6px; margin-bottom: 14px; color: #475569; font-size: 12px; font-weight: 800; }
 .post-central-field select { width: 100%; min-height: 44px; }
+.post-central-inline-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.post-central-inline-fields .post-central-field { margin-bottom: 14px; }
 .post-central-actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
 .post-central-actions button { min-height: 42px; padding: 0 14px; border-radius: 11px; font-weight: 800; }
 .post-central-search { position: relative; display: block; margin: 12px 0; }
@@ -12163,6 +12165,7 @@ button.admin-button-loading::after {
   .post-central-tabs { grid-template-columns: 1fr; gap: 8px; }
   .post-central-tabs > button { min-height: 80px; }
   .post-central-generator, .post-central-controls { gap: 12px; }
+  .post-central-inline-fields { grid-template-columns: 1fr; gap: 0; }
   .post-central-data-card { grid-template-columns: auto 58px minmax(0, 1fr); gap: 9px; }
   .post-central-data-image { width: 58px; height: 54px; }
   .post-art-workspace { gap: 12px; margin-top: 12px; }

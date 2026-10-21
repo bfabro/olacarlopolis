@@ -139,10 +139,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 893,
-  label: "v900",
+  numero: 894,
+  label: "v901",
   data: "2026-10-20",
-  nota: "Imagens das novidades passam a usar moldura uniforme, exibição completa e fundo derivado da própria imagem."
+  nota: "Novidades da semana permitem escolher de 4 a 10 itens, ajustam a grade automaticamente e oferecem temas mais suaves."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -383,6 +383,7 @@ let state = {
   postArtCentralMode: "catalogo",
   postArtCentralFormat: "feed",
   weeklyPostDays: 7,
+  weeklyPostMaxItems: 4,
   weeklyPostTheme: "sereno",
   weeklyPostTitle: "Novidades da semana",
   weeklyPostSubtitle: "Tudo o que movimentou Carlópolis em um só lugar",
@@ -26579,10 +26580,11 @@ function renderPostArtCatalogView() {
 }
 
 const CENTRAL_POST_MAX_ITEMS = 6;
-const WEEKLY_POST_MAX_ITEMS = 4;
+const WEEKLY_POST_MIN_ITEMS = 4;
+const WEEKLY_POST_MAX_ITEMS = 10;
 const WEEKLY_POST_THEMES = {
-  sereno: { key: "sereno", nome: "Sereno", descricao: "Verde-azulado suave", bodyStart: "#e6efed", bodyEnd: "#cedfdd", card: "#164c57", border: "#5f9ea2", text: "#17353b", accent: "#e5ad35", footerStart: "#123d49", footerEnd: "#0b2d38", shade: "rgba(10,57,72,.64)" },
-  entardecer: { key: "entardecer", nome: "Entardecer", descricao: "Areia e terracota", bodyStart: "#f5ead9", bodyEnd: "#e6d1b5", card: "#654235", border: "#be8769", text: "#44332d", accent: "#eead35", footerStart: "#493229", footerEnd: "#2f2421", shade: "rgba(74,43,34,.56)" }
+  sereno: { key: "sereno", nome: "Sereno", descricao: "Verde-azulado suave", bodyStart: "#e6efed", bodyEnd: "#cedfdd", card: "#164c57", surface: "#f8fbfa", border: "#5f9ea2", text: "#17353b", subtext: "#526c70", accent: "#e5ad35", footerStart: "#123d49", footerEnd: "#0b2d38", shade: "rgba(10,57,72,.64)" },
+  claro: { key: "claro", nome: "Claro", descricao: "Neutro e elegante", bodyStart: "#f7f4ee", bodyEnd: "#e8e2d8", card: "#3f4c52", surface: "#fffdf8", border: "#a8b0ad", text: "#293237", subtext: "#667177", accent: "#dda72d", footerStart: "#3b474c", footerEnd: "#252d31", shade: "rgba(38,49,55,.52)" }
 };
 let centralPostPreviewRequest = 0;
 let centralPostPreviewTimer = null;
@@ -26593,6 +26595,10 @@ function centralPostFormat() {
 
 function weeklyPostTheme() {
   return WEEKLY_POST_THEMES[state.weeklyPostTheme] || WEEKLY_POST_THEMES.sereno;
+}
+
+function weeklyPostLimit() {
+  return Math.max(WEEKLY_POST_MIN_ITEMS, Math.min(WEEKLY_POST_MAX_ITEMS, Number(state.weeklyPostMaxItems) || WEEKLY_POST_MIN_ITEMS));
 }
 
 function centralPostImage(item = {}) {
@@ -26753,19 +26759,24 @@ function drawWeeklyPostHeader(ctx, assets, title, subtitle, format, theme) {
     postArtDrawText(ctx, title, 58, titleY, titleWidth, 2, titleSize, "#ffffff", { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
     ctx.restore();
   }
-  preencherRoundRect(ctx, 58, vertical ? 334 : 226, vertical ? 610 : 435, vertical ? 12 : 9, 7, theme.accent);
   postArtDrawText(ctx, subtitle, 58, vertical ? 374 : 249, vertical ? 700 : 600, 2, vertical ? 31 : 22, "#ffffff", { min: 18, weight: 800, lineHeight: vertical ? 37 : 27 });
 }
 
 function drawWeeklyPostCards(ctx, items, assets, format, theme) {
   const vertical = format.key === "reels";
-  const columns = items.length === 1 ? 1 : 2;
-  const gap = vertical ? 20 : 13;
-  const startY = vertical ? 540 : 316;
+  const count = Math.max(1, items.length);
+  const columns = vertical
+    ? (count >= 9 ? 3 : (count === 1 ? 1 : 2))
+    : (count <= 4 ? (count === 1 ? 1 : 2) : count <= 6 ? 3 : 4);
+  const gap = vertical ? (count >= 9 ? 14 : 18) : (columns >= 4 ? 10 : 13);
+  const startY = vertical ? 520 : 306;
   const footerSpace = vertical ? 270 : 146;
-  const rows = Math.ceil(items.length / columns);
+  const rows = Math.ceil(count / columns);
   const cardW = (format.width - 48 - gap * (columns - 1)) / columns;
-  const cardH = Math.min(vertical ? 510 : 300, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
+  const cardH = (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows);
+  const compact = vertical ? rows >= 4 || columns >= 3 : columns >= 4;
+  const barH = vertical ? (compact ? 58 : 76) : (compact ? 44 : 58);
+  const descriptionH = vertical ? (compact ? 54 : 72) : (compact ? 58 : 68);
   items.forEach((item, index) => {
     const col = index % columns;
     const row = Math.floor(index / columns);
@@ -26775,30 +26786,37 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
     ctx.shadowColor = "rgba(0,17,49,.5)";
     ctx.shadowBlur = vertical ? 14 : 8;
     ctx.shadowOffsetY = 5;
-    preencherRoundRect(ctx, x, y, cardW, cardH - (vertical ? 55 : 38), 24, theme.card);
+    preencherRoundRect(ctx, x, y, cardW, cardH, compact ? 16 : 24, theme.surface);
     ctx.restore();
-    const barH = vertical ? 90 : 58;
-    const descriptionH = vertical ? 55 : 38;
     const imageH = cardH - barH - descriptionH;
     const status = weeklyPostStatus(item);
-    const badgeW = status.label === "Novo" ? (vertical ? 138 : 88) : (vertical ? 188 : 120);
-    preencherRoundRect(ctx, x + 10, y + 12, badgeW, vertical ? 48 : 30, 24, status.color);
+    preencherRoundRect(ctx, x, y, cardW, barH, compact ? 16 : 24, theme.card);
+    const statusText = compact && status.label === "Atualizado" ? "Atual." : status.label;
+    const badgeW = statusText === "Novo" ? (vertical ? 112 : (compact ? 58 : 88)) : (vertical ? 144 : (compact ? 70 : 120));
+    const badgeH = vertical ? (compact ? 34 : 42) : (compact ? 26 : 30);
+    preencherRoundRect(ctx, x + (compact ? 7 : 10), y + (barH - badgeH) / 2, badgeW, badgeH, badgeH / 2, status.color);
     ctx.fillStyle = "#ffffff";
-    ctx.font = `900 ${vertical ? 23 : 14}px Arial`;
+    ctx.font = `900 ${vertical ? (compact ? 16 : 20) : (compact ? 11 : 14)}px Arial`;
     ctx.textAlign = "left";
-    ctx.fillText(`${status.symbol}  ${status.label}`, x + 22, y + (vertical ? 43 : 32));
-    const metaX = x + badgeW + (vertical ? 30 : 22);
-    ctx.strokeStyle = "rgba(255,255,255,.65)"; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.moveTo(metaX - (vertical ? 14 : 10), y + 12); ctx.lineTo(metaX - (vertical ? 14 : 10), y + (vertical ? 63 : 43)); ctx.stroke();
-    ctx.fillStyle = "#ffffff";
-    postArtDrawText(ctx, item.estabelecimento || "Olá Carlópolis", metaX, y + (vertical ? 20 : 14), cardW - (metaX - x) - 14, 1, vertical ? 19 : 12, "#ffffff", { min: vertical ? 14 : 9, weight: 800, lineHeight: vertical ? 21 : 14 });
-    postArtDrawText(ctx, weeklyPostItemTitle(item), metaX, y + (vertical ? 40 : 27), cardW - (metaX - x) - 14, 2, vertical ? 22 : 14, theme.accent, { min: vertical ? 13 : 8, weight: 900, lineHeight: vertical ? 23 : 14 });
-    drawWeeklyClientImage(ctx, assets.images[index], x + 3, y + barH, cardW - 6, imageH, 18);
+    ctx.fillText(`${status.symbol} ${statusText}`, x + (compact ? 13 : 22), y + barH / 2 + (vertical ? (compact ? 6 : 7) : 5));
+    const metaX = x + badgeW + (vertical ? 24 : (compact ? 14 : 22));
+    postArtDrawText(ctx, item.estabelecimento || "Olá Carlópolis", metaX, y + barH / 2 - (vertical ? (compact ? 8 : 10) : (compact ? 6 : 7)), cardW - (metaX - x) - 10, 2, vertical ? (compact ? 15 : 18) : (compact ? 10 : 12), "#ffffff", { min: vertical ? 11 : 8, weight: 800, lineHeight: vertical ? 17 : 12 });
+    drawWeeklyClientImage(ctx, assets.images[index], x + 3, y + barH, cardW - 6, imageH, compact ? 10 : 16);
     ctx.strokeStyle = theme.border;
-    ctx.lineWidth = 3;
-    canvasRoundRect(ctx, x + 2, y + barH - 1, cardW - 4, imageH + 2, 18);
+    ctx.lineWidth = compact ? 2 : 3;
+    canvasRoundRect(ctx, x + 2, y + barH - 1, cardW - 4, imageH + 2, compact ? 10 : 16);
     ctx.stroke();
-    postArtDrawText(ctx, weeklyPostItemDescription(item), x + 16, y + cardH - descriptionH + (vertical ? 8 : 6), cardW - 32, 2, vertical ? 18 : 12, theme.text, { min: vertical ? 14 : 9, weight: 650, lineHeight: vertical ? 21 : 14 });
+    const textX = x + (compact ? 10 : 16);
+    const textWidth = cardW - (compact ? 20 : 32);
+    const textY = y + cardH - descriptionH + (compact ? 8 : 10);
+    postArtDrawText(ctx, weeklyPostItemTitle(item), textX, textY, textWidth, 2, vertical ? (compact ? 17 : 21) : (compact ? 13 : 16), theme.text, { min: vertical ? 12 : 9, weight: 900, lineHeight: vertical ? (compact ? 18 : 23) : (compact ? 14 : 18) });
+    if (!compact && descriptionH >= 68) {
+      postArtDrawText(ctx, weeklyPostItemDescription(item), textX, textY + (vertical ? 27 : 22), textWidth, 1, vertical ? 15 : 11, theme.subtext, { min: vertical ? 12 : 9, weight: 650, lineHeight: vertical ? 17 : 13 });
+    }
+    ctx.strokeStyle = theme.border;
+    ctx.lineWidth = 2;
+    canvasRoundRect(ctx, x, y, cardW, cardH, compact ? 16 : 24);
+    ctx.stroke();
   });
 }
 
@@ -26818,14 +26836,11 @@ function drawWeeklyPostFooter(ctx, format, theme) {
   ctx.shadowOffsetY = 7;
   preencherRoundRect(ctx, boxX, boxY, boxW, boxH, 34, footerGradient);
   ctx.restore();
-  preencherRoundRect(ctx, boxX + 26, boxY + 18, vertical ? 132 : 94, vertical ? 25 : 16, 12, theme.accent);
   ctx.textAlign = "left";
-  ctx.fillStyle = "#082b60";
-  ctx.font = `900 ${vertical ? 13 : 9}px Arial`;
-  ctx.fillText("PORTAL LOCAL", boxX + (vertical ? 43 : 38), boxY + (vertical ? 36 : 30));
+  preencherRoundRect(ctx, boxX + 30, boxY + (vertical ? 31 : 19), vertical ? 92 : 64, vertical ? 8 : 5, 4, theme.accent);
   ctx.fillStyle = "#ffffff";
   ctx.font = `900 ${vertical ? 31 : 22}px Arial`;
-  ctx.fillText("OLÁ CARLÓPOLIS", boxX + 32, boxY + (vertical ? 82 : 51));
+  ctx.fillText("OLÁ CARLÓPOLIS", boxX + 32, boxY + (vertical ? 82 : 50));
   ctx.fillStyle = "#9bdcff";
   ctx.font = `700 ${vertical ? 18 : 13}px Arial`;
   ctx.fillText("Informação e comércio local em um só lugar", boxX + 32, boxY + (vertical ? 112 : 72));
@@ -26890,7 +26905,7 @@ async function atualizarPreviaPostSemanal() {
   if (!canvas) return;
   const request = ++centralPostPreviewRequest;
   const format = centralPostFormat();
-  const items = weeklyPostItems().filter((item) => state.weeklyPostSelectedIds.has(item.id)).slice(0, WEEKLY_POST_MAX_ITEMS);
+  const items = weeklyPostItems().filter((item) => state.weeklyPostSelectedIds.has(item.id)).slice(0, weeklyPostLimit());
   canvas.width = format.width; canvas.height = format.height;
   const assets = await centralPostAssets(items, centralPostImage);
   if (request !== centralPostPreviewRequest || !$("weeklyPostCanvas")) return;
@@ -26944,20 +26959,29 @@ function renderWeeklyPostView() {
   const mount = $("postArtCentralContent");
   if (!mount) return;
   const items = weeklyPostItems();
-  if (!state.weeklyPostSelectionReady) { state.weeklyPostSelectedIds = new Set(items.slice(0, 4).map((item) => item.id)); state.weeklyPostSelectionReady = true; }
-  if (state.weeklyPostSelectedIds.size > WEEKLY_POST_MAX_ITEMS) state.weeklyPostSelectedIds = new Set([...state.weeklyPostSelectedIds].slice(0, WEEKLY_POST_MAX_ITEMS));
+  const itemLimit = weeklyPostLimit();
+  if (!state.weeklyPostSelectionReady) { state.weeklyPostSelectedIds = new Set(items.slice(0, itemLimit).map((item) => item.id)); state.weeklyPostSelectionReady = true; }
+  if (state.weeklyPostSelectedIds.size > itemLimit) state.weeklyPostSelectedIds = new Set([...state.weeklyPostSelectedIds].slice(0, itemLimit));
   const selectedCount = items.filter((item) => state.weeklyPostSelectedIds.has(item.id)).length;
   const format = centralPostFormat();
   mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
-    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, formato e cores</strong><small>As novidades são lidas diretamente dos dados publicados.</small></div></div><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label>${centralPostFormatButtons()}${weeklyPostThemeButtons()}</section>
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, quantidade, formato e cores</strong><small>As novidades são lidas diretamente dos dados publicados.</small></div></div><div class="post-central-inline-fields"><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label><label class="post-central-field">Quantidade na arte<select id="weeklyPostMaxItems">${Array.from({ length: WEEKLY_POST_MAX_ITEMS - WEEKLY_POST_MIN_ITEMS + 1 }, (_, index) => WEEKLY_POST_MIN_ITEMS + index).map((amount) => `<option value="${amount}" ${itemLimit === amount ? "selected" : ""}>Até ${amount} novidades</option>`).join("")}</select></label></div>${centralPostFormatButtons()}${weeklyPostThemeButtons()}</section>
     <section class="panel-card post-art-step"><div class="post-art-step-title"><span>2</span><div><strong>Textos da arte</strong><small>Ajuste a chamada sem alterar as notícias cadastradas.</small></div></div><div class="post-art-fields"><label class="wide">Título<input id="weeklyPostTitle" maxlength="72" value="${escapeAttr(state.weeklyPostTitle)}"></label><label class="wide">Subtítulo<textarea id="weeklyPostSubtitle" maxlength="140" rows="2">${escapeHtml(state.weeklyPostSubtitle)}</textarea></label></div></section>
-    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>3. Escolha as novidades</strong><p>Até ${WEEKLY_POST_MAX_ITEMS} itens • ${selectedCount} selecionado(s)</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list">${items.length ? items.map((item) => `<label class="post-central-data-card ${state.weeklyPostSelectedIds.has(item.id) ? "selected" : ""}"><input type="checkbox" data-weekly-post-id="${escapeAttr(item.id)}" ${state.weeklyPostSelectedIds.has(item.id) ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-newspaper"></i>`}</span><span><strong>${escapeHtml(weeklyPostItemTitle(item))}</strong><small>${escapeHtml(textoCurtoArte(weeklyPostItemDescription(item), 95))}</small><em>${escapeHtml(item.estabelecimento || "Olá Carlópolis")} • ${escapeHtml(centralPostDate(item.dataCriacao || item.createdAt))}</em></span></label>`).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período.</div>`}</div></section>
+    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>3. Escolha as novidades</strong><p>Até ${itemLimit} itens • ${selectedCount} selecionado(s)</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list">${items.length ? items.map((item) => `<label class="post-central-data-card ${state.weeklyPostSelectedIds.has(item.id) ? "selected" : ""}"><input type="checkbox" data-weekly-post-id="${escapeAttr(item.id)}" ${state.weeklyPostSelectedIds.has(item.id) ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-newspaper"></i>`}</span><span><strong>${escapeHtml(weeklyPostItemTitle(item))}</strong><small>${escapeHtml(textoCurtoArte(weeklyPostItemDescription(item), 95))}</small><em>${escapeHtml(item.estabelecimento || "Olá Carlópolis")} • ${escapeHtml(centralPostDate(item.dataCriacao || item.createdAt))}</em></span></label>`).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período.</div>`}</div></section>
     </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<div class="post-art-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
   $("weeklyPostDays")?.addEventListener("change", (event) => { state.weeklyPostDays = Number(event.target.value); state.weeklyPostSelectionReady = false; renderWeeklyPostView(); });
+  $("weeklyPostMaxItems")?.addEventListener("change", (event) => {
+    state.weeklyPostMaxItems = Number(event.target.value);
+    const nextLimit = weeklyPostLimit();
+    const selected = items.filter((item) => state.weeklyPostSelectedIds.has(item.id));
+    const additions = items.filter((item) => !state.weeklyPostSelectedIds.has(item.id));
+    state.weeklyPostSelectedIds = new Set([...selected, ...additions].slice(0, nextLimit).map((item) => item.id));
+    renderWeeklyPostView();
+  });
   bindCentralPostFormats(renderWeeklyPostView);
   mount.querySelectorAll("[data-weekly-post-theme]").forEach((button) => button.addEventListener("click", () => { state.weeklyPostTheme = button.dataset.weeklyPostTheme; renderWeeklyPostView(); }));
   [["weeklyPostTitle", "weeklyPostTitle"], ["weeklyPostSubtitle", "weeklyPostSubtitle"]].forEach(([id, key]) => $(id)?.addEventListener("input", (event) => { state[key] = event.target.value; centralPostSchedulePreview("weekly"); }));
-  mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = input.dataset.weeklyPostId; if (input.checked && state.weeklyPostSelectedIds.size >= WEEKLY_POST_MAX_ITEMS) { input.checked = false; return showToast(`Selecione no máximo ${WEEKLY_POST_MAX_ITEMS} novidades.`); } if (input.checked) state.weeklyPostSelectedIds.add(id); else state.weeklyPostSelectedIds.delete(id); renderWeeklyPostView(); }));
+  mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = input.dataset.weeklyPostId; if (input.checked && state.weeklyPostSelectedIds.size >= itemLimit) { input.checked = false; return showToast(`Selecione no máximo ${itemLimit} novidades.`); } if (input.checked) state.weeklyPostSelectedIds.add(id); else state.weeklyPostSelectedIds.delete(id); renderWeeklyPostView(); }));
   $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
   if (selectedCount) atualizarPreviaPostSemanal();
 }
