@@ -127,19 +127,20 @@ import {
 import {
   WEEKLY_POST_MIN_ITEMS,
   WEEKLY_POST_MAX_ITEMS,
-  WEEKLY_POST_TITLE_SCALE_MAX,
-  WEEKLY_POST_TITLE_SCALE_MIN,
+  WEEKLY_POST_DEFAULT_HEADER_TITLE,
+  WEEKLY_POST_FONT_SCALE_MAX,
+  WEEKLY_POST_FONT_SCALE_MIN,
   weeklyPostCardFields,
   weeklyPostDiverseItems,
-  weeklyPostEditableTitle,
+  weeklyPostFontScale,
   weeklyPostGridLayout,
+  weeklyPostHeaderLines,
   weeklyPostMoveOrder,
   weeklyPostPages,
   weeklyPostRecordReference,
   weeklyPostStatusKind,
-  weeklyPostTitleScale,
   weeklyPostUniqueItems
-} from "./weekly-post-layout.js?v=2";
+} from "./weekly-post-layout.js?v=3";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -155,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 899,
-  label: "v906",
+  numero: 900,
+  label: "v907",
   data: "2026-10-21",
-  nota: "Resumo de novidades com títulos editáveis, tamanho individual ajustável e destaque visual reforçado nos cards."
+  nota: "Resumo de novidades com cabeçalho editável, fontes globais padronizadas e grade otimizada para seis cards."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -403,8 +404,10 @@ let state = {
   weeklyPostMaxItems: 4,
   weeklyPostSelectedIds: new Set(),
   weeklyPostSelectedOrder: [],
-  weeklyPostTitleOverrides: {},
-  weeklyPostTitleScales: {},
+  weeklyPostHeaderTitle: WEEKLY_POST_DEFAULT_HEADER_TITLE,
+  weeklyPostHeaderTitleScale: 100,
+  weeklyPostCardTitleScale: 100,
+  weeklyPostCardDescriptionScale: 100,
   weeklyPostLastGeneratedIds: [],
   weeklyPostSelectionReady: false,
   commercePostSelectedIds: new Set(),
@@ -26646,23 +26649,12 @@ function weeklyPostItems() {
     .filter((item) => item && item.ativo !== false && Number(item.dataCriacao || item.createdAt || item.updatedAt || 0) >= limit));
 }
 
-function weeklyPostItemTitle(item = {}) {
-  return weeklyPostEditableTitle(item, state.weeklyPostTitleOverrides);
-}
-
 function weeklyPostArtFields(item = {}) {
-  const fields = weeklyPostCardFields(item);
-  const title = weeklyPostItemTitle(item);
-  const normalizedTitle = normalizeName(title);
-  return {
-    client: normalizeName(fields.client) === normalizedTitle ? "" : fields.client,
-    title,
-    change: normalizeName(fields.change) === normalizedTitle ? "" : fields.change
-  };
+  return weeklyPostCardFields(item);
 }
 
-function weeklyPostItemTitleScale(item = {}) {
-  return weeklyPostTitleScale(state.weeklyPostTitleScales[String(item.id)] ?? 100);
+function weeklyPostGlobalScale(stateKey) {
+  return weeklyPostFontScale(state[stateKey] ?? 100);
 }
 
 function weeklyPostSelectedItems(items = weeklyPostItems()) {
@@ -26848,8 +26840,14 @@ function drawWeeklyPostHeader(ctx, assets, format, theme, layout) {
   ctx.shadowOffsetY = 3;
   const x = story ? 58 : 50;
   const maxTitleWidth = logoX - x - (story ? 20 : 16);
-  weeklyPostDrawFittedText(ctx, "NOVIDADES NO", x, story ? 132 : 78, maxTitleWidth, 1, story ? 54 : 41, { minimum: story ? 45 : 34, weight: 900, color: theme.white });
-  weeklyPostDrawFittedText(ctx, "OLÁ CARLÓPOLIS", x, story ? 194 : 124, maxTitleWidth, 1, story ? 64 : 50, { minimum: story ? 50 : 39, weight: 900, color: theme.accent });
+  const titleLines = weeklyPostHeaderLines(state.weeklyPostHeaderTitle);
+  const titleScale = weeklyPostGlobalScale("weeklyPostHeaderTitleScale") / 100;
+  const titleSize = Math.round((story ? 58 : 44) * titleScale);
+  let titleY = story ? 112 : 60;
+  titleLines.slice(0, 2).forEach((line, index) => {
+    const lineHeight = weeklyPostDrawFittedText(ctx, line.toUpperCase(), x, titleY, maxTitleWidth, 1, index ? Math.round(titleSize * 1.08) : titleSize, { minimum: story ? 36 : 28, weight: 900, color: index ? theme.accent : theme.white, lineHeight: 1.02 });
+    titleY += lineHeight + (story ? 6 : 4);
+  });
   ctx.restore();
   ctx.fillStyle = theme.accent;
   ctx.fillRect(story ? 58 : 50, headerHeight - (story ? 29 : 22), story ? 118 : 90, story ? 6 : 5);
@@ -26857,7 +26855,9 @@ function drawWeeklyPostHeader(ctx, assets, format, theme, layout) {
 
 function drawWeeklyPostCards(ctx, items, assets, format, theme) {
   const layout = weeklyPostGridLayout(format, items.length);
-  const { story, count, columns, rows, margin, gap, cardWidth: cardW, cardHeight: cardH } = layout;
+  const { story, dense, count, columns, rows, margin, gap, cardWidth: cardW, cardHeight: cardH } = layout;
+  const cardTitleScale = weeklyPostGlobalScale("weeklyPostCardTitleScale") / 100;
+  const cardDescriptionScale = weeklyPostGlobalScale("weeklyPostCardDescriptionScale") / 100;
   items.forEach((item, index) => {
     const isLastCentered = count % 2 === 1 && index === count - 1;
     const col = index % columns;
@@ -26882,7 +26882,7 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
 
     const hasImage = Boolean(assets.images[index]);
     const compact = rows >= 3;
-    const detailsH = hasImage ? (story ? (compact ? 148 : 176) : (compact ? 112 : 150)) : cardH - badgeH;
+    const detailsH = hasImage ? (story ? (dense ? 164 : 176) : (dense ? 126 : 150)) : cardH - badgeH;
     const imageY = y + badgeH;
     const imageH = hasImage ? Math.max(0, cardH - badgeH - detailsH) : 0;
     if (hasImage) drawWeeklyClientImage(ctx, assets.images[index], item, x + 7, imageY + 7, cardW - 14, imageH - 7, story ? 15 : 12);
@@ -26898,15 +26898,15 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
     }
     if (fields.title) {
       const titleY = textY;
-      const titleScale = weeklyPostItemTitleScale(item) / 100;
-      const baseTitleSize = story ? (compact ? 22 : 25) : (compact ? 18 : 22);
-      const titleHeight = weeklyPostDrawFittedText(ctx, fields.title, contentX + 11, titleY, contentWidth - 11, 2, Math.round(baseTitleSize * titleScale), { minimum: story ? 17 : 14, weight: 950, color: theme.navy, lineHeight: 1.04 });
+      const baseTitleSize = story ? (compact ? 24 : 25) : (compact ? 20 : 22);
+      const titleHeight = weeklyPostDrawFittedText(ctx, fields.title, contentX + 11, titleY, contentWidth - 11, 2, Math.round(baseTitleSize * cardTitleScale), { minimum: story ? 16 : 13, weight: 950, color: theme.navy, lineHeight: 1.04 });
       preencherRoundRect(ctx, contentX, titleY + 1, story ? 5 : 4, Math.max(18, Math.min(titleHeight - 2, story ? 54 : 44)), 3, theme.accent);
       textY += titleHeight;
       textY += story ? 4 : 3;
     }
     if (fields.change) {
-      weeklyPostDrawFittedText(ctx, fields.change, contentX, textY, contentWidth, compact ? 1 : 2, story ? 16 : 14, { minimum: story ? 12 : 11, weight: 650, color: theme.muted, lineHeight: 1.08 });
+      const baseDescriptionSize = story ? (compact ? 16 : 17) : (compact ? 14 : 15);
+      weeklyPostDrawFittedText(ctx, fields.change, contentX, textY, contentWidth, compact ? 1 : 2, Math.round(baseDescriptionSize * cardDescriptionScale), { minimum: story ? 11 : 10, weight: 700, color: theme.muted, lineHeight: 1.08 });
     }
   });
   return layout;
@@ -27037,10 +27037,16 @@ function weeklyPostSelectionCardHtml(item, selectedCount) {
   const selected = state.weeklyPostSelectedIds.has(id);
   const position = state.weeklyPostSelectedOrder.indexOf(id);
   const fields = weeklyPostArtFields(item);
-  const titleScale = weeklyPostItemTitleScale(item);
-  const sourceTitle = weeklyPostCardFields(item).title;
-  const customTitle = Object.prototype.hasOwnProperty.call(state.weeklyPostTitleOverrides, id);
-  return `<article class="post-central-data-card weekly-post-data-card ${selected ? "selected" : ""}" data-weekly-record-id="${escapeAttr(id)}" data-weekly-record-link="${escapeAttr(item.link || item.url || "")}"><div class="weekly-post-data-main"><label class="weekly-post-data-select"><input type="checkbox" data-weekly-post-id="${escapeAttr(id)}" ${selected ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-image"></i>`}</span><span class="weekly-post-data-copy"><strong>${escapeHtml(fields.title || fields.client || "Registro sem título")}</strong>${fields.change ? `<small>${escapeHtml(textoCurtoArte(fields.change, 95))}</small>` : ""}<em>${[fields.client, centralPostDate(item.dataCriacao || item.createdAt || item.updatedAt)].filter(Boolean).map(escapeHtml).join(" • ")}</em></span></label>${selected ? `<span class="weekly-post-order-actions"><button type="button" data-weekly-post-move="-1" data-weekly-post-order-id="${escapeAttr(id)}" ${position <= 0 ? "disabled" : ""} aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-weekly-post-move="1" data-weekly-post-order-id="${escapeAttr(id)}" ${position >= selectedCount - 1 ? "disabled" : ""} aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button></span>` : ""}</div>${selected ? `<div class="weekly-post-title-editor"><label><span>Título na arte</span><input type="text" maxlength="90" data-weekly-post-title-id="${escapeAttr(id)}" value="${escapeAttr(fields.title)}" placeholder="${escapeAttr(sourceTitle || "Título da novidade")}"></label><label class="weekly-post-title-size"><span>Tamanho do título <output data-weekly-post-title-scale-output="${escapeAttr(id)}">${titleScale}%</output></span><input type="range" min="${WEEKLY_POST_TITLE_SCALE_MIN}" max="${WEEKLY_POST_TITLE_SCALE_MAX}" step="5" value="${titleScale}" data-weekly-post-title-scale-id="${escapeAttr(id)}"></label><button type="button" class="weekly-post-title-reset" data-weekly-post-title-reset-id="${escapeAttr(id)}" ${!customTitle && titleScale === 100 ? "disabled" : ""}>Restaurar</button></div>` : ""}</article>`;
+  return `<article class="post-central-data-card weekly-post-data-card ${selected ? "selected" : ""}" data-weekly-record-id="${escapeAttr(id)}" data-weekly-record-link="${escapeAttr(item.link || item.url || "")}"><div class="weekly-post-data-main"><label class="weekly-post-data-select"><input type="checkbox" data-weekly-post-id="${escapeAttr(id)}" ${selected ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-image"></i>`}</span><span class="weekly-post-data-copy"><strong>${escapeHtml(fields.title || fields.client || "Registro sem título")}</strong>${fields.change ? `<small>${escapeHtml(textoCurtoArte(fields.change, 95))}</small>` : ""}<em>${[fields.client, centralPostDate(item.dataCriacao || item.createdAt || item.updatedAt)].filter(Boolean).map(escapeHtml).join(" • ")}</em></span></label>${selected ? `<span class="weekly-post-order-actions"><button type="button" data-weekly-post-move="-1" data-weekly-post-order-id="${escapeAttr(id)}" ${position <= 0 ? "disabled" : ""} aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-weekly-post-move="1" data-weekly-post-order-id="${escapeAttr(id)}" ${position >= selectedCount - 1 ? "disabled" : ""} aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button></span>` : ""}</div></article>`;
+}
+
+function weeklyPostGlobalEditorHtml() {
+  const controls = [
+    ["weeklyPostHeaderTitleScale", "Tamanho do título do cabeçalho"],
+    ["weeklyPostCardTitleScale", "Títulos dos cards"],
+    ["weeklyPostCardDescriptionScale", "Descrições dos cards"]
+  ];
+  return `<div class="weekly-post-global-editor"><div class="weekly-post-global-editor-head"><strong>Ajustes gerais da arte</strong><small>Os tamanhos são aplicados igualmente em todos os cards.</small></div><label class="weekly-post-header-title-field"><span>Texto do título do cabeçalho</span><input id="weeklyPostHeaderTitle" type="text" maxlength="60" value="${escapeAttr(state.weeklyPostHeaderTitle || WEEKLY_POST_DEFAULT_HEADER_TITLE)}"></label>${controls.map(([key, label]) => { const value = weeklyPostGlobalScale(key); return `<label class="weekly-post-global-scale"><span>${label}<output id="${key}Output">${value}%</output></span><input id="${key}" type="range" min="${WEEKLY_POST_FONT_SCALE_MIN}" max="${WEEKLY_POST_FONT_SCALE_MAX}" step="5" value="${value}"></label>`; }).join("")}</div>`;
 }
 
 function renderWeeklyPostView() {
@@ -27057,8 +27063,8 @@ function renderWeeklyPostView() {
   const displayItems = [...selectedItems, ...items.filter((item) => !state.weeklyPostSelectedIds.has(String(item.id)))];
   const format = weeklyPostFormat();
   mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
-    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, quantidade e formato</strong><small>Seleção automática com novidades reais, recentes e variadas.</small></div></div><div class="post-central-inline-fields"><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label><label class="post-central-field">Quantidade na arte<select id="weeklyPostMaxItems">${Array.from({ length: WEEKLY_POST_MAX_ITEMS - WEEKLY_POST_MIN_ITEMS + 1 }, (_, index) => WEEKLY_POST_MIN_ITEMS + index).map((amount) => `<option value="${amount}" ${itemLimit === amount ? "selected" : ""}>${amount} novidades</option>`).join("")}</select></label></div>${weeklyPostFormatButtons()}<div class="post-central-actions"><button id="weeklyPostRegenerate" type="button" class="primary-button"><i class="fa-solid fa-arrows-rotate"></i> Regenerar arte</button></div></section>
-    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>2. Escolha, edite e ordene as novidades</strong><p>${selectedCount} de ${itemLimit} selecionada(s)${items.length < WEEKLY_POST_MIN_ITEMS ? " • layout adaptado aos registros disponíveis" : ""}</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list weekly-post-item-list">${displayItems.length ? displayItems.map((item) => weeklyPostSelectionCardHtml(item, selectedCount)).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período. A arte não cria dados de demonstração.</div>`}</div></section>
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, quantidade, formato e textos</strong><small>Seleção automática com novidades reais, recentes e variadas.</small></div></div><div class="post-central-inline-fields"><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label><label class="post-central-field">Quantidade na arte<select id="weeklyPostMaxItems">${Array.from({ length: WEEKLY_POST_MAX_ITEMS - WEEKLY_POST_MIN_ITEMS + 1 }, (_, index) => WEEKLY_POST_MIN_ITEMS + index).map((amount) => `<option value="${amount}" ${itemLimit === amount ? "selected" : ""}>${amount} novidades</option>`).join("")}</select></label></div>${weeklyPostFormatButtons()}${weeklyPostGlobalEditorHtml()}<div class="post-central-actions"><button id="weeklyPostRegenerate" type="button" class="primary-button"><i class="fa-solid fa-arrows-rotate"></i> Regenerar arte</button></div></section>
+    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>2. Escolha e ordene as novidades</strong><p>${selectedCount} de ${itemLimit} selecionada(s)${items.length < WEEKLY_POST_MIN_ITEMS ? " • layout adaptado aos registros disponíveis" : ""}</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list weekly-post-item-list">${displayItems.length ? displayItems.map((item) => weeklyPostSelectionCardHtml(item, selectedCount)).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período. A arte não cria dados de demonstração.</div>`}</div></section>
     </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<div class="post-art-canvas-shell weekly-post-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
   $("weeklyPostDays")?.addEventListener("change", (event) => { state.weeklyPostDays = Number(event.target.value); state.weeklyPostSelectionReady = false; renderWeeklyPostView(); });
   $("weeklyPostMaxItems")?.addEventListener("change", (event) => {
@@ -27073,25 +27079,19 @@ function renderWeeklyPostView() {
   $("weeklyPostRegenerate")?.addEventListener("click", () => { regenerateWeeklyPostSelection(items); renderWeeklyPostView(); });
   mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = String(input.dataset.weeklyPostId); if (input.checked && state.weeklyPostSelectedIds.size >= itemLimit) { input.checked = false; return showToast(`Selecione no máximo ${itemLimit} novidades.`); } if (input.checked) { state.weeklyPostSelectedIds.add(id); state.weeklyPostSelectedOrder.push(id); } else { state.weeklyPostSelectedIds.delete(id); state.weeklyPostSelectedOrder = state.weeklyPostSelectedOrder.filter((current) => current !== id); } renderWeeklyPostView(); }));
   mount.querySelectorAll("[data-weekly-post-order-id]").forEach((button) => button.addEventListener("click", () => { state.weeklyPostSelectedOrder = weeklyPostMoveOrder(state.weeklyPostSelectedOrder, button.dataset.weeklyPostOrderId, Number(button.dataset.weeklyPostMove)); renderWeeklyPostView(); }));
-  mount.querySelectorAll("[data-weekly-post-title-id]").forEach((input) => input.addEventListener("input", () => {
-    state.weeklyPostTitleOverrides[String(input.dataset.weeklyPostTitleId)] = input.value;
+  $("weeklyPostHeaderTitle")?.addEventListener("input", (event) => {
+    state.weeklyPostHeaderTitle = event.target.value;
     centralPostSchedulePreview("weekly");
-  }));
-  mount.querySelectorAll("[data-weekly-post-title-scale-id]").forEach((input) => input.addEventListener("input", () => {
-    const id = String(input.dataset.weeklyPostTitleScaleId);
-    const value = weeklyPostTitleScale(input.value);
-    state.weeklyPostTitleScales[id] = value;
-    const output = [...mount.querySelectorAll("[data-weekly-post-title-scale-output]")]
-      .find((element) => String(element.dataset.weeklyPostTitleScaleOutput) === id);
-    if (output) output.textContent = `${value}%`;
-    centralPostSchedulePreview("weekly");
-  }));
-  mount.querySelectorAll("[data-weekly-post-title-reset-id]").forEach((button) => button.addEventListener("click", () => {
-    const id = String(button.dataset.weeklyPostTitleResetId);
-    delete state.weeklyPostTitleOverrides[id];
-    delete state.weeklyPostTitleScales[id];
-    renderWeeklyPostView();
-  }));
+  });
+  ["weeklyPostHeaderTitleScale", "weeklyPostCardTitleScale", "weeklyPostCardDescriptionScale"].forEach((key) => {
+    $(key)?.addEventListener("input", (event) => {
+      const value = weeklyPostFontScale(event.target.value);
+      state[key] = value;
+      const output = $(`${key}Output`);
+      if (output) output.textContent = `${value}%`;
+      centralPostSchedulePreview("weekly");
+    });
+  });
   $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
   if (selectedCount) atualizarPreviaPostSemanal();
 }

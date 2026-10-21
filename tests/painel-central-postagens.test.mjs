@@ -4,17 +4,18 @@ import { readFileSync } from "node:fs";
 import {
   WEEKLY_POST_MIN_ITEMS,
   WEEKLY_POST_MAX_ITEMS,
-  WEEKLY_POST_TITLE_SCALE_MAX,
-  WEEKLY_POST_TITLE_SCALE_MIN,
+  WEEKLY_POST_DEFAULT_HEADER_TITLE,
+  WEEKLY_POST_FONT_SCALE_MAX,
+  WEEKLY_POST_FONT_SCALE_MIN,
   weeklyPostCardFields,
   weeklyPostDiverseItems,
-  weeklyPostEditableTitle,
+  weeklyPostFontScale,
   weeklyPostGridLayout,
+  weeklyPostHeaderLines,
   weeklyPostMoveOrder,
   weeklyPostPages,
   weeklyPostRecordReference,
   weeklyPostStatusKind,
-  weeklyPostTitleScale,
   weeklyPostUniqueItems
 } from "../admin/weekly-post-layout.js";
 
@@ -93,6 +94,12 @@ test("layouts de story e feed se adaptam a quatro, cinco e seis cards", () => {
     assert.ok(feed.cardWidth > 450 && feed.cardHeight > 280);
     assert.ok(story.ctaY + story.ctaHeight <= 1920 - 250, "CTA respeita a área segura inferior do Story");
   }
+  const sixStory = weeklyPostGridLayout({ key: "reels", width: 1080, height: 1920 }, 6);
+  const sixFeed = weeklyPostGridLayout({ key: "feed", width: 1080, height: 1350 }, 6);
+  assert.equal(sixStory.dense, true);
+  assert.equal(sixFeed.dense, true);
+  assert.ok(sixStory.cardHeight >= 400, "seis cards aproveitam a altura disponível no Story");
+  assert.ok(sixFeed.cardHeight >= 315, "seis cards aproveitam a altura disponível no Feed");
   assert.match(panel, /const isLastCentered = count % 2 === 1/);
 });
 
@@ -112,8 +119,8 @@ test("campos ausentes e duplicados são omitidos sem inventar informações", ()
 test("arte usa a identidade oficial, foto real e tipografia sem contorno pesado", () => {
   assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/img_padrao_site\/logo_1\.png"\)/);
   assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
-  assert.match(panel, /"NOVIDADES NO"/);
-  assert.match(panel, /"OLÁ CARLÓPOLIS"/);
+  assert.equal(WEEKLY_POST_DEFAULT_HEADER_TITLE, "Novidades no Olá Carlópolis");
+  assert.deepEqual(weeklyPostHeaderLines(WEEKLY_POST_DEFAULT_HEADER_TITLE), ["Novidades no", "Olá Carlópolis"]);
   assert.match(panel, /navy: "#092B45"/);
   assert.match(panel, /accent: "#FFBB2D"/);
   assert.match(panel, /white: "#FFFFFF"/);
@@ -137,23 +144,22 @@ test("cards mantêm selo fora da foto, enquadramento inteligente e textos ajust�
   assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
 });
 
-test("título de cada card pode ser editado e ampliado manualmente na prévia", () => {
-  const item = { id: "n1", tituloConteudo: "Título original" };
-  assert.equal(weeklyPostEditableTitle(item, {}), "Título original");
-  assert.equal(weeklyPostEditableTitle(item, { n1: "  Chamada mais forte  " }), "Chamada mais forte");
-  assert.equal(WEEKLY_POST_TITLE_SCALE_MIN, 90);
-  assert.equal(WEEKLY_POST_TITLE_SCALE_MAX, 145);
-  assert.equal(weeklyPostTitleScale(80), 90);
-  assert.equal(weeklyPostTitleScale(125), 125);
-  assert.equal(weeklyPostTitleScale(180), 145);
-  assert.match(panel, /weeklyPostTitleOverrides: \{\}/);
-  assert.match(panel, /weeklyPostTitleScales: \{\}/);
-  assert.match(panel, /data-weekly-post-title-id/);
-  assert.match(panel, /data-weekly-post-title-scale-id/);
-  assert.match(panel, /data-weekly-post-title-reset-id/);
+test("ajustes gerais editam o cabeçalho e padronizam as fontes de todos os cards", () => {
+  assert.equal(WEEKLY_POST_FONT_SCALE_MIN, 80);
+  assert.equal(WEEKLY_POST_FONT_SCALE_MAX, 140);
+  assert.equal(weeklyPostFontScale(70), 80);
+  assert.equal(weeklyPostFontScale(125), 125);
+  assert.equal(weeklyPostFontScale(180), 140);
+  assert.match(panel, /weeklyPostHeaderTitle: WEEKLY_POST_DEFAULT_HEADER_TITLE/);
+  assert.match(panel, /weeklyPostHeaderTitleScale: 100/);
+  assert.match(panel, /weeklyPostCardTitleScale: 100/);
+  assert.match(panel, /weeklyPostCardDescriptionScale: 100/);
+  assert.match(panel, /id="weeklyPostHeaderTitle"/);
+  assert.match(panel, /weeklyPostGlobalEditorHtml/);
+  assert.doesNotMatch(panel, /data-weekly-post-title-id/);
   assert.match(panel, /centralPostSchedulePreview\("weekly"\)/);
   assert.match(panel, /weight: 950, color: theme\.navy/);
-  assert.match(css, /\.weekly-post-title-editor/);
+  assert.match(css, /\.weekly-post-global-editor/);
 });
 
 test("prévia e PNG usam o mesmo canvas nos formatos 1080 por 1920 e 1080 por 1350", () => {
@@ -177,8 +183,8 @@ test("rodapé apresenta um único CTA textual sem botão falso", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=604/);
-  assert.match(html, /painel\.js\?v=906/);
-  assert.match(panel, /numero: 899/);
-  assert.match(panel, /label: "v906"/);
+  assert.match(html, /painel\.css\?v=605/);
+  assert.match(html, /painel\.js\?v=907/);
+  assert.match(panel, /numero: 900/);
+  assert.match(panel, /label: "v907"/);
 });

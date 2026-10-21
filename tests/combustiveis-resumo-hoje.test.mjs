@@ -84,7 +84,7 @@ test("cabecalho de combustiveis segue o padrao de automoveis e explica a pagina"
 });
 
 test("versoes publicas foram atualizadas", () => {
-  assert.ok(html.includes("style.css?v=613"));
-  assert.ok(html.includes("script.js?v=813"));
-  assert.ok(html.includes("Olá Carlópolis v559"));
+  assert.ok(html.includes("style.css?v=614"));
+  assert.ok(html.includes("script.js?v=814"));
+  assert.ok(html.includes("Olá Carlópolis v560"));
 });

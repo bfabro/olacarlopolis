@@ -1,8 +1,9 @@
 export const WEEKLY_POST_MIN_ITEMS = 4;
 export const WEEKLY_POST_MAX_ITEMS = 6;
 export const WEEKLY_POST_PAGE_SIZE = 6;
-export const WEEKLY_POST_TITLE_SCALE_MIN = 90;
-export const WEEKLY_POST_TITLE_SCALE_MAX = 145;
+export const WEEKLY_POST_FONT_SCALE_MIN = 80;
+export const WEEKLY_POST_FONT_SCALE_MAX = 140;
+export const WEEKLY_POST_DEFAULT_HEADER_TITLE = "Novidades no Olá Carlópolis";
 
 function plainText(value) {
   return String(value ?? "").replace(/\s+/g, " ").trim();
@@ -45,16 +46,28 @@ export function weeklyPostCardFields(item = {}) {
   return { client, title: rawTitle, change };
 }
 
-export function weeklyPostEditableTitle(item = {}, overrides = {}) {
-  const id = plainText(item.id);
-  if (id && Object.prototype.hasOwnProperty.call(overrides, id)) return plainText(overrides[id]);
-  return weeklyPostCardFields(item).title;
-}
-
-export function weeklyPostTitleScale(value = 100) {
+export function weeklyPostFontScale(value = 100) {
   const numeric = Number(value);
   if (!Number.isFinite(numeric)) return 100;
-  return Math.max(WEEKLY_POST_TITLE_SCALE_MIN, Math.min(WEEKLY_POST_TITLE_SCALE_MAX, Math.round(numeric)));
+  return Math.max(WEEKLY_POST_FONT_SCALE_MIN, Math.min(WEEKLY_POST_FONT_SCALE_MAX, Math.round(numeric)));
+}
+
+export function weeklyPostHeaderLines(value = WEEKLY_POST_DEFAULT_HEADER_TITLE) {
+  const title = plainText(value) || WEEKLY_POST_DEFAULT_HEADER_TITLE;
+  const words = title.split(" ");
+  if (words.length < 2 || title.length <= 20) return [title];
+  let bestIndex = 1;
+  let bestDifference = Number.POSITIVE_INFINITY;
+  for (let index = 1; index < words.length; index += 1) {
+    const first = words.slice(0, index).join(" ");
+    const second = words.slice(index).join(" ");
+    const difference = Math.abs(first.length - second.length);
+    if (difference < bestDifference) {
+      bestDifference = difference;
+      bestIndex = index;
+    }
+  }
+  return [words.slice(0, bestIndex).join(" "), words.slice(bestIndex).join(" ")];
 }
 
 export function weeklyPostStatusKind(item = {}) {
@@ -128,16 +141,17 @@ export function weeklyPostGridLayout(format = {}, itemCount = 0) {
   const count = Math.max(1, Math.min(WEEKLY_POST_MAX_ITEMS, Number(itemCount) || 1));
   const columns = count === 1 ? 1 : 2;
   const rows = Math.ceil(count / columns);
-  const margin = story ? 42 : 38;
-  const gap = story ? 18 : 14;
-  const headerHeight = story ? 332 : 232;
-  const cardStartY = headerHeight + (story ? 18 : 14);
+  const dense = count >= 6;
+  const margin = story ? (dense ? 36 : 42) : (dense ? 34 : 38);
+  const gap = story ? (dense ? 14 : 18) : (dense ? 12 : 14);
+  const headerHeight = story ? (dense ? 312 : 332) : (dense ? 218 : 232);
+  const cardStartY = headerHeight + (story ? (dense ? 14 : 18) : (dense ? 10 : 14));
   const ctaHeight = story ? 82 : 70;
   const ctaY = story ? height - 336 : height - 118;
   const cardEndY = ctaY - (story ? 24 : 18);
   const cardWidth = columns === 1 ? Math.min(760, width - margin * 2) : (width - margin * 2 - gap) / 2;
   const cardHeight = (cardEndY - cardStartY - gap * Math.max(0, rows - 1)) / rows;
-  return { story, width, height, count, columns, rows, margin, gap, headerHeight, cardStartY, cardEndY, cardWidth, cardHeight, ctaY, ctaHeight };
+  return { story, dense, width, height, count, columns, rows, margin, gap, headerHeight, cardStartY, cardEndY, cardWidth, cardHeight, ctaY, ctaHeight };
 }
 
 export function weeklyPostRecordReference(item = {}) {
