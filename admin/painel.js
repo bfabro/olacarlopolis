@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 900,
-  label: "v907",
+  numero: 901,
+  label: "v908",
   data: "2026-10-21",
-  nota: "Resumo de novidades com cabeçalho editável, fontes globais padronizadas e grade otimizada para seis cards."
+  nota: "Site público otimizado para desktop com dependências adiadas, carregamento ocioso dos dados e cache eficiente."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

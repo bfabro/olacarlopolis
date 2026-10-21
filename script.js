@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v687.
+// Release do site v688.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -25515,10 +25515,19 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
   });
 
 
-  aplicarDadosAdminClientesEmSegundoPlano(renderizarTelaAtualComDadosAdmin);
-  window.addEventListener("DOMContentLoaded", () => {
-    aplicarDadosAdminClientesEmSegundoPlano(renderizarTelaAtualComDadosAdmin);
-  });
+  function agendarDadosPublicosEmSegundoPlano() {
+    const iniciar = () => aplicarDadosAdminClientesEmSegundoPlano(renderizarTelaAtualComDadosAdmin);
+    if (location.hash) {
+      iniciar();
+      return;
+    }
+    if (typeof window.requestIdleCallback === "function") {
+      window.requestIdleCallback(iniciar, { timeout: 1800 });
+    } else {
+      window.setTimeout(iniciar, 500);
+    }
+  }
+  window.addEventListener("DOMContentLoaded", agendarDadosPublicosEmSegundoPlano, { once: true });
 
 
 
@@ -27059,7 +27068,7 @@ ${servicosIniciaisLoja.length ? `
     const h = (location.hash || "").toLowerCase();
     if (h !== "#ola-pesca") window.destroyOlaPesca?.();
     atualizarVisibilidadeHomeQuickBanner();
-    if (!ADMIN_CLIENTES_LOADED) {
+    if (h && !ADMIN_CLIENTES_LOADED) {
       aplicarDadosAdminClientesEmSegundoPlano(() => handleHashRoute());
     }
 
@@ -28474,7 +28483,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // ✅ REGISTRO DO SERVICE WORKER
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js?v=942', { updateViaCache: 'none' })
+  navigator.serviceWorker.register('/service-worker.js?v=943', { updateViaCache: 'none' })
     .then(reg => {
       reg.update();
       console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);

@@ -10,6 +10,24 @@
   };
   let data = load();
   let modal = null;
+  let jsPdfLoadPromise = null;
+
+  function ensureJsPdf() {
+    if (window.jspdf?.jsPDF) return Promise.resolve(window.jspdf.jsPDF);
+    if (jsPdfLoadPromise) return jsPdfLoadPromise;
+    jsPdfLoadPromise = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js";
+      script.async = true;
+      script.onload = () => window.jspdf?.jsPDF ? resolve(window.jspdf.jsPDF) : reject(new Error("jsPDF não inicializou."));
+      script.onerror = () => reject(new Error("Não foi possível carregar o gerador de PDF."));
+      document.head.appendChild(script);
+    }).catch((error) => {
+      jsPdfLoadPromise = null;
+      throw error;
+    });
+    return jsPdfLoadPromise;
+  }
 
   function clone(value) { return JSON.parse(JSON.stringify(value)); }
   function load() {
@@ -194,10 +212,9 @@
   }
   async function generatePdf() {
     if (!validate()) return;
-    if (!window.jspdf?.jsPDF) return alert("O gerador de PDF ainda está carregando. Tente novamente em instantes.");
     const button = modal.querySelector("[data-pdf]"); button.disabled = true; button.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Gerando PDF...';
     try {
-      const { jsPDF } = window.jspdf; const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
+      const jsPDF = await ensureJsPdf(); const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
       let page = 1, y = 52, mainX = 63, mainW = 133;
       const header = (continuation = false) => {
         doc.setFillColor(20, 59, 93); doc.rect(0, 0, 210, continuation ? 27 : 43, "F");
@@ -261,7 +278,6 @@
   window.ResumeBuilder = { open, close };
   document.addEventListener("click", (event) => { if (event.target.closest("[data-open-resume-builder]")) { event.preventDefault(); open(); } });
   function mountVacancyCta() {
-    document.querySelectorAll(".sidebar-version").forEach((item) => { item.textContent = "Olá Carlópolis v405"; });
     const area = document.querySelector(".content_area");
     if (!area || area.querySelector(".vagas-resume-cta")) return;
     const vacancyPage = area.querySelector(".vagas-public-page");

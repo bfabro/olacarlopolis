@@ -52,3 +52,29 @@
   to = "/admin/painel.html"
   status = 301
   force = true
+
+# Arquivos principais usam versao na URL; o navegador pode reutiliza-los sem revalidar.
+[[headers]]
+  for = "/script.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/style.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/ola-pesca.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/firebase-public-init.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/images/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800, stale-while-revalidate=86400"

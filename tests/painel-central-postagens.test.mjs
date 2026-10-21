@@ -183,8 +183,8 @@ test("rodapé apresenta um único CTA textual sem botão falso", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=605/);
-  assert.match(html, /painel\.js\?v=907/);
-  assert.match(panel, /numero: 900/);
-  assert.match(panel, /label: "v907"/);
+  assert.match(html, /painel\.css\?v=606/);
+  assert.match(html, /painel\.js\?v=908/);
+  assert.match(panel, /numero: 901/);
+  assert.match(panel, /label: "v908"/);
 });
