@@ -55,10 +55,16 @@ test("artes oferecem Feed e Story, prévia e download PNG", () => {
 test("novidades da semana seguem o modelo editorial e levam a logo ao topo direito", () => {
   assert.match(panel, /function drawWeeklyPostHeader/);
   assert.match(panel, /function drawWeeklyLogoTransparent/);
+  assert.match(panel, /ctx\.strokeText\("NOVIDADES NO"/);
+  assert.match(panel, /ctx\.strokeText\("OLACARLOPOLIS"/);
   assert.match(panel, /const logoX = format\.width - logoSize/);
+  assert.match(panel, /const logoSize = vertical \? 244 : 184/);
   assert.match(panel, /const logoY = vertical \? 36 : 24/);
   assert.match(panel, /drawWeeklyLogoTransparent\(ctx, assets\.siteLogo, logoX, logoY/);
   assert.doesNotMatch(panel, /preencherRoundRect\(ctx, logoX - 8/);
+  assert.match(panel, /ctx\.lineWidth = vertical \? 12 : 9/);
+  assert.doesNotMatch(panel, /id="weeklyPostSubtitle"/);
+  assert.doesNotMatch(panel, /id="weeklyPostTitle"/);
   assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
   assert.match(panel, /desenharImagemCover\(ctx, assets\.headerImage, 0, 0, format\.width, headerH\)/);
   assert.match(panel, /function drawWeeklyClientImage/);
@@ -68,6 +74,7 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.match(panel, /const isLastCentered = count % 2 === 1/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemTitle\(item\)/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemDescription\(item\)/);
+  assert.match(panel, /return item\.acao \|\| item\.descricao/);
   assert.match(panel, /function weeklyPostStatus/);
   assert.match(panel, /label: "Novo"/);
   assert.match(panel, /label: "Atualizado"/);
@@ -76,7 +83,8 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.doesNotMatch(panel, /preencherRoundRect\(ctx, 58, vertical \? 334 : 226/);
   assert.match(panel, /const footerGradient = ctx\.createLinearGradient/);
   assert.match(panel, /www\.olacarlopolis\.com/);
-  assert.match(panel, /Empresas, imóveis, restaurantes e muito mais/);
+  assert.match(panel, /Confira muito mais acessando: /);
+  assert.doesNotMatch(panel, /function drawWeeklyPostCategories/);
   assert.doesNotMatch(panel, /function weeklyPostClient/);
   assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
   assert.doesNotMatch(panel, /const arrowSize =/);
@@ -97,8 +105,8 @@ test("novidades oferecem dois fundos suaves com paletas próprias", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=601/);
-  assert.match(html, /painel\.js\?v=903/);
-  assert.match(panel, /numero: 896/);
-  assert.match(panel, /label: "v903"/);
+  assert.match(html, /painel\.css\?v=602/);
+  assert.match(html, /painel\.js\?v=904/);
+  assert.match(panel, /numero: 897/);
+  assert.match(panel, /label: "v904"/);
 });
