@@ -22,7 +22,9 @@ test("resumo semanal usa novidades reais com período e limite seguro", () => {
   assert.match(panel, /Últimos 14 dias/);
   assert.match(panel, /Últimos 30 dias/);
   assert.match(panel, /const CENTRAL_POST_MAX_ITEMS = 6/);
-  assert.match(panel, /weeklyPostSelectedIds\.size >= CENTRAL_POST_MAX_ITEMS/);
+  assert.match(panel, /const WEEKLY_POST_MAX_ITEMS = 4/);
+  assert.match(panel, /weeklyPostSelectedIds\.size >= WEEKLY_POST_MAX_ITEMS/);
+  assert.match(panel, /\.slice\(0, WEEKLY_POST_MAX_ITEMS\)/);
 });
 
 test("vitrine permite seleção manual e aleatória de comércios reais", () => {
@@ -55,9 +57,9 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
   assert.match(panel, /desenharImagemCover\(ctx, assets\.headerImage, 0, 0, format\.width, headerH\)/);
   assert.match(panel, /function drawWeeklyClientImage/);
-  assert.match(panel, /ctx\.filter = "blur\(13px\) saturate\(1\.08\)"/);
-  assert.match(panel, /foregroundScale = Math\.min/);
-  assert.match(panel, /foregroundWidth = image\.width \* foregroundScale/);
+  assert.match(panel, /ctx\.imageSmoothingQuality = "high"/);
+  assert.match(panel, /desenharImagemCover\(ctx, image, x, y, width, height, radius\)/);
+  assert.match(panel, /const cardH = Math\.min\(vertical \? 510 : 300/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemTitle\(item\)/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemDescription\(item\)/);
   assert.match(panel, /function weeklyPostStatus/);
@@ -69,9 +71,20 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.match(panel, /www\.olacarlopolis\.com/);
 });
 
+test("novidades oferecem dois fundos suaves com paletas próprias", () => {
+  assert.match(panel, /const WEEKLY_POST_THEMES =/);
+  assert.match(panel, /sereno:/);
+  assert.match(panel, /entardecer:/);
+  assert.match(panel, /data-weekly-post-theme/);
+  assert.match(panel, /Fundo e cores/);
+  assert.match(panel, /theme\.bodyStart/);
+  assert.match(panel, /theme\.footerStart/);
+  assert.match(css, /\.post-central-theme-toggle/);
+});
+
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=597/);
-  assert.match(html, /painel\.js\?v=899/);
-  assert.match(panel, /numero: 892/);
-  assert.match(panel, /label: "v899"/);
+  assert.match(html, /painel\.css\?v=598/);
+  assert.match(html, /painel\.js\?v=900/);
+  assert.match(panel, /numero: 893/);
+  assert.match(panel, /label: "v900"/);
 });

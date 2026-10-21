@@ -11886,6 +11886,44 @@ button.admin-button-loading::after {
 .post-art-format-toggle button:hover { transform: translateY(-1px); border-color: #9fbae8; }
 .post-art-format-toggle button.active { border-color: #4f46e5; background: #f5f5ff; box-shadow: 0 0 0 3px rgba(79,70,229,.1); }
 .post-art-format-toggle button.active > i { background: #4f46e5; color: #fff; }
+
+.post-central-theme-label {
+  margin: 16px 0 8px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: .02em;
+}
+
+.post-central-theme-toggle button:first-child > i {
+  background: #e1efed;
+  color: #28666a;
+}
+
+.post-central-theme-toggle button:last-child > i {
+  background: #f5e6d4;
+  color: #9a5e3d;
+}
+
+.post-central-theme-toggle button.active:first-child {
+  border-color: #5f9ea2;
+  background: #f1f8f7;
+  box-shadow: 0 0 0 3px rgba(95,158,162,.14);
+}
+
+.post-central-theme-toggle button.active:last-child {
+  border-color: #be8769;
+  background: #fff8f1;
+  box-shadow: 0 0 0 3px rgba(190,135,105,.14);
+}
+
+.post-central-theme-toggle button.active:first-child > i,
+.post-central-theme-toggle button.active:last-child > i {
+  color: #fff;
+}
+
+.post-central-theme-toggle button.active:first-child > i { background: #28666a; }
+.post-central-theme-toggle button.active:last-child > i { background: #9a5e3d; }
 .post-art-type-toggle {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -139,8 +139,8 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 892,
-  label: "v899",
+  numero: 893,
+  label: "v900",
   data: "2026-10-20",
   nota: "Imagens das novidades passam a usar moldura uniforme, exibição completa e fundo derivado da própria imagem."
 };
@@ -383,6 +383,7 @@ let state = {
   postArtCentralMode: "catalogo",
   postArtCentralFormat: "feed",
   weeklyPostDays: 7,
+  weeklyPostTheme: "sereno",
   weeklyPostTitle: "Novidades da semana",
   weeklyPostSubtitle: "Tudo o que movimentou Carlópolis em um só lugar",
   weeklyPostSelectedIds: new Set(),
@@ -26578,11 +26579,20 @@ function renderPostArtCatalogView() {
 }
 
 const CENTRAL_POST_MAX_ITEMS = 6;
+const WEEKLY_POST_MAX_ITEMS = 4;
+const WEEKLY_POST_THEMES = {
+  sereno: { key: "sereno", nome: "Sereno", descricao: "Verde-azulado suave", bodyStart: "#e6efed", bodyEnd: "#cedfdd", card: "#164c57", border: "#5f9ea2", text: "#17353b", accent: "#e5ad35", footerStart: "#123d49", footerEnd: "#0b2d38", shade: "rgba(10,57,72,.64)" },
+  entardecer: { key: "entardecer", nome: "Entardecer", descricao: "Areia e terracota", bodyStart: "#f5ead9", bodyEnd: "#e6d1b5", card: "#654235", border: "#be8769", text: "#44332d", accent: "#eead35", footerStart: "#493229", footerEnd: "#2f2421", shade: "rgba(74,43,34,.56)" }
+};
 let centralPostPreviewRequest = 0;
 let centralPostPreviewTimer = null;
 
 function centralPostFormat() {
   return POST_ART_FORMATS[state.postArtCentralFormat] || POST_ART_FORMATS.feed;
+}
+
+function weeklyPostTheme() {
+  return WEEKLY_POST_THEMES[state.weeklyPostTheme] || WEEKLY_POST_THEMES.sereno;
 }
 
 function centralPostImage(item = {}) {
@@ -26714,36 +26724,14 @@ function drawWeeklyLogoTransparent(ctx, image, x, y, width, height) {
 }
 
 function drawWeeklyClientImage(ctx, image, x, y, width, height, radius) {
-  if (!image) return desenharImagemCover(ctx, image, x, y, width, height, radius);
-  preencherRoundRect(ctx, x, y, width, height, radius, "#061d3a");
-  const backgroundScale = Math.max(width / image.width, height / image.height);
-  const backgroundWidth = image.width * backgroundScale;
-  const backgroundHeight = image.height * backgroundScale;
   ctx.save();
-  canvasRoundRect(ctx, x, y, width, height, radius);
-  ctx.clip();
-  ctx.globalAlpha = .52;
-  ctx.filter = "blur(13px) saturate(1.08)";
-  ctx.drawImage(image, x + (width - backgroundWidth) / 2 - 10, y + (height - backgroundHeight) / 2 - 10, backgroundWidth + 20, backgroundHeight + 20);
-  ctx.filter = "none";
-  ctx.globalAlpha = 1;
-  ctx.fillStyle = "rgba(3,24,54,.28)";
-  ctx.fillRect(x, y, width, height);
-  const inset = 10;
-  const foregroundScale = Math.min((width - inset * 2) / image.width, (height - inset * 2) / image.height);
-  const foregroundWidth = image.width * foregroundScale;
-  const foregroundHeight = image.height * foregroundScale;
-  ctx.shadowColor = "rgba(0,10,30,.38)";
-  ctx.shadowBlur = 10;
-  ctx.drawImage(image, x + (width - foregroundWidth) / 2, y + (height - foregroundHeight) / 2, foregroundWidth, foregroundHeight);
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+  desenharImagemCover(ctx, image, x, y, width, height, radius);
   ctx.restore();
-  ctx.strokeStyle = "rgba(74,190,255,.9)";
-  ctx.lineWidth = 2;
-  canvasRoundRect(ctx, x, y, width, height, radius);
-  ctx.stroke();
 }
 
-function drawWeeklyPostHeader(ctx, assets, title, subtitle, format) {
+function drawWeeklyPostHeader(ctx, assets, title, subtitle, format, theme) {
   const vertical = format.key === "reels";
   const logoSize = vertical ? 184 : 128;
   const logoX = format.width - logoSize - (vertical ? 48 : 36);
@@ -26758,18 +26746,18 @@ function drawWeeklyPostHeader(ctx, assets, title, subtitle, format) {
   if (titleMatch) {
     ctx.save(); ctx.shadowColor = "rgba(0,27,76,.8)"; ctx.shadowBlur = 15; ctx.shadowOffsetY = 7;
     postArtDrawText(ctx, titleMatch[1], 58, titleY, titleWidth, 1, titleSize, "#ffffff", { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
-    postArtDrawText(ctx, titleMatch[2].trim(), 58, titleY + (vertical ? 94 : 65), titleWidth, 1, titleSize, "#ffd126", { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
+    postArtDrawText(ctx, titleMatch[2].trim(), 58, titleY + (vertical ? 94 : 65), titleWidth, 1, titleSize, theme.accent, { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
     ctx.restore();
   } else {
     ctx.save(); ctx.shadowColor = "rgba(0,27,76,.8)"; ctx.shadowBlur = 15; ctx.shadowOffsetY = 7;
     postArtDrawText(ctx, title, 58, titleY, titleWidth, 2, titleSize, "#ffffff", { min: vertical ? 62 : 44, lineHeight: vertical ? 94 : 65 });
     ctx.restore();
   }
-  preencherRoundRect(ctx, 58, vertical ? 334 : 226, vertical ? 610 : 435, vertical ? 12 : 9, 7, "#ffd126");
+  preencherRoundRect(ctx, 58, vertical ? 334 : 226, vertical ? 610 : 435, vertical ? 12 : 9, 7, theme.accent);
   postArtDrawText(ctx, subtitle, 58, vertical ? 374 : 249, vertical ? 700 : 600, 2, vertical ? 31 : 22, "#ffffff", { min: 18, weight: 800, lineHeight: vertical ? 37 : 27 });
 }
 
-function drawWeeklyPostCards(ctx, items, assets, format) {
+function drawWeeklyPostCards(ctx, items, assets, format, theme) {
   const vertical = format.key === "reels";
   const columns = items.length === 1 ? 1 : 2;
   const gap = vertical ? 20 : 13;
@@ -26777,7 +26765,7 @@ function drawWeeklyPostCards(ctx, items, assets, format) {
   const footerSpace = vertical ? 270 : 146;
   const rows = Math.ceil(items.length / columns);
   const cardW = (format.width - 48 - gap * (columns - 1)) / columns;
-  const cardH = Math.min(vertical ? 365 : 198, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
+  const cardH = Math.min(vertical ? 510 : 300, (format.height - startY - footerSpace - gap * Math.max(0, rows - 1)) / Math.max(1, rows));
   items.forEach((item, index) => {
     const col = index % columns;
     const row = Math.floor(index / columns);
@@ -26787,10 +26775,10 @@ function drawWeeklyPostCards(ctx, items, assets, format) {
     ctx.shadowColor = "rgba(0,17,49,.5)";
     ctx.shadowBlur = vertical ? 14 : 8;
     ctx.shadowOffsetY = 5;
-    preencherRoundRect(ctx, x, y, cardW, cardH - (vertical ? 50 : 34), 24, "#082c63");
+    preencherRoundRect(ctx, x, y, cardW, cardH - (vertical ? 55 : 38), 24, theme.card);
     ctx.restore();
     const barH = vertical ? 90 : 58;
-    const descriptionH = vertical ? 50 : 34;
+    const descriptionH = vertical ? 55 : 38;
     const imageH = cardH - barH - descriptionH;
     const status = weeklyPostStatus(item);
     const badgeW = status.label === "Novo" ? (vertical ? 138 : 88) : (vertical ? 188 : 120);
@@ -26804,30 +26792,33 @@ function drawWeeklyPostCards(ctx, items, assets, format) {
     ctx.beginPath(); ctx.moveTo(metaX - (vertical ? 14 : 10), y + 12); ctx.lineTo(metaX - (vertical ? 14 : 10), y + (vertical ? 63 : 43)); ctx.stroke();
     ctx.fillStyle = "#ffffff";
     postArtDrawText(ctx, item.estabelecimento || "Olá Carlópolis", metaX, y + (vertical ? 20 : 14), cardW - (metaX - x) - 14, 1, vertical ? 19 : 12, "#ffffff", { min: vertical ? 14 : 9, weight: 800, lineHeight: vertical ? 21 : 14 });
-    postArtDrawText(ctx, weeklyPostItemTitle(item), metaX, y + (vertical ? 40 : 27), cardW - (metaX - x) - 14, 2, vertical ? 22 : 14, "#ffd126", { min: vertical ? 13 : 8, weight: 900, lineHeight: vertical ? 23 : 14 });
+    postArtDrawText(ctx, weeklyPostItemTitle(item), metaX, y + (vertical ? 40 : 27), cardW - (metaX - x) - 14, 2, vertical ? 22 : 14, theme.accent, { min: vertical ? 13 : 8, weight: 900, lineHeight: vertical ? 23 : 14 });
     drawWeeklyClientImage(ctx, assets.images[index], x + 3, y + barH, cardW - 6, imageH, 18);
-    ctx.fillStyle = "#ffffff";
-    postArtDrawText(ctx, weeklyPostItemDescription(item), x + 16, y + cardH - descriptionH + (vertical ? 8 : 5), cardW - 32, 2, vertical ? 17 : 11, "#ffffff", { min: vertical ? 13 : 8, weight: 600, lineHeight: vertical ? 20 : 13 });
+    ctx.strokeStyle = theme.border;
+    ctx.lineWidth = 3;
+    canvasRoundRect(ctx, x + 2, y + barH - 1, cardW - 4, imageH + 2, 18);
+    ctx.stroke();
+    postArtDrawText(ctx, weeklyPostItemDescription(item), x + 16, y + cardH - descriptionH + (vertical ? 8 : 6), cardW - 32, 2, vertical ? 18 : 12, theme.text, { min: vertical ? 14 : 9, weight: 650, lineHeight: vertical ? 21 : 14 });
   });
 }
 
-function drawWeeklyPostFooter(ctx, format) {
+function drawWeeklyPostFooter(ctx, format, theme) {
   const vertical = format.key === "reels";
   const boxX = vertical ? 42 : 32;
   const boxY = format.height - (vertical ? 218 : 122);
   const boxW = format.width - boxX * 2;
   const boxH = vertical ? 174 : 94;
   const footerGradient = ctx.createLinearGradient(boxX, boxY, boxX + boxW, boxY + boxH);
-  footerGradient.addColorStop(0, "#031f49");
-  footerGradient.addColorStop(.58, "#063a70");
-  footerGradient.addColorStop(1, "#021a3d");
+  footerGradient.addColorStop(0, theme.footerStart);
+  footerGradient.addColorStop(.58, theme.card);
+  footerGradient.addColorStop(1, theme.footerEnd);
   ctx.save();
   ctx.shadowColor = "rgba(0,15,45,.42)";
   ctx.shadowBlur = vertical ? 22 : 13;
   ctx.shadowOffsetY = 7;
   preencherRoundRect(ctx, boxX, boxY, boxW, boxH, 34, footerGradient);
   ctx.restore();
-  preencherRoundRect(ctx, boxX + 26, boxY + 18, vertical ? 132 : 94, vertical ? 25 : 16, 12, "#ffd126");
+  preencherRoundRect(ctx, boxX + 26, boxY + 18, vertical ? 132 : 94, vertical ? 25 : 16, 12, theme.accent);
   ctx.textAlign = "left";
   ctx.fillStyle = "#082b60";
   ctx.font = `900 ${vertical ? 13 : 9}px Arial`;
@@ -26848,7 +26839,7 @@ function drawWeeklyPostFooter(ctx, format) {
   ctx.moveTo(ctaX - (vertical ? 24 : 16), boxY + (vertical ? 26 : 16));
   ctx.lineTo(ctaX - (vertical ? 24 : 16), boxY + boxH - (vertical ? 26 : 16));
   ctx.stroke();
-  preencherRoundRect(ctx, ctaX, ctaY, ctaW, ctaH, ctaH / 2, "#ffd126");
+  preencherRoundRect(ctx, ctaX, ctaY, ctaW, ctaH, ctaH / 2, theme.accent);
   ctx.fillStyle = "#082b60";
   ctx.textAlign = "center";
   ctx.font = `900 ${vertical ? 25 : 17}px Arial`;
@@ -26860,21 +26851,22 @@ function drawWeeklyPostFooter(ctx, format) {
 
 function drawWeeklyPostCanvas(ctx, items, assets, title, subtitle, format) {
   const vertical = format.key === "reels";
+  const theme = weeklyPostTheme();
   const headerH = vertical ? 520 : 300;
   ctx.fillStyle = "#006ca7";
   ctx.fillRect(0, 0, format.width, format.height);
   desenharImagemCover(ctx, assets.headerImage, 0, 0, format.width, headerH);
   const headerShade = ctx.createLinearGradient(0, 0, format.width, headerH);
-  headerShade.addColorStop(0, "rgba(0,35,86,.78)");
-  headerShade.addColorStop(.55, "rgba(0,43,91,.35)");
+  headerShade.addColorStop(0, theme.shade);
+  headerShade.addColorStop(.55, "rgba(20,35,42,.18)");
   headerShade.addColorStop(1, "rgba(0,33,78,.08)");
   ctx.fillStyle = headerShade; ctx.fillRect(0, 0, format.width, headerH);
   const bodyShade = ctx.createLinearGradient(0, headerH, 0, format.height);
-  bodyShade.addColorStop(0, "#075493"); bodyShade.addColorStop(1, "#003b6c");
+  bodyShade.addColorStop(0, theme.bodyStart); bodyShade.addColorStop(1, theme.bodyEnd);
   ctx.fillStyle = bodyShade; ctx.fillRect(0, headerH, format.width, format.height - headerH);
-  drawWeeklyPostHeader(ctx, assets, title, subtitle, format);
-  drawWeeklyPostCards(ctx, items, assets, format);
-  drawWeeklyPostFooter(ctx, format);
+  drawWeeklyPostHeader(ctx, assets, title, subtitle, format, theme);
+  drawWeeklyPostCards(ctx, items, assets, format, theme);
+  drawWeeklyPostFooter(ctx, format, theme);
 }
 
 function drawCentralPostCanvas(ctx, items, assets, title, subtitle, format, kind) {
@@ -26898,7 +26890,7 @@ async function atualizarPreviaPostSemanal() {
   if (!canvas) return;
   const request = ++centralPostPreviewRequest;
   const format = centralPostFormat();
-  const items = weeklyPostItems().filter((item) => state.weeklyPostSelectedIds.has(item.id)).slice(0, CENTRAL_POST_MAX_ITEMS);
+  const items = weeklyPostItems().filter((item) => state.weeklyPostSelectedIds.has(item.id)).slice(0, WEEKLY_POST_MAX_ITEMS);
   canvas.width = format.width; canvas.height = format.height;
   const assets = await centralPostAssets(items, centralPostImage);
   if (request !== centralPostPreviewRequest || !$("weeklyPostCanvas")) return;
@@ -26943,22 +26935,29 @@ function bindCentralPostFormats(render) {
   document.querySelectorAll("[data-central-post-format]").forEach((button) => button.addEventListener("click", () => { state.postArtCentralFormat = button.dataset.centralPostFormat; render(); }));
 }
 
+function weeklyPostThemeButtons() {
+  const active = weeklyPostTheme();
+  return `<div class="post-central-theme-label">Fundo e cores</div><div class="post-art-format-toggle post-central-theme-toggle">${Object.values(WEEKLY_POST_THEMES).map((theme) => `<button type="button" data-weekly-post-theme="${theme.key}" class="${active.key === theme.key ? "active" : ""}"><i class="fa-solid fa-palette"></i><strong>${theme.nome}</strong><span>${theme.descricao}</span></button>`).join("")}</div>`;
+}
+
 function renderWeeklyPostView() {
   const mount = $("postArtCentralContent");
   if (!mount) return;
   const items = weeklyPostItems();
   if (!state.weeklyPostSelectionReady) { state.weeklyPostSelectedIds = new Set(items.slice(0, 4).map((item) => item.id)); state.weeklyPostSelectionReady = true; }
+  if (state.weeklyPostSelectedIds.size > WEEKLY_POST_MAX_ITEMS) state.weeklyPostSelectedIds = new Set([...state.weeklyPostSelectedIds].slice(0, WEEKLY_POST_MAX_ITEMS));
   const selectedCount = items.filter((item) => state.weeklyPostSelectedIds.has(item.id)).length;
   const format = centralPostFormat();
   mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
-    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período e formato</strong><small>As novidades são lidas diretamente dos dados publicados.</small></div></div><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label>${centralPostFormatButtons()}</section>
+    <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, formato e cores</strong><small>As novidades são lidas diretamente dos dados publicados.</small></div></div><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label>${centralPostFormatButtons()}${weeklyPostThemeButtons()}</section>
     <section class="panel-card post-art-step"><div class="post-art-step-title"><span>2</span><div><strong>Textos da arte</strong><small>Ajuste a chamada sem alterar as notícias cadastradas.</small></div></div><div class="post-art-fields"><label class="wide">Título<input id="weeklyPostTitle" maxlength="72" value="${escapeAttr(state.weeklyPostTitle)}"></label><label class="wide">Subtítulo<textarea id="weeklyPostSubtitle" maxlength="140" rows="2">${escapeHtml(state.weeklyPostSubtitle)}</textarea></label></div></section>
-    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>3. Escolha as novidades</strong><p>Até ${CENTRAL_POST_MAX_ITEMS} itens • ${selectedCount} selecionado(s)</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list">${items.length ? items.map((item) => `<label class="post-central-data-card ${state.weeklyPostSelectedIds.has(item.id) ? "selected" : ""}"><input type="checkbox" data-weekly-post-id="${escapeAttr(item.id)}" ${state.weeklyPostSelectedIds.has(item.id) ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-newspaper"></i>`}</span><span><strong>${escapeHtml(weeklyPostItemTitle(item))}</strong><small>${escapeHtml(textoCurtoArte(weeklyPostItemDescription(item), 95))}</small><em>${escapeHtml(item.estabelecimento || "Olá Carlópolis")} • ${escapeHtml(centralPostDate(item.dataCriacao || item.createdAt))}</em></span></label>`).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período.</div>`}</div></section>
+    <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>3. Escolha as novidades</strong><p>Até ${WEEKLY_POST_MAX_ITEMS} itens • ${selectedCount} selecionado(s)</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list">${items.length ? items.map((item) => `<label class="post-central-data-card ${state.weeklyPostSelectedIds.has(item.id) ? "selected" : ""}"><input type="checkbox" data-weekly-post-id="${escapeAttr(item.id)}" ${state.weeklyPostSelectedIds.has(item.id) ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-newspaper"></i>`}</span><span><strong>${escapeHtml(weeklyPostItemTitle(item))}</strong><small>${escapeHtml(textoCurtoArte(weeklyPostItemDescription(item), 95))}</small><em>${escapeHtml(item.estabelecimento || "Olá Carlópolis")} • ${escapeHtml(centralPostDate(item.dataCriacao || item.createdAt))}</em></span></label>`).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período.</div>`}</div></section>
     </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<div class="post-art-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
   $("weeklyPostDays")?.addEventListener("change", (event) => { state.weeklyPostDays = Number(event.target.value); state.weeklyPostSelectionReady = false; renderWeeklyPostView(); });
   bindCentralPostFormats(renderWeeklyPostView);
+  mount.querySelectorAll("[data-weekly-post-theme]").forEach((button) => button.addEventListener("click", () => { state.weeklyPostTheme = button.dataset.weeklyPostTheme; renderWeeklyPostView(); }));
   [["weeklyPostTitle", "weeklyPostTitle"], ["weeklyPostSubtitle", "weeklyPostSubtitle"]].forEach(([id, key]) => $(id)?.addEventListener("input", (event) => { state[key] = event.target.value; centralPostSchedulePreview("weekly"); }));
-  mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = input.dataset.weeklyPostId; if (input.checked && state.weeklyPostSelectedIds.size >= CENTRAL_POST_MAX_ITEMS) { input.checked = false; return showToast(`Selecione no máximo ${CENTRAL_POST_MAX_ITEMS} novidades.`); } if (input.checked) state.weeklyPostSelectedIds.add(id); else state.weeklyPostSelectedIds.delete(id); renderWeeklyPostView(); }));
+  mount.querySelectorAll("[data-weekly-post-id]").forEach((input) => input.addEventListener("change", () => { const id = input.dataset.weeklyPostId; if (input.checked && state.weeklyPostSelectedIds.size >= WEEKLY_POST_MAX_ITEMS) { input.checked = false; return showToast(`Selecione no máximo ${WEEKLY_POST_MAX_ITEMS} novidades.`); } if (input.checked) state.weeklyPostSelectedIds.add(id); else state.weeklyPostSelectedIds.delete(id); renderWeeklyPostView(); }));
   $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
   if (selectedCount) atualizarPreviaPostSemanal();
 }
