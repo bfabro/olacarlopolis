@@ -38,6 +38,7 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.match(client, /uploadBytesResumable/);
   assert.match(client, /studioJobs\/\$\{state\.user\.uid\}/);
   assert.match(client, /onValue\(ref\(db, `studioJobs/);
+  assert.match(client, /getDownloadURL\(ref\(storage, project\.output\.storagePath\)\)/);
   assert.doesNotMatch(client, /setInterval\([^)]*progress/i);
 });
 

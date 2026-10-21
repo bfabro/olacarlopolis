@@ -317,6 +317,14 @@ async function loadProjects() {
   const snapshot = await get(query(ref(db, `studioProjects/${state.user.uid}`), limitToLast(30)));
   const value = snapshot.val() || {};
   state.projects = Object.entries(value).map(([id, project]) => ({ id, ...project })).sort((a, b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0));
+  await Promise.all(state.projects.map(async (project) => {
+    if (project.status !== "completed" || !project.output?.storagePath || project.output.downloadUrl) return;
+    try {
+      project.output.downloadUrl = await getDownloadURL(ref(storage, project.output.storagePath));
+    } catch (error) {
+      console.warn("Não foi possível preparar o download do projeto", project.id, error);
+    }
+  }));
   renderProjects();
 }
 
