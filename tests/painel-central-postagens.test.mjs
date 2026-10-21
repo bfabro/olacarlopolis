@@ -23,7 +23,7 @@ test("resumo semanal usa novidades reais com período e limite seguro", () => {
   assert.match(panel, /Últimos 30 dias/);
   assert.match(panel, /const CENTRAL_POST_MAX_ITEMS = 6/);
   assert.match(panel, /const WEEKLY_POST_MIN_ITEMS = 4/);
-  assert.match(panel, /const WEEKLY_POST_MAX_ITEMS = 10/);
+  assert.match(panel, /const WEEKLY_POST_MAX_ITEMS = 6/);
   assert.match(panel, /id="weeklyPostMaxItems"/);
   assert.match(panel, /function weeklyPostLimit/);
   assert.match(panel, /weeklyPostSelectedIds\.size >= itemLimit/);
@@ -42,6 +42,8 @@ test("vitrine permite seleção manual e aleatória de comércios reais", () => 
 test("artes oferecem Feed e Story, prévia e download PNG", () => {
   assert.match(panel, /width: 1080, height: 1080/);
   assert.match(panel, /width: 1080, height: 1920/);
+  assert.match(panel, /Feed 4:5/);
+  assert.match(panel, /width: 1080, height: 1350/);
   assert.match(panel, /weeklyPostCanvas/);
   assert.match(panel, /commercePostCanvas/);
   assert.match(panel, /canvasParaBlob/);
@@ -54,7 +56,7 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.match(panel, /function drawWeeklyPostHeader/);
   assert.match(panel, /function drawWeeklyLogoTransparent/);
   assert.match(panel, /const logoX = format\.width - logoSize/);
-  assert.match(panel, /const logoY = vertical \? 34 : 22/);
+  assert.match(panel, /const logoY = vertical \? 36 : 24/);
   assert.match(panel, /drawWeeklyLogoTransparent\(ctx, assets\.siteLogo, logoX, logoY/);
   assert.doesNotMatch(panel, /preencherRoundRect\(ctx, logoX - 8/);
   assert.match(panel, /carregarImagemCanvas\("\.\.\/images\/turismo\/ponte\.jpg"\)/);
@@ -62,8 +64,8 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.match(panel, /function drawWeeklyClientImage/);
   assert.match(panel, /ctx\.imageSmoothingQuality = "high"/);
   assert.match(panel, /desenharImagemCover\(ctx, image, x, y, width, height, radius\)/);
-  assert.match(panel, /count <= 6 \? 3 : 4/);
-  assert.match(panel, /count >= 9 \? 3/);
+  assert.match(panel, /const columns = count === 1 \? 1 : 2/);
+  assert.match(panel, /const isLastCentered = count % 2 === 1/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemTitle\(item\)/);
   assert.match(panel, /postArtDrawText\(ctx, weeklyPostItemDescription\(item\)/);
   assert.match(panel, /function weeklyPostStatus/);
@@ -74,6 +76,10 @@ test("novidades da semana seguem o modelo editorial e levam a logo ao topo direi
   assert.doesNotMatch(panel, /preencherRoundRect\(ctx, 58, vertical \? 334 : 226/);
   assert.match(panel, /const footerGradient = ctx\.createLinearGradient/);
   assert.match(panel, /www\.olacarlopolis\.com/);
+  assert.match(panel, /Empresas, imóveis, restaurantes e muito mais/);
+  assert.match(panel, /function weeklyPostClient/);
+  assert.match(panel, /assets\.logos\?\.\[index\]/);
+  assert.match(css, /\.weekly-post-canvas-shell\.is-feed canvas/);
 });
 
 test("novidades oferecem dois fundos suaves com paletas próprias", () => {
@@ -89,8 +95,8 @@ test("novidades oferecem dois fundos suaves com paletas próprias", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=599/);
-  assert.match(html, /painel\.js\?v=901/);
-  assert.match(panel, /numero: 894/);
-  assert.match(panel, /label: "v901"/);
+  assert.match(html, /painel\.css\?v=600/);
+  assert.match(html, /painel\.js\?v=902/);
+  assert.match(panel, /numero: 895/);
+  assert.match(panel, /label: "v902"/);
 });

@@ -12121,6 +12121,10 @@ button.admin-button-loading::after {
   aspect-ratio: 1;
 }
 
+.weekly-post-canvas-shell.is-feed canvas {
+  aspect-ratio: 4 / 5;
+}
+
 .post-art-canvas-shell.is-reels {
   max-width: 420px;
   margin-inline: auto;
