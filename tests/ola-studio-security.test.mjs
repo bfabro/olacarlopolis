@@ -74,6 +74,11 @@ test("editor visual reutiliza plano privado e envia somente origens do próprio 
   assert.match(client, /getBlob\(storageRef\(storage, storagePath\)\)/);
   assert.match(client, /planOverride/);
   assert.match(client, /mode === "preview"/);
+  assert.match(client, /data-version-download/);
+  assert.match(client, /data-version-restore/);
+  assert.match(client, /readPrivateJson\(version\.planStoragePath\)/);
+  assert.match(workerMain, /sceneCount: Array\.isArray\(plan\.scenes\)/);
+  assert.match(workerMain, /videoBitrateKbps: Number\(plan\.export/);
   assert.doesNotMatch(client, /OPENAI_API_KEY/);
 });
 

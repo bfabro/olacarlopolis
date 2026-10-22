@@ -126,7 +126,9 @@ Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON p
 - fonte, tamanho, cor, contorno, alinhamento, fundo e margem ajustáveis nos textos;
 - comando para criar uma nova montagem automática preservando as versões anteriores;
 - duração total recalculada considerando as sobreposições;
-- histórico preservado das exportações.
+- histórico preservado das exportações, com reprodução e download individual;
+- restauração segura do plano JSON de qualquer versão anterior para continuar a edição e gerar uma nova versão sem sobrescrever os renders existentes;
+- resumo técnico por versão com duração, quantidade de cenas, FPS e perfil de qualidade.
 
 O frontend nunca grava arquivos na pasta de renders. Ele envia uma cópia do plano editado ao trabalho privado da fila. O worker verifica novamente IDs de origem, limites, transições, tempos e duração total antes de executar FFmpeg. A prévia rápida usa exatamente esse plano em 360 × 640, 640 × 360 ou 480 × 480, com codificação acelerada; a exportação final mantém Full HD. Uma prévia cancelada ou com falha não remove o último vídeo final do projeto.
 

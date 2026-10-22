@@ -172,7 +172,28 @@ async function processJob(job) {
       const versionId = job.versionId || job.jobId;
       const versionNumber = Math.max(1, Number(job.versionNumber || project.versionCounter || 0) + (job.versionNumber ? 0 : 1));
       updates[`studioProjects/${job.uid}/${job.projectId}/versionCounter`] = versionNumber;
-      updates[`studioProjects/${job.uid}/${job.projectId}/versions/${versionId}`] = { id: versionId, number: versionNumber, jobId: job.jobId, output, planStoragePath, source: job.planOverride ? "visual-editor" : "automatic", createdAt: job.createdAt || Date.now(), completedAt: Date.now() };
+      updates[`studioProjects/${job.uid}/${job.projectId}/versions/${versionId}`] = {
+        id: versionId,
+        number: versionNumber,
+        jobId: job.jobId,
+        output,
+        planStoragePath,
+        source: job.planOverride ? "visual-editor" : "automatic",
+        summary: {
+          schemaVersion: Number(plan.schemaVersion || 1),
+          duration: Number(plan.duration || 0),
+          format: plan.format || project.format || "9:16",
+          sceneCount: Array.isArray(plan.scenes) ? plan.scenes.length : 0,
+          title: String(plan.text?.title || "").slice(0, 160),
+          export: {
+            fps: Number(plan.export?.fps || 30),
+            quality: plan.export?.quality || "balanced",
+            videoBitrateKbps: Number(plan.export?.videoBitrateKbps || 8000)
+          }
+        },
+        createdAt: job.createdAt || Date.now(),
+        completedAt: Date.now()
+      };
     }
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/status`] = "consumed";
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/completedAt`] = Date.now();

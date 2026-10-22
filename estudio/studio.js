@@ -19,7 +19,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map() };
+const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "" };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 
@@ -861,7 +861,18 @@ function renderVisualTimeline() {
 
 function renderVisualVersions() {
   const versions = Object.values(state.visualProject?.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0));
-  $("visualVersionHistory").innerHTML = versions.length ? versions.map((version) => `<div class="visual-version"><span><strong>Versão ${Number(version.number || 1)}</strong><small>${escapeHtml(version.source === "visual-editor" ? "Editor visual" : "Montagem automática")} • ${formatDate(version.completedAt)}</small></span><button type="button" data-version-open="${escapeHtml(version.id)}" title="Reproduzir esta versão"><i class="fa-solid fa-play"></i></button></div>`).join("") : '<p class="empty-copy">A primeira versão aparecerá aqui após a próxima exportação.</p>';
+  $("visualVersionHistory").innerHTML = versions.length ? versions.map((version) => {
+    const summary = version.summary || {};
+    const exportSettings = summary.export || {};
+    const details = [
+      summary.duration ? `${Number(summary.duration).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s` : "",
+      summary.sceneCount ? `${Number(summary.sceneCount)} cenas` : "",
+      exportSettings.fps ? `${Number(exportSettings.fps)} FPS` : "",
+      exportSettings.quality ? (STUDIO_EXPORT_QUALITIES[exportSettings.quality]?.label || exportSettings.quality) : ""
+    ].filter(Boolean).join(" • ");
+    const selected = state.selectedVisualVersionId === version.id;
+    return `<article class="visual-version${selected ? " is-selected" : ""}"><div class="visual-version-copy"><span><strong>Versão ${Number(version.number || 1)}</strong><small>${escapeHtml(version.source === "visual-editor" ? "Editor visual" : "Montagem automática")} • ${formatDate(version.completedAt)}</small></span>${details ? `<em>${escapeHtml(details)}</em>` : ""}</div><div class="visual-version-actions"><button type="button" data-version-open="${escapeHtml(version.id)}" title="Reproduzir esta versão" aria-label="Reproduzir versão ${Number(version.number || 1)}"><i class="fa-solid fa-play"></i></button><button type="button" data-version-download="${escapeHtml(version.id)}" title="Baixar esta versão" aria-label="Baixar versão ${Number(version.number || 1)}"><i class="fa-solid fa-download"></i></button><button type="button" data-version-restore="${escapeHtml(version.id)}" title="Carregar plano desta versão no editor" aria-label="Editar a partir da versão ${Number(version.number || 1)}" ${version.planStoragePath ? "" : "disabled"}><i class="fa-solid fa-clock-rotate-left"></i></button></div></article>`;
+  }).join("") : '<p class="empty-copy">A primeira versão aparecerá aqui após a próxima exportação.</p>';
 }
 
 async function setVisualPreview(output) {
@@ -884,6 +895,7 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   if (!planPath) planPath = Object.values(project.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0))[0]?.planStoragePath || "";
   state.visualProject = project;
   state.visualPlan = await readPrivateJson(planPath);
+  state.selectedVisualVersionId = Object.values(project.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0))[0]?.id || "";
   state.activeProjectId = projectId;
   state.visualSourceUrls = new Map();
   await Promise.all(project.sources.map(async (source) => {
@@ -909,7 +921,45 @@ async function openVisualVersion(versionId) {
   const version = state.visualProject?.versions?.[versionId];
   if (!version?.output) return toast("Arquivo desta versão não encontrado.");
   await setVisualPreview(version.output);
+  state.selectedVisualVersionId = versionId;
+  renderVisualVersions();
   $("visualPreviewNotice").textContent = `Reproduzindo a versão ${Number(version.number || 1)} preservada no histórico.`;
+}
+
+async function downloadVisualVersion(versionId) {
+  const version = state.visualProject?.versions?.[versionId];
+  if (!version?.output) throw new Error("Arquivo desta versão não encontrado.");
+  const url = await privateOutputUrl(version.output);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = cleanFileName(version.output.fileName || `${state.visualProject.name || "ola-studio"}-v${Number(version.number || 1)}.mp4`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  if (url.startsWith("blob:")) setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+async function restoreVisualVersion(versionId) {
+  const version = state.visualProject?.versions?.[versionId];
+  if (!version?.planStoragePath) throw new Error("O plano desta versão não está disponível.");
+  if (!window.confirm(`Carregar o plano da versão ${Number(version.number || 1)}? Ajustes ainda não renderizados no editor serão substituídos, mas nenhum vídeo será apagado.`)) return;
+  const plan = await readPrivateJson(version.planStoragePath);
+  const sourceIds = new Set((state.visualProject.sources || []).map((source) => source.id));
+  if (!Array.isArray(plan?.scenes) || !plan.scenes.length || plan.scenes.some((scene) => !sourceIds.has(scene.sourceId))) throw new Error("O plano desta versão não corresponde mais aos arquivos do projeto.");
+  state.visualPlan = plan;
+  state.selectedVisualVersionId = versionId;
+  $("visualTitle").value = plan.text?.title || "";
+  $("visualSubtitle").value = plan.text?.subtitle || "";
+  $("visualCta").value = plan.text?.callToAction || "";
+  renderVisualPrimaryTextStyle();
+  renderVisualAudioMixer();
+  renderVisualExportSettings();
+  renderVisualTimeline();
+  renderVisualTextLayers();
+  renderVisualVersions();
+  if (version.output) await setVisualPreview(version.output);
+  $("visualPreviewNotice").textContent = `Plano da versão ${Number(version.number || 1)} carregado para edição. Renderize para criar uma nova versão sem alterar as anteriores.`;
+  toast(`Versão ${Number(version.number || 1)} carregada no editor.`);
 }
 
 async function enqueueVisualRender(mode) {
@@ -1170,6 +1220,10 @@ $("visualTimeline").addEventListener("change", (event) => {
   syncVisualTexts();
 });
 $("visualVersionHistory").addEventListener("click", (event) => {
-  const button = event.target.closest("[data-version-open]");
-  if (button) openVisualVersion(button.dataset.versionOpen).catch((error) => toast(error.message));
+  const open = event.target.closest("[data-version-open]");
+  const download = event.target.closest("[data-version-download]");
+  const restore = event.target.closest("[data-version-restore]");
+  if (open) openVisualVersion(open.dataset.versionOpen).catch((error) => toast(error.message));
+  if (download) downloadVisualVersion(download.dataset.versionDownload).catch((error) => toast(error.message));
+  if (restore) restoreVisualVersion(restore.dataset.versionRestore).catch((error) => toast(error.message));
 });
