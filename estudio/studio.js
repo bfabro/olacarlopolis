@@ -708,6 +708,19 @@ function transitionOptions(selected, first) {
   return Object.values(STUDIO_TRANSITIONS).filter((item) => item.id !== "auto").map((item) => `<option value="${item.ffmpeg}" ${item.ffmpeg === selected ? "selected" : ""}>${escapeHtml(item.label)}</option>`).join("");
 }
 
+function visualTransitionDurationLimit(index) {
+  if (!state.visualPlan?.scenes?.[index] || index < 1) return 0;
+  const scene = state.visualPlan.scenes[index];
+  const previous = state.visualPlan.scenes[index - 1];
+  return Math.max(0.1, Math.min(1.5, Number(scene.duration || 0) / 2, Number(previous.duration || 0) / 2));
+}
+
+function clampVisualTransitionDuration(index, value) {
+  const scene = state.visualPlan?.scenes?.[index];
+  if (!scene || index < 1 || scene.transition === "hardcut") return 0;
+  return Number(Math.max(0.1, Math.min(visualTransitionDurationLimit(index), Number(value || 0.35))).toFixed(2));
+}
+
 function visualWaveformSamples() {
   const direct = state.visualPlan?.audio?.waveform;
   if (direct?.method === "music-pcm-envelope-v1" && direct.samples?.length) return direct.samples;
@@ -855,7 +868,10 @@ function renderVisualTimeline() {
     const media = image
       ? `<img class="visual-scene-media" src="${escapeHtml(url)}" alt="Cena ${index + 1}">`
       : `<video class="visual-scene-media" src="${escapeHtml(url)}#t=${Math.max(0, Number(scene.start || 0)).toFixed(2)}" muted preload="metadata"></video>`;
-    return `<article class="visual-scene" data-visual-scene="${index}"><span class="visual-scene-index">${index + 1}</span>${media}<div class="visual-scene-info"><strong>${escapeHtml(source.name || `Arquivo ${Number(scene.sourceIndex || 0) + 1}`)}</strong><label>Duração<input data-scene-duration="${index}" type="number" min="0.5" max="${Math.min(15, visualSourceDuration(scene)).toFixed(1)}" step="0.1" value="${Number(scene.duration || 0).toFixed(1)}"></label><label>Transição<select data-scene-transition="${index}" ${index === 0 ? "disabled" : ""}>${transitionOptions(scene.transition, index === 0)}</select></label>${visualTrimMarkup(scene, index, image)}</div><div class="visual-scene-actions"><button type="button" data-scene-up="${index}" ${index === 0 ? "disabled" : ""} title="Mover antes"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-scene-down="${index}" ${index === plan.scenes.length - 1 ? "disabled" : ""} title="Mover depois"><i class="fa-solid fa-arrow-down"></i></button></div></article>`;
+    const transitionDuration = index ? clampVisualTransitionDuration(index, scene.transitionDuration) : 0;
+    scene.transitionDuration = transitionDuration;
+    const transitionDurationField = index ? `<label>Duração da transição<input data-scene-transition-duration="${index}" type="number" min="0.1" max="${visualTransitionDurationLimit(index).toFixed(2)}" step="0.05" value="${transitionDuration.toFixed(2)}" ${scene.transition === "hardcut" ? "disabled" : ""}></label>` : "";
+    return `<article class="visual-scene" data-visual-scene="${index}"><span class="visual-scene-index">${index + 1}</span>${media}<div class="visual-scene-info"><strong>${escapeHtml(source.name || `Arquivo ${Number(scene.sourceIndex || 0) + 1}`)}</strong><label>Duração da cena<input data-scene-duration="${index}" type="number" min="0.5" max="${Math.min(15, visualSourceDuration(scene)).toFixed(1)}" step="0.1" value="${Number(scene.duration || 0).toFixed(1)}"></label><label>Transição<select data-scene-transition="${index}" ${index === 0 ? "disabled" : ""}>${transitionOptions(scene.transition, index === 0)}</select></label>${transitionDurationField}${visualTrimMarkup(scene, index, image)}</div><div class="visual-scene-actions"><button type="button" data-scene-up="${index}" ${index === 0 ? "disabled" : ""} title="Mover antes"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-scene-down="${index}" ${index === plan.scenes.length - 1 ? "disabled" : ""} title="Mover depois"><i class="fa-solid fa-arrow-down"></i></button></div></article>`;
   }).join("");
 }
 
@@ -1210,12 +1226,24 @@ $("visualTimeline").addEventListener("input", (event) => {
 $("visualTimeline").addEventListener("change", (event) => {
   const duration = event.target.closest("[data-scene-duration]");
   const transition = event.target.closest("[data-scene-transition]");
+  const transitionDuration = event.target.closest("[data-scene-transition-duration]");
   if (duration) {
-    const scene = state.visualPlan.scenes[Number(duration.dataset.sceneDuration)];
+    const index = Number(duration.dataset.sceneDuration);
+    const scene = state.visualPlan.scenes[index];
     scene.duration = Math.max(0.5, Math.min(15, visualSourceDuration(scene) - Number(scene.start || 0), Number(duration.value || 0.5)));
-    scene.transitionDuration = Math.min(Number(scene.transitionDuration || 0), scene.duration / 2);
+    scene.transitionDuration = clampVisualTransitionDuration(index, scene.transitionDuration);
+    if (state.visualPlan.scenes[index + 1]) state.visualPlan.scenes[index + 1].transitionDuration = clampVisualTransitionDuration(index + 1, state.visualPlan.scenes[index + 1].transitionDuration);
   }
-  if (transition) state.visualPlan.scenes[Number(transition.dataset.sceneTransition)].transition = transition.value;
+  if (transition) {
+    const index = Number(transition.dataset.sceneTransition);
+    const scene = state.visualPlan.scenes[index];
+    scene.transition = transition.value;
+    scene.transitionDuration = clampVisualTransitionDuration(index, scene.transitionDuration || 0.35);
+  }
+  if (transitionDuration) {
+    const index = Number(transitionDuration.dataset.sceneTransitionDuration);
+    state.visualPlan.scenes[index].transitionDuration = clampVisualTransitionDuration(index, transitionDuration.value);
+  }
   renderVisualTimeline();
   syncVisualTexts();
 });

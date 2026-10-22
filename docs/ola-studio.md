@@ -117,7 +117,7 @@ Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON p
 - timeline com miniaturas dos arquivos reais;
 - ordem das cenas;
 - duração individual entre 0,5 e 15 segundos;
-- transição de cada corte;
+- transição de cada corte e duração individual da sobreposição, limitada automaticamente pela duração das duas cenas;
 - título, subtítulo e chamada final;
 - forma de onda calculada a partir do áudio real das mídias ou da música selecionada;
 - recorte do início e do fim de cada vídeo por alças na timeline;
