@@ -39,7 +39,7 @@ export async function prepareSemanticEvidence(analyzedSources, workDir, options 
   const transcripts = [];
   const representative = new Map();
   candidates.forEach((candidate) => { if (!representative.has(candidate.sourceId)) representative.set(candidate.sourceId, candidate); });
-  for (const candidate of [...representative.values()].slice(0, 8)) {
+  for (const candidate of [...representative.values()].slice(0, options.maxFrames || workerConfig.aiMaxFrames)) {
     const source = analyzedSources.find((item) => item.id === candidate.sourceId);
     if (!source) continue;
     const target = path.join(workDir, `semantic-frame-${frames.length + 1}.jpg`);
@@ -122,7 +122,8 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
       recommendedRhythm: direction.rhythm,
       visualInputCount: evidence.frames.length,
       transcriptionInputCount: evidence.transcripts.length,
-      usage: providerMeta.usage || null
+      usage: providerMeta.usage || null,
+      estimatedCostUsd: Number(providerMeta.estimatedCostUsd || 0)
     },
     scenes
   };
@@ -139,6 +140,7 @@ export class OpenAISemanticPlanner {
     this.model = options.model || "";
     this.fetchImpl = options.fetchImpl || fetch;
     this.endpoint = options.endpoint || "https://api.openai.com/v1/responses";
+    this.pricing = options.pricing || { inputUsdPerMillion: workerConfig.aiInputUsdPerMillion, outputUsdPerMillion: workerConfig.aiOutputUsdPerMillion };
   }
   get enabled() { return Boolean(this.apiKey && this.model); }
   async createPlan({ project, basePlan, evidence, analyzedSources, signal }) {
@@ -148,7 +150,7 @@ export class OpenAISemanticPlanner {
     const content = [
       { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços ou características. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
     ];
-    evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro representativo do ${frame.candidateId}, origem ${frame.sourceId}:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: "low" }); });
+    evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro representativo do ${frame.candidateId}, origem ${frame.sourceId}:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: workerConfig.aiImageDetail }); });
     const timeoutSignal = AbortSignal.timeout(workerConfig.aiTimeoutMs);
     const requestSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;
     const response = await this.fetchImpl(this.endpoint, {
@@ -162,8 +164,17 @@ export class OpenAISemanticPlanner {
     const text = responseText(payload);
     if (!text) throw new Error("Diretor de IA não devolveu um plano estruturado.");
     const direction = JSON.parse(text);
-    return mergeSemanticDirection(basePlan, direction, evidence, analyzedSources, { provider: "openai", model: this.model, usage: payload.usage || null });
+    return mergeSemanticDirection(basePlan, direction, evidence, analyzedSources, { provider: "openai", model: this.model, usage: payload.usage || null, estimatedCostUsd: estimateSemanticUsageCost(payload.usage, this.pricing) });
   }
+}
+
+export function estimateSemanticUsageCost(usage = {}, pricing = {}) {
+  if (!usage || typeof usage !== "object") return null;
+  const inputTokens = Number(usage.input_tokens || usage.prompt_tokens || 0);
+  const outputTokens = Number(usage.output_tokens || usage.completion_tokens || 0);
+  const inputRate = Math.max(0, Number(pricing.inputUsdPerMillion || 0));
+  const outputRate = Math.max(0, Number(pricing.outputUsdPerMillion || 0));
+  return Number(((inputTokens * inputRate + outputTokens * outputRate) / 1_000_000).toFixed(6));
 }
 
 export function createSemanticPlanner(options = {}) {

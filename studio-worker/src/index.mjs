@@ -11,6 +11,7 @@ import { renderPlan } from "./renderer.mjs";
 import { analyzeMusicRhythm } from "./rhythm.mjs";
 import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence } from "./ai-planner.mjs";
 import { prepareVisualEditorPlan } from "./editor-plan.mjs";
+import { generateLibraryMusic, generateTransitionSoundtrack, generatedAudioPaths } from "./sound-library.mjs";
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -76,13 +77,16 @@ async function processJob(job) {
     ensureNotCancelled();
     const logo = await downloadAsset(project.logo, sourceDir, "logo");
     const music = await downloadAsset(project.music, sourceDir, "music");
+    const audioPaths = generatedAudioPaths(workDir);
+    const requestedLibraryMusic = job.planOverride?.music?.libraryTrack || project.libraryMusic || "none";
+    const musicPath = music?.localPath || await generateLibraryMusic(requestedLibraryMusic, project.duration, audioPaths.music, cancellation.signal);
     ensureNotCancelled();
     const analyzed = await analyzeSources(sources, async (done, total) => updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 32 + Math.round(done / total * 16), message: `Analisando arquivo ${done} de ${total}.` }), cancellation.signal);
     const totalSourceDuration = analyzed.reduce((sum, source) => sum + (source.contentType.startsWith("video/") ? Number(source.metadata.duration || 0) : 0), 0);
     if (sources.length > 10) throw new Error("O projeto excede o limite de 10 arquivos.");
     if (totalSourceDuration > 600) throw new Error("A duração total dos vídeos de origem excede 10 minutos.");
-    await updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 49, message: music?.localPath ? "Analisando o ritmo real da música." : "Montando a narrativa técnica." });
-    const rhythm = await analyzeMusicRhythm(music?.localPath || "", workDir, cancellation.signal);
+    await updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 49, message: musicPath ? "Analisando o ritmo real da música." : "Montando a narrativa técnica." });
+    const rhythm = await analyzeMusicRhythm(musicPath, workDir, cancellation.signal);
     const technicalPlan = createDeterministicPlan(project, analyzed, { rhythm });
     let plan = job.planOverride ? prepareVisualEditorPlan(job.planOverride, technicalPlan, analyzed) : technicalPlan;
     if (!job.planOverride && project.director?.mode === "semantic") {
@@ -93,7 +97,7 @@ async function processJob(job) {
         try {
           await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 49, message: "O diretor de IA está analisando quadros, transcrições e o objetivo criativo." });
           const sourceTranscriptionProvider = await createTranscriptionProvider();
-          const evidence = await prepareSemanticEvidence(analyzed, workDir, { signal: cancellation.signal, transcriptionProvider: sourceTranscriptionProvider, prompt: project.captions?.prompt || "" });
+          const evidence = await prepareSemanticEvidence(analyzed, workDir, { signal: cancellation.signal, transcriptionProvider: sourceTranscriptionProvider, prompt: project.captions?.prompt || "", maxFrames: workerConfig.aiMaxFrames });
           plan = await semanticPlanner.createPlan({ project, basePlan: technicalPlan, evidence, analyzedSources: analyzed, signal: cancellation.signal });
         } catch (error) {
           if (error?.code === "studio_cancelled" || cancellation.signal.aborted) throw error;
@@ -108,6 +112,7 @@ async function processJob(job) {
       ? { requested: true, applied: plan.aiDirector?.applied === true, provider: plan.planner?.provider || "", model: plan.planner?.model || "", reason: plan.aiDirector?.reason || "", updatedAt: Date.now() }
       : { requested: false, applied: false, updatedAt: Date.now() };
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
+    const soundEffectsPath = await generateTransitionSoundtrack(plan.soundEffects?.preset || "none", plan, audioPaths.effects, cancellation.signal);
     await uploadJson(plan, planStoragePath);
     await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ directorResult });
     await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.type === "semantic-ai" ? "Direção semântica concluída. Renderizando cenas." : plan.planner?.fallback ? "IA indisponível. Renderizando com a montagem técnica local." : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, director: directorResult });
@@ -116,7 +121,7 @@ async function processJob(job) {
       : null;
     const transcriptionProvider = project.captionsEnabled && !approvedTranscription ? await createTranscriptionProvider() : null;
     const rendered = await renderPlan({
-      plan, sources: analyzed, outputDir, logoPath: logo?.localPath || "", musicPath: music?.localPath || "",
+      plan, sources: analyzed, outputDir, logoPath: logo?.localPath || "", musicPath, soundEffectsPath,
       renderProfile: job.mode === "preview" ? "preview" : "final",
       transcriptionProvider,
       approvedTranscription,
@@ -155,7 +160,7 @@ async function processJob(job) {
     const output = await uploadRender(outputPath, storagePath);
     ensureNotCancelled();
     const elapsedSeconds = Math.round((Date.now() - started) / 1000);
-    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.type === "semantic-ai" ? plan.planner.provider : "none", aiModel: plan.planner?.type === "semantic-ai" ? plan.planner.model : "none", aiUsage: plan.aiDirector?.usage || null, workerId: workerConfig.workerId, createdAt: Date.now() };
+    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.type === "semantic-ai" ? plan.planner.provider : "none", aiModel: plan.planner?.type === "semantic-ai" ? plan.planner.model : "none", aiUsage: plan.aiDirector?.usage || null, aiEstimatedCostUsd: Number(plan.aiDirector?.estimatedCostUsd || 0), workerId: workerConfig.workerId, createdAt: Date.now() };
     const updates = {};
     updates[`studioJobs/${job.uid}/${job.jobId}/status`] = "completed";
     updates[`studioJobs/${job.uid}/${job.jobId}/stage`] = "complete";

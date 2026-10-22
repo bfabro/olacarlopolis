@@ -113,6 +113,20 @@ export const STUDIO_EXPORT_QUALITIES = Object.freeze({
   high: Object.freeze({ id: "high", label: "Alta", videoBitrateKbps: 12000, audioBitrateKbps: 192, preset: "medium" })
 });
 
+export const STUDIO_LIBRARY_MUSIC = Object.freeze({
+  none: Object.freeze({ id: "none", label: "Sem trilha", description: "Mantém somente o áudio original." }),
+  ambient: Object.freeze({ id: "ambient", label: "Horizonte calmo", description: "Trilha ambiente original para turismo, imóveis e vídeos institucionais." }),
+  corporate: Object.freeze({ id: "corporate", label: "Conexão positiva", description: "Trilha original leve para empresas e comércio local." }),
+  dynamic: Object.freeze({ id: "dynamic", label: "Pulso dinâmico", description: "Trilha original ritmada para Reels, eventos e promoções." })
+});
+
+export const STUDIO_TRANSITION_SOUNDS = Object.freeze({
+  none: Object.freeze({ id: "none", label: "Sem efeitos" }),
+  subtle: Object.freeze({ id: "subtle", label: "Suave" }),
+  impact: Object.freeze({ id: "impact", label: "Impacto" }),
+  sparkle: Object.freeze({ id: "sparkle", label: "Brilho" })
+});
+
 const text = (value, max = 180) => String(value || "").trim().slice(0, max);
 const numberBetween = (value, min, max, fallback) => {
   const parsed = Number(value);
@@ -205,6 +219,8 @@ export function normalizeStudioProject(input = {}) {
       fadeSeconds: numberBetween(input.audio?.fadeSeconds, 0, 5, 1.2),
       noiseReduction: input.audio?.noiseReduction === true
     },
+    libraryMusic: STUDIO_LIBRARY_MUSIC[input.libraryMusic] ? input.libraryMusic : "none",
+    transitionSound: STUDIO_TRANSITION_SOUNDS[input.transitionSound] ? input.transitionSound : "none",
     sources: Array.isArray(input.sources) ? input.sources.slice(0, STUDIO_LIMITS.maxFiles) : [],
     logo: input.logo || null,
     music: input.music || null

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { STUDIO_CAPTION_STYLES, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, normalizeStudioProject, studioJobCostEstimate, validateEditPlan, validateStudioProject } from "../shared/studio-contracts.mjs";
+import { STUDIO_CAPTION_STYLES, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_LIBRARY_MUSIC, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate, validateEditPlan, validateStudioProject } from "../shared/studio-contracts.mjs";
 
 const source = { id: "media-1", storagePath: "studio/uid/originals/project/video.mp4", contentType: "video/mp4", size: 1024 };
 
@@ -79,4 +79,15 @@ test("normaliza áudio e legendas dentro de limites seguros", () => {
   assert.equal(project.audio.voiceVolume, 0.5);
   assert.equal(project.audio.fadeSeconds, 5);
   assert.equal(project.audio.noiseReduction, true);
+});
+
+test("normaliza somente trilhas e efeitos internos conhecidos", () => {
+  assert.equal(Object.keys(STUDIO_LIBRARY_MUSIC).length, 4);
+  assert.equal(Object.keys(STUDIO_TRANSITION_SOUNDS).length, 4);
+  const valid = normalizeStudioProject({ libraryMusic: "corporate", transitionSound: "subtle" });
+  const unsafe = normalizeStudioProject({ libraryMusic: "https://example.com/song.mp3", transitionSound: "arquivo-local" });
+  assert.equal(valid.libraryMusic, "corporate");
+  assert.equal(valid.transitionSound, "subtle");
+  assert.equal(unsafe.libraryMusic, "none");
+  assert.equal(unsafe.transitionSound, "none");
 });

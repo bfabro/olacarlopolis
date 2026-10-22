@@ -56,6 +56,32 @@ const median = (values) => {
   return ordered.length % 2 ? ordered[middle] : (ordered[middle - 1] + ordered[middle]) / 2;
 };
 
+const quantile = (values, position) => {
+  const ordered = [...values].filter(Number.isFinite).sort((a, b) => a - b);
+  if (!ordered.length) return 0;
+  const index = (ordered.length - 1) * Math.max(0, Math.min(1, position));
+  const lower = Math.floor(index);
+  const upper = Math.ceil(index);
+  return ordered[lower] + (ordered[upper] - ordered[lower]) * (index - lower);
+};
+
+const bounded = (value, minimum, maximum) => Math.max(minimum, Math.min(maximum, value));
+
+export function deriveQualityThresholds(frames = []) {
+  if (frames.length < 6) return { darkBrightness: 0.13, frozenMotion: 0.003, highMotion: 0.16, blur: 12, sampleCount: frames.length, method: "safe-default-v1" };
+  const brightness = frames.map((frame) => frame.brightness);
+  const motion = frames.map((frame) => frame.motion);
+  const blur = frames.map((frame) => frame.blur).filter(Number.isFinite);
+  return {
+    darkBrightness: round(bounded(quantile(brightness, 0.1) * 0.72, 0.08, 0.15)),
+    frozenMotion: round(bounded(quantile(motion, 0.15) * 0.45, 0.0015, 0.0045), 4),
+    highMotion: round(bounded(quantile(motion, 0.9) * 1.35, 0.12, 0.22)),
+    blur: round(bounded((quantile(blur, 0.75) || 9) * 1.35, 10, 18)),
+    sampleCount: frames.length,
+    method: "source-adaptive-percentiles-v1"
+  };
+}
+
 export function parseCameraMotionTransforms(content = "", fps = 4) {
   const frames = [];
   let previous = null;
@@ -96,7 +122,8 @@ export function buildShakeIntervals(frames, duration, threshold = 4.5) {
 export async function analyzeCameraStability(localPath, metadata, signal) {
   if (!metadata?.hasVideo || metadata.contentType?.startsWith("image/")) return { frames: [], intervals: [], method: "none" };
   const fps = 4;
-  const transformPath = path.join(path.dirname(localPath), `.camera-${crypto.randomUUID()}.trf`);
+  await fs.mkdir(workerConfig.workRoot, { recursive: true });
+  const transformPath = path.join(workerConfig.workRoot, `.camera-${crypto.randomUUID()}.trf`);
   const filterPath = transformPath.replace(/\\/g, "/").replace(/:/g, "\\:");
   try {
     await runProcess(workerConfig.ffmpegPath, ["-y", "-hide_banner", "-i", localPath, "-vf", `fps=${fps},scale=320:-2,vidstabdetect=result=${filterPath}:shakiness=5:accuracy=9:mincontrast=0.25`, "-an", "-f", "null", "-"], { signal });
@@ -112,7 +139,7 @@ export async function analyzeCameraStability(localPath, metadata, signal) {
 
 const overlaps = (intervals, start, end) => intervals.some((item) => Number(item.end) > start && Number(item.start) < end);
 
-export function buildQualityWindows(frames, duration, detections = {}) {
+export function buildQualityWindows(frames, duration, detections = {}, thresholds = deriveQualityThresholds(frames)) {
   const buckets = new Map();
   for (const frame of frames) {
     const second = Math.max(0, Math.floor(frame.time));
@@ -127,10 +154,10 @@ export function buildQualityWindows(frames, duration, detections = {}) {
     const blurSamples = samples.map((item) => item.blur).filter(Number.isFinite);
     const blur = blurSamples.length ? blurSamples.reduce((sum, value) => sum + value, 0) / blurSamples.length : 0;
     const flags = [];
-    if (brightness < 0.13 || overlaps(detections.black || [], second, second + 1)) flags.push("dark");
-    if (motion < 0.003 || overlaps(detections.freeze || [], second, second + 1)) flags.push("frozen");
-    if (motion > 0.16) flags.push("high_motion");
-    if (blur > 12) flags.push("blurred");
+    if (brightness < thresholds.darkBrightness || overlaps(detections.black || [], second, second + 1)) flags.push("dark");
+    if (motion < thresholds.frozenMotion || overlaps(detections.freeze || [], second, second + 1)) flags.push("frozen");
+    if (motion > thresholds.highMotion) flags.push("high_motion");
+    if (blur > thresholds.blur) flags.push("blurred");
     if (overlaps(detections.shake || [], second, second + 1)) flags.push("shaky");
     const exposure = Math.max(0, 1 - Math.abs(brightness - 0.48) * 1.45);
     const movement = motion < 0.006 ? 0.25 : motion > 0.18 ? 0.45 : 1;
@@ -141,7 +168,7 @@ export function buildQualityWindows(frames, duration, detections = {}) {
 }
 
 export async function analyzeVideo(localPath, metadata, signal) {
-  if (!metadata.hasVideo || metadata.contentType.startsWith("image/")) return { sceneTimes: [0], silences: [], qualityWindows: [{ start: 0, end: 15, brightness: 0.5, motion: 0, blur: 0, score: 0.82, flags: [] }], blackIntervals: [], freezeIntervals: [], shakeIntervals: [], analysisMethod: "still-image" };
+  if (!metadata.hasVideo || metadata.contentType.startsWith("image/")) return { sceneTimes: [0], silences: [], qualityWindows: [{ start: 0, end: 15, brightness: 0.5, motion: 0, blur: 0, score: 0.82, flags: [] }], qualityThresholds: deriveQualityThresholds([]), blackIntervals: [], freezeIntervals: [], shakeIntervals: [], analysisMethod: "still-image" };
   const tolerateAnalysisError = (error) => { if (error?.code === "studio_cancelled") throw error; return { stdout: error.stdout || "", stderr: error.stderr || "" }; };
   const scene = await runProcess(workerConfig.ffmpegPath, ["-hide_banner", "-i", localPath, "-vf", "select='gt(scene,0.32)',showinfo", "-an", "-f", "null", "-" ], { signal }).catch(tolerateAnalysisError);
   const signalAnalysis = await runProcess(workerConfig.ffmpegPath, ["-hide_banner", "-i", localPath, "-vf", "fps=2,scale=320:-2,signalstats,blurdetect=block_width=32:block_height=32,metadata=print,blackdetect=d=0.5:pix_th=0.10,freezedetect=n=-50dB:d=1", "-an", "-f", "null", "-"], { signal }).catch(tolerateAnalysisError);
@@ -151,6 +178,7 @@ export async function analyzeVideo(localPath, metadata, signal) {
   const blackIntervals = parseIntervals(log, "black");
   const freezeIntervals = parseIntervals(log, "freeze");
   const frames = parseSignalFrames(log);
+  const qualityThresholds = deriveQualityThresholds(frames);
   return {
     sceneTimes: [0, ...parseSceneTimes(scene.stderr)].filter((time, index, list) => time < metadata.duration && (index === 0 || time - list[index - 1] >= 1)),
     silences: parseSilences(silence.stderr),
@@ -158,8 +186,34 @@ export async function analyzeVideo(localPath, metadata, signal) {
     freezeIntervals,
     shakeIntervals: camera.intervals,
     cameraAnalysisMethod: camera.method,
-    qualityWindows: buildQualityWindows(frames, metadata.duration, { black: blackIntervals, freeze: freezeIntervals, shake: camera.intervals }),
-    analysisMethod: "ffmpeg-technical-v2"
+    qualityThresholds,
+    qualityWindows: buildQualityWindows(frames, metadata.duration, { black: blackIntervals, freeze: freezeIntervals, shake: camera.intervals }, qualityThresholds),
+    analysisMethod: "ffmpeg-technical-v3-adaptive"
+  };
+}
+
+export function summarizeCalibration(analyzedSources = []) {
+  const videos = analyzedSources.filter((source) => source.metadata?.hasVideo && !String(source.contentType || "").startsWith("image/"));
+  const thresholds = videos.map((source) => source.technical?.qualityThresholds).filter(Boolean);
+  const totals = { windows: 0, dark: 0, frozen: 0, high_motion: 0, blurred: 0, shaky: 0 };
+  videos.forEach((source) => (source.technical?.qualityWindows || []).forEach((window) => {
+    totals.windows += 1;
+    window.flags.forEach((flag) => { if (Object.hasOwn(totals, flag)) totals[flag] += 1; });
+  }));
+  return {
+    schemaVersion: 1,
+    analyzedAt: new Date().toISOString(),
+    files: videos.length,
+    filesAnalyzed: videos.length,
+    totalDuration: round(videos.reduce((sum, source) => sum + Number(source.metadata?.duration || 0), 0)),
+    totals,
+    recommendedThresholds: thresholds.length ? {
+      darkBrightness: round(quantile(thresholds.map((item) => item.darkBrightness), 0.5)),
+      frozenMotion: round(quantile(thresholds.map((item) => item.frozenMotion), 0.5), 4),
+      highMotion: round(quantile(thresholds.map((item) => item.highMotion), 0.5)),
+      blur: round(quantile(thresholds.map((item) => item.blur), 0.5))
+    } : deriveQualityThresholds([]),
+    sources: videos.map((source) => ({ id: source.id, name: source.name, metadata: source.metadata, thresholds: source.technical?.qualityThresholds, shakeIntervals: source.technical?.shakeIntervals?.length || 0, windows: source.technical?.qualityWindows?.length || 0, averageScore: round((source.technical?.qualityWindows || []).reduce((sum, window) => sum + Number(window.score || 0), 0) / Math.max(1, source.technical?.qualityWindows?.length || 0)) }))
   };
 }
 

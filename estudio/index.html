@@ -157,12 +157,14 @@
                   <label class="toggle-field"><input id="textBackground" type="checkbox" checked><span></span><div><strong>Fundo semitransparente</strong><small>Melhora a leitura sobre imagens claras.</small></div></label>
                 </div>
                 <label class="file-field">Logo<input id="logoFile" type="file" accept="image/png,image/webp"><span id="logoFileLabel"><i class="fa-regular fa-image"></i> Escolher PNG ou WebP</span></label>
-                <label class="file-field">Música licenciada<input id="musicFile" type="file" accept="audio/mpeg,audio/mp4,audio/wav,audio/ogg"><span id="musicFileLabel"><i class="fa-solid fa-music"></i> Escolher áudio</span></label>
+                <label>Trilha original do Studio<select id="libraryMusic"><option value="none">Sem trilha</option><option value="ambient">Horizonte calmo</option><option value="corporate">Conexão positiva</option><option value="dynamic">Pulso dinâmico</option></select></label>
+                <label class="file-field">Ou envie uma música licenciada<input id="musicFile" type="file" accept="audio/mpeg,audio/mp4,audio/wav,audio/ogg"><span id="musicFileLabel"><i class="fa-solid fa-music"></i> Escolher áudio</span></label>
                 <div class="wide text-design-panel audio-design-panel">
-                  <div><strong>Áudio profissional</strong><small>A voz é preservada e a música reduz automaticamente durante a fala.</small></div>
+                  <div><strong>Áudio profissional</strong><small>As trilhas e efeitos internos são originais, gerados localmente e não usam obras de terceiros. Um arquivo enviado sempre tem prioridade.</small></div>
                   <label>Volume da voz<input id="voiceVolume" type="range" min="50" max="160" value="100"><output id="voiceVolumeValue">100%</output></label>
                   <label>Volume da música<input id="musicVolume" type="range" min="0" max="70" value="18"><output id="musicVolumeValue">18%</output></label>
                   <label>Fade da música<select id="musicFadeSeconds"><option value="0">Sem fade</option><option value="0.8">Rápido — 0,8s</option><option value="1.2" selected>Suave — 1,2s</option><option value="2.5">Cinematográfico — 2,5s</option></select></label>
+                  <label>Efeito nas transições<select id="transitionSound"><option value="none">Sem efeitos</option><option value="subtle">Suave</option><option value="impact">Impacto</option><option value="sparkle">Brilho</option></select></label>
                   <label class="toggle-field"><input id="noiseReduction" type="checkbox"><span></span><div><strong>Redução moderada de ruído</strong><small>Filtra ruído contínuo sem substituir a voz.</small></div></label>
                 </div>
                 <label class="toggle-field wide"><input id="captionsEnabled" type="checkbox"><span></span><div><strong>Transcrever e gerar legendas</strong><small>O Whisper local reconhece a fala em português e usa timestamps reais.</small></div></label>
@@ -228,6 +230,8 @@
               </div>
               <div class="visual-layer-heading"><strong>Mixagem de áudio</strong><span class="visual-mixer-status">Aplicada na próxima renderização</span></div>
               <div class="visual-audio-mixer">
+                <label>Trilha original<select id="visualLibraryMusic"><option value="none">Sem trilha</option><option value="ambient">Horizonte calmo</option><option value="corporate">Conexão positiva</option><option value="dynamic">Pulso dinâmico</option></select></label>
+                <label>Efeitos de transição<select id="visualTransitionSound"><option value="none">Sem efeitos</option><option value="subtle">Suave</option><option value="impact">Impacto</option><option value="sparkle">Brilho</option></select></label>
                 <label>Voz e som original<input id="visualVoiceVolume" type="range" min="50" max="160" step="1"><output id="visualVoiceVolumeValue">100%</output></label>
                 <label>Trilha musical<input id="visualMusicVolume" type="range" min="0" max="70" step="1"><output id="visualMusicVolumeValue">18%</output></label>
                 <label>Fade da música<input id="visualMusicFade" type="range" min="0" max="5" step="0.1"><output id="visualMusicFadeValue">1,2s</output></label>
@@ -289,6 +293,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=21"></script>
+  <script type="module" src="studio.js?v=22"></script>
 </body>
 </html>

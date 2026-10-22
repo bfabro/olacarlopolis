@@ -29,7 +29,8 @@ export function waveformFromPcm(buffer, bins = 96) {
 
 export async function analyzeAudioWaveform(localPath, metadata, signal) {
   if (!metadata?.hasAudio) return { available: false, samples: [], duration: Number(metadata?.duration || 0), method: "none" };
-  const pcmPath = path.join(path.dirname(localPath), `.waveform-${crypto.randomUUID()}.pcm`);
+  await fs.mkdir(workerConfig.workRoot, { recursive: true });
+  const pcmPath = path.join(workerConfig.workRoot, `.waveform-${crypto.randomUUID()}.pcm`);
   try {
     await runProcess(workerConfig.ffmpegPath, ["-y", "-hide_banner", "-i", localPath, "-vn", "-ac", "1", "-ar", "1000", "-f", "s16le", pcmPath], { signal });
     const samples = waveformFromPcm(await fs.readFile(pcmPath), 96);

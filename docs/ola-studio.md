@@ -60,8 +60,11 @@ Variáveis opcionais:
 - `STUDIO_WHISPER_THREADS`
 - `STUDIO_WHISPER_WORD_THRESHOLD`
 - `OPENAI_API_KEY` (somente no ambiente seguro do worker)
-- `STUDIO_OPENAI_MODEL` (obrigatório junto com a chave; não há modelo presumido)
+- `STUDIO_OPENAI_MODEL` (padrão protegido: `gpt-6-luna`; só é usado quando existe `OPENAI_API_KEY`)
 - `STUDIO_AI_TIMEOUT_MS`
+- `STUDIO_AI_MAX_FRAMES` (padrão 6)
+- `STUDIO_AI_IMAGE_DETAIL` (`low` por padrão ou `high`)
+- `STUDIO_AI_INPUT_USD_PER_MILLION` e `STUDIO_AI_OUTPUT_USD_PER_MILLION` para a estimativa auditável de custo
 
 A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e `If-Match`, evitando que dois workers processem o mesmo trabalho. Leituras externas têm tempo limite para que uma conexão iniciada antes da rede do contêiner ficar pronta não bloqueie o worker indefinidamente.
 
@@ -70,6 +73,7 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 - lê streams e duração com FFprobe;
 - detecta mudanças de cena, silêncios, trechos escuros, congelados, desfocados e tremidos;
 - mede nitidez por quadro e estabilidade por vetores reais de movimento do FFmpeg;
+- adapta os limiares de exposição, movimento e desfoque aos percentis de cada vídeo, sempre dentro de faixas seguras;
 - pontua janelas técnicas e prioriza trechos melhores, mantendo diversidade de arquivos;
 - organiza a montagem em abertura, desenvolvimento e encerramento sem inventar interpretação semântica;
 - analisa a energia PCM da música, estima BPM e alinha cortes às batidas quando solicitado;
@@ -85,6 +89,9 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 - permite ajustar globalmente o volume da voz e aplicar redução moderada de ruído contínuo;
 - reduz a música durante o áudio principal com `sidechaincompress`;
 - permite ajustar o volume e os fades de entrada e saída da música;
+- oferece três trilhas instrumentais originais geradas localmente pelo FFmpeg, sem incorporar obras de terceiros;
+- oferece efeitos originais Suave, Impacto e Brilho sincronizados às transições;
+- dá prioridade ao arquivo musical enviado pelo usuário quando ele escolhe uma trilha própria licenciada;
 - compõe título, subtítulo, descrição, nome/cargo, oferta, chamada promocional, encerramento e CTA em camadas temporizadas;
 - oferece seis estilos visuais e oito animações de texto: Fade, Slide Up, Slide Down, Typewriter, Zoom Pop, Bounce suave, Revelação e Palavra por palavra;
 - permite configurar tamanho, cor, posição e fundo semitransparente dos textos;
@@ -104,9 +111,9 @@ O usuário pode escolher posição, tamanho, cor principal, cor de destaque e fo
 
 ## Diretor por IA opcional
 
-O modo padrão permanece `local`. Para habilitar o modo semântico em um ambiente protegido, configure `OPENAI_API_KEY` e `STUDIO_OPENAI_MODEL` somente no processo do worker e recrie o contêiner. A requisição usa a Responses API com Structured Outputs, `strict: true` e `store: false`. Nenhuma chave, custo ou chamada externa é ativada automaticamente por esta entrega.
+O modo padrão permanece `local`. Para habilitar o modo semântico em um ambiente protegido, configure `OPENAI_API_KEY` somente no processo do worker e recrie o contêiner. O modelo padrão recomendado é `gpt-6-luna`, adequado ao fluxo de alto volume e baixo custo; ele pode ser substituído por `STUDIO_OPENAI_MODEL`. A requisição usa a Responses API com Structured Outputs, `strict: true`, `store: false`, no máximo seis quadros e detalhe visual baixo por padrão. Nenhuma chave, cobrança ou chamada externa é ativada automaticamente por esta entrega.
 
-O resultado registra provedor, modelo, uso retornado pela API, quantidade de quadros/transcrições e se houve fallback. O plano técnico continua sendo a fonte de durações e limites de renderização; a IA escolhe apenas candidatos reais previamente extraídos e não pode inventar uma mídia inexistente.
+O resultado registra provedor, modelo, uso retornado pela API, estimativa de custo em dólar, quantidade de quadros/transcrições e se houve fallback. A estimativa utiliza somente os tokens efetivamente retornados pelo provedor e as tarifas configuradas no worker. O plano técnico continua sendo a fonte de durações e limites de renderização; a IA escolhe apenas candidatos reais previamente extraídos e não pode inventar uma mídia inexistente.
 
 ## Editor visual e versões
 
@@ -155,23 +162,28 @@ A exclusão manual remove somente os originais, logos, músicas, planos e render
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
-Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, camadas adicionais, ordem, duração e transição no mesmo plano, calcula a forma de onda do áudio real, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas.
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, camadas adicionais, ordem, duração e transição no mesmo plano, calcula a forma de onda do áudio real, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas. O teste da Fase 6 gera uma trilha e efeitos originais, mistura-os ao áudio principal e confirma vídeo, áudio, resolução e duração no MP4 final.
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs test/phase6-sound-library.integration.test.mjs
 ```
 
-O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nenhum dado demonstrativo é gravado no Firebase.
+Os testes usam mídias temporárias e as removem ao terminar; nenhum dado demonstrativo é gravado no Firebase. Para calibrar sem alterar os arquivos reais ou o Firebase, monte uma pasta de vídeos em modo somente leitura e execute:
 
-## Fases ainda não concluídas
+```powershell
+docker run --rm --mount "type=bind,source=C:\pasta\dos\videos,target=/calibration,readonly" ola-studio-worker:local-v29-final node scripts/calibrate-media.mjs /calibration
+docker run --rm --mount "type=bind,source=C:\pasta\dos\videos,target=/calibration,readonly" ola-studio-worker:local-v29-final node scripts/validate-real-media.mjs /calibration
+```
 
-- calibração contínua dos limiares de desfoque e tremor com vídeos reais de diferentes aparelhos;
-- biblioteca licenciada de músicas;
-- avaliação de custo/qualidade do Diretor por IA com um modelo de produção escolhido pelo responsável (a integração existe, mas permanece sem credencial e sem modelo por padrão);
-- biblioteca licenciada de efeitos sonoros para as transições.
+Em 22/10/2026, a calibração local analisou seis vídeos reais (97,094 s, um vertical e cinco horizontais) e 99 janelas. O render de validação usou três desses vídeos e gerou uma prévia vertical de 15 s, 360 × 640, com seis cenas, vídeo e áudio. Os arquivos originais permaneceram somente leitura e o resultado temporário foi removido após a verificação.
 
-Esses itens permanecem explicitamente fora da interface funcional até possuírem processamento real e testes próprios.
+## Validações externas ainda necessárias
+
+- ampliar periodicamente a calibração com vídeos de outros aparelhos, ambientes escuros e movimentos mais intensos;
+- executar uma avaliação semântica paga com a credencial de produção para medir custo e qualidade reais do modelo escolhido.
+
+As trilhas e os efeitos disponíveis na interface são originais e gerados pelo próprio sistema; por isso não dependem de licenças de catálogos externos. A avaliação paga permanece desativada até uma credencial ser fornecida ao worker, nunca ao frontend.
 
 ## Preparação comercial
 

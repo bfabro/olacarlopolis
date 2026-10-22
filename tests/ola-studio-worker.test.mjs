@@ -6,11 +6,12 @@ import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
 import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
-import { buildQualityWindows, buildShakeIntervals, parseCameraMotionTransforms, parseIntervals, parseSignalFrames } from "../studio-worker/src/analyzer.mjs";
+import { buildQualityWindows, buildShakeIntervals, deriveQualityThresholds, parseCameraMotionTransforms, parseIntervals, parseSignalFrames, summarizeCalibration } from "../studio-worker/src/analyzer.mjs";
 import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
-import { OpenAISemanticPlanner, buildSemanticCandidates, markSemanticFallback } from "../studio-worker/src/ai-planner.mjs";
+import { OpenAISemanticPlanner, buildSemanticCandidates, estimateSemanticUsageCost, markSemanticFallback } from "../studio-worker/src/ai-planner.mjs";
 import { composePlanWaveform, waveformFromPcm } from "../studio-worker/src/audio-waveform.mjs";
 import { deleteStudioProjectAssets, studioProjectPrefixes } from "../studio-worker/src/cleanup.mjs";
+import { libraryMusicDefinition, transitionEffectEvents } from "../studio-worker/src/sound-library.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -63,6 +64,36 @@ test("análise de estabilidade transforma vetores reais em intervalos de tremor"
   assert.equal(frames.length, 3);
   assert.ok(frames.at(-1).jitter > 20);
   assert.deepEqual(intervals.map(({ start, end }) => ({ start, end })), [{ start: 0, end: 1 }]);
+});
+
+test("limiares de qualidade se adaptam sem sair das faixas seguras", () => {
+  const frames = [
+    { brightness: 0.02, motion: 0.001, blur: 7 },
+    { brightness: 0.08, motion: 0.004, blur: 10 },
+    { brightness: 0.12, motion: 0.01, blur: 12 },
+    { brightness: 0.2, motion: 0.04, blur: 15 },
+    { brightness: 0.3, motion: 0.12, blur: 18 },
+    { brightness: 0.5, motion: 0.2, blur: 24 }
+  ];
+  const thresholds = deriveQualityThresholds(frames);
+  assert.ok(thresholds.darkBrightness >= 0.08 && thresholds.darkBrightness <= 0.15);
+  assert.ok(thresholds.blur >= 10 && thresholds.blur <= 18);
+  assert.ok(thresholds.highMotion >= 0.12 && thresholds.highMotion <= 0.22);
+  const report = summarizeCalibration([{ name: "a.mp4", contentType: "video/mp4", metadata: { hasVideo: true, duration: 3 }, technical: { qualityThresholds: thresholds, qualityWindows: [] } }]);
+  assert.equal(report.filesAnalyzed, 1);
+  assert.ok(report.recommendedThresholds.blur >= 10);
+});
+
+test("biblioteca interna usa presets conhecidos e posiciona efeitos nas transições", () => {
+  assert.equal(libraryMusicDefinition("corporate").id, "corporate");
+  assert.equal(libraryMusicDefinition("externa"), null);
+  const events = transitionEffectEvents({ scenes: [{ duration: 4 }, { duration: 5, transition: "fade", transitionDuration: 0.5 }, { duration: 3, transition: "wipeleft", transitionDuration: 0.25 }] });
+  assert.deepEqual(events.map((event) => event.time), [3.5, 8.25]);
+});
+
+test("estimativa de IA usa somente o consumo retornado pelo provedor", () => {
+  assert.equal(estimateSemanticUsageCost(null, { inputUsdPerMillion: 0.05, outputUsdPerMillion: 0.25 }), null);
+  assert.equal(estimateSemanticUsageCost({ input_tokens: 1000000, output_tokens: 1000000 }, { inputUsdPerMillion: 0.05, outputUsdPerMillion: 0.25 }), 0.3);
 });
 
 test("detector de ritmo encontra pulsos reais no PCM", () => {
@@ -152,6 +183,15 @@ test("editor visual valida origens, recalcula duração e preserva o plano rende
   const custom = edited.textLayers.find((layer) => layer.type === "custom");
   assert.deepEqual({ id: custom.id, value: custom.value, animation: custom.animation, position: custom.position, align: custom.align, font: custom.font, size: custom.sizeScale, color: custom.color, outline: custom.outlineColor, background: custom.background, margin: custom.margin }, { id: "oferta", value: "Oferta especial", animation: "fade", position: "center", align: "center", font: "sans", size: 1.8, color: "#FFFFFF", outline: "#123456", background: false, margin: 180 });
   assert.throws(() => prepareVisualEditorPlan({ ...base, scenes: [{ ...base.scenes[0], sourceId: "invasor" }] }, base, [video, image]), /não pertence/);
+});
+
+test("editor visual permite desligar a biblioteca sonora sem preservar fonte fantasma", () => {
+  const technical = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15, libraryMusic: "corporate", transitionSound: "impact" }, [video, image]);
+  const edited = prepareVisualEditorPlan({ ...technical, music: { ...technical.music, libraryTrack: "none" }, soundEffects: { preset: "none" } }, technical, [video, image]);
+  assert.equal(edited.music.enabled, false);
+  assert.equal(edited.music.source, "none");
+  assert.equal(edited.soundEffects.preset, "none");
+  assert.equal(edited.soundEffects.source, "none");
 });
 
 test("prévia usa resolução reduzida e codificação rápida sem alterar o plano", () => {

@@ -23,6 +23,10 @@ export const workerConfig = Object.freeze({
   openaiApiKey: process.env.OPENAI_API_KEY || "",
   openaiModel: process.env.STUDIO_OPENAI_MODEL || "",
   aiTimeoutMs: numberEnv("STUDIO_AI_TIMEOUT_MS", 90000),
+  aiMaxFrames: Math.max(1, Math.min(8, Math.floor(numberEnv("STUDIO_AI_MAX_FRAMES", 6)))),
+  aiImageDetail: ["low", "high"].includes(process.env.STUDIO_AI_IMAGE_DETAIL) ? process.env.STUDIO_AI_IMAGE_DETAIL : "low",
+  aiInputUsdPerMillion: Math.max(0, numberEnv("STUDIO_AI_INPUT_USD_PER_MILLION", 0.05)),
+  aiOutputUsdPerMillion: Math.max(0, numberEnv("STUDIO_AI_OUTPUT_USD_PER_MILLION", 0.25)),
   workerId: process.env.STUDIO_WORKER_ID || `${os.hostname()}-${process.pid}`,
   fontFile: process.env.STUDIO_FONT_FILE || "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 });

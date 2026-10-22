@@ -15,6 +15,12 @@ services:
       STUDIO_WHISPER_PATH: /usr/local/bin/whisper-cli
       STUDIO_WHISPER_MODEL: /opt/whisper/ggml-tiny.bin
       STUDIO_WHISPER_THREADS: 2
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      STUDIO_OPENAI_MODEL: ${STUDIO_OPENAI_MODEL:-gpt-6-luna}
+      STUDIO_AI_MAX_FRAMES: ${STUDIO_AI_MAX_FRAMES:-6}
+      STUDIO_AI_IMAGE_DETAIL: ${STUDIO_AI_IMAGE_DETAIL:-low}
+      STUDIO_AI_INPUT_USD_PER_MILLION: ${STUDIO_AI_INPUT_USD_PER_MILLION:-0.05}
+      STUDIO_AI_OUTPUT_USD_PER_MILLION: ${STUDIO_AI_OUTPUT_USD_PER_MILLION:-0.25}
     volumes:
       - ${FIREBASE_SERVICE_ACCOUNT_FILE}:/run/secrets/firebase-service-account.json:ro
       - ola-studio-work:/tmp/ola-studio

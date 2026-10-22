@@ -1,4 +1,4 @@
-import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_SCHEMA_VERSION, STUDIO_TEXT_ANIMATIONS, STUDIO_TRANSITIONS, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_LIBRARY_MUSIC, STUDIO_SCHEMA_VERSION, STUDIO_TEXT_ANIMATIONS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, validateEditPlan } from "../../shared/studio-contracts.mjs";
 import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
@@ -25,6 +25,9 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
   const textValues = input.text || {};
   const exportFps = STUDIO_EXPORT_FPS.includes(Number(input.export?.fps)) ? Number(input.export.fps) : Number(technicalPlan.export?.fps || 30);
   const exportQuality = STUDIO_EXPORT_QUALITIES[input.export?.quality] || STUDIO_EXPORT_QUALITIES[technicalPlan.export?.quality] || STUDIO_EXPORT_QUALITIES.balanced;
+  const libraryTrack = STUDIO_LIBRARY_MUSIC[input.music?.libraryTrack] ? input.music.libraryTrack : technicalPlan.music?.libraryTrack || "none";
+  const hasUploadedMusic = technicalPlan.music?.source === "upload";
+  const soundPreset = STUDIO_TRANSITION_SOUNDS[input.soundEffects?.preset] ? input.soundEffects.preset : technicalPlan.soundEffects?.preset || "none";
   const layerValues = new Map([['title', textValues.title], ['subtitle', textValues.subtitle], ['call_to_action', textValues.callToAction]]);
   const textLayers = (Array.isArray(input.textLayers) ? input.textLayers : technicalPlan.textLayers || []).slice(0, 20).map((layer, index) => ({
     id: String(layer.id || `text-${index + 1}`).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80) || `text-${index + 1}`,
@@ -59,7 +62,8 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
       noiseReduction: input.audio?.noiseReduction === true,
       waveform: technicalPlan.audio?.waveform?.method === "music-pcm-envelope-v1" ? technicalPlan.audio.waveform : composePlanWaveform(scenes, analyzedSources, duration)
     },
-    music: { ...(technicalPlan.music || {}), duckDuringSpeech: input.music?.duckDuringSpeech !== false },
+    music: { ...(technicalPlan.music || {}), libraryTrack, enabled: hasUploadedMusic || libraryTrack !== "none", source: hasUploadedMusic ? "upload" : libraryTrack !== "none" ? "original-library" : "none", duckDuringSpeech: input.music?.duckDuringSpeech !== false },
+    soundEffects: { preset: soundPreset, source: soundPreset !== "none" ? "original-library" : "none" },
     scenes
   };
   const validation = validateEditPlan(plan);

@@ -10,6 +10,8 @@ const panel = readFileSync(new URL("../admin/painel.html", import.meta.url), "ut
 const workerQueue = readFileSync(new URL("../studio-worker/src/queue.mjs", import.meta.url), "utf8");
 const workerMain = readFileSync(new URL("../studio-worker/src/index.mjs", import.meta.url), "utf8");
 const workerCleanup = readFileSync(new URL("../studio-worker/src/cleanup.mjs", import.meta.url), "utf8");
+const workerCompose = readFileSync(new URL("../studio-worker/docker-compose.yml", import.meta.url), "utf8");
+const soundLibrary = readFileSync(new URL("../studio-worker/src/sound-library.mjs", import.meta.url), "utf8");
 
 test("Studio não é exposto na navegação pública e abre protegido pelo painel Master", () => {
   assert.match(panel, /data-master="true" href="\.\.\/estudio\/\?preview=1"/);
@@ -83,6 +85,17 @@ test("editor visual reutiliza plano privado e envia somente origens do próprio 
   assert.match(workerMain, /sceneCount: Array\.isArray\(plan\.scenes\)/);
   assert.match(workerMain, /videoBitrateKbps: Number\(plan\.export/);
   assert.doesNotMatch(client, /OPENAI_API_KEY/);
+});
+
+test("biblioteca sonora é interna e IA permanece protegida no worker", () => {
+  assert.match(html, /id="libraryMusic"/);
+  assert.match(html, /id="transitionSound"/);
+  assert.match(html, /id="visualLibraryMusic"/);
+  assert.match(html, /id="visualTransitionSound"/);
+  assert.match(workerCompose, /OPENAI_API_KEY:\s*\$\{OPENAI_API_KEY:-\}/);
+  assert.match(workerCompose, /STUDIO_OPENAI_MODEL:\s*\$\{STUDIO_OPENAI_MODEL:-gpt-6-luna\}/);
+  assert.doesNotMatch(soundLibrary, /https?:\/\//);
+  assert.doesNotMatch(soundLibrary, /fetch\(/);
 });
 
 test("worker consulta e reserva a fila com autenticação e concorrência segura", () => {

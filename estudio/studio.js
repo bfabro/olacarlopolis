@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=7";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=8";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -174,6 +174,8 @@ function currentDraft(sources = []) {
       fadeSeconds: Number($("musicFadeSeconds").value),
       noiseReduction: $("noiseReduction").checked
     },
+    libraryMusic: $("libraryMusic").value,
+    transitionSound: $("transitionSound").value,
     sources
   });
 }
@@ -817,6 +819,12 @@ function visualTrimMarkup(scene, index, image) {
 
 function renderVisualAudioMixer() {
   const audio = state.visualPlan?.audio || {};
+  const libraryTrack = state.visualPlan?.music?.libraryTrack || "none";
+  const transitionSound = state.visualPlan?.soundEffects?.preset || "none";
+  $("visualLibraryMusic").value = STUDIO_LIBRARY_MUSIC[libraryTrack] ? libraryTrack : "none";
+  $("visualTransitionSound").value = STUDIO_TRANSITION_SOUNDS[transitionSound] ? transitionSound : "none";
+  $("visualLibraryMusic").disabled = Boolean(state.visualProject?.music);
+  $("visualLibraryMusic").title = state.visualProject?.music ? "A música enviada tem prioridade neste projeto." : "Trilha original gerada localmente.";
   $("visualVoiceVolume").value = Math.round(Number(audio.voiceVolume ?? 1) * 100);
   $("visualMusicVolume").value = Math.round(Number(audio.musicVolume ?? 0.18) * 100);
   $("visualMusicFade").value = Number(audio.fadeSeconds ?? 1.2);
@@ -829,6 +837,8 @@ function renderVisualAudioMixer() {
 
 function syncVisualAudioMixer() {
   if (!state.visualPlan) return;
+  const libraryTrack = STUDIO_LIBRARY_MUSIC[$("visualLibraryMusic").value] ? $("visualLibraryMusic").value : "none";
+  const transitionSound = STUDIO_TRANSITION_SOUNDS[$("visualTransitionSound").value] ? $("visualTransitionSound").value : "none";
   state.visualPlan.audio = {
     ...(state.visualPlan.audio || {}),
     voiceVolume: Number($("visualVoiceVolume").value) / 100,
@@ -836,7 +846,8 @@ function syncVisualAudioMixer() {
     fadeSeconds: Number($("visualMusicFade").value),
     noiseReduction: $("visualNoiseReduction").checked
   };
-  state.visualPlan.music = { ...(state.visualPlan.music || {}), duckDuringSpeech: $("visualMusicDucking").checked };
+  state.visualPlan.music = { ...(state.visualPlan.music || {}), enabled: Boolean(state.visualProject?.music) || libraryTrack !== "none", source: state.visualProject?.music ? "upload" : libraryTrack !== "none" ? "original-library" : "none", libraryTrack, duckDuringSpeech: $("visualMusicDucking").checked };
+  state.visualPlan.soundEffects = { preset: transitionSound, source: transitionSound !== "none" ? "original-library" : "none" };
   $("visualVoiceVolumeValue").textContent = `${$("visualVoiceVolume").value}%`;
   $("visualMusicVolumeValue").textContent = `${$("visualMusicVolume").value}%`;
   $("visualMusicFadeValue").textContent = `${Number($("visualMusicFade").value).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
@@ -1143,7 +1154,7 @@ $("regenerateVideo").addEventListener("click", () => state.activeProjectId && re
 $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
 [$("visualTextFont"), $("visualTextSize"), $("visualTextColor"), $("visualTextOutline"), $("visualTextAlign"), $("visualTextBackground")].forEach((field) => field.addEventListener("input", syncVisualPrimaryTextStyle));
-[$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
+[$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking"), $("visualLibraryMusic"), $("visualTransitionSound")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
 [$("visualExportFps"), $("visualExportQuality")].forEach((field) => field.addEventListener("change", syncVisualExportSettings));
 $("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
 $("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));

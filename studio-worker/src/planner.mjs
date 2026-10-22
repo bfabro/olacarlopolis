@@ -1,4 +1,4 @@
-import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_SCHEMA_VERSION, studioStyleParameters, studioTransitionParameters, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_LIBRARY_MUSIC, STUDIO_SCHEMA_VERSION, STUDIO_TRANSITION_SOUNDS, studioStyleParameters, studioTransitionParameters, validateEditPlan } from "../../shared/studio-contracts.mjs";
 import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const AUTO_TRANSITIONS = Object.freeze({
@@ -93,6 +93,8 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
   const rhythmLevel = project.editing?.rhythm || "balanced";
   const exportFps = STUDIO_EXPORT_FPS.includes(Number(project.export?.fps)) ? Number(project.export.fps) : 30;
   const exportQuality = STUDIO_EXPORT_QUALITIES[project.export?.quality] || STUDIO_EXPORT_QUALITIES.balanced;
+  const libraryMusic = STUDIO_LIBRARY_MUSIC[project.libraryMusic] ? project.libraryMusic : "none";
+  const transitionSound = STUDIO_TRANSITION_SOUNDS[project.transitionSound] ? project.transitionSound : "none";
   const paceFactor = rhythmLevel === "soft" ? 1.22 : rhythmLevel === "dynamic" ? 0.78 : 1;
   const minClip = Math.max(0.8, style.minClipSeconds * paceFactor);
   const maxClip = Math.max(minClip + 0.4, style.maxClipSeconds * paceFactor);
@@ -133,7 +135,8 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
     text: { title: project.title || "", subtitle: project.subtitle || "", callToAction: project.callToAction || "" }, textDesign: project.textDesign || {}, textLayers: textLayersFor(project, target),
     captions: { requested: project.captionsEnabled === true, enabled: project.captionsEnabled === true && options.transcription?.available === true, provider: options.transcription?.provider || "pending", segments: options.transcription?.segments || [], ...(project.captions || {}) },
     audio: { musicVolume: style.musicVolume, voiceVolume: 1, fadeSeconds: 1.2, noiseReduction: false, ...(project.audio || {}), waveform: rhythm.waveform?.available ? rhythm.waveform : composePlanWaveform(scenes, analyzedSources, target) },
-    music: { enabled: Boolean(project.music), volume: Number(project.audio?.musicVolume ?? style.musicVolume), duckDuringSpeech: true },
+    music: { enabled: Boolean(project.music) || libraryMusic !== "none", source: project.music ? "upload" : libraryMusic !== "none" ? "original-library" : "none", libraryTrack: libraryMusic, volume: Number(project.audio?.musicVolume ?? style.musicVolume), duckDuringSpeech: true },
+    soundEffects: { preset: transitionSound, source: transitionSound !== "none" ? "original-library" : "none" },
     logo: { enabled: Boolean(project.logo), position: "center", start: Math.max(0, target - 5), end: target - 0.1, size: 0.22 }, scenes
   };
   const validation = validateEditPlan(plan);
