@@ -79,8 +79,9 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
     text: { title: project.title || "", subtitle: project.subtitle || "", callToAction: project.callToAction || "" },
     textDesign: project.textDesign || {},
     textLayers: textLayersFor(project, target),
-    captions: { enabled: project.captionsEnabled === true && options.transcription?.available === true, provider: options.transcription?.provider || "disabled", segments: options.transcription?.segments || [] },
-    music: { enabled: Boolean(project.music), volume: style.musicVolume, duckDuringSpeech: true },
+    captions: { requested: project.captionsEnabled === true, enabled: project.captionsEnabled === true && options.transcription?.available === true, provider: options.transcription?.provider || "pending", segments: options.transcription?.segments || [], ...(project.captions || {}) },
+    audio: { musicVolume: style.musicVolume, voiceVolume: 1, fadeSeconds: 1.2, noiseReduction: false, ...(project.audio || {}) },
+    music: { enabled: Boolean(project.music), volume: Number(project.audio?.musicVolume ?? style.musicVolume), duckDuringSpeech: true },
     logo: { enabled: Boolean(project.logo), position: "center", start: Math.max(0, target - 5), end: target - 0.1, size: 0.22 },
     scenes
   };

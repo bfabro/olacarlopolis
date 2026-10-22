@@ -12,6 +12,9 @@ services:
       STUDIO_STARTUP_DELAY_MS: 2000
       STUDIO_POLL_INTERVAL_MS: 4000
       STUDIO_DATABASE_TIMEOUT_MS: 15000
+      STUDIO_WHISPER_PATH: /usr/local/bin/whisper-cli
+      STUDIO_WHISPER_MODEL: /opt/whisper/ggml-tiny.bin
+      STUDIO_WHISPER_THREADS: 2
     volumes:
       - ${FIREBASE_SERVICE_ACCOUNT_FILE}:/run/secrets/firebase-service-account.json:ro
       - ola-studio-work:/tmp/ola-studio

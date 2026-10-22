@@ -3,6 +3,7 @@ import path from "node:path";
 import { studioOutputDimensions } from "../../shared/studio-contracts.mjs";
 import { workerConfig } from "./config.mjs";
 import { runProcess } from "./process-utils.mjs";
+import { writeAssCaptions } from "./captions.mjs";
 
 const seconds = (value) => Math.max(0.05, Number(value || 0)).toFixed(3);
 
@@ -80,7 +81,7 @@ export function buildTextLayerFilters(input, layer, width, height, index) {
   return { filters, output: current };
 }
 
-export function buildSegmentArgs(scene, source, outputPath, format) {
+export function buildSegmentArgs(scene, source, outputPath, format, audioOptions = {}) {
   const { width, height } = studioOutputDimensions(format);
   const image = source.contentType.startsWith("image/");
   const args = ["-y"];
@@ -91,7 +92,12 @@ export function buildSegmentArgs(scene, source, outputPath, format) {
   }
   args.push("-map", "0:v:0", "-map", source.metadata.hasAudio && !image ? "0:a:0" : "1:a:0");
   args.push("-vf", `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},fps=30,setsar=1,format=yuv420p`);
-  if (source.metadata.hasAudio && !image) args.push("-af", "loudnorm=I=-16:LRA=11:TP=-1.5,aresample=48000");
+  if (source.metadata.hasAudio && !image) {
+    const filters = [];
+    if (audioOptions.noiseReduction) filters.push("highpass=f=80", "lowpass=f=12000", "afftdn=nf=-25");
+    filters.push(`volume=${Math.min(1.6, Math.max(0.5, Number(audioOptions.voiceVolume || 1))).toFixed(2)}`, "loudnorm=I=-16:LRA=11:TP=-1.5", "aresample=48000");
+    args.push("-af", filters.join(","));
+  }
   args.push("-t", seconds(scene.duration), "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-ac", "2", "-movflags", "+faststart", outputPath);
   return args;
 }
@@ -153,7 +159,7 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
     video = "vlogo";
   }
   if (captionsPath) {
-    filters.push(`[${video}]subtitles='${filterPathEscape(captionsPath)}':force_style='FontName=DejaVu Sans,FontSize=18,PrimaryColour=&H00FFFFFF,OutlineColour=&H00122435,BorderStyle=1,Outline=2,Alignment=2,MarginV=70'[vcap]`);
+    filters.push(`[${video}]subtitles='${filterPathEscape(captionsPath)}'[vcap]`);
     video = "vcap";
   }
   const legacyLayers = [
@@ -169,7 +175,10 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
   });
   filters.push(`[${video}]null[vout]`);
   if (musicIndex >= 0) {
-    filters.push(`[${musicIndex}:a]volume=${Number(plan.music?.volume || 0.18).toFixed(2)},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[music]`);
+    const fadeSeconds = Math.min(Math.max(0, Number(plan.audio?.fadeSeconds ?? 1.2)), Number(duration) / 3);
+    const fadeOutStart = Math.max(0, Number(duration) - fadeSeconds);
+    const fades = fadeSeconds > 0 ? `,afade=t=in:st=0:d=${seconds(fadeSeconds)},afade=t=out:st=${seconds(fadeOutStart)}:d=${seconds(fadeSeconds)}` : "";
+    filters.push(`[${musicIndex}:a]volume=${Number(plan.audio?.musicVolume ?? plan.music?.volume ?? 0.18).toFixed(2)}${fades},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[music]`);
     filters.push("[music][0:a]sidechaincompress=threshold=0.035:ratio=10:attack=20:release=450[ducked]");
     filters.push("[0:a][ducked]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:LRA=9:TP=-1.5[aout]");
   } else filters.push("[0:a]anull[aout]");
@@ -177,7 +186,7 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
   return args;
 }
 
-export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", progress = async () => {}, signal }) {
+export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", transcriptionProvider = null, progress = async () => {}, signal }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const segmentPaths = [];
   for (let index = 0; index < plan.scenes.length; index += 1) {
@@ -185,7 +194,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     const source = sourceById.get(scene.sourceId);
     if (!source) throw new Error(`Origem ${scene.sourceId} nao encontrada para a cena ${scene.id}.`);
     const segmentPath = path.join(outputDir, `segment-${String(index + 1).padStart(3, "0")}.mp4`);
-    await runProcess(workerConfig.ffmpegPath, buildSegmentArgs(scene, source, segmentPath, plan.format), { signal });
+    await runProcess(workerConfig.ffmpegPath, buildSegmentArgs(scene, source, segmentPath, plan.format, plan.audio), { signal });
     segmentPaths.push(segmentPath);
     await progress("segments", index + 1, plan.scenes.length);
   }
@@ -215,8 +224,15 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
       await progress("transitions", index, segmentPaths.length - 1);
     }
   }
+  if (!captionsPath && plan.captions?.requested && transcriptionProvider) {
+    await progress("transcription", 0, 1);
+    const transcription = await transcriptionProvider.transcribeFile(compositionPath, outputDir, { signal, prompt: plan.captions.prompt });
+    plan.captions = { ...plan.captions, ...transcription, enabled: transcription.available === true && transcription.segments.length > 0 };
+    if (plan.captions.enabled) captionsPath = await writeAssCaptions(path.join(outputDir, "captions.ass"), transcription, { ...plan.captions, format: plan.format });
+    await progress("transcription", 1, 1);
+  }
   const outputPath = path.join(outputDir, "ola-studio-final.mp4");
   await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, captionsPath }), { signal });
   await progress("branding", 1, 1);
-  return outputPath;
+  return { outputPath, plan };
 }

@@ -45,21 +45,24 @@ async function processJob(job) {
     const totalSourceDuration = analyzed.reduce((sum, source) => sum + (source.contentType.startsWith("video/") ? Number(source.metadata.duration || 0) : 0), 0);
     if (sources.length > 10) throw new Error("O projeto excede o limite de 10 arquivos.");
     if (totalSourceDuration > 600) throw new Error("A duração total dos vídeos de origem excede 10 minutos.");
-    const transcription = project.captionsEnabled ? await createTranscriptionProvider().transcribe(analyzed) : { available: false, provider: "disabled", segments: [] };
-    ensureNotCancelled();
-    const plan = createDeterministicPlan(project, analyzed, { transcription });
+    const plan = createDeterministicPlan(project, analyzed);
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
     await uploadJson(plan, planStoragePath);
     await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner } });
-    const outputPath = await renderPlan({
+    const transcriptionProvider = project.captionsEnabled ? await createTranscriptionProvider() : null;
+    const rendered = await renderPlan({
       plan, sources: analyzed, outputDir, logoPath: logo?.localPath || "", musicPath: music?.localPath || "",
+      transcriptionProvider,
       signal: cancellation.signal,
       progress: async (stage, done, total) => {
-        const base = stage === "segments" ? 50 : stage === "transitions" ? 82 : 90;
-        const span = stage === "segments" ? 31 : stage === "transitions" ? 8 : 7;
-        await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: Math.min(97, base + Math.round(done / total * span)), message: stage === "segments" ? `Renderizando cena ${done} de ${total}.` : stage === "transitions" ? "Aplicando transições." : "Aplicando identidade visual e áudio." });
+        const base = stage === "segments" ? 50 : stage === "transitions" ? 76 : stage === "transcription" ? 85 : 92;
+        const span = stage === "segments" ? 25 : stage === "transitions" ? 8 : stage === "transcription" ? 6 : 5;
+        const message = stage === "segments" ? `Renderizando cena ${done} de ${total}.` : stage === "transitions" ? "Aplicando transições." : stage === "transcription" ? "Transcrevendo a fala em português para gerar legendas." : "Aplicando identidade visual, legendas e áudio.";
+        await updateJob(job.uid, job.jobId, { stage: stage === "transcription" ? "transcription" : "render", status: "rendering", progress: Math.min(97, base + Math.round(done / total * span)), message });
       }
     });
+    await uploadJson(rendered.plan, planStoragePath);
+    const outputPath = rendered.outputPath;
     ensureNotCancelled();
     await updateJob(job.uid, job.jobId, { stage: "upload_output", status: "rendering", progress: 98, message: "Salvando o MP4 final." });
     const storagePath = `studio/${job.uid}/renders/${job.projectId}/${job.jobId}.mp4`;

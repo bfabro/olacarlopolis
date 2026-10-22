@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
 import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
+import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
+import { parseWhisperJson } from "../studio-worker/src/transcription.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -68,12 +70,41 @@ test("oito animações geram filtros de texto renderizáveis", () => {
 });
 
 test("branding prepara logo, textos, música com ducking e faststart", () => {
-  const args = buildBrandingArgs({ inputPath: "/tmp/base.mp4", outputPath: "/tmp/final.mp4", duration: 15, format: "9:16", logoPath: "/tmp/logo.png", musicPath: "/tmp/music.mp3", plan: { text: { title: "Oferta", callToAction: "Fale conosco" }, music: { volume: 0.2 } } });
+  const args = buildBrandingArgs({ inputPath: "/tmp/base.mp4", outputPath: "/tmp/final.mp4", duration: 15, format: "9:16", logoPath: "/tmp/logo.png", musicPath: "/tmp/music.mp3", captionsPath: "/tmp/captions.ass", plan: { text: { title: "Oferta", callToAction: "Fale conosco" }, music: { volume: 0.2 }, audio: { musicVolume: 0.2, fadeSeconds: 1.2 } } });
   const filters = args[args.indexOf("-filter_complex") + 1];
   assert.match(filters, /overlay=/);
+  assert.match(filters, /subtitles=/);
+  assert.doesNotMatch(filters, /force_style/);
   assert.match(filters, /drawtext=/);
   assert.match(filters, /sidechaincompress/);
+  assert.match(filters, /afade=t=in/);
   assert.ok(args.includes("+faststart"));
+});
+
+test("parser do Whisper preserva português e timestamps reais por palavra", () => {
+  const parsed = parseWhisperJson({ result: { language: "pt" }, transcription: [{ offsets: { from: 500, to: 2100 }, text: " Olá Carlópolis", tokens: [{ text: " Olá", offsets: { from: 500, to: 1100 }, p: 0.92 }, { text: " Carlópolis", offsets: { from: 1100, to: 2100 }, p: 0.88 }] }] });
+  assert.equal(parsed.language, "pt");
+  assert.equal(parsed.segments[0].start, 0.5);
+  assert.equal(parsed.segments[0].words[1].end, 2.1);
+  assert.equal(parsed.segments[0].text, "Olá Carlópolis");
+});
+
+test("legendas ASS oferecem modo tradicional e destaque dinâmico", () => {
+  const transcription = { segments: [{ start: 0.5, end: 2.1, text: "Olá Carlópolis", words: [{ text: "Olá", start: 0.5, end: 1.1 }, { text: "Carlópolis", start: 1.1, end: 2.1 }] }] };
+  const traditional = buildAssCaptions(transcription, { format: "9:16", mode: "traditional", position: "bottom" });
+  const dynamic = buildAssCaptions(transcription, { format: "9:16", mode: "dynamic", position: "bottom", highlightColor: "#FFBB2D" });
+  assert.match(traditional, /PlayResX: 1080/);
+  assert.match(traditional, /Olá Carlópolis/);
+  assert.match(dynamic, /\\kf60/);
+  assert.match(dynamic, /Carlópolis/);
+});
+
+test("tratamento de voz aplica redução moderada de ruído quando solicitada", () => {
+  const args = buildSegmentArgs({ start: 0, duration: 3 }, video, "/tmp/out.mp4", "9:16", { voiceVolume: 1.2, noiseReduction: true });
+  const audioFilter = args[args.indexOf("-af") + 1];
+  assert.match(audioFilter, /afftdn/);
+  assert.match(audioFilter, /volume=1.20/);
+  assert.match(audioFilter, /loudnorm/);
 });
 
 test("operações externas travadas são interrompidas para permitir nova tentativa", async () => {

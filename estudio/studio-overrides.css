@@ -102,6 +102,29 @@
   font-size: 12px;
 }
 
+.audio-design-panel,
+.caption-design-panel {
+  margin-top: 4px;
+}
+
+.audio-design-panel {
+  background: #fffaf0;
+  border-color: #f0d99e;
+}
+
+.caption-design-panel {
+  background: #f7f7ff;
+  border-color: #d9d9f3;
+}
+
+.text-design-panel .wide {
+  grid-column: 1/-1;
+}
+
+.process-steps {
+  grid-template-columns: repeat(6,1fr);
+}
+
 @media(max-width:620px) {
   .text-design-panel {
     grid-template-columns: 1fr;
@@ -109,5 +132,9 @@
 
   .text-design-panel > div:first-child {
     grid-column: auto;
+  }
+
+  .process-steps {
+    grid-template-columns: repeat(6,60px);
   }
 }

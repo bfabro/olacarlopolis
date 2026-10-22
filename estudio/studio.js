@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=2";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=3";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -136,6 +136,20 @@ function currentDraft(sources = []) {
       background: $("textBackground").checked
     },
     captionsEnabled: $("captionsEnabled").checked,
+    captions: {
+      mode: $("captionMode").value,
+      sizeScale: Number($("captionSizeScale").value) / 100,
+      color: $("captionColor").value,
+      highlightColor: $("captionHighlightColor").value,
+      position: $("captionPosition").value,
+      prompt: $("captionPrompt").value
+    },
+    audio: {
+      voiceVolume: Number($("voiceVolume").value) / 100,
+      musicVolume: Number($("musicVolume").value) / 100,
+      fadeSeconds: Number($("musicFadeSeconds").value),
+      noiseReduction: $("noiseReduction").checked
+    },
     sources
   });
 }
@@ -162,6 +176,12 @@ function updateTextSizeLabel() {
   $("textSizeValue").textContent = `${$("textSizeScale").value}%`;
 }
 
+function updateAudioCaptionLabels() {
+  $("voiceVolumeValue").textContent = `${$("voiceVolume").value}%`;
+  $("musicVolumeValue").textContent = `${$("musicVolume").value}%`;
+  $("captionSizeValue").textContent = `${$("captionSizeScale").value}%`;
+}
+
 function switchView(name) {
   ["projects", "editor", "processing", "usage"].forEach((view) => $(`${view}View`)?.classList.toggle("hidden", view !== name));
   document.querySelectorAll("[data-studio-view]").forEach((button) => button.classList.toggle("active", button.dataset.studioView === name));
@@ -179,6 +199,7 @@ function resetEditor() {
   $("logoFileLabel").innerHTML = '<i class="fa-regular fa-image"></i> Escolher PNG ou WebP';
   $("musicFileLabel").innerHTML = '<i class="fa-solid fa-music"></i> Escolher áudio';
   updateTextSizeLabel();
+  updateAudioCaptionLabels();
   renderMediaLibrary();
   updateSummary();
 }
@@ -416,7 +437,7 @@ function watchJob(jobId, projectId) {
   state.jobUnsubscribe = onValue(ref(db, `studioJobs/${state.user.uid}/${jobId}`), async (snapshot) => {
     const job = snapshot.val();
     if (!job) return;
-    const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
+    const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "transcription" ? "transcription" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
     markProcessStep(step);
     updateProgress(job.progress || 25, statusLabels[job.status] || job.stage || "Processando", job.message || "O processamento continua no worker.");
     if (job.status === "completed") {
@@ -568,6 +589,7 @@ $("projectForm").addEventListener("change", updateSummary);
 $("projectForm").addEventListener("input", updateSummary);
 $("textPreset").addEventListener("change", applyTextPreset);
 $("textSizeScale").addEventListener("input", updateTextSizeLabel);
+[$("voiceVolume"), $("musicVolume"), $("captionSizeScale")].forEach((input) => input.addEventListener("input", updateAudioCaptionLabels));
 $("projectForm").addEventListener("submit", submitProject);
 $("logoFile").addEventListener("change", () => { const file = $("logoFile").files[0]; if (file && file.size > 8 * 1024 * 1024) { $("logoFile").value = ""; return toast("A logo deve ter no máximo 8 MB."); } $("logoFileLabel").innerHTML = `<i class="fa-regular fa-image"></i> ${escapeHtml(file?.name || "Escolher PNG ou WebP")}`; });
 $("musicFile").addEventListener("change", () => { const file = $("musicFile").files[0]; if (file && file.size > STUDIO_LIMITS.maxAudioBytes) { $("musicFile").value = ""; return toast("A música deve ter no máximo 25 MB."); } $("musicFileLabel").innerHTML = `<i class="fa-solid fa-music"></i> ${escapeHtml(file?.name || "Escolher áudio")}`; });

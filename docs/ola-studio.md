@@ -14,7 +14,7 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 `Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON → FFmpeg → Storage → prévia/download`
 
-O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio e silêncio. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 2 e registra cenas, transições, camadas de texto, animações, logo, áudio e parâmetros de exportação.
+O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio e silêncio. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 3 e registra cenas, transições, camadas de texto, animações, logo, áudio, legendas e parâmetros de exportação.
 
 ## Aplicar configuração de desenvolvimento
 
@@ -53,6 +53,10 @@ Variáveis opcionais:
 - `STUDIO_MAX_ATTEMPTS`
 - `STUDIO_WORKER_ID`
 - `STUDIO_FONT_FILE`
+- `STUDIO_WHISPER_PATH`
+- `STUDIO_WHISPER_MODEL`
+- `STUDIO_WHISPER_THREADS`
+- `STUDIO_WHISPER_WORD_THRESHOLD`
 
 A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e `If-Match`, evitando que dois workers processem o mesmo trabalho. Leituras externas têm tempo limite para que uma conexão iniciada antes da rede do contêiner ficar pronta não bloqueie o worker indefinidamente.
 
@@ -68,22 +72,25 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 - aplica `xfade`, `zoompan`, `concat` e `acrossfade` conforme a transição;
 - compõe transições de forma incremental, mantendo somente duas cenas na memória por etapa;
 - normaliza áudio com `loudnorm`;
+- permite ajustar globalmente o volume da voz e aplicar redução moderada de ruído contínuo;
 - reduz a música durante o áudio principal com `sidechaincompress`;
+- permite ajustar o volume e os fades de entrada e saída da música;
 - compõe título, subtítulo, descrição, nome/cargo, oferta, chamada promocional, encerramento e CTA em camadas temporizadas;
 - oferece seis estilos visuais e oito animações de texto: Fade, Slide Up, Slide Down, Typewriter, Zoom Pop, Bounce suave, Revelação e Palavra por palavra;
 - permite configurar tamanho, cor, posição e fundo semitransparente dos textos;
 - apresenta a logo no encerramento com tempo e tamanho definidos no plano;
 - exporta H.264/AAC com `faststart`.
 
-## Legendas e IA
+## Transcrição e legendas
 
-O contrato de transcrição existe, mas o provedor padrão é explicitamente `disabled`. Por isso nenhuma legenda falsa é gerada. Para a próxima etapa:
+O worker compila `whisper.cpp` v1.7.5 e executa localmente o modelo `ggml-tiny`, sem enviar o áudio a serviços externos. A composição pronta é convertida para PCM mono de 16 kHz e transcrita em português; assim os tempos permanecem alinhados mesmo depois dos cortes e transições.
 
-1. implementar um `TranscriptionProvider` server-side;
-2. gerar SRT com timestamps reais;
-3. implementar um `SemanticPlanner` que receba quadros representativos, transcrição e metadados;
-4. validar a resposta pelo contrato de `shared/studio-contracts.mjs`;
-5. comparar custo/qualidade com o plano técnico antes de habilitar por créditos.
+Há dois modos reais de legenda incorporada ao MP4:
+
+- tradicional, agrupada por frase;
+- dinâmica, em ASS, com destaque progressivo de cada palavra conforme os timestamps do Whisper.
+
+O usuário pode escolher posição, tamanho, cor principal, cor de destaque e fornecer nomes próprios como contexto. Se o binário ou o modelo não estiver disponível, o provedor retorna `disabled` e não inventa conteúdo. A edição manual da transcrição antes da renderização e o diretor semântico por IA continuam reservados para as próximas etapas.
 
 ## Limites e retenção
 
@@ -103,16 +110,18 @@ A exclusão automática ainda não está ativa. Ela deve ser implementada como t
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra.
+
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs
 ```
 
 O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nenhum dado demonstrativo é gravado no Firebase.
 
 ## Fases ainda não concluídas
 
-- Whisper local, edição de transcrição e legendas palavra por palavra;
+- revisão e edição manual da transcrição antes da renderização final;
 - detecção técnica de desfoque, escuridão, tremor e duplicidade;
 - sincronização de cortes com batidas e biblioteca licenciada de músicas;
 - diretor semântico por IA configurável;

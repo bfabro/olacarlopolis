@@ -1,4 +1,4 @@
-export const STUDIO_SCHEMA_VERSION = 2;
+export const STUDIO_SCHEMA_VERSION = 3;
 
 export const STUDIO_LIMITS = Object.freeze({
   maxFiles: 10,
@@ -92,6 +92,11 @@ export const STUDIO_TEXT_PRESETS = Object.freeze({
 
 export const STUDIO_TEXT_ANIMATIONS = Object.freeze(["fade", "slide_up", "slide_down", "typewriter", "zoom_pop", "soft_bounce", "reveal", "word_by_word"]);
 
+export const STUDIO_CAPTION_STYLES = Object.freeze({
+  traditional: Object.freeze({ id: "traditional", label: "Tradicional", dynamic: false }),
+  dynamic: Object.freeze({ id: "dynamic", label: "Dinâmica para Reels", dynamic: true })
+});
+
 export const STUDIO_FORMATS = Object.freeze({
   "9:16": Object.freeze({ id: "9:16", width: 1080, height: 1920, label: "Vertical" }),
   "16:9": Object.freeze({ id: "16:9", width: 1920, height: 1080, label: "Horizontal" }),
@@ -158,6 +163,20 @@ export function normalizeStudioProject(input = {}) {
       margin: numberBetween(input.textDesign?.margin, 24, 180, 64)
     },
     captionsEnabled: input.captionsEnabled === true,
+    captions: {
+      mode: STUDIO_CAPTION_STYLES[input.captions?.mode] ? input.captions.mode : "traditional",
+      sizeScale: numberBetween(input.captions?.sizeScale, 0.7, 1.6, 1),
+      color: color(input.captions?.color, "#FFFFFF"),
+      highlightColor: color(input.captions?.highlightColor, "#FFBB2D"),
+      position: ["center", "bottom"].includes(input.captions?.position) ? input.captions.position : "bottom",
+      prompt: text(input.captions?.prompt, 240)
+    },
+    audio: {
+      musicVolume: numberBetween(input.audio?.musicVolume, 0, 0.7, studioStyleParameters(style).musicVolume),
+      voiceVolume: numberBetween(input.audio?.voiceVolume, 0.5, 1.6, 1),
+      fadeSeconds: numberBetween(input.audio?.fadeSeconds, 0, 5, 1.2),
+      noiseReduction: input.audio?.noiseReduction === true
+    },
     sources: Array.isArray(input.sources) ? input.sources.slice(0, STUDIO_LIMITS.maxFiles) : [],
     logo: input.logo || null,
     music: input.music || null
@@ -187,6 +206,7 @@ export function validateEditPlan(plan = {}) {
   if (!(duration > 0 && duration <= STUDIO_LIMITS.maxOutputDurationSeconds)) errors.push("Duracao de saida invalida.");
   if (!Array.isArray(plan.scenes) || !plan.scenes.length) errors.push("O plano precisa conter cenas.");
   if (!Array.isArray(plan.textLayers)) errors.push("O plano precisa declarar as camadas de texto.");
+  if (plan.captions?.enabled && !STUDIO_CAPTION_STYLES[plan.captions?.mode]) errors.push("Estilo de legenda invalido.");
   (plan.scenes || []).forEach((scene, index) => {
     const sceneDuration = Number(scene?.duration || 0);
     if (!text(scene?.sourceId, 160)) errors.push(`Cena ${index + 1} sem arquivo de origem.`);
