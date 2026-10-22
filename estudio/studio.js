@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=6";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=7";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -138,6 +138,7 @@ function currentDraft(sources = []) {
     style: selectedValue("editStyle"),
     format: selectedValue("format"),
     duration: Number(selectedValue("duration")),
+    export: { fps: Number($("exportFps").value), quality: $("exportQuality").value },
     transition: $("transitionMode").value,
     transitionDuration: Number($("transitionDuration").value),
     editing: {
@@ -184,6 +185,7 @@ function updateSummary() {
   $("summaryStyle").textContent = STUDIO_EDIT_STYLES[draft.style].label;
   $("summaryFormat").textContent = draft.format;
   $("summaryDuration").textContent = `${draft.duration} segundos`;
+  $("summaryExport").textContent = `${draft.export.fps} FPS • ${(draft.export.videoBitrateKbps / 1000).toLocaleString("pt-BR", { maximumFractionDigits: 1 })} Mbps`;
   $("summaryCredits").textContent = `${cost.estimatedCredits} ${cost.estimatedCredits === 1 ? "crédito" : "créditos"}`;
 }
 
@@ -827,6 +829,18 @@ function syncVisualAudioMixer() {
   $("visualMusicFadeValue").textContent = `${Number($("visualMusicFade").value).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
 }
 
+function renderVisualExportSettings() {
+  const settings = state.visualPlan?.export || {};
+  $("visualExportFps").value = String(settings.fps || 30);
+  $("visualExportQuality").value = STUDIO_EXPORT_QUALITIES[settings.quality] ? settings.quality : "balanced";
+}
+
+function syncVisualExportSettings() {
+  if (!state.visualPlan) return;
+  const quality = STUDIO_EXPORT_QUALITIES[$("visualExportQuality").value] || STUDIO_EXPORT_QUALITIES.balanced;
+  state.visualPlan.export = { fps: Number($("visualExportFps").value), quality: quality.id, codec: "h264", audioCodec: "aac", videoBitrateKbps: quality.videoBitrateKbps, audioBitrateKbps: quality.audioBitrateKbps };
+}
+
 function renderVisualTimeline() {
   const plan = state.visualPlan;
   if (!plan) return;
@@ -882,6 +896,7 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   $("visualCta").value = state.visualPlan.text?.callToAction || "";
   renderVisualPrimaryTextStyle();
   renderVisualAudioMixer();
+  renderVisualExportSettings();
   renderVisualTimeline();
   renderVisualTextLayers();
   renderVisualVersions();
@@ -1063,6 +1078,7 @@ $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
 [$("visualTextFont"), $("visualTextSize"), $("visualTextColor"), $("visualTextOutline"), $("visualTextAlign"), $("visualTextBackground")].forEach((field) => field.addEventListener("input", syncVisualPrimaryTextStyle));
 [$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
+[$("visualExportFps"), $("visualExportQuality")].forEach((field) => field.addEventListener("change", syncVisualExportSettings));
 $("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
 $("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));
 $("visualRegenerateAutomatic").addEventListener("click", () => {

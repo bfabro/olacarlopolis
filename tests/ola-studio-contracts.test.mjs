@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { STUDIO_CAPTION_STYLES, STUDIO_EDIT_STYLES, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, normalizeStudioProject, studioJobCostEstimate, validateEditPlan, validateStudioProject } from "../shared/studio-contracts.mjs";
+import { STUDIO_CAPTION_STYLES, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, normalizeStudioProject, studioJobCostEstimate, validateEditPlan, validateStudioProject } from "../shared/studio-contracts.mjs";
 
 const source = { id: "media-1", storagePath: "studio/uid/originals/project/video.mp4", contentType: "video/mp4", size: 1024 };
 
@@ -21,7 +21,7 @@ test("estima créditos sem ativar cobrança", () => {
   const estimate = studioJobCostEstimate({ style: "reels", format: "9:16", duration: 30, sources: [source], captionsEnabled: true });
   assert.ok(estimate.processingUnits > 0);
   assert.ok(estimate.estimatedCredits > 0);
-  assert.equal(estimate.formulaVersion, 1);
+  assert.equal(estimate.formulaVersion, 2);
 });
 
 test("contrato do plano rejeita plano sem cenas", () => {
@@ -38,11 +38,20 @@ test("Studio Pro oferece oito modelos, biblioteca de transições e seis estilos
 
 test("normalização preserva personalização profissional sem aceitar valores inseguros", () => {
   const project = normalizeStudioProject({ style: "gastronomia", transition: "blur", transitionDuration: 0.8, textDesign: { preset: "promo", animation: "typewriter", sizeScale: 1.4, color: "#ffbb2d", position: "bottom", background: false } });
-  assert.equal(project.schemaVersion, 6);
+  assert.equal(project.schemaVersion, 7);
   assert.equal(project.transition, "blur");
   assert.equal(project.textDesign.animation, "typewriter");
   assert.equal(project.textDesign.color, "#FFBB2D");
   assert.equal(project.textDesign.position, "bottom");
+});
+
+test("exportação normaliza FPS, bitrate e codecs dentro dos perfis permitidos", () => {
+  const high = normalizeStudioProject({ export: { fps: 60, quality: "high" } });
+  const fallback = normalizeStudioProject({ export: { fps: 120, quality: "ilimitada" } });
+  assert.equal(Object.keys(STUDIO_EXPORT_QUALITIES).length, 3);
+  assert.deepEqual(high.export, { fps: 60, quality: "high", codec: "h264", audioCodec: "aac", videoBitrateKbps: 12000, audioBitrateKbps: 192 });
+  assert.equal(fallback.export.fps, 30);
+  assert.equal(fallback.export.quality, "balanced");
 });
 
 test("normaliza ritmo e sincronismo musical sem habilitar IA semântica", () => {

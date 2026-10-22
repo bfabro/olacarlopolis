@@ -1,4 +1,4 @@
-export const STUDIO_SCHEMA_VERSION = 6;
+export const STUDIO_SCHEMA_VERSION = 7;
 
 export const STUDIO_LIMITS = Object.freeze({
   maxFiles: 10,
@@ -105,6 +105,14 @@ export const STUDIO_FORMATS = Object.freeze({
 
 export const STUDIO_DURATIONS = Object.freeze([15, 30, 60, 90]);
 
+export const STUDIO_EXPORT_FPS = Object.freeze([24, 30, 60]);
+
+export const STUDIO_EXPORT_QUALITIES = Object.freeze({
+  compact: Object.freeze({ id: "compact", label: "Compacta", videoBitrateKbps: 4500, audioBitrateKbps: 128, preset: "veryfast" }),
+  balanced: Object.freeze({ id: "balanced", label: "Equilibrada", videoBitrateKbps: 8000, audioBitrateKbps: 160, preset: "medium" }),
+  high: Object.freeze({ id: "high", label: "Alta", videoBitrateKbps: 12000, audioBitrateKbps: 192, preset: "medium" })
+});
+
 const text = (value, max = 180) => String(value || "").trim().slice(0, max);
 const numberBetween = (value, min, max, fallback) => {
   const parsed = Number(value);
@@ -133,12 +141,22 @@ export function normalizeStudioProject(input = {}) {
   const duration = STUDIO_DURATIONS.includes(Number(input.duration)) ? Number(input.duration) : 30;
   const preset = STUDIO_TEXT_PRESETS[input.textDesign?.preset] || STUDIO_TEXT_PRESETS.clean;
   const animation = STUDIO_TEXT_ANIMATIONS.includes(input.textDesign?.animation) ? input.textDesign.animation : preset.animation;
+  const exportFps = STUDIO_EXPORT_FPS.includes(Number(input.export?.fps)) ? Number(input.export.fps) : 30;
+  const exportQuality = STUDIO_EXPORT_QUALITIES[input.export?.quality] || STUDIO_EXPORT_QUALITIES.balanced;
   return {
     schemaVersion: STUDIO_SCHEMA_VERSION,
     name: text(input.name, 100) || "Novo video",
     style,
     format,
     duration,
+    export: {
+      fps: exportFps,
+      quality: exportQuality.id,
+      codec: "h264",
+      audioCodec: "aac",
+      videoBitrateKbps: exportQuality.videoBitrateKbps,
+      audioBitrateKbps: exportQuality.audioBitrateKbps
+    },
     title: text(input.title, 120),
     subtitle: text(input.subtitle, 180),
     sceneDescription: text(input.sceneDescription, 180),
@@ -213,6 +231,8 @@ export function validateEditPlan(plan = {}) {
   if (Number(plan.schemaVersion) !== STUDIO_SCHEMA_VERSION) errors.push("Versao do plano de edicao invalida.");
   if (!STUDIO_EDIT_STYLES[plan.style]) errors.push("Estilo de edicao invalido.");
   if (!STUDIO_FORMATS[plan.format]) errors.push("Formato de saida invalido.");
+  if (!STUDIO_EXPORT_FPS.includes(Number(plan.export?.fps))) errors.push("Taxa de quadros invalida.");
+  if (!STUDIO_EXPORT_QUALITIES[plan.export?.quality]) errors.push("Qualidade de exportacao invalida.");
   if (!(duration > 0 && duration <= STUDIO_LIMITS.maxOutputDurationSeconds)) errors.push("Duracao de saida invalida.");
   if (!Array.isArray(plan.scenes) || !plan.scenes.length) errors.push("O plano precisa conter cenas.");
   if (!Array.isArray(plan.textLayers)) errors.push("O plano precisa declarar as camadas de texto.");
@@ -232,10 +252,12 @@ export function studioJobCostEstimate(project = {}) {
   const resolutionFactor = pixels / (1080 * 1080);
   const styleFactor = normalized.style === "reels" ? 1.12 : normalized.style === "comercial" ? 1.08 : 1;
   const captionFactor = normalized.captionsEnabled ? 1.2 : 1;
-  const processingUnits = Math.ceil(normalized.duration * resolutionFactor * styleFactor * captionFactor);
+  const fpsFactor = normalized.export.fps / 30;
+  const qualityFactor = normalized.export.quality === "high" ? 1.25 : normalized.export.quality === "compact" ? 0.8 : 1;
+  const processingUnits = Math.ceil(normalized.duration * resolutionFactor * styleFactor * captionFactor * fpsFactor * qualityFactor);
   return {
     processingUnits,
     estimatedCredits: Math.max(1, Math.ceil(processingUnits / 60)),
-    formulaVersion: 1
+    formulaVersion: 2
   };
 }

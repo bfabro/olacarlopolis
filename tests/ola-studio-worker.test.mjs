@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
-import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, renderDimensions } from "../studio-worker/src/renderer.mjs";
+import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, renderDimensions, renderExportSettings } from "../studio-worker/src/renderer.mjs";
 import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
@@ -161,6 +161,14 @@ test("prévia usa resolução reduzida e codificação rápida sem alterar o pla
   assert.ok(args.includes("scale=360:640:force_original_aspect_ratio=increase,crop=360:640,fps=30,setsar=1,format=yuv420p"));
   assert.ok(args.includes("ultrafast"));
   assert.ok(args.includes("28"));
+});
+
+test("exportação aplica FPS e bitrate reais do perfil selecionado", () => {
+  assert.deepEqual(renderExportSettings({ fps: 60, quality: "high" }), { fps: 60, id: "high", label: "Alta", videoBitrateKbps: 12000, audioBitrateKbps: 192, preset: "medium" });
+  const args = buildSegmentArgs({ start: 0, duration: 3 }, video, "/tmp/high.mp4", "9:16", {}, "final", { fps: 60, quality: "high" });
+  assert.ok(args.includes("scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,fps=60,setsar=1,format=yuv420p"));
+  assert.deepEqual(args.slice(args.indexOf("-b:v"), args.indexOf("-b:v") + 8), ["-b:v", "12000k", "-maxrate", "15000k", "-bufsize", "24000k", "-r", "60"]);
+  assert.ok(args.includes("192k"));
 });
 
 test("FFmpeg recebe escala com crop sem deformação e áudio normalizado", () => {

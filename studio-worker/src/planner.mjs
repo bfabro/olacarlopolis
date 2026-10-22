@@ -1,4 +1,4 @@
-import { STUDIO_SCHEMA_VERSION, studioStyleParameters, studioTransitionParameters, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_SCHEMA_VERSION, studioStyleParameters, studioTransitionParameters, validateEditPlan } from "../../shared/studio-contracts.mjs";
 import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const AUTO_TRANSITIONS = Object.freeze({
@@ -91,6 +91,8 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
   const transition = Number(project.transitionDuration || style.transitionSeconds);
   const automaticTransitions = AUTO_TRANSITIONS[project.style] || [selectedTransition.ffmpeg];
   const rhythmLevel = project.editing?.rhythm || "balanced";
+  const exportFps = STUDIO_EXPORT_FPS.includes(Number(project.export?.fps)) ? Number(project.export.fps) : 30;
+  const exportQuality = STUDIO_EXPORT_QUALITIES[project.export?.quality] || STUDIO_EXPORT_QUALITIES.balanced;
   const paceFactor = rhythmLevel === "soft" ? 1.22 : rhythmLevel === "dynamic" ? 0.78 : 1;
   const minClip = Math.max(0.8, style.minClipSeconds * paceFactor);
   const maxClip = Math.max(minClip + 0.4, style.maxClipSeconds * paceFactor);
@@ -126,7 +128,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
     planner: { type: "deterministic-technical", version: 2, semanticAnalysis: false, technicalSelection: true, narrativeTemplate: "opening-development-closing" },
     analysis: { sources: analyzedSources.map((source) => ({ sourceId: source.id, contentType: source.contentType, duration: Number(source.metadata?.duration || 0), hasAudio: source.metadata?.hasAudio === true, orientation: source.metadata.orientation, method: source.technical?.analysisMethod || "unknown", sceneChanges: source.technical?.sceneTimes?.length || 0, qualityWindows: source.technical?.qualityWindows?.length || 0, waveform: source.technical?.waveform || { available: false, samples: [] } })) },
     rhythm: { available: Boolean(rhythm.available), syncEnabled: Boolean(rhythm.syncEnabled), level: rhythmLevel, bpm: Number(rhythm.bpm || 0), confidence: Number(rhythm.confidence || 0), method: rhythm.method || "none", beatCount: rhythm.beatTimes?.length || 0 },
-    style: project.style, format: project.format, duration: target,
+    style: project.style, format: project.format, duration: target, export: { fps: exportFps, quality: exportQuality.id, codec: "h264", audioCodec: "aac", videoBitrateKbps: exportQuality.videoBitrateKbps, audioBitrateKbps: exportQuality.audioBitrateKbps },
     transition: { mode: project.transition || "auto", name: selectedTransition.ffmpeg, duration: transition },
     text: { title: project.title || "", subtitle: project.subtitle || "", callToAction: project.callToAction || "" }, textDesign: project.textDesign || {}, textLayers: textLayersFor(project, target),
     captions: { requested: project.captionsEnabled === true, enabled: project.captionsEnabled === true && options.transcription?.available === true, provider: options.transcription?.provider || "pending", segments: options.transcription?.segments || [], ...(project.captions || {}) },

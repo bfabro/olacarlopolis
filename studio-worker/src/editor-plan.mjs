@@ -1,4 +1,4 @@
-import { STUDIO_SCHEMA_VERSION, STUDIO_TEXT_ANIMATIONS, STUDIO_TRANSITIONS, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_SCHEMA_VERSION, STUDIO_TEXT_ANIMATIONS, STUDIO_TRANSITIONS, validateEditPlan } from "../../shared/studio-contracts.mjs";
 import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
@@ -23,6 +23,8 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
   const duration = round(scenes.reduce((total, scene, index) => total + scene.duration - (index ? scene.transitionDuration : 0), 0));
   if (!(duration > 0 && duration <= 90)) throw new Error("A duração total editada deve ficar entre 1 e 90 segundos.");
   const textValues = input.text || {};
+  const exportFps = STUDIO_EXPORT_FPS.includes(Number(input.export?.fps)) ? Number(input.export.fps) : Number(technicalPlan.export?.fps || 30);
+  const exportQuality = STUDIO_EXPORT_QUALITIES[input.export?.quality] || STUDIO_EXPORT_QUALITIES[technicalPlan.export?.quality] || STUDIO_EXPORT_QUALITIES.balanced;
   const layerValues = new Map([['title', textValues.title], ['subtitle', textValues.subtitle], ['call_to_action', textValues.callToAction]]);
   const textLayers = (Array.isArray(input.textLayers) ? input.textLayers : technicalPlan.textLayers || []).slice(0, 20).map((layer, index) => ({
     id: String(layer.id || `text-${index + 1}`).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80) || `text-${index + 1}`,
@@ -45,6 +47,7 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
     ...input,
     schemaVersion: STUDIO_SCHEMA_VERSION,
     duration,
+    export: { fps: exportFps, quality: exportQuality.id, codec: "h264", audioCodec: "aac", videoBitrateKbps: exportQuality.videoBitrateKbps, audioBitrateKbps: exportQuality.audioBitrateKbps },
     planner: { type: "visual-editor", version: 1, semanticAnalysis: false, technicalSelection: true, basedOn: input.planner?.type || technicalPlan.planner?.type || "technical" },
     text: { title: String(textValues.title || "").slice(0, 120), subtitle: String(textValues.subtitle || "").slice(0, 180), callToAction: String(textValues.callToAction || "").slice(0, 100) },
     textLayers,

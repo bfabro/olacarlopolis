@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=13">
-  <link rel="stylesheet" href="studio-overrides.css?v=12">
+  <link rel="stylesheet" href="studio.css?v=14">
+  <link rel="stylesheet" href="studio-overrides.css?v=13">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -128,6 +128,10 @@
               <fieldset><legend>Duração</legend><div class="duration-grid">
                 <label><input type="radio" name="duration" value="15"><span>15s</span></label><label><input type="radio" name="duration" value="30" checked><span>30s</span></label><label><input type="radio" name="duration" value="60"><span>60s</span></label><label><input type="radio" name="duration" value="90"><span>90s</span></label>
               </div></fieldset>
+              <fieldset><legend>Exportação</legend><div class="export-grid">
+                <label>Taxa de quadros<select id="exportFps"><option value="24">24 FPS — cinematográfico</option><option value="30" selected>30 FPS — padrão</option><option value="60">60 FPS — movimento fluido</option></select></label>
+                <label>Qualidade e bitrate<select id="exportQuality"><option value="compact">Compacta — 4,5 Mbps</option><option value="balanced" selected>Equilibrada — 8 Mbps</option><option value="high">Alta — 12 Mbps</option></select></label>
+              </div><small class="export-note">A prévia usa resolução reduzida, mas respeita o FPS escolhido. A exportação final permanece em Full HD.</small></fieldset>
             </section>
 
             <section class="studio-card">
@@ -179,7 +183,7 @@
           <aside class="editor-summary">
             <section class="studio-card sticky-card">
               <span class="eyebrow">Resumo do projeto</span><h2>Pronto para criar?</h2>
-              <dl><div><dt>Arquivos</dt><dd id="summaryFiles">0</dd></div><div><dt>Estilo</dt><dd id="summaryStyle">Institucional</dd></div><div><dt>Formato</dt><dd id="summaryFormat">9:16</dd></div><div><dt>Duração</dt><dd id="summaryDuration">30 segundos</dd></div><div><dt>Estimativa</dt><dd id="summaryCredits">2 créditos</dd></div></dl>
+              <dl><div><dt>Arquivos</dt><dd id="summaryFiles">0</dd></div><div><dt>Estilo</dt><dd id="summaryStyle">Institucional</dd></div><div><dt>Formato</dt><dd id="summaryFormat">9:16</dd></div><div><dt>Duração</dt><dd id="summaryDuration">30 segundos</dd></div><div><dt>Exportação</dt><dd id="summaryExport">30 FPS • 8 Mbps</dd></div><div><dt>Estimativa</dt><dd id="summaryCredits">2 créditos</dd></div></dl>
               <div class="cost-note"><i class="fa-solid fa-coins"></i><p><strong>Cobrança desativada</strong>A estimativa já é registrada para análise de custos.</p></div>
               <button id="createVideoButton" class="create-button" type="submit"><i class="fa-solid fa-wand-magic-sparkles"></i> Criar meu vídeo</button>
               <small class="preservation-note"><i class="fa-solid fa-shield"></i> Os arquivos originais serão preservados.</small>
@@ -229,6 +233,11 @@
                 <label>Fade da música<input id="visualMusicFade" type="range" min="0" max="5" step="0.1"><output id="visualMusicFadeValue">1,2s</output></label>
                 <label class="visual-audio-toggle"><input id="visualNoiseReduction" type="checkbox"><span><strong>Reduzir ruído contínuo</strong><small>Filtro moderado para preservar a voz.</small></span></label>
                 <label class="visual-audio-toggle"><input id="visualMusicDucking" type="checkbox"><span><strong>Baixar música durante falas</strong><small>Prioriza automaticamente o áudio original.</small></span></label>
+              </div>
+              <div class="visual-layer-heading"><strong>Exportação</strong><span class="visual-mixer-status">Full HD H.264 / AAC</span></div>
+              <div class="visual-export-settings">
+                <label>Taxa de quadros<select id="visualExportFps"><option value="24">24 FPS</option><option value="30">30 FPS</option><option value="60">60 FPS</option></select></label>
+                <label>Qualidade<select id="visualExportQuality"><option value="compact">Compacta — 4,5 Mbps</option><option value="balanced">Equilibrada — 8 Mbps</option><option value="high">Alta — 12 Mbps</option></select></label>
               </div>
               <div class="visual-layer-heading"><strong>Camadas adicionais</strong><button id="visualAddTextLayer" type="button"><i class="fa-solid fa-plus"></i> Adicionar</button></div>
               <div id="visualTextLayers" class="visual-text-layers"></div>
@@ -280,6 +289,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=18"></script>
+  <script type="module" src="studio.js?v=19"></script>
 </body>
 </html>

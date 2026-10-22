@@ -15,7 +15,9 @@ export async function probeMedia(localPath, contentType = "", signal) {
   const duration = Number(data.format?.duration || video?.duration || 0);
   const width = Number(video?.width || 0);
   const height = Number(video?.height || 0);
-  return { duration: Number.isFinite(duration) ? duration : 0, width, height, orientation: width === height ? "square" : width > height ? "landscape" : "portrait", hasVideo: Boolean(video), hasAudio: Boolean(audio), contentType };
+  const [rateNumerator, rateDenominator] = String(video?.avg_frame_rate || video?.r_frame_rate || "0/1").split("/").map(Number);
+  const frameRate = rateDenominator > 0 ? round(rateNumerator / rateDenominator) : 0;
+  return { duration: Number.isFinite(duration) ? duration : 0, width, height, frameRate, orientation: width === height ? "square" : width > height ? "landscape" : "portrait", hasVideo: Boolean(video), hasAudio: Boolean(audio), contentType };
 }
 
 export function parseSceneTimes(log = "") {
