@@ -1,7 +1,9 @@
-import { STUDIO_SCHEMA_VERSION, STUDIO_TRANSITIONS, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { STUDIO_SCHEMA_VERSION, STUDIO_TEXT_ANIMATIONS, STUDIO_TRANSITIONS, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
 const allowedTransitions = new Set(Object.values(STUDIO_TRANSITIONS).map((item) => item.ffmpeg).filter((item) => item !== "auto"));
+const safeColor = (value, fallback) => /^#[0-9a-f]{6}$/i.test(String(value || "")) ? String(value).toUpperCase() : fallback;
 
 export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
   if (!input || typeof input !== "object") throw new Error("O editor visual não enviou um plano válido.");
@@ -22,11 +24,21 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
   if (!(duration > 0 && duration <= 90)) throw new Error("A duração total editada deve ficar entre 1 e 90 segundos.");
   const textValues = input.text || {};
   const layerValues = new Map([['title', textValues.title], ['subtitle', textValues.subtitle], ['call_to_action', textValues.callToAction]]);
-  const textLayers = (Array.isArray(input.textLayers) ? input.textLayers : technicalPlan.textLayers || []).slice(0, 20).map((layer) => ({
-    ...layer,
-    value: String(layerValues.has(layer.type) ? layerValues.get(layer.type) : layer.value || "").trim().slice(0, 180),
+  const textLayers = (Array.isArray(input.textLayers) ? input.textLayers : technicalPlan.textLayers || []).slice(0, 20).map((layer, index) => ({
+    id: String(layer.id || `text-${index + 1}`).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 80) || `text-${index + 1}`,
+    type: ["title", "subtitle", "person", "description", "offer", "promotion", "closing", "call_to_action", "custom"].includes(layer.type) ? layer.type : "custom",
+    value: String(layerValues.has(layer.type) ? layerValues.get(layer.type) : layer.value || "").replace(/\s+/g, " ").trim().slice(0, 180),
     start: Math.max(0, Math.min(duration, Number(layer.start || 0))),
-    end: Math.max(0.1, Math.min(duration, Number(layer.end || duration)))
+    end: Math.max(0.1, Math.min(duration, Number(layer.end || duration))),
+    animation: STUDIO_TEXT_ANIMATIONS.includes(layer.animation) ? layer.animation : "fade",
+    position: ["top", "center", "bottom"].includes(layer.position) ? layer.position : "center",
+    align: ["left", "center", "right"].includes(layer.align) ? layer.align : "center",
+    font: ["sans", "serif", "mono"].includes(layer.font) ? layer.font : "sans",
+    sizeScale: Math.max(0.7, Math.min(1.8, Number(layer.sizeScale || 1))),
+    color: safeColor(layer.color, "#FFFFFF"), outlineColor: safeColor(layer.outlineColor, "#092B45"),
+    background: layer.background !== false,
+    margin: Math.max(24, Math.min(180, Number(layer.margin || 64))),
+    slot: Math.max(0, Math.min(4, Number(layer.slot || 0)))
   })).filter((layer) => layer.value && layer.end > layer.start);
   const plan = {
     ...technicalPlan,
@@ -36,6 +48,7 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
     planner: { type: "visual-editor", version: 1, semanticAnalysis: false, technicalSelection: true, basedOn: input.planner?.type || technicalPlan.planner?.type || "technical" },
     text: { title: String(textValues.title || "").slice(0, 120), subtitle: String(textValues.subtitle || "").slice(0, 180), callToAction: String(textValues.callToAction || "").slice(0, 100) },
     textLayers,
+    audio: { ...(technicalPlan.audio || {}), ...(input.audio || {}), waveform: technicalPlan.audio?.waveform?.method === "music-pcm-envelope-v1" ? technicalPlan.audio.waveform : composePlanWaveform(scenes, analyzedSources, duration) },
     scenes
   };
   const validation = validateEditPlan(plan);

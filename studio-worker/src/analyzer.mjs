@@ -1,5 +1,6 @@
 import { workerConfig } from "./config.mjs";
 import { runProcess } from "./process-utils.mjs";
+import { analyzeAudioWaveform } from "./audio-waveform.mjs";
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
 
@@ -94,6 +95,7 @@ export async function analyzeSources(sources, progress = () => {}, signal) {
     const source = sources[index];
     const metadata = await probeMedia(source.localPath, source.contentType, signal);
     const technical = await analyzeVideo(source.localPath, metadata, signal);
+    technical.waveform = await analyzeAudioWaveform(source.localPath, metadata, signal);
     results.push({ ...source, metadata, technical });
     await progress(index + 1, sources.length);
   }

@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=8">
-  <link rel="stylesheet" href="studio-overrides.css?v=8">
+  <link rel="stylesheet" href="studio.css?v=9">
+  <link rel="stylesheet" href="studio-overrides.css?v=9">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -203,6 +203,7 @@
             <section class="studio-card">
               <div class="card-heading"><span><i class="fa-solid fa-timeline"></i></span><div><h2>Timeline de cenas</h2><p>Reordene, ajuste a duração e escolha a transição de cada trecho.</p></div></div>
               <div class="timeline-ruler"><span>Início</span><strong id="visualTotalDuration">0s</strong><span>Final</span></div>
+              <div class="visual-audio-track"><div><i class="fa-solid fa-wave-square"></i><span><strong>Faixa de áudio</strong><small id="visualAudioLabel">Energia real da voz e do som original</small></span></div><div id="visualWaveform" class="visual-waveform" aria-label="Forma de onda do áudio"></div></div>
               <div id="visualTimeline" class="visual-timeline"></div>
             </section>
           </div>
@@ -212,9 +213,12 @@
               <label>Título<input id="visualTitle" maxlength="120"></label>
               <label>Subtítulo<textarea id="visualSubtitle" maxlength="180" rows="3"></textarea></label>
               <label>Chamada final<input id="visualCta" maxlength="100"></label>
+              <div class="visual-layer-heading"><strong>Camadas adicionais</strong><button id="visualAddTextLayer" type="button"><i class="fa-solid fa-plus"></i> Adicionar</button></div>
+              <div id="visualTextLayers" class="visual-text-layers"></div>
               <div class="visual-render-actions">
                 <button id="visualGeneratePreview" class="secondary-button" type="button"><i class="fa-solid fa-bolt"></i> Gerar prévia rápida</button>
                 <button id="visualRenderFinal" class="create-button" type="button"><i class="fa-solid fa-film"></i> Renderizar nova versão</button>
+                <button id="visualRegenerateAutomatic" class="secondary-button" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Nova montagem automática</button>
               </div>
               <small><i class="fa-solid fa-shield"></i> Cada nova versão preserva as anteriores e os arquivos originais.</small>
             </section>
@@ -259,6 +263,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=13"></script>
+  <script type="module" src="studio.js?v=14"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { workerConfig } from "./config.mjs";
 import { runProcess } from "./process-utils.mjs";
+import { waveformFromPcm } from "./audio-waveform.mjs";
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
 const median = (values) => {
@@ -25,7 +26,7 @@ export function detectRhythmFromPcm(buffer, sampleRate = 8000, windowMs = 50) {
     }
     energies.push(Math.sqrt(sum / Math.max(1, count)));
   }
-  if (energies.length < 4) return { available: false, bpm: 0, confidence: 0, beatTimes: [], intensity: 0, method: "pcm-energy-onset-v1" };
+  if (energies.length < 4) return { available: false, bpm: 0, confidence: 0, beatTimes: [], intensity: 0, waveform: { available: false, samples: [], method: "none" }, method: "pcm-energy-onset-v1" };
   const flux = energies.map((value, index) => index ? Math.max(0, value - energies[index - 1]) : 0);
   const baseline = median(flux);
   const threshold = baseline + Math.max(0.002, median(flux.map((value) => Math.abs(value - baseline))) * 2.6);
@@ -44,11 +45,12 @@ export function detectRhythmFromPcm(buffer, sampleRate = 8000, windowMs = 50) {
   const duration = energies.length * windowMs / 1000;
   const expected = bpm ? duration * bpm / 60 : 0;
   const confidence = expected ? Math.min(1, beatTimes.length / expected) : 0;
-  return { available: beatTimes.length >= 3, bpm: round(bpm, 1), confidence: round(confidence), beatTimes, intensity: round(Math.min(1, meanEnergy * 6)), method: "pcm-energy-onset-v1" };
+  const waveformSamples = waveformFromPcm(buffer, 120);
+  return { available: beatTimes.length >= 3, bpm: round(bpm, 1), confidence: round(confidence), beatTimes, intensity: round(Math.min(1, meanEnergy * 6)), waveform: { available: waveformSamples.some((value) => value > 0.002), samples: waveformSamples, bins: waveformSamples.length, method: "music-pcm-envelope-v1" }, method: "pcm-energy-onset-v1" };
 }
 
 export async function analyzeMusicRhythm(localPath, workDir, signal) {
-  if (!localPath) return { available: false, bpm: 0, confidence: 0, beatTimes: [], intensity: 0, method: "none" };
+  if (!localPath) return { available: false, bpm: 0, confidence: 0, beatTimes: [], intensity: 0, waveform: { available: false, samples: [], method: "none" }, method: "none" };
   const pcmPath = path.join(workDir, "music-rhythm.pcm");
   try {
     await runProcess(workerConfig.ffmpegPath, ["-y", "-hide_banner", "-i", localPath, "-vn", "-ac", "1", "-ar", "8000", "-f", "s16le", pcmPath], { signal });

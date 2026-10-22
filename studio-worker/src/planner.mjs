@@ -1,4 +1,5 @@
 import { STUDIO_SCHEMA_VERSION, studioStyleParameters, studioTransitionParameters, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const AUTO_TRANSITIONS = Object.freeze({
   institucional: ["fade", "dissolve", "fadeblack"], comercial: ["fadeblack", "fadewhite", "dissolve"], reels: ["smoothleft", "fadewhite", "hardcut", "slideleft"],
@@ -123,13 +124,13 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
   const plan = {
     schemaVersion: STUDIO_SCHEMA_VERSION,
     planner: { type: "deterministic-technical", version: 2, semanticAnalysis: false, technicalSelection: true, narrativeTemplate: "opening-development-closing" },
-    analysis: { sources: analyzedSources.map((source) => ({ sourceId: source.id, orientation: source.metadata.orientation, method: source.technical?.analysisMethod || "unknown", sceneChanges: source.technical?.sceneTimes?.length || 0, qualityWindows: source.technical?.qualityWindows?.length || 0 })) },
+    analysis: { sources: analyzedSources.map((source) => ({ sourceId: source.id, orientation: source.metadata.orientation, method: source.technical?.analysisMethod || "unknown", sceneChanges: source.technical?.sceneTimes?.length || 0, qualityWindows: source.technical?.qualityWindows?.length || 0, waveform: source.technical?.waveform || { available: false, samples: [] } })) },
     rhythm: { available: Boolean(rhythm.available), syncEnabled: Boolean(rhythm.syncEnabled), level: rhythmLevel, bpm: Number(rhythm.bpm || 0), confidence: Number(rhythm.confidence || 0), method: rhythm.method || "none", beatCount: rhythm.beatTimes?.length || 0 },
     style: project.style, format: project.format, duration: target,
     transition: { mode: project.transition || "auto", name: selectedTransition.ffmpeg, duration: transition },
     text: { title: project.title || "", subtitle: project.subtitle || "", callToAction: project.callToAction || "" }, textDesign: project.textDesign || {}, textLayers: textLayersFor(project, target),
     captions: { requested: project.captionsEnabled === true, enabled: project.captionsEnabled === true && options.transcription?.available === true, provider: options.transcription?.provider || "pending", segments: options.transcription?.segments || [], ...(project.captions || {}) },
-    audio: { musicVolume: style.musicVolume, voiceVolume: 1, fadeSeconds: 1.2, noiseReduction: false, ...(project.audio || {}) },
+    audio: { musicVolume: style.musicVolume, voiceVolume: 1, fadeSeconds: 1.2, noiseReduction: false, ...(project.audio || {}), waveform: rhythm.waveform?.available ? rhythm.waveform : composePlanWaveform(scenes, analyzedSources, target) },
     music: { enabled: Boolean(project.music), volume: Number(project.audio?.musicVolume ?? style.musicVolume), duckDuringSpeech: true },
     logo: { enabled: Boolean(project.logo), position: "center", start: Math.max(0, target - 5), end: target - 0.1, size: 0.22 }, scenes
   };

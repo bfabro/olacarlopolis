@@ -9,6 +9,7 @@ import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker
 import { buildQualityWindows, parseIntervals, parseSignalFrames } from "../studio-worker/src/analyzer.mjs";
 import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
 import { OpenAISemanticPlanner, buildSemanticCandidates, markSemanticFallback } from "../studio-worker/src/ai-planner.mjs";
+import { composePlanWaveform, waveformFromPcm } from "../studio-worker/src/audio-waveform.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -53,6 +54,19 @@ test("detector de ritmo encontra pulsos reais no PCM", () => {
   assert.equal(rhythm.available, true);
   assert.ok(rhythm.bpm >= 110 && rhythm.bpm <= 130);
   assert.ok(rhythm.beatTimes.length >= 8);
+  assert.equal(rhythm.waveform.samples.length, 120);
+});
+
+test("forma de onda usa energia PCM real e acompanha a ordem das cenas", () => {
+  const pcm = Buffer.alloc(1000);
+  for (let index = 0; index < 500; index += 1) pcm.writeInt16LE(index < 250 ? 1000 : 22000, index * 2);
+  const samples = waveformFromPcm(pcm, 10);
+  assert.equal(samples.length, 10);
+  assert.ok(samples.at(-1) > samples[0]);
+  const sources = [{ ...video, technical: { ...video.technical, waveform: { available: true, duration: 20, samples: [0.1, 0.9] } } }];
+  const composed = composePlanWaveform([{ sourceId: "video-1", start: 0, duration: 5 }, { sourceId: "video-1", start: 15, duration: 5, transitionDuration: 0 }], sources, 10, 10);
+  assert.equal(composed.available, true);
+  assert.ok(composed.samples.at(-1) > composed.samples[0]);
 });
 
 test("planejador prioriza qualidade, registra narrativa e sincroniza apenas cenas sem fala", () => {

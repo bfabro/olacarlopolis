@@ -117,6 +117,9 @@ Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON p
 - duração individual entre 0,5 e 15 segundos;
 - transição de cada corte;
 - título, subtítulo e chamada final;
+- forma de onda calculada a partir do áudio real das mídias ou da música selecionada;
+- camadas adicionais de texto com conteúdo, intervalo, posição e animação editáveis;
+- comando para criar uma nova montagem automática preservando as versões anteriores;
 - duração total recalculada considerando as sobreposições;
 - histórico preservado das exportações.
 
@@ -142,7 +145,7 @@ A exclusão automática ainda não está ativa. Ela deve ser implementada como t
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
-Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, ordem, duração e transição no mesmo plano, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas.
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, camadas adicionais, ordem, duração e transição no mesmo plano, calcula a forma de onda do áudio real, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas.
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
@@ -156,7 +159,7 @@ O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nen
 - detecção dedicada de desfoque e tremor de câmera (o motor atual mede exposição, congelamento e volatilidade de movimento);
 - biblioteca licenciada de músicas;
 - avaliação de custo/qualidade do Diretor por IA com um modelo de produção escolhido pelo responsável (a integração existe, mas permanece sem credencial e sem modelo por padrão);
-- forma de onda gráfica da faixa de áudio e edição livre das camadas secundárias de texto dentro da timeline.
+- ajuste por arraste das bordas dos clipes e edição visual da mixagem de áudio diretamente na timeline.
 
 Esses itens permanecem explicitamente fora da interface funcional até possuírem processamento real e testes próprios.
 

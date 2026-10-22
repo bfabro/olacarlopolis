@@ -655,11 +655,59 @@ function transitionOptions(selected, first) {
   return Object.values(STUDIO_TRANSITIONS).filter((item) => item.id !== "auto").map((item) => `<option value="${item.ffmpeg}" ${item.ffmpeg === selected ? "selected" : ""}>${escapeHtml(item.label)}</option>`).join("");
 }
 
+function visualWaveformSamples() {
+  const direct = state.visualPlan?.audio?.waveform;
+  if (direct?.method === "music-pcm-envelope-v1" && direct.samples?.length) return direct.samples;
+  const sourceWaveforms = new Map((state.visualPlan?.analysis?.sources || []).map((source) => [source.sourceId, source.waveform]));
+  if (![...sourceWaveforms.values()].some((waveform) => waveform?.available)) return direct?.samples || [];
+  const scenes = state.visualPlan.scenes || [];
+  const duration = visualPlanDuration();
+  const timeline = [];
+  let cursor = 0;
+  scenes.forEach((scene, index) => {
+    cursor -= index ? Number(scene.transitionDuration || 0) : 0;
+    timeline.push({ start: cursor, end: cursor + Number(scene.duration || 0), scene });
+    cursor += Number(scene.duration || 0);
+  });
+  return Array.from({ length: 120 }, (_, bin) => {
+    const time = (bin + 0.5) / 120 * Math.max(0.1, duration);
+    return Math.max(0, ...timeline.filter((item) => time >= item.start && time <= item.end).map((item) => {
+      const waveform = sourceWaveforms.get(item.scene.sourceId);
+      if (!waveform?.samples?.length) return 0;
+      const source = (state.visualProject?.sources || []).find((entry) => entry.id === item.scene.sourceId);
+      const sourceDuration = Number(waveform.duration || source?.duration || item.scene.duration || 1);
+      const sourceTime = Number(item.scene.start || 0) + time - item.start;
+      return Number(waveform.samples[Math.min(waveform.samples.length - 1, Math.max(0, Math.floor(sourceTime / sourceDuration * waveform.samples.length)))] || 0);
+    }));
+  });
+}
+
+function renderVisualWaveform() {
+  const root = $("visualWaveform");
+  const samples = visualWaveformSamples();
+  if (!samples.length || !samples.some((value) => value > 0.002)) {
+    root.className = "visual-waveform empty";
+    root.textContent = "Sem áudio detectado neste plano";
+    $("visualAudioLabel").textContent = "Nenhuma forma de onda disponível";
+    return;
+  }
+  root.className = "visual-waveform";
+  root.innerHTML = samples.map((value) => `<i style="height:${Math.max(4, Math.round(Number(value || 0) * 58))}px"></i>`).join("");
+  $("visualAudioLabel").textContent = state.visualPlan.audio?.waveform?.method === "music-pcm-envelope-v1" ? "Energia real da trilha musical" : "Energia real da voz e do som original";
+}
+
+function renderVisualTextLayers() {
+  const standard = new Set(["title", "subtitle", "call_to_action"]);
+  const layers = (state.visualPlan?.textLayers || []).filter((layer) => !standard.has(layer.type));
+  $("visualTextLayers").innerHTML = layers.length ? layers.map((layer) => `<article class="visual-text-layer" data-text-layer="${escapeHtml(layer.id)}"><textarea data-layer-field="value" maxlength="180" aria-label="Texto da camada">${escapeHtml(layer.value || "")}</textarea><button class="visual-text-layer-remove" data-layer-remove="${escapeHtml(layer.id)}" type="button" title="Remover camada"><i class="fa-solid fa-trash"></i></button><div class="visual-text-layer-fields"><label>Entrada<input data-layer-field="start" type="number" min="0" max="90" step="0.1" value="${Number(layer.start || 0).toFixed(1)}"></label><label>Saída<input data-layer-field="end" type="number" min="0.1" max="90" step="0.1" value="${Number(layer.end || 0).toFixed(1)}"></label><label>Posição<select data-layer-field="position"><option value="top" ${layer.position === "top" ? "selected" : ""}>Superior</option><option value="center" ${layer.position === "center" ? "selected" : ""}>Centro</option><option value="bottom" ${layer.position === "bottom" ? "selected" : ""}>Inferior</option></select></label><label>Animação<select data-layer-field="animation"><option value="fade" ${layer.animation === "fade" ? "selected" : ""}>Fade</option><option value="slide_up" ${layer.animation === "slide_up" ? "selected" : ""}>Slide Up</option><option value="zoom_pop" ${layer.animation === "zoom_pop" ? "selected" : ""}>Zoom Pop</option><option value="reveal" ${layer.animation === "reveal" ? "selected" : ""}>Revelação</option><option value="word_by_word" ${layer.animation === "word_by_word" ? "selected" : ""}>Palavra por palavra</option></select></label></div></article>`).join("") : '<p class="empty-copy">Nenhuma camada adicional. Você pode incluir descrições, ofertas ou observações.</p>';
+}
+
 function renderVisualTimeline() {
   const plan = state.visualPlan;
   if (!plan) return;
   plan.duration = visualPlanDuration();
   $("visualTotalDuration").textContent = `${plan.duration.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
+  renderVisualWaveform();
   const sourceById = new Map((state.visualProject?.sources || []).map((source) => [source.id, source]));
   $("visualTimeline").innerHTML = plan.scenes.map((scene, index) => {
     const source = sourceById.get(scene.sourceId) || {};
@@ -707,6 +755,7 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   $("visualSubtitle").value = state.visualPlan.text?.subtitle || "";
   $("visualCta").value = state.visualPlan.text?.callToAction || "";
   renderVisualTimeline();
+  renderVisualTextLayers();
   renderVisualVersions();
   await setVisualPreview(preferredOutput || project.output || project.preview);
   $("visualPreviewNotice").textContent = preferredOutput || project.preview ? "Prévia reduzida atualizada com o plano editado." : "Exibindo a última exportação Full HD. Gere uma prévia leve para conferir novos ajustes.";
@@ -880,6 +929,35 @@ $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
 $("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
 $("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));
+$("visualRegenerateAutomatic").addEventListener("click", () => {
+  if (!state.visualProject || !window.confirm("Gerar uma montagem automática nova? Seus vídeos e versões anteriores serão preservados.")) return;
+  regenerateProject(state.visualProject.id).catch((error) => toast(error.message));
+});
+$("visualAddTextLayer").addEventListener("click", () => {
+  const layers = state.visualPlan?.textLayers || [];
+  if (layers.length >= 20) return toast("O limite é de 20 camadas de texto por vídeo.");
+  const duration = visualPlanDuration();
+  layers.push({ id: `custom-${crypto.randomUUID()}`, type: "custom", value: "Novo texto", start: Math.min(1, Math.max(0, duration - 1)), end: Math.min(duration, 5), animation: "fade", position: "center", align: "center", font: "sans", sizeScale: 1, color: "#FFFFFF", outlineColor: "#092B45", background: true, margin: 64, slot: 0 });
+  state.visualPlan.textLayers = layers;
+  renderVisualTextLayers();
+});
+$("visualTextLayers").addEventListener("click", (event) => {
+  const remove = event.target.closest("[data-layer-remove]");
+  if (!remove) return;
+  state.visualPlan.textLayers = (state.visualPlan.textLayers || []).filter((layer) => layer.id !== remove.dataset.layerRemove);
+  renderVisualTextLayers();
+});
+const updateVisualTextLayer = (event) => {
+  const field = event.target.closest("[data-layer-field]");
+  const card = event.target.closest("[data-text-layer]");
+  if (!field || !card) return;
+  const layer = (state.visualPlan.textLayers || []).find((item) => item.id === card.dataset.textLayer);
+  if (!layer) return;
+  const key = field.dataset.layerField;
+  layer[key] = ["start", "end"].includes(key) ? Number(field.value || 0) : field.value;
+};
+$("visualTextLayers").addEventListener("input", updateVisualTextLayer);
+$("visualTextLayers").addEventListener("change", updateVisualTextLayer);
 $("visualTimeline").addEventListener("click", (event) => {
   const up = event.target.closest("[data-scene-up]");
   const down = event.target.closest("[data-scene-down]");
