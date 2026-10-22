@@ -141,9 +141,10 @@ Quando a opção de revisão está ativa, o primeiro processamento pausa em `awa
 - saída de até 90 segundos;
 - um processamento simultâneo por usuário no frontend;
 - retenção registrada para 30 dias;
-- originais não são apagados pelo worker.
+- nenhum arquivo é removido automaticamente;
+- projetos inativos podem ser excluídos manualmente em **Meus projetos**, sempre após confirmação explícita.
 
-A exclusão automática ainda não está ativa. Ela deve ser implementada como tarefa separada, com aviso e trilha de auditoria antes de remover qualquer original.
+A exclusão manual remove somente os originais, logos, músicas, planos e renders pertencentes ao projeto confirmado. O worker confere o usuário, o projeto, o token da confirmação e a ausência de outro processamento ativo antes de agir. O registro financeiro de auditoria é preservado sem cobrança. A operação é permanente e idempotente: se houver uma falha parcial, ela pode ser solicitada novamente com segurança. A exclusão automática continua desativada e não deve ser ativada sem aviso prévio e uma política aprovada.
 
 ## Validação da composição profissional
 

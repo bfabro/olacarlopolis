@@ -21,7 +21,7 @@ const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
 const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map() };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
-const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
+const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
@@ -624,6 +624,57 @@ async function regenerateProject(projectId) {
   watchJob(jobId, projectId);
 }
 
+async function requestProjectDeletion(projectId) {
+  const snapshot = await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`));
+  const project = snapshot.val();
+  if (!project) return toast("Este projeto não foi encontrado ou já foi excluído.");
+  if (["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested", "deletion_queued", "deleting"].includes(project.status)) return toast("Cancele ou aguarde o processamento atual antes de excluir.");
+  const projectName = project.name || "Projeto sem nome";
+  const confirmed = window.confirm(`Excluir permanentemente “${projectName}”?\n\nOs arquivos originais, logos, músicas, planos e vídeos renderizados deste projeto serão removidos. Esta ação não pode ser desfeita.`);
+  if (!confirmed) return;
+  const deletionToken = crypto.randomUUID();
+  const jobRef = push(ref(db, `studioJobs/${state.user.uid}`));
+  const jobId = jobRef.key;
+  const now = Date.now();
+  await update(ref(db), {
+    [`studioJobs/${state.user.uid}/${jobId}`]: { schemaVersion: 1, id: jobId, projectId, ownerUid: state.user.uid, mode: "delete", deletionAuthorized: true, deletionToken, status: "queued", stage: "queue", progress: 25, attempt: 0, createdAt: now, updatedAt: now },
+    [`studioProjects/${state.user.uid}/${projectId}/status`]: "deletion_queued",
+    [`studioProjects/${state.user.uid}/${projectId}/jobId`]: jobId,
+    [`studioProjects/${state.user.uid}/${projectId}/deletionRequest`]: { token: deletionToken, requestedBy: state.user.uid, confirmedAt: now },
+    [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: now
+  });
+  state.activeProjectId = projectId;
+  state.activeJobId = jobId;
+  toast("Exclusão confirmada e enviada para a fila segura.");
+  await loadProjects();
+}
+
+function watchDeletionJob(jobId, projectId) {
+  state.jobUnsubscribe?.();
+  state.jobUnsubscribe = onValue(ref(db, `studioJobs/${state.user.uid}/${jobId}`), async (snapshot) => {
+    const job = snapshot.val();
+    if (!job) return;
+    if (["analyzing", "deleting"].includes(job.status)) {
+      const project = state.projects.find((item) => item.id === projectId);
+      if (project) project.status = "deleting";
+      renderProjects();
+    }
+    if (job.status === "completed") {
+      state.jobUnsubscribe?.();
+      state.jobUnsubscribe = null;
+      state.projects = state.projects.filter((item) => item.id !== projectId);
+      renderProjects();
+      toast("Projeto e mídias excluídos permanentemente.");
+    }
+    if (job.status === "failed") {
+      state.jobUnsubscribe?.();
+      state.jobUnsubscribe = null;
+      await loadProjects();
+      toast(job.error?.message || "Não foi possível excluir o projeto.");
+    }
+  });
+}
+
 async function readPrivateJson(storagePath) {
   if (!storagePath) throw new Error("Plano de edição não encontrado.");
   const blob = await getBlob(storageRef(storage, storagePath));
@@ -890,6 +941,8 @@ async function loadProjects() {
   const value = snapshot.val() || {};
   state.projects = Object.entries(value).map(([id, project]) => ({ id, ...project })).sort((a, b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0));
   renderProjects();
+  const deletion = state.projects.find((project) => ["deletion_queued", "deleting"].includes(project.status) && project.jobId);
+  if (deletion) watchDeletionJob(deletion.jobId, deletion.id);
 }
 
 function renderProjects() {
@@ -899,15 +952,17 @@ function renderProjects() {
     const completed = project.status === "completed";
     const failed = project.status === "failed";
     const cancelled = project.status === "cancelled";
-    const active = ["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"].includes(project.status);
+    const deletionActive = ["deletion_queued", "deleting"].includes(project.status);
+    const active = deletionActive || ["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"].includes(project.status);
     const review = project.status === "awaiting_review" && project.jobId ? `<button type="button" data-project-review="${project.id}"><i class="fa-solid fa-closed-captioning"></i> Revisar legendas</button>` : "";
     const open = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-open="${project.id}"><i class="fa-solid fa-circle-play"></i> Abrir</button>` : "";
     const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
     const edit = completed && project.jobId ? `<button type="button" data-project-edit="${project.id}"><i class="fa-solid fa-sliders"></i> Editar</button>` : "";
-    const cancel = active ? `<button type="button" data-project-cancel="${project.id}"><i class="fa-solid fa-ban"></i> Cancelar</button>` : "";
+    const cancel = active && !deletionActive ? `<button type="button" data-project-cancel="${project.id}"><i class="fa-solid fa-ban"></i> Cancelar</button>` : "";
     const regenerate = active ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
+    const remove = active ? "" : `<button type="button" class="danger" data-project-delete="${project.id}"><i class="fa-solid fa-trash-can"></i> Excluir</button>`;
     const director = project.director?.mode === "semantic" ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? "Direção por IA" : "IA solicitada"}</span>` : "";
-    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${open}${edit}${download}${cancel}${regenerate}</div></div></article>`;
+    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ["deletion_queued", "deleting"].includes(project.status) ? "deleting" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${open}${edit}${download}${cancel}${regenerate}${remove}</div></div></article>`;
   }).join("");
 }
 
@@ -990,12 +1045,14 @@ $("projectsGrid").addEventListener("click", (event) => {
   const regenerate = event.target.closest("[data-project-regenerate]");
   const review = event.target.closest("[data-project-review]");
   const edit = event.target.closest("[data-project-edit]");
+  const remove = event.target.closest("[data-project-delete]");
   if (open) showProjectVideo(open.dataset.projectOpen).catch((error) => toast(error.message));
   if (download) downloadProject(download.dataset.projectDownload).catch((error) => toast(error.message));
   if (cancel) cancelProject(cancel.dataset.projectCancel).catch((error) => toast(error.message));
   if (regenerate) regenerateProject(regenerate.dataset.projectRegenerate).catch((error) => toast(error.message));
   if (review) openProjectReview(review.dataset.projectReview).catch((error) => toast(error.message));
   if (edit) openVisualEditor(edit.dataset.projectEdit).catch((error) => toast(error.message));
+  if (remove) requestProjectDeletion(remove.dataset.projectDelete).catch((error) => toast(error.message));
 });
 $("cancelProcessingButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
 $("cancelTranscriptReviewButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));

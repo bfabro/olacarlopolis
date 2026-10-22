@@ -10,9 +10,22 @@ import { buildQualityWindows, buildShakeIntervals, parseCameraMotionTransforms, 
 import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
 import { OpenAISemanticPlanner, buildSemanticCandidates, markSemanticFallback } from "../studio-worker/src/ai-planner.mjs";
 import { composePlanWaveform, waveformFromPcm } from "../studio-worker/src/audio-waveform.mjs";
+import { deleteStudioProjectAssets, studioProjectPrefixes } from "../studio-worker/src/cleanup.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
+
+test("exclusão manual fica restrita às cinco pastas do projeto confirmado", async () => {
+  const prefixes = studioProjectPrefixes("usuario_1", "projeto-1");
+  assert.deepEqual(prefixes, ["originals", "logos", "music", "plans", "renders"].map((folder) => `studio/usuario_1/${folder}/projeto-1/`));
+  assert.throws(() => studioProjectPrefixes("usuario_1", "../outro"), /inválido/);
+  const deleted = [];
+  const bucket = { getFiles: async ({ prefix }) => [[{ delete: async (options) => deleted.push({ prefix, options }) }]] };
+  const result = await deleteStudioProjectAssets(bucket, "usuario_1", "projeto-1");
+  assert.equal(result.deletedFiles, 5);
+  assert.deepEqual(deleted.map((item) => item.prefix), prefixes);
+  assert.ok(deleted.every((item) => item.options.ignoreNotFound === true));
+});
 
 test("planejador técnico declara que não é IA semântica", () => {
   const plan = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15, captionsEnabled: false }, [video, image]);

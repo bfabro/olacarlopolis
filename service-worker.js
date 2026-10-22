@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-10-22-ola-studio-text-design-v972'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-10-22-ola-studio-safe-deletion-v973'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

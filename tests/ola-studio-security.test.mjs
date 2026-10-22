@@ -8,6 +8,8 @@ const html = readFileSync(new URL("../estudio/index.html", import.meta.url), "ut
 const client = readFileSync(new URL("../estudio/studio.js", import.meta.url), "utf8");
 const panel = readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
 const workerQueue = readFileSync(new URL("../studio-worker/src/queue.mjs", import.meta.url), "utf8");
+const workerMain = readFileSync(new URL("../studio-worker/src/index.mjs", import.meta.url), "utf8");
+const workerCleanup = readFileSync(new URL("../studio-worker/src/cleanup.mjs", import.meta.url), "utf8");
 
 test("Studio não é exposto na navegação pública e abre protegido pelo painel Master", () => {
   assert.match(panel, /data-master="true" href="\.\.\/estudio\/\?preview=1"/);
@@ -76,4 +78,16 @@ test("worker consulta e reserva a fila com autenticação e concorrência segura
   assert.match(workerQueue, /"X-Firebase-ETag": "true"/);
   assert.match(workerQueue, /"If-Match": currentResponse\.headers\.get\("etag"\)/);
   assert.match(workerQueue, /claimResponse\.status === 412/);
+});
+
+test("exclusão de projeto exige confirmação vinculada e escopo privado", () => {
+  assert.match(client, /data-project-delete/);
+  assert.match(client, /window\.confirm/);
+  assert.match(client, /deletionAuthorized: true/);
+  assert.match(client, /deletionToken/);
+  assert.match(workerMain, /job\.deletionToken !== request\.token/);
+  assert.match(workerMain, /request\.requestedBy !== job\.uid/);
+  assert.match(workerMain, /deleteProjectAssets\(job\.uid, job\.projectId\)/);
+  for (const folder of ["originals", "logos", "music", "plans", "renders"]) assert.match(workerCleanup, new RegExp(`"${folder}"`));
+  assert.match(workerCleanup, /\^\[a-zA-Z0-9_-\]/);
 });

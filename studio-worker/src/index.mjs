@@ -3,7 +3,7 @@ import path from "node:path";
 import { workerConfig } from "./config.mjs";
 import { database } from "./firebase-client.mjs";
 import { nextQueuedJob, claimJob, updateJob } from "./queue.mjs";
-import { downloadAsset, uploadJson, uploadRender } from "./storage.mjs";
+import { deleteProjectAssets, downloadAsset, uploadJson, uploadRender } from "./storage.mjs";
 import { analyzeSources } from "./analyzer.mjs";
 import { createTranscriptionProvider, prepareReviewedTranscription } from "./transcription.mjs";
 import { createDeterministicPlan } from "./planner.mjs";
@@ -13,6 +13,35 @@ import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence } 
 import { prepareVisualEditorPlan } from "./editor-plan.mjs";
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+async function processDeletionJob(job, project) {
+  const request = project.deletionRequest || {};
+  if (job.deletionAuthorized !== true || !job.deletionToken || job.deletionToken !== request.token || request.requestedBy !== job.uid) throw new Error("A exclusão não possui confirmação válida do proprietário.");
+  const jobsSnapshot = await database.ref(`studioJobs/${job.uid}`).get();
+  const jobs = jobsSnapshot.val() || {};
+  const active = Object.entries(jobs).find(([jobId, item]) => jobId !== job.jobId && item?.projectId === job.projectId && ["queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"].includes(item?.status));
+  if (active) throw new Error("Cancele o processamento ativo antes de excluir o projeto.");
+  await updateJob(job.uid, job.jobId, { status: "deleting", stage: "deleting", progress: 55, message: "Excluindo somente os arquivos deste projeto." });
+  const removed = await deleteProjectAssets(job.uid, job.projectId);
+  const completedAt = Date.now();
+  const updates = {
+    [`studioProjects/${job.uid}/${job.projectId}`]: null,
+    [`studioJobs/${job.uid}/${job.jobId}/status`]: "completed",
+    [`studioJobs/${job.uid}/${job.jobId}/stage`]: "complete",
+    [`studioJobs/${job.uid}/${job.jobId}/progress`]: 100,
+    [`studioJobs/${job.uid}/${job.jobId}/message`]: "Projeto e mídias excluídos com autorização do usuário.",
+    [`studioJobs/${job.uid}/${job.jobId}/deletedFiles`]: removed.deletedFiles,
+    [`studioJobs/${job.uid}/${job.jobId}/completedAt`]: completedAt,
+    [`studioJobs/${job.uid}/${job.jobId}/updatedAt`]: completedAt,
+    [`studioCreditLedger/${job.uid}/${job.jobId}`]: { type: "deletion", amount: 0, projectId: job.projectId, jobId: job.jobId, description: "Exclusão autorizada do projeto e das mídias", createdAt: completedAt }
+  };
+  Object.entries(jobs).forEach(([jobId, item]) => {
+    if (jobId === job.jobId || item?.projectId !== job.projectId) return;
+    updates[`studioJobs/${job.uid}/${jobId}`] = null;
+    updates[`studioUsage/${job.uid}/estimates/${jobId}`] = null;
+  });
+  await database.ref().update(updates);
+}
 
 async function processJob(job) {
   const started = Date.now();
@@ -30,6 +59,10 @@ async function processJob(job) {
     const projectSnap = await database.ref(`studioProjects/${job.uid}/${job.projectId}`).get();
     const project = projectSnap.val();
     if (!project) throw new Error("Projeto nao encontrado.");
+    if (job.mode === "delete") {
+      await processDeletionJob(job, project);
+      return;
+    }
     const sourceDir = path.join(workDir, "sources");
     const outputDir = path.join(workDir, "output");
     await fs.mkdir(sourceDir, { recursive: true });
@@ -164,6 +197,11 @@ async function processJob(job) {
     }
     const errorMessage = error?.signal === "SIGKILL" ? "O renderizador excedeu a memória disponível. Reduza a duração ou tente novamente após atualizar o worker." : String(error?.message || error).slice(0, 500);
     await updateJob(job.uid, job.jobId, { status: "failed", stage: "failed", progress: 100, message: "Falha no processamento.", failedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
+    if (job.mode === "delete") {
+      const remainingProject = await database.ref(`studioProjects/${job.uid}/${job.projectId}`).get();
+      if (remainingProject.exists()) await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ status: "failed", updatedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
+      return;
+    }
     await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update(job.mode === "preview"
       ? { status: "completed", updatedAt: Date.now(), previewError: { code: "worker_error", message: errorMessage } }
       : { status: "failed", updatedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });

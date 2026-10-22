@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import crypto from "node:crypto";
 import { bucket } from "./firebase-client.mjs";
+import { deleteStudioProjectAssets } from "./cleanup.mjs";
 
 export async function downloadAsset(asset, outputDir, prefix) {
   if (!asset?.storagePath) return null;
@@ -28,4 +29,8 @@ export async function uploadJson(value, storagePath) {
   try { await bucket.upload(temporary, { destination: storagePath, resumable: false, metadata: { contentType: "application/json", cacheControl: "private,no-store" } }); }
   finally { await fs.rm(temporary, { force: true }); }
   return storagePath;
+}
+
+export async function deleteProjectAssets(uid, projectId) {
+  return deleteStudioProjectAssets(bucket, uid, projectId);
 }
