@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=10">
-  <link rel="stylesheet" href="studio-overrides.css?v=10">
+  <link rel="stylesheet" href="studio.css?v=11">
+  <link rel="stylesheet" href="studio-overrides.css?v=11">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -213,6 +213,14 @@
               <label>Título<input id="visualTitle" maxlength="120"></label>
               <label>Subtítulo<textarea id="visualSubtitle" maxlength="180" rows="3"></textarea></label>
               <label>Chamada final<input id="visualCta" maxlength="100"></label>
+              <div class="visual-layer-heading"><strong>Mixagem de áudio</strong><span class="visual-mixer-status">Aplicada na próxima renderização</span></div>
+              <div class="visual-audio-mixer">
+                <label>Voz e som original<input id="visualVoiceVolume" type="range" min="50" max="160" step="1"><output id="visualVoiceVolumeValue">100%</output></label>
+                <label>Trilha musical<input id="visualMusicVolume" type="range" min="0" max="70" step="1"><output id="visualMusicVolumeValue">18%</output></label>
+                <label>Fade da música<input id="visualMusicFade" type="range" min="0" max="5" step="0.1"><output id="visualMusicFadeValue">1,2s</output></label>
+                <label class="visual-audio-toggle"><input id="visualNoiseReduction" type="checkbox"><span><strong>Reduzir ruído contínuo</strong><small>Filtro moderado para preservar a voz.</small></span></label>
+                <label class="visual-audio-toggle"><input id="visualMusicDucking" type="checkbox"><span><strong>Baixar música durante falas</strong><small>Prioriza automaticamente o áudio original.</small></span></label>
+              </div>
               <div class="visual-layer-heading"><strong>Camadas adicionais</strong><button id="visualAddTextLayer" type="button"><i class="fa-solid fa-plus"></i> Adicionar</button></div>
               <div id="visualTextLayers" class="visual-text-layers"></div>
               <div class="visual-render-actions">
@@ -263,6 +271,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=15"></script>
+  <script type="module" src="studio.js?v=16"></script>
 </body>
 </html>

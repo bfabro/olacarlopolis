@@ -128,11 +128,13 @@ test("diretor sem configuração registra fallback técnico sem fingir IA", () =
 
 test("editor visual valida origens, recalcula duração e preserva o plano renderizável", () => {
   const base = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15, title: "Antes" }, [video, image]);
-  const edited = prepareVisualEditorPlan({ ...base, text: { title: "Depois", subtitle: "Nova mensagem", callToAction: "Fale conosco" }, scenes: [base.scenes[1], { ...base.scenes[0], duration: 2.6, transition: "dissolve", transitionDuration: 0.4 }] }, base, [video, image]);
+  const edited = prepareVisualEditorPlan({ ...base, text: { title: "Depois", subtitle: "Nova mensagem", callToAction: "Fale conosco" }, audio: { voiceVolume: 9, musicVolume: -1, fadeSeconds: 99, noiseReduction: true }, music: { duckDuringSpeech: false }, scenes: [base.scenes[1], { ...base.scenes[0], start: 19, duration: 2.6, transition: "dissolve", transitionDuration: 0.4 }] }, base, [video, image]);
   assert.equal(edited.planner.type, "visual-editor");
   assert.equal(edited.scenes[0].id, "scene-1");
   assert.equal(edited.scenes[1].transition, "dissolve");
   assert.equal(edited.duration, Number((edited.scenes[0].duration + 2.6 - 0.4).toFixed(3)));
+  assert.equal(edited.scenes[1].start, 17.35);
+  assert.deepEqual({ voice: edited.audio.voiceVolume, music: edited.audio.musicVolume, fade: edited.audio.fadeSeconds, noise: edited.audio.noiseReduction, duck: edited.music.duckDuringSpeech }, { voice: 1.6, music: 0, fade: 5, noise: true, duck: false });
   assert.ok(edited.textLayers.some((layer) => layer.type === "title" && layer.value === "Depois"));
   assert.throws(() => prepareVisualEditorPlan({ ...base, scenes: [{ ...base.scenes[0], sourceId: "invasor" }] }, base, [video, image]), /não pertence/);
 });
@@ -200,6 +202,10 @@ test("branding prepara logo, textos, música com ducking e faststart", () => {
   assert.match(filters, /sidechaincompress/);
   assert.match(filters, /afade=t=in/);
   assert.ok(args.includes("+faststart"));
+  const withoutDucking = buildBrandingArgs({ inputPath: "/tmp/base.mp4", outputPath: "/tmp/final.mp4", duration: 15, format: "9:16", musicPath: "/tmp/music.mp3", plan: { textLayers: [], music: { duckDuringSpeech: false }, audio: { musicVolume: 0.2 } } });
+  const directMix = withoutDucking[withoutDucking.indexOf("-filter_complex") + 1];
+  assert.doesNotMatch(directMix, /sidechaincompress/);
+  assert.match(directMix, /\[0:a\]\[music\]amix/);
 });
 
 test("parser do Whisper preserva português e timestamps reais por palavra", () => {

@@ -48,7 +48,15 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
     planner: { type: "visual-editor", version: 1, semanticAnalysis: false, technicalSelection: true, basedOn: input.planner?.type || technicalPlan.planner?.type || "technical" },
     text: { title: String(textValues.title || "").slice(0, 120), subtitle: String(textValues.subtitle || "").slice(0, 180), callToAction: String(textValues.callToAction || "").slice(0, 100) },
     textLayers,
-    audio: { ...(technicalPlan.audio || {}), ...(input.audio || {}), waveform: technicalPlan.audio?.waveform?.method === "music-pcm-envelope-v1" ? technicalPlan.audio.waveform : composePlanWaveform(scenes, analyzedSources, duration) },
+    audio: {
+      ...(technicalPlan.audio || {}),
+      musicVolume: Math.max(0, Math.min(0.7, Number(input.audio?.musicVolume ?? technicalPlan.audio?.musicVolume ?? 0.18))),
+      voiceVolume: Math.max(0.5, Math.min(1.6, Number(input.audio?.voiceVolume ?? technicalPlan.audio?.voiceVolume ?? 1))),
+      fadeSeconds: Math.max(0, Math.min(5, Number(input.audio?.fadeSeconds ?? technicalPlan.audio?.fadeSeconds ?? 1.2))),
+      noiseReduction: input.audio?.noiseReduction === true,
+      waveform: technicalPlan.audio?.waveform?.method === "music-pcm-envelope-v1" ? technicalPlan.audio.waveform : composePlanWaveform(scenes, analyzedSources, duration)
+    },
+    music: { ...(technicalPlan.music || {}), duckDuringSpeech: input.music?.duckDuringSpeech !== false },
     scenes
   };
   const validation = validateEditPlan(plan);

@@ -702,6 +702,52 @@ function renderVisualTextLayers() {
   $("visualTextLayers").innerHTML = layers.length ? layers.map((layer) => `<article class="visual-text-layer" data-text-layer="${escapeHtml(layer.id)}"><textarea data-layer-field="value" maxlength="180" aria-label="Texto da camada">${escapeHtml(layer.value || "")}</textarea><button class="visual-text-layer-remove" data-layer-remove="${escapeHtml(layer.id)}" type="button" title="Remover camada"><i class="fa-solid fa-trash"></i></button><div class="visual-text-layer-fields"><label>Entrada<input data-layer-field="start" type="number" min="0" max="90" step="0.1" value="${Number(layer.start || 0).toFixed(1)}"></label><label>Saída<input data-layer-field="end" type="number" min="0.1" max="90" step="0.1" value="${Number(layer.end || 0).toFixed(1)}"></label><label>Posição<select data-layer-field="position"><option value="top" ${layer.position === "top" ? "selected" : ""}>Superior</option><option value="center" ${layer.position === "center" ? "selected" : ""}>Centro</option><option value="bottom" ${layer.position === "bottom" ? "selected" : ""}>Inferior</option></select></label><label>Animação<select data-layer-field="animation"><option value="fade" ${layer.animation === "fade" ? "selected" : ""}>Fade</option><option value="slide_up" ${layer.animation === "slide_up" ? "selected" : ""}>Slide Up</option><option value="zoom_pop" ${layer.animation === "zoom_pop" ? "selected" : ""}>Zoom Pop</option><option value="reveal" ${layer.animation === "reveal" ? "selected" : ""}>Revelação</option><option value="word_by_word" ${layer.animation === "word_by_word" ? "selected" : ""}>Palavra por palavra</option></select></label></div></article>`).join("") : '<p class="empty-copy">Nenhuma camada adicional. Você pode incluir descrições, ofertas ou observações.</p>';
 }
 
+function visualSourceAnalysis(sourceId) {
+  return (state.visualPlan?.analysis?.sources || []).find((source) => source.sourceId === sourceId) || {};
+}
+
+function visualSourceDuration(scene) {
+  const analysis = visualSourceAnalysis(scene.sourceId);
+  return Math.max(0.5, Number(analysis.duration || analysis.waveform?.duration || (Number(scene.start || 0) + Number(scene.duration || 0))));
+}
+
+function visualTrimMarkup(scene, index, image) {
+  if (image) return "";
+  const sourceDuration = visualSourceDuration(scene);
+  const start = Math.max(0, Math.min(Number(scene.start || 0), sourceDuration - 0.5));
+  const end = Math.max(start + 0.5, Math.min(sourceDuration, start + Number(scene.duration || 0)));
+  const left = start / sourceDuration * 100;
+  const right = end / sourceDuration * 100;
+  return `<div class="visual-trim-control"><div class="visual-trim-label"><span>Recorte do arquivo</span><output data-scene-trim-label="${index}">${start.toFixed(1)}s – ${end.toFixed(1)}s</output></div><div class="visual-trim-ranges" style="--trim-left:${left.toFixed(3)}%;--trim-right:${right.toFixed(3)}%"><span></span><input data-scene-trim-start="${index}" type="range" min="0" max="${sourceDuration.toFixed(3)}" step="0.1" value="${start.toFixed(3)}" aria-label="Início do recorte"><input data-scene-trim-end="${index}" type="range" min="0" max="${sourceDuration.toFixed(3)}" step="0.1" value="${end.toFixed(3)}" aria-label="Fim do recorte"></div></div>`;
+}
+
+function renderVisualAudioMixer() {
+  const audio = state.visualPlan?.audio || {};
+  $("visualVoiceVolume").value = Math.round(Number(audio.voiceVolume ?? 1) * 100);
+  $("visualMusicVolume").value = Math.round(Number(audio.musicVolume ?? 0.18) * 100);
+  $("visualMusicFade").value = Number(audio.fadeSeconds ?? 1.2);
+  $("visualNoiseReduction").checked = audio.noiseReduction === true;
+  $("visualMusicDucking").checked = state.visualPlan?.music?.duckDuringSpeech !== false;
+  $("visualVoiceVolumeValue").textContent = `${$("visualVoiceVolume").value}%`;
+  $("visualMusicVolumeValue").textContent = `${$("visualMusicVolume").value}%`;
+  $("visualMusicFadeValue").textContent = `${Number($("visualMusicFade").value).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
+}
+
+function syncVisualAudioMixer() {
+  if (!state.visualPlan) return;
+  state.visualPlan.audio = {
+    ...(state.visualPlan.audio || {}),
+    voiceVolume: Number($("visualVoiceVolume").value) / 100,
+    musicVolume: Number($("visualMusicVolume").value) / 100,
+    fadeSeconds: Number($("visualMusicFade").value),
+    noiseReduction: $("visualNoiseReduction").checked
+  };
+  state.visualPlan.music = { ...(state.visualPlan.music || {}), duckDuringSpeech: $("visualMusicDucking").checked };
+  $("visualVoiceVolumeValue").textContent = `${$("visualVoiceVolume").value}%`;
+  $("visualMusicVolumeValue").textContent = `${$("visualMusicVolume").value}%`;
+  $("visualMusicFadeValue").textContent = `${Number($("visualMusicFade").value).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
+}
+
 function renderVisualTimeline() {
   const plan = state.visualPlan;
   if (!plan) return;
@@ -712,10 +758,11 @@ function renderVisualTimeline() {
   $("visualTimeline").innerHTML = plan.scenes.map((scene, index) => {
     const source = sourceById.get(scene.sourceId) || {};
     const url = state.visualSourceUrls.get(scene.sourceId) || "";
-    const media = String(source.contentType || "").startsWith("image/")
+    const image = String(source.contentType || visualSourceAnalysis(scene.sourceId).contentType || "").startsWith("image/");
+    const media = image
       ? `<img class="visual-scene-media" src="${escapeHtml(url)}" alt="Cena ${index + 1}">`
       : `<video class="visual-scene-media" src="${escapeHtml(url)}#t=${Math.max(0, Number(scene.start || 0)).toFixed(2)}" muted preload="metadata"></video>`;
-    return `<article class="visual-scene" data-visual-scene="${index}"><span class="visual-scene-index">${index + 1}</span>${media}<div class="visual-scene-info"><strong>${escapeHtml(source.name || `Arquivo ${Number(scene.sourceIndex || 0) + 1}`)}</strong><label>Duração<input data-scene-duration="${index}" type="number" min="0.5" max="15" step="0.1" value="${Number(scene.duration || 0).toFixed(1)}"></label><label>Transição<select data-scene-transition="${index}" ${index === 0 ? "disabled" : ""}>${transitionOptions(scene.transition, index === 0)}</select></label></div><div class="visual-scene-actions"><button type="button" data-scene-up="${index}" ${index === 0 ? "disabled" : ""} title="Mover antes"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-scene-down="${index}" ${index === plan.scenes.length - 1 ? "disabled" : ""} title="Mover depois"><i class="fa-solid fa-arrow-down"></i></button></div></article>`;
+    return `<article class="visual-scene" data-visual-scene="${index}"><span class="visual-scene-index">${index + 1}</span>${media}<div class="visual-scene-info"><strong>${escapeHtml(source.name || `Arquivo ${Number(scene.sourceIndex || 0) + 1}`)}</strong><label>Duração<input data-scene-duration="${index}" type="number" min="0.5" max="${Math.min(15, visualSourceDuration(scene)).toFixed(1)}" step="0.1" value="${Number(scene.duration || 0).toFixed(1)}"></label><label>Transição<select data-scene-transition="${index}" ${index === 0 ? "disabled" : ""}>${transitionOptions(scene.transition, index === 0)}</select></label>${visualTrimMarkup(scene, index, image)}</div><div class="visual-scene-actions"><button type="button" data-scene-up="${index}" ${index === 0 ? "disabled" : ""} title="Mover antes"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-scene-down="${index}" ${index === plan.scenes.length - 1 ? "disabled" : ""} title="Mover depois"><i class="fa-solid fa-arrow-down"></i></button></div></article>`;
   }).join("");
 }
 
@@ -754,6 +801,7 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   $("visualTitle").value = state.visualPlan.text?.title || "";
   $("visualSubtitle").value = state.visualPlan.text?.subtitle || "";
   $("visualCta").value = state.visualPlan.text?.callToAction || "";
+  renderVisualAudioMixer();
   renderVisualTimeline();
   renderVisualTextLayers();
   renderVisualVersions();
@@ -927,6 +975,7 @@ $("backToProjects").addEventListener("click", () => { $("previewPlayer").pause()
 $("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));
 $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
+[$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
 $("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
 $("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));
 $("visualRegenerateAutomatic").addEventListener("click", () => {
@@ -971,10 +1020,45 @@ $("visualTimeline").addEventListener("click", (event) => {
   state.visualPlan.scenes.slice(1).forEach((scene) => { if (!scene.transition || scene.transition === "none") { scene.transition = "fade"; scene.transitionDuration = 0.35; } });
   renderVisualTimeline();
 });
+$("visualTimeline").addEventListener("input", (event) => {
+  const startHandle = event.target.closest("[data-scene-trim-start]");
+  const endHandle = event.target.closest("[data-scene-trim-end]");
+  if (!startHandle && !endHandle) return;
+  const index = Number(startHandle?.dataset.sceneTrimStart ?? endHandle?.dataset.sceneTrimEnd);
+  const card = event.target.closest("[data-visual-scene]");
+  const startInput = card?.querySelector("[data-scene-trim-start]");
+  const endInput = card?.querySelector("[data-scene-trim-end]");
+  const scene = state.visualPlan.scenes[index];
+  if (!scene || !startInput || !endInput) return;
+  const sourceDuration = visualSourceDuration(scene);
+  let start = Math.max(0, Math.min(sourceDuration - 0.5, Number(startInput.value || 0)));
+  let end = Math.max(0.5, Math.min(sourceDuration, Number(endInput.value || sourceDuration)));
+  if (startHandle) start = Math.max(end - 15, Math.min(start, end - 0.5));
+  if (endHandle) end = Math.min(start + 15, Math.max(end, start + 0.5));
+  startInput.value = start.toFixed(3);
+  endInput.value = end.toFixed(3);
+  scene.start = Number(start.toFixed(3));
+  scene.duration = Number((end - start).toFixed(3));
+  card.querySelector("[data-scene-duration]").value = scene.duration.toFixed(1);
+  card.querySelector("[data-scene-trim-label]").textContent = `${start.toFixed(1)}s – ${end.toFixed(1)}s`;
+  const ranges = card.querySelector(".visual-trim-ranges");
+  ranges.style.setProperty("--trim-left", `${(start / sourceDuration * 100).toFixed(3)}%`);
+  ranges.style.setProperty("--trim-right", `${(end / sourceDuration * 100).toFixed(3)}%`);
+  const video = card.querySelector("video");
+  if (video) video.currentTime = start;
+  state.visualPlan.duration = visualPlanDuration();
+  $("visualTotalDuration").textContent = `${state.visualPlan.duration.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
+  renderVisualWaveform();
+  syncVisualTexts();
+});
 $("visualTimeline").addEventListener("change", (event) => {
   const duration = event.target.closest("[data-scene-duration]");
   const transition = event.target.closest("[data-scene-transition]");
-  if (duration) state.visualPlan.scenes[Number(duration.dataset.sceneDuration)].duration = Math.max(0.5, Math.min(15, Number(duration.value || 0.5)));
+  if (duration) {
+    const scene = state.visualPlan.scenes[Number(duration.dataset.sceneDuration)];
+    scene.duration = Math.max(0.5, Math.min(15, visualSourceDuration(scene) - Number(scene.start || 0), Number(duration.value || 0.5)));
+    scene.transitionDuration = Math.min(Number(scene.transitionDuration || 0), scene.duration / 2);
+  }
   if (transition) state.visualPlan.scenes[Number(transition.dataset.sceneTransition)].transition = transition.value;
   renderVisualTimeline();
   syncVisualTexts();

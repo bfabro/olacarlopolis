@@ -124,7 +124,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
   const plan = {
     schemaVersion: STUDIO_SCHEMA_VERSION,
     planner: { type: "deterministic-technical", version: 2, semanticAnalysis: false, technicalSelection: true, narrativeTemplate: "opening-development-closing" },
-    analysis: { sources: analyzedSources.map((source) => ({ sourceId: source.id, orientation: source.metadata.orientation, method: source.technical?.analysisMethod || "unknown", sceneChanges: source.technical?.sceneTimes?.length || 0, qualityWindows: source.technical?.qualityWindows?.length || 0, waveform: source.technical?.waveform || { available: false, samples: [] } })) },
+    analysis: { sources: analyzedSources.map((source) => ({ sourceId: source.id, contentType: source.contentType, duration: Number(source.metadata?.duration || 0), hasAudio: source.metadata?.hasAudio === true, orientation: source.metadata.orientation, method: source.technical?.analysisMethod || "unknown", sceneChanges: source.technical?.sceneTimes?.length || 0, qualityWindows: source.technical?.qualityWindows?.length || 0, waveform: source.technical?.waveform || { available: false, samples: [] } })) },
     rhythm: { available: Boolean(rhythm.available), syncEnabled: Boolean(rhythm.syncEnabled), level: rhythmLevel, bpm: Number(rhythm.bpm || 0), confidence: Number(rhythm.confidence || 0), method: rhythm.method || "none", beatCount: rhythm.beatTimes?.length || 0 },
     style: project.style, format: project.format, duration: target,
     transition: { mode: project.transition || "auto", name: selectedTransition.ffmpeg, duration: transition },

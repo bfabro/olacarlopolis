@@ -119,6 +119,8 @@ Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON p
 - transição de cada corte;
 - título, subtítulo e chamada final;
 - forma de onda calculada a partir do áudio real das mídias ou da música selecionada;
+- recorte do início e do fim de cada vídeo por alças na timeline;
+- mixagem de voz e música, fades, redução moderada de ruído e ducking configuráveis;
 - camadas adicionais de texto com conteúdo, intervalo, posição e animação editáveis;
 - comando para criar uma nova montagem automática preservando as versões anteriores;
 - duração total recalculada considerando as sobreposições;
@@ -160,7 +162,7 @@ O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nen
 - calibração contínua dos limiares de desfoque e tremor com vídeos reais de diferentes aparelhos;
 - biblioteca licenciada de músicas;
 - avaliação de custo/qualidade do Diretor por IA com um modelo de produção escolhido pelo responsável (a integração existe, mas permanece sem credencial e sem modelo por padrão);
-- ajuste por arraste das bordas dos clipes e edição visual da mixagem de áudio diretamente na timeline.
+- biblioteca licenciada de efeitos sonoros para as transições.
 
 Esses itens permanecem explicitamente fora da interface funcional até possuírem processamento real e testes próprios.
 
