@@ -61,7 +61,7 @@ function selectCandidate(candidates, scenes, timeline, target) {
   const usage = new Map(scenes.map((scene) => [scene.sourceId, (scenes.filter((item) => item.sourceId === scene.sourceId).length)]));
   return [...candidates].sort((left, right) => {
     const score = (candidate) => {
-      let value = candidate.quality.score * 10 - (candidate.quality.flags.includes("dark") ? 5 : 0) - (candidate.quality.flags.includes("frozen") ? 4 : 0);
+      let value = candidate.quality.score * 10 - (candidate.quality.flags.includes("dark") ? 5 : 0) - (candidate.quality.flags.includes("frozen") ? 4 : 0) - (candidate.quality.flags.includes("blurred") ? 3 : 0) - (candidate.quality.flags.includes("shaky") ? 2.5 : 0);
       if (candidate.source.id !== previous?.sourceId) value += 3;
       value -= Number(usage.get(candidate.source.id) || 0) * 1.8;
       if (scenes.some((scene) => scene.sourceId === candidate.source.id && Math.abs(scene.start - candidate.start) < 0.1)) value -= 3.5;
@@ -116,7 +116,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
       start: candidate.source.contentType.startsWith("image/") ? 0 : candidate.start, duration: round(duration),
       transition: scenes.length ? transitionName : "none", transitionDuration: appliedTransitionDuration, hasSpeech,
       narrativeRole: role,
-      selection: { method: "technical-quality-v2", qualityScore: candidate.quality.score, flags: candidate.quality.flags, reason: candidate.quality.flags.length ? "Melhor alternativa técnica disponível com penalidades registradas." : "Trecho priorizado por exposição, movimento e diversidade de origem." },
+      selection: { method: "technical-quality-v3", qualityScore: candidate.quality.score, flags: candidate.quality.flags, reason: candidate.quality.flags.length ? "Melhor alternativa técnica disponível com penalidades registradas." : "Trecho priorizado por nitidez, estabilidade, exposição, movimento e diversidade de origem." },
       rhythmSynced: rhythm.syncEnabled && !hasSpeech && Math.abs(duration - nominal) > 0.01
     });
     timeline += duration - appliedTransitionDuration;

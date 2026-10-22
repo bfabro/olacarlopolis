@@ -68,7 +68,8 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 ## O que o motor faz
 
 - lê streams e duração com FFprobe;
-- detecta mudanças de cena, silêncios, trechos escuros, congelados e variação de movimento;
+- detecta mudanças de cena, silêncios, trechos escuros, congelados, desfocados e tremidos;
+- mede nitidez por quadro e estabilidade por vetores reais de movimento do FFmpeg;
 - pontua janelas técnicas e prioriza trechos melhores, mantendo diversidade de arquivos;
 - organiza a montagem em abertura, desenvolvimento e encerramento sem inventar interpretação semântica;
 - analisa a energia PCM da música, estima BPM e alinha cortes às batidas quando solicitado;
@@ -156,7 +157,7 @@ O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nen
 
 ## Fases ainda não concluídas
 
-- detecção dedicada de desfoque e tremor de câmera (o motor atual mede exposição, congelamento e volatilidade de movimento);
+- calibração contínua dos limiares de desfoque e tremor com vídeos reais de diferentes aparelhos;
 - biblioteca licenciada de músicas;
 - avaliação de custo/qualidade do Diretor por IA com um modelo de produção escolhido pelo responsável (a integração existe, mas permanece sem credencial e sem modelo por padrão);
 - ajuste por arraste das bordas dos clipes e edição visual da mixagem de áudio diretamente na timeline.

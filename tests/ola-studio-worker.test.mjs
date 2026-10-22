@@ -6,7 +6,7 @@ import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
 import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
-import { buildQualityWindows, parseIntervals, parseSignalFrames } from "../studio-worker/src/analyzer.mjs";
+import { buildQualityWindows, buildShakeIntervals, parseCameraMotionTransforms, parseIntervals, parseSignalFrames } from "../studio-worker/src/analyzer.mjs";
 import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
 import { OpenAISemanticPlanner, buildSemanticCandidates, markSemanticFallback } from "../studio-worker/src/ai-planner.mjs";
 import { composePlanWaveform, waveformFromPcm } from "../studio-worker/src/audio-waveform.mjs";
@@ -30,8 +30,8 @@ test("estilos geram parâmetros de corte realmente diferentes", () => {
   assert.ok(reels.scenes.length > institutional.scenes.length);
 });
 
-test("análise técnica mede exposição, movimento e intervalos problemáticos", () => {
-  const log = "frame:0 pts:0 pts_time:0\nlavfi.signalstats.YAVG=12\nlavfi.signalstats.YDIF=0\nframe:1 pts:1 pts_time:1\nlavfi.signalstats.YAVG=122\nlavfi.signalstats.YDIF=18\n[blackdetect] black_start:0 black_end:0.8 black_duration:0.8\n[freezedetect] freeze_start:0 freeze_end:0.9 freeze_duration:0.9";
+test("análise técnica mede exposição, movimento, nitidez e intervalos problemáticos", () => {
+  const log = "frame:0 pts:0 pts_time:0\nlavfi.signalstats.YAVG=12\nlavfi.signalstats.YDIF=0\nlavfi.blur=18.5\nframe:1 pts:1 pts_time:1\nlavfi.signalstats.YAVG=122\nlavfi.signalstats.YDIF=18\nlavfi.blur=4.2\n[blackdetect] black_start:0 black_end:0.8 black_duration:0.8\n[freezedetect] freeze_start:0 freeze_end:0.9 freeze_duration:0.9";
   const frames = parseSignalFrames(log);
   const dark = parseIntervals(log, "black");
   const frozen = parseIntervals(log, "freeze");
@@ -39,7 +39,17 @@ test("análise técnica mede exposição, movimento e intervalos problemáticos"
   assert.equal(frames.length, 2);
   assert.ok(windows[0].flags.includes("dark"));
   assert.ok(windows[0].flags.includes("frozen"));
+  assert.ok(windows[0].flags.includes("blurred"));
   assert.ok(windows[1].score > windows[0].score);
+});
+
+test("análise de estabilidade transforma vetores reais em intervalos de tremor", () => {
+  const transforms = "Frame 1 (List 0 [])\nFrame 2 (List 4 [(LM 0 0 1 1 16 0.5 0),(LM 0 0 2 2 16 0.5 0),(LM 1 0 3 3 16 0.5 0),(LM 0 1 4 4 16 0.5 0)])\nFrame 3 (List 4 [(LM 12 -10 1 1 16 0.5 0),(LM 11 -10 2 2 16 0.5 0),(LM 13 -9 3 3 16 0.5 0),(LM 12 -11 4 4 16 0.5 0)])\nFrame 4 (List 4 [(LM -10 11 1 1 16 0.5 0),(LM -11 12 2 2 16 0.5 0),(LM -9 11 3 3 16 0.5 0),(LM -10 10 4 4 16 0.5 0)])";
+  const frames = parseCameraMotionTransforms(transforms, 4);
+  const intervals = buildShakeIntervals(frames, 2);
+  assert.equal(frames.length, 3);
+  assert.ok(frames.at(-1).jitter > 20);
+  assert.deepEqual(intervals.map(({ start, end }) => ({ start, end })), [{ start: 0, end: 1 }]);
 });
 
 test("detector de ritmo encontra pulsos reais no PCM", () => {
