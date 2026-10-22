@@ -38,11 +38,18 @@ test("Studio Pro oferece oito modelos, biblioteca de transições e seis estilos
 
 test("normalização preserva personalização profissional sem aceitar valores inseguros", () => {
   const project = normalizeStudioProject({ style: "gastronomia", transition: "blur", transitionDuration: 0.8, textDesign: { preset: "promo", animation: "typewriter", sizeScale: 1.4, color: "#ffbb2d", position: "bottom", background: false } });
-  assert.equal(project.schemaVersion, 4);
+  assert.equal(project.schemaVersion, 5);
   assert.equal(project.transition, "blur");
   assert.equal(project.textDesign.animation, "typewriter");
   assert.equal(project.textDesign.color, "#FFBB2D");
   assert.equal(project.textDesign.position, "bottom");
+});
+
+test("normaliza ritmo e sincronismo musical sem habilitar IA semântica", () => {
+  const project = normalizeStudioProject({ editing: { rhythm: "dynamic", syncToMusic: true, prioritizeTechnicalQuality: true } });
+  assert.equal(project.editing.rhythm, "dynamic");
+  assert.equal(project.editing.syncToMusic, true);
+  assert.equal(project.editing.prioritizeTechnicalQuality, true);
 });
 
 test("normaliza áudio e legendas dentro de limites seguros", () => {

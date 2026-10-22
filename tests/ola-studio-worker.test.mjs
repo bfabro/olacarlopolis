@@ -5,6 +5,8 @@ import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildText
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
 import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
+import { buildQualityWindows, parseIntervals, parseSignalFrames } from "../studio-worker/src/analyzer.mjs";
+import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -23,6 +25,44 @@ test("estilos geram parâmetros de corte realmente diferentes", () => {
   assert.notEqual(institutional.transition.duration, reels.transition.duration);
   assert.notEqual(institutional.scenes[0].duration, reels.scenes[0].duration);
   assert.ok(reels.scenes.length > institutional.scenes.length);
+});
+
+test("análise técnica mede exposição, movimento e intervalos problemáticos", () => {
+  const log = "frame:0 pts:0 pts_time:0\nlavfi.signalstats.YAVG=12\nlavfi.signalstats.YDIF=0\nframe:1 pts:1 pts_time:1\nlavfi.signalstats.YAVG=122\nlavfi.signalstats.YDIF=18\n[blackdetect] black_start:0 black_end:0.8 black_duration:0.8\n[freezedetect] freeze_start:0 freeze_end:0.9 freeze_duration:0.9";
+  const frames = parseSignalFrames(log);
+  const dark = parseIntervals(log, "black");
+  const frozen = parseIntervals(log, "freeze");
+  const windows = buildQualityWindows(frames, 2, { black: dark, freeze: frozen });
+  assert.equal(frames.length, 2);
+  assert.ok(windows[0].flags.includes("dark"));
+  assert.ok(windows[0].flags.includes("frozen"));
+  assert.ok(windows[1].score > windows[0].score);
+});
+
+test("detector de ritmo encontra pulsos reais no PCM", () => {
+  const sampleRate = 8000;
+  const seconds = 6;
+  const pcm = Buffer.alloc(sampleRate * seconds * 2);
+  for (let beat = 0; beat < seconds * 2; beat += 1) {
+    const start = Math.round(beat * 0.5 * sampleRate);
+    for (let index = 0; index < 320; index += 1) pcm.writeInt16LE(Math.round(Math.sin(index / 5) * 24000), (start + index) * 2);
+  }
+  const rhythm = detectRhythmFromPcm(pcm, sampleRate, 50);
+  assert.equal(rhythm.available, true);
+  assert.ok(rhythm.bpm >= 110 && rhythm.bpm <= 130);
+  assert.ok(rhythm.beatTimes.length >= 8);
+});
+
+test("planejador prioriza qualidade, registra narrativa e sincroniza apenas cenas sem fala", () => {
+  const weak = { ...video, id: "weak", metadata: { ...video.metadata, hasAudio: false }, technical: { ...video.technical, qualityWindows: [{ start: 0, end: 20, score: 0.12, flags: ["dark", "frozen"] }] } };
+  const strong = { ...image, id: "strong", technical: { ...image.technical, qualityWindows: [{ start: 0, end: 20, score: 0.95, flags: [] }] } };
+  const plan = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15, editing: { rhythm: "dynamic", syncToMusic: true } }, [weak, strong], { rhythm: { available: true, bpm: 120, confidence: 0.9, beatTimes: Array.from({ length: 31 }, (_, index) => index * 0.5), method: "test" } });
+  assert.equal(plan.planner.version, 2);
+  assert.equal(plan.planner.semanticAnalysis, false);
+  assert.equal(plan.scenes[0].sourceId, "strong");
+  assert.equal(plan.scenes[0].narrativeRole, "opening");
+  assert.equal(plan.rhythm.syncEnabled, true);
+  assert.ok(plan.scenes.some((scene) => scene.rhythmSynced));
 });
 
 test("FFmpeg recebe escala com crop sem deformação e áudio normalizado", () => {

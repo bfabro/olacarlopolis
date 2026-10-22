@@ -1,4 +1,4 @@
-export const STUDIO_SCHEMA_VERSION = 4;
+export const STUDIO_SCHEMA_VERSION = 5;
 
 export const STUDIO_LIMITS = Object.freeze({
   maxFiles: 10,
@@ -150,6 +150,11 @@ export function normalizeStudioProject(input = {}) {
     callToAction: text(input.callToAction, 100),
     transition: STUDIO_TRANSITIONS[input.transition] ? input.transition : "auto",
     transitionDuration: numberBetween(input.transitionDuration, 0.1, 1.5, studioStyleParameters(style).transitionSeconds),
+    editing: {
+      rhythm: ["soft", "balanced", "dynamic"].includes(input.editing?.rhythm) ? input.editing.rhythm : "balanced",
+      syncToMusic: input.editing?.syncToMusic === true,
+      prioritizeTechnicalQuality: input.editing?.prioritizeTechnicalQuality !== false
+    },
     textDesign: {
       preset: preset.id,
       animation,

@@ -8,6 +8,7 @@ import { analyzeSources } from "./analyzer.mjs";
 import { createTranscriptionProvider, prepareReviewedTranscription } from "./transcription.mjs";
 import { createDeterministicPlan } from "./planner.mjs";
 import { renderPlan } from "./renderer.mjs";
+import { analyzeMusicRhythm } from "./rhythm.mjs";
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -45,7 +46,9 @@ async function processJob(job) {
     const totalSourceDuration = analyzed.reduce((sum, source) => sum + (source.contentType.startsWith("video/") ? Number(source.metadata.duration || 0) : 0), 0);
     if (sources.length > 10) throw new Error("O projeto excede o limite de 10 arquivos.");
     if (totalSourceDuration > 600) throw new Error("A duração total dos vídeos de origem excede 10 minutos.");
-    const plan = createDeterministicPlan(project, analyzed);
+    await updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 49, message: music?.localPath ? "Analisando o ritmo real da música." : "Montando a narrativa técnica." });
+    const rhythm = await analyzeMusicRhythm(music?.localPath || "", workDir, cancellation.signal);
+    const plan = createDeterministicPlan(project, analyzed, { rhythm });
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
     await uploadJson(plan, planStoragePath);
     await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner } });

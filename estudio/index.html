@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=5">
-  <link rel="stylesheet" href="studio-overrides.css?v=5">
+  <link rel="stylesheet" href="studio.css?v=6">
+  <link rel="stylesheet" href="studio-overrides.css?v=6">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -108,6 +108,8 @@
               <div class="form-grid studio-advanced-grid">
                 <label>Transição entre cenas<select id="transitionMode"><option value="auto">Automática conforme o modelo</option><option value="fade">Fade</option><option value="dissolve">Cross Dissolve</option><option value="zoomin">Zoom In</option><option value="zoomout">Zoom Out</option><option value="slide">Slide</option><option value="wipe">Wipe</option><option value="blur">Blur</option><option value="whip">Whip Pan</option><option value="flash">Flash</option><option value="match">Match Cut técnico</option><option value="hardcut">Hard Cut</option><option value="dipblack">Dip to Black</option></select></label>
                 <label>Duração da transição<select id="transitionDuration"><option value="0.2">Rápida — 0,2s</option><option value="0.45" selected>Equilibrada — 0,45s</option><option value="0.75">Suave — 0,75s</option><option value="1.1">Cinematográfica — 1,1s</option></select></label>
+                <label>Ritmo da montagem<select id="editingRhythm"><option value="soft">Suave — cenas mais longas</option><option value="balanced" selected>Equilibrado</option><option value="dynamic">Dinâmico — cortes mais rápidos</option></select></label>
+                <label class="toggle-field"><input id="syncCutsToMusic" type="checkbox" checked><span></span><div><strong>Sincronizar cortes com a música</strong><small>Usa batidas detectadas no áudio e preserva cenas com fala.</small></div></label>
               </div>
             </section>
 
@@ -213,6 +215,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=10"></script>
+  <script type="module" src="studio.js?v=11"></script>
 </body>
 </html>

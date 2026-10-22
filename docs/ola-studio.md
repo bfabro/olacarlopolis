@@ -14,7 +14,7 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 `Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON → FFmpeg → Storage → prévia/download`
 
-O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio e silêncio. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 4 e registra cenas, transições, camadas de texto, animações, logo, áudio, legendas e parâmetros de exportação.
+O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 5 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, camadas de texto, animações, logo, áudio, legendas e parâmetros de exportação.
 
 ## Aplicar configuração de desenvolvimento
 
@@ -63,7 +63,11 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 ## O que o motor faz
 
 - lê streams e duração com FFprobe;
-- detecta mudanças de cena e silêncios;
+- detecta mudanças de cena, silêncios, trechos escuros, congelados e variação de movimento;
+- pontua janelas técnicas e prioriza trechos melhores, mantendo diversidade de arquivos;
+- organiza a montagem em abertura, desenvolvimento e encerramento sem inventar interpretação semântica;
+- analisa a energia PCM da música, estima BPM e alinha cortes às batidas quando solicitado;
+- preserva cenas com fala do ajuste automático à batida;
 - oferece oito modelos: Institucional, Comercial, Reels, Comércio local, Imóveis, Gastronomia, Eventos e Turismo;
 - cria cortes mínimos diferentes conforme o modelo selecionado;
 - normaliza todo material para a proporção escolhida com `scale + crop`, sem deformar;
@@ -112,19 +116,19 @@ A exclusão automática ainda não está ativa. Ela deve ser implementada como t
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
-Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra.
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido.
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs
 ```
 
 O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nenhum dado demonstrativo é gravado no Firebase.
 
 ## Fases ainda não concluídas
 
-- detecção técnica de desfoque, escuridão, tremor e duplicidade;
-- sincronização de cortes com batidas e biblioteca licenciada de músicas;
+- detecção dedicada de desfoque e tremor de câmera (o motor atual mede exposição, congelamento e volatilidade de movimento);
+- biblioteca licenciada de músicas;
 - diretor semântico por IA configurável;
 - timeline visual, prévia de baixa resolução e histórico completo de versões.
 
