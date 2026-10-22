@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
 import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
-import { withTimeout } from "../studio-worker/src/process-utils.mjs";
+import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -60,4 +60,13 @@ test("operações externas travadas são interrompidas para permitir nova tentat
     /Leitura de teste excedeu 10 ms/
   );
   assert.equal(await withTimeout(Promise.resolve("ok"), 100, "Leitura de teste"), "ok");
+});
+
+test("processo externo é encerrado quando o usuário cancela a criação", async () => {
+  const cancellation = new AbortController();
+  setTimeout(() => cancellation.abort(), 40);
+  await assert.rejects(
+    runProcess(process.execPath, ["-e", "setTimeout(() => {}, 5000)"], { signal: cancellation.signal }),
+    (error) => error?.code === "studio_cancelled"
+  );
 });

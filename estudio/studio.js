@@ -19,9 +19,9 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "" };
+const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", processing: "Processamento", usage: "Uso e créditos" };
-const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", completed: "Concluído", failed: "Falhou" };
+const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", cancel_requested: "Cancelando", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
@@ -37,7 +37,13 @@ function cleanFileName(name) {
 async function privateOutputUrl(output) {
   if (output?.downloadUrl) return output.downloadUrl;
   if (!output?.storagePath) throw new Error("Arquivo final não encontrado.");
-  return URL.createObjectURL(await getBlob(storageRef(storage, output.storagePath)));
+  const outputRef = storageRef(storage, output.storagePath);
+  try {
+    return await getDownloadURL(outputRef);
+  } catch (error) {
+    console.warn("O render não possui URL privada de streaming; usando download autenticado.", error);
+    return URL.createObjectURL(await getBlob(outputRef));
+  }
 }
 
 async function downloadProject(projectId) {
@@ -50,7 +56,31 @@ async function downloadProject(projectId) {
   document.body.appendChild(link);
   link.click();
   link.remove();
-  if (!project.output.downloadUrl) setTimeout(() => URL.revokeObjectURL(url), 60000);
+  if (url.startsWith("blob:")) setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+async function showProjectVideo(projectId) {
+  const project = state.projects.find((item) => item.id === projectId);
+  if (!project?.output) throw new Error("O vídeo final deste projeto não foi encontrado.");
+  state.activeProjectId = projectId;
+  state.activeJobId = project.jobId || "";
+  $("resultCard").classList.add("hidden");
+  $("errorCard").classList.add("hidden");
+  $("processingStatusCard").classList.remove("hidden");
+  $("cancelProcessingButton").classList.add("hidden");
+  $("processingEyebrow").textContent = "Carregando vídeo";
+  $("processingTitle").textContent = project.name || "Vídeo concluído";
+  markProcessStep("complete");
+  updateProgress(100, "Concluído", "Preparando a prévia protegida do vídeo.");
+  switchView("processing");
+  if (state.outputPreviewUrl) URL.revokeObjectURL(state.outputPreviewUrl);
+  const outputUrl = await privateOutputUrl(project.output);
+  state.outputPreviewUrl = outputUrl.startsWith("blob:") ? outputUrl : "";
+  $("previewPlayer").src = outputUrl;
+  $("downloadVideo").href = outputUrl;
+  $("downloadVideo").download = cleanFileName(project.output.fileName || `${project.name || "ola-studio"}.mp4`);
+  $("processingStatusCard").classList.add("hidden");
+  $("resultCard").classList.remove("hidden");
 }
 
 function showGate(id) {
@@ -205,7 +235,14 @@ function markProcessStep(step) {
 function uploadFile(file, path, progressCallback) {
   return new Promise((resolve, reject) => {
     const task = uploadBytesResumable(storageRef(storage, path), file, { contentType: file.type, customMetadata: { originalName: file.name, ownerUid: state.user.uid } });
-    task.on("state_changed", (snapshot) => progressCallback(snapshot.bytesTransferred, snapshot.totalBytes), reject, async () => resolve({ storagePath: path, downloadUrl: await getDownloadURL(task.snapshot.ref) }));
+    state.activeUploads.add(task);
+    task.on("state_changed", (snapshot) => progressCallback(snapshot.bytesTransferred, snapshot.totalBytes), (error) => {
+      state.activeUploads.delete(task);
+      reject(error);
+    }, async () => {
+      state.activeUploads.delete(task);
+      resolve({ storagePath: path, downloadUrl: await getDownloadURL(task.snapshot.ref) });
+    });
   });
 }
 
@@ -237,22 +274,30 @@ async function submitProject(event) {
   event.preventDefault();
   if (!state.files.length) return toast("Adicione ao menos uma foto ou vídeo.");
   if (!$("projectName").value.trim()) return toast("Informe um nome para o projeto.");
-  const activeJobs = state.projects.filter((item) => ["uploading", "queued", "analyzing", "rendering"].includes(item.status));
+  const activeJobs = state.projects.filter((item) => ["uploading", "queued", "analyzing", "rendering", "cancel_requested"].includes(item.status));
   if (activeJobs.length >= STUDIO_LIMITS.maxConcurrentJobsPerUser) return toast("Aguarde o processamento atual terminar antes de criar outro vídeo.");
   switchView("processing");
   $("resultCard").classList.add("hidden");
   $("errorCard").classList.add("hidden");
+  $("processingEyebrow").textContent = "Enviando arquivos";
   $("processingTitle").textContent = "Enviando seus arquivos";
   markProcessStep("upload");
   updateProgress(1, "Preparando upload", "Os arquivos originais serão mantidos com segurança.");
   const projectRef = push(ref(db, `studioProjects/${state.user.uid}`));
   const projectId = projectRef.key;
   state.activeProjectId = projectId;
+  state.activeJobId = "";
+  state.cancelRequested = false;
+  $("processingStatusCard").classList.remove("hidden");
+  $("cancelProcessingButton").classList.remove("hidden");
+  $("cancelProcessingButton").disabled = false;
   try {
     const initialDraft = currentDraft();
     const now = Date.now();
     await set(projectRef, { ...initialDraft, sources: [], ownerUid: state.user.uid, status: "uploading", createdAt: now, updatedAt: now, retentionUntil: now + STUDIO_LIMITS.retentionDays * 86400000 });
     const assets = await uploadProjectAssets(projectId);
+    const latestProject = (await get(projectRef)).val();
+    if (state.cancelRequested || ["cancel_requested", "cancelled"].includes(latestProject?.status)) throw Object.assign(new Error("Criação cancelada."), { code: "studio_cancelled" });
     const project = normalizeStudioProject({ ...initialDraft, ...assets });
     const cost = studioJobCostEstimate(project);
     const jobRef = push(ref(db, `studioJobs/${state.user.uid}`));
@@ -265,7 +310,62 @@ async function submitProject(event) {
     updateProgress(25, "Aguardando worker", "O worker FFmpeg assumirá o processamento assim que estiver online.");
     watchJob(jobId, projectId);
   } catch (error) {
-    await failLocalProject(projectId, error);
+    if (state.cancelRequested || error?.code === "storage/canceled" || error?.code === "studio_cancelled") await finishClientCancellation(projectId);
+    else await failLocalProject(projectId, error);
+  }
+}
+
+async function finishClientCancellation(projectId) {
+  state.jobUnsubscribe?.();
+  state.jobUnsubscribe = null;
+  const updates = { [`studioProjects/${state.user.uid}/${projectId}/status`]: "cancelled", [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: Date.now() };
+  if (state.activeJobId) {
+    updates[`studioJobs/${state.user.uid}/${state.activeJobId}/status`] = "cancelled";
+    updates[`studioJobs/${state.user.uid}/${state.activeJobId}/stage`] = "cancelled";
+    updates[`studioJobs/${state.user.uid}/${state.activeJobId}/message`] = "Criação cancelada pelo usuário.";
+    updates[`studioJobs/${state.user.uid}/${state.activeJobId}/cancelledAt`] = Date.now();
+    updates[`studioUsage/${state.user.uid}/estimates/${state.activeJobId}/status`] = "cancelled";
+  }
+  await update(ref(db), updates).catch(() => {});
+  $("cancelProcessingButton").classList.add("hidden");
+  toast("Criação cancelada.");
+  await loadProjects();
+  switchView("projects");
+}
+
+async function cancelProject(projectId = state.activeProjectId) {
+  if (!projectId || !window.confirm("Deseja cancelar esta criação? O vídeo em processamento não será concluído.")) return;
+  const projectSnapshot = await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`));
+  const project = projectSnapshot.val();
+  if (!project || ["completed", "failed", "cancelled"].includes(project.status)) return toast("Este processamento já foi encerrado.");
+  if (projectId === state.activeProjectId) {
+    state.cancelRequested = true;
+    state.activeUploads.forEach((task) => task.cancel());
+  }
+  const jobId = project.jobId || (projectId === state.activeProjectId ? state.activeJobId : "");
+  let jobStatus = "cancelled";
+  if (jobId) {
+    const jobSnapshot = await get(ref(db, `studioJobs/${state.user.uid}/${jobId}`));
+    if (["analyzing", "rendering"].includes(jobSnapshot.val()?.status)) jobStatus = "cancel_requested";
+  }
+  const now = Date.now();
+  const updates = { [`studioProjects/${state.user.uid}/${projectId}/status`]: jobStatus, [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: now };
+  if (jobId) {
+    updates[`studioJobs/${state.user.uid}/${jobId}/status`] = jobStatus;
+    updates[`studioJobs/${state.user.uid}/${jobId}/stage`] = jobStatus;
+    updates[`studioJobs/${state.user.uid}/${jobId}/message`] = jobStatus === "cancel_requested" ? "Interrompendo o processamento em segurança." : "Criação cancelada pelo usuário.";
+    updates[`studioJobs/${state.user.uid}/${jobId}/cancelRequestedAt`] = now;
+    if (jobStatus === "cancelled") updates[`studioUsage/${state.user.uid}/estimates/${jobId}/status`] = "cancelled";
+  }
+  await update(ref(db), updates);
+  if (jobStatus === "cancel_requested") {
+    $("cancelProcessingButton").disabled = true;
+    updateProgress(Number($("processingPercent").textContent.replace("%", "")) || 25, "Cancelando", "O worker está encerrando o FFmpeg e limpando os arquivos temporários.");
+    toast("Cancelamento solicitado.");
+  } else {
+    toast("Criação cancelada.");
+    await loadProjects();
+    switchView("projects");
   }
 }
 
@@ -287,7 +387,7 @@ function watchJob(jobId, projectId) {
   state.jobUnsubscribe = onValue(ref(db, `studioJobs/${state.user.uid}/${jobId}`), async (snapshot) => {
     const job = snapshot.val();
     if (!job) return;
-    const step = job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
+    const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
     markProcessStep(step);
     updateProgress(job.progress || 25, statusLabels[job.status] || job.stage || "Processando", job.message || "O processamento continua no worker.");
     if (job.status === "completed") {
@@ -295,9 +395,10 @@ function watchJob(jobId, projectId) {
       state.jobUnsubscribe = null;
       $("processingTitle").textContent = "Seu vídeo está pronto";
       $("processingMessage").textContent = "Assista à prévia e baixe o MP4 em alta qualidade.";
+      $("cancelProcessingButton").classList.add("hidden");
       if (state.outputPreviewUrl) URL.revokeObjectURL(state.outputPreviewUrl);
       const outputUrl = await privateOutputUrl(job.output);
-      state.outputPreviewUrl = job.output?.downloadUrl ? "" : outputUrl;
+      state.outputPreviewUrl = outputUrl.startsWith("blob:") ? outputUrl : "";
       $("previewPlayer").src = outputUrl;
       $("downloadVideo").href = outputUrl;
       $("downloadVideo").download = `${cleanFileName(job.output?.fileName || "ola-studio.mp4")}`;
@@ -307,8 +408,17 @@ function watchJob(jobId, projectId) {
     if (job.status === "failed") {
       state.jobUnsubscribe?.();
       state.jobUnsubscribe = null;
+      $("cancelProcessingButton").classList.add("hidden");
       showProcessingError(job.error?.message || "O worker não conseguiu concluir a renderização.");
       loadProjects();
+    }
+    if (job.status === "cancelled") {
+      state.jobUnsubscribe?.();
+      state.jobUnsubscribe = null;
+      state.cancelRequested = false;
+      $("cancelProcessingButton").classList.add("hidden");
+      toast("Criação cancelada.");
+      loadProjects().then(() => switchView("projects"));
     }
   });
 }
@@ -323,9 +433,14 @@ async function regenerateProject(projectId) {
   await update(ref(db), { [`studioJobs/${state.user.uid}/${jobId}`]: { schemaVersion: 1, id: jobId, projectId, ownerUid: state.user.uid, status: "queued", stage: "queue", progress: 25, attempt: 0, createdAt: Date.now(), updatedAt: Date.now(), costEstimate: cost }, [`studioProjects/${state.user.uid}/${projectId}/jobId`]: jobId, [`studioProjects/${state.user.uid}/${projectId}/status`]: "queued", [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: Date.now(), [`studioUsage/${state.user.uid}/estimates/${jobId}`]: { projectId, ...cost, status: "reserved", createdAt: Date.now() } });
   state.activeProjectId = projectId;
   state.activeJobId = jobId;
+  state.cancelRequested = false;
   switchView("processing");
+  $("processingStatusCard").classList.remove("hidden");
+  $("cancelProcessingButton").classList.remove("hidden");
+  $("cancelProcessingButton").disabled = false;
   $("resultCard").classList.add("hidden");
   $("errorCard").classList.add("hidden");
+  $("processingEyebrow").textContent = "Processando nova versão";
   $("processingTitle").textContent = "Nova versão na fila";
   markProcessStep("queue");
   updateProgress(25, "Aguardando worker", "Os arquivos originais serão reutilizados sem novo upload.");
@@ -346,8 +461,13 @@ function renderProjects() {
   root.innerHTML = state.projects.map((project) => {
     const completed = project.status === "completed";
     const failed = project.status === "failed";
+    const cancelled = project.status === "cancelled";
+    const active = ["uploading", "queued", "analyzing", "rendering", "cancel_requested"].includes(project.status);
+    const open = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-open="${project.id}"><i class="fa-solid fa-circle-play"></i> Abrir</button>` : "";
     const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
-    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span></div><div class="project-actions">${download}<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button></div></div></article>`;
+    const cancel = active ? `<button type="button" data-project-cancel="${project.id}"><i class="fa-solid fa-ban"></i> Cancelar</button>` : "";
+    const regenerate = active ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
+    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span></div><div class="project-actions">${open}${download}${cancel}${regenerate}</div></div></article>`;
   }).join("");
 }
 
@@ -421,9 +541,15 @@ $("projectForm").addEventListener("submit", submitProject);
 $("logoFile").addEventListener("change", () => { const file = $("logoFile").files[0]; if (file && file.size > 8 * 1024 * 1024) { $("logoFile").value = ""; return toast("A logo deve ter no máximo 8 MB."); } $("logoFileLabel").innerHTML = `<i class="fa-regular fa-image"></i> ${escapeHtml(file?.name || "Escolher PNG ou WebP")}`; });
 $("musicFile").addEventListener("change", () => { const file = $("musicFile").files[0]; if (file && file.size > STUDIO_LIMITS.maxAudioBytes) { $("musicFile").value = ""; return toast("A música deve ter no máximo 25 MB."); } $("musicFileLabel").innerHTML = `<i class="fa-solid fa-music"></i> ${escapeHtml(file?.name || "Escolher áudio")}`; });
 $("projectsGrid").addEventListener("click", (event) => {
+  const open = event.target.closest("[data-project-open]");
   const download = event.target.closest("[data-project-download]");
+  const cancel = event.target.closest("[data-project-cancel]");
   const regenerate = event.target.closest("[data-project-regenerate]");
+  if (open) showProjectVideo(open.dataset.projectOpen).catch((error) => toast(error.message));
   if (download) downloadProject(download.dataset.projectDownload).catch((error) => toast(error.message));
+  if (cancel) cancelProject(cancel.dataset.projectCancel).catch((error) => toast(error.message));
   if (regenerate) regenerateProject(regenerate.dataset.projectRegenerate).catch((error) => toast(error.message));
 });
+$("cancelProcessingButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
+$("backToProjects").addEventListener("click", () => { $("previewPlayer").pause(); switchView("projects"); });
 $("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));

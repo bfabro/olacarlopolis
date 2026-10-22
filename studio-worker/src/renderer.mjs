@@ -99,7 +99,7 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
   return args;
 }
 
-export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", progress = async () => {} }) {
+export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", progress = async () => {}, signal }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const segmentPaths = [];
   for (let index = 0; index < plan.scenes.length; index += 1) {
@@ -107,7 +107,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     const source = sourceById.get(scene.sourceId);
     if (!source) throw new Error(`Origem ${scene.sourceId} nao encontrada para a cena ${scene.id}.`);
     const segmentPath = path.join(outputDir, `segment-${String(index + 1).padStart(3, "0")}.mp4`);
-    await runProcess(workerConfig.ffmpegPath, buildSegmentArgs(scene, source, segmentPath, plan.format));
+    await runProcess(workerConfig.ffmpegPath, buildSegmentArgs(scene, source, segmentPath, plan.format), { signal });
     segmentPaths.push(segmentPath);
     await progress("segments", index + 1, plan.scenes.length);
   }
@@ -129,7 +129,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
         transition: plan.scenes[index].transition || "fade",
         transitionDuration: plan.scenes[index].transitionDuration || 0.35
       });
-      await runProcess(workerConfig.ffmpegPath, pair.args);
+      await runProcess(workerConfig.ffmpegPath, pair.args, { signal });
       if (currentPath.includes(`${path.sep}transition-`)) await fs.rm(currentPath, { force: true });
       currentPath = outputPath;
       currentDuration = pair.outputDuration;
@@ -137,7 +137,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     }
   }
   const outputPath = path.join(outputDir, "ola-studio-final.mp4");
-  await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, captionsPath }));
+  await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, captionsPath }), { signal });
   await progress("branding", 1, 1);
   return outputPath;
 }

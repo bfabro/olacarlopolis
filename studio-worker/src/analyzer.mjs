@@ -1,8 +1,8 @@
 import { workerConfig } from "./config.mjs";
 import { runProcess } from "./process-utils.mjs";
 
-export async function probeMedia(localPath, contentType = "") {
-  const { stdout } = await runProcess(workerConfig.ffprobePath, ["-v", "error", "-show_streams", "-show_format", "-of", "json", localPath]);
+export async function probeMedia(localPath, contentType = "", signal) {
+  const { stdout } = await runProcess(workerConfig.ffprobePath, ["-v", "error", "-show_streams", "-show_format", "-of", "json", localPath], { signal });
   const data = JSON.parse(stdout || "{}");
   const video = (data.streams || []).find((stream) => stream.codec_type === "video");
   const audio = (data.streams || []).find((stream) => stream.codec_type === "audio");
@@ -20,19 +20,20 @@ export function parseSilences(log = "") {
   return starts.map((start, index) => ({ start, end: ends[index] ?? start, duration: Math.max(0, (ends[index] ?? start) - start) }));
 }
 
-export async function analyzeVideo(localPath, metadata) {
+export async function analyzeVideo(localPath, metadata, signal) {
   if (!metadata.hasVideo || metadata.contentType.startsWith("image/")) return { sceneTimes: [0], silences: [] };
-  const scene = await runProcess(workerConfig.ffmpegPath, ["-hide_banner", "-i", localPath, "-vf", "select='gt(scene,0.32)',showinfo", "-an", "-f", "null", "-" ]).catch((error) => ({ stderr: error.stderr || "" }));
-  const silence = metadata.hasAudio ? await runProcess(workerConfig.ffmpegPath, ["-hide_banner", "-i", localPath, "-af", "silencedetect=noise=-35dB:d=0.8", "-f", "null", "-"]).catch((error) => ({ stderr: error.stderr || "" })) : { stderr: "" };
+  const tolerateAnalysisError = (error) => { if (error?.code === "studio_cancelled") throw error; return { stderr: error.stderr || "" }; };
+  const scene = await runProcess(workerConfig.ffmpegPath, ["-hide_banner", "-i", localPath, "-vf", "select='gt(scene,0.32)',showinfo", "-an", "-f", "null", "-" ], { signal }).catch(tolerateAnalysisError);
+  const silence = metadata.hasAudio ? await runProcess(workerConfig.ffmpegPath, ["-hide_banner", "-i", localPath, "-af", "silencedetect=noise=-35dB:d=0.8", "-f", "null", "-"], { signal }).catch(tolerateAnalysisError) : { stderr: "" };
   return { sceneTimes: [0, ...parseSceneTimes(scene.stderr)].filter((time, index, list) => time < metadata.duration && (index === 0 || time - list[index - 1] >= 1)), silences: parseSilences(silence.stderr) };
 }
 
-export async function analyzeSources(sources, progress = () => {}) {
+export async function analyzeSources(sources, progress = () => {}, signal) {
   const results = [];
   for (let index = 0; index < sources.length; index += 1) {
     const source = sources[index];
-    const metadata = await probeMedia(source.localPath, source.contentType);
-    const technical = await analyzeVideo(source.localPath, metadata);
+    const metadata = await probeMedia(source.localPath, source.contentType, signal);
+    const technical = await analyzeVideo(source.localPath, metadata, signal);
     results.push({ ...source, metadata, technical });
     await progress(index + 1, sources.length);
   }

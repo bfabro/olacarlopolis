@@ -1,0 +1,22 @@
+.project-status.cancelled {
+  background: var(--danger);
+}
+
+.project-actions {
+  flex-wrap: wrap;
+}
+
+.cancel-processing-button {
+  margin: 24px auto 0;
+  border: 1px solid #efb3b7;
+  border-radius: 12px;
+  padding: 11px 17px;
+  background: #fff;
+  color: var(--danger);
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.cancel-processing-button:hover {
+  background: #fff3f4;
+}

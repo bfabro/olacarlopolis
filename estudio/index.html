@@ -9,7 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=1">
+  <link rel="stylesheet" href="studio.css?v=2">
+  <link rel="stylesheet" href="studio-overrides.css?v=1">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -141,16 +142,17 @@
 
       <section id="processingView" class="studio-view hidden">
         <div class="processing-layout">
-          <section class="studio-card processing-card">
+          <section id="processingStatusCard" class="studio-card processing-card">
             <div id="processingIcon" class="processing-icon"><i class="fa-solid fa-clapperboard"></i></div>
             <span id="processingEyebrow" class="eyebrow">Enviando arquivos</span><h2 id="processingTitle">Seu vídeo está sendo preparado</h2><p id="processingMessage">Não feche esta tela durante o envio.</p>
             <div class="progress-track"><span id="processingBar"></span></div><div class="progress-row"><strong id="processingPercent">0%</strong><span id="processingStage">Iniciando</span></div>
             <ol class="process-steps"><li data-process-step="upload" class="active"><i class="fa-solid fa-cloud-arrow-up"></i><span>Upload</span></li><li data-process-step="queue"><i class="fa-solid fa-list-check"></i><span>Fila</span></li><li data-process-step="analysis"><i class="fa-solid fa-wave-square"></i><span>Análise</span></li><li data-process-step="render"><i class="fa-solid fa-film"></i><span>Renderização</span></li><li data-process-step="complete"><i class="fa-solid fa-circle-check"></i><span>Concluído</span></li></ol>
+            <button id="cancelProcessingButton" class="cancel-processing-button" type="button"><i class="fa-solid fa-ban"></i> Cancelar criação</button>
           </section>
           <section id="resultCard" class="studio-card result-card hidden">
             <div class="card-heading"><span><i class="fa-solid fa-check"></i></span><div><h2>Vídeo concluído</h2><p>Confira o resultado antes de baixar.</p></div></div>
             <video id="previewPlayer" controls playsinline></video>
-            <div class="result-actions"><a id="downloadVideo" class="create-button" href="#" download><i class="fa-solid fa-download"></i> Baixar MP4</a><button id="regenerateVideo" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Gerar outra versão</button></div>
+            <div class="result-actions"><a id="downloadVideo" class="create-button" href="#" download><i class="fa-solid fa-download"></i> Baixar MP4</a><button id="regenerateVideo" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Gerar outra versão</button><button id="backToProjects" class="secondary-button" type="button"><i class="fa-solid fa-arrow-left"></i> Meus projetos</button></div>
           </section>
           <section id="errorCard" class="studio-card error-card hidden"><i class="fa-solid fa-triangle-exclamation"></i><div><h2>Não foi possível concluir</h2><p id="processingError"></p></div><button type="button" data-new-project>Tentar novamente</button></section>
         </div>
@@ -164,6 +166,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=3"></script>
+  <script type="module" src="studio.js?v=5"></script>
 </body>
 </html>
