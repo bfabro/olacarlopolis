@@ -20,6 +20,9 @@ export const workerConfig = Object.freeze({
   whisperModel: process.env.STUDIO_WHISPER_MODEL || "/opt/whisper/ggml-tiny.bin",
   whisperThreads: Math.max(1, Math.floor(numberEnv("STUDIO_WHISPER_THREADS", 2))),
   whisperWordThreshold: Math.min(1, numberEnv("STUDIO_WHISPER_WORD_THRESHOLD", 0.08)),
+  openaiApiKey: process.env.OPENAI_API_KEY || "",
+  openaiModel: process.env.STUDIO_OPENAI_MODEL || "",
+  aiTimeoutMs: numberEnv("STUDIO_AI_TIMEOUT_MS", 90000),
   workerId: process.env.STUDIO_WORKER_ID || `${os.hostname()}-${process.pid}`,
   fontFile: process.env.STUDIO_FONT_FILE || "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 });

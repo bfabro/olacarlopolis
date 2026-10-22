@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=5";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=6";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -59,6 +59,17 @@ async function downloadProject(projectId) {
   if (url.startsWith("blob:")) setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
+function showDirectorResult(result) {
+  const node = $("resultDirectorStatus");
+  if (!node) return;
+  if (!result?.requested) { node.classList.add("hidden"); node.textContent = ""; return; }
+  node.classList.remove("hidden");
+  node.classList.toggle("is-fallback", result.applied !== true);
+  node.innerHTML = result.applied === true
+    ? `<i class="fa-solid fa-wand-magic-sparkles"></i> Direção semântica aplicada por ${escapeHtml(result.provider || "IA configurada")}.`
+    : `<i class="fa-solid fa-shield-halved"></i> A IA não foi aplicada; a montagem técnica local foi usada com segurança. ${escapeHtml(result.reason || "")}`;
+}
+
 async function showProjectVideo(projectId) {
   const project = state.projects.find((item) => item.id === projectId);
   if (!project?.output) throw new Error("O vídeo final deste projeto não foi encontrado.");
@@ -80,6 +91,7 @@ async function showProjectVideo(projectId) {
   $("previewPlayer").src = outputUrl;
   $("downloadVideo").href = outputUrl;
   $("downloadVideo").download = cleanFileName(project.output.fileName || `${project.name || "ola-studio"}.mp4`);
+  showDirectorResult(project.directorResult);
   $("processingStatusCard").classList.add("hidden");
   $("resultCard").classList.remove("hidden");
 }
@@ -132,6 +144,10 @@ function currentDraft(sources = []) {
       rhythm: $("editingRhythm").value,
       syncToMusic: $("syncCutsToMusic").checked,
       prioritizeTechnicalQuality: true
+    },
+    director: {
+      mode: $("directorMode").value,
+      brief: $("directorBrief").value
     },
     textDesign: {
       preset: $("textPreset").value,
@@ -207,6 +223,7 @@ function resetEditor() {
   $("musicFileLabel").innerHTML = '<i class="fa-solid fa-music"></i> Escolher áudio';
   $("captionReviewEnabled").checked = true;
   $("transcriptReviewCard").classList.add("hidden");
+  showDirectorResult(null);
   state.reviewingJobId = "";
   state.transcriptSegments = [];
   updateTextSizeLabel();
@@ -548,6 +565,7 @@ function watchJob(jobId, projectId) {
       $("previewPlayer").src = outputUrl;
       $("downloadVideo").href = outputUrl;
       $("downloadVideo").download = `${cleanFileName(job.output?.fileName || "ola-studio.mp4")}`;
+      showDirectorResult(job.director);
       $("resultCard").classList.remove("hidden");
       loadProjects();
     }
@@ -617,7 +635,8 @@ function renderProjects() {
     const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
     const cancel = active ? `<button type="button" data-project-cancel="${project.id}"><i class="fa-solid fa-ban"></i> Cancelar</button>` : "";
     const regenerate = active ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
-    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span></div><div class="project-actions">${review}${open}${download}${cancel}${regenerate}</div></div></article>`;
+    const director = project.director?.mode === "semantic" ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? "Direção por IA" : "IA solicitada"}</span>` : "";
+    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${open}${download}${cancel}${regenerate}</div></div></article>`;
   }).join("");
 }
 

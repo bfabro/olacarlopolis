@@ -65,11 +65,13 @@ export function prepareReviewedTranscription(review = {}, maxDuration = 90) {
 
 export class DisabledTranscriptionProvider {
   get name() { return "disabled"; }
+  get enabled() { return false; }
   async transcribeFile() { return { available: false, provider: this.name, language: "pt", segments: [], reason: "Whisper local não está disponível no worker." }; }
 }
 
 export class WhisperCppTranscriptionProvider {
   get name() { return "whisper.cpp"; }
+  get enabled() { return true; }
   async transcribeFile(mediaPath, workDir, options = {}) {
     const wavPath = path.join(workDir, "transcription-audio.wav");
     const outputBase = path.join(workDir, "transcription");

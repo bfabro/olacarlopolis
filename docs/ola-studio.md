@@ -12,9 +12,11 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 ## Fluxo funcional
 
-`Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON → FFmpeg → Storage → prévia/download`
+`Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON local ou direção semântica opcional → FFmpeg → Storage → prévia/download`
 
-O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 5 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, camadas de texto, animações, logo, áudio, legendas e parâmetros de exportação.
+O planejador local é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 6 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, camadas de texto, animações, logo, áudio, legendas, direção solicitada e parâmetros de exportação.
+
+O Diretor por IA é uma escolha explícita do usuário. Quando configurado no worker, ele envia à API somente um conjunto limitado de quadros representativos, medições técnicas e transcrições locais, solicita uma resposta JSON estrita e mescla a direção recebida ao plano técnico já validado. A chave nunca vai ao navegador. Se a configuração estiver ausente, a API falhar ou a resposta for inválida, o trabalho continua pelo motor local e o resultado informa claramente o fallback.
 
 ## Aplicar configuração de desenvolvimento
 
@@ -57,6 +59,9 @@ Variáveis opcionais:
 - `STUDIO_WHISPER_MODEL`
 - `STUDIO_WHISPER_THREADS`
 - `STUDIO_WHISPER_WORD_THRESHOLD`
+- `OPENAI_API_KEY` (somente no ambiente seguro do worker)
+- `STUDIO_OPENAI_MODEL` (obrigatório junto com a chave; não há modelo presumido)
+- `STUDIO_AI_TIMEOUT_MS`
 
 A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e `If-Match`, evitando que dois workers processem o mesmo trabalho. Leituras externas têm tempo limite para que uma conexão iniciada antes da rede do contêiner ficar pronta não bloqueie o worker indefinidamente.
 
@@ -94,7 +99,13 @@ Há dois modos reais de legenda incorporada ao MP4:
 - tradicional, agrupada por frase;
 - dinâmica, em ASS, com destaque progressivo de cada palavra conforme os timestamps do Whisper.
 
-O usuário pode escolher posição, tamanho, cor principal, cor de destaque e fornecer nomes próprios como contexto. Se o binário ou o modelo não estiver disponível, o provedor retorna `disabled` e não inventa conteúdo. O diretor semântico por IA continua reservado para uma etapa posterior.
+O usuário pode escolher posição, tamanho, cor principal, cor de destaque e fornecer nomes próprios como contexto. Se o binário ou o modelo não estiver disponível, o provedor retorna `disabled` e não inventa conteúdo. Na direção semântica, a transcrição local pode ser usada como evidência, mas continua opcional.
+
+## Diretor por IA opcional
+
+O modo padrão permanece `local`. Para habilitar o modo semântico em um ambiente protegido, configure `OPENAI_API_KEY` e `STUDIO_OPENAI_MODEL` somente no processo do worker e recrie o contêiner. A requisição usa a Responses API com Structured Outputs, `strict: true` e `store: false`. Nenhuma chave, custo ou chamada externa é ativada automaticamente por esta entrega.
+
+O resultado registra provedor, modelo, uso retornado pela API, quantidade de quadros/transcrições e se houve fallback. O plano técnico continua sendo a fonte de durações e limites de renderização; a IA escolhe apenas candidatos reais previamente extraídos e não pode inventar uma mídia inexistente.
 
 Quando a opção de revisão está ativa, o primeiro processamento pausa em `awaiting_review` depois da transcrição. A interface apresenta cada trecho com seus tempos reais e permite corrigir ou remover o texto. Ao aprovar, o mesmo trabalho retorna à fila, reutiliza os originais privados e renderiza o MP4 com a versão revisada. Palavras alteradas recebem distribuição temporal limitada ao próprio trecho; nenhuma palavra adicional é criada pelo worker.
 
@@ -116,11 +127,11 @@ A exclusão automática ainda não está ativa. Ela deve ser implementada como t
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
-Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido.
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante.
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs
 ```
 
 O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nenhum dado demonstrativo é gravado no Firebase.
@@ -129,7 +140,7 @@ O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nen
 
 - detecção dedicada de desfoque e tremor de câmera (o motor atual mede exposição, congelamento e volatilidade de movimento);
 - biblioteca licenciada de músicas;
-- diretor semântico por IA configurável;
+- avaliação de custo/qualidade do Diretor por IA com um modelo de produção escolhido pelo responsável (a integração existe, mas permanece sem credencial e sem modelo por padrão);
 - timeline visual, prévia de baixa resolução e histórico completo de versões.
 
 Esses itens permanecem explicitamente fora da interface funcional até possuírem processamento real e testes próprios.

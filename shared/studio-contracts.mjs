@@ -1,4 +1,4 @@
-export const STUDIO_SCHEMA_VERSION = 5;
+export const STUDIO_SCHEMA_VERSION = 6;
 
 export const STUDIO_LIMITS = Object.freeze({
   maxFiles: 10,
@@ -154,6 +154,10 @@ export function normalizeStudioProject(input = {}) {
       rhythm: ["soft", "balanced", "dynamic"].includes(input.editing?.rhythm) ? input.editing.rhythm : "balanced",
       syncToMusic: input.editing?.syncToMusic === true,
       prioritizeTechnicalQuality: input.editing?.prioritizeTechnicalQuality !== false
+    },
+    director: {
+      mode: input.director?.mode === "semantic" ? "semantic" : "local",
+      brief: text(input.director?.brief, 1200)
     },
     textDesign: {
       preset: preset.id,

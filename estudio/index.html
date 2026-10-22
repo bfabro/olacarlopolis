@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=6">
-  <link rel="stylesheet" href="studio-overrides.css?v=6">
+  <link rel="stylesheet" href="studio.css?v=7">
+  <link rel="stylesheet" href="studio-overrides.css?v=7">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -95,6 +95,11 @@
 
             <section class="studio-card">
               <div class="card-heading"><span>2</span><div><h2>Estilo da edição</h2><p>Cada estilo muda ritmo, duração dos cortes e transições.</p></div></div>
+              <div class="text-design-panel studio-director-panel">
+                <div><strong>Direção da montagem</strong><small>O modo local usa regras técnicas. A IA semântica é opcional, exige configuração segura no worker e pode consumir uma API paga.</small></div>
+                <label>Modo do diretor<select id="directorMode"><option value="local" selected>Automático local — sem custo de IA</option><option value="semantic">Diretor de IA — se configurado no worker</option></select></label>
+                <label class="wide">Objetivo criativo<textarea id="directorBrief" maxlength="1200" rows="3" placeholder="Ex.: Vídeo institucional elegante, valorizando atendimento, equipe e encerramento com a logo."></textarea></label>
+              </div>
               <div class="style-grid">
                 <label class="style-option"><input type="radio" name="editStyle" value="institucional" checked><span><i class="fa-solid fa-building"></i><strong>Institucional</strong><small>Elegante, suave e inspirador</small></span></label>
                 <label class="style-option"><input type="radio" name="editStyle" value="reels"><span><i class="fa-solid fa-bolt"></i><strong>Reels</strong><small>Dinâmico, vertical e acelerado</small></span></label>
@@ -200,6 +205,7 @@
           </section>
           <section id="resultCard" class="studio-card result-card hidden">
             <div class="card-heading"><span><i class="fa-solid fa-check"></i></span><div><h2>Vídeo concluído</h2><p>Confira o resultado antes de baixar.</p></div></div>
+            <p id="resultDirectorStatus" class="director-result-note hidden"></p>
             <video id="previewPlayer" controls playsinline></video>
             <div class="result-actions"><a id="downloadVideo" class="create-button" href="#" download><i class="fa-solid fa-download"></i> Baixar MP4</a><button id="regenerateVideo" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Gerar outra versão</button><button id="backToProjects" class="secondary-button" type="button"><i class="fa-solid fa-arrow-left"></i> Meus projetos</button></div>
           </section>
@@ -215,6 +221,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=11"></script>
+  <script type="module" src="studio.js?v=12"></script>
 </body>
 </html>

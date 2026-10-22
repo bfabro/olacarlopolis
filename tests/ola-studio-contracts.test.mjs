@@ -38,7 +38,7 @@ test("Studio Pro oferece oito modelos, biblioteca de transições e seis estilos
 
 test("normalização preserva personalização profissional sem aceitar valores inseguros", () => {
   const project = normalizeStudioProject({ style: "gastronomia", transition: "blur", transitionDuration: 0.8, textDesign: { preset: "promo", animation: "typewriter", sizeScale: 1.4, color: "#ffbb2d", position: "bottom", background: false } });
-  assert.equal(project.schemaVersion, 5);
+  assert.equal(project.schemaVersion, 6);
   assert.equal(project.transition, "blur");
   assert.equal(project.textDesign.animation, "typewriter");
   assert.equal(project.textDesign.color, "#FFBB2D");
@@ -50,6 +50,14 @@ test("normaliza ritmo e sincronismo musical sem habilitar IA semântica", () => 
   assert.equal(project.editing.rhythm, "dynamic");
   assert.equal(project.editing.syncToMusic, true);
   assert.equal(project.editing.prioritizeTechnicalQuality, true);
+});
+
+test("diretor de IA exige seleção explícita e limita o briefing", () => {
+  const local = normalizeStudioProject({ director: { mode: "qualquer", brief: "Teste" } });
+  const semantic = normalizeStudioProject({ director: { mode: "semantic", brief: "A".repeat(1400) } });
+  assert.equal(local.director.mode, "local");
+  assert.equal(semantic.director.mode, "semantic");
+  assert.equal(semantic.director.brief.length, 1200);
 });
 
 test("normaliza áudio e legendas dentro de limites seguros", () => {

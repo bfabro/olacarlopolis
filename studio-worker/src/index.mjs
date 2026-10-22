@@ -9,6 +9,7 @@ import { createTranscriptionProvider, prepareReviewedTranscription } from "./tra
 import { createDeterministicPlan } from "./planner.mjs";
 import { renderPlan } from "./renderer.mjs";
 import { analyzeMusicRhythm } from "./rhythm.mjs";
+import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence } from "./ai-planner.mjs";
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -48,10 +49,32 @@ async function processJob(job) {
     if (totalSourceDuration > 600) throw new Error("A duração total dos vídeos de origem excede 10 minutos.");
     await updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 49, message: music?.localPath ? "Analisando o ritmo real da música." : "Montando a narrativa técnica." });
     const rhythm = await analyzeMusicRhythm(music?.localPath || "", workDir, cancellation.signal);
-    const plan = createDeterministicPlan(project, analyzed, { rhythm });
+    const technicalPlan = createDeterministicPlan(project, analyzed, { rhythm });
+    let plan = technicalPlan;
+    if (project.director?.mode === "semantic") {
+      const semanticPlanner = createSemanticPlanner();
+      if (!semanticPlanner.enabled) {
+        plan = markSemanticFallback(technicalPlan, "Diretor de IA não configurado no worker. Defina OPENAI_API_KEY e STUDIO_OPENAI_MODEL para ativá-lo.");
+      } else {
+        try {
+          await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 49, message: "O diretor de IA está analisando quadros, transcrições e o objetivo criativo." });
+          const sourceTranscriptionProvider = await createTranscriptionProvider();
+          const evidence = await prepareSemanticEvidence(analyzed, workDir, { signal: cancellation.signal, transcriptionProvider: sourceTranscriptionProvider, prompt: project.captions?.prompt || "" });
+          plan = await semanticPlanner.createPlan({ project, basePlan: technicalPlan, evidence, analyzedSources: analyzed, signal: cancellation.signal });
+        } catch (error) {
+          if (error?.code === "studio_cancelled" || cancellation.signal.aborted) throw error;
+          console.warn(`[${job.jobId}] Diretor de IA indisponível; usando plano local:`, error.message);
+          plan = markSemanticFallback(technicalPlan, error.message);
+        }
+      }
+    }
+    const directorResult = project.director?.mode === "semantic"
+      ? { requested: true, applied: plan.aiDirector?.applied === true, provider: plan.planner?.provider || "", model: plan.planner?.model || "", reason: plan.aiDirector?.reason || "", updatedAt: Date.now() }
+      : { requested: false, applied: false, updatedAt: Date.now() };
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
     await uploadJson(plan, planStoragePath);
-    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner } });
+    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ directorResult });
+    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.type === "semantic-ai" ? "Direção semântica concluída. Renderizando cenas." : plan.planner?.fallback ? "IA indisponível. Renderizando com a montagem técnica local." : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, director: directorResult });
     const approvedTranscription = project.captionsEnabled && job.transcriptReview?.status === "approved"
       ? prepareReviewedTranscription(job.transcriptReview, project.duration)
       : null;
@@ -93,7 +116,7 @@ async function processJob(job) {
     const output = await uploadRender(outputPath, storagePath);
     ensureNotCancelled();
     const elapsedSeconds = Math.round((Date.now() - started) / 1000);
-    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, workerId: workerConfig.workerId, createdAt: Date.now() };
+    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.type === "semantic-ai" ? plan.planner.provider : "none", aiModel: plan.planner?.type === "semantic-ai" ? plan.planner.model : "none", aiUsage: plan.aiDirector?.usage || null, workerId: workerConfig.workerId, createdAt: Date.now() };
     const updates = {};
     updates[`studioJobs/${job.uid}/${job.jobId}/status`] = "completed";
     updates[`studioJobs/${job.uid}/${job.jobId}/stage`] = "complete";

@@ -7,6 +7,7 @@ import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
 import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
 import { buildQualityWindows, parseIntervals, parseSignalFrames } from "../studio-worker/src/analyzer.mjs";
 import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
+import { OpenAISemanticPlanner, buildSemanticCandidates, markSemanticFallback } from "../studio-worker/src/ai-planner.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -63,6 +64,41 @@ test("planejador prioriza qualidade, registra narrativa e sincroniza apenas cena
   assert.equal(plan.scenes[0].narrativeRole, "opening");
   assert.equal(plan.rhythm.syncEnabled, true);
   assert.ok(plan.scenes.some((scene) => scene.rhythmSynced));
+});
+
+test("diretor semântico usa JSON estrito, não expõe chave e produz plano validado", async () => {
+  const analyzed = [video, image];
+  const basePlan = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15 }, analyzed);
+  const candidates = buildSemanticCandidates(analyzed);
+  let request;
+  const planner = new OpenAISemanticPlanner({
+    apiKey: "segredo-do-worker",
+    model: "modelo-configurado",
+    fetchImpl: async (_url, options) => {
+      request = options;
+      const scenes = candidates.slice(0, 2).map((candidate, index) => ({ candidateId: candidate.id, narrativeRole: index ? "closing" : "opening", transition: "fade", emphasis: "Escolha baseada nas evidências fornecidas." }));
+      return { ok: true, status: 200, json: async () => ({ output_text: JSON.stringify({ scenes, textPreset: "clean", rhythm: "balanced", rationale: "Narrativa baseada somente nos quadros e metadados fornecidos.", confidence: 0.82 }), usage: { input_tokens: 100, output_tokens: 40 } }) };
+    }
+  });
+  const plan = await planner.createPlan({ project: { director: { brief: "Valorizar a empresa" } }, basePlan, evidence: { candidates, frames: [], transcripts: [] }, analyzedSources: analyzed });
+  const body = JSON.parse(request.body);
+  assert.equal(request.headers.Authorization, "Bearer segredo-do-worker");
+  assert.doesNotMatch(request.body, /segredo-do-worker/);
+  assert.equal(body.store, false);
+  assert.equal(body.text.format.type, "json_schema");
+  assert.equal(body.text.format.strict, true);
+  assert.equal(plan.planner.type, "semantic-ai");
+  assert.equal(plan.planner.semanticAnalysis, true);
+  assert.equal(plan.aiDirector.applied, true);
+});
+
+test("diretor sem configuração registra fallback técnico sem fingir IA", () => {
+  const basePlan = createDeterministicPlan({ style: "institucional", format: "16:9", duration: 15 }, [video]);
+  const fallback = markSemanticFallback(basePlan, "Chave ausente");
+  assert.equal(fallback.planner.type, "deterministic-technical");
+  assert.equal(fallback.planner.semanticAnalysis, false);
+  assert.equal(fallback.planner.fallback, true);
+  assert.equal(fallback.aiDirector.applied, false);
 });
 
 test("FFmpeg recebe escala com crop sem deformação e áudio normalizado", () => {
