@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=2";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -115,10 +115,26 @@ function currentDraft(sources = []) {
     name: $("projectName").value,
     title: $("videoTitle").value,
     subtitle: $("videoSubtitle").value,
+    sceneDescription: $("sceneDescription").value,
+    personName: $("personName").value,
+    personRole: $("personRole").value,
+    offerText: $("offerText").value,
+    promoText: $("promoText").value,
+    closingText: $("closingText").value,
     callToAction: $("videoCta").value,
     style: selectedValue("editStyle"),
     format: selectedValue("format"),
     duration: Number(selectedValue("duration")),
+    transition: $("transitionMode").value,
+    transitionDuration: Number($("transitionDuration").value),
+    textDesign: {
+      preset: $("textPreset").value,
+      animation: $("textAnimation").value,
+      sizeScale: Number($("textSizeScale").value) / 100,
+      color: $("textColor").value,
+      position: $("textPosition").value,
+      background: $("textBackground").checked
+    },
     captionsEnabled: $("captionsEnabled").checked,
     sources
   });
@@ -132,6 +148,18 @@ function updateSummary() {
   $("summaryFormat").textContent = draft.format;
   $("summaryDuration").textContent = `${draft.duration} segundos`;
   $("summaryCredits").textContent = `${cost.estimatedCredits} ${cost.estimatedCredits === 1 ? "crédito" : "créditos"}`;
+}
+
+function applyTextPreset() {
+  const preset = STUDIO_TEXT_PRESETS[$("textPreset").value] || STUDIO_TEXT_PRESETS.clean;
+  $("textAnimation").value = preset.animation;
+  $("textColor").value = preset.color;
+  $("textBackground").checked = preset.background;
+  updateSummary();
+}
+
+function updateTextSizeLabel() {
+  $("textSizeValue").textContent = `${$("textSizeScale").value}%`;
 }
 
 function switchView(name) {
@@ -150,6 +178,7 @@ function resetEditor() {
   $("projectName").value = `Vídeo ${new Intl.DateTimeFormat("pt-BR").format(new Date())}`;
   $("logoFileLabel").innerHTML = '<i class="fa-regular fa-image"></i> Escolher PNG ou WebP';
   $("musicFileLabel").innerHTML = '<i class="fa-solid fa-music"></i> Escolher áudio';
+  updateTextSizeLabel();
   renderMediaLibrary();
   updateSummary();
 }
@@ -537,6 +566,8 @@ $("dropZone").addEventListener("drop", (event) => addFiles(event.dataTransfer.fi
 $("mediaLibrary").addEventListener("click", (event) => { const up = event.target.closest("[data-media-up]"); const down = event.target.closest("[data-media-down]"); const remove = event.target.closest("[data-media-remove]"); if (up) moveMedia(up.dataset.mediaUp, -1); if (down) moveMedia(down.dataset.mediaDown, 1); if (remove) removeMedia(remove.dataset.mediaRemove); });
 $("projectForm").addEventListener("change", updateSummary);
 $("projectForm").addEventListener("input", updateSummary);
+$("textPreset").addEventListener("change", applyTextPreset);
+$("textSizeScale").addEventListener("input", updateTextSizeLabel);
 $("projectForm").addEventListener("submit", submitProject);
 $("logoFile").addEventListener("change", () => { const file = $("logoFile").files[0]; if (file && file.size > 8 * 1024 * 1024) { $("logoFile").value = ""; return toast("A logo deve ter no máximo 8 MB."); } $("logoFileLabel").innerHTML = `<i class="fa-regular fa-image"></i> ${escapeHtml(file?.name || "Escolher PNG ou WebP")}`; });
 $("musicFile").addEventListener("change", () => { const file = $("musicFile").files[0]; if (file && file.size > STUDIO_LIMITS.maxAudioBytes) { $("musicFile").value = ""; return toast("A música deve ter no máximo 25 MB."); } $("musicFileLabel").innerHTML = `<i class="fa-solid fa-music"></i> ${escapeHtml(file?.name || "Escolher áudio")}`; });

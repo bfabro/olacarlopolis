@@ -1,4 +1,4 @@
-# Olá Studio — MVP protegido
+# Olá Studio Pro 2.0 — ambiente protegido
 
 ## Estado desta entrega
 
@@ -14,7 +14,7 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 `Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON → FFmpeg → Storage → prévia/download`
 
-O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio e silêncio. Ele não é apresentado como análise semântica de IA.
+O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio e silêncio. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 2 e registra cenas, transições, camadas de texto, animações, logo, áudio e parâmetros de exportação.
 
 ## Aplicar configuração de desenvolvimento
 
@@ -60,14 +60,19 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 
 - lê streams e duração com FFprobe;
 - detecta mudanças de cena e silêncios;
-- cria cortes mínimos diferentes para Institucional, Reels e Comercial;
+- oferece oito modelos: Institucional, Comercial, Reels, Comércio local, Imóveis, Gastronomia, Eventos e Turismo;
+- cria cortes mínimos diferentes conforme o modelo selecionado;
 - normaliza todo material para a proporção escolhida com `scale + crop`, sem deformar;
 - cria áudio silencioso quando uma cena não possui áudio;
-- aplica `xfade` e `acrossfade`;
+- oferece modo automático e doze transições selecionáveis: Fade, Cross Dissolve, Zoom In, Zoom Out, Slide, Wipe, Blur, Whip Pan, Flash, Match Cut técnico, Hard Cut e Dip to Black;
+- aplica `xfade`, `zoompan`, `concat` e `acrossfade` conforme a transição;
 - compõe transições de forma incremental, mantendo somente duas cenas na memória por etapa;
 - normaliza áudio com `loudnorm`;
 - reduz a música durante o áudio principal com `sidechaincompress`;
-- insere logo, título, texto complementar e CTA;
+- compõe título, subtítulo, descrição, nome/cargo, oferta, chamada promocional, encerramento e CTA em camadas temporizadas;
+- oferece seis estilos visuais e oito animações de texto: Fade, Slide Up, Slide Down, Typewriter, Zoom Pop, Bounce suave, Revelação e Palavra por palavra;
+- permite configurar tamanho, cor, posição e fundo semitransparente dos textos;
+- apresenta a logo no encerramento com tempo e tamanho definidos no plano;
 - exporta H.264/AAC com `faststart`.
 
 ## Legendas e IA
@@ -93,6 +98,27 @@ O contrato de transcrição existe, mas o provedor padrão é explicitamente `di
 - originais não são apagados pelo worker.
 
 A exclusão automática ainda não está ativa. Ela deve ser implementada como tarefa separada, com aviso e trilha de auditoria antes de remover qualquer original.
+
+## Validação da composição profissional
+
+O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
+
+```powershell
+$env:STUDIO_INTEGRATION = "1"
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs
+```
+
+O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nenhum dado demonstrativo é gravado no Firebase.
+
+## Fases ainda não concluídas
+
+- Whisper local, edição de transcrição e legendas palavra por palavra;
+- detecção técnica de desfoque, escuridão, tremor e duplicidade;
+- sincronização de cortes com batidas e biblioteca licenciada de músicas;
+- diretor semântico por IA configurável;
+- timeline visual, prévia de baixa resolução e histórico completo de versões.
+
+Esses itens permanecem explicitamente fora da interface funcional até possuírem processamento real e testes próprios.
 
 ## Preparação comercial
 

@@ -8,6 +8,7 @@ WORKDIR /app
 COPY studio-worker/package.json ./
 RUN npm install --omit=dev
 COPY studio-worker/src ./src
+COPY studio-worker/test ./test
 COPY shared /shared
 
 ENV NODE_ENV=production \

@@ -14,6 +14,72 @@ function filterPathEscape(value) {
   return String(value || "").replace(/\\/g, "/").replace(/:/g, "\\:").replace(/'/g, "\\'");
 }
 
+const ffColor = (value, fallback = "FFFFFF") => `0x${String(value || `#${fallback}`).replace("#", "").slice(0, 6)}`;
+
+function fontPath(font) {
+  if (font === "serif") return "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf";
+  if (font === "mono") return "/usr/share/fonts/truetype/dejavu/DejaVuSansMono-Bold.ttf";
+  return workerConfig.fontFile;
+}
+
+function textGeometry(layer, width, height) {
+  const margin = Math.max(24, Number(layer.margin || width * 0.06));
+  const safeTop = Math.max(margin, height * 0.08);
+  const safeBottom = Math.max(margin, height * 0.1);
+  const baseSize = Math.round(width * 0.05 * Number(layer.sizeScale || 1));
+  const lengthFactor = Math.min(1, 31 / Math.max(1, String(layer.value || "").length));
+  const size = Math.max(Math.round(width * 0.024), Math.round(baseSize * Math.max(0.62, lengthFactor)));
+  const x = layer.align === "left" ? `${Math.round(margin)}` : layer.align === "right" ? `w-text_w-${Math.round(margin)}` : "(w-text_w)/2";
+  const slotOffset = Number(layer.slot || 0) * Math.round(size * 1.45);
+  const y = layer.position === "bottom" ? `h-text_h-${Math.round(safeBottom + slotOffset)}` : layer.position === "center" ? `(h-text_h)/2+${Math.round(slotOffset)}` : `${Math.round(safeTop + slotOffset)}`;
+  return { size, x, y };
+}
+
+function animationOptions(layer, geometry) {
+  const start = Number(layer.start || 0);
+  const end = Number(layer.end || start + 3);
+  const fade = `if(lt(t,${seconds(start)}),0,if(lt(t,${seconds(start + 0.45)}),(t-${seconds(start)})/0.45,if(lt(t,${seconds(Math.max(start + 0.5, end - 0.45))}),1,max(0,( ${seconds(end)}-t)/0.45))))`;
+  const options = { alpha: fade, y: geometry.y, size: String(geometry.size) };
+  if (layer.animation === "slide_up") options.y = `${geometry.y}+if(lt(t,${seconds(start + 0.6)}),(1-(t-${seconds(start)})/0.6)*90,0)`;
+  if (layer.animation === "slide_down") options.y = `${geometry.y}-if(lt(t,${seconds(start + 0.6)}),(1-(t-${seconds(start)})/0.6)*90,0)`;
+  if (layer.animation === "zoom_pop") options.size = `${geometry.size}*(0.72+0.28*min(1,max(0,(t-${seconds(start)})/0.42)))`;
+  if (layer.animation === "soft_bounce") options.y = `${geometry.y}-if(lt(t,${seconds(start + 0.9)}),abs(sin((t-${seconds(start)})*9))*38*(1-(t-${seconds(start)})/0.9),0)`;
+  if (layer.animation === "reveal") options.alpha = `if(lt(t,${seconds(start)}),0,min(1,max(0,(t-${seconds(start)})/0.65)))*if(lt(t,${seconds(end - 0.35)}),1,max(0,(${seconds(end)}-t)/0.35))`;
+  return options;
+}
+
+function drawTextFilter(input, output, layer, value, geometry, start, end) {
+  const animated = animationOptions({ ...layer, start, end }, geometry);
+  const background = layer.background ? ":box=1:boxcolor=0x092B45@0.62:boxborderw=18" : "";
+  return `[${input}]drawtext=fontfile='${filterPathEscape(fontPath(layer.font))}':text='${drawTextEscape(value)}':fontcolor=${ffColor(layer.color)}:fontsize='${animated.size}':borderw=3:bordercolor=${ffColor(layer.outlineColor, "092B45")}@0.95:shadowx=2:shadowy=3:shadowcolor=0x000000@0.45${background}:x='${geometry.x}':y='${animated.y}':alpha='${animated.alpha}':enable='between(t,${seconds(start)},${seconds(end)})'[${output}]`;
+}
+
+export function buildTextLayerFilters(input, layer, width, height, index) {
+  const geometry = textGeometry(layer, width, height);
+  const start = Number(layer.start || 0);
+  const end = Number(layer.end || start + 3);
+  const revealMode = layer.animation === "typewriter" || layer.animation === "word_by_word";
+  if (!revealMode) {
+    const output = `vtext${index}`;
+    return { filters: [drawTextFilter(input, output, layer, layer.value, geometry, start, end)], output };
+  }
+  const units = layer.animation === "word_by_word" ? String(layer.value).split(/\s+/).filter(Boolean) : [...String(layer.value)];
+  const maxSteps = layer.animation === "word_by_word" ? 12 : 24;
+  const sampled = units.length <= maxSteps ? units.map((_, unitIndex) => unitIndex + 1) : Array.from({ length: maxSteps }, (_, unitIndex) => Math.ceil((unitIndex + 1) * units.length / maxSteps));
+  const revealDuration = Math.min(2.2, Math.max(0.8, (end - start) * 0.42));
+  const filters = [];
+  let current = input;
+  sampled.forEach((amount, step) => {
+    const stepStart = start + step * revealDuration / sampled.length;
+    const stepEnd = step === sampled.length - 1 ? end : start + (step + 1) * revealDuration / sampled.length;
+    const output = `vtext${index}s${step}`;
+    const value = layer.animation === "word_by_word" ? units.slice(0, amount).join(" ") : units.slice(0, amount).join("");
+    filters.push(drawTextFilter(current, output, { ...layer, animation: "reveal" }, value, geometry, stepStart, stepEnd));
+    current = output;
+  });
+  return { filters, output: current };
+}
+
 export function buildSegmentArgs(scene, source, outputPath, format) {
   const { width, height } = studioOutputDimensions(format);
   const image = source.contentType.startsWith("image/");
@@ -50,10 +116,18 @@ export function buildTransitionGraph(scenes) {
   return { graph: filters.join(";"), video: "[vout]", audio: "[aout]" };
 }
 
-export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftDuration, rightDuration, transition = "fade", transitionDuration = 0.35 }) {
+export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftDuration, rightDuration, transition = "fade", transitionDuration = 0.35, width = 1080, height = 1920 }) {
+  if (transition === "hardcut") {
+    const graph = "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[vout][aout]";
+    return { args: ["-y", "-i", leftPath, "-i", rightPath, "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", outputPath], outputDuration: Number(leftDuration) + Number(rightDuration) };
+  }
   const safeDuration = Math.min(Number(transitionDuration || 0.35), Number(leftDuration) / 2, Number(rightDuration) / 2);
   const offset = Math.max(0, Number(leftDuration) - safeDuration);
-  const graph = `[0:v][1:v]xfade=transition=${transition}:duration=${seconds(safeDuration)}:offset=${seconds(offset)}[vout];[0:a][1:a]acrossfade=d=${seconds(safeDuration)}:c1=tri:c2=tri[aout]`;
+  const zoomOut = transition === "zoomout" ? `[0:v]settb=AVTB[leftzoom];[1:v]zoompan=z='max(1,1.22-0.22*on/${Math.max(1, Math.round(safeDuration * 30))})':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)':d=1:s=${width}x${height}:fps=30,settb=AVTB[rightzoom];` : "";
+  const leftVideo = transition === "zoomout" ? "leftzoom" : "0:v";
+  const rightVideo = transition === "zoomout" ? "rightzoom" : "1:v";
+  const xfade = transition === "zoomout" ? "fade" : transition;
+  const graph = `${zoomOut}[${leftVideo}][${rightVideo}]xfade=transition=${xfade}:duration=${seconds(safeDuration)}:offset=${seconds(offset)}[vout];[0:a][1:a]acrossfade=d=${seconds(safeDuration)}:c1=tri:c2=tri[aout]`;
   return {
     args: ["-y", "-i", leftPath, "-i", rightPath, "-filter_complex_threads", "1", "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", outputPath],
     outputDuration: Number(leftDuration) + Number(rightDuration) - safeDuration
@@ -61,7 +135,7 @@ export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftD
 }
 
 export function buildBrandingArgs({ inputPath, outputPath, duration, format, plan, logoPath = "", musicPath = "", captionsPath = "" }) {
-  const { width } = studioOutputDimensions(format);
+  const { width, height } = studioOutputDimensions(format);
   const args = ["-y", "-i", inputPath];
   let nextInput = 1;
   let logoIndex = -1;
@@ -71,25 +145,29 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
   const filters = [];
   let video = "0:v";
   if (logoIndex >= 0) {
-    filters.push(`[${logoIndex}:v]scale=${Math.round(width * 0.18)}:-1[logo]`);
-    filters.push(`[${video}][logo]overlay=W-w-${Math.round(width * 0.045)}:${Math.round(width * 0.045)}:format=auto[vlogo]`);
+    const logoSize = Number(plan.logo?.size || 0.2);
+    const logoStart = Number(plan.logo?.start ?? Math.max(0, duration - 5));
+    const logoEnd = Number(plan.logo?.end ?? duration);
+    filters.push(`[${logoIndex}:v]scale=${Math.round(width * logoSize)}:-1[logo]`);
+    filters.push(`[${video}][logo]overlay=(W-w)/2:(H-h)/2:format=auto:enable='between(t,${seconds(logoStart)},${seconds(logoEnd)})'[vlogo]`);
     video = "vlogo";
   }
   if (captionsPath) {
     filters.push(`[${video}]subtitles='${filterPathEscape(captionsPath)}':force_style='FontName=DejaVu Sans,FontSize=18,PrimaryColour=&H00FFFFFF,OutlineColour=&H00122435,BorderStyle=1,Outline=2,Alignment=2,MarginV=70'[vcap]`);
     video = "vcap";
   }
-  const textBlocks = [
-    { value: plan.text?.title, size: Math.round(width * 0.048), y: "h*0.10", enable: "between(t,0,4.8)" },
-    { value: plan.text?.subtitle, size: Math.round(width * 0.026), y: "h*0.17", enable: "between(t,0.4,5.5)" },
-    { value: plan.text?.callToAction, size: Math.round(width * 0.038), y: "h*0.82", enable: `between(t,${Math.max(0, duration - 4.5)},${duration})` }
-  ].filter((item) => item.value);
-  textBlocks.forEach((item, index) => {
-    const out = index === textBlocks.length - 1 ? "vout" : `vtext${index}`;
-    filters.push(`[${video}]drawtext=fontfile='${filterPathEscape(workerConfig.fontFile)}':text='${drawTextEscape(item.value)}':fontcolor=white:fontsize=${item.size}:borderw=3:bordercolor=0x092B45@0.92:box=1:boxcolor=0x092B45@0.58:boxborderw=18:x=(w-text_w)/2:y=${item.y}:enable='${item.enable}'[${out}]`);
-    video = out;
+  const legacyLayers = [
+    { type: "title", value: plan.text?.title, start: 0, end: 4.8, position: "top", sizeScale: 1.2 },
+    { type: "subtitle", value: plan.text?.subtitle, start: 0.4, end: 5.5, position: "top", slot: 1, sizeScale: 0.8 },
+    { type: "call_to_action", value: plan.text?.callToAction, start: Math.max(0, duration - 4.5), end: duration, position: "bottom", sizeScale: 1 }
+  ];
+  const textLayers = (Array.isArray(plan.textLayers) ? plan.textLayers : legacyLayers).filter((item) => item?.value);
+  textLayers.forEach((layer, index) => {
+    const built = buildTextLayerFilters(video, { ...plan.textDesign, ...layer }, width, height, index);
+    filters.push(...built.filters);
+    video = built.output;
   });
-  if (!textBlocks.length) filters.push(`[${video}]null[vout]`);
+  filters.push(`[${video}]null[vout]`);
   if (musicIndex >= 0) {
     filters.push(`[${musicIndex}:a]volume=${Number(plan.music?.volume || 0.18).toFixed(2)},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[music]`);
     filters.push("[music][0:a]sidechaincompress=threshold=0.035:ratio=10:attack=20:release=450[ducked]");
@@ -127,7 +205,8 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
         leftDuration: currentDuration,
         rightDuration: Number(plan.scenes[index].duration),
         transition: plan.scenes[index].transition || "fade",
-        transitionDuration: plan.scenes[index].transitionDuration || 0.35
+        transitionDuration: plan.scenes[index].transitionDuration || 0.35,
+        ...studioOutputDimensions(plan.format)
       });
       await runProcess(workerConfig.ffmpegPath, pair.args, { signal });
       if (currentPath.includes(`${path.sep}transition-`)) await fs.rm(currentPath, { force: true });

@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
-import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
+import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
@@ -43,6 +43,28 @@ test("composição incremental mantém somente duas cenas por etapa", () => {
   assert.match(pair.args[pair.args.indexOf("-filter_complex") + 1], /xfade=transition=fade/);
   assert.match(pair.args[pair.args.indexOf("-filter_complex") + 1], /acrossfade/);
   assert.equal(pair.outputDuration, 13.5);
+});
+
+test("hard cut concatena sem sobreposição e mantém a duração integral", () => {
+  const pair = buildPairTransitionArgs({ leftPath: "/tmp/a.mp4", rightPath: "/tmp/b.mp4", outputPath: "/tmp/out.mp4", leftDuration: 4, rightDuration: 3, transition: "hardcut", transitionDuration: 0.5 });
+  assert.match(pair.args[pair.args.indexOf("-filter_complex") + 1], /concat=n=2/);
+  assert.equal(pair.outputDuration, 7);
+});
+
+test("plano profissional cria camadas de texto e respeita transição escolhida", () => {
+  const plan = createDeterministicPlan({ style: "comercial", format: "9:16", duration: 30, transition: "wipe", transitionDuration: 0.6, title: "Oferta especial", sceneDescription: "Atendimento completo", offerText: "R$ 99", closingText: "Esperamos você", callToAction: "Fale conosco", textDesign: { animation: "slide_up", color: "#FFBB2D", position: "bottom" } }, [video, image]);
+  assert.ok(plan.textLayers.length >= 5);
+  assert.ok(plan.scenes.slice(1).every((scene) => scene.transition === "wipeleft"));
+  assert.ok(plan.scenes.slice(1).every((scene) => scene.transitionDuration === 0.6));
+  assert.equal(plan.logo.start, 25);
+});
+
+test("oito animações geram filtros de texto renderizáveis", () => {
+  for (const animation of ["fade", "slide_up", "slide_down", "typewriter", "zoom_pop", "soft_bounce", "reveal", "word_by_word"]) {
+    const built = buildTextLayerFilters("0:v", { value: "Olá Carlópolis", start: 0, end: 4, animation, color: "#FFFFFF", outlineColor: "#092B45", position: "top", align: "center", sizeScale: 1, background: true }, 1080, 1920, 0);
+    assert.ok(built.filters.length >= 1, animation);
+    assert.ok(built.filters.every((filter) => filter.includes("drawtext=")), animation);
+  }
 });
 
 test("branding prepara logo, textos, música com ducking e faststart", () => {
