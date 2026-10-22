@@ -68,8 +68,9 @@ async function processJob(job) {
     await database.ref().update(updates);
   } catch (error) {
     console.error(`[${job.jobId}]`, error);
-    await updateJob(job.uid, job.jobId, { status: "failed", stage: "failed", progress: 100, message: "Falha no processamento.", failedAt: Date.now(), error: { code: "worker_error", message: String(error?.message || error).slice(0, 500) } });
-    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ status: "failed", updatedAt: Date.now(), error: { code: "worker_error", message: String(error?.message || error).slice(0, 500) } });
+    const errorMessage = error?.signal === "SIGKILL" ? "O renderizador excedeu a memória disponível. Reduza a duração ou tente novamente após atualizar o worker." : String(error?.message || error).slice(0, 500);
+    await updateJob(job.uid, job.jobId, { status: "failed", stage: "failed", progress: 100, message: "Falha no processamento.", failedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
+    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ status: "failed", updatedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
   } finally {
     await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});
   }

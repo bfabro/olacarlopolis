@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
-import { buildBrandingArgs, buildSegmentArgs, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
+import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
 import { withTimeout } from "../studio-worker/src/process-utils.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
@@ -35,6 +35,14 @@ test("grafo final aplica transição de vídeo e áudio", () => {
   const graph = buildTransitionGraph([{ duration: 4 }, { duration: 4, transition: "fade", transitionDuration: 0.5 }]);
   assert.match(graph.graph, /xfade=transition=fade/);
   assert.match(graph.graph, /acrossfade/);
+});
+
+test("composição incremental mantém somente duas cenas por etapa", () => {
+  const pair = buildPairTransitionArgs({ leftPath: "/tmp/a.mp4", rightPath: "/tmp/b.mp4", outputPath: "/tmp/out.mp4", leftDuration: 10, rightDuration: 4, transition: "fade", transitionDuration: 0.5 });
+  assert.equal(pair.args.filter((value) => value === "-i").length, 2);
+  assert.match(pair.args[pair.args.indexOf("-filter_complex") + 1], /xfade=transition=fade/);
+  assert.match(pair.args[pair.args.indexOf("-filter_complex") + 1], /acrossfade/);
+  assert.equal(pair.outputDuration, 13.5);
 });
 
 test("branding prepara logo, textos, música com ducking e faststart", () => {

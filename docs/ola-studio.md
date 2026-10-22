@@ -64,6 +64,7 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 - normaliza todo material para a proporção escolhida com `scale + crop`, sem deformar;
 - cria áudio silencioso quando uma cena não possui áudio;
 - aplica `xfade` e `acrossfade`;
+- compõe transições de forma incremental, mantendo somente duas cenas na memória por etapa;
 - normaliza áudio com `loudnorm`;
 - reduz a música durante o áudio principal com `sidechaincompress`;
 - insere logo, título, texto complementar e CTA;

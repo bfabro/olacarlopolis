@@ -1,3 +1,4 @@
+import fs from "node:fs/promises";
 import path from "node:path";
 import { studioOutputDimensions } from "../../shared/studio-contracts.mjs";
 import { workerConfig } from "./config.mjs";
@@ -47,6 +48,16 @@ export function buildTransitionGraph(scenes) {
     audioLabel = nextAudio;
   }
   return { graph: filters.join(";"), video: "[vout]", audio: "[aout]" };
+}
+
+export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftDuration, rightDuration, transition = "fade", transitionDuration = 0.35 }) {
+  const safeDuration = Math.min(Number(transitionDuration || 0.35), Number(leftDuration) / 2, Number(rightDuration) / 2);
+  const offset = Math.max(0, Number(leftDuration) - safeDuration);
+  const graph = `[0:v][1:v]xfade=transition=${transition}:duration=${seconds(safeDuration)}:offset=${seconds(offset)}[vout];[0:a][1:a]acrossfade=d=${seconds(safeDuration)}:c1=tri:c2=tri[aout]`;
+  return {
+    args: ["-y", "-i", leftPath, "-i", rightPath, "-filter_complex_threads", "1", "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", outputPath],
+    outputDuration: Number(leftDuration) + Number(rightDuration) - safeDuration
+  };
 }
 
 export function buildBrandingArgs({ inputPath, outputPath, duration, format, plan, logoPath = "", musicPath = "", captionsPath = "" }) {
@@ -101,10 +112,30 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     await progress("segments", index + 1, plan.scenes.length);
   }
   const compositionPath = path.join(outputDir, "composition.mp4");
-  const transition = buildTransitionGraph(plan.scenes);
-  const transitionArgs = ["-y", ...segmentPaths.flatMap((file) => ["-i", file]), "-filter_complex", transition.graph, "-map", transition.video, "-map", transition.audio, "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", compositionPath];
-  await runProcess(workerConfig.ffmpegPath, transitionArgs);
-  await progress("transitions", 1, 1);
+  if (segmentPaths.length === 1) {
+    await fs.copyFile(segmentPaths[0], compositionPath);
+    await progress("transitions", 1, 1);
+  } else {
+    let currentPath = segmentPaths[0];
+    let currentDuration = Number(plan.scenes[0].duration);
+    for (let index = 1; index < segmentPaths.length; index += 1) {
+      const outputPath = index === segmentPaths.length - 1 ? compositionPath : path.join(outputDir, `transition-${String(index).padStart(3, "0")}.mp4`);
+      const pair = buildPairTransitionArgs({
+        leftPath: currentPath,
+        rightPath: segmentPaths[index],
+        outputPath,
+        leftDuration: currentDuration,
+        rightDuration: Number(plan.scenes[index].duration),
+        transition: plan.scenes[index].transition || "fade",
+        transitionDuration: plan.scenes[index].transitionDuration || 0.35
+      });
+      await runProcess(workerConfig.ffmpegPath, pair.args);
+      if (currentPath.includes(`${path.sep}transition-`)) await fs.rm(currentPath, { force: true });
+      currentPath = outputPath;
+      currentDuration = pair.outputDuration;
+      await progress("transitions", index, segmentPaths.length - 1);
+    }
+  }
   const outputPath = path.join(outputDir, "ola-studio-final.mp4");
   await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, captionsPath }));
   await progress("branding", 1, 1);
