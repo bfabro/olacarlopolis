@@ -1,4 +1,4 @@
-export const STUDIO_SCHEMA_VERSION = 3;
+export const STUDIO_SCHEMA_VERSION = 4;
 
 export const STUDIO_LIMITS = Object.freeze({
   maxFiles: 10,
@@ -169,7 +169,8 @@ export function normalizeStudioProject(input = {}) {
       color: color(input.captions?.color, "#FFFFFF"),
       highlightColor: color(input.captions?.highlightColor, "#FFBB2D"),
       position: ["center", "bottom"].includes(input.captions?.position) ? input.captions.position : "bottom",
-      prompt: text(input.captions?.prompt, 240)
+      prompt: text(input.captions?.prompt, 240),
+      reviewBeforeRender: input.captions?.reviewBeforeRender === true
     },
     audio: {
       musicVolume: numberBetween(input.audio?.musicVolume, 0, 0.7, studioStyleParameters(style).musicVolume),

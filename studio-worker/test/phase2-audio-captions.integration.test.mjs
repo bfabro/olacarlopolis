@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import crypto from "node:crypto";
 import { buildAssCaptions } from "../src/captions.mjs";
 import { buildBrandingArgs } from "../src/renderer.mjs";
 import { runProcess } from "../src/process-utils.mjs";
@@ -16,6 +17,8 @@ test("Fase 2 incorpora legenda dinâmica e música com ducking em MP4 real", { s
     const music = path.join(root, "music.wav");
     const captions = path.join(root, "captions.ass");
     const output = path.join(root, "phase2.mp4");
+    const editedCaptions = path.join(root, "captions-edited.ass");
+    const editedOutput = path.join(root, "phase2-edited.mp4");
     await runProcess("ffmpeg", ["-y", "-f", "lavfi", "-i", "color=c=0x092B45:s=360x640:r=30:d=4", "-f", "lavfi", "-i", "sine=frequency=440:sample_rate=48000:duration=4", "-shortest", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", base]);
     await runProcess("ffmpeg", ["-y", "-f", "lavfi", "-i", "sine=frequency=180:sample_rate=48000:duration=4", "-c:a", "pcm_s16le", music]);
     const transcript = { segments: [{ start: 0.4, end: 3.4, text: "Olá Carlópolis informação local", words: [{ text: "Olá", start: 0.4, end: 1 }, { text: "Carlópolis", start: 1, end: 1.8 }, { text: "informação", start: 1.8, end: 2.6 }, { text: "local", start: 2.6, end: 3.4 }] }] };
@@ -25,6 +28,11 @@ test("Fase 2 incorpora legenda dinâmica e música com ducking em MP4 real", { s
     const metadata = JSON.parse(stdout).format;
     assert.ok(Number(metadata.duration) >= 3.9 && Number(metadata.duration) <= 4.1);
     assert.ok(Number(metadata.size) > 10000);
+    const editedTranscript = { segments: [{ ...transcript.segments[0], text: "Olá Carlópolis legenda corrigida", words: [{ text: "Olá", start: 0.4, end: 1 }, { text: "Carlópolis", start: 1, end: 1.8 }, { text: "legenda", start: 1.8, end: 2.6 }, { text: "corrigida", start: 2.6, end: 3.4 }] }] };
+    await fs.writeFile(editedCaptions, buildAssCaptions(editedTranscript, { format: "9:16", mode: "dynamic", position: "bottom", color: "#FFFFFF", highlightColor: "#FFBB2D" }));
+    await runProcess("ffmpeg", buildBrandingArgs({ inputPath: base, outputPath: editedOutput, duration: 4, format: "9:16", musicPath: music, captionsPath: editedCaptions, plan: { textLayers: [], audio: { musicVolume: 0.18, fadeSeconds: 0.8 }, music: { enabled: true } } }));
+    const digest = async (file) => crypto.createHash("sha256").update(await fs.readFile(file)).digest("hex");
+    assert.notEqual(await digest(output), await digest(editedOutput));
   } finally {
     await fs.rm(root, { recursive: true, force: true });
   }

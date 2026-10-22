@@ -186,7 +186,7 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
   return args;
 }
 
-export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", transcriptionProvider = null, progress = async () => {}, signal }) {
+export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", transcriptionProvider = null, approvedTranscription = null, pauseForTranscriptReview = false, progress = async () => {}, signal }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const segmentPaths = [];
   for (let index = 0; index < plan.scenes.length; index += 1) {
@@ -224,10 +224,14 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
       await progress("transitions", index, segmentPaths.length - 1);
     }
   }
-  if (!captionsPath && plan.captions?.requested && transcriptionProvider) {
+  if (!captionsPath && plan.captions?.requested && (transcriptionProvider || approvedTranscription)) {
     await progress("transcription", 0, 1);
-    const transcription = await transcriptionProvider.transcribeFile(compositionPath, outputDir, { signal, prompt: plan.captions.prompt });
+    const transcription = approvedTranscription || await transcriptionProvider.transcribeFile(compositionPath, outputDir, { signal, prompt: plan.captions.prompt });
     plan.captions = { ...plan.captions, ...transcription, enabled: transcription.available === true && transcription.segments.length > 0 };
+    if (pauseForTranscriptReview && plan.captions.enabled && !approvedTranscription) {
+      await progress("transcription_review", 1, 1);
+      return { outputPath: "", plan, reviewRequired: true, transcription };
+    }
     if (plan.captions.enabled) captionsPath = await writeAssCaptions(path.join(outputDir, "captions.ass"), transcription, { ...plan.captions, format: plan.format });
     await progress("transcription", 1, 1);
   }

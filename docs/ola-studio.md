@@ -14,7 +14,7 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 `Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON → FFmpeg → Storage → prévia/download`
 
-O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio e silêncio. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 3 e registra cenas, transições, camadas de texto, animações, logo, áudio, legendas e parâmetros de exportação.
+O planejador atual é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio e silêncio. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 4 e registra cenas, transições, camadas de texto, animações, logo, áudio, legendas e parâmetros de exportação.
 
 ## Aplicar configuração de desenvolvimento
 
@@ -90,7 +90,9 @@ Há dois modos reais de legenda incorporada ao MP4:
 - tradicional, agrupada por frase;
 - dinâmica, em ASS, com destaque progressivo de cada palavra conforme os timestamps do Whisper.
 
-O usuário pode escolher posição, tamanho, cor principal, cor de destaque e fornecer nomes próprios como contexto. Se o binário ou o modelo não estiver disponível, o provedor retorna `disabled` e não inventa conteúdo. A edição manual da transcrição antes da renderização e o diretor semântico por IA continuam reservados para as próximas etapas.
+O usuário pode escolher posição, tamanho, cor principal, cor de destaque e fornecer nomes próprios como contexto. Se o binário ou o modelo não estiver disponível, o provedor retorna `disabled` e não inventa conteúdo. O diretor semântico por IA continua reservado para uma etapa posterior.
+
+Quando a opção de revisão está ativa, o primeiro processamento pausa em `awaiting_review` depois da transcrição. A interface apresenta cada trecho com seus tempos reais e permite corrigir ou remover o texto. Ao aprovar, o mesmo trabalho retorna à fila, reutiliza os originais privados e renderiza o MP4 com a versão revisada. Palavras alteradas recebem distribuição temporal limitada ao próprio trecho; nenhuma palavra adicional é criada pelo worker.
 
 ## Limites e retenção
 
@@ -114,14 +116,13 @@ Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs
 ```
 
 O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nenhum dado demonstrativo é gravado no Firebase.
 
 ## Fases ainda não concluídas
 
-- revisão e edição manual da transcrição antes da renderização final;
 - detecção técnica de desfoque, escuridão, tremor e duplicidade;
 - sincronização de cortes com batidas e biblioteca licenciada de músicas;
 - diretor semântico por IA configurável;

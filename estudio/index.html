@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=4">
-  <link rel="stylesheet" href="studio-overrides.css?v=4">
+  <link rel="stylesheet" href="studio.css?v=5">
+  <link rel="stylesheet" href="studio-overrides.css?v=5">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -163,6 +163,7 @@
                   <label>Cor principal<input id="captionColor" type="color" value="#FFFFFF"></label>
                   <label>Cor de destaque<input id="captionHighlightColor" type="color" value="#FFBB2D"></label>
                   <label class="wide">Vocabulário e nomes próprios<input id="captionPrompt" maxlength="240" placeholder="Ex.: Olá Carlópolis, nome da empresa e produtos"></label>
+                  <label class="toggle-field wide"><input id="captionReviewEnabled" type="checkbox" checked><span></span><div><strong>Revisar antes de renderizar</strong><small>O processamento pausa para você corrigir a transcrição antes do MP4 final.</small></div></label>
                 </div>
               </div>
             </section>
@@ -189,6 +190,12 @@
             <ol class="process-steps"><li data-process-step="upload" class="active"><i class="fa-solid fa-cloud-arrow-up"></i><span>Upload</span></li><li data-process-step="queue"><i class="fa-solid fa-list-check"></i><span>Fila</span></li><li data-process-step="analysis"><i class="fa-solid fa-wave-square"></i><span>Análise</span></li><li data-process-step="transcription"><i class="fa-solid fa-closed-captioning"></i><span>Legendas</span></li><li data-process-step="render"><i class="fa-solid fa-film"></i><span>Renderização</span></li><li data-process-step="complete"><i class="fa-solid fa-circle-check"></i><span>Concluído</span></li></ol>
             <button id="cancelProcessingButton" class="cancel-processing-button" type="button"><i class="fa-solid fa-ban"></i> Cancelar criação</button>
           </section>
+          <section id="transcriptReviewCard" class="studio-card transcript-review-card hidden">
+            <div class="card-heading"><span><i class="fa-solid fa-closed-captioning"></i></span><div><h2>Revise as legendas</h2><p>Corrija somente o que foi reconhecido incorretamente. Os tempos da fala serão preservados.</p></div></div>
+            <div class="transcript-review-summary"><strong id="transcriptReviewCount">0 trechos</strong><span>Deixe um trecho vazio para removê-lo das legendas.</span></div>
+            <div id="transcriptReviewList" class="transcript-review-list"></div>
+            <div class="transcript-review-actions"><button id="approveTranscriptButton" class="create-button" type="button"><i class="fa-solid fa-check"></i> Aprovar e renderizar</button><button id="cancelTranscriptReviewButton" class="secondary-button" type="button"><i class="fa-solid fa-ban"></i> Cancelar criação</button></div>
+          </section>
           <section id="resultCard" class="studio-card result-card hidden">
             <div class="card-heading"><span><i class="fa-solid fa-check"></i></span><div><h2>Vídeo concluído</h2><p>Confira o resultado antes de baixar.</p></div></div>
             <video id="previewPlayer" controls playsinline></video>
@@ -206,6 +213,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=9"></script>
+  <script type="module" src="studio.js?v=10"></script>
 </body>
 </html>

@@ -11,6 +11,17 @@ const secondsFromWhisper = (value, fallback = 0) => {
 
 const cleanToken = (value) => String(value || "").replace(/<\|[^>]+\|>/g, "").replace(/\s+/g, " ").trim();
 
+const rebuiltWords = (text, start, end) => {
+  const tokens = cleanToken(text).split(/\s+/).filter(Boolean);
+  const duration = Math.max(0.05, end - start);
+  return tokens.map((token, index) => ({
+    text: token,
+    start: start + duration * index / tokens.length,
+    end: start + duration * (index + 1) / tokens.length,
+    confidence: null
+  }));
+};
+
 export function parseWhisperJson(payload = {}) {
   const segments = [];
   for (const [index, item] of (payload.transcription || []).entries()) {
@@ -31,6 +42,25 @@ export function parseWhisperJson(payload = {}) {
     segments.push({ id: `caption-${index + 1}`, start, end, text: value, words, confidence });
   }
   return { language: payload.result?.language || payload.params?.language || "pt", segments };
+}
+
+export function prepareReviewedTranscription(review = {}, maxDuration = 90) {
+  const segments = (Array.isArray(review.segments) ? review.segments : []).slice(0, 500).map((item, index) => {
+    const start = Math.min(maxDuration, Math.max(0, Number(item?.start || 0)));
+    const end = Math.min(maxDuration, Math.max(start + 0.05, Number(item?.end || start + 0.5)));
+    const value = cleanToken(item?.text).slice(0, 300);
+    if (!value) return null;
+    const originalWords = Array.isArray(item?.words) ? item.words : [];
+    const originalText = cleanToken(originalWords.map((word) => word?.text).join(" "));
+    const words = originalText.localeCompare(value, "pt-BR", { sensitivity: "base", ignorePunctuation: true }) === 0
+      ? originalWords.map((word) => {
+        const wordStart = Math.min(end - 0.03, Math.max(start, Number(word.start || start)));
+        return { text: cleanToken(word.text), start: wordStart, end: Math.min(end, Math.max(Number(word.end || end), wordStart + 0.03)), confidence: Number.isFinite(Number(word.confidence)) ? Number(word.confidence) : null };
+      }).filter((word) => word.text)
+      : rebuiltWords(value, start, end);
+    return { id: String(item?.id || `caption-${index + 1}`).slice(0, 80), start, end, text: value, words, confidence: Number.isFinite(Number(item?.confidence)) ? Number(item.confidence) : null };
+  }).filter(Boolean);
+  return { available: true, provider: String(review.provider || "whisper.cpp").slice(0, 80), model: String(review.model || "").slice(0, 120), language: "pt", segments };
 }
 
 export class DisabledTranscriptionProvider {

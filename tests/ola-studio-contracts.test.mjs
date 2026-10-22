@@ -38,7 +38,7 @@ test("Studio Pro oferece oito modelos, biblioteca de transições e seis estilos
 
 test("normalização preserva personalização profissional sem aceitar valores inseguros", () => {
   const project = normalizeStudioProject({ style: "gastronomia", transition: "blur", transitionDuration: 0.8, textDesign: { preset: "promo", animation: "typewriter", sizeScale: 1.4, color: "#ffbb2d", position: "bottom", background: false } });
-  assert.equal(project.schemaVersion, 3);
+  assert.equal(project.schemaVersion, 4);
   assert.equal(project.transition, "blur");
   assert.equal(project.textDesign.animation, "typewriter");
   assert.equal(project.textDesign.color, "#FFBB2D");
@@ -46,10 +46,11 @@ test("normalização preserva personalização profissional sem aceitar valores 
 });
 
 test("normaliza áudio e legendas dentro de limites seguros", () => {
-  const project = normalizeStudioProject({ captionsEnabled: true, captions: { mode: "dynamic", sizeScale: 4, color: "#ffffff", highlightColor: "#ffbb2d", position: "center", prompt: "Olá Carlópolis" }, audio: { musicVolume: 0.9, voiceVolume: 0.2, fadeSeconds: 8, noiseReduction: true } });
+  const project = normalizeStudioProject({ captionsEnabled: true, captions: { mode: "dynamic", sizeScale: 4, color: "#ffffff", highlightColor: "#ffbb2d", position: "center", prompt: "Olá Carlópolis", reviewBeforeRender: true }, audio: { musicVolume: 0.9, voiceVolume: 0.2, fadeSeconds: 8, noiseReduction: true } });
   assert.equal(Object.keys(STUDIO_CAPTION_STYLES).length, 2);
   assert.equal(project.captions.mode, "dynamic");
   assert.equal(project.captions.sizeScale, 1.6);
+  assert.equal(project.captions.reviewBeforeRender, true);
   assert.equal(project.audio.musicVolume, 0.7);
   assert.equal(project.audio.voiceVolume, 0.5);
   assert.equal(project.audio.fadeSeconds, 5);

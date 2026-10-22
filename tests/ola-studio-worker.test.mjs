@@ -4,7 +4,7 @@ import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
 import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
-import { parseWhisperJson } from "../studio-worker/src/transcription.mjs";
+import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -97,6 +97,18 @@ test("legendas ASS oferecem modo tradicional e destaque dinâmico", () => {
   assert.match(traditional, /Olá Carlópolis/);
   assert.match(dynamic, /\\kf60/);
   assert.match(dynamic, /Carlópolis/);
+});
+
+test("revisão de transcrição preserva tempos e recalcula palavras somente quando o texto muda", () => {
+  const reviewed = prepareReviewedTranscription({ provider: "whisper.cpp", segments: [{ id: "caption-1", start: 0.5, end: 2.5, text: "Olá Carlópolis corrigido", words: [{ text: "Olá", start: 0.5, end: 1 }, { text: "Carlópolis", start: 1, end: 2.5 }] }] }, 15);
+  assert.equal(reviewed.segments[0].start, 0.5);
+  assert.equal(reviewed.segments[0].end, 2.5);
+  assert.equal(reviewed.segments[0].words.length, 3);
+  assert.equal(reviewed.segments[0].words[0].start, 0.5);
+  assert.equal(reviewed.segments[0].words[2].end, 2.5);
+  const clamped = prepareReviewedTranscription({ segments: [{ start: 0, end: 1, text: "fora", words: [{ text: "fora", start: 3, end: 4 }] }] }, 2);
+  assert.ok(clamped.segments[0].words[0].start < clamped.segments[0].words[0].end);
+  assert.equal(clamped.segments[0].words[0].end, 1);
 });
 
 test("tratamento de voz aplica redução moderada de ruído quando solicitada", () => {

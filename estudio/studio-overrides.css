@@ -2,6 +2,10 @@
   background: var(--danger);
 }
 
+.project-status.review {
+  background: #b97800;
+}
+
 .project-actions {
   flex-wrap: wrap;
 }
@@ -117,6 +121,78 @@
   border-color: #d9d9f3;
 }
 
+.transcript-review-card {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.transcript-review-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 18px 0 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f4f8fa;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.transcript-review-summary strong {
+  color: var(--blue);
+}
+
+.transcript-review-list {
+  display: grid;
+  gap: 12px;
+  max-height: 55vh;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.transcript-segment {
+  display: grid;
+  grid-template-columns: 110px minmax(0,1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.transcript-segment span {
+  padding-top: 12px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.transcript-segment textarea {
+  width: 100%;
+  min-height: 74px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 11px 12px;
+  color: var(--ink);
+  font: inherit;
+  line-height: 1.45;
+}
+
+.transcript-segment textarea:focus {
+  border-color: var(--cyan);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(34,196,231,.14);
+}
+
+.transcript-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 18px;
+}
+
 .text-design-panel .wide {
   grid-column: 1/-1;
 }
@@ -136,5 +212,15 @@
 
   .process-steps {
     grid-template-columns: repeat(6,60px);
+  }
+
+  .transcript-review-summary,
+  .transcript-segment {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .transcript-segment span {
+    padding-top: 0;
   }
 }

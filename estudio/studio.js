@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=3";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=4";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -19,9 +19,9 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false };
+const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", processing: "Processamento", usage: "Uso e créditos" };
-const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", cancel_requested: "Cancelando", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
+const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
@@ -66,6 +66,7 @@ async function showProjectVideo(projectId) {
   state.activeJobId = project.jobId || "";
   $("resultCard").classList.add("hidden");
   $("errorCard").classList.add("hidden");
+  $("transcriptReviewCard").classList.add("hidden");
   $("processingStatusCard").classList.remove("hidden");
   $("cancelProcessingButton").classList.add("hidden");
   $("processingEyebrow").textContent = "Carregando vídeo";
@@ -142,7 +143,8 @@ function currentDraft(sources = []) {
       color: $("captionColor").value,
       highlightColor: $("captionHighlightColor").value,
       position: $("captionPosition").value,
-      prompt: $("captionPrompt").value
+      prompt: $("captionPrompt").value,
+      reviewBeforeRender: $("captionReviewEnabled").checked
     },
     audio: {
       voiceVolume: Number($("voiceVolume").value) / 100,
@@ -198,6 +200,10 @@ function resetEditor() {
   $("projectName").value = `Vídeo ${new Intl.DateTimeFormat("pt-BR").format(new Date())}`;
   $("logoFileLabel").innerHTML = '<i class="fa-regular fa-image"></i> Escolher PNG ou WebP';
   $("musicFileLabel").innerHTML = '<i class="fa-solid fa-music"></i> Escolher áudio';
+  $("captionReviewEnabled").checked = true;
+  $("transcriptReviewCard").classList.add("hidden");
+  state.reviewingJobId = "";
+  state.transcriptSegments = [];
   updateTextSizeLabel();
   updateAudioCaptionLabels();
   renderMediaLibrary();
@@ -273,7 +279,7 @@ function updateProgress(percent, stage, message = "") {
 }
 
 function markProcessStep(step) {
-  const order = ["upload", "queue", "analysis", "render", "complete"];
+  const order = ["upload", "queue", "analysis", "transcription", "render", "complete"];
   const activeIndex = Math.max(0, order.indexOf(step));
   document.querySelectorAll("[data-process-step]").forEach((item) => {
     const index = order.indexOf(item.dataset.processStep);
@@ -324,11 +330,12 @@ async function submitProject(event) {
   event.preventDefault();
   if (!state.files.length) return toast("Adicione ao menos uma foto ou vídeo.");
   if (!$("projectName").value.trim()) return toast("Informe um nome para o projeto.");
-  const activeJobs = state.projects.filter((item) => ["uploading", "queued", "analyzing", "rendering", "cancel_requested"].includes(item.status));
+  const activeJobs = state.projects.filter((item) => ["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"].includes(item.status));
   if (activeJobs.length >= STUDIO_LIMITS.maxConcurrentJobsPerUser) return toast("Aguarde o processamento atual terminar antes de criar outro vídeo.");
   switchView("processing");
   $("resultCard").classList.add("hidden");
   $("errorCard").classList.add("hidden");
+  $("transcriptReviewCard").classList.add("hidden");
   $("processingEyebrow").textContent = "Enviando arquivos";
   $("processingTitle").textContent = "Enviando seus arquivos";
   markProcessStep("upload");
@@ -432,20 +439,104 @@ function showProcessingError(message) {
   $("errorCard").classList.remove("hidden");
 }
 
+function timelineTime(seconds) {
+  const value = Math.max(0, Number(seconds || 0));
+  const minutes = Math.floor(value / 60);
+  const remaining = (value % 60).toFixed(1).padStart(4, "0");
+  return `${String(minutes).padStart(2, "0")}:${remaining}`;
+}
+
+function showTranscriptReview(job, projectId) {
+  if (state.reviewingJobId === job.id && !$("transcriptReviewCard").classList.contains("hidden")) return;
+  const rawSegments = Array.isArray(job.transcriptReview?.segments) ? job.transcriptReview.segments : Object.values(job.transcriptReview?.segments || {});
+  state.reviewingJobId = job.id;
+  state.transcriptSegments = rawSegments.slice(0, 500);
+  state.activeProjectId = projectId;
+  state.activeJobId = job.id;
+  $("processingStatusCard").classList.add("hidden");
+  $("resultCard").classList.add("hidden");
+  $("errorCard").classList.add("hidden");
+  $("transcriptReviewCard").classList.remove("hidden");
+  $("transcriptReviewCount").textContent = `${state.transcriptSegments.length} ${state.transcriptSegments.length === 1 ? "trecho" : "trechos"}`;
+  $("transcriptReviewList").innerHTML = state.transcriptSegments.length ? state.transcriptSegments.map((segment, index) => `<label class="transcript-segment"><span>${timelineTime(segment.start)} – ${timelineTime(segment.end)}</span><textarea data-transcript-index="${index}" maxlength="300" aria-label="Trecho ${index + 1}">${escapeHtml(segment.text || "")}</textarea></label>`).join("") : '<p class="empty-copy">Nenhuma fala foi reconhecida. Você pode aprovar para continuar sem legendas.</p>';
+  $("approveTranscriptButton").disabled = false;
+  $("studioViewTitle").textContent = "Revisar legendas";
+}
+
+async function approveTranscriptReview() {
+  const jobId = state.reviewingJobId;
+  const projectId = state.activeProjectId;
+  if (!jobId || !projectId) return;
+  const button = $("approveTranscriptButton");
+  button.disabled = true;
+  try {
+    const now = Date.now();
+    const updates = {
+      [`studioJobs/${state.user.uid}/${jobId}/transcriptReview/status`]: "approved",
+      [`studioJobs/${state.user.uid}/${jobId}/transcriptReview/approvedAt`]: now,
+      [`studioJobs/${state.user.uid}/${jobId}/transcriptReview/approvedBy`]: state.user.uid,
+      [`studioJobs/${state.user.uid}/${jobId}/status`]: "queued",
+      [`studioJobs/${state.user.uid}/${jobId}/stage`]: "queue",
+      [`studioJobs/${state.user.uid}/${jobId}/progress`]: 88,
+      [`studioJobs/${state.user.uid}/${jobId}/message`]: "Transcrição aprovada. Preparando a renderização final.",
+      [`studioJobs/${state.user.uid}/${jobId}/updatedAt`]: now,
+      [`studioProjects/${state.user.uid}/${projectId}/status`]: "queued",
+      [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: now,
+      [`studioUsage/${state.user.uid}/estimates/${jobId}/status`]: "reserved"
+    };
+    document.querySelectorAll("[data-transcript-index]").forEach((field) => {
+      const index = Number(field.dataset.transcriptIndex);
+      updates[`studioJobs/${state.user.uid}/${jobId}/transcriptReview/segments/${index}/text`] = String(field.value || "").replace(/\s+/g, " ").trim().slice(0, 300);
+    });
+    await update(ref(db), updates);
+    state.reviewingJobId = "";
+    state.transcriptSegments = [];
+    $("transcriptReviewCard").classList.add("hidden");
+    $("processingStatusCard").classList.remove("hidden");
+    $("cancelProcessingButton").classList.remove("hidden");
+    $("cancelProcessingButton").disabled = false;
+    $("processingEyebrow").textContent = "Transcrição aprovada";
+    $("processingTitle").textContent = "Renderização final na fila";
+    markProcessStep("queue");
+    updateProgress(88, "Aguardando worker", "As correções foram salvas. O vídeo final usará esta transcrição.");
+    await loadProjects();
+  } catch (error) {
+    console.error(error);
+    button.disabled = false;
+    toast("Não foi possível salvar a revisão. Tente novamente.");
+  }
+}
+
+async function openProjectReview(projectId) {
+  const project = state.projects.find((item) => item.id === projectId) || (await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`))).val();
+  if (!project?.jobId) return toast("A revisão deste projeto não foi encontrada.");
+  state.activeProjectId = projectId;
+  state.activeJobId = project.jobId;
+  state.cancelRequested = false;
+  switchView("processing");
+  watchJob(project.jobId, projectId);
+}
+
 function watchJob(jobId, projectId) {
   state.jobUnsubscribe?.();
   state.jobUnsubscribe = onValue(ref(db, `studioJobs/${state.user.uid}/${jobId}`), async (snapshot) => {
     const job = snapshot.val();
     if (!job) return;
-    const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "transcription" ? "transcription" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
+    const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "transcription" || job.stage === "transcription_review" ? "transcription" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
     markProcessStep(step);
     updateProgress(job.progress || 25, statusLabels[job.status] || job.stage || "Processando", job.message || "O processamento continua no worker.");
+    if (job.status === "awaiting_review") {
+      showTranscriptReview(job, projectId);
+      loadProjects();
+      return;
+    }
     if (job.status === "completed") {
       state.jobUnsubscribe?.();
       state.jobUnsubscribe = null;
       $("processingTitle").textContent = "Seu vídeo está pronto";
       $("processingMessage").textContent = "Assista à prévia e baixe o MP4 em alta qualidade.";
       $("cancelProcessingButton").classList.add("hidden");
+      $("transcriptReviewCard").classList.add("hidden");
       if (state.outputPreviewUrl) URL.revokeObjectURL(state.outputPreviewUrl);
       const outputUrl = await privateOutputUrl(job.output);
       state.outputPreviewUrl = outputUrl.startsWith("blob:") ? outputUrl : "";
@@ -459,6 +550,7 @@ function watchJob(jobId, projectId) {
       state.jobUnsubscribe?.();
       state.jobUnsubscribe = null;
       $("cancelProcessingButton").classList.add("hidden");
+      $("transcriptReviewCard").classList.add("hidden");
       showProcessingError(job.error?.message || "O worker não conseguiu concluir a renderização.");
       loadProjects();
     }
@@ -467,6 +559,7 @@ function watchJob(jobId, projectId) {
       state.jobUnsubscribe = null;
       state.cancelRequested = false;
       $("cancelProcessingButton").classList.add("hidden");
+      $("transcriptReviewCard").classList.add("hidden");
       toast("Criação cancelada.");
       loadProjects().then(() => switchView("projects"));
     }
@@ -490,6 +583,7 @@ async function regenerateProject(projectId) {
   $("cancelProcessingButton").disabled = false;
   $("resultCard").classList.add("hidden");
   $("errorCard").classList.add("hidden");
+  $("transcriptReviewCard").classList.add("hidden");
   $("processingEyebrow").textContent = "Processando nova versão";
   $("processingTitle").textContent = "Nova versão na fila";
   markProcessStep("queue");
@@ -512,12 +606,13 @@ function renderProjects() {
     const completed = project.status === "completed";
     const failed = project.status === "failed";
     const cancelled = project.status === "cancelled";
-    const active = ["uploading", "queued", "analyzing", "rendering", "cancel_requested"].includes(project.status);
+    const active = ["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"].includes(project.status);
+    const review = project.status === "awaiting_review" && project.jobId ? `<button type="button" data-project-review="${project.id}"><i class="fa-solid fa-closed-captioning"></i> Revisar legendas</button>` : "";
     const open = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-open="${project.id}"><i class="fa-solid fa-circle-play"></i> Abrir</button>` : "";
     const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
     const cancel = active ? `<button type="button" data-project-cancel="${project.id}"><i class="fa-solid fa-ban"></i> Cancelar</button>` : "";
     const regenerate = active ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
-    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span></div><div class="project-actions">${open}${download}${cancel}${regenerate}</div></div></article>`;
+    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span></div><div class="project-actions">${review}${open}${download}${cancel}${regenerate}</div></div></article>`;
   }).join("");
 }
 
@@ -598,11 +693,15 @@ $("projectsGrid").addEventListener("click", (event) => {
   const download = event.target.closest("[data-project-download]");
   const cancel = event.target.closest("[data-project-cancel]");
   const regenerate = event.target.closest("[data-project-regenerate]");
+  const review = event.target.closest("[data-project-review]");
   if (open) showProjectVideo(open.dataset.projectOpen).catch((error) => toast(error.message));
   if (download) downloadProject(download.dataset.projectDownload).catch((error) => toast(error.message));
   if (cancel) cancelProject(cancel.dataset.projectCancel).catch((error) => toast(error.message));
   if (regenerate) regenerateProject(regenerate.dataset.projectRegenerate).catch((error) => toast(error.message));
+  if (review) openProjectReview(review.dataset.projectReview).catch((error) => toast(error.message));
 });
 $("cancelProcessingButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
+$("cancelTranscriptReviewButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
+$("approveTranscriptButton").addEventListener("click", approveTranscriptReview);
 $("backToProjects").addEventListener("click", () => { $("previewPlayer").pause(); switchView("projects"); });
 $("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));

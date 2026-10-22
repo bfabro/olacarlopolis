@@ -5,7 +5,7 @@ import { database } from "./firebase-client.mjs";
 import { nextQueuedJob, claimJob, updateJob } from "./queue.mjs";
 import { downloadAsset, uploadJson, uploadRender } from "./storage.mjs";
 import { analyzeSources } from "./analyzer.mjs";
-import { createTranscriptionProvider } from "./transcription.mjs";
+import { createTranscriptionProvider, prepareReviewedTranscription } from "./transcription.mjs";
 import { createDeterministicPlan } from "./planner.mjs";
 import { renderPlan } from "./renderer.mjs";
 
@@ -49,19 +49,40 @@ async function processJob(job) {
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
     await uploadJson(plan, planStoragePath);
     await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner } });
-    const transcriptionProvider = project.captionsEnabled ? await createTranscriptionProvider() : null;
+    const approvedTranscription = project.captionsEnabled && job.transcriptReview?.status === "approved"
+      ? prepareReviewedTranscription(job.transcriptReview, project.duration)
+      : null;
+    const transcriptionProvider = project.captionsEnabled && !approvedTranscription ? await createTranscriptionProvider() : null;
     const rendered = await renderPlan({
       plan, sources: analyzed, outputDir, logoPath: logo?.localPath || "", musicPath: music?.localPath || "",
       transcriptionProvider,
+      approvedTranscription,
+      pauseForTranscriptReview: project.captions?.reviewBeforeRender === true && !approvedTranscription,
       signal: cancellation.signal,
       progress: async (stage, done, total) => {
-        const base = stage === "segments" ? 50 : stage === "transitions" ? 76 : stage === "transcription" ? 85 : 92;
-        const span = stage === "segments" ? 25 : stage === "transitions" ? 8 : stage === "transcription" ? 6 : 5;
-        const message = stage === "segments" ? `Renderizando cena ${done} de ${total}.` : stage === "transitions" ? "Aplicando transições." : stage === "transcription" ? "Transcrevendo a fala em português para gerar legendas." : "Aplicando identidade visual, legendas e áudio.";
-        await updateJob(job.uid, job.jobId, { stage: stage === "transcription" ? "transcription" : "render", status: "rendering", progress: Math.min(97, base + Math.round(done / total * span)), message });
+        const transcriptionStage = stage === "transcription" || stage === "transcription_review";
+        const base = stage === "segments" ? 50 : stage === "transitions" ? 76 : transcriptionStage ? 85 : 92;
+        const span = stage === "segments" ? 25 : stage === "transitions" ? 8 : transcriptionStage ? 6 : 5;
+        const message = stage === "segments" ? `Renderizando cena ${done} de ${total}.` : stage === "transitions" ? "Aplicando transições." : stage === "transcription_review" ? "Preparando a transcrição para sua revisão." : stage === "transcription" ? "Transcrevendo a fala em português para gerar legendas." : "Aplicando identidade visual, legendas e áudio.";
+        await updateJob(job.uid, job.jobId, { stage: transcriptionStage ? stage : "render", status: "rendering", progress: Math.min(97, base + Math.round(done / total * span)), message });
       }
     });
     await uploadJson(rendered.plan, planStoragePath);
+    if (rendered.reviewRequired) {
+      const reviewAt = Date.now();
+      await database.ref().update({
+        [`studioJobs/${job.uid}/${job.jobId}/status`]: "awaiting_review",
+        [`studioJobs/${job.uid}/${job.jobId}/stage`]: "transcription_review",
+        [`studioJobs/${job.uid}/${job.jobId}/progress`]: 88,
+        [`studioJobs/${job.uid}/${job.jobId}/message`]: "Revise a transcrição antes da renderização final.",
+        [`studioJobs/${job.uid}/${job.jobId}/transcriptReview`]: { ...rendered.transcription, status: "pending", createdAt: reviewAt },
+        [`studioJobs/${job.uid}/${job.jobId}/updatedAt`]: reviewAt,
+        [`studioProjects/${job.uid}/${job.projectId}/status`]: "awaiting_review",
+        [`studioProjects/${job.uid}/${job.projectId}/updatedAt`]: reviewAt,
+        [`studioUsage/${job.uid}/estimates/${job.jobId}/status`]: "awaiting_review"
+      });
+      return;
+    }
     const outputPath = rendered.outputPath;
     ensureNotCancelled();
     await updateJob(job.uid, job.jobId, { stage: "upload_output", status: "rendering", progress: 98, message: "Salvando o MP4 final." });
