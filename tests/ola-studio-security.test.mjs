@@ -49,6 +49,16 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.doesNotMatch(client, /setInterval\([^)]*progress/i);
 });
 
+test("editor visual reutiliza plano privado e envia somente origens do próprio projeto", () => {
+  assert.match(html, /id="visualTimeline"/);
+  assert.match(html, /id="visualGeneratePreview"/);
+  assert.match(html, /id="visualVersionHistory"/);
+  assert.match(client, /getBlob\(storageRef\(storage, storagePath\)\)/);
+  assert.match(client, /planOverride/);
+  assert.match(client, /mode === "preview"/);
+  assert.doesNotMatch(client, /OPENAI_API_KEY/);
+});
+
 test("worker consulta e reserva a fila com autenticação e concorrência segura", () => {
   assert.match(workerQueue, /Authorization: `Bearer \$\{token\.access_token\}`/);
   assert.match(workerQueue, /"X-Firebase-ETag": "true"/);

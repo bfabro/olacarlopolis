@@ -7,6 +7,17 @@ import { writeAssCaptions } from "./captions.mjs";
 
 const seconds = (value) => Math.max(0.05, Number(value || 0)).toFixed(3);
 
+export function renderDimensions(format, profile = "final") {
+  if (profile !== "preview") return studioOutputDimensions(format);
+  if (format === "16:9") return { width: 640, height: 360 };
+  if (format === "1:1") return { width: 480, height: 480 };
+  return { width: 360, height: 640 };
+}
+
+const videoEncoding = (profile = "final", branding = false) => profile === "preview"
+  ? ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "28", "-c:a", "aac", "-b:a", "96k"]
+  : ["-c:v", "libx264", "-preset", branding ? "medium" : "veryfast", "-crf", branding ? "19" : "20", "-c:a", "aac", "-b:a", branding ? "192k" : "160k"];
+
 function drawTextEscape(value) {
   return String(value || "").replace(/\\/g, "\\\\").replace(/:/g, "\\:").replace(/'/g, "\\'").replace(/%/g, "\\%").replace(/\n/g, " ");
 }
@@ -81,8 +92,8 @@ export function buildTextLayerFilters(input, layer, width, height, index) {
   return { filters, output: current };
 }
 
-export function buildSegmentArgs(scene, source, outputPath, format, audioOptions = {}) {
-  const { width, height } = studioOutputDimensions(format);
+export function buildSegmentArgs(scene, source, outputPath, format, audioOptions = {}, renderProfile = "final") {
+  const { width, height } = renderDimensions(format, renderProfile);
   const image = source.contentType.startsWith("image/");
   const args = ["-y"];
   if (image) args.push("-loop", "1", "-t", seconds(scene.duration), "-i", source.localPath, "-f", "lavfi", "-t", seconds(scene.duration), "-i", "anullsrc=channel_layout=stereo:sample_rate=48000");
@@ -98,7 +109,7 @@ export function buildSegmentArgs(scene, source, outputPath, format, audioOptions
     filters.push(`volume=${Math.min(1.6, Math.max(0.5, Number(audioOptions.voiceVolume || 1))).toFixed(2)}`, "loudnorm=I=-16:LRA=11:TP=-1.5", "aresample=48000");
     args.push("-af", filters.join(","));
   }
-  args.push("-t", seconds(scene.duration), "-c:v", "libx264", "-preset", "veryfast", "-crf", "20", "-c:a", "aac", "-b:a", "160k", "-ar", "48000", "-ac", "2", "-movflags", "+faststart", outputPath);
+  args.push("-t", seconds(scene.duration), ...videoEncoding(renderProfile), "-ar", "48000", "-ac", "2", "-movflags", "+faststart", outputPath);
   return args;
 }
 
@@ -122,10 +133,10 @@ export function buildTransitionGraph(scenes) {
   return { graph: filters.join(";"), video: "[vout]", audio: "[aout]" };
 }
 
-export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftDuration, rightDuration, transition = "fade", transitionDuration = 0.35, width = 1080, height = 1920 }) {
+export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftDuration, rightDuration, transition = "fade", transitionDuration = 0.35, width = 1080, height = 1920, renderProfile = "final" }) {
   if (transition === "hardcut") {
     const graph = "[0:v][0:a][1:v][1:a]concat=n=2:v=1:a=1[vout][aout]";
-    return { args: ["-y", "-i", leftPath, "-i", rightPath, "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", outputPath], outputDuration: Number(leftDuration) + Number(rightDuration) };
+    return { args: ["-y", "-i", leftPath, "-i", rightPath, "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]", ...videoEncoding(renderProfile), "-movflags", "+faststart", outputPath], outputDuration: Number(leftDuration) + Number(rightDuration) };
   }
   const safeDuration = Math.min(Number(transitionDuration || 0.35), Number(leftDuration) / 2, Number(rightDuration) / 2);
   const offset = Math.max(0, Number(leftDuration) - safeDuration);
@@ -135,13 +146,13 @@ export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftD
   const xfade = transition === "zoomout" ? "fade" : transition;
   const graph = `${zoomOut}[${leftVideo}][${rightVideo}]xfade=transition=${xfade}:duration=${seconds(safeDuration)}:offset=${seconds(offset)}[vout];[0:a][1:a]acrossfade=d=${seconds(safeDuration)}:c1=tri:c2=tri[aout]`;
   return {
-    args: ["-y", "-i", leftPath, "-i", rightPath, "-filter_complex_threads", "1", "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]", "-c:v", "libx264", "-preset", "veryfast", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", outputPath],
+    args: ["-y", "-i", leftPath, "-i", rightPath, "-filter_complex_threads", "1", "-filter_complex", graph, "-map", "[vout]", "-map", "[aout]", ...videoEncoding(renderProfile), "-movflags", "+faststart", outputPath],
     outputDuration: Number(leftDuration) + Number(rightDuration) - safeDuration
   };
 }
 
-export function buildBrandingArgs({ inputPath, outputPath, duration, format, plan, logoPath = "", musicPath = "", captionsPath = "" }) {
-  const { width, height } = studioOutputDimensions(format);
+export function buildBrandingArgs({ inputPath, outputPath, duration, format, plan, logoPath = "", musicPath = "", captionsPath = "", renderProfile = "final" }) {
+  const { width, height } = renderDimensions(format, renderProfile);
   const args = ["-y", "-i", inputPath];
   let nextInput = 1;
   let logoIndex = -1;
@@ -182,11 +193,11 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
     filters.push("[music][0:a]sidechaincompress=threshold=0.035:ratio=10:attack=20:release=450[ducked]");
     filters.push("[0:a][ducked]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:LRA=9:TP=-1.5[aout]");
   } else filters.push("[0:a]anull[aout]");
-  args.push("-filter_complex", filters.join(";"), "-map", "[vout]", "-map", "[aout]", "-t", seconds(duration), "-c:v", "libx264", "-preset", "medium", "-crf", "19", "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", outputPath);
+  args.push("-filter_complex", filters.join(";"), "-map", "[vout]", "-map", "[aout]", "-t", seconds(duration), ...videoEncoding(renderProfile, true), "-movflags", "+faststart", outputPath);
   return args;
 }
 
-export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", transcriptionProvider = null, approvedTranscription = null, pauseForTranscriptReview = false, progress = async () => {}, signal }) {
+export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", captionsPath = "", transcriptionProvider = null, approvedTranscription = null, pauseForTranscriptReview = false, renderProfile = "final", progress = async () => {}, signal }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const segmentPaths = [];
   for (let index = 0; index < plan.scenes.length; index += 1) {
@@ -194,7 +205,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     const source = sourceById.get(scene.sourceId);
     if (!source) throw new Error(`Origem ${scene.sourceId} nao encontrada para a cena ${scene.id}.`);
     const segmentPath = path.join(outputDir, `segment-${String(index + 1).padStart(3, "0")}.mp4`);
-    await runProcess(workerConfig.ffmpegPath, buildSegmentArgs(scene, source, segmentPath, plan.format, plan.audio), { signal });
+    await runProcess(workerConfig.ffmpegPath, buildSegmentArgs(scene, source, segmentPath, plan.format, plan.audio, renderProfile), { signal });
     segmentPaths.push(segmentPath);
     await progress("segments", index + 1, plan.scenes.length);
   }
@@ -215,7 +226,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
         rightDuration: Number(plan.scenes[index].duration),
         transition: plan.scenes[index].transition || "fade",
         transitionDuration: plan.scenes[index].transitionDuration || 0.35,
-        ...studioOutputDimensions(plan.format)
+        ...renderDimensions(plan.format, renderProfile), renderProfile
       });
       await runProcess(workerConfig.ffmpegPath, pair.args, { signal });
       if (currentPath.includes(`${path.sep}transition-`)) await fs.rm(currentPath, { force: true });
@@ -236,7 +247,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     await progress("transcription", 1, 1);
   }
   const outputPath = path.join(outputDir, "ola-studio-final.mp4");
-  await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, captionsPath }), { signal });
+  await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, captionsPath, renderProfile }), { signal });
   await progress("branding", 1, 1);
   return { outputPath, plan };
 }

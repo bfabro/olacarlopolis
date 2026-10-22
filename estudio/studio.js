@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=6";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=6";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -19,8 +19,8 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [] };
-const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", processing: "Processamento", usage: "Uso e créditos" };
+const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map() };
+const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 
 function escapeHtml(value) {
@@ -206,7 +206,7 @@ function updateAudioCaptionLabels() {
 }
 
 function switchView(name) {
-  ["projects", "editor", "processing", "usage"].forEach((view) => $(`${view}View`)?.classList.toggle("hidden", view !== name));
+  ["projects", "editor", "visual", "processing", "usage"].forEach((view) => $(`${view}View`)?.classList.toggle("hidden", view !== name));
   document.querySelectorAll("[data-studio-view]").forEach((button) => button.classList.toggle("active", button.dataset.studioView === name));
   $("studioViewTitle").textContent = viewTitles[name] || "Olá Studio";
   document.querySelector(".studio-shell")?.classList.remove("menu-open");
@@ -423,12 +423,15 @@ async function cancelProject(projectId = state.activeProjectId) {
   }
   const jobId = project.jobId || (projectId === state.activeProjectId ? state.activeJobId : "");
   let jobStatus = "cancelled";
+  let jobMode = "final";
   if (jobId) {
     const jobSnapshot = await get(ref(db, `studioJobs/${state.user.uid}/${jobId}`));
+    jobMode = jobSnapshot.val()?.mode || "final";
     if (["analyzing", "rendering"].includes(jobSnapshot.val()?.status)) jobStatus = "cancel_requested";
   }
   const now = Date.now();
-  const updates = { [`studioProjects/${state.user.uid}/${projectId}/status`]: jobStatus, [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: now };
+  const projectStatus = jobMode === "preview" && jobStatus === "cancelled" ? "completed" : jobStatus;
+  const updates = { [`studioProjects/${state.user.uid}/${projectId}/status`]: projectStatus, [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: now };
   if (jobId) {
     updates[`studioJobs/${state.user.uid}/${jobId}/status`] = jobStatus;
     updates[`studioJobs/${state.user.uid}/${jobId}/stage`] = jobStatus;
@@ -555,6 +558,13 @@ function watchJob(jobId, projectId) {
     if (job.status === "completed") {
       state.jobUnsubscribe?.();
       state.jobUnsubscribe = null;
+      if (job.mode === "preview") {
+        $("cancelProcessingButton").classList.add("hidden");
+        await loadProjects();
+        toast("Prévia rápida concluída.");
+        await openVisualEditor(projectId, job.output);
+        return;
+      }
       $("processingTitle").textContent = "Seu vídeo está pronto";
       $("processingMessage").textContent = "Assista à prévia e baixe o MP4 em alta qualidade.";
       $("cancelProcessingButton").classList.add("hidden");
@@ -614,6 +624,140 @@ async function regenerateProject(projectId) {
   watchJob(jobId, projectId);
 }
 
+async function readPrivateJson(storagePath) {
+  if (!storagePath) throw new Error("Plano de edição não encontrado.");
+  const blob = await getBlob(storageRef(storage, storagePath));
+  return JSON.parse(await blob.text());
+}
+
+function visualPlanDuration() {
+  const scenes = state.visualPlan?.scenes || [];
+  return Number(scenes.reduce((total, scene, index) => total + Number(scene.duration || 0) - (index ? Number(scene.transitionDuration || 0) : 0), 0).toFixed(3));
+}
+
+function syncVisualTexts() {
+  if (!state.visualPlan) return;
+  const values = { title: $("visualTitle").value.trim(), subtitle: $("visualSubtitle").value.trim(), call_to_action: $("visualCta").value.trim() };
+  state.visualPlan.text = { title: values.title, subtitle: values.subtitle, callToAction: values.call_to_action };
+  const duration = visualPlanDuration();
+  const defaults = {
+    title: { start: 0, end: Math.min(5, duration), position: "top", sizeScale: 1.2, slot: 0 },
+    subtitle: { start: 0.4, end: Math.min(5.8, duration), position: "top", sizeScale: 0.82, slot: 1 },
+    call_to_action: { start: Math.max(0, duration - 4.5), end: duration, position: "bottom", sizeScale: 1, slot: 0 }
+  };
+  const existing = new Map((state.visualPlan.textLayers || []).filter((layer) => ["title", "subtitle", "call_to_action"].includes(layer.type)).map((layer) => [layer.type, layer]));
+  const other = (state.visualPlan.textLayers || []).filter((layer) => !Object.hasOwn(values, layer.type));
+  state.visualPlan.textLayers = [...other, ...Object.entries(values).filter(([, value]) => value).map(([type, value]) => ({ ...defaults[type], ...(existing.get(type) || {}), type, value, ...(type === "call_to_action" ? { start: Math.max(0, duration - 4.5), end: duration } : {}) }))];
+}
+
+function transitionOptions(selected, first) {
+  if (first) return '<option value="none">Início do vídeo</option>';
+  return Object.values(STUDIO_TRANSITIONS).filter((item) => item.id !== "auto").map((item) => `<option value="${item.ffmpeg}" ${item.ffmpeg === selected ? "selected" : ""}>${escapeHtml(item.label)}</option>`).join("");
+}
+
+function renderVisualTimeline() {
+  const plan = state.visualPlan;
+  if (!plan) return;
+  plan.duration = visualPlanDuration();
+  $("visualTotalDuration").textContent = `${plan.duration.toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
+  const sourceById = new Map((state.visualProject?.sources || []).map((source) => [source.id, source]));
+  $("visualTimeline").innerHTML = plan.scenes.map((scene, index) => {
+    const source = sourceById.get(scene.sourceId) || {};
+    const url = state.visualSourceUrls.get(scene.sourceId) || "";
+    const media = String(source.contentType || "").startsWith("image/")
+      ? `<img class="visual-scene-media" src="${escapeHtml(url)}" alt="Cena ${index + 1}">`
+      : `<video class="visual-scene-media" src="${escapeHtml(url)}#t=${Math.max(0, Number(scene.start || 0)).toFixed(2)}" muted preload="metadata"></video>`;
+    return `<article class="visual-scene" data-visual-scene="${index}"><span class="visual-scene-index">${index + 1}</span>${media}<div class="visual-scene-info"><strong>${escapeHtml(source.name || `Arquivo ${Number(scene.sourceIndex || 0) + 1}`)}</strong><label>Duração<input data-scene-duration="${index}" type="number" min="0.5" max="15" step="0.1" value="${Number(scene.duration || 0).toFixed(1)}"></label><label>Transição<select data-scene-transition="${index}" ${index === 0 ? "disabled" : ""}>${transitionOptions(scene.transition, index === 0)}</select></label></div><div class="visual-scene-actions"><button type="button" data-scene-up="${index}" ${index === 0 ? "disabled" : ""} title="Mover antes"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-scene-down="${index}" ${index === plan.scenes.length - 1 ? "disabled" : ""} title="Mover depois"><i class="fa-solid fa-arrow-down"></i></button></div></article>`;
+  }).join("");
+}
+
+function renderVisualVersions() {
+  const versions = Object.values(state.visualProject?.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0));
+  $("visualVersionHistory").innerHTML = versions.length ? versions.map((version) => `<div class="visual-version"><span><strong>Versão ${Number(version.number || 1)}</strong><small>${escapeHtml(version.source === "visual-editor" ? "Editor visual" : "Montagem automática")} • ${formatDate(version.completedAt)}</small></span><button type="button" data-version-open="${escapeHtml(version.id)}" title="Reproduzir esta versão"><i class="fa-solid fa-play"></i></button></div>`).join("") : '<p class="empty-copy">A primeira versão aparecerá aqui após a próxima exportação.</p>';
+}
+
+async function setVisualPreview(output) {
+  if (!output) { $("visualPreviewPlayer").removeAttribute("src"); return; }
+  if (state.outputPreviewUrl) URL.revokeObjectURL(state.outputPreviewUrl);
+  const url = await privateOutputUrl(output);
+  state.outputPreviewUrl = url.startsWith("blob:") ? url : "";
+  $("visualPreviewPlayer").src = url;
+}
+
+async function openVisualEditor(projectId, preferredOutput = null) {
+  const snapshot = await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`));
+  const project = { id: projectId, ...(snapshot.val() || {}) };
+  if (!project.sources?.length) throw new Error("Este projeto não possui arquivos de origem.");
+  let planPath = "";
+  if (project.jobId) {
+    const job = (await get(ref(db, `studioJobs/${state.user.uid}/${project.jobId}`))).val();
+    planPath = job?.plan?.storagePath || "";
+  }
+  if (!planPath) planPath = Object.values(project.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0))[0]?.planStoragePath || "";
+  state.visualProject = project;
+  state.visualPlan = await readPrivateJson(planPath);
+  state.activeProjectId = projectId;
+  state.visualSourceUrls = new Map();
+  await Promise.all(project.sources.map(async (source) => {
+    const url = source.downloadUrl || await getDownloadURL(storageRef(storage, source.storagePath));
+    state.visualSourceUrls.set(source.id, url);
+  }));
+  $("visualProjectName").textContent = project.name || "Ajuste sua montagem";
+  $("visualTitle").value = state.visualPlan.text?.title || "";
+  $("visualSubtitle").value = state.visualPlan.text?.subtitle || "";
+  $("visualCta").value = state.visualPlan.text?.callToAction || "";
+  renderVisualTimeline();
+  renderVisualVersions();
+  await setVisualPreview(preferredOutput || project.output || project.preview);
+  $("visualPreviewNotice").textContent = preferredOutput || project.preview ? "Prévia reduzida atualizada com o plano editado." : "Exibindo a última exportação Full HD. Gere uma prévia leve para conferir novos ajustes.";
+  switchView("visual");
+}
+
+async function openVisualVersion(versionId) {
+  const version = state.visualProject?.versions?.[versionId];
+  if (!version?.output) return toast("Arquivo desta versão não encontrado.");
+  await setVisualPreview(version.output);
+  $("visualPreviewNotice").textContent = `Reproduzindo a versão ${Number(version.number || 1)} preservada no histórico.`;
+}
+
+async function enqueueVisualRender(mode) {
+  if (!state.visualPlan || !state.visualProject) return;
+  syncVisualTexts();
+  state.visualPlan.duration = visualPlanDuration();
+  if (!(state.visualPlan.duration > 0 && state.visualPlan.duration <= 90)) return toast("A timeline deve ter no máximo 90 segundos.");
+  const jobRef = push(ref(db, `studioJobs/${state.user.uid}`));
+  const jobId = jobRef.key;
+  const now = Date.now();
+  const versionNumber = Number(state.visualProject.versionCounter || 0) + 1;
+  const versionId = mode === "preview" ? "" : `version-${versionNumber}-${now}`;
+  const cost = studioJobCostEstimate({ ...state.visualProject, duration: Math.min(90, Math.max(15, state.visualPlan.duration)) });
+  const job = { schemaVersion: 2, id: jobId, projectId: state.visualProject.id, ownerUid: state.user.uid, mode, planOverride: JSON.parse(JSON.stringify(state.visualPlan)), versionId, versionNumber, status: "queued", stage: "queue", progress: 25, attempt: 0, createdAt: now, updatedAt: now, costEstimate: cost };
+  await update(ref(db), {
+    [`studioJobs/${state.user.uid}/${jobId}`]: job,
+    [`studioProjects/${state.user.uid}/${state.visualProject.id}/jobId`]: jobId,
+    [`studioProjects/${state.user.uid}/${state.visualProject.id}/status`]: "queued",
+    [`studioProjects/${state.user.uid}/${state.visualProject.id}/duration`]: state.visualPlan.duration,
+    [`studioProjects/${state.user.uid}/${state.visualProject.id}/title`]: state.visualPlan.text?.title || "",
+    [`studioProjects/${state.user.uid}/${state.visualProject.id}/subtitle`]: state.visualPlan.text?.subtitle || "",
+    [`studioProjects/${state.user.uid}/${state.visualProject.id}/callToAction`]: state.visualPlan.text?.callToAction || "",
+    [`studioProjects/${state.user.uid}/${state.visualProject.id}/updatedAt`]: now,
+    [`studioUsage/${state.user.uid}/estimates/${jobId}`]: { projectId: state.visualProject.id, ...cost, status: "reserved", mode, createdAt: now }
+  });
+  state.activeProjectId = state.visualProject.id;
+  state.activeJobId = jobId;
+  switchView("processing");
+  $("processingStatusCard").classList.remove("hidden");
+  $("resultCard").classList.add("hidden");
+  $("errorCard").classList.add("hidden");
+  $("cancelProcessingButton").classList.remove("hidden");
+  $("cancelProcessingButton").disabled = false;
+  $("processingEyebrow").textContent = mode === "preview" ? "Prévia rápida" : `Versão ${versionNumber}`;
+  $("processingTitle").textContent = mode === "preview" ? "Gerando prévia reduzida" : "Renderizando nova versão";
+  markProcessStep("queue");
+  updateProgress(25, "Aguardando worker", "O mesmo plano da timeline será processado pelo FFmpeg.");
+  watchJob(jobId, state.visualProject.id);
+}
+
 async function loadProjects() {
   if (!state.user) return;
   const snapshot = await get(query(ref(db, `studioProjects/${state.user.uid}`), limitToLast(30)));
@@ -633,10 +777,11 @@ function renderProjects() {
     const review = project.status === "awaiting_review" && project.jobId ? `<button type="button" data-project-review="${project.id}"><i class="fa-solid fa-closed-captioning"></i> Revisar legendas</button>` : "";
     const open = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-open="${project.id}"><i class="fa-solid fa-circle-play"></i> Abrir</button>` : "";
     const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
+    const edit = completed && project.jobId ? `<button type="button" data-project-edit="${project.id}"><i class="fa-solid fa-sliders"></i> Editar</button>` : "";
     const cancel = active ? `<button type="button" data-project-cancel="${project.id}"><i class="fa-solid fa-ban"></i> Cancelar</button>` : "";
     const regenerate = active ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
     const director = project.director?.mode === "semantic" ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? "Direção por IA" : "IA solicitada"}</span>` : "";
-    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${open}${download}${cancel}${regenerate}</div></div></article>`;
+    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${open}${edit}${download}${cancel}${regenerate}</div></div></article>`;
   }).join("");
 }
 
@@ -718,14 +863,45 @@ $("projectsGrid").addEventListener("click", (event) => {
   const cancel = event.target.closest("[data-project-cancel]");
   const regenerate = event.target.closest("[data-project-regenerate]");
   const review = event.target.closest("[data-project-review]");
+  const edit = event.target.closest("[data-project-edit]");
   if (open) showProjectVideo(open.dataset.projectOpen).catch((error) => toast(error.message));
   if (download) downloadProject(download.dataset.projectDownload).catch((error) => toast(error.message));
   if (cancel) cancelProject(cancel.dataset.projectCancel).catch((error) => toast(error.message));
   if (regenerate) regenerateProject(regenerate.dataset.projectRegenerate).catch((error) => toast(error.message));
   if (review) openProjectReview(review.dataset.projectReview).catch((error) => toast(error.message));
+  if (edit) openVisualEditor(edit.dataset.projectEdit).catch((error) => toast(error.message));
 });
 $("cancelProcessingButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
 $("cancelTranscriptReviewButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
 $("approveTranscriptButton").addEventListener("click", approveTranscriptReview);
 $("backToProjects").addEventListener("click", () => { $("previewPlayer").pause(); switchView("projects"); });
 $("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));
+$("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
+[$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
+$("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
+$("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));
+$("visualTimeline").addEventListener("click", (event) => {
+  const up = event.target.closest("[data-scene-up]");
+  const down = event.target.closest("[data-scene-down]");
+  const index = Number(up?.dataset.sceneUp ?? down?.dataset.sceneDown);
+  if (!Number.isInteger(index)) return;
+  const target = index + (up ? -1 : 1);
+  if (target < 0 || target >= state.visualPlan.scenes.length) return;
+  [state.visualPlan.scenes[index], state.visualPlan.scenes[target]] = [state.visualPlan.scenes[target], state.visualPlan.scenes[index]];
+  state.visualPlan.scenes[0].transition = "none";
+  state.visualPlan.scenes[0].transitionDuration = 0;
+  state.visualPlan.scenes.slice(1).forEach((scene) => { if (!scene.transition || scene.transition === "none") { scene.transition = "fade"; scene.transitionDuration = 0.35; } });
+  renderVisualTimeline();
+});
+$("visualTimeline").addEventListener("change", (event) => {
+  const duration = event.target.closest("[data-scene-duration]");
+  const transition = event.target.closest("[data-scene-transition]");
+  if (duration) state.visualPlan.scenes[Number(duration.dataset.sceneDuration)].duration = Math.max(0.5, Math.min(15, Number(duration.value || 0.5)));
+  if (transition) state.visualPlan.scenes[Number(transition.dataset.sceneTransition)].transition = transition.value;
+  renderVisualTimeline();
+  syncVisualTexts();
+});
+$("visualVersionHistory").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-version-open]");
+  if (button) openVisualVersion(button.dataset.versionOpen).catch((error) => toast(error.message));
+});

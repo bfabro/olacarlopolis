@@ -12,7 +12,7 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 ## Fluxo funcional
 
-`Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON local ou direção semântica opcional → FFmpeg → Storage → prévia/download`
+`Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON local ou direção semântica opcional → editor visual → prévia reduzida ou FFmpeg Full HD → Storage → histórico/download`
 
 O planejador local é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 6 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, camadas de texto, animações, logo, áudio, legendas, direção solicitada e parâmetros de exportação.
 
@@ -107,6 +107,21 @@ O modo padrão permanece `local`. Para habilitar o modo semântico em um ambient
 
 O resultado registra provedor, modelo, uso retornado pela API, quantidade de quadros/transcrições e se houve fallback. O plano técnico continua sendo a fonte de durações e limites de renderização; a IA escolhe apenas candidatos reais previamente extraídos e não pode inventar uma mídia inexistente.
 
+## Editor visual e versões
+
+Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON privado diretamente do Storage autenticado e apresenta:
+
+- prévia reproduzível da última exportação ou da prévia reduzida;
+- timeline com miniaturas dos arquivos reais;
+- ordem das cenas;
+- duração individual entre 0,5 e 15 segundos;
+- transição de cada corte;
+- título, subtítulo e chamada final;
+- duração total recalculada considerando as sobreposições;
+- histórico preservado das exportações.
+
+O frontend nunca grava arquivos na pasta de renders. Ele envia uma cópia do plano editado ao trabalho privado da fila. O worker verifica novamente IDs de origem, limites, transições, tempos e duração total antes de executar FFmpeg. A prévia rápida usa exatamente esse plano em 360 × 640, 640 × 360 ou 480 × 480, com codificação acelerada; a exportação final mantém Full HD. Uma prévia cancelada ou com falha não remove o último vídeo final do projeto.
+
 Quando a opção de revisão está ativa, o primeiro processamento pausa em `awaiting_review` depois da transcrição. A interface apresenta cada trecho com seus tempos reais e permite corrigir ou remover o texto. Ao aprovar, o mesmo trabalho retorna à fila, reutiliza os originais privados e renderiza o MP4 com a versão revisada. Palavras alteradas recebem distribuição temporal limitada ao próprio trecho; nenhuma palavra adicional é criada pelo worker.
 
 ## Limites e retenção
@@ -127,11 +142,11 @@ A exclusão automática ainda não está ativa. Ela deve ser implementada como t
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
-Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante.
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, ordem, duração e transição no mesmo plano, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas.
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs
 ```
 
 O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nenhum dado demonstrativo é gravado no Firebase.
@@ -141,7 +156,7 @@ O teste usa apenas mídias sintéticas temporárias e as remove ao terminar; nen
 - detecção dedicada de desfoque e tremor de câmera (o motor atual mede exposição, congelamento e volatilidade de movimento);
 - biblioteca licenciada de músicas;
 - avaliação de custo/qualidade do Diretor por IA com um modelo de produção escolhido pelo responsável (a integração existe, mas permanece sem credencial e sem modelo por padrão);
-- timeline visual, prévia de baixa resolução e histórico completo de versões.
+- forma de onda gráfica da faixa de áudio e edição livre das camadas secundárias de texto dentro da timeline.
 
 Esses itens permanecem explicitamente fora da interface funcional até possuírem processamento real e testes próprios.
 

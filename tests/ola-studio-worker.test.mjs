@@ -1,7 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
-import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph } from "../studio-worker/src/renderer.mjs";
+import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, renderDimensions } from "../studio-worker/src/renderer.mjs";
+import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
 import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
@@ -99,6 +100,26 @@ test("diretor sem configuração registra fallback técnico sem fingir IA", () =
   assert.equal(fallback.planner.semanticAnalysis, false);
   assert.equal(fallback.planner.fallback, true);
   assert.equal(fallback.aiDirector.applied, false);
+});
+
+test("editor visual valida origens, recalcula duração e preserva o plano renderizável", () => {
+  const base = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15, title: "Antes" }, [video, image]);
+  const edited = prepareVisualEditorPlan({ ...base, text: { title: "Depois", subtitle: "Nova mensagem", callToAction: "Fale conosco" }, scenes: [base.scenes[1], { ...base.scenes[0], duration: 2.6, transition: "dissolve", transitionDuration: 0.4 }] }, base, [video, image]);
+  assert.equal(edited.planner.type, "visual-editor");
+  assert.equal(edited.scenes[0].id, "scene-1");
+  assert.equal(edited.scenes[1].transition, "dissolve");
+  assert.equal(edited.duration, Number((edited.scenes[0].duration + 2.6 - 0.4).toFixed(3)));
+  assert.ok(edited.textLayers.some((layer) => layer.type === "title" && layer.value === "Depois"));
+  assert.throws(() => prepareVisualEditorPlan({ ...base, scenes: [{ ...base.scenes[0], sourceId: "invasor" }] }, base, [video, image]), /não pertence/);
+});
+
+test("prévia usa resolução reduzida e codificação rápida sem alterar o plano", () => {
+  assert.deepEqual(renderDimensions("9:16", "preview"), { width: 360, height: 640 });
+  assert.deepEqual(renderDimensions("16:9", "preview"), { width: 640, height: 360 });
+  const args = buildSegmentArgs({ start: 0, duration: 3 }, video, "/tmp/preview.mp4", "9:16", {}, "preview");
+  assert.ok(args.includes("scale=360:640:force_original_aspect_ratio=increase,crop=360:640,fps=30,setsar=1,format=yuv420p"));
+  assert.ok(args.includes("ultrafast"));
+  assert.ok(args.includes("28"));
 });
 
 test("FFmpeg recebe escala com crop sem deformação e áudio normalizado", () => {

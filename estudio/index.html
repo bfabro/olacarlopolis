@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=7">
-  <link rel="stylesheet" href="studio-overrides.css?v=7">
+  <link rel="stylesheet" href="studio.css?v=8">
+  <link rel="stylesheet" href="studio-overrides.css?v=8">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -188,6 +188,44 @@
         </form>
       </section>
 
+      <section id="visualView" class="studio-view hidden">
+        <div class="visual-editor-heading">
+          <div><span class="eyebrow">Editor visual</span><h2 id="visualProjectName">Ajuste sua montagem</h2><p>O storyboard abaixo representa o mesmo plano que será enviado ao FFmpeg.</p></div>
+          <button id="visualBackProjects" class="secondary-button" type="button"><i class="fa-solid fa-arrow-left"></i> Meus projetos</button>
+        </div>
+        <div class="visual-editor-layout">
+          <div class="visual-editor-main">
+            <section class="studio-card visual-preview-card">
+              <div class="card-heading"><span><i class="fa-solid fa-play"></i></span><div><h2>Prévia reproduzível</h2><p>Veja a última exportação ou gere uma prévia leve depois dos ajustes.</p></div></div>
+              <video id="visualPreviewPlayer" controls playsinline></video>
+              <div id="visualPreviewNotice" class="visual-preview-notice">A prévia reduzida usa o mesmo plano de cenas da exportação final.</div>
+            </section>
+            <section class="studio-card">
+              <div class="card-heading"><span><i class="fa-solid fa-timeline"></i></span><div><h2>Timeline de cenas</h2><p>Reordene, ajuste a duração e escolha a transição de cada trecho.</p></div></div>
+              <div class="timeline-ruler"><span>Início</span><strong id="visualTotalDuration">0s</strong><span>Final</span></div>
+              <div id="visualTimeline" class="visual-timeline"></div>
+            </section>
+          </div>
+          <aside class="visual-editor-sidebar">
+            <section class="studio-card visual-settings-card">
+              <span class="eyebrow">Textos do vídeo</span>
+              <label>Título<input id="visualTitle" maxlength="120"></label>
+              <label>Subtítulo<textarea id="visualSubtitle" maxlength="180" rows="3"></textarea></label>
+              <label>Chamada final<input id="visualCta" maxlength="100"></label>
+              <div class="visual-render-actions">
+                <button id="visualGeneratePreview" class="secondary-button" type="button"><i class="fa-solid fa-bolt"></i> Gerar prévia rápida</button>
+                <button id="visualRenderFinal" class="create-button" type="button"><i class="fa-solid fa-film"></i> Renderizar nova versão</button>
+              </div>
+              <small><i class="fa-solid fa-shield"></i> Cada nova versão preserva as anteriores e os arquivos originais.</small>
+            </section>
+            <section class="studio-card">
+              <div class="card-heading compact"><span><i class="fa-solid fa-clock-rotate-left"></i></span><div><h2>Histórico de versões</h2><p>Exporte ou compare resultados anteriores.</p></div></div>
+              <div id="visualVersionHistory" class="visual-version-history"></div>
+            </section>
+          </aside>
+        </div>
+      </section>
+
       <section id="processingView" class="studio-view hidden">
         <div class="processing-layout">
           <section id="processingStatusCard" class="studio-card processing-card">
@@ -221,6 +259,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=12"></script>
+  <script type="module" src="studio.js?v=13"></script>
 </body>
 </html>

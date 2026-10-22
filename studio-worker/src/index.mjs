@@ -10,6 +10,7 @@ import { createDeterministicPlan } from "./planner.mjs";
 import { renderPlan } from "./renderer.mjs";
 import { analyzeMusicRhythm } from "./rhythm.mjs";
 import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence } from "./ai-planner.mjs";
+import { prepareVisualEditorPlan } from "./editor-plan.mjs";
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -50,8 +51,8 @@ async function processJob(job) {
     await updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 49, message: music?.localPath ? "Analisando o ritmo real da música." : "Montando a narrativa técnica." });
     const rhythm = await analyzeMusicRhythm(music?.localPath || "", workDir, cancellation.signal);
     const technicalPlan = createDeterministicPlan(project, analyzed, { rhythm });
-    let plan = technicalPlan;
-    if (project.director?.mode === "semantic") {
+    let plan = job.planOverride ? prepareVisualEditorPlan(job.planOverride, technicalPlan, analyzed) : technicalPlan;
+    if (!job.planOverride && project.director?.mode === "semantic") {
       const semanticPlanner = createSemanticPlanner();
       if (!semanticPlanner.enabled) {
         plan = markSemanticFallback(technicalPlan, "Diretor de IA não configurado no worker. Defina OPENAI_API_KEY e STUDIO_OPENAI_MODEL para ativá-lo.");
@@ -68,7 +69,9 @@ async function processJob(job) {
         }
       }
     }
-    const directorResult = project.director?.mode === "semantic"
+    const directorResult = job.planOverride
+      ? { requested: false, applied: false, editorApplied: true, updatedAt: Date.now() }
+      : project.director?.mode === "semantic"
       ? { requested: true, applied: plan.aiDirector?.applied === true, provider: plan.planner?.provider || "", model: plan.planner?.model || "", reason: plan.aiDirector?.reason || "", updatedAt: Date.now() }
       : { requested: false, applied: false, updatedAt: Date.now() };
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
@@ -81,6 +84,7 @@ async function processJob(job) {
     const transcriptionProvider = project.captionsEnabled && !approvedTranscription ? await createTranscriptionProvider() : null;
     const rendered = await renderPlan({
       plan, sources: analyzed, outputDir, logoPath: logo?.localPath || "", musicPath: music?.localPath || "",
+      renderProfile: job.mode === "preview" ? "preview" : "final",
       transcriptionProvider,
       approvedTranscription,
       pauseForTranscriptReview: project.captions?.reviewBeforeRender === true && !approvedTranscription,
@@ -112,7 +116,9 @@ async function processJob(job) {
     const outputPath = rendered.outputPath;
     ensureNotCancelled();
     await updateJob(job.uid, job.jobId, { stage: "upload_output", status: "rendering", progress: 98, message: "Salvando o MP4 final." });
-    const storagePath = `studio/${job.uid}/renders/${job.projectId}/${job.jobId}.mp4`;
+    const storagePath = job.mode === "preview"
+      ? `studio/${job.uid}/renders/${job.projectId}/previews/${job.jobId}.mp4`
+      : `studio/${job.uid}/renders/${job.projectId}/${job.jobId}.mp4`;
     const output = await uploadRender(outputPath, storagePath);
     ensureNotCancelled();
     const elapsedSeconds = Math.round((Date.now() - started) / 1000);
@@ -126,11 +132,18 @@ async function processJob(job) {
     updates[`studioJobs/${job.uid}/${job.jobId}/completedAt`] = Date.now();
     updates[`studioJobs/${job.uid}/${job.jobId}/updatedAt`] = Date.now();
     updates[`studioProjects/${job.uid}/${job.projectId}/status`] = "completed";
-    updates[`studioProjects/${job.uid}/${job.projectId}/output`] = output;
+    if (job.mode === "preview") updates[`studioProjects/${job.uid}/${job.projectId}/preview`] = output;
+    else updates[`studioProjects/${job.uid}/${job.projectId}/output`] = output;
     updates[`studioProjects/${job.uid}/${job.projectId}/updatedAt`] = Date.now();
+    if (job.mode !== "preview") {
+      const versionId = job.versionId || job.jobId;
+      const versionNumber = Math.max(1, Number(job.versionNumber || project.versionCounter || 0) + (job.versionNumber ? 0 : 1));
+      updates[`studioProjects/${job.uid}/${job.projectId}/versionCounter`] = versionNumber;
+      updates[`studioProjects/${job.uid}/${job.projectId}/versions/${versionId}`] = { id: versionId, number: versionNumber, jobId: job.jobId, output, planStoragePath, source: job.planOverride ? "visual-editor" : "automatic", createdAt: job.createdAt || Date.now(), completedAt: Date.now() };
+    }
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/status`] = "consumed";
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/completedAt`] = Date.now();
-    updates[`studioCreditLedger/${job.uid}/${job.jobId}`] = { type: "processing", amount: 0, estimatedCredits: cost.estimatedCredits, projectId: job.projectId, jobId: job.jobId, description: "Processamento do MVP sem cobrança", createdAt: Date.now() };
+    updates[`studioCreditLedger/${job.uid}/${job.jobId}`] = { type: job.mode === "preview" ? "preview" : "processing", amount: 0, estimatedCredits: cost.estimatedCredits, projectId: job.projectId, jobId: job.jobId, description: job.mode === "preview" ? "Prévia reduzida sem cobrança" : "Processamento do MVP sem cobrança", createdAt: Date.now() };
     updates[`studioAdminCosts/${job.jobId}`] = { uid: job.uid, projectId: job.projectId, ...cost };
     await database.ref().update(updates);
   } catch (error) {
@@ -143,7 +156,7 @@ async function processJob(job) {
         [`studioJobs/${job.uid}/${job.jobId}/message`]: "Criação cancelada pelo usuário.",
         [`studioJobs/${job.uid}/${job.jobId}/cancelledAt`]: cancelledAt,
         [`studioJobs/${job.uid}/${job.jobId}/updatedAt`]: cancelledAt,
-        [`studioProjects/${job.uid}/${job.projectId}/status`]: "cancelled",
+        [`studioProjects/${job.uid}/${job.projectId}/status`]: job.mode === "preview" ? "completed" : "cancelled",
         [`studioProjects/${job.uid}/${job.projectId}/updatedAt`]: cancelledAt,
         [`studioUsage/${job.uid}/estimates/${job.jobId}/status`]: "cancelled"
       });
@@ -151,7 +164,9 @@ async function processJob(job) {
     }
     const errorMessage = error?.signal === "SIGKILL" ? "O renderizador excedeu a memória disponível. Reduza a duração ou tente novamente após atualizar o worker." : String(error?.message || error).slice(0, 500);
     await updateJob(job.uid, job.jobId, { status: "failed", stage: "failed", progress: 100, message: "Falha no processamento.", failedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
-    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ status: "failed", updatedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
+    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update(job.mode === "preview"
+      ? { status: "completed", updatedAt: Date.now(), previewError: { code: "worker_error", message: errorMessage } }
+      : { status: "failed", updatedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
   } finally {
     jobRef.off("value", cancellationListener);
     await fs.rm(workDir, { recursive: true, force: true }).catch(() => {});
