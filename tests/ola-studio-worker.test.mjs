@@ -128,7 +128,7 @@ test("diretor sem configuração registra fallback técnico sem fingir IA", () =
 
 test("editor visual valida origens, recalcula duração e preserva o plano renderizável", () => {
   const base = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15, title: "Antes" }, [video, image]);
-  const edited = prepareVisualEditorPlan({ ...base, text: { title: "Depois", subtitle: "Nova mensagem", callToAction: "Fale conosco" }, audio: { voiceVolume: 9, musicVolume: -1, fadeSeconds: 99, noiseReduction: true }, music: { duckDuringSpeech: false }, scenes: [base.scenes[1], { ...base.scenes[0], start: 19, duration: 2.6, transition: "dissolve", transitionDuration: 0.4 }] }, base, [video, image]);
+  const edited = prepareVisualEditorPlan({ ...base, text: { title: "Depois", subtitle: "Nova mensagem", callToAction: "Fale conosco" }, textLayers: [...base.textLayers, { id: "../../oferta", type: "custom", value: " Oferta   especial ", start: 1, end: 4, animation: "inválida", position: "fora", align: "fora", font: "externa", sizeScale: 9, color: "red", outlineColor: "#123456", background: false, margin: 999 }], audio: { voiceVolume: 9, musicVolume: -1, fadeSeconds: 99, noiseReduction: true }, music: { duckDuringSpeech: false }, scenes: [base.scenes[1], { ...base.scenes[0], start: 19, duration: 2.6, transition: "dissolve", transitionDuration: 0.4 }] }, base, [video, image]);
   assert.equal(edited.planner.type, "visual-editor");
   assert.equal(edited.scenes[0].id, "scene-1");
   assert.equal(edited.scenes[1].transition, "dissolve");
@@ -136,6 +136,8 @@ test("editor visual valida origens, recalcula duração e preserva o plano rende
   assert.equal(edited.scenes[1].start, 17.35);
   assert.deepEqual({ voice: edited.audio.voiceVolume, music: edited.audio.musicVolume, fade: edited.audio.fadeSeconds, noise: edited.audio.noiseReduction, duck: edited.music.duckDuringSpeech }, { voice: 1.6, music: 0, fade: 5, noise: true, duck: false });
   assert.ok(edited.textLayers.some((layer) => layer.type === "title" && layer.value === "Depois"));
+  const custom = edited.textLayers.find((layer) => layer.type === "custom");
+  assert.deepEqual({ id: custom.id, value: custom.value, animation: custom.animation, position: custom.position, align: custom.align, font: custom.font, size: custom.sizeScale, color: custom.color, outline: custom.outlineColor, background: custom.background, margin: custom.margin }, { id: "oferta", value: "Oferta especial", animation: "fade", position: "center", align: "center", font: "sans", size: 1.8, color: "#FFFFFF", outline: "#123456", background: false, margin: 180 });
   assert.throws(() => prepareVisualEditorPlan({ ...base, scenes: [{ ...base.scenes[0], sourceId: "invasor" }] }, base, [video, image]), /não pertence/);
 });
 

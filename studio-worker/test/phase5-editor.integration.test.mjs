@@ -21,7 +21,7 @@ test("Fase 5 usa o mesmo plano editado na prévia e na exportação final", { sk
     await runProcess("ffmpeg", ["-y", "-f", "lavfi", "-i", "sine=frequency=220:sample_rate=48000:duration=6", musicPath]);
     const sources = await analyzeSources(sourcePaths.map((localPath, index) => ({ id: `source-${index + 1}`, order: index, contentType: "video/mp4", localPath })));
     const base = createDeterministicPlan({ style: "reels", format: "9:16", duration: 15, title: "Título antigo" }, sources);
-    const edited = prepareVisualEditorPlan({ ...base, text: { title: "Título alterado", subtitle: "Prévia fiel", callToAction: "Confira agora" }, audio: { ...base.audio, voiceVolume: 1.15, musicVolume: 0.12, fadeSeconds: 0.8, noiseReduction: true }, music: { ...base.music, duckDuringSpeech: false }, scenes: [{ ...base.scenes[1], start: 0.5, duration: 2 }, { ...base.scenes[0], start: 1, duration: 2, transition: "dissolve", transitionDuration: 0.3 }] }, base, sources);
+    const edited = prepareVisualEditorPlan({ ...base, text: { title: "Título alterado", subtitle: "Prévia fiel", callToAction: "Confira agora" }, textLayers: base.textLayers.map((layer) => layer.type === "title" ? { ...layer, font: "serif", sizeScale: 1.5, color: "#FFBB2D", outlineColor: "#092B45", align: "center", background: true } : layer), audio: { ...base.audio, voiceVolume: 1.15, musicVolume: 0.12, fadeSeconds: 0.8, noiseReduction: true }, music: { ...base.music, duckDuringSpeech: false }, scenes: [{ ...base.scenes[1], start: 0.5, duration: 2 }, { ...base.scenes[0], start: 1, duration: 2, transition: "dissolve", transitionDuration: 0.3 }] }, base, sources);
     const previewDir = path.join(root, "preview");
     const finalDir = path.join(root, "final");
     await fs.mkdir(previewDir);
@@ -39,6 +39,7 @@ test("Fase 5 usa o mesmo plano editado na prévia e na exportação final", { sk
     assert.equal(final.plan.scenes[1].start, 1);
     assert.equal(final.plan.audio.voiceVolume, 1.15);
     assert.equal(final.plan.music.duckDuringSpeech, false);
+    assert.equal(final.plan.textLayers.find((layer) => layer.type === "title").sizeScale, 1.5);
     assert.equal(final.plan.audio.waveform.available, true);
     assert.equal(final.plan.audio.waveform.samples.length, 120);
   } finally {

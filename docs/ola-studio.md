@@ -122,6 +122,7 @@ Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON p
 - recorte do início e do fim de cada vídeo por alças na timeline;
 - mixagem de voz e música, fades, redução moderada de ruído e ducking configuráveis;
 - camadas adicionais de texto com conteúdo, intervalo, posição e animação editáveis;
+- fonte, tamanho, cor, contorno, alinhamento, fundo e margem ajustáveis nos textos;
 - comando para criar uma nova montagem automática preservando as versões anteriores;
 - duração total recalculada considerando as sobreposições;
 - histórico preservado das exportações.

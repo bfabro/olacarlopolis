@@ -58,8 +58,13 @@ test("editor visual reutiliza plano privado e envia somente origens do próprio 
   assert.match(html, /id="visualRegenerateAutomatic"/);
   assert.match(html, /id="visualVoiceVolume"/);
   assert.match(html, /id="visualMusicDucking"/);
+  assert.match(html, /id="visualTextFont"/);
+  assert.match(html, /id="visualTextSize"/);
+  assert.match(html, /id="visualTextOutline"/);
   assert.match(client, /data-scene-trim-start/);
   assert.match(client, /data-scene-trim-end/);
+  assert.match(client, /data-layer-field="sizeScale"/);
+  assert.match(client, /data-layer-field="background"/);
   assert.match(client, /getBlob\(storageRef\(storage, storagePath\)\)/);
   assert.match(client, /planOverride/);
   assert.match(client, /mode === "preview"/);

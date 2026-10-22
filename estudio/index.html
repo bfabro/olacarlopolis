@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=11">
-  <link rel="stylesheet" href="studio-overrides.css?v=11">
+  <link rel="stylesheet" href="studio.css?v=12">
+  <link rel="stylesheet" href="studio-overrides.css?v=12">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -213,6 +213,15 @@
               <label>Título<input id="visualTitle" maxlength="120"></label>
               <label>Subtítulo<textarea id="visualSubtitle" maxlength="180" rows="3"></textarea></label>
               <label>Chamada final<input id="visualCta" maxlength="100"></label>
+              <div class="visual-layer-heading"><strong>Estilo dos textos principais</strong><span class="visual-mixer-status">Título, subtítulo e chamada</span></div>
+              <div class="visual-primary-text-style">
+                <label>Fonte<select id="visualTextFont"><option value="sans">Moderna</option><option value="serif">Elegante</option><option value="mono">Técnica</option></select></label>
+                <label>Escala<input id="visualTextSize" type="range" min="70" max="180" step="5"><output id="visualTextSizeValue">120%</output></label>
+                <label>Cor do texto<input id="visualTextColor" type="color" value="#FFFFFF"></label>
+                <label>Cor do contorno<input id="visualTextOutline" type="color" value="#092B45"></label>
+                <label>Alinhamento<select id="visualTextAlign"><option value="left">Esquerda</option><option value="center">Centro</option><option value="right">Direita</option></select></label>
+                <label class="visual-audio-toggle"><input id="visualTextBackground" type="checkbox"><span><strong>Fundo semitransparente</strong><small>Melhora a leitura sobre imagens claras.</small></span></label>
+              </div>
               <div class="visual-layer-heading"><strong>Mixagem de áudio</strong><span class="visual-mixer-status">Aplicada na próxima renderização</span></div>
               <div class="visual-audio-mixer">
                 <label>Voz e som original<input id="visualVoiceVolume" type="range" min="50" max="160" step="1"><output id="visualVoiceVolumeValue">100%</output></label>
@@ -271,6 +280,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=16"></script>
+  <script type="module" src="studio.js?v=17"></script>
 </body>
 </html>

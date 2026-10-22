@@ -699,7 +699,35 @@ function renderVisualWaveform() {
 function renderVisualTextLayers() {
   const standard = new Set(["title", "subtitle", "call_to_action"]);
   const layers = (state.visualPlan?.textLayers || []).filter((layer) => !standard.has(layer.type));
-  $("visualTextLayers").innerHTML = layers.length ? layers.map((layer) => `<article class="visual-text-layer" data-text-layer="${escapeHtml(layer.id)}"><textarea data-layer-field="value" maxlength="180" aria-label="Texto da camada">${escapeHtml(layer.value || "")}</textarea><button class="visual-text-layer-remove" data-layer-remove="${escapeHtml(layer.id)}" type="button" title="Remover camada"><i class="fa-solid fa-trash"></i></button><div class="visual-text-layer-fields"><label>Entrada<input data-layer-field="start" type="number" min="0" max="90" step="0.1" value="${Number(layer.start || 0).toFixed(1)}"></label><label>Saída<input data-layer-field="end" type="number" min="0.1" max="90" step="0.1" value="${Number(layer.end || 0).toFixed(1)}"></label><label>Posição<select data-layer-field="position"><option value="top" ${layer.position === "top" ? "selected" : ""}>Superior</option><option value="center" ${layer.position === "center" ? "selected" : ""}>Centro</option><option value="bottom" ${layer.position === "bottom" ? "selected" : ""}>Inferior</option></select></label><label>Animação<select data-layer-field="animation"><option value="fade" ${layer.animation === "fade" ? "selected" : ""}>Fade</option><option value="slide_up" ${layer.animation === "slide_up" ? "selected" : ""}>Slide Up</option><option value="zoom_pop" ${layer.animation === "zoom_pop" ? "selected" : ""}>Zoom Pop</option><option value="reveal" ${layer.animation === "reveal" ? "selected" : ""}>Revelação</option><option value="word_by_word" ${layer.animation === "word_by_word" ? "selected" : ""}>Palavra por palavra</option></select></label></div></article>`).join("") : '<p class="empty-copy">Nenhuma camada adicional. Você pode incluir descrições, ofertas ou observações.</p>';
+  $("visualTextLayers").innerHTML = layers.length ? layers.map((layer) => `<article class="visual-text-layer" data-text-layer="${escapeHtml(layer.id)}"><textarea data-layer-field="value" maxlength="180" aria-label="Texto da camada">${escapeHtml(layer.value || "")}</textarea><button class="visual-text-layer-remove" data-layer-remove="${escapeHtml(layer.id)}" type="button" title="Remover camada"><i class="fa-solid fa-trash"></i></button><div class="visual-text-layer-fields"><label>Entrada<input data-layer-field="start" type="number" min="0" max="90" step="0.1" value="${Number(layer.start || 0).toFixed(1)}"></label><label>Saída<input data-layer-field="end" type="number" min="0.1" max="90" step="0.1" value="${Number(layer.end || 0).toFixed(1)}"></label><label>Posição<select data-layer-field="position"><option value="top" ${layer.position === "top" ? "selected" : ""}>Superior</option><option value="center" ${layer.position === "center" ? "selected" : ""}>Centro</option><option value="bottom" ${layer.position === "bottom" ? "selected" : ""}>Inferior</option></select></label><label>Animação<select data-layer-field="animation"><option value="fade" ${layer.animation === "fade" ? "selected" : ""}>Fade</option><option value="slide_up" ${layer.animation === "slide_up" ? "selected" : ""}>Slide Up</option><option value="slide_down" ${layer.animation === "slide_down" ? "selected" : ""}>Slide Down</option><option value="typewriter" ${layer.animation === "typewriter" ? "selected" : ""}>Máquina de escrever</option><option value="zoom_pop" ${layer.animation === "zoom_pop" ? "selected" : ""}>Zoom Pop</option><option value="soft_bounce" ${layer.animation === "soft_bounce" ? "selected" : ""}>Bounce suave</option><option value="reveal" ${layer.animation === "reveal" ? "selected" : ""}>Revelação</option><option value="word_by_word" ${layer.animation === "word_by_word" ? "selected" : ""}>Palavra por palavra</option></select></label><label>Fonte<select data-layer-field="font"><option value="sans" ${layer.font === "sans" ? "selected" : ""}>Moderna</option><option value="serif" ${layer.font === "serif" ? "selected" : ""}>Elegante</option><option value="mono" ${layer.font === "mono" ? "selected" : ""}>Técnica</option></select></label><label>Alinhamento<select data-layer-field="align"><option value="left" ${layer.align === "left" ? "selected" : ""}>Esquerda</option><option value="center" ${layer.align === "center" ? "selected" : ""}>Centro</option><option value="right" ${layer.align === "right" ? "selected" : ""}>Direita</option></select></label><label>Tamanho (${Math.round(Number(layer.sizeScale || 1) * 100)}%)<input data-layer-field="sizeScale" type="range" min="70" max="180" step="5" value="${Math.round(Number(layer.sizeScale || 1) * 100)}"></label><label>Margem<input data-layer-field="margin" type="number" min="24" max="180" step="4" value="${Number(layer.margin || 64)}"></label><label>Cor<input data-layer-field="color" type="color" value="${escapeHtml(layer.color || "#FFFFFF")}"></label><label>Contorno<input data-layer-field="outlineColor" type="color" value="${escapeHtml(layer.outlineColor || "#092B45")}"></label><label class="visual-layer-toggle"><input data-layer-field="background" type="checkbox" ${layer.background !== false ? "checked" : ""}><span>Fundo</span></label></div></article>`).join("") : '<p class="empty-copy">Nenhuma camada adicional. Você pode incluir descrições, ofertas ou observações.</p>';
+}
+
+function primaryVisualLayer() {
+  return (state.visualPlan?.textLayers || []).find((layer) => layer.type === "title") || state.visualPlan?.textDesign || {};
+}
+
+function renderVisualPrimaryTextStyle() {
+  const design = primaryVisualLayer();
+  $("visualTextFont").value = design.font || "sans";
+  $("visualTextSize").value = Math.round(Number(design.sizeScale || 1.2) * 100);
+  $("visualTextColor").value = design.color || "#FFFFFF";
+  $("visualTextOutline").value = design.outlineColor || "#092B45";
+  $("visualTextAlign").value = design.align || "center";
+  $("visualTextBackground").checked = design.background !== false;
+  $("visualTextSizeValue").textContent = `${$("visualTextSize").value}%`;
+}
+
+function syncVisualPrimaryTextStyle() {
+  if (!state.visualPlan) return;
+  const size = Number($("visualTextSize").value) / 100;
+  const design = { font: $("visualTextFont").value, sizeScale: size, color: $("visualTextColor").value, outlineColor: $("visualTextOutline").value, align: $("visualTextAlign").value, background: $("visualTextBackground").checked };
+  state.visualPlan.textDesign = { ...(state.visualPlan.textDesign || {}), ...design };
+  const scaleByType = { title: 1, subtitle: 0.72, call_to_action: 0.84 };
+  (state.visualPlan.textLayers || []).forEach((layer) => {
+    if (!Object.hasOwn(scaleByType, layer.type)) return;
+    Object.assign(layer, design, { sizeScale: Number((size * scaleByType[layer.type]).toFixed(3)) });
+  });
+  $("visualTextSizeValue").textContent = `${$("visualTextSize").value}%`;
 }
 
 function visualSourceAnalysis(sourceId) {
@@ -801,6 +829,7 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   $("visualTitle").value = state.visualPlan.text?.title || "";
   $("visualSubtitle").value = state.visualPlan.text?.subtitle || "";
   $("visualCta").value = state.visualPlan.text?.callToAction || "";
+  renderVisualPrimaryTextStyle();
   renderVisualAudioMixer();
   renderVisualTimeline();
   renderVisualTextLayers();
@@ -975,6 +1004,7 @@ $("backToProjects").addEventListener("click", () => { $("previewPlayer").pause()
 $("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));
 $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
+[$("visualTextFont"), $("visualTextSize"), $("visualTextColor"), $("visualTextOutline"), $("visualTextAlign"), $("visualTextBackground")].forEach((field) => field.addEventListener("input", syncVisualPrimaryTextStyle));
 [$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
 $("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
 $("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));
@@ -1003,7 +1033,10 @@ const updateVisualTextLayer = (event) => {
   const layer = (state.visualPlan.textLayers || []).find((item) => item.id === card.dataset.textLayer);
   if (!layer) return;
   const key = field.dataset.layerField;
-  layer[key] = ["start", "end"].includes(key) ? Number(field.value || 0) : field.value;
+  if (key === "background") layer[key] = field.checked;
+  else if (key === "sizeScale") layer[key] = Number(field.value || 100) / 100;
+  else if (["start", "end", "margin"].includes(key)) layer[key] = Number(field.value || 0);
+  else layer[key] = field.value;
 };
 $("visualTextLayers").addEventListener("input", updateVisualTextLayer);
 $("visualTextLayers").addEventListener("change", updateVisualTextLayer);
