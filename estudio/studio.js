@@ -1,7 +1,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_FORMATS, STUDIO_LIMITS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs";
 
 const firebaseConfig = {
@@ -19,7 +19,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null };
+const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "" };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", processing: "Processamento", usage: "Uso e créditos" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", completed: "Concluído", failed: "Falhou" };
 
@@ -32,6 +32,25 @@ function cleanFileName(name) {
   const extension = parts.length > 1 ? "." + parts.pop().replace(/[^a-zA-Z0-9]/g, "").toLowerCase() : "";
   const base = parts.join(".").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 70) || "arquivo";
   return base + extension;
+}
+
+async function privateOutputUrl(output) {
+  if (output?.downloadUrl) return output.downloadUrl;
+  if (!output?.storagePath) throw new Error("Arquivo final não encontrado.");
+  return URL.createObjectURL(await getBlob(storageRef(storage, output.storagePath)));
+}
+
+async function downloadProject(projectId) {
+  const project = state.projects.find((item) => item.id === projectId);
+  if (!project?.output) throw new Error("O vídeo final deste projeto não foi encontrado.");
+  const url = await privateOutputUrl(project.output);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = cleanFileName(project.output.fileName || `${project.name || "ola-studio"}.mp4`);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  if (!project.output.downloadUrl) setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
 
 function showGate(id) {
@@ -276,8 +295,9 @@ function watchJob(jobId, projectId) {
       state.jobUnsubscribe = null;
       $("processingTitle").textContent = "Seu vídeo está pronto";
       $("processingMessage").textContent = "Assista à prévia e baixe o MP4 em alta qualidade.";
-      let outputUrl = job.output?.downloadUrl || "";
-      if (!outputUrl && job.output?.storagePath) outputUrl = await getDownloadURL(storageRef(storage, job.output.storagePath));
+      if (state.outputPreviewUrl) URL.revokeObjectURL(state.outputPreviewUrl);
+      const outputUrl = await privateOutputUrl(job.output);
+      state.outputPreviewUrl = job.output?.downloadUrl ? "" : outputUrl;
       $("previewPlayer").src = outputUrl;
       $("downloadVideo").href = outputUrl;
       $("downloadVideo").download = `${cleanFileName(job.output?.fileName || "ola-studio.mp4")}`;
@@ -317,14 +337,6 @@ async function loadProjects() {
   const snapshot = await get(query(ref(db, `studioProjects/${state.user.uid}`), limitToLast(30)));
   const value = snapshot.val() || {};
   state.projects = Object.entries(value).map(([id, project]) => ({ id, ...project })).sort((a, b) => Number(b.updatedAt || 0) - Number(a.updatedAt || 0));
-  await Promise.all(state.projects.map(async (project) => {
-    if (project.status !== "completed" || !project.output?.storagePath || project.output.downloadUrl) return;
-    try {
-      project.output.downloadUrl = await getDownloadURL(ref(storage, project.output.storagePath));
-    } catch (error) {
-      console.warn("Não foi possível preparar o download do projeto", project.id, error);
-    }
-  }));
   renderProjects();
 }
 
@@ -334,7 +346,7 @@ function renderProjects() {
   root.innerHTML = state.projects.map((project) => {
     const completed = project.status === "completed";
     const failed = project.status === "failed";
-    const download = completed && project.output?.downloadUrl ? `<a href="${escapeHtml(project.output.downloadUrl)}" download><i class="fa-solid fa-download"></i> Baixar</a>` : "";
+    const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
     return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span></div><div class="project-actions">${download}<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button></div></div></article>`;
   }).join("");
 }
@@ -408,5 +420,10 @@ $("projectForm").addEventListener("input", updateSummary);
 $("projectForm").addEventListener("submit", submitProject);
 $("logoFile").addEventListener("change", () => { const file = $("logoFile").files[0]; if (file && file.size > 8 * 1024 * 1024) { $("logoFile").value = ""; return toast("A logo deve ter no máximo 8 MB."); } $("logoFileLabel").innerHTML = `<i class="fa-regular fa-image"></i> ${escapeHtml(file?.name || "Escolher PNG ou WebP")}`; });
 $("musicFile").addEventListener("change", () => { const file = $("musicFile").files[0]; if (file && file.size > STUDIO_LIMITS.maxAudioBytes) { $("musicFile").value = ""; return toast("A música deve ter no máximo 25 MB."); } $("musicFileLabel").innerHTML = `<i class="fa-solid fa-music"></i> ${escapeHtml(file?.name || "Escolher áudio")}`; });
-$("projectsGrid").addEventListener("click", (event) => { const button = event.target.closest("[data-project-regenerate]"); if (button) regenerateProject(button.dataset.projectRegenerate).catch((error) => toast(error.message)); });
+$("projectsGrid").addEventListener("click", (event) => {
+  const download = event.target.closest("[data-project-download]");
+  const regenerate = event.target.closest("[data-project-regenerate]");
+  if (download) downloadProject(download.dataset.projectDownload).catch((error) => toast(error.message));
+  if (regenerate) regenerateProject(regenerate.dataset.projectRegenerate).catch((error) => toast(error.message));
+});
 $("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));
