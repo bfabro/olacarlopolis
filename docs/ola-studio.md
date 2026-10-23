@@ -162,21 +162,21 @@ A exclusão manual remove somente os originais, logos, músicas, planos e render
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
-Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, camadas adicionais, ordem, duração e transição no mesmo plano, calcula a forma de onda do áudio real, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas. O teste da Fase 6 gera uma trilha e efeitos originais, mistura-os ao áudio principal e confirma vídeo, áudio, resolução e duração no MP4 final.
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, camadas adicionais, ordem, duração e transição no mesmo plano, calcula a forma de onda do áudio real, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas. O teste da Fase 6 gera uma trilha e efeitos originais, mistura-os ao áudio principal e confirma vídeo, áudio, resolução e duração no MP4 final. O teste da Fase 7 cobre os dez critérios finais em uma montagem de cinco vídeos e 30 segundos: título animado, texto de cena, logo, legenda, música com ducking, transições, prévia, Full HD e nova renderização após editar o título.
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs test/phase6-sound-library.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs test/phase6-sound-library.integration.test.mjs test/phase7-acceptance.integration.test.mjs
 ```
 
 Os testes usam mídias temporárias e as removem ao terminar; nenhum dado demonstrativo é gravado no Firebase. Para calibrar sem alterar os arquivos reais ou o Firebase, monte uma pasta de vídeos em modo somente leitura e execute:
 
 ```powershell
-docker run --rm --mount "type=bind,source=C:\pasta\dos\videos,target=/calibration,readonly" ola-studio-worker:local-v29-final node scripts/calibrate-media.mjs /calibration
-docker run --rm --mount "type=bind,source=C:\pasta\dos\videos,target=/calibration,readonly" ola-studio-worker:local-v29-final node scripts/validate-real-media.mjs /calibration
+docker run --rm --mount "type=bind,source=C:\pasta\dos\videos,target=/calibration,readonly" ola-studio-worker:local-v30 node scripts/calibrate-media.mjs /calibration
+docker run --rm --mount "type=bind,source=C:\pasta\dos\videos,target=/calibration,readonly" ola-studio-worker:local-v30 node scripts/validate-real-media.mjs /calibration
 ```
 
-Em 22/10/2026, a calibração local analisou seis vídeos reais (97,094 s, um vertical e cinco horizontais) e 99 janelas. O render de validação usou três desses vídeos e gerou uma prévia vertical de 15 s, 360 × 640, com seis cenas, vídeo e áudio. Os arquivos originais permaneceram somente leitura e o resultado temporário foi removido após a verificação.
+Em 22/10/2026, a calibração local analisou seis vídeos reais (97,094 s, um vertical e cinco horizontais) e 99 janelas. Na validação final, cinco vídeos reais (82,416 s de origem) geraram uma prévia vertical de 30 s, 360 × 640, com doze cenas, vídeo e áudio. O teste automatizado adicional exportou os mesmos 30 s em Full HD 1080 × 1920 e confirmou todos os critérios de aceitação. Os arquivos originais permaneceram somente leitura e os resultados temporários foram removidos após a verificação.
 
 ## Validações externas ainda necessárias
 

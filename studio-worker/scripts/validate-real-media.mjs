@@ -10,14 +10,14 @@ const mediaDirectory = path.resolve(process.argv[2] || "");
 if (!process.argv[2]) throw new Error("Informe o diretório com vídeos reais para validação.");
 const entries = (await fs.readdir(mediaDirectory, { withFileTypes: true }))
   .filter((entry) => entry.isFile() && /\.(mp4|mov|m4v|webm)$/i.test(entry.name))
-  .slice(0, 3);
+  .slice(0, 5);
 if (!entries.length) throw new Error("Nenhum vídeo compatível foi encontrado para validação.");
 
 const root = await fs.mkdtemp(path.join(os.tmpdir(), "ola-studio-real-media-"));
 try {
   const sources = entries.map((entry, order) => ({ id: `real-${order + 1}`, order, name: entry.name, contentType: entry.name.toLowerCase().endsWith(".webm") ? "video/webm" : "video/mp4", localPath: path.join(mediaDirectory, entry.name) }));
   const analyzed = await analyzeSources(sources, (done, total) => process.stderr.write(`Analisando ${done}/${total}\n`));
-  const project = { style: "reels", format: "9:16", duration: 15, transition: "fade", transitionDuration: 0.25, libraryMusic: "corporate", transitionSound: "subtle", editing: { rhythm: "dynamic", syncToMusic: false, prioritizeTechnicalQuality: true }, audio: { musicVolume: 0.18, voiceVolume: 1, fadeSeconds: 0.6 } };
+  const project = { style: "reels", format: "9:16", duration: 30, transition: "fade", transitionDuration: 0.25, libraryMusic: "corporate", transitionSound: "subtle", editing: { rhythm: "dynamic", syncToMusic: false, prioritizeTechnicalQuality: true }, audio: { musicVolume: 0.18, voiceVolume: 1, fadeSeconds: 0.6 } };
   const plan = createDeterministicPlan(project, analyzed);
   const audio = generatedAudioPaths(root);
   await generateLibraryMusic(project.libraryMusic, plan.duration, audio.music);
