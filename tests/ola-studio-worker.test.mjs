@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
-import { buildBrandingArgs, buildNarrationTimelineArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, renderDimensions, renderExportSettings, scheduleNarrationSegments, splitNarrationScript } from "../studio-worker/src/renderer.mjs";
+import { buildBrandingArgs, buildNarrationTimelineArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, narrationCaptionSegments, renderDimensions, renderExportSettings, scheduleNarrationSegments, splitNarrationScript } from "../studio-worker/src/renderer.mjs";
 import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
@@ -343,6 +343,9 @@ test("narração é dividida, distribuída até o final e preparada em uma timel
   assert.match(graph, /adelay=450\|450/);
   assert.match(graph, /amix=inputs=4:duration=first/);
   assert.match(graph, /atrim=duration=30\.000/);
+  const captions = narrationCaptionSegments(scheduled);
+  assert.deepEqual(captions[1], { id: "narration-2", start: scheduled[1].start, end: scheduled[1].end, text: sentences[1] });
+  assert.equal("words" in captions[1], false);
 });
 
 test("parser do Whisper preserva português e timestamps reais por palavra", () => {

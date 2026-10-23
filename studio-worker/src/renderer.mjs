@@ -4,6 +4,7 @@ import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, studioOutputDimensions } fr
 import { workerConfig } from "./config.mjs";
 import { runProcess } from "./process-utils.mjs";
 import { writeAssCaptions } from "./captions.mjs";
+import { wavDurationSeconds } from "./tts-provider.mjs";
 
 const seconds = (value) => Math.max(0.05, Number(value || 0)).toFixed(3);
 
@@ -40,18 +41,30 @@ export function buildNarrationTimelineArgs(segments, outputPath, duration) {
   return [...args, "-filter_complex", graph, "-map", "[aout]", "-c:a", "pcm_s16le", outputPath];
 }
 
-function narrationCaptionSegments(segments) {
-  return segments.map((segment, index) => {
-    const words = String(segment.text || "").split(/\s+/).filter(Boolean);
-    const span = Math.max(0.1, Number(segment.end) - Number(segment.start));
-    return {
-      id: `narration-${index + 1}`,
-      start: segment.start,
-      end: segment.end,
-      text: segment.text,
-      words: words.map((word, wordIndex) => ({ text: word, start: Number((Number(segment.start) + span * wordIndex / words.length).toFixed(3)), end: Number((Number(segment.start) + span * (wordIndex + 1) / words.length).toFixed(3)) }))
-    };
-  });
+export function narrationCaptionSegments(segments) {
+  return segments.map((segment, index) => ({
+    id: `narration-${index + 1}`,
+    start: segment.start,
+    end: segment.end,
+    text: segment.text
+  }));
+}
+
+export async function trimNarrationAudio(spoken, outputDir, index, signal) {
+  const trimmedPath = path.join(outputDir, `ai-narration-${String(index + 1).padStart(2, "0")}-trimmed.wav`);
+  await runProcess(workerConfig.ffmpegPath, [
+    "-y", "-i", spoken.localPath,
+    "-af", "silenceremove=start_periods=1:start_duration=0.02:start_silence=0.04:start_threshold=-50dB,areverse,silenceremove=start_periods=1:start_duration=0.02:start_silence=0.08:start_threshold=-50dB,areverse,aresample=48000,aformat=channel_layouts=stereo",
+    "-c:a", "pcm_s16le", trimmedPath
+  ], { signal });
+  const trimmedDuration = wavDurationSeconds(await fs.readFile(trimmedPath));
+  if (trimmedDuration < 0.1) throw Object.assign(new Error("A locução gerada não contém fala audível."), { code: "narration_silence_only" });
+  return {
+    ...spoken,
+    localPath: trimmedPath,
+    originalDurationSeconds: Number(spoken.durationSeconds || 0),
+    durationSeconds: trimmedDuration
+  };
 }
 
 export function renderDimensions(format, profile = "final") {
@@ -328,7 +341,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     const spokenParts = [];
     for (let index = 0; index < parts.length; index += 1) {
       const spoken = await speechProvider.synthesize({ script: parts[index], voice: plan.narration.voice, tone: plan.narration.tone, outputDir, fileName: `ai-narration-${String(index + 1).padStart(2, "0")}.wav`, signal });
-      if (spoken.available) spokenParts.push({ ...spoken, text: parts[index] });
+      if (spoken.available) spokenParts.push({ ...(await trimNarrationAudio(spoken, outputDir, index, signal)), text: parts[index] });
       await progress("narration", index + 1, parts.length);
     }
     if (spokenParts.length) {
@@ -336,9 +349,9 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
       narrationPath = path.join(outputDir, "ai-narration-timeline.wav");
       await runProcess(workerConfig.ffmpegPath, buildNarrationTimelineArgs(scheduled, narrationPath, plan.duration), { signal });
       const captionSegments = narrationCaptionSegments(scheduled);
-      captionsPath = await writeAssCaptions(path.join(outputDir, "narration-captions.ass"), { segments: captionSegments }, { ...(plan.captions || {}), enabled: true, mode: plan.captions?.mode || "traditional", format: plan.format });
+      captionsPath = await writeAssCaptions(path.join(outputDir, "narration-captions.ass"), { segments: captionSegments }, { ...(plan.captions || {}), enabled: true, mode: "traditional", format: plan.format });
       plan.textLayers = (plan.textLayers || []).map((layer) => layer.type === "ai_scene_text" ? { ...layer, position: "top", slot: 1 } : layer);
-      plan.captions = { ...(plan.captions || {}), enabled: true, provider: "openai-tts-timeline", autoNarration: true, segments: captionSegments };
+      plan.captions = { ...(plan.captions || {}), enabled: true, mode: "traditional", provider: "openai-tts-timeline", autoNarration: true, segments: captionSegments };
       plan.narration = { ...plan.narration, provider: spokenParts[0].provider, model: spokenParts[0].model, voice: spokenParts[0].voice, characters: spokenParts.reduce((sum, item) => sum + Number(item.characters || 0), 0), durationSeconds: Number(spokenParts.reduce((sum, item) => sum + Number(item.durationSeconds || 0), 0).toFixed(3)), timelineDurationSeconds: Number(scheduled.at(-1)?.end || 0), estimatedCostUsd: Number(spokenParts.reduce((sum, item) => sum + Number(item.estimatedCostUsd || 0), 0).toFixed(6)), segments: scheduled.map(({ text, start, end, durationSeconds }) => ({ text, start, end, durationSeconds })), rendered: true };
     }
   }

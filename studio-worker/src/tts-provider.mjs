@@ -10,7 +10,7 @@ const TONES = {
   calm: "Fale em português brasileiro com tom calmo, elegante e inspirador."
 };
 
-function wavDurationSeconds(buffer) {
+export function wavDurationSeconds(buffer) {
   if (buffer.length < 44 || buffer.toString("ascii", 0, 4) !== "RIFF") return 0;
   let offset = 12;
   let byteRate = 0;
