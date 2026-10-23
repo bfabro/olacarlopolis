@@ -123,6 +123,10 @@ A versão própria do Olá Studio é exibida nas telas de acesso, na barra super
 
 A autenticação solicita persistência local explícita ao Firebase. Se a sessão terminar ou o usuário sair durante uma renderização, o worker continua processando no servidor. Depois de entrar novamente, o Studio busca o projeto ativo do próprio usuário, reconecta ao job e reabre automaticamente o andamento e seu histórico. Os cards ativos também oferecem a ação **Acompanhar**. O progresso não é exposto sem autenticação.
 
+O processamento mostra tempo decorrido, uma faixa dinâmica de tempo restante e a previsão total. A estimativa combina o progresso atual com a mediana histórica de segundos por unidade de processamento do próprio usuário; por isso é apresentada como faixa, nunca como promessa exata. Ao concluir, o tempo total real substitui a previsão.
+
+Os detalhes de consumo distinguem créditos estimados de processamento, débito efetivo e custo estimado do provedor de IA. Enquanto a cobrança estiver desativada, o ledger registra `amount: 0`, ainda que exiba os créditos calculados. Quando o Diretor de IA é aplicado, a tela informa modelo, tokens retornados pelo provedor e custo estimado em dólar, sem expor a chave da API.
+
 ## Editor visual e versões
 
 Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON privado diretamente do Storage autenticado e apresenta:

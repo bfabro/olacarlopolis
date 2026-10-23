@@ -3,6 +3,7 @@ import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, s
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=9";
+import { estimateProcessingTiming } from "../shared/studio-metrics.mjs?v=1";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -19,8 +20,8 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v32", date: "2026-10-23" });
-const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "" };
+const STUDIO_RELEASE = Object.freeze({ label: "v33", date: "2026-10-23" });
+const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 const resumableStatuses = new Set(["queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"]);
@@ -99,7 +100,7 @@ async function showProjectVideo(projectId) {
   switchView("processing");
   if (state.activeJobId) {
     const job = (await get(ref(db, `studioJobs/${state.user.uid}/${state.activeJobId}`))).val();
-    if (job) renderProcessingLog(job.events, job);
+    if (job) { renderProcessingLog(job.events, job); updateProcessingTiming(job); }
   }
   if (state.outputPreviewUrl) URL.revokeObjectURL(state.outputPreviewUrl);
   const outputUrl = await privateOutputUrl(project.output);
@@ -108,6 +109,7 @@ async function showProjectVideo(projectId) {
   $("downloadVideo").href = outputUrl;
   $("downloadVideo").download = cleanFileName(project.output.fileName || `${project.name || "ola-studio"}.mp4`);
   showDirectorResult(project.directorResult);
+  await loadAndRenderProjectCost(state.activeJobId, project.directorResult);
   $("processingStatusCard").classList.add("hidden");
   $("resultCard").classList.remove("hidden");
 }
@@ -133,6 +135,77 @@ function formatBytes(bytes) {
 
 function formatDate(timestamp) {
   return timestamp ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(timestamp)) : "-";
+}
+
+function formatDuration(seconds) {
+  const total = Math.max(0, Math.round(Number(seconds || 0)));
+  const hours = Math.floor(total / 3600);
+  const minutes = Math.floor(total % 3600 / 60);
+  const remainder = total % 60;
+  if (hours) return `${hours}h ${String(minutes).padStart(2, "0")}min`;
+  if (minutes) return `${minutes}min ${String(remainder).padStart(2, "0")}s`;
+  return `${remainder}s`;
+}
+
+function formatUsd(value) {
+  return `US$ ${Number(value || 0).toLocaleString("pt-BR", { minimumFractionDigits: 6, maximumFractionDigits: 6 })}`;
+}
+
+function stopProcessingClock() {
+  if (state.processingClock) clearInterval(state.processingClock);
+  state.processingClock = null;
+}
+
+function paintProcessingTiming() {
+  const job = state.currentTimingJob;
+  if (!job) return;
+  const timing = estimateProcessingTiming(job, state.processingCosts);
+  $("processingElapsed").textContent = formatDuration(timing.elapsedSeconds);
+  if (timing.complete) {
+    $("processingRemaining").textContent = "Concluído";
+    $("processingTotal").textContent = formatDuration(timing.totalSeconds);
+    return;
+  }
+  $("processingRemaining").textContent = timing.calculating ? "Calculando…" : `${formatDuration(timing.remainingLowSeconds)}–${formatDuration(timing.remainingHighSeconds)}`;
+  $("processingTotal").textContent = timing.calculating ? "Estimando…" : `aprox. ${formatDuration(timing.totalSeconds)}`;
+}
+
+function updateProcessingTiming(job) {
+  state.currentTimingJob = { ...(job || {}) };
+  paintProcessingTiming();
+  stopProcessingClock();
+  if (job && !["completed", "failed", "cancelled"].includes(job.status)) state.processingClock = setInterval(paintProcessingTiming, 1000);
+}
+
+function resetProcessingTiming() {
+  stopProcessingClock();
+  state.currentTimingJob = null;
+  $("processingElapsed").textContent = "0s";
+  $("processingRemaining").textContent = "Calculando…";
+  $("processingTotal").textContent = "Estimando…";
+}
+
+async function loadProcessingCosts() {
+  const snapshot = await get(query(ref(db, "studioAdminCosts"), limitToLast(100)));
+  state.processingCosts = Object.entries(snapshot.val() || {}).map(([jobId, item]) => ({ jobId, ...(item || {}) })).filter((item) => item.uid === state.user?.uid);
+  return state.processingCosts;
+}
+
+function renderCostDetails(cost = {}, ledger = {}, director = {}) {
+  const node = $("resultCostDetails");
+  if (!node) return;
+  if (!Object.keys(cost).length && !Object.keys(ledger).length) { node.classList.add("hidden"); node.innerHTML = ""; return; }
+  const aiUsed = director?.applied === true || (cost.aiProvider && cost.aiProvider !== "none");
+  const tokens = Number(cost.aiUsage?.total_tokens || 0);
+  const credits = Number(ledger.estimatedCredits ?? cost.estimatedCredits ?? 0);
+  node.classList.remove("hidden");
+  node.innerHTML = `<div><span><i class="fa-solid fa-stopwatch"></i> Tempo total</span><strong>${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</strong></div><div><span><i class="fa-solid fa-coins"></i> Créditos de processamento</span><strong>${credits} ${credits === 1 ? "crédito" : "créditos"}</strong><small>${Number(ledger.amount || 0) ? `${Number(ledger.amount)} debitado(s)` : "MVP sem débito real"}</small></div><div><span><i class="fa-solid fa-wand-magic-sparkles"></i> Diretor de IA</span><strong>${aiUsed ? formatUsd(cost.aiEstimatedCostUsd) : "Não utilizado"}</strong><small>${aiUsed ? `${escapeHtml(cost.aiModel || director.model || "IA")} • ${tokens.toLocaleString("pt-BR")} tokens` : "Montagem técnica local"}</small></div>`;
+}
+
+async function loadAndRenderProjectCost(jobId, director = {}) {
+  if (!jobId || !state.user) return $("resultCostDetails")?.classList.add("hidden");
+  const [costSnapshot, ledgerSnapshot] = await Promise.all([get(ref(db, `studioAdminCosts/${jobId}`)), get(ref(db, `studioCreditLedger/${state.user.uid}/${jobId}`))]);
+  renderCostDetails(costSnapshot.val() || {}, ledgerSnapshot.val() || {}, director);
 }
 
 function processingEventTime(timestamp) {
@@ -169,6 +242,7 @@ function resetProcessingLog(message = "Preparando o processamento.") {
   $("processingLogBody")?.classList.remove("hidden");
   $("processingLogToggle")?.setAttribute("aria-expanded", "true");
   renderProcessingLog({ local: { timestamp: Date.now(), stage: "upload", status: "uploading", level: "info", code: "current_status", message } });
+  resetProcessingTiming();
 }
 
 function selectedValue(name) {
@@ -614,6 +688,7 @@ function watchJob(jobId, projectId) {
     const job = snapshot.val();
     if (!job) return;
     renderProcessingLog(job.events, job);
+    updateProcessingTiming(job);
     const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "transcription" || job.stage === "transcription_review" ? "transcription" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
     markProcessStep(step);
     updateProgress(job.progress || 25, statusLabels[job.status] || job.stage || "Processando", job.message || "O processamento continua no worker.");
@@ -643,6 +718,7 @@ function watchJob(jobId, projectId) {
       $("downloadVideo").href = outputUrl;
       $("downloadVideo").download = `${cleanFileName(job.output?.fileName || "ola-studio.mp4")}`;
       showDirectorResult(job.director);
+      await loadAndRenderProjectCost(jobId, job.director);
       $("resultCard").classList.remove("hidden");
       loadProjects();
     }
@@ -1126,7 +1202,7 @@ function renderProjects() {
 
 async function loadUsage() {
   if (!state.user) return;
-  const [creditsSnap, usageSnap, ledgerSnap] = await Promise.all([get(ref(db, `studioCredits/${state.user.uid}`)), get(ref(db, `studioUsage/${state.user.uid}`)), get(query(ref(db, `studioCreditLedger/${state.user.uid}`), limitToLast(30)))]);
+  const [creditsSnap, usageSnap, ledgerSnap] = await Promise.all([get(ref(db, `studioCredits/${state.user.uid}`)), get(ref(db, `studioUsage/${state.user.uid}`)), get(query(ref(db, `studioCreditLedger/${state.user.uid}`), limitToLast(30))), loadProcessingCosts()]);
   const credits = creditsSnap.val() || {};
   const usage = usageSnap.val() || {};
   const ledger = ledgerSnap.val() || {};
@@ -1137,7 +1213,16 @@ async function loadUsage() {
   const units = Object.values(usage.estimates || {}).reduce((sum, item) => sum + Number(item.processingUnits || 0), 0);
   $("processingUnits").textContent = units.toLocaleString("pt-BR");
   const entries = Object.entries(ledger).map(([id, item]) => ({ id, ...item })).sort((a, b) => Number(b.createdAt || 0) - Number(a.createdAt || 0));
-  $("usageHistory").innerHTML = entries.length ? entries.map((item) => `<div class="usage-entry"><span><strong>${escapeHtml(item.description || item.type || "Movimentação")}</strong><small>${formatDate(item.createdAt)}</small></span><b>${Number(item.amount || 0) > 0 ? "+" : ""}${Number(item.amount || 0)}</b></div>`).join("") : '<p class="empty-copy">Nenhum consumo registrado.</p>';
+  const costs = new Map(state.processingCosts.map((item) => [item.jobId, item]));
+  const projects = new Map(state.projects.map((item) => [item.id, item]));
+  $("usageHistory").innerHTML = entries.length ? entries.map((item) => {
+    const cost = costs.get(item.jobId) || {};
+    const project = projects.get(item.projectId) || {};
+    const aiUsed = cost.aiProvider && cost.aiProvider !== "none";
+    const creditsUsed = Number(item.estimatedCredits ?? cost.estimatedCredits ?? 0);
+    const tokens = Number(cost.aiUsage?.total_tokens || 0);
+    return `<div class="usage-entry usage-entry-detailed"><span><strong>${escapeHtml(project.name || item.description || item.type || "Processamento")}</strong><small>${formatDate(item.createdAt)} • ${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</small><em>${aiUsed ? `IA ${escapeHtml(cost.aiModel || cost.aiProvider)} • ${tokens.toLocaleString("pt-BR")} tokens • ${formatUsd(cost.aiEstimatedCostUsd)}` : "IA não utilizada"}</em></span><b>${creditsUsed} ${creditsUsed === 1 ? "crédito" : "créditos"}<small>${Number(item.amount || 0) ? `${Number(item.amount)} debitado(s)` : "0 debitado • MVP"}</small></b></div>`;
+  }).join("") : '<p class="empty-copy">Nenhum consumo registrado.</p>';
 }
 
 async function authorize(user) {
@@ -1161,6 +1246,7 @@ async function authorize(user) {
   $("userInitial").textContent = String(state.profile.nome || user.email || "A").trim().charAt(0).toUpperCase();
   showGate("studioApp");
   resetEditor();
+  await loadProcessingCosts();
   await loadProjects();
   hadAuthenticatedSession = true;
   if (authPersistenceWarning) toast(authPersistenceWarning);
@@ -1185,6 +1271,7 @@ function handleAuthState(user) {
   }
   state.jobUnsubscribe?.();
   state.jobUnsubscribe = null;
+  stopProcessingClock();
   state.user = null;
   state.profile = null;
   if (hadAuthenticatedSession) $("loginMessage").textContent = logoutRequested ? "Você saiu do Studio. Seus projetos e processamentos continuam salvos." : "Sua sessão terminou. Entre novamente para retomar automaticamente o processamento.";

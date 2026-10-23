@@ -9,14 +9,14 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=16">
-  <link rel="stylesheet" href="studio-overrides.css?v=16">
+  <link rel="stylesheet" href="studio.css?v=17">
+  <link rel="stylesheet" href="studio-overrides.css?v=17">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-      <span class="studio-release-badge">Olá Studio <b data-studio-version>v32</b></span>
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v33</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -27,7 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v32</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v33</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -43,7 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v32</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v33</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -55,7 +55,7 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v32</b></small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v33</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
@@ -70,7 +70,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
-        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v32</b></span>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v33</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -270,6 +270,7 @@
             <div id="processingIcon" class="processing-icon"><i class="fa-solid fa-clapperboard"></i></div>
             <span id="processingEyebrow" class="eyebrow">Enviando arquivos</span><h2 id="processingTitle">Seu vídeo está sendo preparado</h2><p id="processingMessage">Não feche esta tela durante o envio.</p>
             <div class="progress-track"><span id="processingBar"></span></div><div class="progress-row"><strong id="processingPercent">0%</strong><span id="processingStage">Iniciando</span></div>
+            <div class="processing-timing" aria-live="polite"><span><small>Tempo decorrido</small><strong id="processingElapsed">0s</strong></span><span><small>Previsão restante</small><strong id="processingRemaining">Calculando…</strong></span><span><small>Tempo total</small><strong id="processingTotal">Estimando…</strong></span></div>
             <ol class="process-steps"><li data-process-step="upload" class="active"><i class="fa-solid fa-cloud-arrow-up"></i><span>Upload</span></li><li data-process-step="queue"><i class="fa-solid fa-list-check"></i><span>Fila</span></li><li data-process-step="analysis"><i class="fa-solid fa-wave-square"></i><span>Análise</span></li><li data-process-step="transcription"><i class="fa-solid fa-closed-captioning"></i><span>Legendas</span></li><li data-process-step="render"><i class="fa-solid fa-film"></i><span>Renderização</span></li><li data-process-step="complete"><i class="fa-solid fa-circle-check"></i><span>Concluído</span></li></ol>
             <button id="cancelProcessingButton" class="cancel-processing-button" type="button"><i class="fa-solid fa-ban"></i> Cancelar criação</button>
           </section>
@@ -291,6 +292,7 @@
           <section id="resultCard" class="studio-card result-card hidden">
             <div class="card-heading"><span><i class="fa-solid fa-check"></i></span><div><h2>Vídeo concluído</h2><p>Confira o resultado antes de baixar.</p></div></div>
             <p id="resultDirectorStatus" class="director-result-note hidden"></p>
+            <div id="resultCostDetails" class="result-cost-details hidden"></div>
             <video id="previewPlayer" controls playsinline></video>
             <div class="result-actions"><a id="downloadVideo" class="create-button" href="#" download><i class="fa-solid fa-download"></i> Baixar MP4</a><button id="regenerateVideo" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Gerar outra versão</button><button id="backToProjects" class="secondary-button" type="button"><i class="fa-solid fa-arrow-left"></i> Meus projetos</button></div>
           </section>
@@ -306,6 +308,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=25"></script>
+  <script type="module" src="studio.js?v=26"></script>
 </body>
 </html>

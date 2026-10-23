@@ -212,7 +212,7 @@ async function processJob(job) {
     }
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/status`] = "consumed";
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/completedAt`] = Date.now();
-    updates[`studioCreditLedger/${job.uid}/${job.jobId}`] = { type: job.mode === "preview" ? "preview" : "processing", amount: 0, estimatedCredits: cost.estimatedCredits, projectId: job.projectId, jobId: job.jobId, description: job.mode === "preview" ? "Prévia reduzida sem cobrança" : "Processamento do MVP sem cobrança", createdAt: Date.now() };
+    updates[`studioCreditLedger/${job.uid}/${job.jobId}`] = { type: job.mode === "preview" ? "preview" : "processing", amount: 0, estimatedCredits: cost.estimatedCredits, processingUnits: cost.processingUnits, aiUsed: cost.aiProvider !== "none", aiProvider: cost.aiProvider, aiModel: cost.aiModel, aiEstimatedCostUsd: cost.aiEstimatedCostUsd, aiTokens: Number(cost.aiUsage?.total_tokens || 0), elapsedSeconds: cost.elapsedSeconds, projectId: job.projectId, jobId: job.jobId, description: job.mode === "preview" ? "Prévia reduzida sem cobrança" : "Processamento do MVP sem cobrança", createdAt: Date.now() };
     updates[`studioAdminCosts/${job.jobId}`] = { uid: job.uid, projectId: job.projectId, ...cost };
     await database.ref().update(updates);
   } catch (error) {

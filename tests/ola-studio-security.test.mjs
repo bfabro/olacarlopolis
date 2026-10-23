@@ -54,7 +54,10 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.match(client, /setPersistence\(auth, browserLocalPersistence\)/);
   assert.match(client, /resumeLatestProcessing/);
   assert.match(client, /data-project-progress/);
-  assert.match(html, /data-studio-version>v32/);
+  assert.match(client, /studioAdminCosts/);
+  assert.match(client, /aiEstimatedCostUsd/);
+  assert.match(html, /id="processingRemaining"/);
+  assert.match(html, /data-studio-version>v33/);
   assert.doesNotMatch(client, /setInterval\([^)]*progress/i);
 });
 
