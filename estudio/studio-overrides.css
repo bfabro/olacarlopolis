@@ -9,6 +9,40 @@
   flex-wrap: wrap;
 }
 
+.studio-release-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: max-content;
+  padding: 6px 10px;
+  border: 1px solid #cfe0e8;
+  border-radius: 999px;
+  background: #f3f9fb;
+  color: #486675;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.studio-release-badge b {
+  color: var(--blue);
+}
+
+.topbar-release {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.studio-topbar .topbar-release + .user-chip {
+  margin-left: 0;
+}
+
+@media(max-width:620px) {
+  .topbar-release {
+    padding: 5px 8px;
+  }
+}
+
 .cancel-processing-button {
   margin: 24px auto 0;
   border: 1px solid #efb3b7;

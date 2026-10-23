@@ -119,6 +119,10 @@ A preparação visual tenta primeiro o ponto técnico selecionado de cada vídeo
 
 A tela de processamento apresenta um histórico persistido no próprio trabalho, com horário, etapa, avisos, códigos de suporte e detalhes compreensíveis. Mensagens destinadas ao usuário não exibem chaves, caminhos temporários nem respostas brutas do provedor. O histórico permanece disponível ao reabrir um vídeo concluído.
 
+A versão própria do Olá Studio é exibida nas telas de acesso, na barra superior e na marca lateral. Toda alteração do Studio deve incrementar esse identificador junto das versões gerais do site, painel e service worker.
+
+A autenticação solicita persistência local explícita ao Firebase. Se a sessão terminar ou o usuário sair durante uma renderização, o worker continua processando no servidor. Depois de entrar novamente, o Studio busca o projeto ativo do próprio usuário, reconecta ao job e reabre automaticamente o andamento e seu histórico. Os cards ativos também oferecem a ação **Acompanhar**. O progresso não é exposto sem autenticação.
+
 ## Editor visual e versões
 
 Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON privado diretamente do Storage autenticado e apresenta:

@@ -9,13 +9,14 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=15">
-  <link rel="stylesheet" href="studio-overrides.css?v=15">
+  <link rel="stylesheet" href="studio.css?v=16">
+  <link rel="stylesheet" href="studio-overrides.css?v=16">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v32</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -26,6 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
+      <span class="studio-release-badge">Versão <b data-studio-version>v32</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -41,6 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
+      <span class="studio-release-badge">Versão <b data-studio-version>v32</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -52,7 +55,7 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido</small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v32</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
@@ -67,6 +70,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v32</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -302,6 +306,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=24"></script>
+  <script type="module" src="studio.js?v=25"></script>
 </body>
 </html>

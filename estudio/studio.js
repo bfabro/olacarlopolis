@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=9";
@@ -19,9 +19,20 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
+const STUDIO_RELEASE = Object.freeze({ label: "v32", date: "2026-10-23" });
 const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "" };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
+const resumableStatuses = new Set(["queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"]);
+let hadAuthenticatedSession = false;
+let logoutRequested = false;
+let authPersistenceWarning = "";
+
+document.querySelectorAll("[data-studio-version]").forEach((node) => { node.textContent = STUDIO_RELEASE.label; });
+const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch((error) => {
+  console.warn("Não foi possível manter a sessão local do Studio.", error?.code || error?.message);
+  authPersistenceWarning = "Este navegador bloqueou a permanência da sessão. O processamento continuará salvo e poderá ser retomado após entrar novamente.";
+});
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
@@ -578,15 +589,23 @@ async function approveTranscriptReview() {
   }
 }
 
-async function openProjectReview(projectId) {
+async function openProjectProgress(projectId, { automatic = false } = {}) {
   const project = state.projects.find((item) => item.id === projectId) || (await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`))).val();
-  if (!project?.jobId) return toast("A revisão deste projeto não foi encontrada.");
+  if (!project?.jobId) return toast("O processamento deste projeto não foi encontrado.");
   state.activeProjectId = projectId;
   state.activeJobId = project.jobId;
   state.cancelRequested = false;
-  resetProcessingLog("Carregando os detalhes do processamento.");
+  resetProcessingLog(automatic ? "Sessão recuperada. Reconectando ao processamento em andamento." : "Carregando os detalhes do processamento.");
   switchView("processing");
   watchJob(project.jobId, projectId);
+  if (automatic) toast("Processamento retomado automaticamente.");
+}
+
+async function resumeLatestProcessing() {
+  const project = state.projects.find((item) => resumableStatuses.has(item.status) && item.jobId);
+  if (!project) return false;
+  await openProjectProgress(project.id, { automatic: true });
+  return true;
 }
 
 function watchJob(jobId, projectId) {
@@ -1093,6 +1112,7 @@ function renderProjects() {
     const deletionActive = ["deletion_queued", "deleting"].includes(project.status);
     const active = deletionActive || ["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"].includes(project.status);
     const review = project.status === "awaiting_review" && project.jobId ? `<button type="button" data-project-review="${project.id}"><i class="fa-solid fa-closed-captioning"></i> Revisar legendas</button>` : "";
+    const progress = active && !deletionActive && project.jobId ? `<button type="button" data-project-progress="${project.id}"><i class="fa-solid fa-chart-line"></i> Acompanhar</button>` : "";
     const open = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-open="${project.id}"><i class="fa-solid fa-circle-play"></i> Abrir</button>` : "";
     const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
     const edit = completed && project.jobId ? `<button type="button" data-project-edit="${project.id}"><i class="fa-solid fa-sliders"></i> Editar</button>` : "";
@@ -1100,7 +1120,7 @@ function renderProjects() {
     const regenerate = active ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
     const remove = active ? "" : `<button type="button" class="danger" data-project-delete="${project.id}"><i class="fa-solid fa-trash-can"></i> Excluir</button>`;
     const director = project.director?.mode === "semantic" ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? "Direção por IA" : "IA solicitada"}</span>` : "";
-    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ["deletion_queued", "deleting"].includes(project.status) ? "deleting" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${open}${edit}${download}${cancel}${regenerate}${remove}</div></div></article>`;
+    return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ["deletion_queued", "deleting"].includes(project.status) ? "deleting" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${progress}${open}${edit}${download}${cancel}${regenerate}${remove}</div></div></article>`;
   }).join("");
 }
 
@@ -1142,23 +1162,40 @@ async function authorize(user) {
   showGate("studioApp");
   resetEditor();
   await loadProjects();
-  switchView(location.hash === "#editor" ? "editor" : location.hash === "#usage" ? "usage" : "projects");
+  hadAuthenticatedSession = true;
+  if (authPersistenceWarning) toast(authPersistenceWarning);
+  const resumed = await resumeLatestProcessing();
+  if (!resumed) switchView(location.hash === "#editor" ? "editor" : location.hash === "#usage" ? "usage" : "projects");
 }
 
 $("loginForm").addEventListener("submit", async (event) => {
   event.preventDefault();
   $("loginButton").disabled = true;
   $("loginMessage").textContent = "";
-  try { await signInWithEmailAndPassword(auth, $("loginEmail").value.trim(), $("loginPassword").value); }
+  try { await authPersistenceReady; await signInWithEmailAndPassword(auth, $("loginEmail").value.trim(), $("loginPassword").value); }
   catch (error) { $("loginMessage").textContent = error.code === "auth/invalid-credential" ? "E-mail ou senha inválidos." : "Não foi possível entrar. Tente novamente."; }
   finally { $("loginButton").disabled = false; }
 });
 
-onAuthStateChanged(auth, (user) => user ? authorize(user).catch((error) => { console.error(error); $("unavailableMessage").textContent = "Não foi possível validar o acesso ao Studio."; showGate("studioUnavailable"); }) : showGate("studioLogin"));
+function handleAuthState(user) {
+  if (user) {
+    logoutRequested = false;
+    authorize(user).catch((error) => { console.error(error); $("unavailableMessage").textContent = "Não foi possível validar o acesso ao Studio."; showGate("studioUnavailable"); });
+    return;
+  }
+  state.jobUnsubscribe?.();
+  state.jobUnsubscribe = null;
+  state.user = null;
+  state.profile = null;
+  if (hadAuthenticatedSession) $("loginMessage").textContent = logoutRequested ? "Você saiu do Studio. Seus projetos e processamentos continuam salvos." : "Sua sessão terminou. Entre novamente para retomar automaticamente o processamento.";
+  showGate("studioLogin");
+}
+
+authPersistenceReady.finally(() => onAuthStateChanged(auth, handleAuthState));
 
 document.querySelectorAll("[data-studio-view]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.studioView)));
 document.querySelectorAll("[data-new-project]").forEach((button) => button.addEventListener("click", openNewProject));
-$("logoutButton").addEventListener("click", () => signOut(auth));
+$("logoutButton").addEventListener("click", () => { logoutRequested = true; signOut(auth); });
 $("mobileMenuButton").addEventListener("click", () => document.querySelector(".studio-shell").classList.toggle("menu-open"));
 $("refreshProjects").addEventListener("click", () => loadProjects().then(() => toast("Projetos atualizados.")));
 $("dropZone").addEventListener("click", () => $("sourceFiles").click());
@@ -1182,13 +1219,15 @@ $("projectsGrid").addEventListener("click", (event) => {
   const cancel = event.target.closest("[data-project-cancel]");
   const regenerate = event.target.closest("[data-project-regenerate]");
   const review = event.target.closest("[data-project-review]");
+  const progress = event.target.closest("[data-project-progress]");
   const edit = event.target.closest("[data-project-edit]");
   const remove = event.target.closest("[data-project-delete]");
   if (open) showProjectVideo(open.dataset.projectOpen).catch((error) => toast(error.message));
   if (download) downloadProject(download.dataset.projectDownload).catch((error) => toast(error.message));
   if (cancel) cancelProject(cancel.dataset.projectCancel).catch((error) => toast(error.message));
   if (regenerate) regenerateProject(regenerate.dataset.projectRegenerate).catch((error) => toast(error.message));
-  if (review) openProjectReview(review.dataset.projectReview).catch((error) => toast(error.message));
+  if (review) openProjectProgress(review.dataset.projectReview).catch((error) => toast(error.message));
+  if (progress) openProjectProgress(progress.dataset.projectProgress).catch((error) => toast(error.message));
   if (edit) openVisualEditor(edit.dataset.projectEdit).catch((error) => toast(error.message));
   if (remove) requestProjectDeletion(remove.dataset.projectDelete).catch((error) => toast(error.message));
 });
