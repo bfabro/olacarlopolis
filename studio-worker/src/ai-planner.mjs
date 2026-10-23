@@ -106,13 +106,14 @@ const semanticSchema = {
   type: "object",
   additionalProperties: false,
   properties: {
-    scenes: { type: "array", items: { type: "object", additionalProperties: false, properties: { candidateId: { type: "string" }, narrativeRole: { type: "string", enum: ROLES }, transition: { type: "string", enum: TRANSITIONS }, emphasis: { type: "string" } }, required: ["candidateId", "narrativeRole", "transition", "emphasis"] } },
+    scenes: { type: "array", items: { type: "object", additionalProperties: false, properties: { candidateId: { type: "string" }, narrativeRole: { type: "string", enum: ROLES }, transition: { type: "string", enum: TRANSITIONS }, emphasis: { type: "string" }, onScreenText: { type: "string" } }, required: ["candidateId", "narrativeRole", "transition", "emphasis", "onScreenText"] } },
+    narration: { type: "object", additionalProperties: false, properties: { script: { type: "string" }, tone: { type: "string", enum: ["professional", "warm", "energetic", "calm"] } }, required: ["script", "tone"] },
     textPreset: { type: "string", enum: ["clean", "cinematic", "promo", "local", "minimal", "impact"] },
     rhythm: { type: "string", enum: ["soft", "balanced", "dynamic"] },
     rationale: { type: "string" },
     confidence: { type: "number" }
   },
-  required: ["scenes", "textPreset", "rhythm", "rationale", "confidence"]
+  required: ["scenes", "narration", "textPreset", "rhythm", "rationale", "confidence"]
 };
 
 function responseText(payload) {
@@ -146,9 +147,19 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
       transition: index === 0 ? "none" : userTransitionLocked ? baseScene.transition : directed.item.transition,
       hasSpeech: speechAt(source, safeStart),
       narrativeRole: directed.item.narrativeRole,
+      onScreenText: String(directed.item.onScreenText || "").replace(/\s+/g, " ").trim().slice(0, 90),
       selection: { method: "semantic-ai-v1", candidateId: directed.candidate.id, qualityScore: directed.candidate.qualityScore, flags: directed.candidate.flags, reason: String(directed.item.emphasis || "").slice(0, 280) }
     };
   });
+  let timeline = 0;
+  const aiTextLayers = scenes.map((scene, index) => {
+    const start = timeline;
+    const end = Math.min(Number(basePlan.duration || 0), start + Number(scene.duration || 0));
+    timeline = Math.max(0, end - Number(scene.transitionDuration || 0));
+    if (!scene.onScreenText) return null;
+    return { id: `ai-scene-text-${index + 1}`, type: "ai_scene_text", value: scene.onScreenText, start, end, animation: "fade", position: "bottom", slot: 0, sizeScale: 0.82, color: "#FFFFFF", outlineColor: "#092B45", background: true, align: "center", font: "sans", margin: 86 };
+  }).filter(Boolean);
+  const script = String(direction.narration?.script || "").replace(/\s+/g, " ").trim().slice(0, 4000);
   const plan = {
     ...basePlan,
     planner: { type: "semantic-ai", version: 1, semanticAnalysis: true, technicalSelection: true, provider: providerMeta.provider || "openai", model: providerMeta.model || "configured", fallback: false },
@@ -164,7 +175,9 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
       usage: providerMeta.usage || null,
       estimatedCostUsd: Number(providerMeta.estimatedCostUsd || 0)
     },
-    scenes
+    scenes,
+    textLayers: [...(basePlan.textLayers || []), ...aiTextLayers],
+    narration: { ...basePlan.narration, generated: true, script, tone: direction.narration?.tone || basePlan.narration?.tone || "professional", disclosure: "Voz gerada por inteligência artificial." }
   };
   return validateSemanticPlan(plan);
 }
@@ -198,9 +211,11 @@ export class OpenAISemanticPlanner {
   async createPlan({ project, basePlan, evidence, analyzedSources, signal }) {
     if (!this.enabled) throw new Error("Diretor de IA não configurado no worker.");
     const brief = String(project.director?.brief || "Criar uma montagem profissional coerente com o modelo selecionado.").slice(0, 1200);
+    const maxWords = Math.max(12, Math.floor(Number(basePlan.duration || 30) * 2.05));
+    const wantsScript = project.narration?.generateScript === true;
     const compactEvidence = { candidates: evidence.candidates, transcripts: evidence.transcripts, baseScenes: basePlan.scenes.map((scene) => ({ sourceId: scene.sourceId, start: scene.start, duration: scene.duration, narrativeRole: scene.narrativeRole })) };
     const content = [
-      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços ou características. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
+      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços, locais ou características. Use somente informações visíveis nos quadros, presentes nas transcrições ou declaradas no objetivo do usuário. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. ${wantsScript ? `Para cada cena, escreva onScreenText curto, claro e factual; deixe vazio quando não houver informação segura. Crie também uma narração contínua em português brasileiro com no máximo ${maxWords} palavras, coerente com a ordem das cenas.` : "Retorne todos os onScreenText e narration.script vazios."} Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
     ];
     evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro representativo do ${frame.candidateId}, origem ${frame.sourceId}:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: workerConfig.aiImageDetail }); });
     const timeoutSignal = AbortSignal.timeout(workerConfig.aiTimeoutMs);

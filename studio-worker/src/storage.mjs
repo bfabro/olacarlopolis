@@ -31,6 +31,11 @@ export async function uploadJson(value, storagePath) {
   return storagePath;
 }
 
+export async function downloadJson(storagePath) {
+  const [contents] = await bucket.file(storagePath).download();
+  return JSON.parse(contents.toString("utf8"));
+}
+
 export async function deleteProjectAssets(uid, projectId) {
   return deleteStudioProjectAssets(bucket, uid, projectId);
 }

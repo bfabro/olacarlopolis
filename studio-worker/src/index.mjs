@@ -3,7 +3,7 @@ import path from "node:path";
 import { workerConfig } from "./config.mjs";
 import { database } from "./firebase-client.mjs";
 import { nextQueuedJob, claimJob, updateJob } from "./queue.mjs";
-import { deleteProjectAssets, downloadAsset, uploadJson, uploadRender } from "./storage.mjs";
+import { deleteProjectAssets, downloadAsset, downloadJson, uploadJson, uploadRender } from "./storage.mjs";
 import { analyzeSources } from "./analyzer.mjs";
 import { createTranscriptionProvider, prepareReviewedTranscription } from "./transcription.mjs";
 import { createDeterministicPlan } from "./planner.mjs";
@@ -12,6 +12,7 @@ import { analyzeMusicRhythm } from "./rhythm.mjs";
 import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence, semanticFailureInfo } from "./ai-planner.mjs";
 import { prepareVisualEditorPlan } from "./editor-plan.mjs";
 import { generateLibraryMusic, generateTransitionSoundtrack, generatedAudioPaths } from "./sound-library.mjs";
+import { createSpeechProvider } from "./tts-provider.mjs";
 
 const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
@@ -88,8 +89,11 @@ async function processJob(job) {
     await updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 49, message: musicPath ? "Analisando o ritmo real da música." : "Montando a narrativa técnica." });
     const rhythm = await analyzeMusicRhythm(musicPath, workDir, cancellation.signal);
     const technicalPlan = createDeterministicPlan(project, analyzed, { rhythm });
-    let plan = job.planOverride ? prepareVisualEditorPlan(job.planOverride, technicalPlan, analyzed) : technicalPlan;
-    if (!job.planOverride && project.director?.mode === "semantic") {
+    const ownedPlanPrefix = `studio/${job.uid}/plans/${job.projectId}/`;
+    const reusablePlanPath = job.transcriptReview?.status === "approved" && String(job.plan?.storagePath || "").startsWith(ownedPlanPrefix) ? job.plan.storagePath : "";
+    const reusablePlan = reusablePlanPath ? await downloadJson(reusablePlanPath).catch(() => null) : null;
+    let plan = reusablePlan || (job.planOverride ? prepareVisualEditorPlan(job.planOverride, technicalPlan, analyzed) : technicalPlan);
+    if (!reusablePlan && !job.planOverride && project.director?.mode === "semantic") {
       const semanticPlanner = createSemanticPlanner();
       if (!semanticPlanner.enabled) {
         const fallback = { code: "ai_not_configured", message: "O Diretor de IA não está configurado neste worker. A montagem técnica local continuará normalmente." };
@@ -132,6 +136,7 @@ async function processJob(job) {
     const transcriptionProvider = project.captionsEnabled && !approvedTranscription ? await createTranscriptionProvider() : null;
     const rendered = await renderPlan({
       plan, sources: analyzed, outputDir, logoPath: logo?.localPath || "", musicPath, soundEffectsPath,
+      speechProvider: plan.narration?.enabled ? createSpeechProvider() : null,
       renderProfile: job.mode === "preview" ? "preview" : "final",
       transcriptionProvider,
       approvedTranscription,
@@ -139,9 +144,9 @@ async function processJob(job) {
       signal: cancellation.signal,
       progress: async (stage, done, total) => {
         const transcriptionStage = stage === "transcription" || stage === "transcription_review";
-        const base = stage === "segments" ? 50 : stage === "transitions" ? 76 : transcriptionStage ? 85 : 92;
-        const span = stage === "segments" ? 25 : stage === "transitions" ? 8 : transcriptionStage ? 6 : 5;
-        const message = stage === "segments" ? `Renderizando cena ${done} de ${total}.` : stage === "transitions" ? "Aplicando transições." : stage === "transcription_review" ? "Preparando a transcrição para sua revisão." : stage === "transcription" ? "Transcrevendo a fala em português para gerar legendas." : "Aplicando identidade visual, legendas e áudio.";
+        const base = stage === "segments" ? 50 : stage === "transitions" ? 76 : transcriptionStage ? 85 : stage === "narration" ? 91 : 94;
+        const span = stage === "segments" ? 25 : stage === "transitions" ? 8 : transcriptionStage ? 6 : stage === "narration" ? 3 : 3;
+        const message = stage === "segments" ? `Renderizando cena ${done} de ${total}.` : stage === "transitions" ? "Aplicando transições." : stage === "transcription_review" ? "Preparando a transcrição para sua revisão." : stage === "transcription" ? "Transcrevendo a fala em português para gerar legendas." : stage === "narration" ? "Gerando a narração por inteligência artificial." : "Aplicando identidade visual, legendas e áudio.";
         await updateJob(job.uid, job.jobId, { stage: transcriptionStage ? stage : "render", status: "rendering", progress: Math.min(97, base + Math.round(done / total * span)), message });
       }
     });
@@ -170,7 +175,7 @@ async function processJob(job) {
     const output = await uploadRender(outputPath, storagePath);
     ensureNotCancelled();
     const elapsedSeconds = Math.round((Date.now() - started) / 1000);
-    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.type === "semantic-ai" ? plan.planner.provider : "none", aiModel: plan.planner?.type === "semantic-ai" ? plan.planner.model : "none", aiUsage: plan.aiDirector?.usage || null, aiEstimatedCostUsd: Number(plan.aiDirector?.estimatedCostUsd || 0), workerId: workerConfig.workerId, createdAt: Date.now() };
+    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.type === "semantic-ai" ? plan.planner.provider : "none", aiModel: plan.planner?.type === "semantic-ai" ? plan.planner.model : "none", aiUsage: plan.aiDirector?.usage || null, aiEstimatedCostUsd: Number(plan.aiDirector?.estimatedCostUsd || 0), narrationUsed: plan.narration?.rendered === true, narrationProvider: plan.narration?.provider || "none", narrationModel: plan.narration?.model || "none", narrationVoice: plan.narration?.voice || "", narrationCharacters: Number(plan.narration?.characters || 0), narrationDurationSeconds: Number(plan.narration?.durationSeconds || 0), narrationEstimatedCostUsd: Number(plan.narration?.estimatedCostUsd || 0), workerId: workerConfig.workerId, createdAt: Date.now() };
     const updates = {};
     updates[`studioJobs/${job.uid}/${job.jobId}/status`] = "completed";
     updates[`studioJobs/${job.uid}/${job.jobId}/stage`] = "complete";
@@ -212,7 +217,7 @@ async function processJob(job) {
     }
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/status`] = "consumed";
     updates[`studioUsage/${job.uid}/estimates/${job.jobId}/completedAt`] = Date.now();
-    updates[`studioCreditLedger/${job.uid}/${job.jobId}`] = { type: job.mode === "preview" ? "preview" : "processing", amount: 0, estimatedCredits: cost.estimatedCredits, processingUnits: cost.processingUnits, aiUsed: cost.aiProvider !== "none", aiProvider: cost.aiProvider, aiModel: cost.aiModel, aiEstimatedCostUsd: cost.aiEstimatedCostUsd, aiTokens: Number(cost.aiUsage?.total_tokens || 0), elapsedSeconds: cost.elapsedSeconds, projectId: job.projectId, jobId: job.jobId, description: job.mode === "preview" ? "Prévia reduzida sem cobrança" : "Processamento do MVP sem cobrança", createdAt: Date.now() };
+    updates[`studioCreditLedger/${job.uid}/${job.jobId}`] = { type: job.mode === "preview" ? "preview" : "processing", amount: 0, estimatedCredits: cost.estimatedCredits, processingUnits: cost.processingUnits, aiUsed: cost.aiProvider !== "none", aiProvider: cost.aiProvider, aiModel: cost.aiModel, aiEstimatedCostUsd: cost.aiEstimatedCostUsd, aiTokens: Number(cost.aiUsage?.total_tokens || 0), narrationUsed: cost.narrationUsed, narrationProvider: cost.narrationProvider, narrationModel: cost.narrationModel, narrationVoice: cost.narrationVoice, narrationCharacters: cost.narrationCharacters, narrationDurationSeconds: cost.narrationDurationSeconds, narrationEstimatedCostUsd: cost.narrationEstimatedCostUsd, elapsedSeconds: cost.elapsedSeconds, projectId: job.projectId, jobId: job.jobId, description: job.mode === "preview" ? "Prévia reduzida sem cobrança" : "Processamento do MVP sem cobrança", createdAt: Date.now() };
     updates[`studioAdminCosts/${job.jobId}`] = { uid: job.uid, projectId: job.projectId, ...cost };
     await database.ref().update(updates);
   } catch (error) {

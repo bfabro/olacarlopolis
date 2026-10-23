@@ -1,4 +1,4 @@
-export const STUDIO_SCHEMA_VERSION = 7;
+export const STUDIO_SCHEMA_VERSION = 8;
 
 export const STUDIO_LIMITS = Object.freeze({
   maxFiles: 10,
@@ -190,6 +190,14 @@ export function normalizeStudioProject(input = {}) {
     director: {
       mode: input.director?.mode === "semantic" ? "semantic" : "local",
       brief: text(input.director?.brief, 1200)
+    },
+    narration: {
+      generateScript: input.director?.mode === "semantic" && input.narration?.generateScript === true,
+      enabled: input.director?.mode === "semantic" && input.narration?.generateScript === true && input.narration?.enabled === true,
+      voice: ["marin", "cedar"].includes(input.narration?.voice) ? input.narration.voice : "marin",
+      tone: ["professional", "warm", "energetic", "calm"].includes(input.narration?.tone) ? input.narration.tone : "professional",
+      volume: numberBetween(input.narration?.volume, 0.7, 1.5, 1),
+      disclosure: "Voz gerada por inteligência artificial."
     },
     textDesign: {
       preset: preset.id,

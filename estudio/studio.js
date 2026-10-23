@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=9";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=10";
 import { estimateProcessingTiming } from "../shared/studio-metrics.mjs?v=1";
 
 const firebaseConfig = {
@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v33", date: "2026-10-23" });
+const STUDIO_RELEASE = Object.freeze({ label: "v34", date: "2026-10-23" });
 const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
@@ -199,7 +199,8 @@ function renderCostDetails(cost = {}, ledger = {}, director = {}) {
   const tokens = Number(cost.aiUsage?.total_tokens || 0);
   const credits = Number(ledger.estimatedCredits ?? cost.estimatedCredits ?? 0);
   node.classList.remove("hidden");
-  node.innerHTML = `<div><span><i class="fa-solid fa-stopwatch"></i> Tempo total</span><strong>${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</strong></div><div><span><i class="fa-solid fa-coins"></i> Créditos de processamento</span><strong>${credits} ${credits === 1 ? "crédito" : "créditos"}</strong><small>${Number(ledger.amount || 0) ? `${Number(ledger.amount)} debitado(s)` : "MVP sem débito real"}</small></div><div><span><i class="fa-solid fa-wand-magic-sparkles"></i> Diretor de IA</span><strong>${aiUsed ? formatUsd(cost.aiEstimatedCostUsd) : "Não utilizado"}</strong><small>${aiUsed ? `${escapeHtml(cost.aiModel || director.model || "IA")} • ${tokens.toLocaleString("pt-BR")} tokens` : "Montagem técnica local"}</small></div>`;
+  const narrationUsed = cost.narrationUsed === true;
+  node.innerHTML = `<div><span><i class="fa-solid fa-stopwatch"></i> Tempo total</span><strong>${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</strong></div><div><span><i class="fa-solid fa-coins"></i> Créditos de processamento</span><strong>${credits} ${credits === 1 ? "crédito" : "créditos"}</strong><small>${Number(ledger.amount || 0) ? `${Number(ledger.amount)} debitado(s)` : "MVP sem débito real"}</small></div><div><span><i class="fa-solid fa-wand-magic-sparkles"></i> Diretor de IA</span><strong>${aiUsed ? formatUsd(cost.aiEstimatedCostUsd) : "Não utilizado"}</strong><small>${aiUsed ? `${escapeHtml(cost.aiModel || director.model || "IA")} • ${tokens.toLocaleString("pt-BR")} tokens` : "Montagem técnica local"}</small></div><div><span><i class="fa-solid fa-microphone-lines"></i> Narração por IA</span><strong>${narrationUsed ? formatUsd(cost.narrationEstimatedCostUsd) : "Não utilizada"}</strong><small>${narrationUsed ? `${escapeHtml(cost.narrationVoice || "voz IA")} • ${escapeHtml(formatDuration(cost.narrationDurationSeconds || 0))} • ${Number(cost.narrationCharacters || 0).toLocaleString("pt-BR")} caracteres • voz gerada por IA` : "Sem locução sintética"}</small></div>`;
 }
 
 async function loadAndRenderProjectCost(jobId, director = {}) {
@@ -276,6 +277,13 @@ function currentDraft(sources = []) {
       mode: $("directorMode").value,
       brief: $("directorBrief").value
     },
+    narration: {
+      generateScript: $("generateAiScript").checked,
+      enabled: $("enableAiNarration").checked,
+      voice: $("aiNarrationVoice").value,
+      tone: $("aiNarrationTone").value,
+      volume: 1
+    },
     textDesign: {
       preset: $("textPreset").value,
       animation: $("textAnimation").value,
@@ -317,6 +325,18 @@ function updateSummary() {
   $("summaryCredits").textContent = `${cost.estimatedCredits} ${cost.estimatedCredits === 1 ? "crédito" : "créditos"}`;
 }
 
+function syncAiNarrationControls() {
+  const semantic = $("directorMode").value === "semantic";
+  $("aiNarrationPanel").classList.toggle("hidden", !semantic);
+  $("generateAiScript").disabled = !semantic;
+  if (!semantic) { $("generateAiScript").checked = false; $("enableAiNarration").checked = false; }
+  const scriptEnabled = semantic && $("generateAiScript").checked;
+  $("enableAiNarration").disabled = !scriptEnabled;
+  if (!scriptEnabled) $("enableAiNarration").checked = false;
+  $("aiNarrationVoice").disabled = !$("enableAiNarration").checked;
+  $("aiNarrationTone").disabled = !$("enableAiNarration").checked;
+}
+
 function applyTextPreset() {
   const preset = STUDIO_TEXT_PRESETS[$("textPreset").value] || STUDIO_TEXT_PRESETS.clean;
   $("textAnimation").value = preset.animation;
@@ -352,6 +372,7 @@ function resetEditor() {
   $("logoFileLabel").innerHTML = '<i class="fa-regular fa-image"></i> Escolher PNG ou WebP';
   $("musicFileLabel").innerHTML = '<i class="fa-solid fa-music"></i> Escolher áudio';
   $("captionReviewEnabled").checked = true;
+  syncAiNarrationControls();
   $("transcriptReviewCard").classList.add("hidden");
   showDirectorResult(null);
   state.reviewingJobId = "";
@@ -1221,7 +1242,8 @@ async function loadUsage() {
     const aiUsed = cost.aiProvider && cost.aiProvider !== "none";
     const creditsUsed = Number(item.estimatedCredits ?? cost.estimatedCredits ?? 0);
     const tokens = Number(cost.aiUsage?.total_tokens || 0);
-    return `<div class="usage-entry usage-entry-detailed"><span><strong>${escapeHtml(project.name || item.description || item.type || "Processamento")}</strong><small>${formatDate(item.createdAt)} • ${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</small><em>${aiUsed ? `IA ${escapeHtml(cost.aiModel || cost.aiProvider)} • ${tokens.toLocaleString("pt-BR")} tokens • ${formatUsd(cost.aiEstimatedCostUsd)}` : "IA não utilizada"}</em></span><b>${creditsUsed} ${creditsUsed === 1 ? "crédito" : "créditos"}<small>${Number(item.amount || 0) ? `${Number(item.amount)} debitado(s)` : "0 debitado • MVP"}</small></b></div>`;
+    const narration = cost.narrationUsed === true ? ` • Narração ${escapeHtml(cost.narrationVoice || "IA")} (${formatUsd(cost.narrationEstimatedCostUsd)})` : "";
+    return `<div class="usage-entry usage-entry-detailed"><span><strong>${escapeHtml(project.name || item.description || item.type || "Processamento")}</strong><small>${formatDate(item.createdAt)} • ${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</small><em>${aiUsed ? `IA ${escapeHtml(cost.aiModel || cost.aiProvider)} • ${tokens.toLocaleString("pt-BR")} tokens • ${formatUsd(cost.aiEstimatedCostUsd)}${narration}` : "IA não utilizada"}</em></span><b>${creditsUsed} ${creditsUsed === 1 ? "crédito" : "créditos"}<small>${Number(item.amount || 0) ? `${Number(item.amount)} debitado(s)` : "0 debitado • MVP"}</small></b></div>`;
   }).join("") : '<p class="empty-copy">Nenhum consumo registrado.</p>';
 }
 
@@ -1295,6 +1317,9 @@ $("mediaLibrary").addEventListener("click", (event) => { const up = event.target
 $("projectForm").addEventListener("change", updateSummary);
 $("projectForm").addEventListener("input", updateSummary);
 $("textPreset").addEventListener("change", applyTextPreset);
+$("directorMode").addEventListener("change", syncAiNarrationControls);
+$("generateAiScript").addEventListener("change", syncAiNarrationControls);
+$("enableAiNarration").addEventListener("change", syncAiNarrationControls);
 $("textSizeScale").addEventListener("input", updateTextSizeLabel);
 [$("voiceVolume"), $("musicVolume"), $("captionSizeScale")].forEach((input) => input.addEventListener("input", updateAudioCaptionLabels));
 $("projectForm").addEventListener("submit", submitProject);

@@ -161,16 +161,18 @@ export function buildPairTransitionArgs({ leftPath, rightPath, outputPath, leftD
   };
 }
 
-export function buildBrandingArgs({ inputPath, outputPath, duration, format, plan, logoPath = "", musicPath = "", soundEffectsPath = "", captionsPath = "", renderProfile = "final" }) {
+export function buildBrandingArgs({ inputPath, outputPath, duration, format, plan, logoPath = "", musicPath = "", soundEffectsPath = "", narrationPath = "", captionsPath = "", renderProfile = "final" }) {
   const { width, height } = renderDimensions(format, renderProfile);
   const args = ["-y", "-i", inputPath];
   let nextInput = 1;
   let logoIndex = -1;
   let musicIndex = -1;
   let soundEffectsIndex = -1;
+  let narrationIndex = -1;
   if (logoPath) { logoIndex = nextInput++; args.push("-loop", "1", "-i", logoPath); }
   if (musicPath) { musicIndex = nextInput++; args.push("-stream_loop", "-1", "-i", musicPath); }
   if (soundEffectsPath) { soundEffectsIndex = nextInput++; args.push("-i", soundEffectsPath); }
+  if (narrationPath) { narrationIndex = nextInput++; args.push("-i", narrationPath); }
   const filters = [];
   let video = "0:v";
   if (logoIndex >= 0) {
@@ -210,13 +212,18 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
   } else filters.push("[0:a]anull[baseaudio]");
   if (soundEffectsIndex >= 0) {
     filters.push(`[${soundEffectsIndex}:a]atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[sfx]`);
-    filters.push(`[${mixedAudio}][sfx]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:LRA=9:TP=-1.5[aout]`);
-  } else filters.push(`[${mixedAudio}]loudnorm=I=-14:LRA=9:TP=-1.5[aout]`);
+    filters.push(`[${mixedAudio}][sfx]amix=inputs=2:duration=first:normalize=0[contentaudio]`);
+  } else filters.push(`[${mixedAudio}]anull[contentaudio]`);
+  if (narrationIndex >= 0) {
+    filters.push(`[${narrationIndex}:a]volume=${Number(plan.narration?.volume || 1).toFixed(2)},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS,asplit=2[narrationside][narrationmix]`);
+    filters.push("[contentaudio][narrationside]sidechaincompress=threshold=0.025:ratio=12:attack=15:release=500[duckedcontent]");
+    filters.push("[duckedcontent][narrationmix]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:LRA=9:TP=-1.5[aout]");
+  } else filters.push("[contentaudio]loudnorm=I=-14:LRA=9:TP=-1.5[aout]");
   args.push("-filter_complex", filters.join(";"), "-map", "[vout]", "-map", "[aout]", "-t", seconds(duration), ...videoEncoding(renderProfile, plan.export), "-movflags", "+faststart", outputPath);
   return args;
 }
 
-export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", soundEffectsPath = "", captionsPath = "", transcriptionProvider = null, approvedTranscription = null, pauseForTranscriptReview = false, renderProfile = "final", progress = async () => {}, signal }) {
+export async function renderPlan({ plan, sources, outputDir, logoPath = "", musicPath = "", soundEffectsPath = "", narrationPath = "", speechProvider = null, captionsPath = "", transcriptionProvider = null, approvedTranscription = null, pauseForTranscriptReview = false, renderProfile = "final", progress = async () => {}, signal }) {
   const sourceById = new Map(sources.map((source) => [source.id, source]));
   const segmentPaths = [];
   for (let index = 0; index < plan.scenes.length; index += 1) {
@@ -265,8 +272,17 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     if (plan.captions.enabled) captionsPath = await writeAssCaptions(path.join(outputDir, "captions.ass"), transcription, { ...plan.captions, format: plan.format });
     await progress("transcription", 1, 1);
   }
+  if (!narrationPath && plan.narration?.enabled && plan.narration?.script && speechProvider?.enabled) {
+    await progress("narration", 0, 1);
+    const spoken = await speechProvider.synthesize({ script: plan.narration.script, voice: plan.narration.voice, tone: plan.narration.tone, outputDir, signal });
+    if (spoken.available) {
+      narrationPath = spoken.localPath;
+      plan.narration = { ...plan.narration, provider: spoken.provider, model: spoken.model, voice: spoken.voice, characters: spoken.characters, durationSeconds: spoken.durationSeconds, estimatedCostUsd: spoken.estimatedCostUsd, rendered: true };
+    }
+    await progress("narration", 1, 1);
+  }
   const outputPath = path.join(outputDir, "ola-studio-final.mp4");
-  await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, soundEffectsPath, captionsPath, renderProfile }), { signal });
+  await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, soundEffectsPath, narrationPath, captionsPath, renderProfile }), { signal });
   await progress("branding", 1, 1);
   return { outputPath, plan };
 }

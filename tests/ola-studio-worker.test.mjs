@@ -15,6 +15,7 @@ import { OpenAISemanticPlanner, buildSemanticCandidates, estimateSemanticUsageCo
 import { composePlanWaveform, waveformFromPcm } from "../studio-worker/src/audio-waveform.mjs";
 import { deleteStudioProjectAssets, studioProjectPrefixes } from "../studio-worker/src/cleanup.mjs";
 import { libraryMusicDefinition, transitionEffectEvents } from "../studio-worker/src/sound-library.mjs";
+import { OpenAISpeechProvider } from "../studio-worker/src/tts-provider.mjs";
 
 const video = { id: "video-1", order: 0, contentType: "video/mp4", localPath: "/tmp/video.mp4", metadata: { duration: 20, hasAudio: true }, technical: { sceneTimes: [0, 4, 9, 14], silences: [{ start: 6, end: 7 }] } };
 const image = { id: "image-1", order: 1, contentType: "image/jpeg", localPath: "/tmp/foto.jpg", metadata: { duration: 0, hasAudio: false }, technical: { sceneTimes: [0], silences: [] } };
@@ -148,8 +149,8 @@ test("diretor semântico usa JSON estrito, não expõe chave e produz plano vali
     model: "modelo-configurado",
     fetchImpl: async (_url, options) => {
       request = options;
-      const scenes = candidates.slice(0, 2).map((candidate, index) => ({ candidateId: candidate.id, narrativeRole: index ? "closing" : "opening", transition: "fade", emphasis: "Escolha baseada nas evidências fornecidas." }));
-      return { ok: true, status: 200, json: async () => ({ output_text: JSON.stringify({ scenes, textPreset: "clean", rhythm: "balanced", rationale: "Narrativa baseada somente nos quadros e metadados fornecidos.", confidence: 0.82 }), usage: { input_tokens: 100, output_tokens: 40 } }) };
+      const scenes = candidates.slice(0, 2).map((candidate, index) => ({ candidateId: candidate.id, narrativeRole: index ? "closing" : "opening", transition: "fade", emphasis: "Escolha baseada nas evidências fornecidas.", onScreenText: index ? "Conheça nosso trabalho" : "Olá Carlópolis" }));
+      return { ok: true, status: 200, json: async () => ({ output_text: JSON.stringify({ scenes, narration: { script: "Conheça um trabalho feito com cuidado.", tone: "professional" }, textPreset: "clean", rhythm: "balanced", rationale: "Narrativa baseada somente nos quadros e metadados fornecidos.", confidence: 0.82 }), usage: { input_tokens: 100, output_tokens: 40 } }) };
     }
   });
   const plan = await planner.createPlan({ project: { director: { brief: "Valorizar a empresa" } }, basePlan, evidence: { candidates, frames: [], transcripts: [] }, analyzedSources: analyzed });
@@ -162,6 +163,8 @@ test("diretor semântico usa JSON estrito, não expõe chave e produz plano vali
   assert.equal(plan.planner.type, "semantic-ai");
   assert.equal(plan.planner.semanticAnalysis, true);
   assert.equal(plan.aiDirector.applied, true);
+  assert.equal(plan.narration.generated, true);
+  assert.ok(plan.textLayers.some((layer) => layer.type === "ai_scene_text"));
 });
 
 test("diretor sem configuração registra fallback técnico sem fingir IA", () => {
@@ -304,6 +307,25 @@ test("branding prepara logo, textos, música com ducking e faststart", () => {
   const directMix = withoutDucking[withoutDucking.indexOf("-filter_complex") + 1];
   assert.doesNotMatch(directMix, /sidechaincompress/);
   assert.match(directMix, /\[0:a\]\[music\]amix/);
+  const withNarration = buildBrandingArgs({ inputPath: "/tmp/base.mp4", outputPath: "/tmp/final.mp4", duration: 15, format: "9:16", narrationPath: "/tmp/narration.wav", plan: { textLayers: [], narration: { volume: 1 } } });
+  const narrationMix = withNarration[withNarration.indexOf("-filter_complex") + 1];
+  assert.match(narrationMix, /asplit=2\[narrationside\]\[narrationmix\]/);
+  assert.match(narrationMix, /\[duckedcontent\]\[narrationmix\]amix/);
+});
+
+test("provedor de voz envia somente o roteiro e salva WAV sem expor a chave", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "ola-studio-tts-"));
+  let request;
+  try {
+    const provider = new OpenAISpeechProvider({ apiKey: "chave-secreta", model: "tts-test", fetchImpl: async (_url, options) => { request = options; return new Response(Buffer.alloc(512, 1), { status: 200, headers: { "content-type": "audio/wav" } }); } });
+    const spoken = await provider.synthesize({ script: "Conheça o comércio local.", voice: "cedar", tone: "warm", outputDir: root });
+    const body = JSON.parse(request.body);
+    assert.equal(request.headers.Authorization, "Bearer chave-secreta");
+    assert.doesNotMatch(request.body, /chave-secreta/);
+    assert.deepEqual({ model: body.model, voice: body.voice, input: body.input, format: body.response_format }, { model: "tts-test", voice: "cedar", input: "Conheça o comércio local.", format: "wav" });
+    assert.equal(spoken.available, true);
+    assert.ok((await fs.stat(spoken.localPath)).size > 0);
+  } finally { await fs.rm(root, { recursive: true, force: true }); }
 });
 
 test("parser do Whisper preserva português e timestamps reais por palavra", () => {

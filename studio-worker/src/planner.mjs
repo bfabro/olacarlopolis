@@ -134,6 +134,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
     transition: { mode: project.transition || "auto", name: selectedTransition.ffmpeg, duration: transition },
     text: { title: project.title || "", subtitle: project.subtitle || "", callToAction: project.callToAction || "" }, textDesign: project.textDesign || {}, textLayers: textLayersFor(project, target),
     captions: { requested: project.captionsEnabled === true, enabled: project.captionsEnabled === true && options.transcription?.available === true, provider: options.transcription?.provider || "pending", segments: options.transcription?.segments || [], ...(project.captions || {}) },
+    narration: { ...(project.narration || {}), script: "", generated: false, reviewed: false },
     audio: { musicVolume: style.musicVolume, voiceVolume: 1, fadeSeconds: 1.2, noiseReduction: false, ...(project.audio || {}), waveform: rhythm.waveform?.available ? rhythm.waveform : composePlanWaveform(scenes, analyzedSources, target) },
     music: { enabled: Boolean(project.music) || libraryMusic !== "none", source: project.music ? "upload" : libraryMusic !== "none" ? "original-library" : "none", libraryTrack: libraryMusic, volume: Number(project.audio?.musicVolume ?? style.musicVolume), duckDuringSpeech: true },
     soundEffects: { preset: transitionSound, source: transitionSound !== "none" ? "original-library" : "none" },

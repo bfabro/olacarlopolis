@@ -38,7 +38,7 @@ test("Studio Pro oferece oito modelos, biblioteca de transições e seis estilos
 
 test("normalização preserva personalização profissional sem aceitar valores inseguros", () => {
   const project = normalizeStudioProject({ style: "gastronomia", transition: "blur", transitionDuration: 0.8, textDesign: { preset: "promo", animation: "typewriter", sizeScale: 1.4, color: "#ffbb2d", position: "bottom", background: false } });
-  assert.equal(project.schemaVersion, 7);
+  assert.equal(project.schemaVersion, 8);
   assert.equal(project.transition, "blur");
   assert.equal(project.textDesign.animation, "typewriter");
   assert.equal(project.textDesign.color, "#FFBB2D");
@@ -67,6 +67,14 @@ test("diretor de IA exige seleção explícita e limita o briefing", () => {
   assert.equal(local.director.mode, "local");
   assert.equal(semantic.director.mode, "semantic");
   assert.equal(semantic.director.brief.length, 1200);
+});
+
+test("roteiro e narração só são habilitados com o diretor semântico", () => {
+  const local = normalizeStudioProject({ director: { mode: "local" }, narration: { generateScript: true, enabled: true, voice: "cedar" } });
+  const semantic = normalizeStudioProject({ director: { mode: "semantic" }, narration: { generateScript: true, enabled: true, voice: "cedar", tone: "warm" } });
+  assert.equal(local.narration.enabled, false);
+  assert.deepEqual({ script: semantic.narration.generateScript, enabled: semantic.narration.enabled, voice: semantic.narration.voice, tone: semantic.narration.tone }, { script: true, enabled: true, voice: "cedar", tone: "warm" });
+  assert.match(semantic.narration.disclosure, /inteligência artificial/i);
 });
 
 test("normaliza áudio e legendas dentro de limites seguros", () => {
