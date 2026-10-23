@@ -128,8 +128,9 @@ async function processJob(job) {
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
     const soundEffectsPath = await generateTransitionSoundtrack(plan.soundEffects?.preset || "none", plan, audioPaths.effects, cancellation.signal);
     await uploadJson(plan, planStoragePath);
-    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ directorResult });
-    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.type === "semantic-ai" ? "Direção por IA concluída. Renderizando as cenas selecionadas." : plan.planner?.fallback ? `${plan.aiDirector?.reason || "A IA não pôde ser aplicada"} Renderizando com a montagem técnica local.` : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, director: directorResult });
+    const editorPlan = JSON.parse(JSON.stringify(plan));
+    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ directorResult, editorPlan });
+    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.type === "semantic-ai" ? "Direção por IA concluída. Renderizando as cenas selecionadas." : plan.planner?.fallback ? `${plan.aiDirector?.reason || "A IA não pôde ser aplicada"} Renderizando com a montagem técnica local.` : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, editorPlan, director: directorResult });
     const approvedTranscription = project.captionsEnabled && job.transcriptReview?.status === "approved"
       ? prepareReviewedTranscription(job.transcriptReview, project.duration)
       : null;
@@ -175,6 +176,7 @@ async function processJob(job) {
     const output = await uploadRender(outputPath, storagePath);
     ensureNotCancelled();
     const elapsedSeconds = Math.round((Date.now() - started) / 1000);
+    const renderedEditorPlan = JSON.parse(JSON.stringify(rendered.plan));
     const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.type === "semantic-ai" ? plan.planner.provider : "none", aiModel: plan.planner?.type === "semantic-ai" ? plan.planner.model : "none", aiUsage: plan.aiDirector?.usage || null, aiEstimatedCostUsd: Number(plan.aiDirector?.estimatedCostUsd || 0), narrationUsed: plan.narration?.rendered === true, narrationProvider: plan.narration?.provider || "none", narrationModel: plan.narration?.model || "none", narrationVoice: plan.narration?.voice || "", narrationCharacters: Number(plan.narration?.characters || 0), narrationDurationSeconds: Number(plan.narration?.durationSeconds || 0), narrationEstimatedCostUsd: Number(plan.narration?.estimatedCostUsd || 0), workerId: workerConfig.workerId, createdAt: Date.now() };
     const updates = {};
     updates[`studioJobs/${job.uid}/${job.jobId}/status`] = "completed";
@@ -182,9 +184,11 @@ async function processJob(job) {
     updates[`studioJobs/${job.uid}/${job.jobId}/progress`] = 100;
     updates[`studioJobs/${job.uid}/${job.jobId}/message`] = "Vídeo concluído.";
     updates[`studioJobs/${job.uid}/${job.jobId}/output`] = output;
+    updates[`studioJobs/${job.uid}/${job.jobId}/editorPlan`] = renderedEditorPlan;
     updates[`studioJobs/${job.uid}/${job.jobId}/completedAt`] = Date.now();
     updates[`studioJobs/${job.uid}/${job.jobId}/updatedAt`] = Date.now();
     updates[`studioProjects/${job.uid}/${job.projectId}/status`] = "completed";
+    updates[`studioProjects/${job.uid}/${job.projectId}/editorPlan`] = renderedEditorPlan;
     if (job.mode === "preview") updates[`studioProjects/${job.uid}/${job.projectId}/preview`] = output;
     else updates[`studioProjects/${job.uid}/${job.projectId}/output`] = output;
     updates[`studioProjects/${job.uid}/${job.projectId}/updatedAt`] = Date.now();
@@ -198,6 +202,7 @@ async function processJob(job) {
         jobId: job.jobId,
         output,
         planStoragePath,
+        editorPlan: renderedEditorPlan,
         source: job.planOverride ? "visual-editor" : "automatic",
         summary: {
           schemaVersion: Number(plan.schemaVersion || 1),

@@ -20,7 +20,8 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v34", date: "2026-10-23" });
+const STUDIO_RELEASE = Object.freeze({ label: "v35", date: "2026-10-23" });
+const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
@@ -56,6 +57,14 @@ async function privateOutputUrl(output) {
     console.warn("O render não possui URL privada de streaming; usando download autenticado.", error);
     return URL.createObjectURL(await getBlob(outputRef));
   }
+}
+
+function withStudioTimeout(promise, message, timeoutMs = STORAGE_OPERATION_TIMEOUT_MS) {
+  let timer;
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => { timer = window.setTimeout(() => reject(new Error(message)), timeoutMs); })
+  ]).finally(() => window.clearTimeout(timer));
 }
 
 async function downloadProject(projectId) {
@@ -842,8 +851,38 @@ function watchDeletionJob(jobId, projectId) {
 
 async function readPrivateJson(storagePath) {
   if (!storagePath) throw new Error("Plano de edição não encontrado.");
-  const blob = await getBlob(storageRef(storage, storagePath));
-  return JSON.parse(await blob.text());
+  const fileRef = storageRef(storage, storagePath);
+  const url = await withStudioTimeout(getDownloadURL(fileRef), "O endereço privado do plano demorou demais para carregar.");
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), STORAGE_OPERATION_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { cache: "no-store", signal: controller.signal });
+    if (!response.ok) throw new Error(`O plano respondeu HTTP ${response.status}.`);
+    return await response.json();
+  } catch (error) {
+    if (error?.name === "AbortError") throw new Error("O plano demorou demais para carregar. Verifique sua conexão e tente novamente.");
+    throw error;
+  } finally {
+    window.clearTimeout(timer);
+  }
+}
+
+function normalizeVisualPlan(plan) {
+  const narration = plan?.narration || {};
+  return {
+    ...plan,
+    scenes: Array.isArray(plan?.scenes) ? plan.scenes : [],
+    narration: {
+      enabled: narration.enabled === true,
+      generateScript: narration.generateScript === true,
+      generated: narration.generated === true,
+      reviewed: narration.reviewed === true,
+      script: String(narration.script || ""),
+      voice: ["marin", "cedar"].includes(narration.voice) ? narration.voice : "marin",
+      tone: ["professional", "warm", "energetic", "calm"].includes(narration.tone) ? narration.tone : "professional",
+      volume: Number(narration.volume || 1)
+    }
+  };
 }
 
 function visualPlanDuration() {
@@ -994,6 +1033,23 @@ function renderVisualAudioMixer() {
   $("visualVoiceVolumeValue").textContent = `${$("visualVoiceVolume").value}%`;
   $("visualMusicVolumeValue").textContent = `${$("visualMusicVolume").value}%`;
   $("visualMusicFadeValue").textContent = `${Number($("visualMusicFade").value).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
+  const narration = state.visualPlan?.narration || {};
+  $("visualNarrationEnabled").checked = narration.enabled === true;
+  $("visualNarrationVoice").value = ["marin", "cedar"].includes(narration.voice) ? narration.voice : "marin";
+  $("visualNarrationTone").value = ["professional", "warm", "energetic", "calm"].includes(narration.tone) ? narration.tone : "professional";
+  $("visualNarrationScript").value = narration.script || "";
+  updateVisualNarrationStatus();
+}
+
+function updateVisualNarrationStatus() {
+  const enabled = $("visualNarrationEnabled").checked;
+  const script = $("visualNarrationScript").value.trim();
+  $("visualNarrationVoice").disabled = !enabled;
+  $("visualNarrationTone").disabled = !enabled;
+  $("visualNarrationScript").disabled = !enabled;
+  $("visualNarrationStatus").textContent = !enabled ? "Desativada" : script ? "Pronta para gerar" : "Roteiro necessário";
+  $("visualNarrationStatus").classList.toggle("is-warning", enabled && !script);
+  $("visualNarrationHelp").textContent = enabled && !script ? "Preencha o roteiro para evitar um vídeo sem voz." : "A voz será gerada na próxima prévia ou versão final.";
 }
 
 function syncVisualAudioMixer() {
@@ -1009,9 +1065,19 @@ function syncVisualAudioMixer() {
   };
   state.visualPlan.music = { ...(state.visualPlan.music || {}), enabled: Boolean(state.visualProject?.music) || libraryTrack !== "none", source: state.visualProject?.music ? "upload" : libraryTrack !== "none" ? "original-library" : "none", libraryTrack, duckDuringSpeech: $("visualMusicDucking").checked };
   state.visualPlan.soundEffects = { preset: transitionSound, source: transitionSound !== "none" ? "original-library" : "none" };
+  state.visualPlan.narration = {
+    ...(state.visualPlan.narration || {}),
+    enabled: $("visualNarrationEnabled").checked,
+    script: $("visualNarrationScript").value.trim(),
+    voice: $("visualNarrationVoice").value,
+    tone: $("visualNarrationTone").value,
+    reviewed: true,
+    rendered: false
+  };
   $("visualVoiceVolumeValue").textContent = `${$("visualVoiceVolume").value}%`;
   $("visualMusicVolumeValue").textContent = `${$("visualMusicVolume").value}%`;
   $("visualMusicFadeValue").textContent = `${Number($("visualMusicFade").value).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}s`;
+  updateVisualNarrationStatus();
 }
 
 function renderVisualExportSettings() {
@@ -1037,9 +1103,11 @@ function renderVisualTimeline() {
     const source = sourceById.get(scene.sourceId) || {};
     const url = state.visualSourceUrls.get(scene.sourceId) || "";
     const image = String(source.contentType || visualSourceAnalysis(scene.sourceId).contentType || "").startsWith("image/");
-    const media = image
-      ? `<img class="visual-scene-media" src="${escapeHtml(url)}" alt="Cena ${index + 1}">`
-      : `<video class="visual-scene-media" src="${escapeHtml(url)}#t=${Math.max(0, Number(scene.start || 0)).toFixed(2)}" muted preload="metadata"></video>`;
+    const media = !url
+      ? `<div class="visual-scene-media visual-scene-placeholder"><i class="fa-solid fa-photo-film"></i><span>Carregando mídia…</span></div>`
+      : image
+        ? `<img class="visual-scene-media" src="${escapeHtml(url)}" alt="Cena ${index + 1}">`
+        : `<video class="visual-scene-media" src="${escapeHtml(url)}#t=${Math.max(0, Number(scene.start || 0)).toFixed(2)}" muted preload="metadata"></video>`;
     const transitionDuration = index ? clampVisualTransitionDuration(index, scene.transitionDuration) : 0;
     scene.transitionDuration = transitionDuration;
     const transitionDurationField = index ? `<label>Duração da transição<input data-scene-transition-duration="${index}" type="number" min="0.1" max="${visualTransitionDurationLimit(index).toFixed(2)}" step="0.05" value="${transitionDuration.toFixed(2)}" ${scene.transition === "hardcut" ? "disabled" : ""}></label>` : "";
@@ -1072,24 +1140,27 @@ async function setVisualPreview(output) {
 }
 
 async function openVisualEditor(projectId, preferredOutput = null) {
-  const snapshot = await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`));
-  const project = { id: projectId, ...(snapshot.val() || {}) };
+  const cachedProject = state.projects.find((item) => item.id === projectId);
+  const snapshot = cachedProject?.editorPlan ? null : await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`));
+  const project = { id: projectId, ...(snapshot?.val() || cachedProject || {}) };
   if (!project.sources?.length) throw new Error("Este projeto não possui arquivos de origem.");
   let planPath = "";
-  if (project.jobId) {
+  let inlinePlan = project.editorPlan || null;
+  if (project.jobId && !inlinePlan) {
     const job = (await get(ref(db, `studioJobs/${state.user.uid}/${project.jobId}`))).val();
     planPath = job?.plan?.storagePath || "";
+    inlinePlan = job?.editorPlan || inlinePlan;
   }
-  if (!planPath) planPath = Object.values(project.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0))[0]?.planStoragePath || "";
+  const latestVersion = Object.values(project.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0))[0] || null;
+  if (!planPath) planPath = latestVersion?.planStoragePath || "";
+  inlinePlan = inlinePlan || latestVersion?.editorPlan || null;
   state.visualProject = project;
-  state.visualPlan = await readPrivateJson(planPath);
+  toast("Abrindo o editor e carregando o plano…");
+  state.visualPlan = normalizeVisualPlan(inlinePlan || await readPrivateJson(planPath));
+  if (!state.visualPlan.scenes.length) throw new Error("Este projeto não possui cenas editáveis.");
   state.selectedVisualVersionId = Object.values(project.versions || {}).sort((a, b) => Number(b.number || 0) - Number(a.number || 0))[0]?.id || "";
   state.activeProjectId = projectId;
   state.visualSourceUrls = new Map();
-  await Promise.all(project.sources.map(async (source) => {
-    const url = source.downloadUrl || await getDownloadURL(storageRef(storage, source.storagePath));
-    state.visualSourceUrls.set(source.id, url);
-  }));
   $("visualProjectName").textContent = project.name || "Ajuste sua montagem";
   $("visualTitle").value = state.visualPlan.text?.title || "";
   $("visualSubtitle").value = state.visualPlan.text?.subtitle || "";
@@ -1100,9 +1171,22 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   renderVisualTimeline();
   renderVisualTextLayers();
   renderVisualVersions();
-  await setVisualPreview(preferredOutput || project.output || project.preview);
-  $("visualPreviewNotice").textContent = preferredOutput || project.preview ? "Prévia reduzida atualizada com o plano editado." : "Exibindo a última exportação Full HD. Gere uma prévia leve para conferir novos ajustes.";
   switchView("visual");
+  $("visualPreviewNotice").textContent = "Editor aberto. As mídias e a última prévia estão sendo carregadas em segundo plano.";
+  const mediaResults = await Promise.allSettled(project.sources.map(async (source) => {
+    const url = source.downloadUrl || await withStudioTimeout(getDownloadURL(storageRef(storage, source.storagePath)), `A mídia ${source.name || "do projeto"} demorou para carregar.`);
+    state.visualSourceUrls.set(source.id, url);
+  }));
+  renderVisualTimeline();
+  const unavailable = mediaResults.filter((result) => result.status === "rejected").length;
+  if (unavailable) toast(`Editor aberto. ${unavailable} mídia(s) não carregaram agora, mas os ajustes continuam disponíveis.`);
+  try {
+    await withStudioTimeout(setVisualPreview(preferredOutput || project.output || project.preview), "A prévia demorou para carregar.");
+    $("visualPreviewNotice").textContent = preferredOutput || project.preview ? "Prévia reduzida atualizada com o plano editado." : "Exibindo a última exportação Full HD. Gere uma prévia leve para conferir novos ajustes.";
+  } catch (error) {
+    $("visualPreviewNotice").textContent = "O editor está disponível, mas a última prévia não pôde ser carregada agora.";
+    toast(error.message);
+  }
 }
 
 async function openVisualVersion(versionId) {
@@ -1129,9 +1213,9 @@ async function downloadVisualVersion(versionId) {
 
 async function restoreVisualVersion(versionId) {
   const version = state.visualProject?.versions?.[versionId];
-  if (!version?.planStoragePath) throw new Error("O plano desta versão não está disponível.");
+  if (!version?.planStoragePath && !version?.editorPlan) throw new Error("O plano desta versão não está disponível.");
   if (!window.confirm(`Carregar o plano da versão ${Number(version.number || 1)}? Ajustes ainda não renderizados no editor serão substituídos, mas nenhum vídeo será apagado.`)) return;
-  const plan = await readPrivateJson(version.planStoragePath);
+  const plan = normalizeVisualPlan(version.editorPlan || await readPrivateJson(version.planStoragePath));
   const sourceIds = new Set((state.visualProject.sources || []).map((source) => source.id));
   if (!Array.isArray(plan?.scenes) || !plan.scenes.length || plan.scenes.some((scene) => !sourceIds.has(scene.sourceId))) throw new Error("O plano desta versão não corresponde mais aos arquivos do projeto.");
   state.visualPlan = plan;
@@ -1153,6 +1237,8 @@ async function restoreVisualVersion(versionId) {
 async function enqueueVisualRender(mode) {
   if (!state.visualPlan || !state.visualProject) return;
   syncVisualTexts();
+  syncVisualAudioMixer();
+  if (state.visualPlan.narration?.enabled && !state.visualPlan.narration?.script) return toast("Preencha o roteiro da narração antes de gerar o vídeo.");
   state.visualPlan.duration = visualPlanDuration();
   if (!(state.visualPlan.duration > 0 && state.visualPlan.duration <= 90)) return toast("A timeline deve ter no máximo 90 segundos.");
   const jobRef = push(ref(db, `studioJobs/${state.user.uid}`));
@@ -1214,9 +1300,12 @@ function renderProjects() {
     const download = completed && (project.output?.storagePath || project.output?.downloadUrl) ? `<button type="button" data-project-download="${project.id}"><i class="fa-solid fa-download"></i> Baixar</button>` : "";
     const edit = completed && project.jobId ? `<button type="button" data-project-edit="${project.id}"><i class="fa-solid fa-sliders"></i> Editar</button>` : "";
     const cancel = active && !deletionActive ? `<button type="button" data-project-cancel="${project.id}"><i class="fa-solid fa-ban"></i> Cancelar</button>` : "";
-    const regenerate = active ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
+    const hasSources = Array.isArray(project.sources) && project.sources.length > 0;
+    const regenerate = active || !hasSources ? "" : `<button type="button" data-project-regenerate="${project.id}"><i class="fa-solid fa-rotate"></i> Nova versão</button>`;
     const remove = active ? "" : `<button type="button" class="danger" data-project-delete="${project.id}"><i class="fa-solid fa-trash-can"></i> Excluir</button>`;
-    const director = project.director?.mode === "semantic" ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? "Direção por IA" : "IA solicitada"}</span>` : "";
+    const director = cancelled && !hasSources
+      ? `<span><i class="fa-solid fa-circle-info"></i> Cancelado antes da IA e da voz</span>`
+      : project.director?.mode === "semantic" ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? "Direção por IA" : "IA solicitada"}</span>` : "";
     return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ["deletion_queued", "deleting"].includes(project.status) ? "deleting" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${progress}${open}${edit}${download}${cancel}${regenerate}${remove}</div></div></article>`;
   }).join("");
 }
@@ -1357,7 +1446,7 @@ $("regenerateVideo").addEventListener("click", () => state.activeProjectId && re
 $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
 [$("visualTextFont"), $("visualTextSize"), $("visualTextColor"), $("visualTextOutline"), $("visualTextAlign"), $("visualTextBackground")].forEach((field) => field.addEventListener("input", syncVisualPrimaryTextStyle));
-[$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking"), $("visualLibraryMusic"), $("visualTransitionSound")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
+[$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking"), $("visualLibraryMusic"), $("visualTransitionSound"), $("visualNarrationEnabled"), $("visualNarrationVoice"), $("visualNarrationTone"), $("visualNarrationScript")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
 [$("visualExportFps"), $("visualExportQuality")].forEach((field) => field.addEventListener("change", syncVisualExportSettings));
 $("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
 $("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));

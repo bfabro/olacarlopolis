@@ -272,6 +272,12 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     if (plan.captions.enabled) captionsPath = await writeAssCaptions(path.join(outputDir, "captions.ass"), transcription, { ...plan.captions, format: plan.format });
     await progress("transcription", 1, 1);
   }
+  if (!narrationPath && plan.narration?.enabled && !String(plan.narration?.script || "").trim()) {
+    throw Object.assign(new Error("A narração foi solicitada, mas o roteiro de voz está vazio. Revise o roteiro no editor e tente novamente."), { code: "narration_script_required" });
+  }
+  if (!narrationPath && plan.narration?.enabled && !speechProvider?.enabled) {
+    throw Object.assign(new Error("A narração foi solicitada, mas o serviço de voz por IA não está configurado no worker."), { code: "narration_provider_unavailable" });
+  }
   if (!narrationPath && plan.narration?.enabled && plan.narration?.script && speechProvider?.enabled) {
     await progress("narration", 0, 1);
     const spoken = await speechProvider.synthesize({ script: plan.narration.script, voice: plan.narration.voice, tone: plan.narration.tone, outputDir, signal });

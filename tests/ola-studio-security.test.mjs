@@ -57,7 +57,7 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.match(client, /studioAdminCosts/);
   assert.match(client, /aiEstimatedCostUsd/);
   assert.match(html, /id="processingRemaining"/);
-  assert.match(html, /data-studio-version>v34/);
+  assert.match(html, /data-studio-version>v35/);
   assert.match(html, /id="enableAiNarration"/);
   assert.match(client, /narrationEstimatedCostUsd/);
   assert.doesNotMatch(client, /setInterval\([^)]*progress/i);
@@ -86,12 +86,17 @@ test("editor visual reutiliza plano privado e envia somente origens do próprio 
   assert.match(html, /id="exportQuality"/);
   assert.match(html, /id="visualExportFps"/);
   assert.match(html, /id="visualExportQuality"/);
-  assert.match(client, /getBlob\(storageRef\(storage, storagePath\)\)/);
+  assert.match(client, /inlinePlan \|\| await readPrivateJson\(planPath\)/);
+  assert.match(client, /Promise\.allSettled\(project\.sources/);
   assert.match(client, /planOverride/);
   assert.match(client, /mode === "preview"/);
   assert.match(client, /data-version-download/);
   assert.match(client, /data-version-restore/);
-  assert.match(client, /readPrivateJson\(version\.planStoragePath\)/);
+  assert.match(client, /version\.editorPlan \|\| await readPrivateJson\(version\.planStoragePath\)/);
+  assert.match(html, /id="visualNarrationScript"/);
+  assert.match(html, /id="visualNarrationEnabled"/);
+  assert.match(workerMain, /const renderedEditorPlan = JSON\.parse\(JSON\.stringify\(rendered\.plan\)\)/);
+  assert.match(workerMain, /\/editorPlan`\] = renderedEditorPlan/);
   assert.match(workerMain, /sceneCount: Array\.isArray\(plan\.scenes\)/);
   assert.match(workerMain, /videoBitrateKbps: Number\(plan\.export/);
   assert.doesNotMatch(client, /OPENAI_API_KEY/);

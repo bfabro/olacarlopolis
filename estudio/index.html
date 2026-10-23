@@ -9,14 +9,14 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=18">
+  <link rel="stylesheet" href="studio.css?v=19">
   <link rel="stylesheet" href="studio-overrides.css?v=17">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-      <span class="studio-release-badge">Olá Studio <b data-studio-version>v34</b></span>
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v35</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -27,7 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v34</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v35</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -43,7 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v34</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v35</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -55,7 +55,7 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v34</b></small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v35</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
@@ -70,7 +70,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
-        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v34</b></span>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v35</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -251,6 +251,13 @@
                 <label class="visual-audio-toggle"><input id="visualNoiseReduction" type="checkbox"><span><strong>Reduzir ruído contínuo</strong><small>Filtro moderado para preservar a voz.</small></span></label>
                 <label class="visual-audio-toggle"><input id="visualMusicDucking" type="checkbox"><span><strong>Baixar música durante falas</strong><small>Prioriza automaticamente o áudio original.</small></span></label>
               </div>
+              <div class="visual-layer-heading"><strong>Narração por IA</strong><span id="visualNarrationStatus" class="visual-mixer-status">Desativada</span></div>
+              <div class="visual-narration-editor">
+                <label class="visual-audio-toggle wide"><input id="visualNarrationEnabled" type="checkbox"><span><strong>Gerar voz na próxima versão</strong><small>O roteiro abaixo será narrado e misturado ao vídeo.</small></span></label>
+                <label>Voz<select id="visualNarrationVoice"><option value="marin">Marin</option><option value="cedar">Cedar</option></select></label>
+                <label>Tom<select id="visualNarrationTone"><option value="professional">Profissional</option><option value="warm">Acolhedor</option><option value="energetic">Energético</option><option value="calm">Calmo</option></select></label>
+                <label class="wide">Roteiro da locução<textarea id="visualNarrationScript" maxlength="4000" rows="7" placeholder="Escreva ou revise exatamente o que deverá ser falado no vídeo."></textarea><small id="visualNarrationHelp">A voz somente será gerada quando este roteiro estiver preenchido.</small></label>
+              </div>
               <div class="visual-layer-heading"><strong>Exportação</strong><span class="visual-mixer-status">Full HD H.264 / AAC</span></div>
               <div class="visual-export-settings">
                 <label>Taxa de quadros<select id="visualExportFps"><option value="24">24 FPS</option><option value="30">30 FPS</option><option value="60">60 FPS</option></select></label>
@@ -317,6 +324,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=27"></script>
+  <script type="module" src="studio.js?v=28"></script>
 </body>
 </html>
