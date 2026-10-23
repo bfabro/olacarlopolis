@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v37", date: "2026-10-23" });
+const STUDIO_RELEASE = Object.freeze({ label: "v38", date: "2026-10-23" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
@@ -635,11 +635,29 @@ function timelineTime(seconds) {
   return `${String(minutes).padStart(2, "0")}:${remaining}`;
 }
 
+function sanitizeTranscriptReviewSegments(segments = []) {
+  const sanitized = [];
+  let insideNonSpeechLabel = false;
+  for (const segment of segments) {
+    const text = String(segment?.text || "").replace(/\s+/g, " ").trim();
+    if (insideNonSpeechLabel || text.includes("[")) {
+      insideNonSpeechLabel = !text.includes("]");
+      continue;
+    }
+    if (text.includes("]") || /^[♪♫♬]+$/.test(text)) {
+      insideNonSpeechLabel = false;
+      continue;
+    }
+    if (text) sanitized.push({ ...segment, text });
+  }
+  return sanitized;
+}
+
 function showTranscriptReview(job, projectId) {
   if (state.reviewingJobId === job.id && !$("transcriptReviewCard").classList.contains("hidden")) return;
   const rawSegments = Array.isArray(job.transcriptReview?.segments) ? job.transcriptReview.segments : Object.values(job.transcriptReview?.segments || {});
   state.reviewingJobId = job.id;
-  state.transcriptSegments = rawSegments.slice(0, 500);
+  state.transcriptSegments = sanitizeTranscriptReviewSegments(rawSegments.slice(0, 500));
   state.activeProjectId = projectId;
   state.activeJobId = job.id;
   $("processingStatusCard").classList.add("hidden");
@@ -673,10 +691,12 @@ async function approveTranscriptReview() {
       [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: now,
       [`studioUsage/${state.user.uid}/estimates/${jobId}/status`]: "reserved"
     };
+    const reviewedSegments = state.transcriptSegments.map((segment) => ({ ...segment }));
     document.querySelectorAll("[data-transcript-index]").forEach((field) => {
       const index = Number(field.dataset.transcriptIndex);
-      updates[`studioJobs/${state.user.uid}/${jobId}/transcriptReview/segments/${index}/text`] = String(field.value || "").replace(/\s+/g, " ").trim().slice(0, 300);
+      reviewedSegments[index].text = String(field.value || "").replace(/\s+/g, " ").trim().slice(0, 300);
     });
+    updates[`studioJobs/${state.user.uid}/${jobId}/transcriptReview/segments`] = reviewedSegments.filter((segment) => segment.text);
     await update(ref(db), updates);
     state.reviewingJobId = "";
     state.transcriptSegments = [];

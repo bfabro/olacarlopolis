@@ -123,7 +123,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=645" />
+   <link rel="stylesheet" href="style.css?v=646" />
    <link rel="stylesheet" href="ola-pesca.css?v=109" />
    <link rel="stylesheet" href="casas-veraneio.css?v=9" />
    <link rel="stylesheet" href="loterias.css?v=8" />
@@ -1370,7 +1370,7 @@
 
             </ul>
 
-            <div class="sidebar-version">Olá Carlópolis v591</div>
+            <div class="sidebar-version">Olá Carlópolis v592</div>
 
             <!-- Sidebar Open / Close -->
             <div class="bottom_content">
@@ -1682,7 +1682,7 @@
    <script>
       if ('serviceWorker' in navigator) {
          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js?v=985', { updateViaCache: 'none' })
+            navigator.serviceWorker.register('/service-worker.js?v=986', { updateViaCache: 'none' })
                .then((reg) => {
                   reg.update();
                   console.log("✅ Service Worker registrado:", reg.scope);
@@ -1690,7 +1690,7 @@
                .catch((err) => console.error("❌ Falha ao registrar Service Worker:", err));
          });
          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            const reloadKey = 'ola_sw_reloaded_v985';
+            const reloadKey = 'ola_sw_reloaded_v986';
             if (sessionStorage.getItem(reloadKey)) return;
             sessionStorage.setItem(reloadKey, '1');
             window.location.reload();
@@ -1702,7 +1702,7 @@
    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
    <script defer src="ola-pesca.js?v=109"></script>
-   <script defer src="script.js?v=845"></script>
+   <script defer src="script.js?v=846"></script>
    <script defer src="clima-story.js?v=16"></script>
    <script defer src="loterias.js?v=11"></script>
    <script defer src="item-share.js?v=3"></script>

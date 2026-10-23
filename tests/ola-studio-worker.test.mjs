@@ -356,6 +356,12 @@ test("parser do Whisper preserva português e timestamps reais por palavra", () 
   assert.equal(parsed.segments[0].text, "Olá Carlópolis");
 });
 
+test("parser do Whisper descarta marcadores de música mesmo quando chegam fragmentados", () => {
+  const transcription = ["[", "M", "Ú", "S", "ICA", "DE", "F", "UND", "O", "]"].map((text, index) => ({ offsets: { from: index * 400, to: (index + 1) * 400 }, text, tokens: [{ text, offsets: { from: index * 400, to: (index + 1) * 400 }, p: 0.99 }] }));
+  const parsed = parseWhisperJson({ result: { language: "pt" }, transcription });
+  assert.deepEqual(parsed.segments, []);
+});
+
 test("legendas ASS oferecem modo tradicional e destaque dinâmico", () => {
   const transcription = { segments: [{ start: 0.5, end: 2.1, text: "Olá Carlópolis", words: [{ text: "Olá", start: 0.5, end: 1.1 }, { text: "Carlópolis", start: 1.1, end: 2.1 }] }] };
   const traditional = buildAssCaptions(transcription, { format: "9:16", mode: "traditional", position: "bottom" });

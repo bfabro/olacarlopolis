@@ -24,7 +24,17 @@ const rebuiltWords = (text, start, end) => {
 
 export function parseWhisperJson(payload = {}) {
   const segments = [];
+  let insideNonSpeechLabel = false;
   for (const [index, item] of (payload.transcription || []).entries()) {
+    const rawValue = cleanToken(item.text);
+    if (insideNonSpeechLabel || rawValue.includes("[")) {
+      insideNonSpeechLabel = !rawValue.includes("]");
+      continue;
+    }
+    if (rawValue.includes("]") || /^[♪♫♬]+$/.test(rawValue)) {
+      insideNonSpeechLabel = false;
+      continue;
+    }
     const start = secondsFromWhisper(item.offsets?.from ?? item.timestamps?.from);
     const end = Math.max(start + 0.05, secondsFromWhisper(item.offsets?.to ?? item.timestamps?.to, start + 0.5));
     const words = (item.tokens || []).map((token) => {
@@ -35,7 +45,7 @@ export function parseWhisperJson(payload = {}) {
       const probability = Number(token.p ?? token.probability ?? 1);
       return { text: value, start: wordStart, end: wordEnd, confidence: Number.isFinite(probability) ? probability : 1 };
     }).filter(Boolean);
-    const value = cleanToken(item.text) || words.map((word) => word.text).join(" ");
+    const value = rawValue || words.map((word) => word.text).join(" ");
     if (!value) continue;
     const confidences = words.map((word) => word.confidence).filter(Number.isFinite);
     const confidence = confidences.length ? confidences.reduce((sum, number) => sum + number, 0) / confidences.length : null;
@@ -76,7 +86,7 @@ export class WhisperCppTranscriptionProvider {
     const wavPath = path.join(workDir, "transcription-audio.wav");
     const outputBase = path.join(workDir, "transcription");
     await runProcess(workerConfig.ffmpegPath, ["-y", "-i", mediaPath, "-vn", "-af", "highpass=f=80,lowpass=f=9000", "-ar", "16000", "-ac", "1", "-c:a", "pcm_s16le", wavPath], { signal: options.signal });
-    const args = ["-m", workerConfig.whisperModel, "-f", wavPath, "-l", "pt", "-t", String(workerConfig.whisperThreads), "-ojf", "-of", outputBase, "-ml", "1", "-wt", String(workerConfig.whisperWordThreshold), "-np", "--no-gpu"];
+    const args = ["-m", workerConfig.whisperModel, "-f", wavPath, "-l", "pt", "-t", String(workerConfig.whisperThreads), "-ojf", "-of", outputBase, "-ml", "72", "-sow", "-wt", String(workerConfig.whisperWordThreshold), "-np", "--no-gpu"];
     if (options.prompt) args.push("--prompt", String(options.prompt).slice(0, 240));
     await runProcess(workerConfig.whisperPath, args, { signal: options.signal });
     const parsed = parseWhisperJson(JSON.parse(await fs.readFile(`${outputBase}.json`, "utf8")));
