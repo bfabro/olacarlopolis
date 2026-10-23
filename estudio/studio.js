@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v35", date: "2026-10-23" });
+const STUDIO_RELEASE = Object.freeze({ label: "v36", date: "2026-10-23" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
@@ -209,7 +209,10 @@ function renderCostDetails(cost = {}, ledger = {}, director = {}) {
   const credits = Number(ledger.estimatedCredits ?? cost.estimatedCredits ?? 0);
   node.classList.remove("hidden");
   const narrationUsed = cost.narrationUsed === true;
-  node.innerHTML = `<div><span><i class="fa-solid fa-stopwatch"></i> Tempo total</span><strong>${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</strong></div><div><span><i class="fa-solid fa-coins"></i> Créditos de processamento</span><strong>${credits} ${credits === 1 ? "crédito" : "créditos"}</strong><small>${Number(ledger.amount || 0) ? `${Number(ledger.amount)} debitado(s)` : "MVP sem débito real"}</small></div><div><span><i class="fa-solid fa-wand-magic-sparkles"></i> Diretor de IA</span><strong>${aiUsed ? formatUsd(cost.aiEstimatedCostUsd) : "Não utilizado"}</strong><small>${aiUsed ? `${escapeHtml(cost.aiModel || director.model || "IA")} • ${tokens.toLocaleString("pt-BR")} tokens` : "Montagem técnica local"}</small></div><div><span><i class="fa-solid fa-microphone-lines"></i> Narração por IA</span><strong>${narrationUsed ? formatUsd(cost.narrationEstimatedCostUsd) : "Não utilizada"}</strong><small>${narrationUsed ? `${escapeHtml(cost.narrationVoice || "voz IA")} • ${escapeHtml(formatDuration(cost.narrationDurationSeconds || 0))} • ${Number(cost.narrationCharacters || 0).toLocaleString("pt-BR")} caracteres • voz gerada por IA` : "Sem locução sintética"}</small></div>`;
+  const narrationTiming = Number(cost.narrationTimelineDurationSeconds || 0) > Number(cost.narrationDurationSeconds || 0) + 1
+    ? `${formatDuration(cost.narrationDurationSeconds || 0)} de voz distribuídos até ${formatDuration(cost.narrationTimelineDurationSeconds)}`
+    : formatDuration(cost.narrationDurationSeconds || 0);
+  node.innerHTML = `<div><span><i class="fa-solid fa-stopwatch"></i> Tempo total</span><strong>${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</strong></div><div><span><i class="fa-solid fa-coins"></i> Créditos de processamento</span><strong>${credits} ${credits === 1 ? "crédito" : "créditos"}</strong><small>${Number(ledger.amount || 0) ? `${Number(ledger.amount)} debitado(s)` : "MVP sem débito real"}</small></div><div><span><i class="fa-solid fa-wand-magic-sparkles"></i> Diretor de IA</span><strong>${aiUsed ? formatUsd(cost.aiEstimatedCostUsd) : "Não utilizado"}</strong><small>${aiUsed ? `${escapeHtml(cost.aiModel || director.model || "IA")} • ${tokens.toLocaleString("pt-BR")} tokens` : "Montagem técnica local"}</small></div><div><span><i class="fa-solid fa-microphone-lines"></i> Narração por IA</span><strong>${narrationUsed ? formatUsd(cost.narrationEstimatedCostUsd) : "Não utilizada"}</strong><small>${narrationUsed ? `${escapeHtml(cost.narrationVoice || "voz IA")} • ${escapeHtml(narrationTiming)} • ${Number(cost.narrationCharacters || 0).toLocaleString("pt-BR")} caracteres • voz e legendas sincronizadas` : "Sem locução sintética"}</small></div>`;
 }
 
 async function loadAndRenderProjectCost(jobId, director = {}) {
@@ -1049,7 +1052,7 @@ function updateVisualNarrationStatus() {
   $("visualNarrationScript").disabled = !enabled;
   $("visualNarrationStatus").textContent = !enabled ? "Desativada" : script ? "Pronta para gerar" : "Roteiro necessário";
   $("visualNarrationStatus").classList.toggle("is-warning", enabled && !script);
-  $("visualNarrationHelp").textContent = enabled && !script ? "Preencha o roteiro para evitar um vídeo sem voz." : "A voz será gerada na próxima prévia ou versão final.";
+  $("visualNarrationHelp").textContent = enabled && !script ? "Preencha o roteiro para evitar um vídeo sem voz." : "A voz e as legendas serão sincronizadas e distribuídas ao longo do vídeo.";
 }
 
 function syncVisualAudioMixer() {

@@ -157,7 +157,7 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
     const end = Math.min(Number(basePlan.duration || 0), start + Number(scene.duration || 0));
     timeline = Math.max(0, end - Number(scene.transitionDuration || 0));
     if (!scene.onScreenText) return null;
-    return { id: `ai-scene-text-${index + 1}`, type: "ai_scene_text", value: scene.onScreenText, start, end, animation: "fade", position: "bottom", slot: 0, sizeScale: 0.82, color: "#FFFFFF", outlineColor: "#092B45", background: true, align: "center", font: "sans", margin: 86 };
+    return { id: `ai-scene-text-${index + 1}`, type: "ai_scene_text", value: scene.onScreenText, start, end, animation: "fade", position: basePlan.narration?.enabled ? "top" : "bottom", slot: basePlan.narration?.enabled ? 1 : 0, sizeScale: 0.82, color: "#FFFFFF", outlineColor: "#092B45", background: true, align: "center", font: "sans", margin: 86 };
   }).filter(Boolean);
   const script = String(direction.narration?.script || "").replace(/\s+/g, " ").trim().slice(0, 4000);
   const plan = {
@@ -211,11 +211,12 @@ export class OpenAISemanticPlanner {
   async createPlan({ project, basePlan, evidence, analyzedSources, signal }) {
     if (!this.enabled) throw new Error("Diretor de IA não configurado no worker.");
     const brief = String(project.director?.brief || "Criar uma montagem profissional coerente com o modelo selecionado.").slice(0, 1200);
-    const maxWords = Math.max(12, Math.floor(Number(basePlan.duration || 30) * 2.05));
+    const minWords = Math.max(12, Math.floor(Number(basePlan.duration || 30) * 1.55));
+    const maxWords = Math.max(minWords + 6, Math.floor(Number(basePlan.duration || 30) * 1.95));
     const wantsScript = project.narration?.generateScript === true;
     const compactEvidence = { candidates: evidence.candidates, transcripts: evidence.transcripts, baseScenes: basePlan.scenes.map((scene) => ({ sourceId: scene.sourceId, start: scene.start, duration: scene.duration, narrativeRole: scene.narrativeRole })) };
     const content = [
-      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços, locais ou características. Use somente informações visíveis nos quadros, presentes nas transcrições ou declaradas no objetivo do usuário. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. ${wantsScript ? `Para cada cena, escreva onScreenText curto, claro e factual; deixe vazio quando não houver informação segura. Crie também uma narração contínua em português brasileiro com no máximo ${maxWords} palavras, coerente com a ordem das cenas.` : "Retorne todos os onScreenText e narration.script vazios."} Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
+      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços, locais ou características. Use somente informações visíveis nos quadros, presentes nas transcrições ou declaradas no objetivo do usuário. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. ${wantsScript ? `Para cada cena, escreva onScreenText curto, claro e factual; deixe vazio quando não houver informação segura. Crie também uma narração em português brasileiro com ${minWords} a ${maxWords} palavras, dividida em frases curtas na ordem das cenas. Sempre que houver informação segura, produza uma frase para cada cena para que a locução acompanhe o vídeo do início ao fim.` : "Retorne todos os onScreenText e narration.script vazios."} Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
     ];
     evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro representativo do ${frame.candidateId}, origem ${frame.sourceId}:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: workerConfig.aiImageDetail }); });
     const timeoutSignal = AbortSignal.timeout(workerConfig.aiTimeoutMs);

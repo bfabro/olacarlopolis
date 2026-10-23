@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
-import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, renderDimensions, renderExportSettings } from "../studio-worker/src/renderer.mjs";
+import { buildBrandingArgs, buildNarrationTimelineArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, renderDimensions, renderExportSettings, scheduleNarrationSegments, splitNarrationScript } from "../studio-worker/src/renderer.mjs";
 import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
 import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
@@ -300,7 +300,8 @@ test("branding prepara logo, textos, música com ducking e faststart", () => {
   assert.match(filters, /subtitles=/);
   assert.doesNotMatch(filters, /force_style/);
   assert.match(filters, /drawtext=/);
-  assert.match(filters, /sidechaincompress/);
+  assert.match(filters, /loudnorm=I=-20/);
+  assert.doesNotMatch(filters, /\[music\]\[0:a\]sidechaincompress/);
   assert.match(filters, /afade=t=in/);
   assert.ok(args.includes("+faststart"));
   const withoutDucking = buildBrandingArgs({ inputPath: "/tmp/base.mp4", outputPath: "/tmp/final.mp4", duration: 15, format: "9:16", musicPath: "/tmp/music.mp3", plan: { textLayers: [], music: { duckDuringSpeech: false }, audio: { musicVolume: 0.2 } } });
@@ -326,6 +327,22 @@ test("provedor de voz envia somente o roteiro e salva WAV sem expor a chave", as
     assert.equal(spoken.available, true);
     assert.ok((await fs.stat(spoken.localPath)).size > 0);
   } finally { await fs.rm(root, { recursive: true, force: true }); }
+});
+
+test("narração é dividida, distribuída até o final e preparada em uma timeline única", () => {
+  const sentences = splitNarrationScript("A primeira cena apresenta a entrada. Depois mostramos a área externa. Por fim aparece a vista da água.", 5);
+  assert.equal(sentences.length, 3);
+  const scheduled = scheduleNarrationSegments(sentences.map((text, index) => ({ text, localPath: `/tmp/voz-${index}.wav`, durationSeconds: 3 + index })), 30);
+  assert.equal(scheduled[0].start, 0.45);
+  assert.ok(scheduled[1].start > 10);
+  assert.ok(scheduled[2].start > 24);
+  assert.equal(scheduled[2].end, 29.55);
+  const args = buildNarrationTimelineArgs(scheduled, "/tmp/timeline.wav", 30);
+  const graph = args[args.indexOf("-filter_complex") + 1];
+  assert.equal(args.filter((item) => item === "-i").length, 4);
+  assert.match(graph, /adelay=450\|450/);
+  assert.match(graph, /amix=inputs=4:duration=first/);
+  assert.match(graph, /atrim=duration=30\.000/);
 });
 
 test("parser do Whisper preserva português e timestamps reais por palavra", () => {

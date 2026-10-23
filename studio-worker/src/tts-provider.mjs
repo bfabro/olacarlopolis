@@ -33,7 +33,7 @@ export class OpenAISpeechProvider {
     this.endpoint = options.endpoint || "https://api.openai.com/v1/audio/speech";
   }
   get enabled() { return Boolean(this.apiKey && this.model); }
-  async synthesize({ script, voice = "marin", tone = "professional", outputDir, signal }) {
+  async synthesize({ script, voice = "marin", tone = "professional", outputDir, fileName = "ai-narration.wav", signal }) {
     const input = String(script || "").replace(/\s+/g, " ").trim().slice(0, 4000);
     if (!input) return { available: false, reason: "Roteiro vazio." };
     if (!this.enabled) return { available: false, reason: "Narração por IA não configurada no worker." };
@@ -50,7 +50,8 @@ export class OpenAISpeechProvider {
       const payload = await response.json().catch(() => ({}));
       throw Object.assign(new Error(`A voz por IA respondeu HTTP ${response.status}: ${String(payload?.error?.message || "erro não detalhado").slice(0, 240)}`), { status: response.status, code: "openai_tts_error" });
     }
-    const target = path.join(outputDir, "ai-narration.wav");
+    const safeFileName = String(fileName || "ai-narration.wav").replace(/[^a-zA-Z0-9_.-]/g, "-").slice(0, 120) || "ai-narration.wav";
+    const target = path.join(outputDir, safeFileName);
     const audio = Buffer.from(await response.arrayBuffer());
     await fs.writeFile(target, audio);
     const durationSeconds = wavDurationSeconds(audio);

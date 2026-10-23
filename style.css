@@ -9,7 +9,7 @@
   font-family: "Poppins", sans-serif;
 }
 
-/* Release global do site v618 — correções de edição e narração do Olá Studio. */
+/* Release global do site v619 — sincronização de voz, legendas e música do Olá Studio. */
 
 /* Imóveis: quando o modo Cards estiver ativo no desktop, mantém o mesmo formato vertical do mobile. */
 @media (min-width: 768px) {

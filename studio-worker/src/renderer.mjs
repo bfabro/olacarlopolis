@@ -7,6 +7,53 @@ import { writeAssCaptions } from "./captions.mjs";
 
 const seconds = (value) => Math.max(0.05, Number(value || 0)).toFixed(3);
 
+export function splitNarrationScript(script, maximumSegments = 12) {
+  const sentences = String(script || "").replace(/\s+/g, " ").trim().match(/[^.!?]+[.!?]?/g)?.map((item) => item.trim()).filter(Boolean) || [];
+  if (sentences.length <= maximumSegments) return sentences;
+  const groups = Array.from({ length: maximumSegments }, () => []);
+  sentences.forEach((sentence, index) => groups[Math.min(maximumSegments - 1, Math.floor(index * maximumSegments / sentences.length))].push(sentence));
+  return groups.map((group) => group.join(" ")).filter(Boolean);
+}
+
+export function scheduleNarrationSegments(items, totalDuration) {
+  const duration = Math.max(0.5, Number(totalDuration || 0));
+  const padding = Math.min(0.45, duration * 0.03);
+  if (!items.length) return [];
+  if (items.length === 1) return [{ ...items[0], start: padding, end: Math.min(duration, padding + Number(items[0].durationSeconds || 0)) }];
+  return items.map((item, index) => {
+    const spokenDuration = Math.max(0.1, Number(item.durationSeconds || 0));
+    const ideal = index / (items.length - 1) * Math.max(0, duration - spokenDuration - padding);
+    const start = index === items.length - 1 ? Math.max(padding, duration - spokenDuration - padding) : Math.max(padding, ideal);
+    return { ...item, start: Number(start.toFixed(3)), end: Number(Math.min(duration, start + spokenDuration).toFixed(3)) };
+  });
+}
+
+export function buildNarrationTimelineArgs(segments, outputPath, duration) {
+  const args = ["-y", "-f", "lavfi", "-t", seconds(duration), "-i", "anullsrc=r=48000:cl=stereo"];
+  segments.forEach((segment) => args.push("-i", segment.localPath));
+  const delayed = segments.map((segment, index) => {
+    const delay = Math.max(0, Math.round(Number(segment.start || 0) * 1000));
+    return `[${index + 1}:a]aresample=48000,aformat=channel_layouts=stereo,adelay=${delay}|${delay}[narration${index + 1}]`;
+  });
+  const inputs = ["[0:a]", ...segments.map((_, index) => `[narration${index + 1}]`)].join("");
+  const graph = `${delayed.join(";")};${inputs}amix=inputs=${segments.length + 1}:duration=first:normalize=0,atrim=duration=${seconds(duration)}[aout]`;
+  return [...args, "-filter_complex", graph, "-map", "[aout]", "-c:a", "pcm_s16le", outputPath];
+}
+
+function narrationCaptionSegments(segments) {
+  return segments.map((segment, index) => {
+    const words = String(segment.text || "").split(/\s+/).filter(Boolean);
+    const span = Math.max(0.1, Number(segment.end) - Number(segment.start));
+    return {
+      id: `narration-${index + 1}`,
+      start: segment.start,
+      end: segment.end,
+      text: segment.text,
+      words: words.map((word, wordIndex) => ({ text: word, start: Number((Number(segment.start) + span * wordIndex / words.length).toFixed(3)), end: Number((Number(segment.start) + span * (wordIndex + 1) / words.length).toFixed(3)) }))
+    };
+  });
+}
+
 export function renderDimensions(format, profile = "final") {
   if (profile !== "preview") return studioOutputDimensions(format);
   if (format === "16:9") return { width: 640, height: 360 };
@@ -204,11 +251,8 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
     const fadeSeconds = Math.min(Math.max(0, Number(plan.audio?.fadeSeconds ?? 1.2)), Number(duration) / 3);
     const fadeOutStart = Math.max(0, Number(duration) - fadeSeconds);
     const fades = fadeSeconds > 0 ? `,afade=t=in:st=0:d=${seconds(fadeSeconds)},afade=t=out:st=${seconds(fadeOutStart)}:d=${seconds(fadeSeconds)}` : "";
-    filters.push(`[${musicIndex}:a]volume=${Number(plan.audio?.musicVolume ?? plan.music?.volume ?? 0.18).toFixed(2)}${fades},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[music]`);
-    if (plan.music?.duckDuringSpeech !== false) {
-      filters.push("[music][0:a]sidechaincompress=threshold=0.035:ratio=10:attack=20:release=450[ducked]");
-      filters.push("[0:a][ducked]amix=inputs=2:duration=first:normalize=0[baseaudio]");
-    } else filters.push("[0:a][music]amix=inputs=2:duration=first:normalize=0[baseaudio]");
+    filters.push(`[${musicIndex}:a]loudnorm=I=-20:LRA=11:TP=-2,volume=${Number(plan.audio?.musicVolume ?? plan.music?.volume ?? 0.18).toFixed(2)}${fades},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[music]`);
+    filters.push("[0:a][music]amix=inputs=2:duration=first:normalize=0[baseaudio]");
   } else filters.push("[0:a]anull[baseaudio]");
   if (soundEffectsIndex >= 0) {
     filters.push(`[${soundEffectsIndex}:a]atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[sfx]`);
@@ -279,13 +323,24 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     throw Object.assign(new Error("A narração foi solicitada, mas o serviço de voz por IA não está configurado no worker."), { code: "narration_provider_unavailable" });
   }
   if (!narrationPath && plan.narration?.enabled && plan.narration?.script && speechProvider?.enabled) {
-    await progress("narration", 0, 1);
-    const spoken = await speechProvider.synthesize({ script: plan.narration.script, voice: plan.narration.voice, tone: plan.narration.tone, outputDir, signal });
-    if (spoken.available) {
-      narrationPath = spoken.localPath;
-      plan.narration = { ...plan.narration, provider: spoken.provider, model: spoken.model, voice: spoken.voice, characters: spoken.characters, durationSeconds: spoken.durationSeconds, estimatedCostUsd: spoken.estimatedCostUsd, rendered: true };
+    const parts = splitNarrationScript(plan.narration.script, Math.min(12, Math.max(1, plan.scenes.length)));
+    await progress("narration", 0, parts.length);
+    const spokenParts = [];
+    for (let index = 0; index < parts.length; index += 1) {
+      const spoken = await speechProvider.synthesize({ script: parts[index], voice: plan.narration.voice, tone: plan.narration.tone, outputDir, fileName: `ai-narration-${String(index + 1).padStart(2, "0")}.wav`, signal });
+      if (spoken.available) spokenParts.push({ ...spoken, text: parts[index] });
+      await progress("narration", index + 1, parts.length);
     }
-    await progress("narration", 1, 1);
+    if (spokenParts.length) {
+      const scheduled = scheduleNarrationSegments(spokenParts, plan.duration);
+      narrationPath = path.join(outputDir, "ai-narration-timeline.wav");
+      await runProcess(workerConfig.ffmpegPath, buildNarrationTimelineArgs(scheduled, narrationPath, plan.duration), { signal });
+      const captionSegments = narrationCaptionSegments(scheduled);
+      captionsPath = await writeAssCaptions(path.join(outputDir, "narration-captions.ass"), { segments: captionSegments }, { ...(plan.captions || {}), enabled: true, mode: plan.captions?.mode || "traditional", format: plan.format });
+      plan.textLayers = (plan.textLayers || []).map((layer) => layer.type === "ai_scene_text" ? { ...layer, position: "top", slot: 1 } : layer);
+      plan.captions = { ...(plan.captions || {}), enabled: true, provider: "openai-tts-timeline", autoNarration: true, segments: captionSegments };
+      plan.narration = { ...plan.narration, provider: spokenParts[0].provider, model: spokenParts[0].model, voice: spokenParts[0].voice, characters: spokenParts.reduce((sum, item) => sum + Number(item.characters || 0), 0), durationSeconds: Number(spokenParts.reduce((sum, item) => sum + Number(item.durationSeconds || 0), 0).toFixed(3)), timelineDurationSeconds: Number(scheduled.at(-1)?.end || 0), estimatedCostUsd: Number(spokenParts.reduce((sum, item) => sum + Number(item.estimatedCostUsd || 0), 0).toFixed(6)), segments: scheduled.map(({ text, start, end, durationSeconds }) => ({ text, start, end, durationSeconds })), rendered: true };
+    }
   }
   const outputPath = path.join(outputDir, "ola-studio-final.mp4");
   await runProcess(workerConfig.ffmpegPath, buildBrandingArgs({ inputPath: compositionPath, outputPath, duration: plan.duration, format: plan.format, plan, logoPath, musicPath, soundEffectsPath, narrationPath, captionsPath, renderProfile }), { signal });
