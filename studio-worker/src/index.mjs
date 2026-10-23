@@ -9,7 +9,7 @@ import { createTranscriptionProvider, prepareReviewedTranscription } from "./tra
 import { createDeterministicPlan } from "./planner.mjs";
 import { renderPlan } from "./renderer.mjs";
 import { analyzeMusicRhythm } from "./rhythm.mjs";
-import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence } from "./ai-planner.mjs";
+import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence, semanticFailureInfo } from "./ai-planner.mjs";
 import { prepareVisualEditorPlan } from "./editor-plan.mjs";
 import { generateLibraryMusic, generateTransitionSoundtrack, generatedAudioPaths } from "./sound-library.mjs";
 
@@ -92,30 +92,40 @@ async function processJob(job) {
     if (!job.planOverride && project.director?.mode === "semantic") {
       const semanticPlanner = createSemanticPlanner();
       if (!semanticPlanner.enabled) {
-        plan = markSemanticFallback(technicalPlan, "Diretor de IA não configurado no worker. Defina OPENAI_API_KEY e STUDIO_OPENAI_MODEL para ativá-lo.");
+        const fallback = { code: "ai_not_configured", message: "O Diretor de IA não está configurado neste worker. A montagem técnica local continuará normalmente." };
+        plan = markSemanticFallback(technicalPlan, fallback.message, fallback);
+        await updateJob(job.uid, job.jobId, { message: fallback.message, event: { level: "warning", code: fallback.code, message: fallback.message } });
       } else {
         try {
           await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 49, message: "O diretor de IA está analisando quadros, transcrições e o objetivo criativo." });
           const sourceTranscriptionProvider = await createTranscriptionProvider();
           const evidence = await prepareSemanticEvidence(analyzed, workDir, { signal: cancellation.signal, transcriptionProvider: sourceTranscriptionProvider, prompt: project.captions?.prompt || "", maxFrames: workerConfig.aiMaxFrames });
+          if (evidence.warnings.length) {
+            const count = evidence.warnings.length;
+            const message = `${count} ${count === 1 ? "mídia não gerou quadro para a IA e foi ignorada" : "mídias não geraram quadros para a IA e foram ignoradas"}. A análise continuará com ${evidence.frames.length} ${evidence.frames.length === 1 ? "quadro válido" : "quadros válidos"}.`;
+            await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 49, message, event: { level: "warning", code: "ai_evidence_partial", message, details: evidence.warnings.map((warning) => warning.message).slice(0, 6) } });
+          }
           plan = await semanticPlanner.createPlan({ project, basePlan: technicalPlan, evidence, analyzedSources: analyzed, signal: cancellation.signal });
+          await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 50, message: "Direção por IA concluída e validada. Preparando a renderização.", event: { level: "success", code: "ai_direction_applied", message: `Direção por IA aplicada com ${evidence.frames.length} ${evidence.frames.length === 1 ? "quadro visual" : "quadros visuais"}.` } });
         } catch (error) {
           if (error?.code === "studio_cancelled" || cancellation.signal.aborted) throw error;
           console.warn(`[${job.jobId}] Diretor de IA indisponível; usando plano local:`, error.message);
-          plan = markSemanticFallback(technicalPlan, error.message);
+          const fallback = semanticFailureInfo(error);
+          plan = markSemanticFallback(technicalPlan, fallback.message, fallback);
+          await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 50, message: fallback.message, event: { level: "warning", code: fallback.code, message: `${fallback.message} Nenhum arquivo original foi alterado.` } });
         }
       }
     }
     const directorResult = job.planOverride
       ? { requested: false, applied: false, editorApplied: true, updatedAt: Date.now() }
       : project.director?.mode === "semantic"
-      ? { requested: true, applied: plan.aiDirector?.applied === true, provider: plan.planner?.provider || "", model: plan.planner?.model || "", reason: plan.aiDirector?.reason || "", updatedAt: Date.now() }
+      ? { requested: true, applied: plan.aiDirector?.applied === true, provider: plan.planner?.provider || "", model: plan.planner?.model || "", reason: plan.aiDirector?.reason || "", code: plan.aiDirector?.code || "", updatedAt: Date.now() }
       : { requested: false, applied: false, updatedAt: Date.now() };
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
     const soundEffectsPath = await generateTransitionSoundtrack(plan.soundEffects?.preset || "none", plan, audioPaths.effects, cancellation.signal);
     await uploadJson(plan, planStoragePath);
     await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ directorResult });
-    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.type === "semantic-ai" ? "Direção semântica concluída. Renderizando cenas." : plan.planner?.fallback ? "IA indisponível. Renderizando com a montagem técnica local." : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, director: directorResult });
+    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.type === "semantic-ai" ? "Direção por IA concluída. Renderizando as cenas selecionadas." : plan.planner?.fallback ? `${plan.aiDirector?.reason || "A IA não pôde ser aplicada"} Renderizando com a montagem técnica local.` : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, director: directorResult });
     const approvedTranscription = project.captionsEnabled && job.transcriptReview?.status === "approved"
       ? prepareReviewedTranscription(job.transcriptReview, project.duration)
       : null;

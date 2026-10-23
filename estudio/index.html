@@ -9,8 +9,8 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=14">
-  <link rel="stylesheet" href="studio-overrides.css?v=14">
+  <link rel="stylesheet" href="studio.css?v=15">
+  <link rel="stylesheet" href="studio-overrides.css?v=15">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
@@ -269,6 +269,15 @@
             <ol class="process-steps"><li data-process-step="upload" class="active"><i class="fa-solid fa-cloud-arrow-up"></i><span>Upload</span></li><li data-process-step="queue"><i class="fa-solid fa-list-check"></i><span>Fila</span></li><li data-process-step="analysis"><i class="fa-solid fa-wave-square"></i><span>Análise</span></li><li data-process-step="transcription"><i class="fa-solid fa-closed-captioning"></i><span>Legendas</span></li><li data-process-step="render"><i class="fa-solid fa-film"></i><span>Renderização</span></li><li data-process-step="complete"><i class="fa-solid fa-circle-check"></i><span>Concluído</span></li></ol>
             <button id="cancelProcessingButton" class="cancel-processing-button" type="button"><i class="fa-solid fa-ban"></i> Cancelar criação</button>
           </section>
+          <section id="processingLogCard" class="studio-card processing-log-card">
+            <button id="processingLogToggle" class="processing-log-toggle" type="button" aria-expanded="true" aria-controls="processingLogBody">
+              <span><i class="fa-solid fa-list-check"></i><span><strong>Detalhes do processamento</strong><small>Acompanhe o que está acontecendo e entenda avisos sem termos técnicos desnecessários.</small></span></span>
+              <span><b id="processingLogCount">0 eventos</b><i class="fa-solid fa-chevron-up"></i></span>
+            </button>
+            <div id="processingLogBody" class="processing-log-body">
+              <ol id="processingLogList" class="processing-log-list" aria-live="polite"><li class="processing-log-empty">O histórico aparecerá assim que o processamento começar.</li></ol>
+            </div>
+          </section>
           <section id="transcriptReviewCard" class="studio-card transcript-review-card hidden">
             <div class="card-heading"><span><i class="fa-solid fa-closed-captioning"></i></span><div><h2>Revise as legendas</h2><p>Corrija somente o que foi reconhecido incorretamente. Os tempos da fala serão preservados.</p></div></div>
             <div class="transcript-review-summary"><strong id="transcriptReviewCount">0 trechos</strong><span>Deixe um trecho vazio para removê-lo das legendas.</span></div>
@@ -293,6 +302,6 @@
     </section>
   </div>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=23"></script>
+  <script type="module" src="studio.js?v=24"></script>
 </body>
 </html>

@@ -115,6 +115,10 @@ O modo padrão permanece `local`. Para habilitar o modo semântico em um ambient
 
 O resultado registra provedor, modelo, uso retornado pela API, estimativa de custo em dólar, quantidade de quadros/transcrições e se houve fallback. A estimativa utiliza somente os tokens efetivamente retornados pelo provedor e as tarifas configuradas no worker. O plano técnico continua sendo a fonte de durações e limites de renderização; a IA escolhe apenas candidatos reais previamente extraídos e não pode inventar uma mídia inexistente.
 
+A preparação visual tenta primeiro o ponto técnico selecionado de cada vídeo e, se necessário, tenta novamente o início da mídia. Quando um arquivo isolado ainda não produz um quadro válido, somente essa evidência é ignorada; as demais mídias e transcrições continuam disponíveis para a direção semântica. O trabalho só usa fallback local quando a própria direção por IA não pode ser concluída ou validada.
+
+A tela de processamento apresenta um histórico persistido no próprio trabalho, com horário, etapa, avisos, códigos de suporte e detalhes compreensíveis. Mensagens destinadas ao usuário não exibem chaves, caminhos temporários nem respostas brutas do provedor. O histórico permanece disponível ao reabrir um vídeo concluído.
+
 ## Editor visual e versões
 
 Projetos concluídos possuem a ação **Editar**. O navegador lê o plano JSON privado diretamente do Storage autenticado e apresenta:

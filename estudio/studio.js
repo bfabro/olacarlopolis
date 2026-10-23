@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=8";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=9";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -84,7 +84,12 @@ async function showProjectVideo(projectId) {
   $("processingTitle").textContent = project.name || "Vídeo concluído";
   markProcessStep("complete");
   updateProgress(100, "Concluído", "Preparando a prévia protegida do vídeo.");
+  resetProcessingLog("Carregando o histórico deste processamento.");
   switchView("processing");
+  if (state.activeJobId) {
+    const job = (await get(ref(db, `studioJobs/${state.user.uid}/${state.activeJobId}`))).val();
+    if (job) renderProcessingLog(job.events, job);
+  }
   if (state.outputPreviewUrl) URL.revokeObjectURL(state.outputPreviewUrl);
   const outputUrl = await privateOutputUrl(project.output);
   state.outputPreviewUrl = outputUrl.startsWith("blob:") ? outputUrl : "";
@@ -117,6 +122,42 @@ function formatBytes(bytes) {
 
 function formatDate(timestamp) {
   return timestamp ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(timestamp)) : "-";
+}
+
+function processingEventTime(timestamp) {
+  return timestamp ? new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(timestamp)) : "agora";
+}
+
+function normalizedProcessingEvents(events, fallbackJob) {
+  const list = Object.entries(events || {}).map(([id, event]) => ({ id, ...(event || {}) }));
+  if (!list.length && fallbackJob?.message) list.push({ id: "current", timestamp: fallbackJob.updatedAt || Date.now(), stage: fallbackJob.stage, status: fallbackJob.status, level: fallbackJob.status === "failed" ? "error" : "info", code: "current_status", message: fallbackJob.message });
+  return list.filter((event) => event.message).sort((a, b) => Number(a.timestamp || 0) - Number(b.timestamp || 0)).slice(-60);
+}
+
+function renderProcessingLog(events, fallbackJob = null) {
+  const root = $("processingLogList");
+  if (!root) return;
+  const list = normalizedProcessingEvents(events, fallbackJob);
+  $("processingLogCount").textContent = `${list.length} ${list.length === 1 ? "evento" : "eventos"}`;
+  if (!list.length) {
+    root.innerHTML = '<li class="processing-log-empty">O histórico aparecerá assim que o processamento começar.</li>';
+    return;
+  }
+  const stageNames = { upload: "Upload", queue: "Fila", probe: "Leitura", analysis: "Análise", planning: "Direção por IA", transcription: "Legendas", transcription_review: "Revisão", render: "Renderização", upload_output: "Finalização", complete: "Concluído", failed: "Falha", cancelled: "Cancelado" };
+  const icons = { info: "fa-circle-info", success: "fa-circle-check", warning: "fa-triangle-exclamation", error: "fa-circle-xmark" };
+  root.innerHTML = list.map((event) => {
+    const level = ["success", "warning", "error"].includes(event.level) ? event.level : "info";
+    const details = Array.isArray(event.details) ? event.details : Object.values(event.details || {});
+    const code = event.code && !["progress_update", "current_status"].includes(event.code) ? `<small class="processing-log-code">Código: ${escapeHtml(event.code)}</small>` : "";
+    return `<li class="processing-log-event ${level}"><span class="processing-log-icon"><i class="fa-solid ${icons[level]}"></i></span><div><div class="processing-log-heading"><strong>${escapeHtml(stageNames[event.stage] || "Processamento")}</strong><time>${escapeHtml(processingEventTime(event.timestamp))}</time></div><p>${escapeHtml(event.message)}</p>${details.length ? `<ul>${details.slice(0, 8).map((detail) => `<li>${escapeHtml(detail)}</li>`).join("")}</ul>` : ""}${code}</div></li>`;
+  }).join("");
+  root.scrollTop = root.scrollHeight;
+}
+
+function resetProcessingLog(message = "Preparando o processamento.") {
+  $("processingLogBody")?.classList.remove("hidden");
+  $("processingLogToggle")?.setAttribute("aria-expanded", "true");
+  renderProcessingLog({ local: { timestamp: Date.now(), stage: "upload", status: "uploading", level: "info", code: "current_status", message } });
 }
 
 function selectedValue(name) {
@@ -358,6 +399,7 @@ async function submitProject(event) {
   if (!$("projectName").value.trim()) return toast("Informe um nome para o projeto.");
   const activeJobs = state.projects.filter((item) => ["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"].includes(item.status));
   if (activeJobs.length >= STUDIO_LIMITS.maxConcurrentJobsPerUser) return toast("Aguarde o processamento atual terminar antes de criar outro vídeo.");
+  resetProcessingLog("Preparando o envio dos arquivos originais.");
   switchView("processing");
   $("resultCard").classList.add("hidden");
   $("errorCard").classList.add("hidden");
@@ -542,6 +584,7 @@ async function openProjectReview(projectId) {
   state.activeProjectId = projectId;
   state.activeJobId = project.jobId;
   state.cancelRequested = false;
+  resetProcessingLog("Carregando os detalhes do processamento.");
   switchView("processing");
   watchJob(project.jobId, projectId);
 }
@@ -551,6 +594,7 @@ function watchJob(jobId, projectId) {
   state.jobUnsubscribe = onValue(ref(db, `studioJobs/${state.user.uid}/${jobId}`), async (snapshot) => {
     const job = snapshot.val();
     if (!job) return;
+    renderProcessingLog(job.events, job);
     const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "transcription" || job.stage === "transcription_review" ? "transcription" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
     markProcessStep(step);
     updateProgress(job.progress || 25, statusLabels[job.status] || job.stage || "Processando", job.message || "O processamento continua no worker.");
@@ -614,6 +658,7 @@ async function regenerateProject(projectId) {
   state.activeProjectId = projectId;
   state.activeJobId = jobId;
   state.cancelRequested = false;
+  resetProcessingLog("Nova montagem enviada para a fila com os arquivos já armazenados.");
   switchView("processing");
   $("processingStatusCard").classList.remove("hidden");
   $("cancelProcessingButton").classList.remove("hidden");
@@ -1014,6 +1059,7 @@ async function enqueueVisualRender(mode) {
   });
   state.activeProjectId = state.visualProject.id;
   state.activeJobId = jobId;
+  resetProcessingLog(mode === "preview" ? "Prévia rápida enviada para a fila." : "Nova versão enviada para a fila de renderização.");
   switchView("processing");
   $("processingStatusCard").classList.remove("hidden");
   $("resultCard").classList.add("hidden");
@@ -1147,6 +1193,12 @@ $("projectsGrid").addEventListener("click", (event) => {
   if (remove) requestProjectDeletion(remove.dataset.projectDelete).catch((error) => toast(error.message));
 });
 $("cancelProcessingButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
+$("processingLogToggle").addEventListener("click", () => {
+  const body = $("processingLogBody");
+  const expanded = $("processingLogToggle").getAttribute("aria-expanded") === "true";
+  $("processingLogToggle").setAttribute("aria-expanded", String(!expanded));
+  body.classList.toggle("hidden", expanded);
+});
 $("cancelTranscriptReviewButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
 $("approveTranscriptButton").addEventListener("click", approveTranscriptReview);
 $("backToProjects").addEventListener("click", () => { $("previewPlayer").pause(); switchView("projects"); });

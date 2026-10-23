@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
 import { buildBrandingArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, renderDimensions, renderExportSettings } from "../studio-worker/src/renderer.mjs";
 import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
@@ -8,7 +11,7 @@ import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
 import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
 import { buildQualityWindows, buildShakeIntervals, deriveQualityThresholds, parseCameraMotionTransforms, parseIntervals, parseSignalFrames, summarizeCalibration } from "../studio-worker/src/analyzer.mjs";
 import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
-import { OpenAISemanticPlanner, buildSemanticCandidates, estimateSemanticUsageCost, markSemanticFallback } from "../studio-worker/src/ai-planner.mjs";
+import { OpenAISemanticPlanner, buildSemanticCandidates, estimateSemanticUsageCost, markSemanticFallback, prepareSemanticEvidence, semanticFailureInfo } from "../studio-worker/src/ai-planner.mjs";
 import { composePlanWaveform, waveformFromPcm } from "../studio-worker/src/audio-waveform.mjs";
 import { deleteStudioProjectAssets, studioProjectPrefixes } from "../studio-worker/src/cleanup.mjs";
 import { libraryMusicDefinition, transitionEffectEvents } from "../studio-worker/src/sound-library.mjs";
@@ -168,6 +171,38 @@ test("diretor sem configuração registra fallback técnico sem fingir IA", () =
   assert.equal(fallback.planner.semanticAnalysis, false);
   assert.equal(fallback.planner.fallback, true);
   assert.equal(fallback.aiDirector.applied, false);
+});
+
+test("evidências semânticas ignoram somente a mídia cujo quadro não foi gerado", async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "ola-studio-evidence-"));
+  try {
+    const bad = { ...video, id: "bad-video", name: "video-problematico.mp4", localPath: path.join(root, "bad.mp4"), metadata: { ...video.metadata, hasVideo: true }, technical: { ...video.technical, qualityWindows: [{ start: 2, score: 0.9, flags: [] }] } };
+    const good = { ...image, id: "good-image", name: "foto-valida.jpg", localPath: path.join(root, "good.jpg"), metadata: { ...image.metadata, hasVideo: true }, technical: { ...image.technical, qualityWindows: [{ start: 0, score: 0.8, flags: [] }] } };
+    const calls = [];
+    const evidence = await prepareSemanticEvidence([bad, good], root, {
+      runProcess: async (_command, args) => {
+        calls.push(args);
+        const sourcePath = args[args.indexOf("-i") + 1];
+        if (sourcePath === good.localPath) await fs.writeFile(args.at(-1), Buffer.alloc(256, 1));
+        return { stdout: "", stderr: "" };
+      }
+    });
+    assert.equal(calls.length, 3, "o vídeo inválido deve tentar o ponto escolhido e o início antes de ser ignorado");
+    assert.equal(evidence.frames.length, 1);
+    assert.equal(evidence.frames[0].sourceId, "good-image");
+    assert.equal(evidence.warnings.length, 1);
+    assert.equal(evidence.warnings[0].code, "semantic_frame_unavailable");
+    assert.match(evidence.warnings[0].message, /video-problematico\.mp4/);
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+  }
+});
+
+test("falhas da IA são traduzidas para mensagens seguras e compreensíveis", () => {
+  assert.deepEqual(semanticFailureInfo({ status: 401, code: "invalid_api_key" }), { code: "openai_authentication", message: "A chave da IA foi recusada. Verifique se ela está ativa e pertence ao projeto correto." });
+  assert.equal(semanticFailureInfo({ status: 429, code: "rate_limit_exceeded" }).code, "openai_limit");
+  assert.equal(semanticFailureInfo({ code: "openai_invalid_json" }).code, "openai_invalid_response");
+  assert.equal(semanticFailureInfo(new Error("/tmp/caminho-interno/segredo")).message, "A direção por IA não pôde ser concluída. A montagem técnica local continuará normalmente.");
 });
 
 test("editor visual valida origens, recalcula duração e preserva o plano renderizável", () => {

@@ -8,6 +8,21 @@ const TRANSITIONS = ["fade", "dissolve", "zoomin", "zoomout", "slideleft", "wipe
 const ROLES = ["opening", "development", "closing"];
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
 
+const sourceDisplayName = (source, fallback) => String(source?.name || source?.originalName || fallback || "mídia sem nome").replace(/[\r\n]+/g, " ").trim().slice(0, 120);
+
+async function readableFrame(target) {
+  const stats = await fs.stat(target);
+  if (!stats.isFile() || stats.size < 128) throw Object.assign(new Error("O FFmpeg não gerou um quadro utilizável."), { code: "semantic_frame_missing" });
+  return fs.readFile(target);
+}
+
+function frameArguments(source, candidate, target, fallback = false) {
+  const filters = "scale=512:-2:force_original_aspect_ratio=decrease";
+  if (String(source.contentType || "").startsWith("image/")) return ["-y", "-i", source.localPath, "-frames:v", "1", "-vf", filters, "-q:v", "4", target];
+  const start = fallback ? 0 : Math.max(0, Number(candidate.start || 0));
+  return ["-y", "-ss", String(start), "-i", source.localPath, "-frames:v", "1", "-vf", filters, "-q:v", "4", target];
+}
+
 export function buildSemanticCandidates(analyzedSources, maxCandidates = 24) {
   const candidates = [];
   for (const source of analyzedSources) {
@@ -37,18 +52,42 @@ export async function prepareSemanticEvidence(analyzedSources, workDir, options 
   const candidates = buildSemanticCandidates(analyzedSources);
   const frames = [];
   const transcripts = [];
+  const warnings = [];
+  const processRunner = options.runProcess || runProcess;
   const representative = new Map();
   candidates.forEach((candidate) => { if (!representative.has(candidate.sourceId)) representative.set(candidate.sourceId, candidate); });
-  for (const candidate of [...representative.values()].slice(0, options.maxFrames || workerConfig.aiMaxFrames)) {
+  const selected = [...representative.values()].slice(0, options.maxFrames || workerConfig.aiMaxFrames);
+  for (let frameIndex = 0; frameIndex < selected.length; frameIndex += 1) {
+    const candidate = selected[frameIndex];
     const source = analyzedSources.find((item) => item.id === candidate.sourceId);
     if (!source) continue;
-    const target = path.join(workDir, `semantic-frame-${frames.length + 1}.jpg`);
+    const target = path.join(workDir, `semantic-frame-${frameIndex + 1}.jpg`);
+    const displayName = sourceDisplayName(source, `mídia ${Number(source.order || 0) + 1}`);
+    if (source.metadata?.hasVideo === false) {
+      warnings.push({ code: "semantic_source_without_video", sourceId: source.id, sourceName: displayName, message: `“${displayName}” não possui imagem utilizável e foi ignorado somente na análise visual da IA.` });
+      continue;
+    }
+    let frameBuffer = null;
+    let lastError = null;
     try {
-      await runProcess(workerConfig.ffmpegPath, ["-y", "-ss", String(candidate.start), "-i", source.localPath, "-frames:v", "1", "-vf", "scale=512:-2:force_original_aspect_ratio=decrease", "-q:v", "4", target], { signal: options.signal });
-      frames.push({ candidateId: candidate.id, sourceId: source.id, dataUrl: `data:image/jpeg;base64,${(await fs.readFile(target)).toString("base64")}` });
+      const attempts = String(source.contentType || "").startsWith("image/") ? [false] : [false, true];
+      for (const fallback of attempts) {
+        await fs.rm(target, { force: true }).catch(() => {});
+        try {
+          await processRunner(workerConfig.ffmpegPath, frameArguments(source, candidate, target, fallback), { signal: options.signal });
+          frameBuffer = await readableFrame(target);
+          break;
+        } catch (error) {
+          if (error?.code === "studio_cancelled" || options.signal?.aborted) throw error;
+          lastError = error;
+        }
+      }
+      if (frameBuffer) frames.push({ candidateId: candidate.id, sourceId: source.id, dataUrl: `data:image/jpeg;base64,${frameBuffer.toString("base64")}` });
+      else warnings.push({ code: "semantic_frame_unavailable", sourceId: source.id, sourceName: displayName, message: `Não foi possível preparar um quadro de “${displayName}”. A IA continuará com as demais mídias.` });
     } finally {
       await fs.rm(target, { force: true }).catch(() => {});
     }
+    if (!frameBuffer && options.onWarning) await options.onWarning(warnings.at(-1), lastError);
   }
   if (options.transcriptionProvider?.enabled) {
     let transcribedSeconds = 0;
@@ -60,7 +99,7 @@ export async function prepareSemanticEvidence(analyzedSources, workDir, options 
       transcribedSeconds += duration;
     }
   }
-  return { candidates, frames, transcripts };
+  return { candidates, frames, transcripts, warnings };
 }
 
 const semanticSchema = {
@@ -130,8 +169,21 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
   return validateSemanticPlan(plan);
 }
 
-export function markSemanticFallback(basePlan, reason) {
-  return { ...basePlan, planner: { ...basePlan.planner, aiRequested: true, fallback: true, fallbackReason: String(reason || "Diretor de IA indisponível.").slice(0, 300) }, aiDirector: { requested: true, applied: false, reason: String(reason || "Diretor de IA indisponível.").slice(0, 300) } };
+export function markSemanticFallback(basePlan, reason, details = {}) {
+  const safeReason = String(reason || "Diretor de IA indisponível.").slice(0, 300);
+  return { ...basePlan, planner: { ...basePlan.planner, aiRequested: true, fallback: true, fallbackReason: safeReason, fallbackCode: String(details.code || "semantic_unavailable").slice(0, 80) }, aiDirector: { requested: true, applied: false, reason: safeReason, code: String(details.code || "semantic_unavailable").slice(0, 80) } };
+}
+
+export function semanticFailureInfo(error) {
+  const status = Number(error?.status || 0);
+  const rawCode = String(error?.apiCode || error?.code || "semantic_unavailable").toLowerCase();
+  if (status === 401 || rawCode.includes("api_key") || rawCode.includes("authentication")) return { code: "openai_authentication", message: "A chave da IA foi recusada. Verifique se ela está ativa e pertence ao projeto correto." };
+  if (status === 403 || rawCode.includes("permission")) return { code: "openai_permission", message: "A chave não possui permissão para usar o Diretor de IA." };
+  if (status === 429 || rawCode.includes("rate_limit")) return { code: "openai_limit", message: "A conta da IA atingiu um limite de uso, saldo ou velocidade. A montagem local continuará normalmente." };
+  if (rawCode.includes("timeout") || error?.name === "TimeoutError") return { code: "openai_timeout", message: "A IA demorou além do limite para responder. A montagem local continuará normalmente." };
+  if (rawCode.includes("invalid_json") || error instanceof SyntaxError) return { code: "openai_invalid_response", message: "A IA respondeu em um formato que não pôde ser validado. A montagem local continuará normalmente." };
+  if (rawCode.includes("invalid_plan")) return { code: "openai_invalid_plan", message: "O plano sugerido pela IA não passou nas validações de segurança da edição." };
+  return { code: rawCode.replace(/[^a-z0-9_-]/g, "_").slice(0, 80) || "semantic_unavailable", message: "A direção por IA não pôde ser concluída. A montagem técnica local continuará normalmente." };
 }
 
 export class OpenAISemanticPlanner {
@@ -160,10 +212,12 @@ export class OpenAISemanticPlanner {
       signal: requestSignal
     });
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(`Diretor de IA respondeu HTTP ${response.status}: ${String(payload?.error?.message || "erro não detalhado").slice(0, 240)}`);
+    if (!response.ok) throw Object.assign(new Error(`Diretor de IA respondeu HTTP ${response.status}: ${String(payload?.error?.message || "erro não detalhado").slice(0, 240)}`), { status: response.status, code: "openai_api_error", apiCode: payload?.error?.code || payload?.error?.type || "" });
     const text = responseText(payload);
-    if (!text) throw new Error("Diretor de IA não devolveu um plano estruturado.");
-    const direction = JSON.parse(text);
+    if (!text) throw Object.assign(new Error("Diretor de IA não devolveu um plano estruturado."), { code: "openai_empty_response" });
+    let direction;
+    try { direction = JSON.parse(text); }
+    catch (error) { throw Object.assign(new Error("Diretor de IA devolveu um JSON inválido."), { code: "openai_invalid_json", cause: error }); }
     return mergeSemanticDirection(basePlan, direction, evidence, analyzedSources, { provider: "openai", model: this.model, usage: payload.usage || null, estimatedCostUsd: estimateSemanticUsageCost(payload.usage, this.pricing) });
   }
 }
@@ -183,7 +237,7 @@ export function createSemanticPlanner(options = {}) {
 
 export function validateSemanticPlan(plan) {
   const validation = validateEditPlan(plan);
-  if (!validation.valid) throw new Error(`Plano semantico invalido: ${validation.errors.join(" ")}`);
-  if (plan.planner?.type !== "semantic-ai" || plan.planner?.semanticAnalysis !== true) throw new Error("O plano de IA deve declarar análise semântica real.");
+  if (!validation.valid) throw Object.assign(new Error(`Plano semantico invalido: ${validation.errors.join(" ")}`), { code: "semantic_invalid_plan" });
+  if (plan.planner?.type !== "semantic-ai" || plan.planner?.semanticAnalysis !== true) throw Object.assign(new Error("O plano de IA deve declarar análise semântica real."), { code: "semantic_invalid_plan" });
   return plan;
 }
