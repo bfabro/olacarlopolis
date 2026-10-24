@@ -20,15 +20,63 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v38", date: "2026-10-23" });
+const STUDIO_RELEASE = Object.freeze({ label: "v39", date: "2026-10-23" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
-const state = { user: null, profile: null, files: [], projects: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
-const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos" };
+const state = { user: null, profile: null, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
+const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 const resumableStatuses = new Set(["queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"]);
 let hadAuthenticatedSession = false;
 let logoutRequested = false;
 let authPersistenceWarning = "";
+
+const FIELD_HELP = Object.freeze({
+  sourceFiles: { title: "Arquivos do vídeo", body: "Envie fotos e vídeos que poderão virar cenas. A ordem mostrada nesta lista influencia a narrativa, embora o modo automático possa escolher os melhores trechos. Os originais são preservados." },
+  directorMode: { title: "Modo do diretor", body: "No modo automático local, regras técnicas escolhem cortes, ritmo e qualidade sem custo de IA. No Diretor de IA, quadros e informações do projeto são analisados semanticamente para criar uma proposta de edição; esse modo usa a API configurada e pode gerar custo." },
+  directorBrief: { title: "Objetivo criativo", body: "Explique o resultado desejado: público, clima, pontos que devem aparecer e mensagem principal. Este texto orienta o Diretor de IA, mas não aparece escrito no vídeo." },
+  generateAiScript: { title: "Criar roteiro e textos", body: "Quando ativado, a IA prepara um roteiro baseado apenas nos arquivos, transcrições e objetivo criativo. O roteiro poderá alimentar os textos das cenas e a narração." },
+  enableAiNarration: { title: "Narrar com voz de IA", body: "Transforma o roteiro em locução. As frases são distribuídas ao longo do vídeo, as legendas acompanham a fala e a música é reduzida durante a voz." },
+  aiNarrationVoice: { title: "Voz da narração", body: "Escolhe o timbre usado na locução. Marin e Cedar mudam somente a voz; não alteram o texto nem os cortes." },
+  aiNarrationTone: { title: "Estilo da voz", body: "Define a interpretação: profissional é clara e neutra; acolhedora é próxima; energética tem ritmo publicitário; calma é suave e inspiradora." },
+  transitionMode: { title: "Transição entre cenas", body: "Define como uma imagem passa para a próxima. Automática respeita o tema escolhido. Fade e dissolve são suaves; slide, whip e flash são mais enérgicos; hard cut troca sem efeito." },
+  transitionDuration: { title: "Duração da transição", body: "Controla por quanto tempo duas cenas se misturam. Valores curtos deixam o vídeo ágil; valores maiores criam uma passagem suave e cinematográfica." },
+  editingRhythm: { title: "Ritmo da montagem", body: "Suave mantém cenas mais longas; equilibrado combina contemplação e movimento; dinâmico cria cortes mais rápidos. O tema ainda define limites seguros para cada cena." },
+  syncCutsToMusic: { title: "Sincronizar com a música", body: "Detecta batidas reais da trilha e aproxima os cortes delas. Trechos com fala são preservados para não cortar palavras." },
+  exportFps: { title: "Taxa de quadros", body: "24 FPS dá aparência cinematográfica; 30 FPS é o padrão para redes sociais; 60 FPS deixa movimentos mais fluidos, mas aumenta o processamento e o arquivo." },
+  exportQuality: { title: "Qualidade e bitrate", body: "Compacta gera arquivo menor; equilibrada oferece boa qualidade para redes sociais; alta preserva mais detalhes e produz um MP4 maior." },
+  projectName: { title: "Nome do projeto", body: "Serve para identificar o trabalho em Meus projetos, Logs e Histórico. Não aparece dentro do vídeo." },
+  videoTitle: { title: "Título no vídeo", body: "É a mensagem principal da abertura. Aparece na parte superior, normalmente nos primeiros segundos, com tamanho maior que os demais textos." },
+  videoSubtitle: { title: "Texto complementar", body: "Aparece abaixo do título durante a abertura, em tamanho menor. Use uma frase curta para explicar ou contextualizar a mensagem principal." },
+  sceneDescription: { title: "Descrição de uma cena", body: "Aparece na parte inferior aproximadamente no meio do vídeo, sobre uma cena de desenvolvimento. É útil para destacar atendimento, estrutura, benefício ou ambiente." },
+  personName: { title: "Nome da pessoa", body: "Aparece na parte inferior junto do cargo, na primeira metade do vídeo. Se o cargo ficar vazio, somente o nome será mostrado." },
+  personRole: { title: "Cargo ou função", body: "Completa o nome da pessoa, formando uma identificação como “Bruno — Consultor”. Não é exibido sozinho se o nome também estiver vazio." },
+  offerText: { title: "Preço ou oferta", body: "Entra no centro do vídeo, com maior destaque e animação de impacto, por volta da metade da duração. Preencha apenas quando houver uma condição real." },
+  promoText: { title: "Chamada promocional", body: "Aparece após a oferta, no centro, reforçando prazo, benefício ou condição especial." },
+  closingText: { title: "Texto de encerramento", body: "Surge no centro nos segundos finais e prepara o fechamento da história antes da chamada final." },
+  videoCta: { title: "Chamada final", body: "Aparece na parte inferior nos últimos segundos. Indique uma ação clara, como falar no WhatsApp, visitar o local ou conhecer o portal." },
+  textPreset: { title: "Estilo visual dos textos", body: "Aplica um conjunto coerente de fonte, cor, fundo e animação. Clean é versátil; cinematográfico é elegante; oferta destaca preço; impacto usa linguagem visual de Reels." },
+  textAnimation: { title: "Animação dos textos", body: "Define como cada texto entra e sai. Animações discretas favorecem vídeos institucionais; zoom, bounce e palavra por palavra combinam com peças rápidas." },
+  textSizeScale: { title: "Tamanho geral dos textos", body: "Aumenta ou reduz todos os textos principais mantendo a proporção entre título, descrição, oferta e chamada final." },
+  textColor: { title: "Cor do texto", body: "Define a cor principal das mensagens inseridas no vídeo. Prefira contraste alto com as imagens." },
+  textPosition: { title: "Posição dos textos", body: "É a posição padrão. Alguns campos têm posição própria: título fica no topo, oferta no centro e chamada final na parte inferior." },
+  textBackground: { title: "Fundo semitransparente", body: "Adiciona uma faixa escura discreta atrás do texto para melhorar a leitura em fotos claras ou movimentadas." },
+  logoFile: { title: "Logo", body: "A logo aparece centralizada no encerramento, normalmente durante os últimos cinco segundos. PNG ou WebP com transparência produz o melhor resultado." },
+  libraryMusic: { title: "Trilha original do Studio", body: "Escolhe uma música interna licenciada para o projeto. Horizonte calmo favorece turismo e imóveis; Conexão positiva combina com empresas; Pulso dinâmico é indicado para Reels e eventos." },
+  musicFile: { title: "Música enviada", body: "Usa seu próprio arquivo de áudio e substitui a trilha interna. Envie somente música que você tenha autorização para utilizar." },
+  voiceVolume: { title: "Volume da voz e som original", body: "Ajusta o áudio que já existe nos vídeos. Também influencia a presença da voz original em relação à música." },
+  musicVolume: { title: "Volume da música", body: "Controla a intensidade da trilha de fundo. Durante narração, o Studio reduz a música automaticamente para priorizar a fala." },
+  musicFadeSeconds: { title: "Fade da música", body: "Cria entrada e saída gradual da trilha. Um fade suave evita que a música comece ou termine de forma brusca." },
+  transitionSound: { title: "Efeito nas transições", body: "Adiciona um efeito sonoro curto nas mudanças de cena. Suave é discreto; impacto reforça cortes; brilho combina com revelações e ofertas." },
+  noiseReduction: { title: "Redução de ruído", body: "Aplica um filtro moderado contra ruído contínuo, como vento ou ventilador. Não reconstrói falas e pode ser deixado desligado em gravações limpas." },
+  captionsEnabled: { title: "Transcrever e gerar legendas", body: "O Whisper local reconhece somente a fala do áudio original e incorpora as legendas ao MP4. Música e marcadores de ruído são ignorados." },
+  captionMode: { title: "Apresentação das legendas", body: "Tradicional mostra a frase durante a fala. Dinâmica destaca palavras individualmente quando existem tempos reais por palavra. A narração de IA usa frase sincronizada para evitar marcação artificial." },
+  captionPosition: { title: "Posição das legendas", body: "Inferior usa a área segura para redes sociais; centro pode ser útil quando a parte inferior da imagem contém informações importantes." },
+  captionSizeScale: { title: "Tamanho das legendas", body: "Ajusta somente as legendas, sem alterar título, oferta ou outros textos do vídeo." },
+  captionColor: { title: "Cor principal da legenda", body: "Define a cor das palavras comuns da legenda. Branco costuma oferecer a melhor leitura." },
+  captionHighlightColor: { title: "Cor de destaque", body: "No modo dinâmico, identifica a palavra que está sendo falada. Não altera a legenda tradicional." },
+  captionPrompt: { title: "Vocabulário e nomes próprios", body: "Informe nomes de empresas, pessoas, produtos ou lugares difíceis. Isso ajuda o Whisper a reconhecer a grafia correta e não aparece no vídeo." },
+  captionReviewEnabled: { title: "Revisar antes de renderizar", body: "Pausa a criação depois da transcrição para você corrigir ou remover frases. Ao aprovar, o Studio continua do ponto salvo." }
+});
 
 document.querySelectorAll("[data-studio-version]").forEach((node) => { node.textContent = STUDIO_RELEASE.label; });
 const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch((error) => {
@@ -38,6 +86,63 @@ const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+}
+
+function editorFieldHelp(control) {
+  if (!control) return null;
+  if (control.name === "editStyle") {
+    const style = STUDIO_EDIT_STYLES[control.value];
+    const descriptions = {
+      institucional: "Prioriza apresentação elegante e confiável, com cenas de 3,2 a 7 segundos, música discreta e transições suaves. Indicado para história da empresa, estrutura e equipe.",
+      reels: "Cria montagem vertical mais rápida, com cenas de 1,25 a 3,5 segundos, cortes enérgicos e maior presença da música. Indicado para prender atenção rapidamente.",
+      comercial: "Equilibra produto, benefício, preço e chamada para ação, com cenas de 2,1 a 5 segundos e ritmo promocional.",
+      comercio_local: "Apresenta fachada, ambiente, atendimento e diferenciais da empresa com ritmo equilibrado e identidade próxima da cidade.",
+      imoveis: "Mantém ambientes por mais tempo, usa movimentos e transições suaves e favorece a compreensão dos espaços.",
+      gastronomia: "Valoriza detalhes de pratos, preparo e ambiente com aproximações e cortes dinâmicos.",
+      eventos: "Prioriza momentos marcantes, energia e variedade de cenas, com cortes curtos e transições rápidas.",
+      turismo: "Dá tempo para observar paisagens, utiliza cenas longas e passagens suaves com caráter contemplativo."
+    };
+    return { title: `Tema ${style?.label || control.value}`, body: descriptions[control.value] || "Este tema ajusta automaticamente ritmo, duração das cenas, transições e volume da música." };
+  }
+  if (control.name === "format") {
+    const formats = { "9:16": "Vídeo vertical 1080 × 1920, ideal para Stories, Reels e tela cheia no celular.", "16:9": "Vídeo horizontal 1920 × 1080, indicado para YouTube, televisores e apresentações.", "1:1": "Vídeo quadrado 1080 × 1080, indicado para publicações no feed." };
+    return { title: `Formato ${control.value}`, body: formats[control.value] };
+  }
+  if (control.name === "duration") return { title: `Duração de ${control.value} segundos`, body: `O vídeo final terá aproximadamente ${control.value} segundos. O Studio ajustará a quantidade e o tempo das cenas para preencher esse período sem acelerar os arquivos.` };
+  return FIELD_HELP[control.id] || null;
+}
+
+function openFieldHelp(key, control = null) {
+  const info = FIELD_HELP[key] || editorFieldHelp(control);
+  if (!info) return;
+  $("fieldHelpTitle").textContent = info.title;
+  $("fieldHelpContent").innerHTML = `<p>${escapeHtml(info.body)}</p>`;
+  const dialog = $("fieldHelpDialog");
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeFieldHelp() {
+  const dialog = $("fieldHelpDialog");
+  if (typeof dialog.close === "function" && dialog.open) dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+function initializeEditorHelp() {
+  document.querySelectorAll("#editorView label").forEach((label) => {
+    const control = label.querySelector("input,select,textarea");
+    const info = editorFieldHelp(control);
+    if (!control || !info || label.querySelector(".field-help-button")) return;
+    label.classList.add("has-field-help");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "field-help-button";
+    button.setAttribute("aria-label", `Explicar ${info.title}`);
+    button.innerHTML = '<i class="fa-regular fa-circle-question"></i>';
+    button.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); openFieldHelp("", control); });
+    label.appendChild(button);
+  });
+  document.querySelectorAll("[data-help-key]").forEach((button) => button.addEventListener("click", () => openFieldHelp(button.dataset.helpKey)));
 }
 
 function cleanFileName(name) {
@@ -258,6 +363,57 @@ function resetProcessingLog(message = "Preparando o processamento.") {
   resetProcessingTiming();
 }
 
+function jobLogEvents(job) {
+  const events = normalizedProcessingEvents(job.events, job);
+  if (job.error?.message && !events.some((event) => event.level === "error" && event.message === job.error.message)) {
+    events.push({ id: "job-error", timestamp: job.failedAt || job.updatedAt, stage: "failed", status: "failed", level: "error", code: job.error.code || "worker_error", message: job.error.message });
+  }
+  return events.sort((a, b) => Number(a.timestamp || 0) - Number(b.timestamp || 0));
+}
+
+function jobHasLogIssue(job) {
+  return job.status === "failed" || Boolean(job.error) || jobLogEvents(job).some((event) => ["warning", "error"].includes(event.level));
+}
+
+function renderStudioLogs() {
+  const root = $("studioLogsList");
+  if (!root) return;
+  const filter = $("logsFilter").value;
+  const activeStatuses = new Set(["uploading", "queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"]);
+  const projects = new Map(state.projects.map((project) => [project.id, project]));
+  const all = state.logs;
+  const visible = all.filter((job) => filter === "errors" ? jobHasLogIssue(job) : filter === "active" ? activeStatuses.has(job.status) : filter === "completed" ? job.status === "completed" : true);
+  $("logsJobCount").textContent = all.length;
+  $("logsErrorCount").textContent = all.filter(jobHasLogIssue).length;
+  if (!visible.length) {
+    root.innerHTML = '<div class="empty-state"><i class="fa-solid fa-list-check"></i><h3>Nenhum registro neste filtro</h3><p>Altere o filtro ou atualize os logs.</p></div>';
+    return;
+  }
+  const stageNames = { upload: "Upload", queue: "Fila", probe: "Leitura dos arquivos", analysis: "Análise técnica", planning: "Direção por IA", transcription: "Transcrição", transcription_review: "Revisão das legendas", render: "Renderização", upload_output: "Salvamento", complete: "Concluído", failed: "Falha", cancelled: "Cancelado" };
+  const icons = { info: "fa-circle-info", success: "fa-circle-check", warning: "fa-triangle-exclamation", error: "fa-circle-xmark" };
+  root.innerHTML = visible.map((job) => {
+    const project = projects.get(job.projectId) || {};
+    const events = jobLogEvents(job);
+    const issue = jobHasLogIssue(job);
+    const latestError = [...events].reverse().find((event) => event.level === "error");
+    const latestWarning = [...events].reverse().find((event) => event.level === "warning");
+    const reason = job.error?.message || latestError?.message || latestWarning?.message || "";
+    const eventHtml = events.length ? events.map((event) => {
+      const level = ["success", "warning", "error"].includes(event.level) ? event.level : "info";
+      const details = Array.isArray(event.details) ? event.details : Object.values(event.details || {});
+      return `<li class="processing-log-event ${level}"><span class="processing-log-icon"><i class="fa-solid ${icons[level]}"></i></span><div><div class="processing-log-heading"><strong>${escapeHtml(stageNames[event.stage] || event.stage || "Processamento")}</strong><time>${escapeHtml(formatDate(event.timestamp))}</time></div><p>${escapeHtml(event.message)}</p>${details.length ? `<ul>${details.slice(0, 8).map((detail) => `<li>${escapeHtml(detail)}</li>`).join("")}</ul>` : ""}${event.code && event.code !== "progress_update" ? `<small class="processing-log-code">Código: ${escapeHtml(event.code)}</small>` : ""}</div></li>`;
+    }).join("") : '<li class="processing-log-empty">Este processamento não registrou etapas detalhadas.</li>';
+    return `<details class="studio-log-job ${issue ? "has-issue" : ""}" ${job.status === "failed" ? "open" : ""}><summary><span class="studio-log-status ${escapeHtml(job.status || "unknown")}"><i class="fa-solid ${issue ? "fa-triangle-exclamation" : job.status === "completed" ? "fa-circle-check" : "fa-clock"}"></i></span><span><strong>${escapeHtml(project.name || job.projectName || "Projeto sem nome")}</strong><small>${escapeHtml(statusLabels[job.status] || job.status || "Processamento")} • ${escapeHtml(formatDate(job.updatedAt || job.createdAt))}</small></span><span class="studio-log-summary-meta">${events.length} ${events.length === 1 ? "evento" : "eventos"}<i class="fa-solid fa-chevron-down"></i></span></summary>${reason ? `<div class="studio-log-reason ${job.status === "failed" ? "error" : "warning"}"><strong>${job.status === "failed" ? "Motivo do erro" : "Aviso encontrado"}</strong><p>${escapeHtml(reason)}</p>${job.error?.code ? `<code>${escapeHtml(job.error.code)}</code>` : ""}</div>` : ""}<ol class="processing-log-list studio-log-events">${eventHtml}</ol><div class="studio-log-identifiers"><span>Projeto: ${escapeHtml(job.projectId || "-")}</span><span>Processamento: ${escapeHtml(job.id || job.jobId || "-")}</span><span>Tentativa: ${Number(job.attempt || 0)}</span></div></details>`;
+  }).join("");
+}
+
+async function loadLogs() {
+  if (!state.user) return;
+  const snapshot = await get(query(ref(db, `studioJobs/${state.user.uid}`), limitToLast(80)));
+  state.logs = Object.entries(snapshot.val() || {}).map(([id, job]) => ({ id, ...(job || {}) })).sort((a, b) => Number(b.updatedAt || b.createdAt || 0) - Number(a.updatedAt || a.createdAt || 0));
+  renderStudioLogs();
+}
+
 function selectedValue(name) {
   return document.querySelector(`input[name="${name}"]:checked`)?.value || "";
 }
@@ -368,11 +524,12 @@ function updateAudioCaptionLabels() {
 }
 
 function switchView(name) {
-  ["projects", "editor", "visual", "processing", "usage"].forEach((view) => $(`${view}View`)?.classList.toggle("hidden", view !== name));
+  ["projects", "editor", "visual", "processing", "usage", "logs"].forEach((view) => $(`${view}View`)?.classList.toggle("hidden", view !== name));
   document.querySelectorAll("[data-studio-view]").forEach((button) => button.classList.toggle("active", button.dataset.studioView === name));
   $("studioViewTitle").textContent = viewTitles[name] || "Olá Studio";
   document.querySelector(".studio-shell")?.classList.remove("menu-open");
   if (name === "usage") loadUsage();
+  if (name === "logs") loadLogs().catch((error) => toast(`Não foi possível carregar os logs: ${error.message}`));
   location.hash = name === "processing" ? "projects" : name;
 }
 
@@ -1385,7 +1542,7 @@ async function authorize(user) {
   hadAuthenticatedSession = true;
   if (authPersistenceWarning) toast(authPersistenceWarning);
   const resumed = await resumeLatestProcessing();
-  if (!resumed) switchView(location.hash === "#editor" ? "editor" : location.hash === "#usage" ? "usage" : "projects");
+  if (!resumed) switchView(location.hash === "#editor" ? "editor" : location.hash === "#usage" ? "usage" : location.hash === "#logs" ? "logs" : "projects");
 }
 
 $("loginForm").addEventListener("submit", async (event) => {
@@ -1414,11 +1571,17 @@ function handleAuthState(user) {
 
 authPersistenceReady.finally(() => onAuthStateChanged(auth, handleAuthState));
 
+initializeEditorHelp();
 document.querySelectorAll("[data-studio-view]").forEach((button) => button.addEventListener("click", () => switchView(button.dataset.studioView)));
 document.querySelectorAll("[data-new-project]").forEach((button) => button.addEventListener("click", openNewProject));
 $("logoutButton").addEventListener("click", () => { logoutRequested = true; signOut(auth); });
 $("mobileMenuButton").addEventListener("click", () => document.querySelector(".studio-shell").classList.toggle("menu-open"));
 $("refreshProjects").addEventListener("click", () => loadProjects().then(() => toast("Projetos atualizados.")));
+$("refreshLogs").addEventListener("click", () => loadLogs().then(() => toast("Logs atualizados.")));
+$("logsFilter").addEventListener("change", renderStudioLogs);
+$("fieldHelpClose").addEventListener("click", closeFieldHelp);
+$("fieldHelpOk").addEventListener("click", closeFieldHelp);
+$("fieldHelpDialog").addEventListener("click", (event) => { if (event.target === $("fieldHelpDialog")) closeFieldHelp(); });
 $("dropZone").addEventListener("click", () => $("sourceFiles").click());
 $("dropZone").addEventListener("keydown", (event) => { if (["Enter", " "].includes(event.key)) { event.preventDefault(); $("sourceFiles").click(); } });
 $("sourceFiles").addEventListener("change", (event) => { addFiles(event.target.files); event.target.value = ""; });

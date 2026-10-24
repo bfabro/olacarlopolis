@@ -9,14 +9,14 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=22">
-  <link rel="stylesheet" href="studio-overrides.css?v=17">
+  <link rel="stylesheet" href="studio.css?v=23">
+  <link rel="stylesheet" href="studio-overrides.css?v=18">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-      <span class="studio-release-badge">Olá Studio <b data-studio-version>v38</b></span>
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v39</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -27,7 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v38</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v39</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -43,7 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v38</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v39</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -55,12 +55,13 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v38</b></small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v39</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
         <button type="button" data-studio-view="editor"><i class="fa-solid fa-clapperboard"></i><span>Novo vídeo</span></button>
         <button type="button" data-studio-view="usage"><i class="fa-solid fa-chart-pie"></i><span>Uso e créditos</span></button>
+        <button type="button" data-studio-view="logs"><i class="fa-solid fa-list-check"></i><span>Logs e erros</span></button>
       </nav>
       <div class="sidebar-security"><i class="fa-solid fa-lock"></i><span><strong>Não publicado</strong>Feature flag desativada</span></div>
       <a class="panel-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Painel Admin</a>
@@ -70,7 +71,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
-        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v38</b></span>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v39</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -89,7 +90,7 @@
         <form id="projectForm" class="editor-layout">
           <div class="editor-column">
             <section class="studio-card upload-card">
-              <div class="card-heading"><span>1</span><div><h2>Arquivos do vídeo</h2><p>Envie até 10 fotos ou vídeos e organize a sequência.</p></div></div>
+              <div class="card-heading"><span>1</span><div><h2>Arquivos do vídeo</h2><p>Envie até 10 fotos ou vídeos e organize a sequência.</p></div><button class="section-help-button" type="button" data-help-key="sourceFiles" aria-label="Explicar arquivos do vídeo"><i class="fa-regular fa-circle-question"></i></button></div>
               <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="Selecionar fotos e vídeos">
                 <input id="sourceFiles" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple hidden>
                 <i class="fa-solid fa-cloud-arrow-up"></i><strong>Arraste seus arquivos aqui</strong><span>ou clique para escolher • até 1 GB por projeto</span>
@@ -321,9 +322,23 @@
         <div class="usage-grid"><article><i class="fa-solid fa-coins"></i><span>Saldo de créditos</span><strong id="creditBalance">0</strong><small>Cobrança ainda não ativada</small></article><article><i class="fa-solid fa-film"></i><span>Vídeos processados</span><strong id="processedCount">0</strong><small id="processedMinutes">0 min renderizados</small></article><article><i class="fa-solid fa-server"></i><span>Unidades estimadas</span><strong id="processingUnits">0</strong><small>Base para custo futuro</small></article></div>
         <section class="studio-card"><div class="card-heading"><span><i class="fa-solid fa-receipt"></i></span><div><h2>Histórico de consumo</h2><p>Ledger preparado para créditos, reservas e estornos.</p></div></div><div id="usageHistory" class="usage-history"><p class="empty-copy">Nenhum consumo registrado.</p></div></section>
       </section>
+
+      <section id="logsView" class="studio-view hidden">
+        <div class="section-heading logs-heading"><div><span class="eyebrow">Diagnóstico do Studio</span><h2>Logs e erros</h2><p>Veja o caminho percorrido por cada vídeo e o motivo exato quando algo não for concluído.</p></div><button id="refreshLogs" class="secondary-button" type="button"><i class="fa-solid fa-rotate"></i> Atualizar logs</button></div>
+        <section class="studio-card logs-toolbar">
+          <label>Mostrar<select id="logsFilter"><option value="all">Todos os processamentos</option><option value="errors">Somente erros e avisos</option><option value="active">Em andamento</option><option value="completed">Concluídos</option></select></label>
+          <div class="logs-summary"><span><strong id="logsJobCount">0</strong> processamentos</span><span class="error"><strong id="logsErrorCount">0</strong> com erro</span></div>
+        </section>
+        <div id="studioLogsList" class="studio-logs-list"><div class="empty-state"><i class="fa-solid fa-list-check"></i><h3>Nenhum log carregado</h3><p>Os eventos dos seus vídeos aparecerão aqui.</p></div></div>
+      </section>
     </section>
   </div>
+  <dialog id="fieldHelpDialog" class="field-help-dialog" aria-labelledby="fieldHelpTitle">
+    <div class="field-help-header"><span><i class="fa-regular fa-circle-question"></i></span><div><small>Ajuda do campo</small><h2 id="fieldHelpTitle">Como funciona</h2></div><button id="fieldHelpClose" type="button" aria-label="Fechar ajuda"><i class="fa-solid fa-xmark"></i></button></div>
+    <div id="fieldHelpContent" class="field-help-content"></div>
+    <button id="fieldHelpOk" class="create-button" type="button">Entendi</button>
+  </dialog>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=31"></script>
+  <script type="module" src="studio.js?v=32"></script>
 </body>
 </html>

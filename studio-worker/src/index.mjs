@@ -242,7 +242,8 @@ async function processJob(job) {
       return;
     }
     const errorMessage = error?.signal === "SIGKILL" ? "O renderizador excedeu a memória disponível. Reduza a duração ou tente novamente após atualizar o worker." : String(error?.message || error).slice(0, 500);
-    await updateJob(job.uid, job.jobId, { status: "failed", stage: "failed", progress: 100, message: "Falha no processamento.", failedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });
+    const errorCode = String(error?.code || "worker_error").replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 80) || "worker_error";
+    await updateJob(job.uid, job.jobId, { status: "failed", stage: "failed", progress: 100, message: "Falha no processamento.", failedAt: Date.now(), error: { code: errorCode, message: errorMessage }, event: { level: "error", code: errorCode, message: `Não foi possível concluir: ${errorMessage}` } });
     if (job.mode === "delete") {
       const remainingProject = await database.ref(`studioProjects/${job.uid}/${job.projectId}`).get();
       if (remainingProject.exists()) await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ status: "failed", updatedAt: Date.now(), error: { code: "worker_error", message: errorMessage } });

@@ -57,12 +57,27 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.match(client, /studioAdminCosts/);
   assert.match(client, /aiEstimatedCostUsd/);
   assert.match(html, /id="processingRemaining"/);
-  assert.match(html, /data-studio-version>v38/);
+  assert.match(html, /data-studio-version>v39/);
   assert.match(html, /id="enableAiNarration"/);
   assert.match(client, /narrationEstimatedCostUsd/);
   assert.match(client, /sanitizeTranscriptReviewSegments/);
   assert.match(client, /transcriptReview\/segments.*reviewedSegments\.filter/);
+  assert.match(html, /data-studio-view="logs"/);
+  assert.match(html, /id="fieldHelpDialog"/);
+  assert.match(client, /async function loadLogs/);
+  assert.match(client, /function initializeEditorHelp/);
+  assert.match(workerMain, /event: \{ level: "error", code: errorCode/);
   assert.doesNotMatch(client, /setInterval\([^)]*progress/i);
+});
+
+test("todos os campos da edição automática possuem ajuda contextual", () => {
+  const editorHtml = html.split('<section id="editorView"')[1].split('<section id="visualView"')[0];
+  const ids = [...editorHtml.matchAll(/<(?:input|select|textarea)\s+id="([^"]+)"/g)].map((match) => match[1]);
+  assert.ok(ids.length >= 35);
+  ids.forEach((id) => assert.match(client, new RegExp(`\\b${id}: \\{`), `Ajuda ausente para ${id}`));
+  assert.match(client, /control\.name === "editStyle"/);
+  assert.match(client, /control\.name === "format"/);
+  assert.match(client, /control\.name === "duration"/);
 });
 
 test("editor visual reutiliza plano privado e envia somente origens do próprio projeto", () => {
