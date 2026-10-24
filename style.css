@@ -9,7 +9,7 @@
   font-family: "Poppins", sans-serif;
 }
 
-/* Release global do site v623 — correção de legendas duplicadas no Olá Studio. */
+/* Release global do site v624 — dicas de ajuda ao passar o mouse no Olá Studio. */
 
 /* Imóveis: quando o modo Cards estiver ativo no desktop, mantém o mesmo formato vertical do mobile. */
 @media (min-width: 768px) {

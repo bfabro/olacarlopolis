@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v40", date: "2026-10-24" });
+const STUDIO_RELEASE = Object.freeze({ label: "v41", date: "2026-10-24" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
@@ -138,11 +138,16 @@ function initializeEditorHelp() {
     button.type = "button";
     button.className = "field-help-button";
     button.setAttribute("aria-label", `Explicar ${info.title}`);
+    button.dataset.helpTooltip = info.body;
     button.innerHTML = '<i class="fa-regular fa-circle-question"></i>';
     button.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); openFieldHelp("", control); });
     label.appendChild(button);
   });
-  document.querySelectorAll("[data-help-key]").forEach((button) => button.addEventListener("click", () => openFieldHelp(button.dataset.helpKey)));
+  document.querySelectorAll("[data-help-key]").forEach((button) => {
+    const info = FIELD_HELP[button.dataset.helpKey];
+    if (info) button.dataset.helpTooltip = info.body;
+    button.addEventListener("click", () => openFieldHelp(button.dataset.helpKey));
+  });
 }
 
 function cleanFileName(name) {
