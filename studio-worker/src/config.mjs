@@ -6,6 +6,13 @@ const numberEnv = (name, fallback) => {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 };
 
+const booleanEnv = (name, fallback = false) => {
+  const value = String(process.env[name] ?? "").trim().toLowerCase();
+  if (["1", "true", "yes", "on"].includes(value)) return true;
+  if (["0", "false", "no", "off"].includes(value)) return false;
+  return fallback;
+};
+
 export const workerConfig = Object.freeze({
   databaseURL: process.env.FIREBASE_DATABASE_URL || "https://contadoracessos-default-rtdb.firebaseio.com",
   storageBucket: process.env.FIREBASE_STORAGE_BUCKET || "contadoracessos.firebasestorage.app",
@@ -27,6 +34,9 @@ export const workerConfig = Object.freeze({
   ttsUsdPerMinute: Math.max(0, numberEnv("STUDIO_TTS_USD_PER_MINUTE", 0.015)),
   aiTimeoutMs: numberEnv("STUDIO_AI_TIMEOUT_MS", 90000),
   aiMaxFrames: Math.max(1, Math.min(8, Math.floor(numberEnv("STUDIO_AI_MAX_FRAMES", 6)))),
+  advancedDirectorEnabled: booleanEnv("STUDIO_ADVANCED_DIRECTOR_ENABLED", false),
+  advancedAiMaxFrames: Math.max(6, Math.min(18, Math.floor(numberEnv("STUDIO_ADVANCED_AI_MAX_FRAMES", 12)))),
+  renderQualityEnabled: booleanEnv("STUDIO_RENDER_QUALITY_ENABLED", true),
   aiImageDetail: ["low", "high"].includes(process.env.STUDIO_AI_IMAGE_DETAIL) ? process.env.STUDIO_AI_IMAGE_DETAIL : "low",
   aiInputUsdPerMillion: Math.max(0, numberEnv("STUDIO_AI_INPUT_USD_PER_MILLION", 0.05)),
   aiOutputUsdPerMillion: Math.max(0, numberEnv("STUDIO_AI_OUTPUT_USD_PER_MILLION", 0.25)),

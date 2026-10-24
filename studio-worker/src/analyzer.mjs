@@ -119,6 +119,19 @@ export function buildShakeIntervals(frames, duration, threshold = 4.5) {
   }, []);
 }
 
+export function summarizeCameraMotion(frames = []) {
+  if (frames.length < 2) return { available: false, direction: "static", confidence: 0, travelX: 0, travelY: 0, averageJitter: 0 };
+  const first = frames[0];
+  const last = frames.at(-1);
+  const travelX = round(Number(last.x || 0) - Number(first.x || 0));
+  const travelY = round(Number(last.y || 0) - Number(first.y || 0));
+  const magnitude = Math.hypot(travelX, travelY);
+  let direction = "static";
+  if (magnitude >= 1.2) direction = Math.abs(travelX) >= Math.abs(travelY) ? (travelX > 0 ? "right" : "left") : (travelY > 0 ? "down" : "up");
+  const averageJitter = frames.reduce((sum, frame) => sum + Number(frame.jitter || 0), 0) / frames.length;
+  return { available: true, direction, confidence: round(bounded(magnitude / 12, 0, 1)), travelX, travelY, averageJitter: round(averageJitter) };
+}
+
 export async function analyzeCameraStability(localPath, metadata, signal) {
   if (!metadata?.hasVideo || metadata.contentType?.startsWith("image/")) return { frames: [], intervals: [], method: "none" };
   const fps = 4;
@@ -128,10 +141,10 @@ export async function analyzeCameraStability(localPath, metadata, signal) {
   try {
     await runProcess(workerConfig.ffmpegPath, ["-y", "-hide_banner", "-i", localPath, "-vf", `fps=${fps},scale=320:-2,vidstabdetect=result=${filterPath}:shakiness=5:accuracy=9:mincontrast=0.25`, "-an", "-f", "null", "-"], { signal });
     const frames = parseCameraMotionTransforms(await fs.readFile(transformPath, "utf8"), fps);
-    return { frames, intervals: buildShakeIntervals(frames, metadata.duration), method: "vidstab-motion-v1" };
+    return { frames, intervals: buildShakeIntervals(frames, metadata.duration), summary: summarizeCameraMotion(frames), method: "vidstab-motion-v2" };
   } catch (error) {
     if (error?.code === "studio_cancelled") throw error;
-    return { frames: [], intervals: [], method: "unavailable" };
+    return { frames: [], intervals: [], summary: summarizeCameraMotion([]), method: "unavailable" };
   } finally {
     await fs.rm(transformPath, { force: true }).catch(() => {});
   }
@@ -185,6 +198,7 @@ export async function analyzeVideo(localPath, metadata, signal) {
     blackIntervals,
     freezeIntervals,
     shakeIntervals: camera.intervals,
+    cameraMotion: camera.summary || summarizeCameraMotion([]),
     cameraAnalysisMethod: camera.method,
     qualityThresholds,
     qualityWindows: buildQualityWindows(frames, metadata.duration, { black: blackIntervals, freeze: freezeIntervals, shake: camera.intervals }, qualityThresholds),
@@ -217,15 +231,30 @@ export function summarizeCalibration(analyzedSources = []) {
   };
 }
 
-export async function analyzeSources(sources, progress = () => {}, signal) {
+export function sourceAnalysisSignature(source = {}) {
+  return crypto.createHash("sha256").update(JSON.stringify({ storagePath: source.storagePath || "", size: Number(source.size || 0), contentType: source.contentType || "", name: source.name || source.originalName || "" })).digest("hex").slice(0, 24);
+}
+
+export function buildAnalysisCache(analyzedSources = []) {
+  return Object.fromEntries(analyzedSources.map((source) => [sourceAnalysisSignature(source), { schemaVersion: 1, metadata: source.metadata, technical: source.technical, cachedAt: Date.now() }]));
+}
+
+export async function analyzeSources(sources, progress = () => {}, signal, analysisCache = {}) {
   const results = [];
   for (let index = 0; index < sources.length; index += 1) {
     const source = sources[index];
+    const signature = sourceAnalysisSignature(source);
+    const cached = analysisCache?.[signature];
+    if (cached?.schemaVersion === 1 && cached.metadata && cached.technical) {
+      results.push({ ...source, metadata: cached.metadata, technical: cached.technical, analysisCache: { reused: true, signature } });
+      await progress(index + 1, sources.length, { reused: true, source });
+      continue;
+    }
     const metadata = await probeMedia(source.localPath, source.contentType, signal);
     const technical = await analyzeVideo(source.localPath, metadata, signal);
     technical.waveform = await analyzeAudioWaveform(source.localPath, metadata, signal);
-    results.push({ ...source, metadata, technical });
-    await progress(index + 1, sources.length);
+    results.push({ ...source, metadata, technical, analysisCache: { reused: false, signature } });
+    await progress(index + 1, sources.length, { reused: false, source });
   }
   return results;
 }

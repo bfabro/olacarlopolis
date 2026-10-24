@@ -63,6 +63,9 @@ Variáveis opcionais:
 - `STUDIO_OPENAI_MODEL` (padrão protegido: `gpt-6-luna`; só é usado quando existe `OPENAI_API_KEY`)
 - `STUDIO_AI_TIMEOUT_MS`
 - `STUDIO_AI_MAX_FRAMES` (padrão 6)
+- `STUDIO_ADVANCED_DIRECTOR_ENABLED` (`false` por padrão)
+- `STUDIO_ADVANCED_AI_MAX_FRAMES` (padrão 12, máximo 18)
+- `STUDIO_RENDER_QUALITY_ENABLED` (`true` por padrão)
 - `STUDIO_AI_IMAGE_DETAIL` (`low` por padrão ou `high`)
 - `STUDIO_AI_INPUT_USD_PER_MILLION` e `STUDIO_AI_OUTPUT_USD_PER_MILLION` para a estimativa auditável de custo
 
@@ -187,7 +190,7 @@ Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs test/phase6-sound-library.integration.test.mjs test/phase7-acceptance.integration.test.mjs test/phase8-narration-timeline.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs test/phase6-sound-library.integration.test.mjs test/phase7-acceptance.integration.test.mjs test/phase8-narration-timeline.integration.test.mjs test/phase9-advanced-director.test.mjs
 ```
 
 Os testes usam mídias temporárias e as removem ao terminar; nenhum dado demonstrativo é gravado no Firebase. Para calibrar sem alterar os arquivos reais ou o Firebase, monte uma pasta de vídeos em modo somente leitura e execute:
@@ -205,6 +208,39 @@ Em 22/10/2026, a calibração local analisou seis vídeos reais (97,094 s, um ve
 - executar uma avaliação semântica paga com a credencial de produção para medir custo e qualidade reais do modelo escolhido.
 
 As trilhas e os efeitos disponíveis na interface são originais e gerados pelo próprio sistema; por isso não dependem de licenças de catálogos externos. A avaliação paga permanece desativada até uma credencial ser fornecida ao worker, nunca ao frontend.
+
+## Diretor Audiovisual Inteligente v44
+
+A auditoria da v43 classificou como operacionais o corte técnico, detecção de problemas, transcrição, timeline, transições, narração, mixagem, logs, versões e retomada de tarefas. A direção semântica existia parcialmente: usava um quadro representativo por origem, não mantinha um modelo explícito de continuidade global, não movimentava fotografias dentro da cena e não inspecionava objetivamente o MP4 final. Reconhecimento semântico de pessoas, ações, objetos e assuntos continua dependente do provedor visual externo; o worker local não rotula esses elementos como se fossem IA.
+
+A v44 acrescenta, de modo modular:
+
+- amostragem temporal balanceada entre origens, com quadros do início, meio, fim, mudanças de cena, pontuação técnica e direção predominante de câmera;
+- Diretor Avançado com Structured Outputs, escolha somente entre candidatos e timestamps reais, proposta narrativa global, justificativa, intenção de continuidade, destaque, transição, orientação musical e encerramento;
+- validação do plano contra as origens reais, preservando a duração e os limites do plano técnico;
+- cache por assinatura de arquivo para metadados, análise técnica e transcrição semântica, sem guardar o vídeo inteiro em memória;
+- leitura estrutural da trilha em introdução, crescimento, corpo, trecho calmo, pico e encerramento, além de BPM e batidas;
+- movimentos Ken Burns, pan horizontal/vertical e zoom progressivo em fotografias, com easing e reenquadramento normalizado;
+- destaques automáticos curtos em área segura somente quando a evidência permite; cenas com pessoa ou fala não recebem descrição concorrente;
+- controle de qualidade do MP4 final para stream de vídeo/áudio, duração, trechos pretos, congelamento prolongado, nível de áudio, limites de legendas/textos e repetição imediata de cenas;
+- distinção explícita entre verificações objetivas e revisão humana de narrativa, enquadramento, emoção e acabamento;
+- métricas comparativas estruturais e uma rubrica humana, sem fabricar resultados quando não há material real de avaliação.
+
+O controle de qualidade não tenta corrigir automaticamente um defeito ambíguo. Uma falha objetiva impede a entrega e gera código e mensagem nos logs; um ponto não conclusivo vira aviso para revisão humana. `repairAttempts` permanece zero nesta versão porque nenhuma correção destrutiva ou subjetiva foi considerada segura para aplicação automática.
+
+### Ativação e retorno seguro
+
+O modo avançado permanece oculto e desativado por padrão. Para validá-lo em desenvolvimento, configure simultaneamente:
+
+```env
+STUDIO_ADVANCED_DIRECTOR_ENABLED=true
+STUDIO_ADVANCED_AI_MAX_FRAMES=12
+STUDIO_RENDER_QUALITY_ENABLED=true
+```
+
+e grave `studioFeatureFlags/advancedDirectorEnabled: true` no ambiente protegido. A chave `OPENAI_API_KEY` e `STUDIO_OPENAI_MODEL` continuam somente no worker. Para retornar à versão anterior, defina a flag do banco e `STUDIO_ADVANCED_DIRECTOR_ENABLED` como `false`; os modos local e semântico padrão permanecem intactos. O uso adicional aparece no histórico como `aiMode: advanced`, com tokens e custo estimado retornados pelo provedor.
+
+O script `node studio-worker/scripts/compare-directors.mjs plano-local.json plano-avancado.json` compara dois planos reais. Para as seis categorias solicitadas — produto, gastronomia, imóvel, evento, institucional e mistura de fala com fotos — é necessário fornecer mídias autorizadas e avaliar os dois renders com a rubrica registrada; a v44 não inventa notas criativas nem resultados de campo.
 
 ## Preparação comercial
 

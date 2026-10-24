@@ -4,12 +4,14 @@ import { workerConfig } from "./config.mjs";
 import { database } from "./firebase-client.mjs";
 import { nextQueuedJob, claimJob, updateJob } from "./queue.mjs";
 import { deleteProjectAssets, downloadAsset, downloadJson, uploadJson, uploadRender } from "./storage.mjs";
-import { analyzeSources } from "./analyzer.mjs";
+import { analyzeSources, buildAnalysisCache } from "./analyzer.mjs";
 import { createTranscriptionProvider, prepareReviewedTranscription } from "./transcription.mjs";
 import { createDeterministicPlan } from "./planner.mjs";
 import { renderPlan } from "./renderer.mjs";
 import { analyzeMusicRhythm } from "./rhythm.mjs";
 import { createSemanticPlanner, markSemanticFallback, prepareSemanticEvidence, semanticFailureInfo } from "./ai-planner.mjs";
+import { createAdvancedDirector } from "./advanced-director.mjs";
+import { inspectRenderedOutput } from "./render-quality.mjs";
 import { prepareVisualEditorPlan } from "./editor-plan.mjs";
 import { generateLibraryMusic, generateTransitionSoundtrack, generatedAudioPaths } from "./sound-library.mjs";
 import { createSpeechProvider } from "./tts-provider.mjs";
@@ -82,7 +84,9 @@ async function processJob(job) {
     const requestedLibraryMusic = job.planOverride?.music?.libraryTrack || project.libraryMusic || "none";
     const musicPath = music?.localPath || await generateLibraryMusic(requestedLibraryMusic, project.duration, audioPaths.music, cancellation.signal);
     ensureNotCancelled();
-    const analyzed = await analyzeSources(sources, async (done, total) => updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 32 + Math.round(done / total * 16), message: `Analisando arquivo ${done} de ${total}.` }), cancellation.signal);
+    const analyzed = await analyzeSources(sources, async (done, total, detail = {}) => updateJob(job.uid, job.jobId, { stage: "analysis", status: "analyzing", progress: 32 + Math.round(done / total * 16), message: detail.reused ? `Reaproveitando análise validada do arquivo ${done} de ${total}.` : `Analisando arquivo ${done} de ${total}.` }), cancellation.signal, project.analysisCache || {});
+    const analysisCache = buildAnalysisCache(analyzed);
+    await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ analysisCache, analysisCacheUpdatedAt: Date.now() });
     const totalSourceDuration = analyzed.reduce((sum, source) => sum + (source.contentType.startsWith("video/") ? Number(source.metadata.duration || 0) : 0), 0);
     if (sources.length > 10) throw new Error("O projeto excede o limite de 10 arquivos.");
     if (totalSourceDuration > 600) throw new Error("A duração total dos vídeos de origem excede 10 minutos.");
@@ -93,24 +97,28 @@ async function processJob(job) {
     const reusablePlanPath = job.transcriptReview?.status === "approved" && String(job.plan?.storagePath || "").startsWith(ownedPlanPrefix) ? job.plan.storagePath : "";
     const reusablePlan = reusablePlanPath ? await downloadJson(reusablePlanPath).catch(() => null) : null;
     let plan = reusablePlan || (job.planOverride ? prepareVisualEditorPlan(job.planOverride, technicalPlan, analyzed) : technicalPlan);
-    if (!reusablePlan && !job.planOverride && project.director?.mode === "semantic") {
-      const semanticPlanner = createSemanticPlanner();
+    if (!reusablePlan && !job.planOverride && ["semantic", "advanced"].includes(project.director?.mode)) {
+      const advancedRequested = project.director?.mode === "advanced";
+      const semanticPlanner = advancedRequested ? createAdvancedDirector() : createSemanticPlanner();
       if (!semanticPlanner.enabled) {
-        const fallback = { code: "ai_not_configured", message: "O Diretor de IA não está configurado neste worker. A montagem técnica local continuará normalmente." };
+        const fallback = advancedRequested && !workerConfig.advancedDirectorEnabled
+          ? { code: "advanced_feature_disabled", message: "O Diretor Avançado está desativado pela configuração segura deste worker. A montagem técnica local continuará normalmente." }
+          : { code: "ai_not_configured", message: "O Diretor de IA não está configurado neste worker. A montagem técnica local continuará normalmente." };
         plan = markSemanticFallback(technicalPlan, fallback.message, fallback);
         await updateJob(job.uid, job.jobId, { message: fallback.message, event: { level: "warning", code: fallback.code, message: fallback.message } });
       } else {
         try {
-          await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 49, message: "O diretor de IA está analisando quadros, transcrições e o objetivo criativo." });
+          await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 49, message: advancedRequested ? "O Diretor Avançado está comparando começo, meio e fim das cenas para construir a narrativa." : "O diretor de IA está analisando quadros, transcrições e o objetivo criativo." });
           const sourceTranscriptionProvider = await createTranscriptionProvider();
-          const evidence = await prepareSemanticEvidence(analyzed, workDir, { signal: cancellation.signal, transcriptionProvider: sourceTranscriptionProvider, prompt: project.captions?.prompt || "", maxFrames: workerConfig.aiMaxFrames });
+          const evidence = await prepareSemanticEvidence(analyzed, workDir, { signal: cancellation.signal, transcriptionProvider: sourceTranscriptionProvider, transcriptCache: project.semanticTranscriptCache || {}, prompt: project.captions?.prompt || "", temporal: advancedRequested, maxFrames: advancedRequested ? workerConfig.advancedAiMaxFrames : workerConfig.aiMaxFrames });
+          await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ semanticTranscriptCache: evidence.transcriptCache || {}, semanticTranscriptCacheUpdatedAt: Date.now() });
           if (evidence.warnings.length) {
             const count = evidence.warnings.length;
             const message = `${count} ${count === 1 ? "mídia não gerou quadro para a IA e foi ignorada" : "mídias não geraram quadros para a IA e foram ignoradas"}. A análise continuará com ${evidence.frames.length} ${evidence.frames.length === 1 ? "quadro válido" : "quadros válidos"}.`;
             await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 49, message, event: { level: "warning", code: "ai_evidence_partial", message, details: evidence.warnings.map((warning) => warning.message).slice(0, 6) } });
           }
           plan = await semanticPlanner.createPlan({ project, basePlan: technicalPlan, evidence, analyzedSources: analyzed, signal: cancellation.signal });
-          await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 50, message: "Direção por IA concluída e validada. Preparando a renderização.", event: { level: "success", code: "ai_direction_applied", message: `Direção por IA aplicada com ${evidence.frames.length} ${evidence.frames.length === 1 ? "quadro visual" : "quadros visuais"}.` } });
+          await updateJob(job.uid, job.jobId, { stage: "planning", status: "analyzing", progress: 50, message: advancedRequested ? "Direção temporal concluída e validada. Preparando a renderização." : "Direção por IA concluída e validada. Preparando a renderização.", event: { level: "success", code: advancedRequested ? "advanced_direction_applied" : "ai_direction_applied", message: `${advancedRequested ? "Diretor Avançado" : "Direção por IA"} aplicado com ${evidence.frames.length} ${evidence.frames.length === 1 ? "quadro visual" : "quadros visuais"}.` } });
         } catch (error) {
           if (error?.code === "studio_cancelled" || cancellation.signal.aborted) throw error;
           console.warn(`[${job.jobId}] Diretor de IA indisponível; usando plano local:`, error.message);
@@ -122,15 +130,15 @@ async function processJob(job) {
     }
     const directorResult = job.planOverride
       ? { requested: false, applied: false, editorApplied: true, updatedAt: Date.now() }
-      : project.director?.mode === "semantic"
-      ? { requested: true, applied: plan.aiDirector?.applied === true, provider: plan.planner?.provider || "", model: plan.planner?.model || "", reason: plan.aiDirector?.reason || "", code: plan.aiDirector?.code || "", updatedAt: Date.now() }
+      : ["semantic", "advanced"].includes(project.director?.mode)
+      ? { requested: true, mode: project.director.mode, applied: plan.aiDirector?.applied === true, advanced: plan.aiDirector?.advanced === true, provider: plan.planner?.provider || "", model: plan.planner?.model || "", reason: plan.aiDirector?.reason || "", code: plan.aiDirector?.code || "", updatedAt: Date.now() }
       : { requested: false, applied: false, updatedAt: Date.now() };
     const planStoragePath = `studio/${job.uid}/plans/${job.projectId}/${job.jobId}.json`;
     const soundEffectsPath = await generateTransitionSoundtrack(plan.soundEffects?.preset || "none", plan, audioPaths.effects, cancellation.signal);
     await uploadJson(plan, planStoragePath);
     const editorPlan = JSON.parse(JSON.stringify(plan));
     await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ directorResult, editorPlan });
-    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.type === "semantic-ai" ? "Direção por IA concluída. Renderizando as cenas selecionadas." : plan.planner?.fallback ? `${plan.aiDirector?.reason || "A IA não pôde ser aplicada"} Renderizando com a montagem técnica local.` : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, editorPlan, director: directorResult });
+    await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.semanticAnalysis ? `${plan.planner?.temporalAnalysis ? "Direção avançada" : "Direção por IA"} concluída. Renderizando as cenas selecionadas.` : plan.planner?.fallback ? `${plan.aiDirector?.reason || "A IA não pôde ser aplicada"} Renderizando com a montagem técnica local.` : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, editorPlan, director: directorResult });
     const approvedTranscription = (project.captionsEnabled || plan.narration?.enabled) && job.transcriptReview?.status === "approved"
       ? prepareReviewedTranscription(job.transcriptReview, project.duration)
       : null;
@@ -171,6 +179,18 @@ async function processJob(job) {
     }
     const outputPath = rendered.outputPath;
     ensureNotCancelled();
+    let qualityReview = { version: 1, passed: true, skipped: true, warnings: [], errors: [] };
+    if (workerConfig.renderQualityEnabled && job.mode !== "preview") {
+      await updateJob(job.uid, job.jobId, { stage: "quality_review", status: "rendering", progress: 97, message: "Validando duração, imagem, áudio, legendas e continuidade técnica do MP4." });
+      qualityReview = await inspectRenderedOutput(outputPath, rendered.plan, cancellation.signal);
+      rendered.plan.qualityReview = qualityReview;
+      await uploadJson(rendered.plan, planStoragePath);
+      if (!qualityReview.passed) {
+        throw Object.assign(new Error(`O controle de qualidade interrompeu a entrega: ${qualityReview.errors.map((item) => item.message).join(" ")}`), { code: "render_quality_failed", qualityReview });
+      }
+      if (qualityReview.warnings.length) await updateJob(job.uid, job.jobId, { stage: "quality_review", status: "rendering", progress: 97, message: `Vídeo validado com ${qualityReview.warnings.length} aviso(s) técnico(s).`, event: { level: "warning", code: "render_quality_warning", message: "O MP4 passou nos testes obrigatórios, mas há pontos recomendados para revisão humana.", details: qualityReview.warnings.map((item) => item.message).slice(0, 8) } });
+      else await updateJob(job.uid, job.jobId, { stage: "quality_review", status: "rendering", progress: 97, message: "Controle de qualidade técnico concluído.", event: { level: "success", code: "render_quality_passed", message: "Duração, vídeo, áudio e linha do tempo foram validados." } });
+    }
     await updateJob(job.uid, job.jobId, { stage: "upload_output", status: "rendering", progress: 98, message: "Salvando o MP4 final." });
     const storagePath = job.mode === "preview"
       ? `studio/${job.uid}/renders/${job.projectId}/previews/${job.jobId}.mp4`
@@ -179,7 +199,7 @@ async function processJob(job) {
     ensureNotCancelled();
     const elapsedSeconds = Math.round((Date.now() - started) / 1000);
     const renderedEditorPlan = JSON.parse(JSON.stringify(rendered.plan));
-    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.type === "semantic-ai" ? plan.planner.provider : "none", aiModel: plan.planner?.type === "semantic-ai" ? plan.planner.model : "none", aiUsage: plan.aiDirector?.usage || null, aiEstimatedCostUsd: Number(plan.aiDirector?.estimatedCostUsd || 0), narrationUsed: plan.narration?.rendered === true || plan.narration?.apiUsed === true, narrationRendered: plan.narration?.rendered === true, narrationProvider: plan.narration?.provider || "none", narrationModel: plan.narration?.model || "none", narrationVoice: plan.narration?.voice || "", narrationCharacters: Number(plan.narration?.characters || 0), narrationDurationSeconds: Number(plan.narration?.durationSeconds || 0), narrationTimelineDurationSeconds: Number(plan.narration?.timelineDurationSeconds || 0), narrationEstimatedCostUsd: Number(plan.narration?.estimatedCostUsd || 0), workerId: workerConfig.workerId, createdAt: Date.now() };
+    const cost = { elapsedSeconds, outputBytes: output.size, inputFiles: sources.length, processingUnits: job.costEstimate?.processingUnits || 0, estimatedCredits: job.costEstimate?.estimatedCredits || 0, aiProvider: plan.planner?.semanticAnalysis ? plan.planner.provider : "none", aiModel: plan.planner?.semanticAnalysis ? plan.planner.model : "none", aiMode: plan.planner?.temporalAnalysis ? "advanced" : plan.planner?.semanticAnalysis ? "semantic" : "none", aiUsage: plan.aiDirector?.usage || null, aiEstimatedCostUsd: Number(plan.aiDirector?.estimatedCostUsd || 0), narrationUsed: plan.narration?.rendered === true || plan.narration?.apiUsed === true, narrationRendered: plan.narration?.rendered === true, narrationProvider: plan.narration?.provider || "none", narrationModel: plan.narration?.model || "none", narrationVoice: plan.narration?.voice || "", narrationCharacters: Number(plan.narration?.characters || 0), narrationDurationSeconds: Number(plan.narration?.durationSeconds || 0), narrationTimelineDurationSeconds: Number(plan.narration?.timelineDurationSeconds || 0), narrationEstimatedCostUsd: Number(plan.narration?.estimatedCostUsd || 0), qualityReview, workerId: workerConfig.workerId, createdAt: Date.now() };
     const updates = {};
     updates[`studioJobs/${job.uid}/${job.jobId}/status`] = "completed";
     updates[`studioJobs/${job.uid}/${job.jobId}/stage`] = "complete";
@@ -187,10 +207,12 @@ async function processJob(job) {
     updates[`studioJobs/${job.uid}/${job.jobId}/message`] = "Vídeo concluído.";
     updates[`studioJobs/${job.uid}/${job.jobId}/output`] = output;
     updates[`studioJobs/${job.uid}/${job.jobId}/editorPlan`] = renderedEditorPlan;
+    updates[`studioJobs/${job.uid}/${job.jobId}/qualityReview`] = qualityReview;
     updates[`studioJobs/${job.uid}/${job.jobId}/completedAt`] = Date.now();
     updates[`studioJobs/${job.uid}/${job.jobId}/updatedAt`] = Date.now();
     updates[`studioProjects/${job.uid}/${job.projectId}/status`] = "completed";
     updates[`studioProjects/${job.uid}/${job.projectId}/editorPlan`] = renderedEditorPlan;
+    updates[`studioProjects/${job.uid}/${job.projectId}/qualityReview`] = qualityReview;
     if (job.mode === "preview") updates[`studioProjects/${job.uid}/${job.projectId}/preview`] = output;
     else updates[`studioProjects/${job.uid}/${job.projectId}/output`] = output;
     updates[`studioProjects/${job.uid}/${job.projectId}/updatedAt`] = Date.now();

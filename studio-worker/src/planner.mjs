@@ -84,6 +84,13 @@ function syncedDuration(timeline, nominal, transition, minClip, maxClip, rhythm,
   return round(Math.max(minClip, Math.min(maxClip, beat - timeline + transition)));
 }
 
+const PHOTO_MOTIONS = ["zoom_in", "pan_right", "pan_left", "zoom_out", "pan_up", "pan_down"];
+
+function photoMotionFor(source, sceneIndex) {
+  if (!String(source.contentType || "").startsWith("image/")) return null;
+  return { type: PHOTO_MOTIONS[sceneIndex % PHOTO_MOTIONS.length], focusX: 0.5, focusY: 0.5, easing: "smooth", scale: 1.12 };
+}
+
 export function createDeterministicPlan(project, analyzedSources, options = {}) {
   const style = studioStyleParameters(project.style);
   const target = Number(project.duration);
@@ -120,6 +127,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
       start: candidate.source.contentType.startsWith("image/") ? 0 : candidate.start, duration: round(duration),
       transition: scenes.length ? transitionName : "none", transitionDuration: appliedTransitionDuration, hasSpeech,
       narrativeRole: role,
+      photoMotion: photoMotionFor(candidate.source, scenes.length),
       selection: { method: "technical-quality-v3", qualityScore: candidate.quality.score, flags: candidate.quality.flags, reason: candidate.quality.flags.length ? "Melhor alternativa técnica disponível com penalidades registradas." : "Trecho priorizado por nitidez, estabilidade, exposição, movimento e diversidade de origem." },
       rhythmSynced: rhythm.syncEnabled && !hasSpeech && Math.abs(duration - nominal) > 0.01
     });
@@ -129,7 +137,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
     schemaVersion: STUDIO_SCHEMA_VERSION,
     planner: { type: "deterministic-technical", version: 2, semanticAnalysis: false, technicalSelection: true, narrativeTemplate: "opening-development-closing" },
     analysis: { sources: analyzedSources.map((source) => ({ sourceId: source.id, contentType: source.contentType, duration: Number(source.metadata?.duration || 0), hasAudio: source.metadata?.hasAudio === true, orientation: source.metadata.orientation, method: source.technical?.analysisMethod || "unknown", sceneChanges: source.technical?.sceneTimes?.length || 0, qualityWindows: source.technical?.qualityWindows?.length || 0, waveform: source.technical?.waveform || { available: false, samples: [] } })) },
-    rhythm: { available: Boolean(rhythm.available), syncEnabled: Boolean(rhythm.syncEnabled), level: rhythmLevel, bpm: Number(rhythm.bpm || 0), confidence: Number(rhythm.confidence || 0), method: rhythm.method || "none", beatCount: rhythm.beatTimes?.length || 0 },
+    rhythm: { available: Boolean(rhythm.available), syncEnabled: Boolean(rhythm.syncEnabled), level: rhythmLevel, bpm: Number(rhythm.bpm || 0), confidence: Number(rhythm.confidence || 0), method: rhythm.method || "none", beatCount: rhythm.beatTimes?.length || 0, structure: rhythm.structure || { available: false, sections: [], peaks: [], method: "none" } },
     style: project.style, format: project.format, duration: target, export: { fps: exportFps, quality: exportQuality.id, codec: "h264", audioCodec: "aac", videoBitrateKbps: exportQuality.videoBitrateKbps, audioBitrateKbps: exportQuality.audioBitrateKbps },
     transition: { mode: project.transition || "auto", name: selectedTransition.ffmpeg, duration: transition },
     text: { title: project.title || "", subtitle: project.subtitle || "", callToAction: project.callToAction || "" }, textDesign: project.textDesign || {}, textLayers: textLayersFor(project, target),

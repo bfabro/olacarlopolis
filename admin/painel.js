@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 944,
-  label: "v944",
+  numero: 945,
+  label: "v945",
   data: "2026-10-24",
-  nota: "Olá Studio v43: renderização otimizada, fala humana sincronizada e imagens integradas à sequência."
+  nota: "Olá Studio v44: direção temporal avançada, movimento inteligente em fotos e controle de qualidade do MP4."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

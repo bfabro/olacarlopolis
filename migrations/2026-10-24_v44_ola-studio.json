@@ -1,0 +1,9 @@
+{
+  "studioFeatureFlags": {
+    "advancedDirectorEnabled": false,
+    "renderQualityEnabled": true,
+    "advancedDirectorVersion": 44,
+    "updatedAt": 1792857419231,
+    "advancedDirectorNote": "Diretor temporal protegido; habilitar somente após configurar e validar o worker v44."
+  }
+}

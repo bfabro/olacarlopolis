@@ -48,15 +48,45 @@ export function buildSemanticCandidates(analyzedSources, maxCandidates = 24) {
   return candidates.sort((a, b) => b.qualityScore - a.qualityScore || a.sourceIndex - b.sourceIndex).slice(0, maxCandidates).map((item, index) => ({ ...item, id: `candidate-${index + 1}` }));
 }
 
+export function buildTemporalCandidates(analyzedSources, maxCandidates = 48) {
+  const candidates = [];
+  for (const source of analyzedSources) {
+    const isImage = String(source.contentType || "").startsWith("image/");
+    const duration = Number(source.metadata?.duration || 0);
+    const windows = source.technical?.qualityWindows || [];
+    const starts = isImage ? [0] : [0, duration * 0.25, duration * 0.5, duration * 0.75, Math.max(0, duration - 1), ...(source.technical?.sceneTimes || [])];
+    const unique = [...new Set(starts.map((value) => round(Math.max(0, Math.min(Number(value || 0), Math.max(0, duration - 0.5))))))]
+      .sort((a, b) => a - b)
+      .filter((value, index, list) => index === 0 || value - list[index - 1] >= Math.max(0.75, duration / 10));
+    unique.forEach((start) => {
+      const window = windows.find((item) => Number(item.end || 0) > start && Number(item.start || 0) <= start) || { score: isImage ? 0.8 : 0.6, flags: [], motion: 0 };
+      const ratio = duration > 0 ? start / duration : 0;
+      candidates.push({ id: "", sourceId: source.id, sourceIndex: source.order, start, qualityScore: round(window.score || 0.6), motion: round(window.motion || 0), flags: [...new Set(window.flags || [])], orientation: source.metadata?.orientation || "unknown", hasAudio: source.metadata?.hasAudio === true, kind: isImage ? "image" : "video", temporalPhase: isImage ? "still" : ratio < 0.2 ? "opening" : ratio > 0.78 ? "closing" : "middle", cameraMotion: source.technical?.cameraMotion || null });
+    });
+  }
+  const selected = [];
+  const bySource = new Map();
+  candidates.forEach((candidate) => bySource.set(candidate.sourceId, [...(bySource.get(candidate.sourceId) || []), candidate]));
+  while (selected.length < maxCandidates && [...bySource.values()].some((items) => items.length)) {
+    for (const items of bySource.values()) {
+      if (!items.length || selected.length >= maxCandidates) continue;
+      const candidate = items.shift();
+      selected.push(candidate);
+    }
+  }
+  return selected.map((candidate, index) => ({ ...candidate, id: `candidate-${index + 1}` }));
+}
+
 export async function prepareSemanticEvidence(analyzedSources, workDir, options = {}) {
-  const candidates = buildSemanticCandidates(analyzedSources);
+  const candidates = options.temporal === true ? buildTemporalCandidates(analyzedSources) : buildSemanticCandidates(analyzedSources);
   const frames = [];
   const transcripts = [];
+  const transcriptCache = { ...(options.transcriptCache || {}) };
   const warnings = [];
   const processRunner = options.runProcess || runProcess;
   const representative = new Map();
   candidates.forEach((candidate) => { if (!representative.has(candidate.sourceId)) representative.set(candidate.sourceId, candidate); });
-  const selected = [...representative.values()].slice(0, options.maxFrames || workerConfig.aiMaxFrames);
+  const selected = options.temporal === true ? candidates.slice(0, options.maxFrames || workerConfig.advancedAiMaxFrames) : [...representative.values()].slice(0, options.maxFrames || workerConfig.aiMaxFrames);
   for (let frameIndex = 0; frameIndex < selected.length; frameIndex += 1) {
     const candidate = selected[frameIndex];
     const source = analyzedSources.find((item) => item.id === candidate.sourceId);
@@ -82,7 +112,7 @@ export async function prepareSemanticEvidence(analyzedSources, workDir, options 
           lastError = error;
         }
       }
-      if (frameBuffer) frames.push({ candidateId: candidate.id, sourceId: source.id, dataUrl: `data:image/jpeg;base64,${frameBuffer.toString("base64")}` });
+      if (frameBuffer) frames.push({ candidateId: candidate.id, sourceId: source.id, time: candidate.start, temporalPhase: candidate.temporalPhase || "representative", dataUrl: `data:image/jpeg;base64,${frameBuffer.toString("base64")}` });
       else warnings.push({ code: "semantic_frame_unavailable", sourceId: source.id, sourceName: displayName, message: `Não foi possível preparar um quadro de “${displayName}”. A IA continuará com as demais mídias.` });
     } finally {
       await fs.rm(target, { force: true }).catch(() => {});
@@ -94,12 +124,23 @@ export async function prepareSemanticEvidence(analyzedSources, workDir, options 
     for (const source of analyzedSources.filter((item) => item.metadata?.hasAudio)) {
       const duration = Number(source.metadata?.duration || 0);
       if (transcribedSeconds + duration > 180) break;
+      const cacheKey = source.analysisCache?.signature || `${source.id}:${Number(source.size || 0)}`;
+      const cached = transcriptCache[cacheKey];
+      if (cached?.schemaVersion === 1 && Array.isArray(cached.segments)) {
+        transcripts.push({ sourceId: source.id, text: String(cached.text || "").slice(0, 4000), segments: cached.segments.slice(0, 80), reused: true });
+        transcribedSeconds += duration;
+        continue;
+      }
       const result = await options.transcriptionProvider.transcribeFile(source.localPath, workDir, { signal: options.signal, prompt: options.prompt || "" }).catch((error) => ({ available: false, reason: error.message }));
-      if (result.available) transcripts.push({ sourceId: source.id, text: result.segments.map((segment) => segment.text).join(" ").slice(0, 4000), segments: result.segments.slice(0, 80).map((segment) => ({ start: segment.start, end: segment.end, text: segment.text })) });
+      if (result.available) {
+        const cachedTranscript = { schemaVersion: 1, text: result.segments.map((segment) => segment.text).join(" ").slice(0, 4000), segments: result.segments.slice(0, 80).map((segment) => ({ start: segment.start, end: segment.end, text: segment.text })), cachedAt: Date.now() };
+        transcriptCache[cacheKey] = cachedTranscript;
+        transcripts.push({ sourceId: source.id, text: cachedTranscript.text, segments: cachedTranscript.segments, reused: false });
+      }
       transcribedSeconds += duration;
     }
   }
-  return { candidates, frames, transcripts, warnings };
+  return { candidates, frames, transcripts, transcriptCache, warnings };
 }
 
 const semanticSchema = {

@@ -16,7 +16,7 @@
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-      <span class="studio-release-badge">Olá Studio <b data-studio-version>v43</b></span>
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v44</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -27,7 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v43</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v44</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -43,7 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v43</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v44</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -55,7 +55,7 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v43</b></small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v44</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
@@ -71,7 +71,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
-        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v43</b></span>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v44</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -106,7 +106,7 @@
               <div class="card-heading"><span>2</span><div><h2>Estilo da edição</h2><p>Cada estilo muda ritmo, duração dos cortes e transições.</p></div></div>
               <div class="text-design-panel studio-director-panel">
                 <div><strong>Direção da montagem</strong><small>O modo local usa regras técnicas. A IA semântica é opcional, exige configuração segura no worker e pode consumir uma API paga.</small></div>
-                <label>Modo do diretor<select id="directorMode"><option value="local" selected>Automático local — sem custo de IA</option><option value="semantic">Diretor de IA — se configurado no worker</option></select></label>
+                  <label>Modo do diretor<select id="directorMode"><option value="local" selected>Automático local — sem custo de IA</option><option value="semantic">Diretor de IA — análise padrão</option><option value="advanced">Diretor Avançado — narrativa temporal experimental</option></select></label>
                 <label class="wide">Objetivo criativo<textarea id="directorBrief" maxlength="1200" rows="3" placeholder="Ex.: Vídeo institucional elegante, valorizando atendimento, equipe e encerramento com a logo."></textarea></label>
                 <div id="aiNarrationPanel" class="ai-narration-panel wide hidden">
                   <label class="check-row"><input id="generateAiScript" type="checkbox"><span><strong>Criar roteiro e textos por cena</strong><small>A IA usa somente informações visíveis, transcritas ou informadas no objetivo criativo.</small></span></label>
@@ -348,6 +348,6 @@
     <button id="fieldHelpOk" class="create-button" type="button">Entendi</button>
   </dialog>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=36"></script>
+  <script type="module" src="studio.js?v=37"></script>
 </body>
 </html>

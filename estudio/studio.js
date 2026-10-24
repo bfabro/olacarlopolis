@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=10";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=11";
 import { estimateProcessingTiming } from "../shared/studio-metrics.mjs?v=1";
 
 const firebaseConfig = {
@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v43", date: "2026-10-24" });
+const STUDIO_RELEASE = Object.freeze({ label: "v44", date: "2026-10-24" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
@@ -32,7 +32,7 @@ let authPersistenceWarning = "";
 
 const FIELD_HELP = Object.freeze({
   sourceFiles: { title: "Arquivos do vídeo", body: "Adicione vídeos e também imagens estáticas à sequência. Cada foto vira uma cena com duração ajustável no editor visual e pode ser reordenada junto com os vídeos. A IA usa a imagem real na análise e os originais são preservados." },
-  directorMode: { title: "Modo do diretor", body: "No modo automático local, regras técnicas escolhem cortes, ritmo e qualidade sem custo de IA. No Diretor de IA, quadros e informações do projeto são analisados semanticamente para criar uma proposta de edição; esse modo usa a API configurada e pode gerar custo." },
+  directorMode: { title: "Modo do diretor", body: "O modo local usa regras técnicas sem custo de IA. A análise padrão interpreta quadros representativos. O Diretor Avançado acompanha vários momentos das cenas, compara continuidade, ritmo e redundância e produz um plano global; ele é experimental, depende da feature flag segura do worker e pode usar mais tokens." },
   directorBrief: { title: "Objetivo criativo", body: "Explique o resultado desejado: público, clima, pontos que devem aparecer e mensagem principal. Este texto orienta o Diretor de IA, mas não aparece escrito no vídeo." },
   generateAiScript: { title: "Criar roteiro e textos", body: "Quando ativado, a IA prepara um roteiro baseado apenas nos arquivos, transcrições e objetivo criativo. O roteiro poderá alimentar os textos das cenas e a narração." },
   enableAiNarration: { title: "Narrar com voz de IA", body: "Transforma o roteiro em locução. As frases são distribuídas ao longo do vídeo, as legendas acompanham a fala e a música é reduzida durante a voz." },
@@ -351,7 +351,7 @@ function renderProcessingLog(events, fallbackJob = null) {
     root.innerHTML = '<li class="processing-log-empty">O histórico aparecerá assim que o processamento começar.</li>';
     return;
   }
-  const stageNames = { upload: "Upload", queue: "Fila", probe: "Leitura", analysis: "Análise", planning: "Direção por IA", transcription: "Legendas", transcription_review: "Revisão", render: "Renderização", upload_output: "Finalização", complete: "Concluído", failed: "Falha", cancelled: "Cancelado" };
+  const stageNames = { upload: "Upload", queue: "Fila", probe: "Leitura", analysis: "Análise", planning: "Direção por IA", transcription: "Legendas", transcription_review: "Revisão", render: "Renderização", quality_review: "Controle de qualidade", upload_output: "Finalização", complete: "Concluído", failed: "Falha", cancelled: "Cancelado" };
   const icons = { info: "fa-circle-info", success: "fa-circle-check", warning: "fa-triangle-exclamation", error: "fa-circle-xmark" };
   root.innerHTML = list.map((event) => {
     const level = ["success", "warning", "error"].includes(event.level) ? event.level : "info";
@@ -395,7 +395,7 @@ function renderStudioLogs() {
     root.innerHTML = '<div class="empty-state"><i class="fa-solid fa-list-check"></i><h3>Nenhum registro neste filtro</h3><p>Altere o filtro ou atualize os logs.</p></div>';
     return;
   }
-  const stageNames = { upload: "Upload", queue: "Fila", probe: "Leitura dos arquivos", analysis: "Análise técnica", planning: "Direção por IA", transcription: "Transcrição", transcription_review: "Revisão das legendas", render: "Renderização", upload_output: "Salvamento", complete: "Concluído", failed: "Falha", cancelled: "Cancelado" };
+  const stageNames = { upload: "Upload", queue: "Fila", probe: "Leitura dos arquivos", analysis: "Análise técnica", planning: "Direção por IA", transcription: "Transcrição", transcription_review: "Revisão das legendas", render: "Renderização", quality_review: "Controle de qualidade", upload_output: "Salvamento", complete: "Concluído", failed: "Falha", cancelled: "Cancelado" };
   const icons = { info: "fa-circle-info", success: "fa-circle-check", warning: "fa-triangle-exclamation", error: "fa-circle-xmark" };
   root.innerHTML = visible.map((job) => {
     const project = projects.get(job.projectId) || {};
@@ -500,7 +500,7 @@ function updateSummary() {
 }
 
 function syncAiNarrationControls() {
-  const semantic = $("directorMode").value === "semantic";
+  const semantic = ["semantic", "advanced"].includes($("directorMode").value);
   $("aiNarrationPanel").classList.toggle("hidden", !semantic);
   $("generateAiScript").disabled = !semantic;
   if (!semantic) { $("generateAiScript").checked = false; $("enableAiNarration").checked = false; }
@@ -976,7 +976,7 @@ function watchJob(jobId, projectId) {
     if (!job) return;
     renderProcessingLog(job.events, job);
     updateProcessingTiming(job);
-    const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "transcription" || job.stage === "transcription_review" ? "transcription" : job.stage === "render" || job.stage === "upload_output" ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
+    const step = job.status === "cancel_requested" ? (Number(job.progress || 0) >= 50 ? "render" : "analysis") : job.stage === "probe" || job.stage === "analysis" || job.stage === "planning" ? "analysis" : job.stage === "transcription" || job.stage === "transcription_review" ? "transcription" : ["render", "quality_review", "upload_output"].includes(job.stage) ? "render" : job.status === "completed" ? "complete" : job.status === "queued" ? "queue" : "upload";
     markProcessStep(step);
     updateProgress(job.progress || 25, statusLabels[job.status] || job.stage || "Processando", job.message || "O processamento continua no worker.");
     if (job.status === "awaiting_review") {
@@ -1562,7 +1562,7 @@ function renderProjects() {
     const remove = active ? "" : `<button type="button" class="danger" data-project-delete="${project.id}"><i class="fa-solid fa-trash-can"></i> Excluir</button>`;
     const director = cancelled && !hasSources
       ? `<span><i class="fa-solid fa-circle-info"></i> Cancelado antes da IA e da voz</span>`
-      : project.director?.mode === "semantic" ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? "Direção por IA" : "IA solicitada"}</span>` : "";
+      : ["semantic", "advanced"].includes(project.director?.mode) ? `<span><i class="fa-solid fa-wand-magic-sparkles"></i> ${project.directorResult?.applied ? (project.directorResult?.advanced ? "Direção avançada" : "Direção por IA") : "IA solicitada"}</span>` : "";
     return `<article class="project-card"><div class="project-cover"><span class="project-status ${completed ? "completed" : failed ? "failed" : cancelled ? "cancelled" : project.status === "awaiting_review" ? "review" : ["deletion_queued", "deleting"].includes(project.status) ? "deleting" : ""}">${escapeHtml(statusLabels[project.status] || project.status || "Projeto")}</span><i class="fa-solid ${project.format === "9:16" ? "fa-mobile-screen" : project.format === "1:1" ? "fa-square" : "fa-display"}"></i></div><div class="project-body"><h3>${escapeHtml(project.name || "Projeto sem nome")}</h3><p>${escapeHtml(STUDIO_EDIT_STYLES[project.style]?.label || project.style)} • ${escapeHtml(project.format)} • ${Number(project.duration || 0)}s</p><div class="project-meta"><span><i class="fa-regular fa-calendar"></i> ${formatDate(project.updatedAt)}</span><span><i class="fa-regular fa-images"></i> ${project.sources?.length || 0} arquivos</span>${director}</div><div class="project-actions">${review}${progress}${open}${edit}${download}${cancel}${regenerate}${remove}</div></div></article>`;
   }).join("");
 }
@@ -1589,7 +1589,7 @@ async function loadUsage() {
     const creditsUsed = Number(item.estimatedCredits ?? cost.estimatedCredits ?? 0);
     const tokens = Number(cost.aiUsage?.total_tokens || 0);
     const narration = cost.narrationUsed === true ? ` • Narração ${escapeHtml(cost.narrationVoice || "IA")} (${formatUsd(cost.narrationEstimatedCostUsd)})` : "";
-    return `<div class="usage-entry usage-entry-detailed"><span><strong>${escapeHtml(project.name || item.description || item.type || "Processamento")}</strong><small>${formatDate(item.createdAt)} • ${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</small><em>${aiUsed ? `IA ${escapeHtml(cost.aiModel || cost.aiProvider)} • ${tokens.toLocaleString("pt-BR")} tokens • ${formatUsd(cost.aiEstimatedCostUsd)}${narration}` : "IA não utilizada"}</em></span><b>${creditsUsed} ${creditsUsed === 1 ? "crédito" : "créditos"}<small>${Number(item.amount || 0) ? `${Number(item.amount)} debitado(s)` : "0 debitado • MVP"}</small></b></div>`;
+    return `<div class="usage-entry usage-entry-detailed"><span><strong>${escapeHtml(project.name || item.description || item.type || "Processamento")}</strong><small>${formatDate(item.createdAt)} • ${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</small><em>${aiUsed ? `${cost.aiMode === "advanced" ? "IA avançada" : "IA"} ${escapeHtml(cost.aiModel || cost.aiProvider)} • ${tokens.toLocaleString("pt-BR")} tokens • ${formatUsd(cost.aiEstimatedCostUsd)}${narration}` : "IA não utilizada"}</em></span><b>${creditsUsed} ${creditsUsed === 1 ? "crédito" : "créditos"}<small>${Number(item.amount || 0) ? `${Number(item.amount)} debitado(s)` : "0 debitado • MVP"}</small></b></div>`;
   }).join("") : '<p class="empty-copy">Nenhum consumo registrado.</p>';
 }
 
@@ -1602,13 +1602,17 @@ async function authorize(user) {
     showGate("studioUnavailable");
     return;
   }
-  const flagSnap = await get(ref(db, "studioFeatureFlags/enabled"));
+  const flagSnap = await get(ref(db, "studioFeatureFlags"));
+  const featureFlags = flagSnap.val() || {};
   const previewAuthorized = new URLSearchParams(location.search).get("preview") === "1";
-  if (flagSnap.val() !== true && !previewAuthorized) {
+  if (featureFlags.enabled !== true && !previewAuthorized) {
     $("unavailableMessage").textContent = "A feature flag do Olá Studio está desativada. Abra o acesso protegido pelo Painel Admin para testar o MVP.";
     showGate("studioUnavailable");
     return;
   }
+  const advancedOption = [...$("directorMode").options].find((option) => option.value === "advanced");
+  if (advancedOption) advancedOption.hidden = featureFlags.advancedDirectorEnabled !== true;
+  if (featureFlags.advancedDirectorEnabled !== true && $("directorMode").value === "advanced") $("directorMode").value = "local";
   $("userName").textContent = state.profile.nome || "Admin Master";
   $("userEmail").textContent = user.email || state.profile.email || "";
   $("userInitial").textContent = String(state.profile.nome || user.email || "A").trim().charAt(0).toUpperCase();

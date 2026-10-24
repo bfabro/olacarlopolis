@@ -259,7 +259,7 @@ export function buildSegmentArgs(scene, source, outputPath, format, audioOptions
     if (!source.metadata.hasAudio) args.push("-f", "lavfi", "-t", seconds(scene.duration), "-i", "anullsrc=channel_layout=stereo:sample_rate=48000");
   }
   args.push("-map", "0:v:0", "-map", source.metadata.hasAudio && !image ? "0:a:0" : "1:a:0");
-  args.push("-vf", `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},fps=${fps},setsar=1,format=yuv420p`);
+  args.push("-vf", image ? buildPhotoMotionFilter(scene, width, height, fps) : `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},fps=${fps},setsar=1,format=yuv420p`);
   if (source.metadata.hasAudio && !image) {
     const filters = [];
     if (audioOptions.noiseReduction) filters.push("highpass=f=80", "lowpass=f=12000", "afftdn=nf=-25");
@@ -268,6 +268,27 @@ export function buildSegmentArgs(scene, source, outputPath, format, audioOptions
   }
   args.push("-t", seconds(scene.duration), ...videoEncoding(renderProfile, exportOptions, true), "-ar", "48000", "-ac", "2", "-movflags", "+faststart", outputPath);
   return args;
+}
+
+export function buildPhotoMotionFilter(scene, width, height, fps = 30) {
+  const motion = scene.photoMotion || {};
+  const type = ["zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down"].includes(motion.type) ? motion.type : "zoom_in";
+  const frames = Math.max(1, Math.round(Number(scene.duration || 1) * fps));
+  const progress = `on/${frames}`;
+  const eased = `(0.5-0.5*cos(PI*${progress}))`;
+  const scale = Math.max(1.04, Math.min(1.25, Number(motion.scale || 1.12)));
+  const focusX = Math.max(0.1, Math.min(0.9, Number(motion.focusX ?? 0.5)));
+  const focusY = Math.max(0.1, Math.min(0.9, Number(motion.focusY ?? 0.5)));
+  let zoom = String(scale);
+  let x = `(iw-iw/zoom)*${focusX}`;
+  let y = `(ih-ih/zoom)*${focusY}`;
+  if (type === "zoom_in") zoom = `1+${(scale - 1).toFixed(4)}*${eased}`;
+  if (type === "zoom_out") zoom = `${scale.toFixed(4)}-${(scale - 1).toFixed(4)}*${eased}`;
+  if (type === "pan_right") x = `(iw-iw/zoom)*${eased}`;
+  if (type === "pan_left") x = `(iw-iw/zoom)*(1-${eased})`;
+  if (type === "pan_down") y = `(ih-ih/zoom)*${eased}`;
+  if (type === "pan_up") y = `(ih-ih/zoom)*(1-${eased})`;
+  return `scale=${Math.ceil(width * scale)}:${Math.ceil(height * scale)}:force_original_aspect_ratio=increase,crop=iw:ih,zoompan=z='${zoom}':x='${x}':y='${y}':d=1:s=${width}x${height}:fps=${fps},setsar=1,format=yuv420p`;
 }
 
 export function buildTransitionGraph(scenes) {
