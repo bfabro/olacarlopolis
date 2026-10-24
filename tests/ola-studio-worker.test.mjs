@@ -4,10 +4,10 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { createDeterministicPlan } from "../studio-worker/src/planner.mjs";
-import { buildBrandingArgs, buildNarrationTimelineArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, narrationCaptionSegments, renderDimensions, renderExportSettings, scheduleNarrationSegments, splitNarrationScript } from "../studio-worker/src/renderer.mjs";
+import { buildBrandingArgs, buildNarrationTimelineArgs, buildPairTransitionArgs, buildSegmentArgs, buildTextLayerFilters, buildTransitionGraph, narrationCaptionSegments, renderDimensions, renderExportSettings, scheduleNarrationSegments, splitNarrationScript, withoutNarrationDuplicateLayers } from "../studio-worker/src/renderer.mjs";
 import { prepareVisualEditorPlan } from "../studio-worker/src/editor-plan.mjs";
 import { runProcess, withTimeout } from "../studio-worker/src/process-utils.mjs";
-import { buildAssCaptions } from "../studio-worker/src/captions.mjs";
+import { buildAssCaptions, uniqueCaptionSegments } from "../studio-worker/src/captions.mjs";
 import { parseWhisperJson, prepareReviewedTranscription } from "../studio-worker/src/transcription.mjs";
 import { buildQualityWindows, buildShakeIntervals, deriveQualityThresholds, parseCameraMotionTransforms, parseIntervals, parseSignalFrames, summarizeCalibration } from "../studio-worker/src/analyzer.mjs";
 import { detectRhythmFromPcm } from "../studio-worker/src/rhythm.mjs";
@@ -370,6 +370,28 @@ test("legendas ASS oferecem modo tradicional e destaque dinâmico", () => {
   assert.match(traditional, /Olá Carlópolis/);
   assert.match(dynamic, /\\kf60/);
   assert.match(dynamic, /Carlópolis/);
+});
+
+test("legendas repetidas e sobrepostas são consolidadas antes da renderização", () => {
+  const segments = [
+    { start: 1, end: 3, text: "Olá Carlópolis" },
+    { start: 1.05, end: 3.2, text: "Olá, Carlópolis!" },
+    { start: 4, end: 5, text: "Confira as novidades" }
+  ];
+  const unique = uniqueCaptionSegments(segments);
+  assert.equal(unique.length, 2);
+  assert.equal(unique[0].end, 3.2);
+  const ass = buildAssCaptions({ segments }, { format: "9:16", mode: "traditional" });
+  assert.equal((ass.match(/^Dialogue:/gm) || []).length, 2);
+});
+
+test("narração remove textos automáticos de cena para não duplicar a legenda", () => {
+  const layers = withoutNarrationDuplicateLayers([
+    { type: "title", value: "Título informado pelo usuário" },
+    { type: "ai_scene_text", value: "Texto automático repetido" },
+    { type: "call_to_action", value: "Acesse agora" }
+  ]);
+  assert.deepEqual(layers.map((layer) => layer.type), ["title", "call_to_action"]);
 });
 
 test("revisão de transcrição preserva tempos e recalcula palavras somente quando o texto muda", () => {

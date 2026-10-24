@@ -50,6 +50,10 @@ export function narrationCaptionSegments(segments) {
   }));
 }
 
+export function withoutNarrationDuplicateLayers(layers = []) {
+  return layers.filter((layer) => layer?.type !== "ai_scene_text");
+}
+
 export async function trimNarrationAudio(spoken, outputDir, index, signal) {
   const trimmedPath = path.join(outputDir, `ai-narration-${String(index + 1).padStart(2, "0")}-trimmed.wav`);
   await runProcess(workerConfig.ffmpegPath, [
@@ -350,7 +354,10 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
       await runProcess(workerConfig.ffmpegPath, buildNarrationTimelineArgs(scheduled, narrationPath, plan.duration), { signal });
       const captionSegments = narrationCaptionSegments(scheduled);
       captionsPath = await writeAssCaptions(path.join(outputDir, "narration-captions.ass"), { segments: captionSegments }, { ...(plan.captions || {}), enabled: true, mode: "traditional", format: plan.format });
-      plan.textLayers = (plan.textLayers || []).map((layer) => layer.type === "ai_scene_text" ? { ...layer, position: "top", slot: 1 } : layer);
+      // A legenda da locução já comunica o roteiro. Remover somente os textos
+      // automáticos de cena evita duas mensagens geradas pela IA ao mesmo tempo;
+      // títulos, ofertas, descrições e chamadas definidos pelo usuário permanecem.
+      plan.textLayers = withoutNarrationDuplicateLayers(plan.textLayers || []);
       plan.captions = { ...(plan.captions || {}), enabled: true, mode: "traditional", provider: "openai-tts-timeline", autoNarration: true, segments: captionSegments };
       plan.narration = { ...plan.narration, provider: spokenParts[0].provider, model: spokenParts[0].model, voice: spokenParts[0].voice, characters: spokenParts.reduce((sum, item) => sum + Number(item.characters || 0), 0), durationSeconds: Number(spokenParts.reduce((sum, item) => sum + Number(item.durationSeconds || 0), 0).toFixed(3)), timelineDurationSeconds: Number(scheduled.at(-1)?.end || 0), estimatedCostUsd: Number(spokenParts.reduce((sum, item) => sum + Number(item.estimatedCostUsd || 0), 0).toFixed(6)), segments: scheduled.map(({ text, start, end, durationSeconds }) => ({ text, start, end, durationSeconds })), rendered: true };
     }

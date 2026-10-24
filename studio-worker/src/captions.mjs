@@ -25,6 +25,33 @@ function dynamicText(segment) {
   }).join(" ");
 }
 
+const comparableCaptionText = (value) => String(value || "")
+  .normalize("NFD")
+  .replace(/[\u0300-\u036f]/g, "")
+  .replace(/[^a-zA-Z0-9]+/g, " ")
+  .trim()
+  .toLowerCase();
+
+export function uniqueCaptionSegments(segments = []) {
+  const unique = [];
+  const ordered = [...segments]
+    .filter((segment) => Number(segment?.end) > Number(segment?.start) && String(segment?.text || "").trim())
+    .sort((left, right) => Number(left.start) - Number(right.start));
+  for (const segment of ordered) {
+    const start = Number(segment.start);
+    const end = Number(segment.end);
+    const key = comparableCaptionText(segment.text);
+    const duplicate = [...unique].reverse().find((item) => item.key === key && start <= item.end + 0.08);
+    if (duplicate) {
+      duplicate.end = Math.max(duplicate.end, end);
+      if ((segment.words?.length || 0) > (duplicate.segment.words?.length || 0)) duplicate.segment = segment;
+      continue;
+    }
+    unique.push({ key, start, end, segment });
+  }
+  return unique.map(({ start, end, segment }) => ({ ...segment, start, end }));
+}
+
 export function buildAssCaptions(transcription, options = {}) {
   const { width, height } = studioOutputDimensions(options.format || "9:16");
   const scale = Math.min(1.6, Math.max(0.7, Number(options.sizeScale || 1)));
@@ -34,7 +61,7 @@ export function buildAssCaptions(transcription, options = {}) {
   const primary = assColor(options.color || "#FFFFFF");
   const secondary = assColor(options.highlightColor || "#FFBB2D");
   const header = `[Script Info]\nScriptType: v4.00+\nPlayResX: ${width}\nPlayResY: ${height}\nWrapStyle: 0\nScaledBorderAndShadow: yes\n\n[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\nStyle: Caption,DejaVu Sans,${fontSize},${primary},${secondary},&H00092B45,&H76000000,-1,0,0,0,100,100,0,0,3,3,1,${alignment},${Math.round(width * 0.07)},${Math.round(width * 0.07)},${marginV},1\n\n[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text`;
-  const rows = (transcription?.segments || []).filter((segment) => Number(segment.end) > Number(segment.start) && segment.text).map((segment) => {
+  const rows = uniqueCaptionSegments(transcription?.segments || []).map((segment) => {
     const value = options.mode === "dynamic" ? dynamicText(segment) : escapeAss(segment.text);
     return `Dialogue: 0,${assTime(segment.start)},${assTime(segment.end)},Caption,,0,0,0,,${value}`;
   });
