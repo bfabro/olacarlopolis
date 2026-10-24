@@ -9,14 +9,14 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=26">
-  <link rel="stylesheet" href="studio-overrides.css?v=21">
+  <link rel="stylesheet" href="studio.css?v=27">
+  <link rel="stylesheet" href="studio-overrides.css?v=22">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-      <span class="studio-release-badge">Olá Studio <b data-studio-version>v42</b></span>
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v43</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -27,7 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v42</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v43</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -43,7 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v42</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v43</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -55,7 +55,7 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v42</b></small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v43</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
@@ -71,7 +71,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
-        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v42</b></span>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v43</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -93,7 +93,11 @@
               <div class="card-heading"><span>1</span><div><h2>Arquivos do vídeo</h2><p>Envie até 10 fotos ou vídeos e organize a sequência.</p></div><button class="section-help-button" type="button" data-help-key="sourceFiles" aria-label="Explicar arquivos do vídeo"><i class="fa-regular fa-circle-question"></i></button></div>
               <div id="dropZone" class="drop-zone" tabindex="0" role="button" aria-label="Selecionar fotos e vídeos">
                 <input id="sourceFiles" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime,video/webm" multiple hidden>
+                <input id="sourceVideos" type="file" accept="video/mp4,video/quicktime,video/webm" multiple hidden>
+                <input id="sourceImages" type="file" accept="image/jpeg,image/png,image/webp" multiple hidden>
                 <i class="fa-solid fa-cloud-arrow-up"></i><strong>Arraste seus arquivos aqui</strong><span>ou clique para escolher • até 1 GB por projeto</span>
+                <div class="media-type-actions"><button id="pickVideos" type="button"><i class="fa-solid fa-video"></i> Adicionar vídeos</button><button id="pickImages" type="button"><i class="fa-regular fa-images"></i> Inserir imagens no vídeo</button></div>
+                <small>Fotos entram como cenas e podem ser reordenadas junto com os vídeos.</small>
               </div>
               <div id="mediaLibrary" class="media-library"></div>
             </section>
@@ -106,7 +110,7 @@
                 <label class="wide">Objetivo criativo<textarea id="directorBrief" maxlength="1200" rows="3" placeholder="Ex.: Vídeo institucional elegante, valorizando atendimento, equipe e encerramento com a logo."></textarea></label>
                 <div id="aiNarrationPanel" class="ai-narration-panel wide hidden">
                   <label class="check-row"><input id="generateAiScript" type="checkbox"><span><strong>Criar roteiro e textos por cena</strong><small>A IA usa somente informações visíveis, transcritas ou informadas no objetivo criativo.</small></span></label>
-                  <label class="check-row"><input id="enableAiNarration" type="checkbox"><span><strong>Narrar o roteiro com voz de IA</strong><small>A música e o som original serão reduzidos enquanto a voz estiver falando.</small></span></label>
+                  <label class="check-row"><input id="enableAiNarration" type="checkbox"><span><strong>Narrar o roteiro com voz de IA</strong><small>Falas humanas recebem a legenda real. A IA narra e legenda somente cenas sem fala e sem pessoa visível.</small></span></label>
                   <div class="ai-narration-options">
                     <label>Voz<select id="aiNarrationVoice"><option value="marin">Marin</option><option value="cedar">Cedar</option></select></label>
                     <label>Estilo da voz<select id="aiNarrationTone"><option value="professional">Profissional</option><option value="warm">Acolhedora</option><option value="energetic">Energética</option><option value="calm">Calma</option></select></label>
@@ -181,7 +185,7 @@
                   <label>Efeito nas transições<select id="transitionSound"><option value="none">Sem efeitos</option><option value="subtle">Suave</option><option value="impact">Impacto</option><option value="sparkle">Brilho</option></select></label>
                   <label class="toggle-field"><input id="noiseReduction" type="checkbox"><span></span><div><strong>Redução moderada de ruído</strong><small>Filtra ruído contínuo sem substituir a voz.</small></div></label>
                 </div>
-                <label class="toggle-field wide"><input id="captionsEnabled" type="checkbox"><span></span><div><strong>Transcrever e gerar legendas</strong><small>O Whisper local reconhece a fala em português e usa timestamps reais.</small></div></label>
+                <label class="toggle-field wide"><input id="captionsEnabled" type="checkbox"><span></span><div><strong>Transcrever e gerar legendas</strong><small>O Whisper local reconhece a fala em português e mostra cada frase no momento exato, sem substituir a fala por descrição de cena.</small></div></label>
                 <div class="wide text-design-panel caption-design-panel">
                   <div><strong>Estilo das legendas</strong><small>As legendas serão incorporadas diretamente ao MP4.</small></div>
                   <label>Apresentação<select id="captionMode"><option value="traditional">Tradicional por frase</option><option value="dynamic">Dinâmica com destaque por palavra</option></select></label>
@@ -344,6 +348,6 @@
     <button id="fieldHelpOk" class="create-button" type="button">Entendi</button>
   </dialog>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=35"></script>
+  <script type="module" src="studio.js?v=36"></script>
 </body>
 </html>

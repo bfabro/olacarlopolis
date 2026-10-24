@@ -4,11 +4,46 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { probeMedia } from "../src/analyzer.mjs";
-import { buildBrandingArgs, buildNarrationTimelineArgs, narrationCaptionSegments, scheduleNarrationSegments, trimNarrationAudio } from "../src/renderer.mjs";
+import { buildBrandingArgs, buildNarrationTimelineArgs, mergeCaptionSegments, narrationCaptionSegments, narrationItemsForPlan, scheduleNarrationSegments, silentNarrationWindows, trimNarrationAudio, withoutDescriptionsOverSpeech } from "../src/renderer.mjs";
 import { buildAssCaptions } from "../src/captions.mjs";
 import { runProcess } from "../src/process-utils.mjs";
 
 const integration = process.env.STUDIO_INTEGRATION === "1" ? test : test.skip;
+
+test("narração ocupa somente cenas sem fala e sem pessoa", () => {
+  const items = [
+    { text: "Vista da represa.", durationSeconds: 1.2, preferredStart: 0, preferredEnd: 3.8 },
+    { text: "Área externa.", durationSeconds: 1.1, preferredStart: 6, preferredEnd: 10 }
+  ];
+  const speech = [{ start: 0.2, end: 3.4 }];
+  const scheduled = scheduleNarrationSegments(items, 10, { speechSegments: speech });
+  assert.equal(scheduled.length, 1);
+  assert.equal(scheduled[0].text, "Área externa.");
+  assert.ok(scheduled[0].start >= 6);
+  assert.deepEqual(silentNarrationWindows(speech, 10).at(-1), { start: 3.58, end: 10 });
+});
+
+test("legendas preservam fala real e adicionam somente a narração programada", () => {
+  const merged = mergeCaptionSegments([{ id: "fala", start: 1, end: 2, text: "Olá" }], [{ id: "narracao", start: 4, end: 5, text: "Conheça o local" }]);
+  assert.deepEqual(merged.map((item) => item.source), ["original-speech", "ai-narration"]);
+  const layers = withoutDescriptionsOverSpeech([
+    { type: "title", start: 0, end: 5 },
+    { type: "description", start: 0.5, end: 2.5 },
+    { type: "ai_scene_text", start: 3, end: 5 }
+  ], [{ start: 1, end: 2 }]);
+  assert.deepEqual(layers.map((item) => item.type), ["title", "ai_scene_text"]);
+});
+
+test("roteiro por cena ignora cenas com pessoa ou fala", () => {
+  const items = narrationItemsForPlan({ duration: 9, narration: { script: "" }, scenes: [
+    { duration: 3, transitionDuration: 0, hasSpeech: true, containsPerson: true, narrationText: "Não narrar." },
+    { duration: 3, transitionDuration: 0, containsPerson: false, narrationText: "Ambiente preparado para receber você." },
+    { duration: 3, transitionDuration: 0, containsPerson: true, narrationText: "Não narrar também." }
+  ] });
+  assert.equal(items.length, 1);
+  assert.equal(items[0].preferredStart, 3);
+  assert.equal(items[0].text, "Ambiente preparado para receber você.");
+});
 
 integration("narração acompanha legendas até o encerramento e preserva música de fundo", { timeout: 120000 }, async () => {
   const root = await fs.mkdtemp(path.join(os.tmpdir(), "ola-studio-narration-"));

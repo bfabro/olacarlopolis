@@ -1370,7 +1370,7 @@
 
             </ul>
 
-            <div class="sidebar-version">Olá Carlópolis v596</div>
+            <div class="sidebar-version">Olá Carlópolis v597</div>
 
             <!-- Sidebar Open / Close -->
             <div class="bottom_content">
@@ -1690,7 +1690,7 @@
                .catch((err) => console.error("❌ Falha ao registrar Service Worker:", err));
          });
          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            const reloadKey = 'ola_sw_reloaded_v990';
+            const reloadKey = 'ola_sw_reloaded_v991';
             if (sessionStorage.getItem(reloadKey)) return;
             sessionStorage.setItem(reloadKey, '1');
             window.location.reload();

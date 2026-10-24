@@ -3,10 +3,26 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { buildBrandingArgs, buildPairTransitionArgs } from "../src/renderer.mjs";
+import { buildBrandingArgs, buildPairTransitionArgs, buildUnifiedTransitionArgs } from "../src/renderer.mjs";
 import { runProcess } from "../src/process-utils.mjs";
 
 const enabled = process.env.STUDIO_INTEGRATION === "1";
+
+test("composição usa uma única chamada FFmpeg para todas as transições", () => {
+  const built = buildUnifiedTransitionArgs({
+    segmentPaths: ["one.mp4", "two.mp4", "three.mp4"],
+    scenes: [
+      { duration: 3, transition: "none", transitionDuration: 0 },
+      { duration: 3, transition: "fade", transitionDuration: 0.4 },
+      { duration: 3, transition: "hardcut", transitionDuration: 0.4 }
+    ],
+    outputPath: "result.mp4", width: 1080, height: 1920, exportOptions: { fps: 30, quality: "balanced" }
+  });
+  assert.equal(built.args.filter((item) => item === "-filter_complex").length, 1);
+  assert.equal(built.args.filter((item) => item === "-i").length, 3);
+  assert.match(built.args[built.args.indexOf("-filter_complex") + 1], /vchain1.*vout/);
+  assert.ok(built.args.includes("veryfast"));
+});
 
 async function makeClip(target, color) {
   await runProcess("ffmpeg", ["-y", "-f", "lavfi", "-i", `color=c=${color}:s=320x320:r=30:d=1.4`, "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000", "-t", "1.4", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", target]);
@@ -19,6 +35,10 @@ test("Fase 1 exporta transições, textos animados e logo em MP4 real", { skip: 
     const right = path.join(root, "right.mp4");
     await makeClip(left, "0x092B45");
     await makeClip(right, "0xFFBB2D");
+    const unifiedOutput = path.join(root, "transition-unified.mp4");
+    const unified = buildUnifiedTransitionArgs({ segmentPaths: [left, right], scenes: [{ duration: 1.4, transition: "none", transitionDuration: 0 }, { duration: 1.4, transition: "fade", transitionDuration: 0.3 }], outputPath: unifiedOutput, width: 320, height: 320, exportOptions: { fps: 30, quality: "compact" } });
+    await runProcess("ffmpeg", unified.args);
+    assert.ok((await fs.stat(unifiedOutput)).size > 1000);
     for (const transition of ["fade", "dissolve", "zoomin", "zoomout", "slideleft", "wipeleft", "hblur", "smoothleft", "fadewhite", "circleopen", "hardcut", "fadeblack"]) {
       const output = path.join(root, `transition-${transition}.mp4`);
       const built = buildPairTransitionArgs({ leftPath: left, rightPath: right, outputPath: output, leftDuration: 1.4, rightDuration: 1.4, transition, transitionDuration: 0.3, width: 320, height: 320 });

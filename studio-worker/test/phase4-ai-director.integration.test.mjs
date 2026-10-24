@@ -45,7 +45,9 @@ test("Fase 4 envia evidências reais, aplica direção semântica estruturada e 
         narrativeRole: index === 0 ? "opening" : index === basePlan.scenes.length - 1 ? "closing" : "development",
         transition: index === 0 ? "fade" : "dissolve",
         emphasis: "Quadro selecionado pela relevância visual observada.",
-        onScreenText: index === 0 ? "Olá Carlópolis" : ""
+        onScreenText: index === 0 ? "Olá Carlópolis" : "",
+        containsPerson: false,
+        narrationText: ""
       })),
       narration: { script: "", tone: "professional" },
       textPreset: "clean",

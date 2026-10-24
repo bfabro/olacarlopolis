@@ -14,7 +14,7 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 `Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON local ou direção semântica opcional → editor visual → prévia reduzida ou FFmpeg Full HD → Storage → histórico/download`
 
-O planejador local é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 7 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, camadas de texto, animações, logo, áudio, legendas, direção solicitada e parâmetros de exportação.
+O planejador local é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 8 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, camadas de texto, animações, logo, áudio, legendas, direção solicitada e parâmetros de exportação.
 
 O Diretor por IA é uma escolha explícita do usuário. Quando configurado no worker, ele envia à API somente um conjunto limitado de quadros representativos, medições técnicas e transcrições locais, solicita uma resposta JSON estrita e mescla a direção recebida ao plano técnico já validado. A chave nunca vai ao navegador. Se a configuração estiver ausente, a API falhar ou a resposta for inválida, o trabalho continua pelo motor local e o resultado informa claramente o fallback.
 
@@ -84,7 +84,8 @@ A fila é consultada pela API REST autenticada do Firebase. A reserva usa ETag e
 - cria áudio silencioso quando uma cena não possui áudio;
 - oferece modo automático e doze transições selecionáveis: Fade, Cross Dissolve, Zoom In, Zoom Out, Slide, Wipe, Blur, Whip Pan, Flash, Match Cut técnico, Hard Cut e Dip to Black;
 - aplica `xfade`, `zoompan`, `concat` e `acrossfade` conforme a transição;
-- compõe transições de forma incremental, mantendo somente duas cenas na memória por etapa;
+- compõe todas as transições em um único grafo do FFmpeg, sem recodificar repetidamente o trecho acumulado;
+- usa codificação intermediária acelerada e preserva o perfil escolhido na exportação final;
 - normaliza áudio com `loudnorm`;
 - permite ajustar globalmente o volume da voz e aplicar redução moderada de ruído contínuo;
 - reduz a música durante o áudio principal com `sidechaincompress`;
@@ -106,6 +107,10 @@ Há dois modos reais de legenda incorporada ao MP4:
 
 - tradicional, agrupada por frase;
 - dinâmica, em ASS, com destaque progressivo de cada palavra conforme os timestamps do Whisper.
+
+Quando a narração por IA está ativa, o Studio usa uma trilha híbrida. Cenas com fala humana preservam o áudio original e exibem somente a transcrição sincronizada; descrições automáticas não são sobrepostas a esses trechos. A IA identifica cenas com pessoa visível e só cria voz e legenda descritiva para cenas sem fala e sem pessoa. A agenda da locução respeita as janelas silenciosas detectadas e combina a legenda humana e a legenda narrada em uma única faixa ASS ordenada.
+
+Fotos JPEG, PNG e WebP podem ser inseridas na mesma sequência dos vídeos. Cada imagem vira uma cena real, com duração e posição ajustáveis no editor, sem substituição por conteúdo demonstrativo.
 
 O usuário pode escolher posição, tamanho, cor principal, cor de destaque e fornecer nomes próprios como contexto. Se o binário ou o modelo não estiver disponível, o provedor retorna `disabled` e não inventa conteúdo. Na direção semântica, a transcrição local pode ser usada como evidência, mas continua opcional.
 
@@ -178,11 +183,11 @@ A exclusão manual remove somente os originais, logos, músicas, planos e render
 
 O teste `studio-worker/test/phase1-render.integration.test.mjs` executa FFmpeg real dentro do Docker. Ele renderiza as doze transições, gera um MP4 vertical 1080 × 1920 com textos animados em português e logo, e valida resolução, duração e existência do arquivo final.
 
-Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, camadas adicionais, ordem, duração e transição no mesmo plano, calcula a forma de onda do áudio real, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas. O teste da Fase 6 gera uma trilha e efeitos originais, mistura-os ao áudio principal e confirma vídeo, áudio, resolução e duração no MP4 final. O teste da Fase 7 cobre os dez critérios finais em uma montagem de cinco vídeos e 30 segundos: título animado, texto de cena, logo, legenda, música com ducking, transições, prévia, Full HD e nova renderização após editar o título.
+Os testes da Fase 2 validam também a faixa ASS dinâmica, a música com ducking e fades, além de uma transcrição completa executada pelo modelo Whisper local com timestamps por palavra. O teste da Fase 3 cria mídias sintéticas temporárias, confirma a rejeição de trecho escuro/congelado, detecta pulsos de 120 BPM e exporta um MP4 com o plano técnico escolhido. O teste da Fase 4 extrai quadros reais com FFmpeg, simula apenas a resposta estruturada do provedor sem consumir API paga, valida o plano semântico e exporta o MP4 resultante. O teste da Fase 5 altera texto, camadas adicionais, ordem, duração e transição no mesmo plano, calcula a forma de onda do áudio real, gera uma prévia reduzida e uma exportação Full HD e compara duração e conteúdo estruturado entre as duas. O teste da Fase 6 gera uma trilha e efeitos originais, mistura-os ao áudio principal e confirma vídeo, áudio, resolução e duração no MP4 final. O teste da Fase 7 cobre os dez critérios finais em uma montagem de cinco vídeos e 30 segundos: título animado, texto de cena, logo, legenda, música com ducking, transições, prévia, Full HD e nova renderização após editar o título. O teste da Fase 8 confirma a agenda de narração somente em janelas sem fala/pessoa, a união das legendas humanas e narradas e a preservação da música de fundo.
 
 ```powershell
 $env:STUDIO_INTEGRATION = "1"
-docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs test/phase6-sound-library.integration.test.mjs test/phase7-acceptance.integration.test.mjs
+docker compose -f studio-worker/docker-compose.yml run --rm -e STUDIO_INTEGRATION=1 ola-studio-worker node --test test/phase1-render.integration.test.mjs test/phase2-audio-captions.integration.test.mjs test/phase2-transcription.integration.test.mjs test/phase2-review-workflow.integration.test.mjs test/phase3-analysis.integration.test.mjs test/phase4-ai-director.integration.test.mjs test/phase5-editor.integration.test.mjs test/phase6-sound-library.integration.test.mjs test/phase7-acceptance.integration.test.mjs test/phase8-narration-timeline.integration.test.mjs
 ```
 
 Os testes usam mídias temporárias e as removem ao terminar; nenhum dado demonstrativo é gravado no Firebase. Para calibrar sem alterar os arquivos reais ou o Firebase, monte uma pasta de vídeos em modo somente leitura e execute:

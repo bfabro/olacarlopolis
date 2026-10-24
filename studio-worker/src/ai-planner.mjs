@@ -106,7 +106,7 @@ const semanticSchema = {
   type: "object",
   additionalProperties: false,
   properties: {
-    scenes: { type: "array", items: { type: "object", additionalProperties: false, properties: { candidateId: { type: "string" }, narrativeRole: { type: "string", enum: ROLES }, transition: { type: "string", enum: TRANSITIONS }, emphasis: { type: "string" }, onScreenText: { type: "string" } }, required: ["candidateId", "narrativeRole", "transition", "emphasis", "onScreenText"] } },
+    scenes: { type: "array", items: { type: "object", additionalProperties: false, properties: { candidateId: { type: "string" }, narrativeRole: { type: "string", enum: ROLES }, transition: { type: "string", enum: TRANSITIONS }, emphasis: { type: "string" }, onScreenText: { type: "string" }, containsPerson: { type: "boolean" }, narrationText: { type: "string" } }, required: ["candidateId", "narrativeRole", "transition", "emphasis", "onScreenText", "containsPerson", "narrationText"] } },
     narration: { type: "object", additionalProperties: false, properties: { script: { type: "string" }, tone: { type: "string", enum: ["professional", "warm", "energetic", "calm"] } }, required: ["script", "tone"] },
     textPreset: { type: "string", enum: ["clean", "cinematic", "promo", "local", "minimal", "impact"] },
     rhythm: { type: "string", enum: ["soft", "balanced", "dynamic"] },
@@ -122,8 +122,12 @@ function responseText(payload) {
   return "";
 }
 
-function speechAt(source, start) {
+function speechAt(source, start, duration = 0, transcript = null) {
   if (!source?.metadata?.hasAudio) return false;
+  if (transcript && Array.isArray(transcript.segments)) {
+    const end = start + Math.max(0.1, Number(duration || 0));
+    return transcript.segments.some((segment) => Number(segment.end || 0) > start && Number(segment.start || 0) < end);
+  }
   return !(source.technical?.silences || []).some((silence) => start >= silence.start && start < silence.end);
 }
 
@@ -134,20 +138,24 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
   const scenes = basePlan.scenes.map((baseScene, index) => {
     const directed = requested[index % requested.length];
     const source = analyzedSources.find((item) => item.id === directed.candidate.sourceId);
+    const sourceTranscript = evidence.transcripts.find((item) => item.sourceId === directed.candidate.sourceId) || null;
     const userTransitionLocked = basePlan.transition.mode !== "auto";
     const sourceDuration = Number(source?.metadata?.duration || 0);
     const safeStart = directed.candidate.kind === "image"
       ? 0
       : Math.max(0, Math.min(directed.candidate.start, Math.max(0, sourceDuration - Number(baseScene.duration || 0) - 0.05)));
+    const hasSpeech = speechAt(source, safeStart, baseScene.duration, sourceTranscript);
     return {
       ...baseScene,
       sourceId: directed.candidate.sourceId,
       sourceIndex: directed.candidate.sourceIndex,
       start: safeStart,
       transition: index === 0 ? "none" : userTransitionLocked ? baseScene.transition : directed.item.transition,
-      hasSpeech: speechAt(source, safeStart),
+      hasSpeech,
+      containsPerson: directed.item.containsPerson === true,
       narrativeRole: directed.item.narrativeRole,
-      onScreenText: String(directed.item.onScreenText || "").replace(/\s+/g, " ").trim().slice(0, 90),
+      onScreenText: hasSpeech ? "" : String(directed.item.onScreenText || "").replace(/\s+/g, " ").trim().slice(0, 90),
+      narrationText: hasSpeech || directed.item.containsPerson === true ? "" : String(directed.item.narrationText || "").replace(/\s+/g, " ").trim().slice(0, 320),
       selection: { method: "semantic-ai-v1", candidateId: directed.candidate.id, qualityScore: directed.candidate.qualityScore, flags: directed.candidate.flags, reason: String(directed.item.emphasis || "").slice(0, 280) }
     };
   });
@@ -156,10 +164,11 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
     const start = timeline;
     const end = Math.min(Number(basePlan.duration || 0), start + Number(scene.duration || 0));
     timeline = Math.max(0, end - Number(scene.transitionDuration || 0));
-    if (!scene.onScreenText) return null;
+    if (!scene.onScreenText || scene.hasSpeech === true) return null;
     return { id: `ai-scene-text-${index + 1}`, type: "ai_scene_text", value: scene.onScreenText, start, end, animation: "fade", position: basePlan.narration?.enabled ? "top" : "bottom", slot: basePlan.narration?.enabled ? 1 : 0, sizeScale: 0.82, color: "#FFFFFF", outlineColor: "#092B45", background: true, align: "center", font: "sans", margin: 86 };
   }).filter(Boolean);
-  const script = String(direction.narration?.script || "").replace(/\s+/g, " ").trim().slice(0, 4000);
+  const directedScript = scenes.map((scene) => scene.narrationText).filter(Boolean).join(" ");
+  const script = String(directedScript || direction.narration?.script || "").replace(/\s+/g, " ").trim().slice(0, 4000);
   const plan = {
     ...basePlan,
     planner: { type: "semantic-ai", version: 1, semanticAnalysis: true, technicalSelection: true, provider: providerMeta.provider || "openai", model: providerMeta.model || "configured", fallback: false },
@@ -216,7 +225,7 @@ export class OpenAISemanticPlanner {
     const wantsScript = project.narration?.generateScript === true;
     const compactEvidence = { candidates: evidence.candidates, transcripts: evidence.transcripts, baseScenes: basePlan.scenes.map((scene) => ({ sourceId: scene.sourceId, start: scene.start, duration: scene.duration, narrativeRole: scene.narrativeRole })) };
     const content = [
-      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços, locais ou características. Use somente informações visíveis nos quadros, presentes nas transcrições ou declaradas no objetivo do usuário. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. ${wantsScript ? `Para cada cena, escreva onScreenText curto, claro e factual; deixe vazio quando não houver informação segura. Crie também uma narração em português brasileiro com ${minWords} a ${maxWords} palavras, dividida em frases curtas na ordem das cenas. Sempre que houver informação segura, produza uma frase para cada cena para que a locução acompanhe o vídeo do início ao fim.` : "Retorne todos os onScreenText e narration.script vazios."} Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
+      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços, locais ou características. Use somente informações visíveis nos quadros, presentes nas transcrições ou declaradas no objetivo do usuário. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. Para cada cena, marque containsPerson=true quando houver uma pessoa visível. Quando houver fala humana na origem, deixe onScreenText e narrationText vazios: a fala real receberá sua própria legenda sincronizada. ${wantsScript ? `Somente em cenas sem fala e sem pessoa visível, escreva narrationText curto, factual e apropriado ao local ou objeto mostrado; ele será narrado e legendado. O campo narration.script deve reunir, na mesma ordem, somente esses narrationText, sem acrescentar descrições. onScreenText pode ser usado somente quando não competir com a fala. Mantenha o roteiro total conciso, com no máximo ${maxWords} palavras.` : "Retorne todos os onScreenText, narrationText e narration.script vazios."} Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
     ];
     evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro representativo do ${frame.candidateId}, origem ${frame.sourceId}:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: workerConfig.aiImageDetail }); });
     const timeoutSignal = AbortSignal.timeout(workerConfig.aiTimeoutMs);

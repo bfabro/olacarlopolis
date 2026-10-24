@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v42", date: "2026-10-24" });
+const STUDIO_RELEASE = Object.freeze({ label: "v43", date: "2026-10-24" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
@@ -31,7 +31,7 @@ let logoutRequested = false;
 let authPersistenceWarning = "";
 
 const FIELD_HELP = Object.freeze({
-  sourceFiles: { title: "Arquivos do vídeo", body: "Envie fotos e vídeos que poderão virar cenas. A ordem mostrada nesta lista influencia a narrativa, embora o modo automático possa escolher os melhores trechos. Os originais são preservados." },
+  sourceFiles: { title: "Arquivos do vídeo", body: "Adicione vídeos e também imagens estáticas à sequência. Cada foto vira uma cena com duração ajustável no editor visual e pode ser reordenada junto com os vídeos. A IA usa a imagem real na análise e os originais são preservados." },
   directorMode: { title: "Modo do diretor", body: "No modo automático local, regras técnicas escolhem cortes, ritmo e qualidade sem custo de IA. No Diretor de IA, quadros e informações do projeto são analisados semanticamente para criar uma proposta de edição; esse modo usa a API configurada e pode gerar custo." },
   directorBrief: { title: "Objetivo criativo", body: "Explique o resultado desejado: público, clima, pontos que devem aparecer e mensagem principal. Este texto orienta o Diretor de IA, mas não aparece escrito no vídeo." },
   generateAiScript: { title: "Criar roteiro e textos", body: "Quando ativado, a IA prepara um roteiro baseado apenas nos arquivos, transcrições e objetivo criativo. O roteiro poderá alimentar os textos das cenas e a narração." },
@@ -68,7 +68,7 @@ const FIELD_HELP = Object.freeze({
   musicFadeSeconds: { title: "Fade da música", body: "Cria entrada e saída gradual da trilha. Um fade suave evita que a música comece ou termine de forma brusca." },
   transitionSound: { title: "Efeito nas transições", body: "Adiciona um efeito sonoro curto nas mudanças de cena. Suave é discreto; impacto reforça cortes; brilho combina com revelações e ofertas." },
   noiseReduction: { title: "Redução de ruído", body: "Aplica um filtro moderado contra ruído contínuo, como vento ou ventilador. Não reconstrói falas e pode ser deixado desligado em gravações limpas." },
-  captionsEnabled: { title: "Transcrever e gerar legendas", body: "O Whisper local reconhece somente a fala do áudio original e incorpora as legendas ao MP4. Música e marcadores de ruído são ignorados." },
+  captionsEnabled: { title: "Transcrever e gerar legendas", body: "O Whisper local reconhece somente a fala do áudio original e incorpora cada legenda no instante da fala. Quando a narração de IA estiver ativa, ela entra apenas em cenas sem fala e sem pessoa visível; descrições automáticas não cobrem quem está falando." },
   captionMode: { title: "Apresentação das legendas", body: "Tradicional mostra a frase durante a fala. Dinâmica destaca palavras individualmente quando existem tempos reais por palavra. A narração de IA usa frase sincronizada para evitar marcação artificial." },
   captionPosition: { title: "Posição das legendas", body: "Inferior usa a área segura para redes sociais; centro pode ser útil quando a parte inferior da imagem contém informações importantes." },
   captionSizeScale: { title: "Tamanho das legendas", body: "Ajusta somente as legendas, sem alterar título, oferta ou outros textos do vídeo." },
@@ -319,10 +319,11 @@ function renderCostDetails(cost = {}, ledger = {}, director = {}) {
   const credits = Number(ledger.estimatedCredits ?? cost.estimatedCredits ?? 0);
   node.classList.remove("hidden");
   const narrationUsed = cost.narrationUsed === true;
+  const narrationRendered = cost.narrationRendered !== false;
   const narrationTiming = Number(cost.narrationTimelineDurationSeconds || 0) > Number(cost.narrationDurationSeconds || 0) + 1
     ? `${formatDuration(cost.narrationDurationSeconds || 0)} de voz distribuídos até ${formatDuration(cost.narrationTimelineDurationSeconds)}`
     : formatDuration(cost.narrationDurationSeconds || 0);
-  node.innerHTML = `<div><span><i class="fa-solid fa-stopwatch"></i> Tempo total</span><strong>${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</strong></div><div><span><i class="fa-solid fa-coins"></i> Créditos de processamento</span><strong>${credits} ${credits === 1 ? "crédito" : "créditos"}</strong><small>${Number(ledger.amount || 0) ? `${Number(ledger.amount)} debitado(s)` : "MVP sem débito real"}</small></div><div><span><i class="fa-solid fa-wand-magic-sparkles"></i> Diretor de IA</span><strong>${aiUsed ? formatUsd(cost.aiEstimatedCostUsd) : "Não utilizado"}</strong><small>${aiUsed ? `${escapeHtml(cost.aiModel || director.model || "IA")} • ${tokens.toLocaleString("pt-BR")} tokens` : "Montagem técnica local"}</small></div><div><span><i class="fa-solid fa-microphone-lines"></i> Narração por IA</span><strong>${narrationUsed ? formatUsd(cost.narrationEstimatedCostUsd) : "Não utilizada"}</strong><small>${narrationUsed ? `${escapeHtml(cost.narrationVoice || "voz IA")} • ${escapeHtml(narrationTiming)} • ${Number(cost.narrationCharacters || 0).toLocaleString("pt-BR")} caracteres • voz e legendas sincronizadas` : "Sem locução sintética"}</small></div>`;
+  node.innerHTML = `<div><span><i class="fa-solid fa-stopwatch"></i> Tempo total</span><strong>${escapeHtml(formatDuration(cost.elapsedSeconds || 0))}</strong></div><div><span><i class="fa-solid fa-coins"></i> Créditos de processamento</span><strong>${credits} ${credits === 1 ? "crédito" : "créditos"}</strong><small>${Number(ledger.amount || 0) ? `${Number(ledger.amount)} debitado(s)` : "MVP sem débito real"}</small></div><div><span><i class="fa-solid fa-wand-magic-sparkles"></i> Diretor de IA</span><strong>${aiUsed ? formatUsd(cost.aiEstimatedCostUsd) : "Não utilizado"}</strong><small>${aiUsed ? `${escapeHtml(cost.aiModel || director.model || "IA")} • ${tokens.toLocaleString("pt-BR")} tokens` : "Montagem técnica local"}</small></div><div><span><i class="fa-solid fa-microphone-lines"></i> Narração por IA</span><strong>${narrationUsed ? formatUsd(cost.narrationEstimatedCostUsd) : "Não utilizada"}</strong><small>${narrationUsed ? `${escapeHtml(cost.narrationVoice || "voz IA")} • ${escapeHtml(narrationTiming)} • ${Number(cost.narrationCharacters || 0).toLocaleString("pt-BR")} caracteres • ${narrationRendered ? "voz e legendas sincronizadas" : "gerada, mas não sobreposta à fala original"}` : "Sem locução sintética"}</small></div>`;
 }
 
 async function loadAndRenderProjectCost(jobId, director = {}) {
@@ -1661,6 +1662,10 @@ $("fieldHelpDialog").addEventListener("click", (event) => { if (event.target ===
 $("dropZone").addEventListener("click", () => $("sourceFiles").click());
 $("dropZone").addEventListener("keydown", (event) => { if (["Enter", " "].includes(event.key)) { event.preventDefault(); $("sourceFiles").click(); } });
 $("sourceFiles").addEventListener("change", (event) => { addFiles(event.target.files); event.target.value = ""; });
+$("pickVideos").addEventListener("click", (event) => { event.stopPropagation(); $("sourceVideos").click(); });
+$("pickImages").addEventListener("click", (event) => { event.stopPropagation(); $("sourceImages").click(); });
+$("sourceVideos").addEventListener("change", (event) => { addFiles(event.target.files); event.target.value = ""; });
+$("sourceImages").addEventListener("change", (event) => { addFiles(event.target.files); event.target.value = ""; });
 ["dragenter", "dragover"].forEach((type) => $("dropZone").addEventListener(type, (event) => { event.preventDefault(); $("dropZone").classList.add("dragging"); }));
 ["dragleave", "drop"].forEach((type) => $("dropZone").addEventListener(type, (event) => { event.preventDefault(); $("dropZone").classList.remove("dragging"); }));
 $("dropZone").addEventListener("drop", (event) => addFiles(event.dataTransfer.files));
