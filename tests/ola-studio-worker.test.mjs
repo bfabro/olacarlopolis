@@ -406,6 +406,11 @@ test("revisão de transcrição preserva tempos e recalcula palavras somente qua
   assert.equal(clamped.segments[0].words[0].end, 1);
 });
 
+test("pausa para revisão preserva a composição como prévia privada", async () => {
+  const renderer = await fs.readFile(new URL("../studio-worker/src/renderer.mjs", import.meta.url), "utf8");
+  assert.match(renderer, /reviewMediaPath: compositionPath/);
+});
+
 test("tratamento de voz aplica redução moderada de ruído quando solicitada", () => {
   const args = buildSegmentArgs({ start: 0, duration: 3 }, video, "/tmp/out.mp4", "9:16", { voiceVolume: 1.2, noiseReduction: true });
   const audioFilter = args[args.indexOf("-af") + 1];

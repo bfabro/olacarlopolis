@@ -57,7 +57,7 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.match(client, /studioAdminCosts/);
   assert.match(client, /aiEstimatedCostUsd/);
   assert.match(html, /id="processingRemaining"/);
-  assert.match(html, /data-studio-version>v41/);
+  assert.match(html, /data-studio-version>v42/);
   assert.match(html, /id="enableAiNarration"/);
   assert.match(client, /narrationEstimatedCostUsd/);
   assert.match(client, /sanitizeTranscriptReviewSegments/);
@@ -68,6 +68,12 @@ test("frontend envia arquivos direto ao Firebase Storage e acompanha fila real",
   assert.match(client, /function initializeEditorHelp/);
   assert.match(client, /dataset\.helpTooltip = info\.body/);
   assert.match(readFileSync(new URL("../estudio/studio-overrides.css", import.meta.url), "utf8"), /data-help-tooltip.*:hover::after/);
+  assert.match(html, /id="transcriptReviewPlayer"/);
+  assert.match(html, /id="transcriptPreviousButton"/);
+  assert.match(client, /function previewTranscriptSegment/);
+  assert.match(client, /currentTime >= Number\(segment\.end/);
+  assert.match(workerMain, /renders\/\$\{job\.projectId\}\/reviews\/\$\{job\.jobId\}\.mp4/);
+  assert.match(workerMain, /preview: reviewPreview/);
   assert.match(workerMain, /event: \{ level: "error", code: errorCode/);
   assert.doesNotMatch(client, /setInterval\([^)]*progress/i);
 });

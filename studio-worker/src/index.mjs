@@ -154,12 +154,14 @@ async function processJob(job) {
     await uploadJson(rendered.plan, planStoragePath);
     if (rendered.reviewRequired) {
       const reviewAt = Date.now();
+      const reviewStoragePath = `studio/${job.uid}/renders/${job.projectId}/reviews/${job.jobId}.mp4`;
+      const reviewPreview = await uploadRender(rendered.reviewMediaPath, reviewStoragePath);
       await database.ref().update({
         [`studioJobs/${job.uid}/${job.jobId}/status`]: "awaiting_review",
         [`studioJobs/${job.uid}/${job.jobId}/stage`]: "transcription_review",
         [`studioJobs/${job.uid}/${job.jobId}/progress`]: 88,
         [`studioJobs/${job.uid}/${job.jobId}/message`]: "Revise a transcrição antes da renderização final.",
-        [`studioJobs/${job.uid}/${job.jobId}/transcriptReview`]: { ...rendered.transcription, status: "pending", createdAt: reviewAt },
+        [`studioJobs/${job.uid}/${job.jobId}/transcriptReview`]: { ...rendered.transcription, preview: reviewPreview, status: "pending", createdAt: reviewAt },
         [`studioJobs/${job.uid}/${job.jobId}/updatedAt`]: reviewAt,
         [`studioProjects/${job.uid}/${job.projectId}/status`]: "awaiting_review",
         [`studioProjects/${job.uid}/${job.projectId}/updatedAt`]: reviewAt,

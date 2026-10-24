@@ -328,7 +328,7 @@ export async function renderPlan({ plan, sources, outputDir, logoPath = "", musi
     plan.captions = { ...plan.captions, ...transcription, enabled: transcription.available === true && transcription.segments.length > 0 };
     if (pauseForTranscriptReview && plan.captions.enabled && !approvedTranscription) {
       await progress("transcription_review", 1, 1);
-      return { outputPath: "", plan, reviewRequired: true, transcription };
+      return { outputPath: "", reviewMediaPath: compositionPath, plan, reviewRequired: true, transcription };
     }
     if (plan.captions.enabled) captionsPath = await writeAssCaptions(path.join(outputDir, "captions.ass"), transcription, { ...plan.captions, format: plan.format });
     await progress("transcription", 1, 1);

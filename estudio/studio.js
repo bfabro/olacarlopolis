@@ -20,9 +20,9 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v41", date: "2026-10-24" });
+const STUDIO_RELEASE = Object.freeze({ label: "v42", date: "2026-10-24" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
-const state = { user: null, profile: null, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
+const state = { user: null, profile: null, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 const resumableStatuses = new Set(["queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"]);
@@ -159,7 +159,7 @@ function cleanFileName(name) {
 
 async function privateOutputUrl(output) {
   if (output?.downloadUrl) return output.downloadUrl;
-  if (!output?.storagePath) throw new Error("Arquivo final não encontrado.");
+  if (!output?.storagePath) throw new Error("Arquivo de vídeo não encontrado.");
   const outputRef = storageRef(storage, output.storagePath);
   try {
     return await getDownloadURL(outputRef);
@@ -815,11 +815,79 @@ function sanitizeTranscriptReviewSegments(segments = []) {
   return sanitized;
 }
 
+function transcriptReviewSegmentCard(segment, index) {
+  const uncertainWords = [...new Set((segment.words || [])
+    .filter((word) => Number.isFinite(Number(word?.confidence)) && Number(word.confidence) < 0.62)
+    .map((word) => String(word.text || "").trim())
+    .filter(Boolean))].slice(0, 8);
+  const warning = uncertainWords.length ? `<small class="transcript-confidence"><i class="fa-solid fa-triangle-exclamation"></i> Confira principalmente: ${escapeHtml(uncertainWords.join(", "))}</small>` : "";
+  return `<article class="transcript-segment" data-transcript-segment="${index}"><button class="transcript-play-button" type="button" data-transcript-preview="${index}" aria-label="Ouvir trecho ${index + 1}"><i class="fa-solid fa-play"></i><span>${timelineTime(segment.start)} – ${timelineTime(segment.end)}</span><small>Ouvir trecho</small></button><label><span class="sr-only">Texto do trecho ${index + 1}</span>${warning}<textarea data-transcript-index="${index}" maxlength="300" aria-label="Trecho ${index + 1}">${escapeHtml(segment.text || "")}</textarea></label></article>`;
+}
+
+function updateTranscriptPreviewSelection(index) {
+  state.activeTranscriptIndex = index;
+  document.querySelectorAll("[data-transcript-segment]").forEach((card) => card.classList.toggle("active", Number(card.dataset.transcriptSegment) === index));
+  const segment = state.transcriptSegments[index];
+  if (segment) $("transcriptPreviewStatus").textContent = `Trecho ${index + 1} de ${state.transcriptSegments.length} • ${timelineTime(segment.start)} – ${timelineTime(segment.end)}`;
+  $("transcriptPreviousButton").disabled = index <= 0;
+  $("transcriptNextButton").disabled = index < 0 || index >= state.transcriptSegments.length - 1;
+}
+
+function previewTranscriptSegment(index, { play = true } = {}) {
+  const segment = state.transcriptSegments[index];
+  const player = $("transcriptReviewPlayer");
+  if (!segment) return;
+  updateTranscriptPreviewSelection(index);
+  if (!player.src) return toast("A prévia deste processamento ainda não está disponível.");
+  const seek = () => {
+    const target = Math.max(0, Number(segment.start || 0) - 0.15);
+    player.currentTime = Number.isFinite(player.duration) ? Math.min(target, Math.max(0, player.duration - 0.05)) : target;
+    if (play) player.play().catch(() => toast("Use o botão de reprodução do vídeo para ouvir este trecho."));
+  };
+  if (player.readyState >= 1) seek();
+  else player.addEventListener("loadedmetadata", seek, { once: true });
+}
+
+async function loadTranscriptReviewPreview(job) {
+  const player = $("transcriptReviewPlayer");
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  if (state.transcriptReviewUrl.startsWith("blob:")) URL.revokeObjectURL(state.transcriptReviewUrl);
+  state.transcriptReviewUrl = "";
+  const preview = job.transcriptReview?.preview;
+  const available = Boolean(preview?.storagePath || preview?.downloadUrl);
+  $("transcriptPreviousButton").disabled = !available;
+  $("transcriptNextButton").disabled = !available;
+  $("transcriptPreviewMessage").textContent = available ? "Clique em “Ouvir trecho” para reproduzir exatamente o momento correspondente." : "Este processamento foi iniciado antes da prévia por trecho. Novos vídeos permitirão revisar assistindo ao corte exato.";
+  if (!available) return;
+  try {
+    const url = await privateOutputUrl(preview);
+    state.transcriptReviewUrl = url;
+    player.src = url;
+    player.load();
+  } catch (error) {
+    console.error(error);
+    $("transcriptPreviewMessage").textContent = `Não foi possível abrir a prévia: ${error.message}`;
+  }
+}
+
+function clearTranscriptReviewPreview() {
+  const player = $("transcriptReviewPlayer");
+  player.pause();
+  player.removeAttribute("src");
+  player.load();
+  if (state.transcriptReviewUrl.startsWith("blob:")) URL.revokeObjectURL(state.transcriptReviewUrl);
+  state.transcriptReviewUrl = "";
+  state.activeTranscriptIndex = -1;
+}
+
 function showTranscriptReview(job, projectId) {
   if (state.reviewingJobId === job.id && !$("transcriptReviewCard").classList.contains("hidden")) return;
   const rawSegments = Array.isArray(job.transcriptReview?.segments) ? job.transcriptReview.segments : Object.values(job.transcriptReview?.segments || {});
   state.reviewingJobId = job.id;
   state.transcriptSegments = sanitizeTranscriptReviewSegments(rawSegments.slice(0, 500));
+  state.activeTranscriptIndex = -1;
   state.activeProjectId = projectId;
   state.activeJobId = job.id;
   $("processingStatusCard").classList.add("hidden");
@@ -827,7 +895,9 @@ function showTranscriptReview(job, projectId) {
   $("errorCard").classList.add("hidden");
   $("transcriptReviewCard").classList.remove("hidden");
   $("transcriptReviewCount").textContent = `${state.transcriptSegments.length} ${state.transcriptSegments.length === 1 ? "trecho" : "trechos"}`;
-  $("transcriptReviewList").innerHTML = state.transcriptSegments.length ? state.transcriptSegments.map((segment, index) => `<label class="transcript-segment"><span>${timelineTime(segment.start)} – ${timelineTime(segment.end)}</span><textarea data-transcript-index="${index}" maxlength="300" aria-label="Trecho ${index + 1}">${escapeHtml(segment.text || "")}</textarea></label>`).join("") : '<p class="empty-copy">Nenhuma fala foi reconhecida. Você pode aprovar para continuar sem legendas.</p>';
+  $("transcriptReviewList").innerHTML = state.transcriptSegments.length ? state.transcriptSegments.map(transcriptReviewSegmentCard).join("") : '<p class="empty-copy">Nenhuma fala foi reconhecida. Você pode aprovar para continuar sem legendas.</p>';
+  updateTranscriptPreviewSelection(-1);
+  loadTranscriptReviewPreview(job);
   $("approveTranscriptButton").disabled = false;
   $("studioViewTitle").textContent = "Revisar legendas";
 }
@@ -862,6 +932,7 @@ async function approveTranscriptReview() {
     await update(ref(db), updates);
     state.reviewingJobId = "";
     state.transcriptSegments = [];
+    clearTranscriptReviewPreview();
     $("transcriptReviewCard").classList.add("hidden");
     $("processingStatusCard").classList.remove("hidden");
     $("cancelProcessingButton").classList.remove("hidden");
@@ -1632,6 +1703,21 @@ $("processingLogToggle").addEventListener("click", () => {
 });
 $("cancelTranscriptReviewButton").addEventListener("click", () => cancelProject().catch((error) => toast(error.message)));
 $("approveTranscriptButton").addEventListener("click", approveTranscriptReview);
+$("transcriptReviewList").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-transcript-preview]");
+  if (button) previewTranscriptSegment(Number(button.dataset.transcriptPreview));
+});
+$("transcriptReviewList").addEventListener("focusin", (event) => {
+  const field = event.target.closest("[data-transcript-index]");
+  if (field) previewTranscriptSegment(Number(field.dataset.transcriptIndex), { play: false });
+});
+$("transcriptPreviousButton").addEventListener("click", () => previewTranscriptSegment(Math.max(0, state.activeTranscriptIndex - 1)));
+$("transcriptNextButton").addEventListener("click", () => previewTranscriptSegment(Math.min(state.transcriptSegments.length - 1, state.activeTranscriptIndex + 1)));
+$("transcriptReviewPlayer").addEventListener("timeupdate", () => {
+  const segment = state.transcriptSegments[state.activeTranscriptIndex];
+  const player = $("transcriptReviewPlayer");
+  if (segment && !player.paused && player.currentTime >= Number(segment.end || 0)) player.pause();
+});
 $("backToProjects").addEventListener("click", () => { $("previewPlayer").pause(); switchView("projects"); });
 $("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));
 $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
