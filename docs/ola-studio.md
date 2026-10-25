@@ -258,3 +258,7 @@ Os caminhos `studioCredits`, `studioCreditLedger`, `studioUsage` e `studioAdminC
 ## Guia de preparação do conteúdo
 
 A v49 adiciona o botão **Como preparar um bom vídeo** tanto no fluxo de criação quanto no editor visual. O guia reúne o checklist mínimo, recomendações de gravação, ordem sugerida dos arquivos e cuidados para preservar falas completas e cronológicas. Também oferece um exemplo detalhado de objetivo criativo que pode ser copiado e adaptado, sem preencher nem sobrescrever automaticamente as instruções do projeto.
+
+## Adequação da duração e do formato
+
+A v50 garante que o acabamento final apare ou complete a imagem e o áudio exatamente até a duração escolhida no projeto. Uma composição ligeiramente curta passa a preservar o último quadro somente pelo tempo técnico necessário, enquanto o áudio recebe preenchimento silencioso; composições maiores continuam sendo aparadas. O controle de qualidade confirma tanto a duração quanto as dimensões correspondentes ao formato 9:16, 16:9 ou 1:1 antes de liberar o MP4.

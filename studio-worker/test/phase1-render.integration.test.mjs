@@ -24,6 +24,35 @@ test("composição usa uma única chamada FFmpeg para todas as transições", ()
   assert.ok(built.args.includes("veryfast"));
 });
 
+test("acabamento ajusta imagem e áudio exatamente à duração selecionada", () => {
+  const args = buildBrandingArgs({
+    inputPath: "composition.mp4",
+    outputPath: "final.mp4",
+    duration: 30,
+    format: "9:16",
+    plan: { textLayers: [], audio: {}, export: { fps: 30, quality: "balanced" } }
+  });
+  const graph = args[args.indexOf("-filter_complex") + 1];
+  assert.match(graph, /tpad=stop_mode=clone:stop_duration=30\.000,trim=duration=30\.000/);
+  assert.match(graph, /apad=pad_dur=30\.000,atrim=duration=30\.000/);
+  assert.equal(args[args.indexOf("-t") + 1], "30.000");
+});
+
+test("acabamento completa uma composição curta até a duração escolhida", { skip: !enabled, timeout: 120000 }, async () => {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "ola-studio-duration-fit-"));
+  try {
+    const base = path.join(root, "short.mp4");
+    const output = path.join(root, "fitted.mp4");
+    await makeClip(base, "0x092B45");
+    await runProcess("ffmpeg", buildBrandingArgs({ inputPath: base, outputPath: output, duration: 3, format: "9:16", renderProfile: "preview", plan: { textLayers: [], audio: {}, export: { fps: 30, quality: "compact" } } }));
+    const { stdout } = await runProcess("ffprobe", ["-v", "error", "-show_entries", "format=duration", "-of", "json", output]);
+    const duration = Number(JSON.parse(stdout).format.duration);
+    assert.ok(duration >= 2.9 && duration <= 3.1, `duração obtida: ${duration}`);
+  } finally {
+    await fs.rm(root, { recursive: true, force: true });
+  }
+});
+
 async function makeClip(target, color) {
   await runProcess("ffmpeg", ["-y", "-f", "lavfi", "-i", `color=c=${color}:s=320x320:r=30:d=1.4`, "-f", "lavfi", "-i", "anullsrc=channel_layout=stereo:sample_rate=48000", "-t", "1.4", "-c:v", "libx264", "-pix_fmt", "yuv420p", "-c:a", "aac", "-shortest", target]);
 }

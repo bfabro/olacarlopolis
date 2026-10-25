@@ -412,7 +412,7 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
     filters.push(...built.filters);
     video = built.output;
   });
-  filters.push(`[${video}]null[vout]`);
+  filters.push(`[${video}]tpad=stop_mode=clone:stop_duration=${seconds(duration)},trim=duration=${seconds(duration)},setpts=PTS-STARTPTS[vout]`);
   let mixedAudio = "baseaudio";
   if (musicIndex >= 0) {
     const fadeSeconds = Math.min(Math.max(0, Number(plan.audio?.fadeSeconds ?? 1.2)), Number(duration) / 3);
@@ -428,8 +428,8 @@ export function buildBrandingArgs({ inputPath, outputPath, duration, format, pla
   if (narrationIndex >= 0) {
     filters.push(`[${narrationIndex}:a]volume=${Number(plan.narration?.volume || 1).toFixed(2)},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS,asplit=2[narrationside][narrationmix]`);
     filters.push("[contentaudio][narrationside]sidechaincompress=threshold=0.025:ratio=12:attack=15:release=500[duckedcontent]");
-    filters.push("[duckedcontent][narrationmix]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:LRA=9:TP=-1.5[aout]");
-  } else filters.push("[contentaudio]loudnorm=I=-14:LRA=9:TP=-1.5[aout]");
+    filters.push(`[duckedcontent][narrationmix]amix=inputs=2:duration=first:normalize=0,loudnorm=I=-14:LRA=9:TP=-1.5,apad=pad_dur=${seconds(duration)},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[aout]`);
+  } else filters.push(`[contentaudio]loudnorm=I=-14:LRA=9:TP=-1.5,apad=pad_dur=${seconds(duration)},atrim=duration=${seconds(duration)},asetpts=PTS-STARTPTS[aout]`);
   args.push("-filter_complex", filters.join(";"), "-map", "[vout]", "-map", "[aout]", "-t", seconds(duration), ...videoEncoding(renderProfile, plan.export), "-movflags", "+faststart", outputPath);
   return args;
 }

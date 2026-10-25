@@ -1,6 +1,6 @@
 services:
   ola-studio-worker:
-    image: ola-studio-worker:local-v47
+    image: ola-studio-worker:local-v48
     container_name: ola-studio-worker
     build:
       context: ..

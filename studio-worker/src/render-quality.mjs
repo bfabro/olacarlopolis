@@ -1,6 +1,7 @@
 import { workerConfig } from "./config.mjs";
 import { parseIntervals, probeMedia } from "./analyzer.mjs";
 import { runProcess } from "./process-utils.mjs";
+import { studioOutputDimensions } from "../../shared/studio-contracts.mjs";
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
 
@@ -36,8 +37,10 @@ export async function inspectRenderedOutput(outputPath, plan, signal) {
   const consistency = inspectPlanConsistency(plan);
   const metadata = await probeMedia(outputPath, "video/mp4", signal);
   const durationDelta = Math.abs(Number(metadata.duration || 0) - Number(plan.duration || 0));
+  const expectedDimensions = studioOutputDimensions(plan.format);
   objectiveChecks.push({ id: "video_stream", passed: metadata.hasVideo === true, value: metadata.hasVideo });
   objectiveChecks.push({ id: "duration", passed: durationDelta <= 1.25, value: metadata.duration, expected: Number(plan.duration || 0), tolerance: 1.25 });
+  objectiveChecks.push({ id: "dimensions", passed: metadata.width === expectedDimensions.width && metadata.height === expectedDimensions.height, value: { width: metadata.width, height: metadata.height }, expected: expectedDimensions });
   objectiveChecks.push({ id: "audio_stream", passed: metadata.hasAudio === true, value: metadata.hasAudio, severity: "warning" });
   const analysis = await runProcess(workerConfig.ffmpegPath, ["-hide_banner", "-i", outputPath, "-vf", "blackdetect=d=0.7:pix_th=0.10,freezedetect=n=-55dB:d=2.5", "-af", "volumedetect", "-f", "null", "-"], { signal }).catch((error) => ({ stdout: error.stdout || "", stderr: error.stderr || "" }));
   const log = `${analysis.stdout || ""}\n${analysis.stderr || ""}`;
@@ -53,7 +56,7 @@ export async function inspectRenderedOutput(outputPath, plan, signal) {
   const warnings = [...consistency.warnings];
   objectiveChecks.forEach((check) => {
     if (check.passed) return;
-    const item = { code: `quality_${check.id}`, message: check.id === "duration" ? "A duração do MP4 diverge do plano." : check.id === "video_stream" ? "O MP4 final não contém vídeo." : check.id === "black_frames" ? "Foram detectados trechos pretos prolongados." : check.id === "audio_stream" ? "O MP4 final não contém faixa de áudio." : check.id === "audio_level" ? "O nível de áudio final pode estar inaudível ou saturado." : "Foram detectados quadros congelados prolongados." };
+    const item = { code: `quality_${check.id}`, message: check.id === "duration" ? "A duração do MP4 diverge do plano." : check.id === "dimensions" ? "O MP4 final não corresponde ao formato selecionado." : check.id === "video_stream" ? "O MP4 final não contém vídeo." : check.id === "black_frames" ? "Foram detectados trechos pretos prolongados." : check.id === "audio_stream" ? "O MP4 final não contém faixa de áudio." : check.id === "audio_level" ? "O nível de áudio final pode estar inaudível ou saturado." : "Foram detectados quadros congelados prolongados." };
     (check.severity === "warning" ? warnings : errors).push(item);
   });
   return {
