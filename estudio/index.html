@@ -9,14 +9,14 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=29">
+  <link rel="stylesheet" href="studio.css?v=30">
   <link rel="stylesheet" href="studio-overrides.css?v=22">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-      <span class="studio-release-badge">Olá Studio <b data-studio-version>v48</b></span>
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v49</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -27,7 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v48</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v49</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -43,7 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v48</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v49</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -55,7 +55,7 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v48</b></small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v49</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
@@ -71,7 +71,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
-        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v48</b></span>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v49</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -108,6 +108,7 @@
                 <div><strong>Direção da montagem</strong><small>O modo local usa regras técnicas. A IA semântica é opcional, exige configuração segura no worker e pode consumir uma API paga.</small></div>
                   <label>Modo do diretor<select id="directorMode"><option value="local" selected>Automático local — rápido e sem IA</option><option value="semantic">Diretor de IA — entende o conteúdo</option><option value="advanced">Diretor Avançado — narrativa e continuidade</option></select></label>
                 <div id="directorModeDescription" class="director-mode-description wide" aria-live="polite"></div>
+                <button class="director-guide-button wide" type="button" data-director-guide><i class="fa-solid fa-book-open" aria-hidden="true"></i><span><strong>Como preparar um bom vídeo</strong><small>Veja o checklist dos arquivos e um exemplo de objetivo criativo.</small></span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
                 <label class="wide">Objetivo criativo<textarea id="directorBrief" maxlength="1200" rows="3" placeholder="Ex.: Vídeo institucional elegante, valorizando atendimento, equipe e encerramento com a logo."></textarea></label>
                 <div id="aiNarrationPanel" class="ai-narration-panel wide hidden">
                   <label class="check-row"><input id="generateAiScript" type="checkbox"><span><strong>Criar roteiro e textos por cena</strong><small>A IA usa somente informações visíveis, transcritas ou informadas no objetivo criativo.</small></span></label>
@@ -239,6 +240,7 @@
               <div class="visual-director-settings">
                 <label>Modo do diretor<select id="visualDirectorMode"><option value="local">Automático local — rápido e sem IA</option><option value="semantic">Diretor de IA — entende o conteúdo</option><option value="advanced">Diretor Avançado — narrativa e continuidade</option></select></label>
                 <div id="visualDirectorModeDescription" class="director-mode-description wide" aria-live="polite"></div>
+                <button class="director-guide-button wide" type="button" data-director-guide><i class="fa-solid fa-book-open" aria-hidden="true"></i><span><strong>Como preparar um bom vídeo</strong><small>Releia as orientações antes de solicitar uma nova montagem.</small></span><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
                 <label>Acabamento visual<select id="visualEffectsProfile"><option value="professional">Profissional suave</option><option value="cinematic">Cinematográfico</option><option value="dynamic">Dinâmico para Reels</option><option value="natural">Natural, sem tratamento</option></select></label>
                 <label class="wide">Objetivo criativo<textarea id="visualDirectorBrief" maxlength="1200" rows="4" placeholder="Explique o resultado desejado para a nova montagem automática."></textarea></label>
                 <small class="wide"><i class="fa-solid fa-circle-info"></i> O modo escolhido será usado em “Nova montagem com o diretor”. O acabamento também será aplicado aos ajustes manuais.</small>
@@ -357,7 +359,41 @@
     <div id="fieldHelpContent" class="field-help-content"></div>
     <button id="fieldHelpOk" class="create-button" type="button">Entendi</button>
   </dialog>
+  <dialog id="directorGuideDialog" class="director-guide-dialog" aria-labelledby="directorGuideTitle">
+    <header class="director-guide-header">
+      <span><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span>
+      <div><small>Guia de preparação</small><h2 id="directorGuideTitle">Como conseguir uma montagem melhor</h2></div>
+      <button id="directorGuideClose" type="button" aria-label="Fechar guia"><i class="fa-solid fa-xmark"></i></button>
+    </header>
+    <div class="director-guide-body">
+      <p class="director-guide-intro">A qualidade da montagem depende do material enviado e de instruções claras. Use este guia antes de criar ou refazer o vídeo.</p>
+      <div class="director-guide-grid">
+        <section class="director-guide-section"><h3><i class="fa-solid fa-list-check"></i> Checklist mínimo</h3><ul><li>Escolha <strong>Diretor Avançado</strong> quando precisar de narrativa e continuidade.</li><li>Explique público, duração, tom, mensagem principal, abertura e encerramento.</li><li>Ative as legendas e a revisão quando houver pessoas falando.</li><li>Informe nomes próprios no campo de vocabulário para melhorar a transcrição.</li></ul></section>
+        <section class="director-guide-section"><h3><i class="fa-solid fa-photo-film"></i> Material recomendado</h3><ul><li>Envie de 6 a 10 arquivos originais, nítidos, estáveis e bem iluminados.</li><li>Prefira cenas de 5 a 15 segundos, com uma ação clara por arquivo.</li><li>Para Reels e Stories, grave na vertical, preferencialmente em 1080 × 1920.</li><li>Deixe cerca de 1 segundo antes e depois da ação ou da fala.</li></ul></section>
+        <section class="director-guide-section"><h3><i class="fa-solid fa-arrow-down-1-9"></i> Ordem recomendada</h3><ol><li>Fachada ou identificação para a abertura.</li><li>Entrada e visão geral do ambiente.</li><li>Atividade, produto ou serviço principal.</li><li>Atendimento, equipe e diferenciais.</li><li>Falas completas das pessoas.</li><li>Detalhes complementares.</li><li>Fachada ou logo para o encerramento.</li></ol></section>
+        <section class="director-guide-section"><h3><i class="fa-solid fa-microphone-lines"></i> Quando houver fala</h3><ul><li>Grave uma ideia completa por arquivo, em local silencioso.</li><li>Evite começar ou terminar a gravação no meio de uma frase.</li><li>Peça no objetivo que a fala real seja mantida em ordem cronológica.</li><li>Durante a fala, use somente a legenda correspondente, sem descrição concorrente.</li></ul></section>
+      </div>
+      <aside class="director-guide-note"><i class="fa-solid fa-circle-info"></i><p><strong>A ordem dos arquivos ajuda a contar a história.</strong> Coloque primeiro a mídia que deve abrir e por último a que deve encerrar. A IA analisa quadros e transcrições representativos; ela não substitui gravações bem planejadas.</p></aside>
+      <section class="director-guide-prompt">
+        <div><span><small>Exemplo para adaptar</small><h3>Objetivo criativo completo</h3></span><button id="copyDirectorGuidePrompt" type="button"><i class="fa-regular fa-copy"></i> Copiar exemplo</button></div>
+        <textarea id="directorGuidePrompt" readonly rows="14">Crie um vídeo institucional vertical de 30 segundos para apresentar a [NOME DA EMPRESA] aos moradores de Carlópolis. O tom deve ser profissional, acolhedor e moderno.
+
+A abertura deve usar o primeiro arquivo enviado, mostrando a fachada ou a identificação da empresa. Não começar com uma fala cortada, detalhe isolado ou movimento de câmera.
+
+Depois da abertura, apresentar nesta ordem: entrada da empresa, visão geral do ambiente, atividade principal, atendimento e detalhes dos produtos ou serviços.
+
+Quando houver uma pessoa falando, manter as frases completas, em ordem cronológica e sem cortar palavras. Nessas cenas, utilizar somente a legenda da fala real, sem descrição de cena nem narração artificial.
+
+Evitar trechos tremidos, escuros, desfocados, repetidos, câmera sendo posicionada e partes sem ação relevante. Usar transições discretas e ritmo equilibrado. Não repetir a mesma imagem.
+
+Encerrar com o último arquivo enviado, mostrando a fachada ou a logo, e apresentar a chamada: “Conheça a [NOME DA EMPRESA] em Carlópolis”.
+
+O vídeo deve contar uma história clara: apresentação, ambiente, atividade principal, atendimento, diferenciais e encerramento.</textarea>
+      </section>
+    </div>
+    <footer class="director-guide-footer"><button id="directorGuideDone" class="create-button" type="button">Entendi, vou preparar o conteúdo</button></footer>
+  </dialog>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=41"></script>
+  <script type="module" src="studio.js?v=42"></script>
 </body>
 </html>

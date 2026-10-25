@@ -254,3 +254,7 @@ O script `node studio-worker/scripts/compare-directors.mjs plano-local.json plan
 ## Preparação comercial
 
 Os caminhos `studioCredits`, `studioCreditLedger`, `studioUsage` e `studioAdminCosts` já estão isolados. O MVP registra estimativa e consumo com valor financeiro zero. Mercado Pago e Asaas não são chamados. A futura cobrança deverá reservar créditos antes da fila, consumir após sucesso e estornar automaticamente em falhas.
+
+## Guia de preparação do conteúdo
+
+A v49 adiciona o botão **Como preparar um bom vídeo** tanto no fluxo de criação quanto no editor visual. O guia reúne o checklist mínimo, recomendações de gravação, ordem sugerida dos arquivos e cuidados para preservar falas completas e cronológicas. Também oferece um exemplo detalhado de objetivo criativo que pode ser copiado e adaptado, sem preencher nem sobrescrever automaticamente as instruções do projeto.

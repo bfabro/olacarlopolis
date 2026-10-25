@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v48", date: "2026-10-25" });
+const STUDIO_RELEASE = Object.freeze({ label: "v49", date: "2026-10-25" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, featureFlags: {}, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
@@ -159,6 +159,32 @@ function closeFieldHelp() {
   const dialog = $("fieldHelpDialog");
   if (typeof dialog.close === "function" && dialog.open) dialog.close();
   else dialog.removeAttribute("open");
+}
+
+function openDirectorGuide() {
+  const dialog = $("directorGuideDialog");
+  if (typeof dialog.showModal === "function") dialog.showModal();
+  else dialog.setAttribute("open", "");
+}
+
+function closeDirectorGuide() {
+  const dialog = $("directorGuideDialog");
+  if (typeof dialog.close === "function" && dialog.open) dialog.close();
+  else dialog.removeAttribute("open");
+}
+
+async function copyDirectorGuidePrompt() {
+  const field = $("directorGuidePrompt");
+  const prompt = field?.value || "";
+  try {
+    await navigator.clipboard.writeText(prompt);
+  } catch {
+    field.focus();
+    field.select();
+    document.execCommand("copy");
+    field.setSelectionRange(0, 0);
+  }
+  toast("Exemplo copiado. Adapte os campos entre colchetes antes de usar.");
 }
 
 function initializeEditorHelp() {
@@ -1722,6 +1748,11 @@ $("logsFilter").addEventListener("change", renderStudioLogs);
 $("fieldHelpClose").addEventListener("click", closeFieldHelp);
 $("fieldHelpOk").addEventListener("click", closeFieldHelp);
 $("fieldHelpDialog").addEventListener("click", (event) => { if (event.target === $("fieldHelpDialog")) closeFieldHelp(); });
+document.querySelectorAll("[data-director-guide]").forEach((button) => button.addEventListener("click", openDirectorGuide));
+$("directorGuideClose").addEventListener("click", closeDirectorGuide);
+$("directorGuideDone").addEventListener("click", closeDirectorGuide);
+$("copyDirectorGuidePrompt").addEventListener("click", () => copyDirectorGuidePrompt().catch((error) => toast(error?.message || "Não foi possível copiar o exemplo.")));
+$("directorGuideDialog").addEventListener("click", (event) => { if (event.target === $("directorGuideDialog")) closeDirectorGuide(); });
 $("dropZone").addEventListener("click", () => $("sourceFiles").click());
 $("dropZone").addEventListener("keydown", (event) => { if (["Enter", " "].includes(event.key)) { event.preventDefault(); $("sourceFiles").click(); } });
 $("sourceFiles").addEventListener("change", (event) => { addFiles(event.target.files); event.target.value = ""; });
