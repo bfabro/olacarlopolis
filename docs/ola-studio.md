@@ -41,11 +41,13 @@ Pré-requisitos: Docker Desktop e um arquivo de service account do Firebase mant
 ```powershell
 $env:FIREBASE_SERVICE_ACCOUNT_FILE = "C:\caminho-seguro\firebase-service-account.json"
 $env:AVG_WEB_SHIELD_CA_FILE = "C:\caminho-seguro\avg-web-shield-root.pem"
-docker build --secret id=avg_web_shield_ca,src="$env:AVG_WEB_SHIELD_CA_FILE" -f studio-worker/Dockerfile -t ola-studio-worker:local-v45 .
+docker build --secret id=avg_web_shield_ca,src="$env:AVG_WEB_SHIELD_CA_FILE" -f studio-worker/Dockerfile -t ola-studio-worker:local-v46 .
 docker compose --env-file studio-worker/.env -f studio-worker/docker-compose.yml up -d --no-build
 ```
 
 O contêiner instala FFmpeg/FFprobe e limita o processo a 2 CPUs e 4 GB de RAM. A credencial e o certificado local são montados somente para leitura. O certificado também é entregue ao BuildKit como segredo temporário para o `npm install`, sem ser incorporado à imagem e sem desativar a verificação TLS. Nunca adicione a credencial ou o certificado ao Git. A compilação direta evita uma incompatibilidade observada entre Docker Compose Bake, segredos locais e caminhos do Windows; o Compose continua responsável por iniciar o worker já compilado.
+
+No Diretor de IA avançado, a fala humana detectada ativa automaticamente a transcrição e as legendas, mesmo sem seleção manual do campo de legendas. Os cortes escolhidos são normalizados pela ordem dos arquivos e pelo tempo original de cada gravação para preservar a sequência cronológica; a composição final é transcrita novamente para sincronizar a legenda com os cortes efetivamente renderizados.
 
 Variáveis opcionais:
 

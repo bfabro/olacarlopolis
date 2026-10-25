@@ -32,10 +32,47 @@ function responseText(payload) {
   return "";
 }
 
-function hasSpeech(source, candidate, transcript) {
+function hasSpeech(source, candidate, transcript, duration = 3) {
   if (!source?.metadata?.hasAudio) return false;
-  if (transcript?.segments?.length) return transcript.segments.some((segment) => Number(segment.end || 0) > candidate.start && Number(segment.start || 0) < candidate.start + 3);
+  if (transcript?.segments?.length) return transcript.segments.some((segment) => Number(segment.end || 0) > candidate.start && Number(segment.start || 0) < candidate.start + Math.max(0.1, Number(duration || 0)));
   return !(source.technical?.silences || []).some((silence) => candidate.start >= silence.start && candidate.start < silence.end);
+}
+
+function chronologicalCompare(left, right) {
+  return Number(left.candidate.sourceIndex || 0) - Number(right.candidate.sourceIndex || 0)
+    || Number(left.candidate.start || 0) - Number(right.candidate.start || 0)
+    || String(left.candidate.id || "").localeCompare(String(right.candidate.id || ""));
+}
+
+function fallbackDirectionItem(candidate) {
+  return {
+    candidateId: candidate.id, narrativeRole: "development", transition: "dissolve",
+    selectionReason: "Trecho complementar mantido na sequência cronológica original.",
+    continuityIntent: "Preservar a evolução temporal da gravação.", narrativeRelevance: Number(candidate.qualityScore || 0.5),
+    intentionalException: "none", containsPerson: false, onScreenText: "", narrationText: "",
+    highlightType: "none", textPosition: "top", textAnimation: "fade", highlightDuration: 2,
+    photoMotion: "zoom_in", focusX: 0.5, focusY: 0.5
+  };
+}
+
+export function chronologicalAdvancedSelections(direction, evidence, targetCount) {
+  const candidates = new Map(evidence.candidates.map((candidate) => [candidate.id, candidate]));
+  const seen = new Set();
+  const requested = (direction.scenes || []).map((item) => ({ item, candidate: candidates.get(item.candidateId) }))
+    .filter((entry) => entry.candidate && !seen.has(entry.candidate.id) && seen.add(entry.candidate.id));
+  if (!requested.length) return [];
+  const target = Math.max(1, Number(targetCount || requested.length));
+  const unused = evidence.candidates.filter((candidate) => !seen.has(candidate.id))
+    .sort((left, right) => Number(right.qualityScore || 0) - Number(left.qualityScore || 0))
+    .slice(0, Math.max(0, target - requested.length))
+    .map((candidate) => ({ candidate, item: fallbackDirectionItem(candidate) }));
+  const chronological = [...requested, ...unused].sort(chronologicalCompare);
+  if (chronological.length > target) {
+    if (target === 1) return [chronological[0]];
+    return Array.from({ length: target }, (_, index) => chronological[Math.round(index * (chronological.length - 1) / (target - 1))]);
+  }
+  while (chronological.length < target) chronological.push(chronological.at(-1));
+  return chronological;
 }
 
 export function summarizeTemporalEvidence(evidence, analyzedSources) {
@@ -52,19 +89,18 @@ export function summarizeTemporalEvidence(evidence, analyzedSources) {
 }
 
 export function mergeAdvancedDirection(basePlan, direction, evidence, analyzedSources, providerMeta = {}) {
-  const candidates = new Map(evidence.candidates.map((candidate) => [candidate.id, candidate]));
-  const requested = (direction.scenes || []).map((item) => ({ item, candidate: candidates.get(item.candidateId) })).filter((entry) => entry.candidate);
+  const requested = chronologicalAdvancedSelections(direction, evidence, basePlan.scenes.length);
   if (!requested.length) throw Object.assign(new Error("O Diretor Avançado não retornou cenas válidas."), { code: "advanced_invalid_plan" });
   const seen = new Set();
   const scenes = basePlan.scenes.map((baseScene, index) => {
-    const directed = requested[index % requested.length];
+    const directed = requested[index];
     const candidate = directed.candidate;
     const source = analyzedSources.find((item) => item.id === candidate.sourceId);
     if (!source) throw Object.assign(new Error("O Diretor Avançado referenciou uma origem inexistente."), { code: "advanced_invalid_source" });
     const sourceDuration = Number(source.metadata?.duration || 0);
     const safeStart = candidate.kind === "image" ? 0 : Math.max(0, Math.min(candidate.start, Math.max(0, sourceDuration - Number(baseScene.duration || 0) - 0.05)));
     const transcript = evidence.transcripts.find((item) => item.sourceId === candidate.sourceId);
-    const speech = hasSpeech(source, candidate, transcript);
+    const speech = hasSpeech(source, candidate, transcript, baseScene.duration);
     const duplicateKey = `${candidate.sourceId}:${safeStart.toFixed(2)}`;
     const duplicate = seen.has(duplicateKey);
     seen.add(duplicateKey);
@@ -75,7 +111,7 @@ export function mergeAdvancedDirection(basePlan, direction, evidence, analyzedSo
       onScreenText: speech || directed.item.containsPerson === true ? "" : String(directed.item.onScreenText || "").replace(/\s+/g, " ").trim().slice(0, 72),
       narrationText: speech || directed.item.containsPerson === true ? "" : String(directed.item.narrationText || "").replace(/\s+/g, " ").trim().slice(0, 280),
       photoMotion: candidate.kind === "image" ? { type: directed.item.photoMotion, focusX: Math.max(0.1, Math.min(0.9, Number(directed.item.focusX || 0.5))), focusY: Math.max(0.1, Math.min(0.9, Number(directed.item.focusY || 0.5))), easing: "smooth", scale: 1.12 } : null,
-      selection: { method: "advanced-semantic-ai-v1", candidateId: candidate.id, qualityScore: candidate.qualityScore, narrativeRelevance: round(Math.max(0, Math.min(1, Number(directed.item.narrativeRelevance || 0)))), flags: candidate.flags, temporalPhase: candidate.temporalPhase, continuityIntent: String(directed.item.continuityIntent || "").slice(0, 240), intentionalException: directed.item.intentionalException || "none", reason: String(directed.item.selectionReason || "").slice(0, 280), duplicateWarning: duplicate }
+      selection: { method: "advanced-semantic-ai-v2-chronological", candidateId: candidate.id, qualityScore: candidate.qualityScore, narrativeRelevance: round(Math.max(0, Math.min(1, Number(directed.item.narrativeRelevance || 0)))), flags: candidate.flags, temporalPhase: candidate.temporalPhase, continuityIntent: String(directed.item.continuityIntent || "").slice(0, 240), intentionalException: "none", reason: String(directed.item.selectionReason || "").slice(0, 280), duplicateWarning: duplicate, chronological: true }
     };
   });
   let timeline = 0;
@@ -84,16 +120,18 @@ export function mergeAdvancedDirection(basePlan, direction, evidence, analyzedSo
     const start = timeline;
     const end = Math.min(Number(basePlan.duration || 0), start + Number(scene.duration || 0));
     timeline = Math.max(0, end - Number(scene.transitionDuration || 0));
-    const requestedScene = requested[index % requested.length]?.item;
+    const requestedScene = requested[index]?.item;
     if (!scene.onScreenText || scene.hasSpeech || scene.containsPerson || requestedScene?.highlightType === "none") return;
     highlights.push({ id: `advanced-highlight-${index + 1}`, type: "custom", value: scene.onScreenText, start, end: Math.min(end, start + Math.max(1.2, Math.min(4.5, Number(requestedScene?.highlightDuration || 3)))), animation: requestedScene?.textAnimation || "fade", position: requestedScene?.textPosition || "top", slot: 0, sizeScale: requestedScene?.highlightType === "title" ? 1 : 0.82, color: "#FFFFFF", outlineColor: "#092B45", background: true, align: "center", font: "sans", margin: 92 });
   });
   const script = scenes.map((scene) => scene.narrationText).filter(Boolean).join(" ").slice(0, 4000);
+  const detectedHumanSpeech = scenes.some((scene) => scene.hasSpeech === true);
   const plan = {
     ...basePlan,
     planner: { type: "advanced-semantic-ai", version: 1, semanticAnalysis: true, temporalAnalysis: true, technicalSelection: true, provider: providerMeta.provider || "openai", model: providerMeta.model || "configured", fallback: false },
     aiDirector: { requested: true, applied: true, advanced: true, objective: String(direction.objective || "").slice(0, 500), identifiedTheme: String(direction.identifiedTheme || "").slice(0, 300), narrativeProposal: String(direction.narrativeProposal || "").slice(0, 1000), closingProposal: String(direction.closingProposal || "").slice(0, 500), rationale: String(direction.rationale || "").slice(0, 1200), confidence: round(Math.max(0, Math.min(1, Number(direction.confidence || 0)))), musicDirection: String(direction.rhythm?.musicDirection || "").slice(0, 500), evidenceSummary: summarizeTemporalEvidence(evidence, analyzedSources), usage: providerMeta.usage || null, estimatedCostUsd: Number(providerMeta.estimatedCostUsd || 0) },
     scenes,
+    captions: { ...(basePlan.captions || {}), requested: basePlan.captions?.requested === true || detectedHumanSpeech, automaticSpeech: detectedHumanSpeech },
     textLayers: [...(basePlan.textLayers || []), ...highlights],
     narration: { ...basePlan.narration, generated: true, script, tone: direction.narration?.tone || basePlan.narration?.tone || "professional", disclosure: "Voz gerada por inteligência artificial." }
   };
@@ -114,7 +152,7 @@ export class OpenAIAdvancedDirector {
     if (!this.enabled) throw Object.assign(new Error("Diretor Avançado desativado neste worker."), { code: "advanced_feature_disabled" });
     const wantsScript = project.narration?.generateScript === true;
     const compact = { objective: String(project.director?.brief || "Montagem profissional e coerente.").slice(0, 1200), duration: basePlan.duration, format: basePlan.format, style: basePlan.style, rhythm: basePlan.rhythm, candidates: evidence.candidates, transcripts: evidence.transcripts };
-    const content = [{ type: "input_text", text: `Atue como diretor audiovisual do Olá Studio. Analise o conjunto inteiro antes de escolher a ordem. Responda somente no JSON exigido. Use exclusivamente candidateId fornecidos e fatos visíveis, transcritos ou informados pelo usuário. Compare começo, meio e fim de cada origem; evite redundância; mantenha continuidade espacial, temática, de ação e de fala. Não interrompa uma fala coerente. Prefira qualidade técnica sem sacrificar a narrativa. Use intentionalException somente quando contraste, flashback ou montagem paralela forem deliberados e justificáveis. Marque containsPerson quando houver pessoa visível. Nessas cenas, ou quando houver fala humana, deixe onScreenText e narrationText vazios. Destaques devem ser curtos e ficar em área segura, sem simular botões. Para fotos, escolha movimento sutil e foco normalizado entre 0.1 e 0.9. ${wantsScript ? "Nas cenas sem fala e sem pessoa, produza narração factual curta e correspondente ao quadro." : "Deixe toda narração e textos de cena vazios."} Contexto: ${JSON.stringify(compact)}` }];
+    const content = [{ type: "input_text", text: `Atue como diretor audiovisual do Olá Studio. Analise o conjunto inteiro antes de escolher os trechos. Responda somente no JSON exigido e retorne exatamente ${basePlan.scenes.length} cenas. Use exclusivamente candidateId fornecidos e fatos visíveis, transcritos ou informados pelo usuário. Preserve obrigatoriamente a ordem dos arquivos e a ordem temporal dentro de cada vídeo; não use flashback, não volte para um instante anterior e não repita trechos. Compare começo, meio e fim de cada origem; escolha as partes mais relevantes sem quebrar uma fala coerente. Prefira qualidade técnica sem sacrificar a narrativa. Use intentionalException como none. Marque containsPerson quando houver pessoa visível. Nessas cenas, ou quando houver fala humana, deixe onScreenText e narrationText vazios, pois a fala real receberá legenda sincronizada. Destaques devem ser curtos e ficar em área segura, sem simular botões. Para fotos, escolha movimento sutil e foco normalizado entre 0.1 e 0.9. ${wantsScript ? "Nas cenas sem fala e sem pessoa, produza narração factual curta e correspondente ao quadro." : "Deixe toda narração e textos de cena vazios."} Contexto: ${JSON.stringify(compact)}` }];
     evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro temporal ${frame.temporalPhase}, ${frame.candidateId}, origem ${frame.sourceId}, tempo ${frame.time}s:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: workerConfig.aiImageDetail }); });
     const timeoutSignal = AbortSignal.timeout(workerConfig.aiTimeoutMs);
     const requestSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;

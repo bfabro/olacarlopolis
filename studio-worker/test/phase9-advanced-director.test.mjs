@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { buildAnalysisCache, probeMedia, sourceAnalysisSignature, summarizeCameraMotion } from "../src/analyzer.mjs";
 import { buildTemporalCandidates } from "../src/ai-planner.mjs";
-import { mergeAdvancedDirection } from "../src/advanced-director.mjs";
+import { chronologicalAdvancedSelections, mergeAdvancedDirection } from "../src/advanced-director.mjs";
 import { compareDirectorPlans } from "../src/evaluation.mjs";
 import { createDeterministicPlan } from "../src/planner.mjs";
 import { buildPhotoMotionFilter, renderPlan } from "../src/renderer.mjs";
@@ -46,6 +46,27 @@ test("v44 monta plano avançado global sem inventar origem ou intervalo", () => 
   const comparison = compareDirectorPlans(base, advanced);
   assert.equal(comparison.advanced.planner, "advanced-semantic-ai");
   assert.ok(comparison.humanRubric.length >= 6);
+});
+
+test("v46 mantém cortes em ordem cronológica e ativa legenda ao detectar fala", () => {
+  const project = { style: "institucional", format: "9:16", duration: 15, transition: "auto", transitionDuration: 0.3, editing: { rhythm: "balanced", syncToMusic: false }, audio: {}, captionsEnabled: false, captions: {}, narration: { generateScript: false, enabled: false } };
+  const base = createDeterministicPlan(project, sources);
+  const candidates = buildTemporalCandidates(sources, 20);
+  const videoCandidates = candidates.filter((item) => item.sourceId === "video");
+  const evidence = { candidates, frames: [], transcripts: [{ sourceId: "video", text: "Olá, este é o atendimento.", segments: [{ start: 0, end: 18, text: "Olá, este é o atendimento." }] }], warnings: [] };
+  const sceneFor = (candidate) => ({ candidateId: candidate.id, narrativeRole: "development", transition: "dissolve", selectionReason: "fala relevante", continuityIntent: "preservar a fala", narrativeRelevance: 0.9, intentionalException: "flashback", containsPerson: true, onScreenText: "não exibir", narrationText: "não narrar", highlightType: "none", textPosition: "top", textAnimation: "fade", highlightDuration: 2, photoMotion: "zoom_in", focusX: 0.5, focusY: 0.5 });
+  const direction = { objective: "Depoimento", identifiedTheme: "atendimento", narrativeProposal: "fala em ordem", scenes: [...videoCandidates].reverse().map(sceneFor), narration: { script: "", tone: "warm" }, rhythm: { pace: "balanced", musicDirection: "suave" }, closingProposal: "encerrar", rationale: "fala real", confidence: 0.9 };
+  const ordered = chronologicalAdvancedSelections(direction, evidence, base.scenes.length);
+  ordered.forEach((entry, index) => {
+    if (!index) return;
+    const previous = ordered[index - 1].candidate;
+    assert.ok(entry.candidate.sourceIndex > previous.sourceIndex || entry.candidate.sourceIndex === previous.sourceIndex && entry.candidate.start >= previous.start);
+  });
+  const advanced = mergeAdvancedDirection(base, direction, evidence, sources, { provider: "test", model: "fixture" });
+  assert.equal(advanced.captions.requested, true);
+  assert.equal(advanced.captions.automaticSpeech, true);
+  assert.ok(advanced.scenes.some((scene) => scene.hasSpeech));
+  assert.ok(advanced.scenes.filter((scene) => scene.hasSpeech).every((scene) => scene.onScreenText === "" && scene.narrationText === ""));
 });
 
 test("v44 identifica estrutura musical sem afirmar avaliação subjetiva", () => {

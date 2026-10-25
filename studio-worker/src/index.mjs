@@ -139,10 +139,11 @@ async function processJob(job) {
     const editorPlan = JSON.parse(JSON.stringify(plan));
     await database.ref(`studioProjects/${job.uid}/${job.projectId}`).update({ directorResult, editorPlan });
     await updateJob(job.uid, job.jobId, { stage: "render", status: "rendering", progress: 50, message: plan.planner?.semanticAnalysis ? `${plan.planner?.temporalAnalysis ? "Direção avançada" : "Direção por IA"} concluída. Renderizando as cenas selecionadas.` : plan.planner?.fallback ? `${plan.aiDirector?.reason || "A IA não pôde ser aplicada"} Renderizando com a montagem técnica local.` : "Plano técnico concluído. Renderizando cenas.", plan: { storagePath: planStoragePath, planner: plan.planner }, editorPlan, director: directorResult });
-    const approvedTranscription = (project.captionsEnabled || plan.narration?.enabled) && job.transcriptReview?.status === "approved"
+    const captionsRequested = plan.captions?.requested === true || plan.narration?.enabled === true;
+    const approvedTranscription = captionsRequested && job.transcriptReview?.status === "approved"
       ? prepareReviewedTranscription(job.transcriptReview, project.duration)
       : null;
-    const transcriptionProvider = (project.captionsEnabled || plan.narration?.enabled) && !approvedTranscription ? await createTranscriptionProvider() : null;
+    const transcriptionProvider = captionsRequested && !approvedTranscription ? await createTranscriptionProvider() : null;
     const rendered = await renderPlan({
       plan, sources: analyzed, outputDir, logoPath: logo?.localPath || "", musicPath, soundEffectsPath,
       speechProvider: plan.narration?.enabled ? createSpeechProvider() : null,
