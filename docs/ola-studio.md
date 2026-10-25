@@ -40,15 +40,18 @@ Pré-requisitos: Docker Desktop e um arquivo de service account do Firebase mant
 
 ```powershell
 $env:FIREBASE_SERVICE_ACCOUNT_FILE = "C:\caminho-seguro\firebase-service-account.json"
-docker compose -f studio-worker/docker-compose.yml up --build
+$env:AVG_WEB_SHIELD_CA_FILE = "C:\caminho-seguro\avg-web-shield-root.pem"
+docker build --secret id=avg_web_shield_ca,src="$env:AVG_WEB_SHIELD_CA_FILE" -f studio-worker/Dockerfile -t ola-studio-worker:local-v45 .
+docker compose --env-file studio-worker/.env -f studio-worker/docker-compose.yml up -d --no-build
 ```
 
-O contêiner instala FFmpeg/FFprobe e limita o processo a 2 CPUs e 4 GB de RAM. O arquivo de credencial é montado somente para leitura. Nunca adicione essa credencial ao Git.
+O contêiner instala FFmpeg/FFprobe e limita o processo a 2 CPUs e 4 GB de RAM. A credencial e o certificado local são montados somente para leitura. O certificado também é entregue ao BuildKit como segredo temporário para o `npm install`, sem ser incorporado à imagem e sem desativar a verificação TLS. Nunca adicione a credencial ou o certificado ao Git. A compilação direta evita uma incompatibilidade observada entre Docker Compose Bake, segredos locais e caminhos do Windows; o Compose continua responsável por iniciar o worker já compilado.
 
 Variáveis opcionais:
 
 - `FIREBASE_DATABASE_URL`
 - `FIREBASE_STORAGE_BUCKET`
+- `AVG_WEB_SHIELD_CA_FILE` (certificado raiz local usado somente quando há inspeção HTTPS, como o Web Shield do AVG)
 - `STUDIO_STARTUP_DELAY_MS`
 - `STUDIO_POLL_INTERVAL_MS`
 - `STUDIO_DATABASE_TIMEOUT_MS`

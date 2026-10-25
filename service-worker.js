@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-10-24-ola-studio-advanced-director-v992'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-10-25-ola-studio-secure-worker-build-v993'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

@@ -1,3 +1,5 @@
+# syntax=docker/dockerfile:1.7
+
 FROM debian:bookworm-slim AS whisper-builder
 
 RUN apt-get update \
@@ -21,7 +23,8 @@ ADD --checksum=sha256:be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c
 
 WORKDIR /app
 COPY studio-worker/package.json ./
-RUN npm install --omit=dev
+RUN --mount=type=secret,id=avg_web_shield_ca \
+  NODE_EXTRA_CA_CERTS=/run/secrets/avg_web_shield_ca npm install --omit=dev
 COPY studio-worker/src ./src
 COPY studio-worker/scripts ./scripts
 COPY studio-worker/test ./test

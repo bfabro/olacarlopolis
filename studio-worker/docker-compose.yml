@@ -1,13 +1,19 @@
 services:
   ola-studio-worker:
+    image: ola-studio-worker:local-v45
+    container_name: ola-studio-worker
     build:
       context: ..
       dockerfile: studio-worker/Dockerfile
+      secrets:
+        - source: avg_web_shield_ca
+          target: avg_web_shield_ca
     restart: unless-stopped
     environment:
       FIREBASE_DATABASE_URL: ${FIREBASE_DATABASE_URL:-https://contadoracessos-default-rtdb.firebaseio.com}
       FIREBASE_STORAGE_BUCKET: ${FIREBASE_STORAGE_BUCKET:-contadoracessos.firebasestorage.app}
       GOOGLE_APPLICATION_CREDENTIALS: /run/secrets/firebase-service-account.json
+      NODE_EXTRA_CA_CERTS: /run/secrets/avg-web-shield-root.pem
       STUDIO_WORK_DIR: /tmp/ola-studio
       STUDIO_STARTUP_DELAY_MS: 2000
       STUDIO_POLL_INTERVAL_MS: 4000
@@ -30,6 +36,9 @@ services:
     volumes:
       - ${FIREBASE_SERVICE_ACCOUNT_FILE}:/run/secrets/firebase-service-account.json:ro
       - ola-studio-work:/tmp/ola-studio
+    secrets:
+      - source: avg_web_shield_ca
+        target: avg-web-shield-root.pem
     deploy:
       resources:
         limits:
@@ -38,3 +47,7 @@ services:
 
 volumes:
   ola-studio-work:
+
+secrets:
+  avg_web_shield_ca:
+    file: ${AVG_WEB_SHIELD_CA_FILE}
