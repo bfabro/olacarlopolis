@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v47", date: "2026-10-25" });
+const STUDIO_RELEASE = Object.freeze({ label: "v48", date: "2026-10-25" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, featureFlags: {}, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
@@ -32,7 +32,7 @@ let authPersistenceWarning = "";
 
 const FIELD_HELP = Object.freeze({
   sourceFiles: { title: "Arquivos do vídeo", body: "Adicione vídeos e também imagens estáticas à sequência. Cada foto vira uma cena com duração ajustável no editor visual e pode ser reordenada junto com os vídeos. A IA usa a imagem real na análise e os originais são preservados." },
-  directorMode: { title: "Modo do diretor", body: "O modo local usa regras técnicas sem custo de IA. A análise padrão interpreta quadros representativos. O Diretor Avançado acompanha vários momentos das cenas, compara continuidade, ritmo e redundância e produz um plano global; ele é experimental, depende da feature flag segura do worker e pode usar mais tokens." },
+  directorMode: { title: "Modo do diretor", body: "Automático local faz uma montagem rápida usando qualidade, duração, áudio e movimento, sem interpretar o assunto. Diretor de IA entende quadros e falas para escolher cenas coerentes. Diretor Avançado examina vários momentos, preserva ordem e continuidade e constrói uma narrativa mais completa, usando mais processamento e IA." },
   directorBrief: { title: "Objetivo criativo", body: "Explique o resultado desejado: público, clima, pontos que devem aparecer e mensagem principal. Este texto orienta o Diretor de IA, mas não aparece escrito no vídeo." },
   generateAiScript: { title: "Criar roteiro e textos", body: "Quando ativado, a IA prepara um roteiro baseado apenas nos arquivos, transcrições e objetivo criativo. O roteiro poderá alimentar os textos das cenas e a narração." },
   enableAiNarration: { title: "Narrar com voz de IA", body: "Transforma o roteiro em locução. As frases são distribuídas ao longo do vídeo, as legendas acompanham a fala e a música é reduzida durante a voz." },
@@ -41,7 +41,7 @@ const FIELD_HELP = Object.freeze({
   transitionMode: { title: "Transição entre cenas", body: "Define como uma imagem passa para a próxima. Automática respeita o tema escolhido. Fade e dissolve são suaves; slide, whip e flash são mais enérgicos; hard cut troca sem efeito." },
   transitionDuration: { title: "Duração da transição", body: "Controla por quanto tempo duas cenas se misturam. Valores curtos deixam o vídeo ágil; valores maiores criam uma passagem suave e cinematográfica." },
   effectsProfile: { title: "Acabamento visual", body: "Natural preserva a imagem original. Profissional melhora cor e nitidez com discrição. Cinematográfico usa contraste e vinheta leves. Dinâmico realça cores e detalhes para Reels." },
-  visualDirectorMode: { title: "Diretor da nova versão", body: "Escolha novamente como a montagem automática será criada. Local não usa API; IA padrão interpreta quadros; Diretor Avançado compara vários momentos e mantém a narrativa temporal." },
+  visualDirectorMode: { title: "Diretor da nova versão", body: "Escolha o nível de análise usado para refazer a montagem: técnica local rápida, interpretação do conteúdo por IA ou direção avançada com narrativa, continuidade e ordem temporal." },
   visualEffectsProfile: { title: "Efeitos da nova versão", body: "Define o tratamento real aplicado às imagens e vídeos na próxima renderização. O efeito também vale ao renderizar a timeline ajustada manualmente." },
   visualDirectorBrief: { title: "Objetivo da nova versão", body: "Orienta uma nova montagem por IA. Descreva público, clima, mensagem e cenas importantes. O texto não aparece no vídeo." },
   editingRhythm: { title: "Ritmo da montagem", body: "Suave mantém cenas mais longas; equilibrado combina contemplação e movimento; dinâmico cria cortes mais rápidos. O tema ainda define limites seguros para cada cena." },
@@ -82,6 +82,27 @@ const FIELD_HELP = Object.freeze({
   captionReviewEnabled: { title: "Revisar antes de renderizar", body: "Pausa a criação depois da transcrição para você corrigir ou remover frases. Ao aprovar, o Studio continua do ponto salvo." }
 });
 
+const DIRECTOR_MODE_GUIDANCE = Object.freeze({
+  local: Object.freeze({
+    icon: "fa-gauge-high",
+    title: "Automático local: montagem técnica e rápida",
+    body: "Escolhe os melhores trechos pela qualidade da imagem, movimento, áudio, silêncios e duração. Organiza abertura, desenvolvimento e encerramento, mas não interpreta o assunto mostrado nas cenas.",
+    detail: "Não usa a API de IA e não gera custo de IA. Indicado para testes rápidos e montagens simples."
+  }),
+  semantic: Object.freeze({
+    icon: "fa-brain",
+    title: "Diretor de IA: entende o conteúdo",
+    body: "Analisa quadros representativos e falas transcritas para reconhecer o tema, escolher cenas coerentes e propor textos, roteiro e ordem de apresentação conforme o objetivo criativo.",
+    detail: "Usa a API de IA e pode consumir créditos. Indicado quando o significado das cenas é importante."
+  }),
+  advanced: Object.freeze({
+    icon: "fa-clapperboard",
+    title: "Diretor Avançado: constrói uma narrativa completa",
+    body: "Compara vários momentos de cada arquivo, procura continuidade entre cenas, reduz repetições e preserva a ordem cronológica das falas para criar uma história com começo, desenvolvimento e encerramento.",
+    detail: "Usa mais análise, tempo e tokens de IA. Indicado para vídeos com várias gravações, pessoas falando ou uma sequência que precisa fazer sentido."
+  })
+});
+
 document.querySelectorAll("[data-studio-version]").forEach((node) => { node.textContent = STUDIO_RELEASE.label; });
 const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch((error) => {
   console.warn("Não foi possível manter a sessão local do Studio.", error?.code || error?.message);
@@ -90,6 +111,14 @@ const authPersistenceReady = setPersistence(auth, browserLocalPersistence).catch
 
 function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" })[char]);
+}
+
+function updateDirectorModeDescription(selectId, outputId) {
+  const select = $(selectId);
+  const output = $(outputId);
+  const guidance = DIRECTOR_MODE_GUIDANCE[select?.value] || DIRECTOR_MODE_GUIDANCE.local;
+  if (!output) return;
+  output.innerHTML = `<i class="fa-solid ${guidance.icon}" aria-hidden="true"></i><span><strong>${escapeHtml(guidance.title)}</strong>${escapeHtml(guidance.body)}<small>${escapeHtml(guidance.detail)}</small></span>`;
 }
 
 function editorFieldHelp(control) {
@@ -505,6 +534,7 @@ function updateSummary() {
 }
 
 function syncAiNarrationControls() {
+  updateDirectorModeDescription("directorMode", "directorModeDescription");
   const semantic = ["semantic", "advanced"].includes($("directorMode").value);
   $("aiNarrationPanel").classList.toggle("hidden", !semantic);
   $("generateAiScript").disabled = !semantic;
@@ -1444,6 +1474,7 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   const visualAdvancedOption = [...$("visualDirectorMode").options].find((option) => option.value === "advanced");
   if (visualAdvancedOption) visualAdvancedOption.hidden = state.featureFlags.advancedDirectorEnabled !== true;
   if ($("visualDirectorMode").value === "advanced" && state.featureFlags.advancedDirectorEnabled !== true) $("visualDirectorMode").value = "local";
+  updateDirectorModeDescription("visualDirectorMode", "visualDirectorModeDescription");
   $("visualTitle").value = state.visualPlan.text?.title || "";
   $("visualSubtitle").value = state.visualPlan.text?.subtitle || "";
   $("visualCta").value = state.visualPlan.text?.callToAction || "";
@@ -1760,6 +1791,7 @@ $("regenerateVideo").addEventListener("click", () => state.activeProjectId && op
 $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
 $("visualEffectsProfile").addEventListener("change", syncVisualDirectionEffects);
+$("visualDirectorMode").addEventListener("change", () => updateDirectorModeDescription("visualDirectorMode", "visualDirectorModeDescription"));
 [$("visualTextFont"), $("visualTextSize"), $("visualTextColor"), $("visualTextOutline"), $("visualTextAlign"), $("visualTextBackground")].forEach((field) => field.addEventListener("input", syncVisualPrimaryTextStyle));
 [$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking"), $("visualLibraryMusic"), $("visualTransitionSound"), $("visualNarrationEnabled"), $("visualNarrationVoice"), $("visualNarrationTone"), $("visualNarrationScript")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
 [$("visualExportFps"), $("visualExportQuality")].forEach((field) => field.addEventListener("change", syncVisualExportSettings));

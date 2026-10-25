@@ -51,6 +51,8 @@ No Diretor de IA avançado, a fala humana detectada ativa automaticamente a tran
 
 Ao editar um projeto existente, o usuário escolhe novamente entre direção local, IA padrão ou Diretor Avançado, revisa o objetivo criativo e seleciona um acabamento Natural, Profissional, Cinematográfico ou Dinâmico. Os acabamentos aplicam filtros reais de cor, contraste, nitidez e vinheta no FFmpeg e também adaptam as transições automáticas; as versões anteriores continuam preservadas.
 
+A tela explica dinamicamente cada modo do diretor: o Automático local faz seleção técnica sem compreender o assunto; o Diretor de IA interpreta quadros e falas; e o Diretor Avançado compara vários momentos para trabalhar narrativa, continuidade, redução de repetição e ordem cronológica. A explicação também informa, sem promessas indevidas, a diferença de custo e tempo de processamento.
+
 Variáveis opcionais:
 
 - `FIREBASE_DATABASE_URL`
