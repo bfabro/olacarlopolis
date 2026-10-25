@@ -259,7 +259,8 @@ export function buildSegmentArgs(scene, source, outputPath, format, audioOptions
     if (!source.metadata.hasAudio) args.push("-f", "lavfi", "-t", seconds(scene.duration), "-i", "anullsrc=channel_layout=stereo:sample_rate=48000");
   }
   args.push("-map", "0:v:0", "-map", source.metadata.hasAudio && !image ? "0:a:0" : "1:a:0");
-  args.push("-vf", image ? buildPhotoMotionFilter(scene, width, height, fps) : `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},fps=${fps},setsar=1,format=yuv420p`);
+  const baseVideoFilter = image ? buildPhotoMotionFilter(scene, width, height, fps) : `scale=${width}:${height}:force_original_aspect_ratio=increase,crop=${width}:${height},fps=${fps},setsar=1,format=yuv420p`;
+  args.push("-vf", [baseVideoFilter, buildVisualEffectFilter(scene)].filter(Boolean).join(","));
   if (source.metadata.hasAudio && !image) {
     const filters = [];
     if (audioOptions.noiseReduction) filters.push("highpass=f=80", "lowpass=f=12000", "afftdn=nf=-25");
@@ -268,6 +269,13 @@ export function buildSegmentArgs(scene, source, outputPath, format, audioOptions
   }
   args.push("-t", seconds(scene.duration), ...videoEncoding(renderProfile, exportOptions, true), "-ar", "48000", "-ac", "2", "-movflags", "+faststart", outputPath);
   return args;
+}
+
+export function buildVisualEffectFilter(scene = {}) {
+  if (scene.visualEffect === "cinematic") return "eq=contrast=1.075:saturation=0.92:brightness=-0.01,vignette=PI/5";
+  if (scene.visualEffect === "dynamic") return "eq=contrast=1.08:saturation=1.15:brightness=0.008,unsharp=5:5:0.32:5:5:0";
+  if (scene.visualEffect === "professional") return "eq=contrast=1.035:saturation=1.06:brightness=0.005,unsharp=3:3:0.20:3:3:0";
+  return "";
 }
 
 export function buildPhotoMotionFilter(scene, width, height, fps = 30) {

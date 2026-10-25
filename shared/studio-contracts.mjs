@@ -1,4 +1,4 @@
-export const STUDIO_SCHEMA_VERSION = 8;
+export const STUDIO_SCHEMA_VERSION = 9;
 
 export const STUDIO_LIMITS = Object.freeze({
   maxFiles: 10,
@@ -127,6 +127,13 @@ export const STUDIO_TRANSITION_SOUNDS = Object.freeze({
   sparkle: Object.freeze({ id: "sparkle", label: "Brilho" })
 });
 
+export const STUDIO_VISUAL_EFFECTS = Object.freeze({
+  natural: Object.freeze({ id: "natural", label: "Natural", description: "Mantém as cores originais e usa somente as transições escolhidas." }),
+  professional: Object.freeze({ id: "professional", label: "Profissional suave", description: "Melhora contraste, nitidez e cor com acabamento discreto." }),
+  cinematic: Object.freeze({ id: "cinematic", label: "Cinematográfico", description: "Aplica contraste elegante, cores suaves e vinheta leve." }),
+  dynamic: Object.freeze({ id: "dynamic", label: "Dinâmico para Reels", description: "Realça cores, detalhes e movimento para uma montagem mais energética." })
+});
+
 const text = (value, max = 180) => String(value || "").trim().slice(0, max);
 const numberBetween = (value, min, max, fallback) => {
   const parsed = Number(value);
@@ -182,6 +189,7 @@ export function normalizeStudioProject(input = {}) {
     callToAction: text(input.callToAction, 100),
     transition: STUDIO_TRANSITIONS[input.transition] ? input.transition : "auto",
     transitionDuration: numberBetween(input.transitionDuration, 0.1, 1.5, studioStyleParameters(style).transitionSeconds),
+    effectsProfile: STUDIO_VISUAL_EFFECTS[input.effectsProfile] ? input.effectsProfile : "professional",
     editing: {
       rhythm: ["soft", "balanced", "dynamic"].includes(input.editing?.rhythm) ? input.editing.rhythm : "balanced",
       syncToMusic: input.editing?.syncToMusic === true,

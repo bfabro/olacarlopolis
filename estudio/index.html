@@ -9,14 +9,14 @@
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="studio.css?v=27">
+  <link rel="stylesheet" href="studio.css?v=28">
   <link rel="stylesheet" href="studio-overrides.css?v=22">
 </head>
 <body>
   <main id="studioLoading" class="gate-view">
     <section class="gate-card loading-card">
       <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-      <span class="studio-release-badge">Olá Studio <b data-studio-version>v46</b></span>
+      <span class="studio-release-badge">Olá Studio <b data-studio-version>v47</b></span>
       <span class="spinner" aria-hidden="true"></span>
       <h1>Preparando o Olá Studio</h1>
       <p>Validando seu acesso protegido.</p>
@@ -27,7 +27,7 @@
     <section class="gate-card">
       <a class="back-link" href="../admin/painel.html"><i class="fa-solid fa-arrow-left"></i> Voltar ao painel</a>
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v46</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v47</b></span>
       <span class="eyebrow">Ambiente protegido</span>
       <h1>Entre para criar seus vídeos</h1>
       <p>Nesta primeira etapa, o acesso é exclusivo do Admin Master.</p>
@@ -43,7 +43,7 @@
   <main id="studioUnavailable" class="gate-view hidden">
     <section class="gate-card">
       <div class="studio-mark"><img src="../images/img_padrao_site/logo_1.png" alt=""><span>STUDIO</span></div>
-      <span class="studio-release-badge">Versão <b data-studio-version>v46</b></span>
+      <span class="studio-release-badge">Versão <b data-studio-version>v47</b></span>
       <i class="fa-solid fa-shield-halved gate-icon"></i>
       <h1>Recurso em desenvolvimento</h1>
       <p id="unavailableMessage">O Olá Studio permanece protegido e ainda não foi liberado.</p>
@@ -55,7 +55,7 @@
     <aside class="studio-sidebar">
       <a class="studio-brand" href="#projects" aria-label="Olá Studio">
         <img src="../images/img_padrao_site/logo_1.png" alt="Olá Carlópolis">
-        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v46</b></small></span>
+        <span><strong>Olá</strong> Studio<small>MVP protegido • <b data-studio-version>v47</b></small></span>
       </a>
       <nav aria-label="Navegação do Studio">
         <button class="active" type="button" data-studio-view="projects"><i class="fa-solid fa-grid-2"></i><span>Meus projetos</span></button>
@@ -71,7 +71,7 @@
       <header class="studio-topbar">
         <button id="mobileMenuButton" class="icon-button mobile-menu" type="button" aria-label="Abrir menu"><i class="fa-solid fa-bars"></i></button>
         <div><span class="eyebrow">Edição automática</span><h1 id="studioViewTitle">Meus projetos</h1></div>
-        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v46</b></span>
+        <span class="studio-release-badge topbar-release">Studio <b data-studio-version>v47</b></span>
         <div class="user-chip"><span id="userInitial">A</span><div><strong id="userName">Admin Master</strong><small id="userEmail">-</small></div><button id="logoutButton" type="button" title="Sair"><i class="fa-solid fa-arrow-right-from-bracket"></i></button></div>
       </header>
 
@@ -131,6 +131,7 @@
               <div class="form-grid studio-advanced-grid">
                 <label>Transição entre cenas<select id="transitionMode"><option value="auto">Automática conforme o modelo</option><option value="fade">Fade</option><option value="dissolve">Cross Dissolve</option><option value="zoomin">Zoom In</option><option value="zoomout">Zoom Out</option><option value="slide">Slide</option><option value="wipe">Wipe</option><option value="blur">Blur</option><option value="whip">Whip Pan</option><option value="flash">Flash</option><option value="match">Match Cut técnico</option><option value="hardcut">Hard Cut</option><option value="dipblack">Dip to Black</option></select></label>
                 <label>Duração da transição<select id="transitionDuration"><option value="0.2">Rápida — 0,2s</option><option value="0.45" selected>Equilibrada — 0,45s</option><option value="0.75">Suave — 0,75s</option><option value="1.1">Cinematográfica — 1,1s</option></select></label>
+                <label>Acabamento visual<select id="effectsProfile"><option value="professional" selected>Profissional suave</option><option value="cinematic">Cinematográfico</option><option value="dynamic">Dinâmico para Reels</option><option value="natural">Natural, sem tratamento</option></select></label>
                 <label>Ritmo da montagem<select id="editingRhythm"><option value="soft">Suave — cenas mais longas</option><option value="balanced" selected>Equilibrado</option><option value="dynamic">Dinâmico — cortes mais rápidos</option></select></label>
                 <label class="toggle-field"><input id="syncCutsToMusic" type="checkbox" checked><span></span><div><strong>Sincronizar cortes com a música</strong><small>Usa batidas detectadas no áudio e preserva cenas com fala.</small></div></label>
               </div>
@@ -233,6 +234,13 @@
           </div>
           <aside class="visual-editor-sidebar">
             <section class="studio-card visual-settings-card">
+              <span class="eyebrow">Direção da nova versão</span>
+              <div class="visual-director-settings">
+                <label>Modo do diretor<select id="visualDirectorMode"><option value="local">Automático local — sem custo de IA</option><option value="semantic">Diretor de IA — análise padrão</option><option value="advanced">Diretor Avançado — narrativa temporal</option></select></label>
+                <label>Acabamento visual<select id="visualEffectsProfile"><option value="professional">Profissional suave</option><option value="cinematic">Cinematográfico</option><option value="dynamic">Dinâmico para Reels</option><option value="natural">Natural, sem tratamento</option></select></label>
+                <label class="wide">Objetivo criativo<textarea id="visualDirectorBrief" maxlength="1200" rows="4" placeholder="Explique o resultado desejado para a nova montagem automática."></textarea></label>
+                <small class="wide"><i class="fa-solid fa-circle-info"></i> O modo escolhido será usado em “Nova montagem com o diretor”. O acabamento também será aplicado aos ajustes manuais.</small>
+              </div>
               <span class="eyebrow">Textos do vídeo</span>
               <label>Título<input id="visualTitle" maxlength="120"></label>
               <label>Subtítulo<textarea id="visualSubtitle" maxlength="180" rows="3"></textarea></label>
@@ -273,7 +281,7 @@
               <div class="visual-render-actions">
                 <button id="visualGeneratePreview" class="secondary-button" type="button"><i class="fa-solid fa-bolt"></i> Gerar prévia rápida</button>
                 <button id="visualRenderFinal" class="create-button" type="button"><i class="fa-solid fa-film"></i> Renderizar nova versão</button>
-                <button id="visualRegenerateAutomatic" class="secondary-button" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Nova montagem automática</button>
+                <button id="visualRegenerateAutomatic" class="secondary-button" type="button"><i class="fa-solid fa-wand-magic-sparkles"></i> Nova montagem com o diretor</button>
               </div>
               <small><i class="fa-solid fa-shield"></i> Cada nova versão preserva as anteriores e os arquivos originais.</small>
             </section>
@@ -348,6 +356,6 @@
     <button id="fieldHelpOk" class="create-button" type="button">Entendi</button>
   </dialog>
   <div id="studioToast" class="studio-toast hidden" role="status"></div>
-  <script type="module" src="studio.js?v=39"></script>
+  <script type="module" src="studio.js?v=40"></script>
 </body>
 </html>

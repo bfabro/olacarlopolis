@@ -1,4 +1,4 @@
-import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_LIBRARY_MUSIC, STUDIO_SCHEMA_VERSION, STUDIO_TEXT_ANIMATIONS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_LIBRARY_MUSIC, STUDIO_SCHEMA_VERSION, STUDIO_TEXT_ANIMATIONS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, STUDIO_VISUAL_EFFECTS, validateEditPlan } from "../../shared/studio-contracts.mjs";
 import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
@@ -7,6 +7,7 @@ const safeColor = (value, fallback) => /^#[0-9a-f]{6}$/i.test(String(value || ""
 
 export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
   if (!input || typeof input !== "object") throw new Error("O editor visual não enviou um plano válido.");
+  const effectsProfile = STUDIO_VISUAL_EFFECTS[input.effectsProfile] ? input.effectsProfile : STUDIO_VISUAL_EFFECTS[technicalPlan.effectsProfile] ? technicalPlan.effectsProfile : "professional";
   const sources = new Map(analyzedSources.map((source) => [source.id, source]));
   const scenes = (Array.isArray(input.scenes) ? input.scenes : []).slice(0, 80).map((scene, index) => {
     const source = sources.get(String(scene.sourceId || ""));
@@ -17,7 +18,7 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
     const start = image ? 0 : Math.max(0, Math.min(Number(scene.start || 0), Math.max(0, sourceDuration - duration - 0.05)));
     const transition = index === 0 ? "none" : allowedTransitions.has(scene.transition) ? scene.transition : "fade";
     const transitionDuration = index === 0 || transition === "hardcut" ? 0 : Math.max(0.1, Math.min(1.5, Number(scene.transitionDuration || 0.35), duration / 2));
-    return { ...scene, id: `scene-${index + 1}`, sourceId: source.id, sourceIndex: source.order, start: round(start), duration: round(duration), transition, transitionDuration: round(transitionDuration), selection: { ...(scene.selection || {}), method: "visual-editor-v1", reason: "Cena ajustada manualmente no editor visual." } };
+    return { ...scene, id: `scene-${index + 1}`, sourceId: source.id, sourceIndex: source.order, start: round(start), duration: round(duration), transition, transitionDuration: round(transitionDuration), visualEffect: effectsProfile, selection: { ...(scene.selection || {}), method: "visual-editor-v1", reason: "Cena ajustada manualmente no editor visual." } };
   });
   if (!scenes.length) throw new Error("O plano editado precisa manter ao menos uma cena.");
   const duration = round(scenes.reduce((total, scene, index) => total + scene.duration - (index ? scene.transitionDuration : 0), 0));
@@ -50,6 +51,7 @@ export function prepareVisualEditorPlan(input, technicalPlan, analyzedSources) {
     ...input,
     schemaVersion: STUDIO_SCHEMA_VERSION,
     duration,
+    effectsProfile,
     export: { fps: exportFps, quality: exportQuality.id, codec: "h264", audioCodec: "aac", videoBitrateKbps: exportQuality.videoBitrateKbps, audioBitrateKbps: exportQuality.audioBitrateKbps },
     planner: { type: "visual-editor", version: 1, semanticAnalysis: false, technicalSelection: true, basedOn: input.planner?.type || technicalPlan.planner?.type || "technical" },
     text: { title: String(textValues.title || "").slice(0, 120), subtitle: String(textValues.subtitle || "").slice(0, 180), callToAction: String(textValues.callToAction || "").slice(0, 100) },

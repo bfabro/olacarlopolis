@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=11";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, STUDIO_VISUAL_EFFECTS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=12";
 import { estimateProcessingTiming } from "../shared/studio-metrics.mjs?v=1";
 
 const firebaseConfig = {
@@ -20,9 +20,9 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v46", date: "2026-10-25" });
+const STUDIO_RELEASE = Object.freeze({ label: "v47", date: "2026-10-25" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
-const state = { user: null, profile: null, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
+const state = { user: null, profile: null, featureFlags: {}, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
 const statusLabels = { draft: "Rascunho", uploading: "Enviando", queued: "Na fila", analyzing: "Analisando", rendering: "Renderizando", awaiting_review: "Revisar legendas", cancel_requested: "Cancelando", deletion_queued: "Exclusão na fila", deleting: "Excluindo", cancelled: "Cancelado", completed: "Concluído", failed: "Falhou" };
 const resumableStatuses = new Set(["queued", "analyzing", "rendering", "awaiting_review", "cancel_requested"]);
@@ -40,6 +40,10 @@ const FIELD_HELP = Object.freeze({
   aiNarrationTone: { title: "Estilo da voz", body: "Define a interpretação: profissional é clara e neutra; acolhedora é próxima; energética tem ritmo publicitário; calma é suave e inspiradora." },
   transitionMode: { title: "Transição entre cenas", body: "Define como uma imagem passa para a próxima. Automática respeita o tema escolhido. Fade e dissolve são suaves; slide, whip e flash são mais enérgicos; hard cut troca sem efeito." },
   transitionDuration: { title: "Duração da transição", body: "Controla por quanto tempo duas cenas se misturam. Valores curtos deixam o vídeo ágil; valores maiores criam uma passagem suave e cinematográfica." },
+  effectsProfile: { title: "Acabamento visual", body: "Natural preserva a imagem original. Profissional melhora cor e nitidez com discrição. Cinematográfico usa contraste e vinheta leves. Dinâmico realça cores e detalhes para Reels." },
+  visualDirectorMode: { title: "Diretor da nova versão", body: "Escolha novamente como a montagem automática será criada. Local não usa API; IA padrão interpreta quadros; Diretor Avançado compara vários momentos e mantém a narrativa temporal." },
+  visualEffectsProfile: { title: "Efeitos da nova versão", body: "Define o tratamento real aplicado às imagens e vídeos na próxima renderização. O efeito também vale ao renderizar a timeline ajustada manualmente." },
+  visualDirectorBrief: { title: "Objetivo da nova versão", body: "Orienta uma nova montagem por IA. Descreva público, clima, mensagem e cenas importantes. O texto não aparece no vídeo." },
   editingRhythm: { title: "Ritmo da montagem", body: "Suave mantém cenas mais longas; equilibrado combina contemplação e movimento; dinâmico cria cortes mais rápidos. O tema ainda define limites seguros para cada cena." },
   syncCutsToMusic: { title: "Sincronizar com a música", body: "Detecta batidas reais da trilha e aproxima os cortes delas. Trechos com fala são preservados para não cortar palavras." },
   exportFps: { title: "Taxa de quadros", body: "24 FPS dá aparência cinematográfica; 30 FPS é o padrão para redes sociais; 60 FPS deixa movimentos mais fluidos, mas aumenta o processamento e o arquivo." },
@@ -129,7 +133,7 @@ function closeFieldHelp() {
 }
 
 function initializeEditorHelp() {
-  document.querySelectorAll("#editorView label").forEach((label) => {
+  document.querySelectorAll("#editorView label, #visualView label").forEach((label) => {
     const control = label.querySelector("input,select,textarea");
     const info = editorFieldHelp(control);
     if (!control || !info || label.querySelector(".field-help-button")) return;
@@ -442,6 +446,7 @@ function currentDraft(sources = []) {
     export: { fps: Number($("exportFps").value), quality: $("exportQuality").value },
     transition: $("transitionMode").value,
     transitionDuration: Number($("transitionDuration").value),
+    effectsProfile: $("effectsProfile").value,
     editing: {
       rhythm: $("editingRhythm").value,
       syncToMusic: $("syncCutsToMusic").checked,
@@ -1029,18 +1034,24 @@ function watchJob(jobId, projectId) {
   });
 }
 
-async function regenerateProject(projectId) {
+async function regenerateProject(projectId, options = {}) {
   const snapshot = await get(ref(db, `studioProjects/${state.user.uid}/${projectId}`));
   const project = snapshot.val();
   if (!project?.sources?.length) return toast("Projeto sem arquivos de origem.");
+  const directorMode = ["semantic", "advanced"].includes(options.directorMode) ? options.directorMode : options.directorMode === "local" ? "local" : (["semantic", "advanced"].includes(project.director?.mode) ? project.director.mode : "local");
+  if (directorMode === "advanced" && state.featureFlags.advancedDirectorEnabled !== true) return toast("O Diretor Avançado não está habilitado neste ambiente.");
+  const directorBrief = String(options.directorBrief ?? project.director?.brief ?? "").trim().slice(0, 1200);
+  const effectsProfile = STUDIO_VISUAL_EFFECTS[options.effectsProfile] ? options.effectsProfile : (STUDIO_VISUAL_EFFECTS[project.effectsProfile] ? project.effectsProfile : "professional");
   const jobRef = push(ref(db, `studioJobs/${state.user.uid}`));
   const jobId = jobRef.key;
-  const cost = studioJobCostEstimate(project);
-  await update(ref(db), { [`studioJobs/${state.user.uid}/${jobId}`]: { schemaVersion: 1, id: jobId, projectId, ownerUid: state.user.uid, status: "queued", stage: "queue", progress: 25, attempt: 0, createdAt: Date.now(), updatedAt: Date.now(), costEstimate: cost }, [`studioProjects/${state.user.uid}/${projectId}/jobId`]: jobId, [`studioProjects/${state.user.uid}/${projectId}/status`]: "queued", [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: Date.now(), [`studioUsage/${state.user.uid}/estimates/${jobId}`]: { projectId, ...cost, status: "reserved", createdAt: Date.now() } });
+  const configuredProject = { ...project, director: { ...(project.director || {}), mode: directorMode, brief: directorBrief }, effectsProfile };
+  const cost = studioJobCostEstimate(configuredProject);
+  const now = Date.now();
+  await update(ref(db), { [`studioJobs/${state.user.uid}/${jobId}`]: { schemaVersion: 2, id: jobId, projectId, ownerUid: state.user.uid, status: "queued", stage: "queue", progress: 25, attempt: 0, createdAt: now, updatedAt: now, costEstimate: cost }, [`studioProjects/${state.user.uid}/${projectId}/director`]: configuredProject.director, [`studioProjects/${state.user.uid}/${projectId}/effectsProfile`]: effectsProfile, [`studioProjects/${state.user.uid}/${projectId}/jobId`]: jobId, [`studioProjects/${state.user.uid}/${projectId}/status`]: "queued", [`studioProjects/${state.user.uid}/${projectId}/updatedAt`]: now, [`studioUsage/${state.user.uid}/estimates/${jobId}`]: { projectId, ...cost, status: "reserved", createdAt: now } });
   state.activeProjectId = projectId;
   state.activeJobId = jobId;
   state.cancelRequested = false;
-  resetProcessingLog("Nova montagem enviada para a fila com os arquivos já armazenados.");
+  resetProcessingLog(`Nova montagem enviada com ${directorMode === "advanced" ? "Diretor Avançado" : directorMode === "semantic" ? "Diretor de IA" : "direção automática local"} e efeito ${STUDIO_VISUAL_EFFECTS[effectsProfile].label}.`);
   switchView("processing");
   $("processingStatusCard").classList.remove("hidden");
   $("cancelProcessingButton").classList.remove("hidden");
@@ -1128,6 +1139,7 @@ function normalizeVisualPlan(plan) {
   const narration = plan?.narration || {};
   return {
     ...plan,
+    effectsProfile: STUDIO_VISUAL_EFFECTS[plan?.effectsProfile] ? plan.effectsProfile : "professional",
     scenes: Array.isArray(plan?.scenes) ? plan.scenes : [],
     narration: {
       enabled: narration.enabled === true,
@@ -1140,6 +1152,13 @@ function normalizeVisualPlan(plan) {
       volume: Number(narration.volume || 1)
     }
   };
+}
+
+function syncVisualDirectionEffects() {
+  if (!state.visualPlan) return;
+  const profile = STUDIO_VISUAL_EFFECTS[$("visualEffectsProfile").value] ? $("visualEffectsProfile").value : "professional";
+  state.visualPlan.effectsProfile = profile;
+  state.visualPlan.scenes = (state.visualPlan.scenes || []).map((scene) => ({ ...scene, visualEffect: profile }));
 }
 
 function visualPlanDuration() {
@@ -1419,6 +1438,12 @@ async function openVisualEditor(projectId, preferredOutput = null) {
   state.activeProjectId = projectId;
   state.visualSourceUrls = new Map();
   $("visualProjectName").textContent = project.name || "Ajuste sua montagem";
+  $("visualDirectorMode").value = ["semantic", "advanced"].includes(project.director?.mode) ? project.director.mode : "local";
+  $("visualDirectorBrief").value = project.director?.brief || "";
+  $("visualEffectsProfile").value = STUDIO_VISUAL_EFFECTS[state.visualPlan.effectsProfile || project.effectsProfile] ? (state.visualPlan.effectsProfile || project.effectsProfile) : "professional";
+  const visualAdvancedOption = [...$("visualDirectorMode").options].find((option) => option.value === "advanced");
+  if (visualAdvancedOption) visualAdvancedOption.hidden = state.featureFlags.advancedDirectorEnabled !== true;
+  if ($("visualDirectorMode").value === "advanced" && state.featureFlags.advancedDirectorEnabled !== true) $("visualDirectorMode").value = "local";
   $("visualTitle").value = state.visualPlan.text?.title || "";
   $("visualSubtitle").value = state.visualPlan.text?.subtitle || "";
   $("visualCta").value = state.visualPlan.text?.callToAction || "";
@@ -1480,6 +1505,7 @@ async function restoreVisualVersion(versionId) {
   $("visualTitle").value = plan.text?.title || "";
   $("visualSubtitle").value = plan.text?.subtitle || "";
   $("visualCta").value = plan.text?.callToAction || "";
+  $("visualEffectsProfile").value = STUDIO_VISUAL_EFFECTS[plan.effectsProfile] ? plan.effectsProfile : "professional";
   renderVisualPrimaryTextStyle();
   renderVisualAudioMixer();
   renderVisualExportSettings();
@@ -1495,6 +1521,7 @@ async function enqueueVisualRender(mode) {
   if (!state.visualPlan || !state.visualProject) return;
   syncVisualTexts();
   syncVisualAudioMixer();
+  syncVisualDirectionEffects();
   if (state.visualPlan.narration?.enabled && !state.visualPlan.narration?.script) return toast("Preencha o roteiro da narração antes de gerar o vídeo.");
   state.visualPlan.duration = visualPlanDuration();
   if (!(state.visualPlan.duration > 0 && state.visualPlan.duration <= 90)) return toast("A timeline deve ter no máximo 90 segundos.");
@@ -1604,6 +1631,7 @@ async function authorize(user) {
   }
   const flagSnap = await get(ref(db, "studioFeatureFlags"));
   const featureFlags = flagSnap.val() || {};
+  state.featureFlags = featureFlags;
   const previewAuthorized = new URLSearchParams(location.search).get("preview") === "1";
   if (featureFlags.enabled !== true && !previewAuthorized) {
     $("unavailableMessage").textContent = "A feature flag do Olá Studio está desativada. Abra o acesso protegido pelo Painel Admin para testar o MVP.";
@@ -1697,7 +1725,7 @@ $("projectsGrid").addEventListener("click", (event) => {
   if (open) showProjectVideo(open.dataset.projectOpen).catch((error) => toast(error.message));
   if (download) downloadProject(download.dataset.projectDownload).catch((error) => toast(error.message));
   if (cancel) cancelProject(cancel.dataset.projectCancel).catch((error) => toast(error.message));
-  if (regenerate) regenerateProject(regenerate.dataset.projectRegenerate).catch((error) => toast(error.message));
+  if (regenerate) openVisualEditor(regenerate.dataset.projectRegenerate).then(() => toast("Escolha novamente o diretor e os efeitos antes de gerar a nova versão.")).catch((error) => toast(error.message));
   if (review) openProjectProgress(review.dataset.projectReview).catch((error) => toast(error.message));
   if (progress) openProjectProgress(progress.dataset.projectProgress).catch((error) => toast(error.message));
   if (edit) openVisualEditor(edit.dataset.projectEdit).catch((error) => toast(error.message));
@@ -1728,17 +1756,21 @@ $("transcriptReviewPlayer").addEventListener("timeupdate", () => {
   if (segment && !player.paused && player.currentTime >= Number(segment.end || 0)) player.pause();
 });
 $("backToProjects").addEventListener("click", () => { $("previewPlayer").pause(); switchView("projects"); });
-$("regenerateVideo").addEventListener("click", () => state.activeProjectId && regenerateProject(state.activeProjectId).catch((error) => toast(error.message)));
+$("regenerateVideo").addEventListener("click", () => state.activeProjectId && openVisualEditor(state.activeProjectId).then(() => toast("Escolha novamente o diretor e os efeitos antes de gerar a nova versão.")).catch((error) => toast(error.message)));
 $("visualBackProjects").addEventListener("click", () => { $("visualPreviewPlayer").pause(); switchView("projects"); });
 [$("visualTitle"), $("visualSubtitle"), $("visualCta")].forEach((field) => field.addEventListener("input", syncVisualTexts));
+$("visualEffectsProfile").addEventListener("change", syncVisualDirectionEffects);
 [$("visualTextFont"), $("visualTextSize"), $("visualTextColor"), $("visualTextOutline"), $("visualTextAlign"), $("visualTextBackground")].forEach((field) => field.addEventListener("input", syncVisualPrimaryTextStyle));
 [$("visualVoiceVolume"), $("visualMusicVolume"), $("visualMusicFade"), $("visualNoiseReduction"), $("visualMusicDucking"), $("visualLibraryMusic"), $("visualTransitionSound"), $("visualNarrationEnabled"), $("visualNarrationVoice"), $("visualNarrationTone"), $("visualNarrationScript")].forEach((field) => field.addEventListener("input", syncVisualAudioMixer));
 [$("visualExportFps"), $("visualExportQuality")].forEach((field) => field.addEventListener("change", syncVisualExportSettings));
 $("visualGeneratePreview").addEventListener("click", () => enqueueVisualRender("preview").catch((error) => toast(error.message)));
 $("visualRenderFinal").addEventListener("click", () => enqueueVisualRender("final").catch((error) => toast(error.message)));
 $("visualRegenerateAutomatic").addEventListener("click", () => {
-  if (!state.visualProject || !window.confirm("Gerar uma montagem automática nova? Seus vídeos e versões anteriores serão preservados.")) return;
-  regenerateProject(state.visualProject.id).catch((error) => toast(error.message));
+  if (!state.visualProject) return;
+  const mode = $("visualDirectorMode").value;
+  const modeLabel = mode === "advanced" ? "Diretor Avançado" : mode === "semantic" ? "Diretor de IA" : "automático local";
+  if (!window.confirm(`Gerar uma montagem nova com ${modeLabel}? A timeline atual e as versões anteriores serão preservadas.`)) return;
+  regenerateProject(state.visualProject.id, { directorMode: mode, directorBrief: $("visualDirectorBrief").value, effectsProfile: $("visualEffectsProfile").value }).catch((error) => toast(error.message));
 });
 $("visualAddTextLayer").addEventListener("click", () => {
   const layers = state.visualPlan?.textLayers || [];

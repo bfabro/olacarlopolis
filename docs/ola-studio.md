@@ -14,7 +14,7 @@ O frontend não executa FFmpeg. Ele envia os arquivos diretamente ao Firebase St
 
 `Upload direto → studioProjects → studioJobs → worker Docker → FFprobe/análise técnica → plano JSON local ou direção semântica opcional → editor visual → prévia reduzida ou FFmpeg Full HD → Storage → histórico/download`
 
-O planejador local é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 8 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, camadas de texto, animações, logo, áudio, legendas, direção solicitada e parâmetros de exportação.
+O planejador local é identificado no JSON como `deterministic-technical`. Ele usa mudanças de cena, duração, presença de áudio, silêncio, exposição e movimento medidos pelo FFmpeg. Ele não é apresentado como análise semântica de IA. O plano de edição está na versão 9 e registra cenas, evidências técnicas, estrutura narrativa, ritmo, transições, acabamento visual, camadas de texto, animações, logo, áudio, legendas, direção solicitada e parâmetros de exportação.
 
 O Diretor por IA é uma escolha explícita do usuário. Quando configurado no worker, ele envia à API somente um conjunto limitado de quadros representativos, medições técnicas e transcrições locais, solicita uma resposta JSON estrita e mescla a direção recebida ao plano técnico já validado. A chave nunca vai ao navegador. Se a configuração estiver ausente, a API falhar ou a resposta for inválida, o trabalho continua pelo motor local e o resultado informa claramente o fallback.
 
@@ -41,13 +41,15 @@ Pré-requisitos: Docker Desktop e um arquivo de service account do Firebase mant
 ```powershell
 $env:FIREBASE_SERVICE_ACCOUNT_FILE = "C:\caminho-seguro\firebase-service-account.json"
 $env:AVG_WEB_SHIELD_CA_FILE = "C:\caminho-seguro\avg-web-shield-root.pem"
-docker build --secret id=avg_web_shield_ca,src="$env:AVG_WEB_SHIELD_CA_FILE" -f studio-worker/Dockerfile -t ola-studio-worker:local-v46 .
+docker build --secret id=avg_web_shield_ca,src="$env:AVG_WEB_SHIELD_CA_FILE" -f studio-worker/Dockerfile -t ola-studio-worker:local-v47 .
 docker compose --env-file studio-worker/.env -f studio-worker/docker-compose.yml up -d --no-build
 ```
 
 O contêiner instala FFmpeg/FFprobe e limita o processo a 2 CPUs e 4 GB de RAM. A credencial e o certificado local são montados somente para leitura. O certificado também é entregue ao BuildKit como segredo temporário para o `npm install`, sem ser incorporado à imagem e sem desativar a verificação TLS. Nunca adicione a credencial ou o certificado ao Git. A compilação direta evita uma incompatibilidade observada entre Docker Compose Bake, segredos locais e caminhos do Windows; o Compose continua responsável por iniciar o worker já compilado.
 
 No Diretor de IA avançado, a fala humana detectada ativa automaticamente a transcrição e as legendas, mesmo sem seleção manual do campo de legendas. Os cortes escolhidos são normalizados pela ordem dos arquivos e pelo tempo original de cada gravação para preservar a sequência cronológica; a composição final é transcrita novamente para sincronizar a legenda com os cortes efetivamente renderizados.
+
+Ao editar um projeto existente, o usuário escolhe novamente entre direção local, IA padrão ou Diretor Avançado, revisa o objetivo criativo e seleciona um acabamento Natural, Profissional, Cinematográfico ou Dinâmico. Os acabamentos aplicam filtros reais de cor, contraste, nitidez e vinheta no FFmpeg e também adaptam as transições automáticas; as versões anteriores continuam preservadas.
 
 Variáveis opcionais:
 

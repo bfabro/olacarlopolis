@@ -1,10 +1,16 @@
-import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_LIBRARY_MUSIC, STUDIO_SCHEMA_VERSION, STUDIO_TRANSITION_SOUNDS, studioStyleParameters, studioTransitionParameters, validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { STUDIO_EXPORT_FPS, STUDIO_EXPORT_QUALITIES, STUDIO_LIBRARY_MUSIC, STUDIO_SCHEMA_VERSION, STUDIO_TRANSITION_SOUNDS, STUDIO_VISUAL_EFFECTS, studioStyleParameters, studioTransitionParameters, validateEditPlan } from "../../shared/studio-contracts.mjs";
 import { composePlanWaveform } from "./audio-waveform.mjs";
 
 const AUTO_TRANSITIONS = Object.freeze({
   institucional: ["fade", "dissolve", "fadeblack"], comercial: ["fadeblack", "fadewhite", "dissolve"], reels: ["smoothleft", "fadewhite", "hardcut", "slideleft"],
   comercio_local: ["dissolve", "slideleft", "fade"], imoveis: ["smoothleft", "dissolve", "fade"], gastronomia: ["zoomin", "dissolve", "fadewhite"],
   eventos: ["fadewhite", "smoothleft", "hardcut"], turismo: ["fade", "dissolve", "fadeblack"]
+});
+
+const EFFECT_TRANSITIONS = Object.freeze({
+  natural: ["fade", "dissolve"],
+  cinematic: ["fadeblack", "dissolve", "fade"],
+  dynamic: ["smoothleft", "fadewhite", "zoomin", "slideleft"]
 });
 
 const round = (value, digits = 3) => Number(Number(value || 0).toFixed(digits));
@@ -96,7 +102,8 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
   const target = Number(project.duration);
   const selectedTransition = studioTransitionParameters(project.transition, project.style);
   const transition = Number(project.transitionDuration || style.transitionSeconds);
-  const automaticTransitions = AUTO_TRANSITIONS[project.style] || [selectedTransition.ffmpeg];
+  const effectsProfile = STUDIO_VISUAL_EFFECTS[project.effectsProfile] ? project.effectsProfile : "professional";
+  const automaticTransitions = EFFECT_TRANSITIONS[effectsProfile] || AUTO_TRANSITIONS[project.style] || [selectedTransition.ffmpeg];
   const rhythmLevel = project.editing?.rhythm || "balanced";
   const exportFps = STUDIO_EXPORT_FPS.includes(Number(project.export?.fps)) ? Number(project.export.fps) : 30;
   const exportQuality = STUDIO_EXPORT_QUALITIES[project.export?.quality] || STUDIO_EXPORT_QUALITIES.balanced;
@@ -126,6 +133,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
       id: `scene-${scenes.length + 1}`, sourceId: candidate.source.id, sourceIndex: candidate.source.order,
       start: candidate.source.contentType.startsWith("image/") ? 0 : candidate.start, duration: round(duration),
       transition: scenes.length ? transitionName : "none", transitionDuration: appliedTransitionDuration, hasSpeech,
+      visualEffect: effectsProfile,
       narrativeRole: role,
       photoMotion: photoMotionFor(candidate.source, scenes.length),
       selection: { method: "technical-quality-v3", qualityScore: candidate.quality.score, flags: candidate.quality.flags, reason: candidate.quality.flags.length ? "Melhor alternativa técnica disponível com penalidades registradas." : "Trecho priorizado por nitidez, estabilidade, exposição, movimento e diversidade de origem." },
@@ -138,7 +146,7 @@ export function createDeterministicPlan(project, analyzedSources, options = {}) 
     planner: { type: "deterministic-technical", version: 2, semanticAnalysis: false, technicalSelection: true, narrativeTemplate: "opening-development-closing" },
     analysis: { sources: analyzedSources.map((source) => ({ sourceId: source.id, contentType: source.contentType, duration: Number(source.metadata?.duration || 0), hasAudio: source.metadata?.hasAudio === true, orientation: source.metadata.orientation, method: source.technical?.analysisMethod || "unknown", sceneChanges: source.technical?.sceneTimes?.length || 0, qualityWindows: source.technical?.qualityWindows?.length || 0, waveform: source.technical?.waveform || { available: false, samples: [] } })) },
     rhythm: { available: Boolean(rhythm.available), syncEnabled: Boolean(rhythm.syncEnabled), level: rhythmLevel, bpm: Number(rhythm.bpm || 0), confidence: Number(rhythm.confidence || 0), method: rhythm.method || "none", beatCount: rhythm.beatTimes?.length || 0, structure: rhythm.structure || { available: false, sections: [], peaks: [], method: "none" } },
-    style: project.style, format: project.format, duration: target, export: { fps: exportFps, quality: exportQuality.id, codec: "h264", audioCodec: "aac", videoBitrateKbps: exportQuality.videoBitrateKbps, audioBitrateKbps: exportQuality.audioBitrateKbps },
+    style: project.style, format: project.format, duration: target, effectsProfile, export: { fps: exportFps, quality: exportQuality.id, codec: "h264", audioCodec: "aac", videoBitrateKbps: exportQuality.videoBitrateKbps, audioBitrateKbps: exportQuality.audioBitrateKbps },
     transition: { mode: project.transition || "auto", name: selectedTransition.ffmpeg, duration: transition },
     text: { title: project.title || "", subtitle: project.subtitle || "", callToAction: project.callToAction || "" }, textDesign: project.textDesign || {}, textLayers: textLayersFor(project, target),
     captions: { requested: project.captionsEnabled === true || project.narration?.enabled === true, enabled: (project.captionsEnabled === true || project.narration?.enabled === true) && options.transcription?.available === true, provider: options.transcription?.provider || "pending", segments: options.transcription?.segments || [], ...(project.captions || {}) },
