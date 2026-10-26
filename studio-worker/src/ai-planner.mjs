@@ -3,6 +3,7 @@ import path from "node:path";
 import { workerConfig } from "./config.mjs";
 import { runProcess } from "./process-utils.mjs";
 import { validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { intentFirstNarrationGuidance, normalizeNarrationTone } from "./creative-language.mjs";
 
 const TRANSITIONS = ["fade", "dissolve", "zoomin", "zoomout", "slideleft", "wipeleft", "hblur", "smoothleft", "fadewhite", "circleopen", "hardcut", "fadeblack"];
 const ROLES = ["opening", "development", "closing"];
@@ -148,7 +149,7 @@ const semanticSchema = {
   additionalProperties: false,
   properties: {
     scenes: { type: "array", items: { type: "object", additionalProperties: false, properties: { candidateId: { type: "string" }, narrativeRole: { type: "string", enum: ROLES }, transition: { type: "string", enum: TRANSITIONS }, emphasis: { type: "string" }, onScreenText: { type: "string" }, containsPerson: { type: "boolean" }, narrationText: { type: "string" } }, required: ["candidateId", "narrativeRole", "transition", "emphasis", "onScreenText", "containsPerson", "narrationText"] } },
-    narration: { type: "object", additionalProperties: false, properties: { script: { type: "string" }, tone: { type: "string", enum: ["professional", "warm", "energetic", "calm"] } }, required: ["script", "tone"] },
+    narration: { type: "object", additionalProperties: false, properties: { script: { type: "string" }, tone: { type: "string", enum: ["conversational", "professional", "warm", "energetic", "calm"] } }, required: ["script", "tone"] },
     textPreset: { type: "string", enum: ["clean", "cinematic", "promo", "local", "minimal", "impact"] },
     rhythm: { type: "string", enum: ["soft", "balanced", "dynamic"] },
     rationale: { type: "string" },
@@ -227,7 +228,7 @@ export function mergeSemanticDirection(basePlan, direction, evidence, analyzedSo
     },
     scenes,
     textLayers: [...(basePlan.textLayers || []), ...aiTextLayers],
-    narration: { ...basePlan.narration, generated: true, script, tone: direction.narration?.tone || basePlan.narration?.tone || "professional", disclosure: "Voz gerada por inteligência artificial." }
+    narration: { ...basePlan.narration, generated: true, script, tone: normalizeNarrationTone(basePlan.narration?.tone || direction.narration?.tone), disclosure: "Voz gerada por inteligência artificial." }
   };
   return validateSemanticPlan(plan);
 }
@@ -264,9 +265,10 @@ export class OpenAISemanticPlanner {
     const minWords = Math.max(12, Math.floor(Number(basePlan.duration || 30) * 1.55));
     const maxWords = Math.max(minWords + 6, Math.floor(Number(basePlan.duration || 30) * 1.95));
     const wantsScript = project.narration?.generateScript === true;
+    const narrativeGuidance = intentFirstNarrationGuidance(project, { maximumWords: maxWords });
     const compactEvidence = { candidates: evidence.candidates, transcripts: evidence.transcripts, baseScenes: basePlan.scenes.map((scene) => ({ sourceId: scene.sourceId, start: scene.start, duration: scene.duration, narrativeRole: scene.narrativeRole })) };
     const content = [
-      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços, locais ou características. Use somente informações visíveis nos quadros, presentes nas transcrições ou declaradas no objetivo do usuário. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. Para cada cena, marque containsPerson=true quando houver uma pessoa visível. Quando houver fala humana na origem, deixe onScreenText e narrationText vazios: a fala real receberá sua própria legenda sincronizada. ${wantsScript ? `Somente em cenas sem fala e sem pessoa visível, escreva narrationText curto, factual e apropriado ao local ou objeto mostrado; ele será narrado e legendado. O campo narration.script deve reunir, na mesma ordem, somente esses narrationText, sem acrescentar descrições. onScreenText pode ser usado somente quando não competir com a fala. Mantenha o roteiro total conciso, com no máximo ${maxWords} palavras.` : "Retorne todos os onScreenText, narrationText e narration.script vazios."} Objetivo do usuário: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
+      { type: "input_text", text: `Você é o diretor de edição do Olá Studio. Responda somente no JSON solicitado. Não invente fatos, pessoas, preços, locais ou características. Use somente informações visíveis nos quadros, presentes nas transcrições ou declaradas no objetivo do usuário. Use apenas candidateId existentes. Preserve a duração e a segurança técnica do plano-base. Para cada cena, marque containsPerson=true quando houver uma pessoa visível. Quando houver fala humana na origem, deixe onScreenText e narrationText vazios: a fala real receberá sua própria legenda sincronizada. ${wantsScript ? `${narrativeGuidance} Somente em cenas sem fala e sem pessoa visível, distribua trechos curtos dessa história em narrationText. Cada trecho deve avançar a mensagem do vídeo e combinar com a evidência visual, sem simplesmente dizer o que aparece no quadro. O campo narration.script deve reunir, na mesma ordem, somente esses narrationText. onScreenText deve destacar uma ideia, benefício comprovado ou convite curto, nunca servir como legenda descritiva da imagem.` : "Retorne todos os onScreenText, narrationText e narration.script vazios."} Objetivo principal do vídeo: ${brief}\nContexto técnico: ${JSON.stringify(compactEvidence)}` }
     ];
     evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro representativo do ${frame.candidateId}, origem ${frame.sourceId}:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: workerConfig.aiImageDetail }); });
     const timeoutSignal = AbortSignal.timeout(workerConfig.aiTimeoutMs);

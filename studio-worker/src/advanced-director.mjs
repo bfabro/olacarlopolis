@@ -1,6 +1,7 @@
 import { workerConfig } from "./config.mjs";
 import { estimateSemanticUsageCost } from "./ai-planner.mjs";
 import { validateEditPlan } from "../../shared/studio-contracts.mjs";
+import { intentFirstNarrationGuidance, normalizeNarrationTone } from "./creative-language.mjs";
 
 const TRANSITIONS = ["fade", "dissolve", "zoomin", "zoomout", "slideleft", "wipeleft", "hblur", "smoothleft", "fadewhite", "circleopen", "hardcut", "fadeblack"];
 const PHOTO_MOTIONS = ["zoom_in", "zoom_out", "pan_left", "pan_right", "pan_up", "pan_down"];
@@ -19,7 +20,7 @@ const advancedSchema = {
       textPosition: { type: "string", enum: ["top", "bottom"] }, textAnimation: { type: "string", enum: ["fade", "slide_up", "zoom_pop", "reveal"] }, highlightDuration: { type: "number" },
       photoMotion: { type: "string", enum: PHOTO_MOTIONS }, focusX: { type: "number" }, focusY: { type: "number" }
     }, required: ["candidateId", "narrativeRole", "transition", "selectionReason", "continuityIntent", "narrativeRelevance", "intentionalException", "containsPerson", "onScreenText", "narrationText", "highlightType", "textPosition", "textAnimation", "highlightDuration", "photoMotion", "focusX", "focusY"] } },
-    narration: { type: "object", additionalProperties: false, properties: { script: { type: "string" }, tone: { type: "string", enum: ["professional", "warm", "energetic", "calm"] } }, required: ["script", "tone"] },
+    narration: { type: "object", additionalProperties: false, properties: { script: { type: "string" }, tone: { type: "string", enum: ["conversational", "professional", "warm", "energetic", "calm"] } }, required: ["script", "tone"] },
     rhythm: { type: "object", additionalProperties: false, properties: { pace: { type: "string", enum: ["soft", "balanced", "dynamic"] }, musicDirection: { type: "string" } }, required: ["pace", "musicDirection"] },
     closingProposal: { type: "string" }, rationale: { type: "string" }, confidence: { type: "number" }
   },
@@ -133,7 +134,7 @@ export function mergeAdvancedDirection(basePlan, direction, evidence, analyzedSo
     scenes,
     captions: { ...(basePlan.captions || {}), requested: basePlan.captions?.requested === true || detectedHumanSpeech, automaticSpeech: detectedHumanSpeech },
     textLayers: [...(basePlan.textLayers || []), ...highlights],
-    narration: { ...basePlan.narration, generated: true, script, tone: direction.narration?.tone || basePlan.narration?.tone || "professional", disclosure: "Voz gerada por inteligência artificial." }
+    narration: { ...basePlan.narration, generated: true, script, tone: normalizeNarrationTone(basePlan.narration?.tone || direction.narration?.tone), disclosure: "Voz gerada por inteligência artificial." }
   };
   const validation = validateEditPlan(plan);
   if (!validation.valid) throw Object.assign(new Error(`Plano avançado inválido: ${validation.errors.join(" ")}`), { code: "advanced_invalid_plan" });
@@ -151,8 +152,10 @@ export class OpenAIAdvancedDirector {
   async createPlan({ project, basePlan, evidence, analyzedSources, signal }) {
     if (!this.enabled) throw Object.assign(new Error("Diretor Avançado desativado neste worker."), { code: "advanced_feature_disabled" });
     const wantsScript = project.narration?.generateScript === true;
+    const maximumWords = Math.max(12, Math.floor(Number(basePlan.duration || 30) * 1.95));
+    const narrativeGuidance = intentFirstNarrationGuidance(project, { maximumWords });
     const compact = { objective: String(project.director?.brief || "Montagem profissional e coerente.").slice(0, 1200), duration: basePlan.duration, format: basePlan.format, style: basePlan.style, rhythm: basePlan.rhythm, candidates: evidence.candidates, transcripts: evidence.transcripts };
-    const content = [{ type: "input_text", text: `Atue como diretor audiovisual do Olá Studio. Analise o conjunto inteiro antes de escolher os trechos. Responda somente no JSON exigido e retorne exatamente ${basePlan.scenes.length} cenas. Use exclusivamente candidateId fornecidos e fatos visíveis, transcritos ou informados pelo usuário. Preserve obrigatoriamente a ordem dos arquivos e a ordem temporal dentro de cada vídeo; não use flashback, não volte para um instante anterior e não repita trechos. Compare começo, meio e fim de cada origem; escolha as partes mais relevantes sem quebrar uma fala coerente. Prefira qualidade técnica sem sacrificar a narrativa. Use intentionalException como none. Marque containsPerson quando houver pessoa visível. Nessas cenas, ou quando houver fala humana, deixe onScreenText e narrationText vazios, pois a fala real receberá legenda sincronizada. Destaques devem ser curtos e ficar em área segura, sem simular botões. Para fotos, escolha movimento sutil e foco normalizado entre 0.1 e 0.9. ${wantsScript ? "Nas cenas sem fala e sem pessoa, produza narração factual curta e correspondente ao quadro." : "Deixe toda narração e textos de cena vazios."} Contexto: ${JSON.stringify(compact)}` }];
+    const content = [{ type: "input_text", text: `Atue como diretor audiovisual do Olá Studio. Analise o conjunto inteiro e determine primeiro o intuito do vídeo antes de escolher os trechos. Responda somente no JSON exigido e retorne exatamente ${basePlan.scenes.length} cenas. Use exclusivamente candidateId fornecidos e fatos visíveis, transcritos ou informados pelo usuário. Preserve obrigatoriamente a ordem dos arquivos e a ordem temporal dentro de cada vídeo; não use flashback, não volte para um instante anterior e não repita trechos. Compare começo, meio e fim de cada origem; escolha as partes que melhor ajudam a contar a mensagem pretendida sem quebrar uma fala coerente. Prefira qualidade técnica sem sacrificar a narrativa. Use intentionalException como none. Marque containsPerson quando houver pessoa visível. Nessas cenas, ou quando houver fala humana, deixe onScreenText e narrationText vazios, pois a fala real receberá legenda sincronizada. Destaques devem ser curtos e ficar em área segura, sem simular botões. Para fotos, escolha movimento sutil e foco normalizado entre 0.1 e 0.9. ${wantsScript ? `${narrativeGuidance} Nas cenas sem fala e sem pessoa, distribua uma narração curta que avance essa história e dialogue com o público. O quadro deve apoiar a fala, mas a fala não deve apenas descrever o quadro. Preencha objective e narrativeProposal com a intenção real que guiou a montagem.` : "Deixe toda narração e textos de cena vazios."} Contexto: ${JSON.stringify(compact)}` }];
     evidence.frames.forEach((frame) => { content.push({ type: "input_text", text: `Quadro temporal ${frame.temporalPhase}, ${frame.candidateId}, origem ${frame.sourceId}, tempo ${frame.time}s:` }); content.push({ type: "input_image", image_url: frame.dataUrl, detail: workerConfig.aiImageDetail }); });
     const timeoutSignal = AbortSignal.timeout(workerConfig.aiTimeoutMs);
     const requestSignal = signal ? AbortSignal.any([signal, timeoutSignal]) : timeoutSignal;

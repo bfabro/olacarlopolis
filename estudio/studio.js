@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getDatabase, ref, get, set, update, push, onValue, query, limitToLast } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, getBlob } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, STUDIO_VISUAL_EFFECTS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=12";
+import { STUDIO_DURATIONS, STUDIO_EDIT_STYLES, STUDIO_EXPORT_QUALITIES, STUDIO_FORMATS, STUDIO_LIBRARY_MUSIC, STUDIO_LIMITS, STUDIO_TEXT_PRESETS, STUDIO_TRANSITIONS, STUDIO_TRANSITION_SOUNDS, STUDIO_VISUAL_EFFECTS, normalizeStudioProject, studioJobCostEstimate } from "../shared/studio-contracts.mjs?v=13";
 import { estimateProcessingTiming } from "../shared/studio-metrics.mjs?v=1";
 
 const firebaseConfig = {
@@ -20,7 +20,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 const storage = getStorage(app);
 const $ = (id) => document.getElementById(id);
-const STUDIO_RELEASE = Object.freeze({ label: "v50", date: "2026-10-25" });
+const STUDIO_RELEASE = Object.freeze({ label: "v51", date: "2026-10-25" });
 const STORAGE_OPERATION_TIMEOUT_MS = 15000;
 const state = { user: null, profile: null, featureFlags: {}, files: [], projects: [], logs: [], activeProjectId: "", activeJobId: "", jobUnsubscribe: null, outputPreviewUrl: "", transcriptReviewUrl: "", activeUploads: new Set(), cancelRequested: false, reviewingJobId: "", transcriptSegments: [], activeTranscriptIndex: -1, visualProject: null, visualPlan: null, visualSourceUrls: new Map(), selectedVisualVersionId: "", processingClock: null, currentTimingJob: null, processingCosts: [] };
 const viewTitles = { projects: "Meus projetos", editor: "Novo vídeo", visual: "Editor visual", processing: "Processamento", usage: "Uso e créditos", logs: "Logs e erros" };
@@ -33,17 +33,17 @@ let authPersistenceWarning = "";
 const FIELD_HELP = Object.freeze({
   sourceFiles: { title: "Arquivos do vídeo", body: "Adicione vídeos e também imagens estáticas à sequência. Cada foto vira uma cena com duração ajustável no editor visual e pode ser reordenada junto com os vídeos. A IA usa a imagem real na análise e os originais são preservados." },
   directorMode: { title: "Modo do diretor", body: "Automático local faz uma montagem rápida usando qualidade, duração, áudio e movimento, sem interpretar o assunto. Diretor de IA entende quadros e falas para escolher cenas coerentes. Diretor Avançado examina vários momentos, preserva ordem e continuidade e constrói uma narrativa mais completa, usando mais processamento e IA." },
-  directorBrief: { title: "Objetivo criativo", body: "Explique o resultado desejado: público, clima, pontos que devem aparecer e mensagem principal. Este texto orienta o Diretor de IA, mas não aparece escrito no vídeo." },
-  generateAiScript: { title: "Criar roteiro e textos", body: "Quando ativado, a IA prepara um roteiro baseado apenas nos arquivos, transcrições e objetivo criativo. O roteiro poderá alimentar os textos das cenas e a narração." },
+  directorBrief: { title: "Intenção e objetivo do vídeo", body: "Diga para quem é o vídeo, qual mensagem deve ficar, o que você quer que a pessoa sinta e qual ação espera ao final. A IA usa essa intenção como guia principal; as imagens servem para sustentar a história, não para gerar uma descrição literal do cenário." },
+  generateAiScript: { title: "Criar uma história para o vídeo", body: "Quando ativado, a IA transforma a intenção informada em uma narrativa curta, natural e coerente. Ela usa quadros e transcrições como evidência, evita inventar fatos e não deve simplesmente descrever o que aparece na imagem." },
   enableAiNarration: { title: "Narrar com voz de IA", body: "Transforma o roteiro em locução. As frases são distribuídas ao longo do vídeo, as legendas acompanham a fala e a música é reduzida durante a voz." },
   aiNarrationVoice: { title: "Voz da narração", body: "Escolhe o timbre usado na locução. Marin e Cedar mudam somente a voz; não alteram o texto nem os cortes." },
-  aiNarrationTone: { title: "Estilo da voz", body: "Define a interpretação: profissional é clara e neutra; acolhedora é próxima; energética tem ritmo publicitário; calma é suave e inspiradora." },
+  aiNarrationTone: { title: "Estilo da voz", body: "Conversacional soa mais humana e espontânea; profissional é clara e segura; acolhedora é próxima; energética é convidativa; calma é suave e inspiradora." },
   transitionMode: { title: "Transição entre cenas", body: "Define como uma imagem passa para a próxima. Automática respeita o tema escolhido. Fade e dissolve são suaves; slide, whip e flash são mais enérgicos; hard cut troca sem efeito." },
   transitionDuration: { title: "Duração da transição", body: "Controla por quanto tempo duas cenas se misturam. Valores curtos deixam o vídeo ágil; valores maiores criam uma passagem suave e cinematográfica." },
   effectsProfile: { title: "Acabamento visual", body: "Natural preserva a imagem original. Profissional melhora cor e nitidez com discrição. Cinematográfico usa contraste e vinheta leves. Dinâmico realça cores e detalhes para Reels." },
   visualDirectorMode: { title: "Diretor da nova versão", body: "Escolha o nível de análise usado para refazer a montagem: técnica local rápida, interpretação do conteúdo por IA ou direção avançada com narrativa, continuidade e ordem temporal." },
   visualEffectsProfile: { title: "Efeitos da nova versão", body: "Define o tratamento real aplicado às imagens e vídeos na próxima renderização. O efeito também vale ao renderizar a timeline ajustada manualmente." },
-  visualDirectorBrief: { title: "Objetivo da nova versão", body: "Orienta uma nova montagem por IA. Descreva público, clima, mensagem e cenas importantes. O texto não aparece no vídeo." },
+  visualDirectorBrief: { title: "Intenção da nova versão", body: "Explique o público, a mensagem que deve permanecer, o sentimento desejado e a ação esperada. A nova montagem usará essa intenção como guia, em vez de apenas descrever o conteúdo das imagens." },
   editingRhythm: { title: "Ritmo da montagem", body: "Suave mantém cenas mais longas; equilibrado combina contemplação e movimento; dinâmico cria cortes mais rápidos. O tema ainda define limites seguros para cada cena." },
   syncCutsToMusic: { title: "Sincronizar com a música", body: "Detecta batidas reais da trilha e aproxima os cortes delas. Trechos com fala são preservados para não cortar palavras." },
   exportFps: { title: "Taxa de quadros", body: "24 FPS dá aparência cinematográfica; 30 FPS é o padrão para redes sociais; 60 FPS deixa movimentos mais fluidos, mas aumenta o processamento e o arquivo." },
@@ -92,7 +92,7 @@ const DIRECTOR_MODE_GUIDANCE = Object.freeze({
   semantic: Object.freeze({
     icon: "fa-brain",
     title: "Diretor de IA: entende o conteúdo",
-    body: "Analisa quadros representativos e falas transcritas para reconhecer o tema, escolher cenas coerentes e propor textos, roteiro e ordem de apresentação conforme o objetivo criativo.",
+    body: "Analisa quadros representativos e falas transcritas, mas organiza o roteiro a partir da intenção informada. As cenas apoiam uma mensagem natural para o público, em vez de virarem apenas descrições do que aparece na tela.",
     detail: "Usa a API de IA e pode consumir créditos. Indicado quando o significado das cenas é importante."
   }),
   advanced: Object.freeze({
@@ -1204,7 +1204,7 @@ function normalizeVisualPlan(plan) {
       reviewed: narration.reviewed === true,
       script: String(narration.script || ""),
       voice: ["marin", "cedar"].includes(narration.voice) ? narration.voice : "marin",
-      tone: ["professional", "warm", "energetic", "calm"].includes(narration.tone) ? narration.tone : "professional",
+      tone: ["conversational", "professional", "warm", "energetic", "calm"].includes(narration.tone) ? narration.tone : "conversational",
       volume: Number(narration.volume || 1)
     }
   };
@@ -1368,7 +1368,7 @@ function renderVisualAudioMixer() {
   const narration = state.visualPlan?.narration || {};
   $("visualNarrationEnabled").checked = narration.enabled === true;
   $("visualNarrationVoice").value = ["marin", "cedar"].includes(narration.voice) ? narration.voice : "marin";
-  $("visualNarrationTone").value = ["professional", "warm", "energetic", "calm"].includes(narration.tone) ? narration.tone : "professional";
+  $("visualNarrationTone").value = ["conversational", "professional", "warm", "energetic", "calm"].includes(narration.tone) ? narration.tone : "conversational";
   $("visualNarrationScript").value = narration.script || "";
   updateVisualNarrationStatus();
 }

@@ -203,7 +203,7 @@ export function normalizeStudioProject(input = {}) {
       generateScript: ["semantic", "advanced"].includes(input.director?.mode) && input.narration?.generateScript === true,
       enabled: ["semantic", "advanced"].includes(input.director?.mode) && input.narration?.generateScript === true && input.narration?.enabled === true,
       voice: ["marin", "cedar"].includes(input.narration?.voice) ? input.narration.voice : "marin",
-      tone: ["professional", "warm", "energetic", "calm"].includes(input.narration?.tone) ? input.narration.tone : "professional",
+      tone: ["conversational", "professional", "warm", "energetic", "calm"].includes(input.narration?.tone) ? input.narration.tone : "conversational",
       volume: numberBetween(input.narration?.volume, 0.7, 1.5, 1),
       disclosure: "Voz gerada por inteligência artificial."
     },

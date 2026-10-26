@@ -4,8 +4,9 @@ import { workerConfig } from "./config.mjs";
 
 const VOICES = new Set(["marin", "cedar"]);
 const TONES = {
-  professional: "Fale em português brasileiro com tom profissional, claro e natural.",
-  warm: "Fale em português brasileiro com tom acolhedor, próximo e natural.",
+  conversational: "Fale em português brasileiro de forma conversacional, humana e espontânea, como alguém falando diretamente com outra pessoa. Use ritmo natural, pequenas pausas entre ideias e evite voz de locutor publicitário.",
+  professional: "Fale em português brasileiro com tom profissional, claro e natural, sem soar rígido ou mecânico.",
+  warm: "Fale em português brasileiro com tom acolhedor, próximo e natural, como uma conversa simpática.",
   energetic: "Fale em português brasileiro com energia publicitária, sem gritar e mantendo dicção clara.",
   calm: "Fale em português brasileiro com tom calmo, elegante e inspirador."
 };
@@ -33,7 +34,7 @@ export class OpenAISpeechProvider {
     this.endpoint = options.endpoint || "https://api.openai.com/v1/audio/speech";
   }
   get enabled() { return Boolean(this.apiKey && this.model); }
-  async synthesize({ script, voice = "marin", tone = "professional", outputDir, fileName = "ai-narration.wav", signal }) {
+  async synthesize({ script, voice = "marin", tone = "conversational", outputDir, fileName = "ai-narration.wav", signal }) {
     const input = String(script || "").replace(/\s+/g, " ").trim().slice(0, 4000);
     if (!input) return { available: false, reason: "Roteiro vazio." };
     if (!this.enabled) return { available: false, reason: "Narração por IA não configurada no worker." };
@@ -43,7 +44,7 @@ export class OpenAISpeechProvider {
     const response = await this.fetchImpl(this.endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({ model: this.model, voice: selectedVoice, input, instructions: TONES[tone] || TONES.professional, response_format: "wav" }),
+      body: JSON.stringify({ model: this.model, voice: selectedVoice, input, instructions: TONES[tone] || TONES.conversational, response_format: "wav" }),
       signal: requestSignal
     });
     if (!response.ok) {

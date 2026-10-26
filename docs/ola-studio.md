@@ -262,3 +262,7 @@ A v49 adiciona o botão **Como preparar um bom vídeo** tanto no fluxo de criaç
 ## Adequação da duração e do formato
 
 A v50 garante que o acabamento final apare ou complete a imagem e o áudio exatamente até a duração escolhida no projeto. Uma composição ligeiramente curta passa a preservar o último quadro somente pelo tempo técnico necessário, enquanto o áudio recebe preenchimento silencioso; composições maiores continuam sendo aparadas. O controle de qualidade confirma tanto a duração quanto as dimensões correspondentes ao formato 9:16, 16:9 ou 1:1 antes de liberar o MP4.
+
+## Direção humanizada orientada pela intenção
+
+A v51 muda a prioridade dos roteiros gerados por IA. O Diretor de IA e o Diretor Avançado determinam primeiro o intuito, o público, a mensagem e a ação esperada; quadros e transcrições passam a sustentar essa história em vez de originarem uma descrição literal do cenário. O novo tom padrão **Conversacional e humano** usa frases curtas de português brasileiro, transições naturais entre ideias e orientação de voz espontânea. O sistema continua proibido de inventar fatos, benefícios, preços ou características não comprovadas pelo objetivo, pelas imagens ou pelas transcrições.
