@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 952,
-  label: "v952",
-  data: "2026-10-25",
-  nota: "Olá Studio v51: roteiros orientados pela intenção, com linguagem conversacional e humanizada."
+  numero: 953,
+  label: "v953",
+  data: "2026-10-27",
+  nota: "Contatos no computador agora abrem o WhatsApp Web imediatamente, sem bloqueio de popup."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 

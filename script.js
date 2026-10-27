@@ -3,7 +3,7 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v723.
+// Release do site v724.
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -27747,37 +27747,54 @@ ${servicosIniciaisLoja.length ? `
 
   //// fim valdador nome imoveis
 
-  // === Contador: clique em telefone (link tel: dentro da área de info) ===
+  function isDispositivoMovelParaWhatsApp() {
+    return /Android|iPhone|iPad|iPod|Windows Phone|Mobile/i.test(navigator.userAgent || "");
+  }
+
+  function urlWhatsAppParaDispositivo(href) {
+    if (isDispositivoMovelParaWhatsApp()) return href;
+
+    try {
+      const origem = new URL(href, window.location.href);
+      const telefone = origem.hostname.toLowerCase() === "wa.me"
+        ? somenteDigitos(origem.pathname)
+        : somenteDigitos(origem.searchParams.get("phone") || "");
+
+      if (!telefone) return href;
+
+      const destino = new URL("https://web.whatsapp.com/send");
+      destino.searchParams.set("phone", telefone);
+
+      const mensagem = origem.searchParams.get("text");
+      if (mensagem) destino.searchParams.set("text", mensagem);
+
+      return destino.toString();
+    } catch (erro) {
+      console.warn("[WhatsApp] Não foi possível preparar o link para computador:", erro);
+      return href;
+    }
+  }
+
+  // === Contador: clique em telefone/WhatsApp dentro da área de informações ===
   document.addEventListener('click', function (ev) {
     const a = ev.target.closest?.('.telefone-link');
     if (!a) return;
 
-    ev.preventDefault(); // registra primeiro
-
     const href = a.getAttribute('href') || '';
-    const tel = a.dataset.tel || somenteDigitos(href);
     const estId = a.dataset.id || a.closest('[data-est-id]')?.dataset.estId || '';
+    const isWhats = /^https?:\/\/(?:api\.whatsapp\.com|wa\.me|web\.whatsapp\.com)\//i.test(href);
 
+    // O destino precisa ser definido durante o gesto do usuário. Adiar window.open
+    // até o Firebase responder faz os navegadores de computador bloquearem a aba.
+    if (isWhats) {
+      a.href = urlWhatsAppParaDispositivo(href);
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+    }
 
-    // se for link do WhatsApp, mantenha o href original (com text=...);
-    // senão, caia para tel:
-    const isWhats = /^https?:\/\/(?:api\.whatsapp\.com|wa\.me)\//i.test(href);
-    const navegar = () => {
-      if (isWhats) {
-        window.open(href, '_blank');  // abre Whats em nova aba
-      } else {
-        window.open(`tel:${tel}`, '_blank');  // abre discador em nova aba
-      }
-    };
-
-
-
-    let navegou = false;
+    // A medição continua em segundo plano, sem atrasar ou cancelar o clique nativo.
     registrarCliqueBotao('telefone', estId || '', 'servicos-comercios')
-      .finally(() => { navegou = true; navegar(); });
-
-    // fallback caso a rede esteja lenta: garante navegação mesmo sem callback
-    setTimeout(() => { if (!navegou) navegar(); }, 600);
+      .catch((erro) => console.warn('[CliqueBotao] Não foi possível registrar o clique:', erro));
   });
 
 
