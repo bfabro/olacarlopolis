@@ -17,6 +17,7 @@
       --high: #f97316;
       --very-high: #ef4444;
       --period: #ec4899;
+      --pms: #c084fc;
       --today: #a78bfa;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
       --radius: 18px;
@@ -104,6 +105,32 @@
     .field button.secondary {
       background: #0f172a;
       border-color: #475569;
+    }
+
+    .field button.save {
+      background: #7c3aed;
+      border-color: #8b5cf6;
+    }
+
+    .save-status {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 14px;
+      border: 1px solid rgba(192, 132, 252, .38);
+      border-radius: 12px;
+      background: rgba(124, 58, 237, .12);
+      color: #ddd6fe;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .save-status.error {
+      border-color: rgba(248, 113, 113, .5);
+      background: rgba(127, 29, 29, .2);
+      color: #fecaca;
     }
 
     .field.checkbox {
@@ -315,6 +342,11 @@
       border-color: rgba(249,115,22,.55);
     }
 
+    .risk-chip.pms {
+      background: rgba(192,132,252,.28);
+      border-color: rgba(216,180,254,.7);
+    }
+
     .risk-low { background: linear-gradient(180deg, rgba(34,197,94,.25), rgba(15,23,42,.9)); }
     .risk-medium { background: linear-gradient(180deg, rgba(245,158,11,.30), rgba(15,23,42,.9)); }
     .risk-high { background: linear-gradient(180deg, rgba(249,115,22,.30), rgba(15,23,42,.92)); }
@@ -349,6 +381,11 @@
         repeating-linear-gradient(135deg, rgba(255,255,255,.12) 0 8px, rgba(255,255,255,0) 8px 16px);
       border-color: rgba(255,255,255,.95);
       box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+
+    .pms-day {
+      border-color: rgba(216, 180, 254, .88);
+      box-shadow: inset 0 -5px 0 rgba(192, 132, 252, .95);
     }
 
     .period-banner {
@@ -406,6 +443,11 @@
     .big {
       font-size: 28px;
       font-weight: 800;
+    }
+
+    .big.compact {
+      font-size: 20px;
+      line-height: 1.3;
     }
 
     .muted {
@@ -691,14 +733,14 @@
     <section class="hero">
       <h1>Calendário de Fertilidade Dinâmico</h1>
       <p class="sub">
-        Informe a data do início da menstruação e a duração do ciclo. O calendário calcula automaticamente os dias estimados de menstruação, menor, médio, alto e muito alto risco para o mês escolhido, e destaca de 1 a 3 dos dias mais tranquilos do mês com um visual especial.
+        Informe a data do início da menstruação e a duração do ciclo. O calendário calcula automaticamente os dias estimados de menstruação, fertilidade e possível TPM para o mês escolhido. A última configuração salva fica disponível neste dispositivo na próxima vez que a página for aberta.
       </p>
     </section>
 
     <section class="controls">
       <div class="field">
         <label for="startDate">1º dia da última menstruação</label>
-        <input type="date" id="startDate" value="2026-03-25" />
+        <input type="date" id="startDate" />
       </div>
 
       <div class="field">
@@ -732,7 +774,16 @@
 
       <div class="field">
         <label>&nbsp;</label>
+        <button id="saveBtn" class="save">Salvar dados</button>
+      </div>
+
+      <div class="field">
+        <label>&nbsp;</label>
         <button id="todayBtn" class="secondary">Ir para o mês atual</button>
+      </div>
+
+      <div class="save-status" id="savedStatus" role="status" aria-live="polite">
+        Os dados ficam salvos somente neste navegador e não são enviados ao portal.
       </div>
     </section>
 
@@ -748,6 +799,7 @@
           <span><i class="dot" style="background: var(--medium)"></i> Médio</span>
           <span><i class="dot" style="background: var(--high)"></i> Alto</span>
           <span><i class="dot" style="background: var(--very-high)"></i> Muito alto</span>
+          <span><i class="dot" style="background: var(--pms)"></i> Possível TPM</span>
           <span><i class="dot" style="background: var(--today)"></i> Hoje</span>
           <span><i class="dot-best"></i> Dias mais tranquilos do mês</span>
         </div>
@@ -767,6 +819,11 @@
             <h3>Ovulação estimada</h3>
             <div class="big" id="ovulationDate">-</div>
             <div class="muted">Estimativa baseada no ciclo informado.</div>
+          </div>
+          <div class="card">
+            <h3>Possível TPM no mês</h3>
+            <div class="big compact" id="pmsRange">-</div>
+            <div class="muted" id="pmsText">Estimativa dos 5 dias anteriores à próxima menstruação.</div>
           </div>
         </div>
 
@@ -788,6 +845,12 @@
         </div>
 
         <div class="card" style="margin-top: 14px;">
+          <h3>Possíveis dias de TPM</h3>
+          <div class="muted">Faixa estimada dos 5 dias antes da próxima menstruação. Os sintomas variam de pessoa para pessoa e de um ciclo para outro.</div>
+          <div class="list" id="pmsDays"></div>
+        </div>
+
+        <div class="card" style="margin-top: 14px;">
           <h3>Dias possíveis no mês</h3>
           <div class="muted">Mostra os dias do mês com risco médio, alto e muito alto.</div>
           <div class="list" id="possibleDays"></div>
@@ -802,11 +865,12 @@
     </section>
 
     <p class="footnote">
-      Este calendário é apenas uma estimativa visual. O dia da ovulação pode variar de um ciclo para outro, então "menor risco" não significa "risco zero".
+      Este calendário é apenas uma estimativa informativa: não substitui orientação médica e não deve ser usado como método contraceptivo. O dia da ovulação e os sintomas de TPM podem variar de um ciclo para outro, então "menor risco" não significa "risco zero". A faixa de possível TPM considera os 5 dias anteriores à menstruação, conforme o padrão clínico descrito pelo <a href="https://www.acog.org/womens-health/faqs/premenstrual-syndrome" target="_blank" rel="noopener noreferrer" style="color:#c4b5fd;">ACOG</a>.
     </p>
   </div>
 
   <script>
+    const STORAGE_KEY = 'ola-carlopolis-fertility-calendar-v1';
     const monthNames = [
       'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
       'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -821,16 +885,21 @@
       yearSelect: document.getElementById('yearSelect'),
       followCurrentMonth: document.getElementById('followCurrentMonth'),
       recalculateBtn: document.getElementById('recalculateBtn'),
+      saveBtn: document.getElementById('saveBtn'),
       todayBtn: document.getElementById('todayBtn'),
+      savedStatus: document.getElementById('savedStatus'),
       calendarTitle: document.getElementById('calendarTitle'),
       calendar: document.getElementById('calendar'),
       fertileRange: document.getElementById('fertileRange'),
       fertileText: document.getElementById('fertileText'),
       ovulationDate: document.getElementById('ovulationDate'),
+      pmsRange: document.getElementById('pmsRange'),
+      pmsText: document.getElementById('pmsText'),
       monthSummary: document.getElementById('monthSummary'),
       possibleDays: document.getElementById('possibleDays'),
       bestDays: document.getElementById('bestDays'),
       periodDays: document.getElementById('periodDays'),
+      pmsDays: document.getElementById('pmsDays'),
       detailBox: document.getElementById('detailBox'),
       chart: document.getElementById('monthChart')
     };
@@ -850,6 +919,79 @@
 
     function formatDateBR(date) {
       return `${pad(date.getDate())}/${pad(date.getMonth() + 1)}/${date.getFullYear()}`;
+    }
+
+    function isValidISODate(value) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ''))) return false;
+      const date = makeLocalDate(value);
+      return !Number.isNaN(date.getTime()) && toISO(date) === value;
+    }
+
+    function clampNumber(value, min, max, fallback) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? Math.max(min, Math.min(max, parsed)) : fallback;
+    }
+
+    function setSavedStatus(message, isError = false) {
+      els.savedStatus.textContent = message;
+      els.savedStatus.classList.toggle('error', isError);
+    }
+
+    function savePreferences(announce = true) {
+      if (!isValidISODate(els.startDate.value)) {
+        if (announce) setSavedStatus('Informe uma data válida para salvar e calcular.', true);
+        return false;
+      }
+
+      const preferences = {
+        startDate: els.startDate.value,
+        cycleLength: clampNumber(els.cycleLength.value, 20, 40, 28),
+        periodLength: clampNumber(els.periodLength.value, 2, 10, 5),
+        month: Number(els.monthSelect.value),
+        year: Number(els.yearSelect.value),
+        followCurrentMonth: els.followCurrentMonth.checked,
+        savedAt: new Date().toISOString()
+      };
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences));
+        if (announce) {
+          setSavedStatus(`Dados salvos neste dispositivo. Última menstruação: ${formatDateBR(makeLocalDate(preferences.startDate))}.`);
+        }
+        return true;
+      } catch (error) {
+        if (announce) setSavedStatus('O navegador bloqueou o armazenamento local. Verifique as permissões ou o modo privado.', true);
+        return false;
+      }
+    }
+
+    function loadPreferences() {
+      const today = new Date();
+      els.startDate.value = toISO(new Date(today.getFullYear(), today.getMonth(), today.getDate(), 12));
+
+      try {
+        const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
+        if (!saved || !isValidISODate(saved.startDate)) {
+          setSavedStatus('Nenhum dado salvo ainda. Informe a data e toque em “Salvar dados”.');
+          return;
+        }
+
+        els.startDate.value = saved.startDate;
+        els.cycleLength.value = String(clampNumber(saved.cycleLength, 20, 40, 28));
+        els.periodLength.value = String(clampNumber(saved.periodLength, 2, 10, 5));
+        els.followCurrentMonth.checked = saved.followCurrentMonth !== false;
+
+        if (!els.followCurrentMonth.checked) {
+          const monthOptionExists = [...els.monthSelect.options].some(option => Number(option.value) === Number(saved.month));
+          const yearOptionExists = [...els.yearSelect.options].some(option => Number(option.value) === Number(saved.year));
+          if (monthOptionExists) els.monthSelect.value = String(saved.month);
+          if (yearOptionExists) els.yearSelect.value = String(saved.year);
+        }
+
+        setSavedStatus(`Dados recuperados deste dispositivo. Última menstruação: ${formatDateBR(makeLocalDate(saved.startDate))}.`);
+      } catch (error) {
+        setSavedStatus('Não foi possível recuperar os dados salvos. Uma nova configuração poderá ser salva.', true);
+      }
     }
 
     function addDays(date, days) {
@@ -898,6 +1040,8 @@
       const mediumBefore = fertileStart - 1;
       const mediumAfter = fertileEnd + 1;
       const menstruating = cycleDay >= 1 && cycleDay <= periodLength;
+      const pmsStart = Math.max(1, cycleLength - 4);
+      const possiblePms = cycleDay >= pmsStart && cycleDay <= cycleLength;
 
       let risk = 'low';
       let riskLabel = 'Menor';
@@ -923,6 +1067,8 @@
         mediumBefore,
         mediumAfter,
         menstruating,
+        pmsStart,
+        possiblePms,
         risk,
         riskLabel,
         currentCycleStart: addDays(date, -(cycleDay - 1)),
@@ -1001,6 +1147,7 @@
       let periodDaysList = [];
       let fertileDaysInMonth = [];
       let ovulationDatesInMonth = [];
+      let pmsDaysList = [];
 
       const markerCandidates = days
         .map(date => ({ date: new Date(date), info: getCycleInfoForDate(date, cycleStart, cycleLength, periodLength) }))
@@ -1024,6 +1171,7 @@
         if (info.menstruating) classes.push('period-ring');
         if (toISO(date) === todayIso) classes.push('today-ring');
         if (isBestDay) classes.push('best-day-highlight');
+        if (info.possiblePms) classes.push('pms-day');
         day.className = classes.join(' ');
 
         const badges = [];
@@ -1033,6 +1181,10 @@
         }
         if (info.cycleDay >= info.fertileStart && info.cycleDay <= info.fertileEnd) {
           fertileDaysInMonth.push(new Date(date));
+        }
+        if (info.possiblePms) {
+          badges.push('Possível TPM');
+          pmsDaysList.push({ date: new Date(date), label: `Dia ${info.cycleDay} do ciclo` });
         }
 
         counts[info.riskLabel]++;
@@ -1061,6 +1213,7 @@
           isToday ? '<span class="risk-chip">H</span>' : '',
           info.menstruating ? '<span class="risk-chip period">M</span>' : `<span class="risk-chip">${riskShort}</span>`,
           info.cycleDay === info.ovulationDay ? '<span class="risk-chip ovulation">O</span>' : '',
+          info.possiblePms ? '<span class="risk-chip pms">T</span>' : '',
           isBestDay ? '<span class="risk-chip best">★</span>' : ''
         ].filter(Boolean).join('');
 
@@ -1086,6 +1239,7 @@
             ${isBestDay ? 'Dia entre os mais tranquilos do mês: <strong>sim</strong>.<br>' : ''}
             ${info.menstruating ? 'Dia dentro da menstruação estimada.<br>' : ''}
             ${info.cycleDay === info.ovulationDay ? 'Ovulação estimada neste dia.<br>' : ''}
+            ${info.possiblePms ? 'Dia dentro da faixa estimada de possível TPM.<br>' : ''}
             Janela fértil do ciclo atual: <strong>dias ${info.fertileStart} a ${info.fertileEnd}</strong> do ciclo.
           `;
         });
@@ -1107,6 +1261,13 @@
         ? ovulationDatesInMonth.map(formatDateBR).join(' • ')
         : '—';
 
+      els.pmsRange.textContent = pmsDaysList.length
+        ? formatDateRanges(pmsDaysList.map(item => item.date))
+        : '—';
+      els.pmsText.textContent = pmsDaysList.length
+        ? `${pmsDaysList.length} dia(s) do mês dentro da faixa estimada de possível TPM.`
+        : 'Nenhum dia dessa faixa caiu no mês exibido.';
+
       const menstruationCount = periodDaysList.length;
       els.monthSummary.innerHTML = `
         <div class="list-item"><span>Menstruação</span><strong>${menstruationCount} dia(s)</strong></div>
@@ -1114,6 +1275,7 @@
         <div class="list-item"><span>Médio</span><strong>${counts['Médio']} dia(s)</strong></div>
         <div class="list-item"><span>Alto</span><strong>${counts['Alto']} dia(s)</strong></div>
         <div class="list-item"><span>Muito alto</span><strong>${counts['Muito alto']} dia(s)</strong></div>
+        <div class="list-item"><span>Possível TPM</span><strong>${pmsDaysList.length} dia(s)</strong></div>
       `;
 
       if (periodDaysList.length) {
@@ -1125,6 +1287,17 @@
         `).join('');
       } else {
         els.periodDays.innerHTML = `<div class="list-item"><span>Nenhum dia menstruado neste mês.</span><strong>—</strong></div>`;
+      }
+
+      if (pmsDaysList.length) {
+        els.pmsDays.innerHTML = pmsDaysList.map(item => `
+          <div class="list-item">
+            <span>💜 ${formatDateBR(item.date)}</span>
+            <strong>${item.label}</strong>
+          </div>
+        `).join('');
+      } else {
+        els.pmsDays.innerHTML = `<div class="list-item"><span>Nenhum possível dia de TPM neste mês.</span><strong>—</strong></div>`;
       }
 
       if (possibleList.length) {
@@ -1215,22 +1388,57 @@
       });
     }
 
+    function formatDateRanges(dates) {
+      if (!dates.length) return '—';
+      const sorted = [...dates].sort((a, b) => a - b);
+      const groups = [];
+      let start = sorted[0];
+      let end = sorted[0];
+
+      for (let index = 1; index < sorted.length; index++) {
+        if (diffInDays(end, sorted[index]) === 1) {
+          end = sorted[index];
+        } else {
+          groups.push([start, end]);
+          start = sorted[index];
+          end = sorted[index];
+        }
+      }
+      groups.push([start, end]);
+
+      return groups
+        .map(([rangeStart, rangeEnd]) => toISO(rangeStart) === toISO(rangeEnd)
+          ? formatDateBR(rangeStart)
+          : `${formatDateBR(rangeStart)} a ${formatDateBR(rangeEnd)}`)
+        .join(' • ');
+    }
+
     function attachEvents() {
-      ['change', 'input'].forEach(evt => {
-        els.startDate.addEventListener(evt, render);
-        els.cycleLength.addEventListener(evt, render);
-        els.periodLength.addEventListener(evt, render);
-        els.monthSelect.addEventListener(evt, () => {
-          if (evt === 'change') render();
-        });
-        els.yearSelect.addEventListener(evt, () => {
-          if (evt === 'change') render();
+      [els.startDate, els.cycleLength, els.periodLength].forEach(input => {
+        input.addEventListener('input', render);
+        input.addEventListener('change', () => {
+          savePreferences(true);
+          render();
         });
       });
+      [els.monthSelect, els.yearSelect].forEach(select => {
+        select.addEventListener('change', () => {
+          savePreferences(false);
+          render();
+        });
+      });
+      els.followCurrentMonth.addEventListener('change', () => savePreferences(false));
 
-      els.recalculateBtn.addEventListener('click', render);
+      els.recalculateBtn.addEventListener('click', () => {
+        savePreferences(true);
+        render();
+      });
+      els.saveBtn.addEventListener('click', () => {
+        if (savePreferences(true)) render();
+      });
       els.todayBtn.addEventListener('click', () => {
         syncToCurrentMonth();
+        savePreferences(false);
         render();
       });
 
@@ -1251,6 +1459,7 @@
     }
 
     populateSelectors();
+    loadPreferences();
     attachEvents();
     render();
   </script>

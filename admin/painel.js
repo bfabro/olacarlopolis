@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 953,
-  label: "v953",
-  data: "2026-10-27",
-  nota: "Contatos no computador agora abrem o WhatsApp Web imediatamente, sem bloqueio de popup."
+  numero: 954,
+  label: "v954",
+  data: "2026-10-30",
+  nota: "Calendário de fertilidade salva a última configuração e destaca possíveis dias de TPM."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
