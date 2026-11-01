@@ -140,16 +140,19 @@ test("cards usam a ação real na tarja, descrição informativa e enquadramento
   assert.match(panel, /status\.label/);
   assert.match(panel, /const imageY = y \+ badgeH/);
   assert.match(panel, /ctx\.imageSmoothingQuality = "high"/);
-  assert.match(panel, /const focusX = focus\.x/);
-  assert.match(panel, /ctx\.drawImage\(image, sourceX, sourceY, sourceWidth, sourceHeight/);
+  assert.match(panel, /function weeklyPostImageTransform/);
+  assert.match(panel, /containScale \+ \(coverScale - containScale\)/);
+  assert.match(panel, /ctx\.drawImage\(image, x \+ transform\.offsetX/);
   assert.match(panel, /function weeklyPostDrawFittedText/);
   assert.match(panel, /lines = lines\.slice\(0, maxLines\)/);
   assert.match(panel, /fields\.client/);
   assert.match(panel, /fields\.title/);
   assert.match(panel, /fields\.description/);
   assert.match(panel, /weeklyPostImagePositions/);
+  assert.match(panel, /id="weeklyPostImageZoom"/);
+  assert.match(panel, /0%<\/b> mostra a imagem inteira/);
   assert.match(panel, /bindWeeklyPostCanvasDrag/);
-  assert.match(panel, /Arraste a foto dentro do card/);
+  assert.match(panel, /ajuste o zoom e arraste dentro do card/);
   assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
 });
 
@@ -192,8 +195,8 @@ test("rodapé apresenta um único CTA textual sem botão falso", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=634/);
-  assert.match(html, /painel\.js\?v=944/);
-  assert.match(panel, /numero: 955/);
-  assert.match(panel, /label: "v955"/);
+  assert.match(html, /painel\.css\?v=635/);
+  assert.match(html, /painel\.js\?v=945/);
+  assert.match(panel, /numero: 956/);
+  assert.match(panel, /label: "v956"/);
 });

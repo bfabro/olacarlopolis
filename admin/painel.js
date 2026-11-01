@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 955,
-  label: "v955",
+  numero: 956,
+  label: "v956",
   data: "2026-11-01",
-  nota: "Central de postagens detalha cada novidade, permite reposicionar fotos e valoriza o pôr do sol."
+  nota: "Central de postagens permite afastar, aproximar e reposicionar cada foto dos cards."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -409,6 +409,7 @@ let state = {
   weeklyPostCardTitleScale: 100,
   weeklyPostCardDescriptionScale: 100,
   weeklyPostImagePositions: {},
+  weeklyPostSelectedImageId: "",
   weeklyPostLastGeneratedIds: [],
   weeklyPostSelectionReady: false,
   commercePostSelectedIds: new Set(),
@@ -26782,9 +26783,32 @@ function weeklyPostImageFocus(item = {}) {
   const override = state.weeklyPostImagePositions?.[String(item.id)] || {};
   const stored = item?.imagePosition || item?.posicaoImagem || {};
   const clamp = (value) => Math.max(0, Math.min(1, Number(value)));
+  const zoom = Math.max(0, Math.min(180, Number(override.zoom ?? stored.zoom ?? item?.zoomImagem ?? 100)));
   return {
     x: clamp(override.x ?? stored.x ?? item?.focoX ?? .5),
-    y: clamp(override.y ?? stored.y ?? item?.focoY ?? .5)
+    y: clamp(override.y ?? stored.y ?? item?.focoY ?? .5),
+    zoom
+  };
+}
+
+function weeklyPostImageTransform(image, width, height, focus) {
+  const containScale = Math.min(width / image.width, height / image.height);
+  const coverScale = Math.max(width / image.width, height / image.height);
+  const zoom = Math.max(0, Math.min(180, Number(focus?.zoom ?? 100)));
+  const scale = zoom <= 100
+    ? containScale + (coverScale - containScale) * (zoom / 100)
+    : coverScale * (zoom / 100);
+  const drawWidth = image.width * scale;
+  const drawHeight = image.height * scale;
+  const overflowX = Math.max(0, drawWidth - width);
+  const overflowY = Math.max(0, drawHeight - height);
+  return {
+    drawWidth,
+    drawHeight,
+    overflowX,
+    overflowY,
+    offsetX: overflowX ? -overflowX * focus.x : (width - drawWidth) / 2,
+    offsetY: overflowY ? -overflowY * focus.y : (height - drawHeight) / 2
   };
 }
 
@@ -26804,19 +26828,15 @@ function drawWeeklyLogoTransparent(ctx, image, x, y, width, height) {
 function drawWeeklyClientImage(ctx, image, item, x, y, width, height, radius) {
   if (!image) return false;
   const focus = weeklyPostImageFocus(item);
-  const focusX = focus.x;
-  const focusY = focus.y;
-  const scale = Math.max(width / image.width, height / image.height);
-  const sourceWidth = width / scale;
-  const sourceHeight = height / scale;
-  const sourceX = Math.max(0, Math.min(image.width - sourceWidth, (image.width - sourceWidth) * focusX));
-  const sourceY = Math.max(0, Math.min(image.height - sourceHeight, (image.height - sourceHeight) * focusY));
+  const transform = weeklyPostImageTransform(image, width, height, focus);
   ctx.save();
   ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   canvasRoundRect(ctx, x, y, width, height, radius);
   ctx.clip();
-  ctx.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height);
+  ctx.fillStyle = "#E8EFF3";
+  ctx.fillRect(x, y, width, height);
+  ctx.drawImage(image, x + transform.offsetX, y + transform.offsetY, transform.drawWidth, transform.drawHeight);
   ctx.restore();
   return true;
 }
@@ -27018,6 +27038,27 @@ function finishWeeklyPostCanvasDrag(canvas) {
   canvas?.classList.remove("is-dragging");
 }
 
+function weeklyPostZoomLabel(value) {
+  const zoom = Math.max(0, Math.min(180, Number(value) || 0));
+  if (zoom === 0) return "Imagem inteira";
+  if (zoom === 100) return "Preencher card";
+  return `${zoom}%`;
+}
+
+function selectWeeklyPostImage(itemId) {
+  const id = String(itemId || "");
+  state.weeklyPostSelectedImageId = id;
+  const item = weeklyPostPreviewData?.items?.find((entry) => String(entry.id) === id);
+  const fields = item ? weeklyPostArtFields(item) : {};
+  const focus = item ? weeklyPostImageFocus(item) : { zoom: 100 };
+  const label = $("weeklyPostSelectedImageName");
+  const input = $("weeklyPostImageZoom");
+  const output = $("weeklyPostImageZoomOutput");
+  if (label) label.textContent = fields.title || fields.client || "Foto selecionada";
+  if (input) input.value = String(focus.zoom);
+  if (output) output.textContent = weeklyPostZoomLabel(focus.zoom);
+}
+
 function bindWeeklyPostCanvasDrag(canvas) {
   if (!canvas) return;
   canvas.addEventListener("pointerdown", (event) => {
@@ -27025,6 +27066,7 @@ function bindWeeklyPostCanvasDrag(canvas) {
     const slot = weeklyPostCanvasSlots.find((entry) => point.x >= entry.x && point.x <= entry.x + entry.width && point.y >= entry.y && point.y <= entry.y + entry.height);
     if (!slot) return;
     event.preventDefault();
+    selectWeeklyPostImage(slot.id);
     const startFocus = state.weeklyPostImagePositions?.[slot.id] || slot.focus;
     weeklyPostCanvasDrag = { pointerId: event.pointerId, slot, point, startFocus: { ...startFocus } };
     canvas.setPointerCapture?.(event.pointerId);
@@ -27035,15 +27077,16 @@ function bindWeeklyPostCanvasDrag(canvas) {
     event.preventDefault();
     const point = weeklyPostCanvasPoint(canvas, event);
     const { slot, startFocus } = weeklyPostCanvasDrag;
-    const scale = Math.max(slot.width / slot.image.width, slot.height / slot.image.height);
-    const overflowX = Math.max(0, slot.image.width * scale - slot.width);
-    const overflowY = Math.max(0, slot.image.height * scale - slot.height);
+    const transform = weeklyPostImageTransform(slot.image, slot.width, slot.height, startFocus);
+    const overflowX = transform.overflowX;
+    const overflowY = transform.overflowY;
     const clamp = (value) => Math.max(0, Math.min(1, value));
     state.weeklyPostImagePositions = {
       ...(state.weeklyPostImagePositions || {}),
       [slot.id]: {
         x: overflowX > .5 ? clamp(startFocus.x - (point.x - weeklyPostCanvasDrag.point.x) / overflowX) : .5,
-        y: overflowY > .5 ? clamp(startFocus.y - (point.y - weeklyPostCanvasDrag.point.y) / overflowY) : .5
+        y: overflowY > .5 ? clamp(startFocus.y - (point.y - weeklyPostCanvasDrag.point.y) / overflowY) : .5,
+        zoom: startFocus.zoom
       }
     };
     window.cancelAnimationFrame(weeklyPostCanvasDragFrame);
@@ -27128,6 +27171,15 @@ function weeklyPostGlobalEditorHtml() {
   return `<div class="weekly-post-global-editor"><div class="weekly-post-global-editor-head"><strong>Ajustes gerais da arte</strong><small>Os tamanhos são aplicados igualmente em todos os cards.</small></div><label class="weekly-post-header-title-field"><span>Texto do título do cabeçalho</span><input id="weeklyPostHeaderTitle" type="text" maxlength="60" value="${escapeAttr(state.weeklyPostHeaderTitle || WEEKLY_POST_DEFAULT_HEADER_TITLE)}"></label>${controls.map(([key, label]) => { const value = weeklyPostGlobalScale(key); return `<label class="weekly-post-global-scale"><span>${label}<output id="${key}Output">${value}%</output></span><input id="${key}" type="range" min="${WEEKLY_POST_FONT_SCALE_MIN}" max="${WEEKLY_POST_FONT_SCALE_MAX}" step="5" value="${value}"></label>`; }).join("")}</div>`;
 }
 
+function weeklyPostImageEditorHtml(items = []) {
+  const selected = items.find((item) => String(item.id) === String(state.weeklyPostSelectedImageId)) || items[0];
+  if (!selected) return "";
+  state.weeklyPostSelectedImageId = String(selected.id);
+  const fields = weeklyPostArtFields(selected);
+  const zoom = weeklyPostImageFocus(selected).zoom;
+  return `<div class="weekly-post-image-editor"><div><strong>Enquadramento da foto</strong><span id="weeklyPostSelectedImageName">${escapeHtml(fields.title || fields.client || "Foto selecionada")}</span></div><label><span>Zoom da imagem <output id="weeklyPostImageZoomOutput">${escapeHtml(weeklyPostZoomLabel(zoom))}</output></span><input id="weeklyPostImageZoom" type="range" min="0" max="180" step="5" value="${zoom}"></label><small><b>0%</b> mostra a imagem inteira; <b>100%</b> preenche o card. Depois, arraste a foto para posicioná-la.</small></div>`;
+}
+
 function renderWeeklyPostView() {
   const mount = $("postArtCentralContent");
   if (!mount) return;
@@ -27144,7 +27196,7 @@ function renderWeeklyPostView() {
   mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
     <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, quantidade, formato e textos</strong><small>Seleção automática com novidades reais, recentes e variadas.</small></div></div><div class="post-central-inline-fields"><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label><label class="post-central-field">Quantidade na arte<select id="weeklyPostMaxItems">${Array.from({ length: WEEKLY_POST_MAX_ITEMS - WEEKLY_POST_MIN_ITEMS + 1 }, (_, index) => WEEKLY_POST_MIN_ITEMS + index).map((amount) => `<option value="${amount}" ${itemLimit === amount ? "selected" : ""}>${amount} novidades</option>`).join("")}</select></label></div>${weeklyPostFormatButtons()}${weeklyPostGlobalEditorHtml()}<div class="post-central-actions"><button id="weeklyPostRegenerate" type="button" class="primary-button"><i class="fa-solid fa-arrows-rotate"></i> Regenerar arte</button></div></section>
     <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>2. Escolha e ordene as novidades</strong><p>${selectedCount} de ${itemLimit} selecionada(s)${items.length < WEEKLY_POST_MIN_ITEMS ? " • layout adaptado aos registros disponíveis" : ""}</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list weekly-post-item-list">${displayItems.length ? displayItems.map((item) => weeklyPostSelectionCardHtml(item, selectedCount)).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período. A arte não cria dados de demonstração.</div>`}</div></section>
-    </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<p class="weekly-post-drag-help"><i class="fa-solid fa-hand-pointer"></i> Arraste a foto dentro do card para ajustar o enquadramento.</p><div class="post-art-canvas-shell weekly-post-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><div class="weekly-post-preview-actions"><button id="weeklyPostResetImages" type="button" class="ghost-button"><i class="fa-solid fa-crosshairs"></i> Centralizar fotos</button><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button></div>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
+    </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<p class="weekly-post-drag-help"><i class="fa-solid fa-hand-pointer"></i> Clique em uma foto, ajuste o zoom e arraste dentro do card.</p>${weeklyPostImageEditorHtml(selectedItems)}<div class="post-art-canvas-shell weekly-post-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><div class="weekly-post-preview-actions"><button id="weeklyPostResetImages" type="button" class="ghost-button"><i class="fa-solid fa-crosshairs"></i> Centralizar fotos</button><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button></div>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
   $("weeklyPostDays")?.addEventListener("change", (event) => { state.weeklyPostDays = Number(event.target.value); state.weeklyPostSelectionReady = false; renderWeeklyPostView(); });
   $("weeklyPostMaxItems")?.addEventListener("change", (event) => {
     state.weeklyPostMaxItems = Number(event.target.value);
@@ -27173,9 +27225,21 @@ function renderWeeklyPostView() {
   });
   $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
   bindWeeklyPostCanvasDrag($("weeklyPostCanvas"));
+  $("weeklyPostImageZoom")?.addEventListener("input", (event) => {
+    const id = String(state.weeklyPostSelectedImageId || "");
+    const item = selectedItems.find((entry) => String(entry.id) === id);
+    if (!item) return;
+    const focus = weeklyPostImageFocus(item);
+    const zoom = Math.max(0, Math.min(180, Number(event.target.value) || 0));
+    state.weeklyPostImagePositions = { ...(state.weeklyPostImagePositions || {}), [id]: { ...focus, zoom } };
+    const output = $("weeklyPostImageZoomOutput");
+    if (output) output.textContent = weeklyPostZoomLabel(zoom);
+    redrawWeeklyPostPreview();
+  });
   $("weeklyPostResetImages")?.addEventListener("click", () => {
     state.weeklyPostImagePositions = {};
     redrawWeeklyPostPreview();
+    selectWeeklyPostImage(state.weeklyPostSelectedImageId);
     showToast("Fotos centralizadas na arte.");
   });
   if (selectedCount) atualizarPreviaPostSemanal();

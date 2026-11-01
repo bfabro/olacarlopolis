@@ -11779,6 +11779,15 @@ button.admin-button-loading::after {
 .weekly-post-global-scale input[type="range"] { width: 100%; height: 30px; margin: 0; accent-color: #ffbb2d; cursor: pointer; }
 .weekly-post-drag-help { display: flex; gap: 8px; align-items: center; margin: 0 0 10px; padding: 9px 11px; border: 1px solid #d7e2e9; border-radius: 10px; color: #496477; background: #f4f8fa; font-size: 11px; line-height: 1.35; }
 .weekly-post-drag-help i { color: #c88300; }
+.weekly-post-image-editor { display: grid; gap: 9px; margin: 0 0 12px; padding: 12px; border: 1px solid #cddbe4; border-radius: 12px; background: #fff; }
+.weekly-post-image-editor > div { display: flex; gap: 8px; align-items: baseline; justify-content: space-between; }
+.weekly-post-image-editor strong { color: #092b45; font-size: 12px; }
+.weekly-post-image-editor > div > span { overflow: hidden; color: #607689; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.weekly-post-image-editor label { display: grid; gap: 5px; color: #486174; font-size: 10px; font-weight: 850; text-transform: uppercase; }
+.weekly-post-image-editor label > span { display: flex; justify-content: space-between; gap: 8px; }
+.weekly-post-image-editor output { color: #092b45; text-transform: none; }
+.weekly-post-image-editor input[type="range"] { width: 100%; accent-color: #ffbb2d; cursor: pointer; }
+.weekly-post-image-editor small { color: #718596; font-size: 10px; line-height: 1.4; }
 .weekly-post-canvas-shell canvas { cursor: grab; touch-action: none; user-select: none; }
 .weekly-post-canvas-shell canvas.is-dragging { cursor: grabbing; }
 .weekly-post-preview-actions { display: grid; gap: 9px; margin-top: 12px; }
