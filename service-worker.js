@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-11-01-weekly-post-image-picker-v1004'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-11-01-weekly-post-header-styles-v1005'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [

@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 957,
-  label: "v957",
+  numero: 958,
+  label: "v958",
   data: "2026-11-01",
-  nota: "Central de postagens permite escolher outra foto disponível do mesmo item em cada card."
+  nota: "Resumo de novidades oferece três modelos estilizados para o título do cabeçalho."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -405,6 +405,7 @@ let state = {
   weeklyPostSelectedIds: new Set(),
   weeklyPostSelectedOrder: [],
   weeklyPostHeaderTitle: WEEKLY_POST_DEFAULT_HEADER_TITLE,
+  weeklyPostHeaderStyle: "classic",
   weeklyPostHeaderTitleScale: 100,
   weeklyPostCardTitleScale: 100,
   weeklyPostCardDescriptionScale: 100,
@@ -26621,6 +26622,11 @@ const WEEKLY_POST_THEME = {
   text: "#092B45",
   muted: "#587083"
 };
+const WEEKLY_POST_HEADER_STYLES = [
+  { key: "classic", label: "Clássico", description: "Branco e amarelo sobre a foto" },
+  { key: "banner", label: "Faixa premium", description: "Bloco elegante de alto contraste" },
+  { key: "editorial", label: "Editorial", description: "Barra lateral e composição moderna" }
+];
 let centralPostPreviewRequest = 0;
 let centralPostPreviewTimer = null;
 let weeklyPostPreviewData = null;
@@ -26935,14 +26941,46 @@ function drawWeeklyPostHeader(ctx, assets, format, theme, layout) {
   const titleLines = weeklyPostHeaderLines(state.weeklyPostHeaderTitle);
   const titleScale = weeklyPostGlobalScale("weeklyPostHeaderTitleScale") / 100;
   const titleSize = Math.round((story ? 58 : 44) * titleScale);
-  let titleY = story ? 112 : 60;
-  titleLines.slice(0, 2).forEach((line, index) => {
-    const lineHeight = weeklyPostDrawFittedText(ctx, line.toUpperCase(), x, titleY, maxTitleWidth, 1, index ? Math.round(titleSize * 1.08) : titleSize, { minimum: story ? 36 : 28, weight: 900, color: index ? theme.accent : theme.white, lineHeight: 1.02 });
-    titleY += lineHeight + (story ? 6 : 4);
-  });
+  const style = WEEKLY_POST_HEADER_STYLES.some((item) => item.key === state.weeklyPostHeaderStyle) ? state.weeklyPostHeaderStyle : "classic";
+  if (style === "banner") {
+    const boxY = story ? 78 : 43;
+    const boxH = story ? 198 : 160;
+    preencherRoundRect(ctx, x - (story ? 16 : 12), boxY, maxTitleWidth + (story ? 32 : 24), boxH, story ? 24 : 18, "rgba(4,28,45,.82)");
+    ctx.strokeStyle = "rgba(255,187,45,.72)";
+    ctx.lineWidth = story ? 3 : 2;
+    canvasRoundRect(ctx, x - (story ? 16 : 12), boxY, maxTitleWidth + (story ? 32 : 24), boxH, story ? 24 : 18);
+    ctx.stroke();
+    preencherRoundRect(ctx, x, boxY - (story ? 5 : 4), story ? 112 : 88, story ? 10 : 8, 5, theme.accent);
+    let titleY = boxY + (story ? 26 : 19);
+    titleLines.slice(0, 2).forEach((line, index) => {
+      const lineHeight = weeklyPostDrawFittedText(ctx, line.toUpperCase(), x, titleY, maxTitleWidth, 1, index ? Math.round(titleSize * 1.02) : Math.round(titleSize * .92), { minimum: story ? 32 : 24, weight: 900, color: index ? theme.accent : theme.white, lineHeight: 1.02 });
+      titleY += lineHeight + (story ? 7 : 4);
+    });
+  } else if (style === "editorial") {
+    const barY = story ? 92 : 55;
+    const barH = story ? 164 : 136;
+    preencherRoundRect(ctx, x, barY, story ? 9 : 7, barH, 5, theme.accent);
+    ctx.fillStyle = "rgba(4,28,45,.46)";
+    ctx.fillRect(x + (story ? 20 : 16), barY - (story ? 8 : 5), maxTitleWidth - (story ? 20 : 16), barH + (story ? 16 : 10));
+    let titleY = barY + (story ? 9 : 7);
+    const titleX = x + (story ? 38 : 30);
+    const editorialWidth = maxTitleWidth - (story ? 46 : 36);
+    titleLines.slice(0, 2).forEach((line, index) => {
+      const lineHeight = weeklyPostDrawFittedText(ctx, line.toUpperCase(), titleX, titleY, editorialWidth, 1, index ? Math.round(titleSize * 1.08) : Math.round(titleSize * .84), { minimum: story ? 31 : 23, weight: index ? 950 : 800, color: index ? theme.white : theme.accent, lineHeight: 1.02 });
+      titleY += lineHeight + (story ? 7 : 4);
+    });
+  } else {
+    let titleY = story ? 112 : 60;
+    titleLines.slice(0, 2).forEach((line, index) => {
+      const lineHeight = weeklyPostDrawFittedText(ctx, line.toUpperCase(), x, titleY, maxTitleWidth, 1, index ? Math.round(titleSize * 1.08) : titleSize, { minimum: story ? 36 : 28, weight: 900, color: index ? theme.accent : theme.white, lineHeight: 1.02 });
+      titleY += lineHeight + (story ? 6 : 4);
+    });
+  }
   ctx.restore();
-  ctx.fillStyle = theme.accent;
-  ctx.fillRect(story ? 58 : 50, headerHeight - (story ? 29 : 22), story ? 118 : 90, story ? 6 : 5);
+  if (style === "classic") {
+    ctx.fillStyle = theme.accent;
+    ctx.fillRect(story ? 58 : 50, headerHeight - (story ? 29 : 22), story ? 118 : 90, story ? 6 : 5);
+  }
 }
 
 function drawWeeklyPostCards(ctx, items, assets, format, theme) {
@@ -27223,7 +27261,9 @@ function weeklyPostGlobalEditorHtml() {
     ["weeklyPostCardTitleScale", "Títulos dos cards"],
     ["weeklyPostCardDescriptionScale", "Descrições dos cards"]
   ];
-  return `<div class="weekly-post-global-editor"><div class="weekly-post-global-editor-head"><strong>Ajustes gerais da arte</strong><small>Os tamanhos são aplicados igualmente em todos os cards.</small></div><label class="weekly-post-header-title-field"><span>Texto do título do cabeçalho</span><input id="weeklyPostHeaderTitle" type="text" maxlength="60" value="${escapeAttr(state.weeklyPostHeaderTitle || WEEKLY_POST_DEFAULT_HEADER_TITLE)}"></label>${controls.map(([key, label]) => { const value = weeklyPostGlobalScale(key); return `<label class="weekly-post-global-scale"><span>${label}<output id="${key}Output">${value}%</output></span><input id="${key}" type="range" min="${WEEKLY_POST_FONT_SCALE_MIN}" max="${WEEKLY_POST_FONT_SCALE_MAX}" step="5" value="${value}"></label>`; }).join("")}</div>`;
+  const style = WEEKLY_POST_HEADER_STYLES.some((item) => item.key === state.weeklyPostHeaderStyle) ? state.weeklyPostHeaderStyle : "classic";
+  const styles = `<div class="weekly-post-header-styles"><span>Modelo do título do cabeçalho</span><div>${WEEKLY_POST_HEADER_STYLES.map((item) => `<button type="button" data-weekly-header-style="${item.key}" class="${style === item.key ? "active" : ""}"><i class="weekly-post-header-style-sample is-${item.key}" aria-hidden="true"><b></b><b></b></i><strong>${item.label}</strong><small>${item.description}</small></button>`).join("")}</div></div>`;
+  return `<div class="weekly-post-global-editor"><div class="weekly-post-global-editor-head"><strong>Ajustes gerais da arte</strong><small>Os tamanhos são aplicados igualmente em todos os cards.</small></div><label class="weekly-post-header-title-field"><span>Texto do título do cabeçalho</span><input id="weeklyPostHeaderTitle" type="text" maxlength="60" value="${escapeAttr(state.weeklyPostHeaderTitle || WEEKLY_POST_DEFAULT_HEADER_TITLE)}"></label>${styles}${controls.map(([key, label]) => { const value = weeklyPostGlobalScale(key); return `<label class="weekly-post-global-scale"><span>${label}<output id="${key}Output">${value}%</output></span><input id="${key}" type="range" min="${WEEKLY_POST_FONT_SCALE_MIN}" max="${WEEKLY_POST_FONT_SCALE_MAX}" step="5" value="${value}"></label>`; }).join("")}</div>`;
 }
 
 function weeklyPostImageChoicesHtml(item = {}) {
@@ -27276,6 +27316,11 @@ function renderWeeklyPostView() {
     state.weeklyPostHeaderTitle = event.target.value;
     centralPostSchedulePreview("weekly");
   });
+  mount.querySelectorAll("[data-weekly-header-style]").forEach((button) => button.addEventListener("click", () => {
+    state.weeklyPostHeaderStyle = button.dataset.weeklyHeaderStyle;
+    mount.querySelectorAll("[data-weekly-header-style]").forEach((item) => item.classList.toggle("active", item === button));
+    centralPostSchedulePreview("weekly");
+  }));
   ["weeklyPostHeaderTitleScale", "weeklyPostCardTitleScale", "weeklyPostCardDescriptionScale"].forEach((key) => {
     $(key)?.addEventListener("input", (event) => {
       const value = weeklyPostFontScale(event.target.value);

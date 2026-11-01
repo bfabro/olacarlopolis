@@ -11767,13 +11767,31 @@ button.admin-button-loading::after {
 .weekly-post-order-actions button:disabled { opacity: .35; cursor: not-allowed; }
 .weekly-post-data-card.selected { border-color: #52758c; background: #f2f7fa; box-shadow: inset 3px 0 #ffbb2d; }
 .weekly-post-global-editor { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 14px; padding: 14px; border: 1px solid #d5e0e8; border-radius: 14px; background: #f4f8fb; }
-.weekly-post-global-editor-head, .weekly-post-header-title-field { grid-column: 1 / -1; }
+.weekly-post-global-editor-head, .weekly-post-header-title-field, .weekly-post-header-styles { grid-column: 1 / -1; }
 .weekly-post-global-editor-head { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
 .weekly-post-global-editor-head strong { color: #092b45; font-size: 13px; }
 .weekly-post-global-editor-head small { color: #607689; font-size: 10px; }
 .weekly-post-global-editor label { display: grid; gap: 7px; min-width: 0; color: #486174; font-size: 10px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
 .weekly-post-header-title-field input { width: 100%; min-height: 42px; padding: 0 12px; border: 1px solid #bdccd8; border-radius: 10px; color: #092b45; background: #fff; font-size: 14px; font-weight: 850; }
 .weekly-post-header-title-field input:focus { border-color: #ffbb2d; box-shadow: 0 0 0 3px rgba(255,187,45,.18); outline: none; }
+.weekly-post-header-styles { display: grid; gap: 8px; }
+.weekly-post-header-styles > span { color: #486174; font-size: 10px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+.weekly-post-header-styles > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.weekly-post-header-styles button { display: grid; grid-template-columns: 54px minmax(0, 1fr); gap: 2px 9px; min-width: 0; padding: 8px; border: 1px solid #cbd8e1; border-radius: 11px; color: #365064; background: #fff; text-align: left; }
+.weekly-post-header-styles button:hover { border-color: #8fa7b8; }
+.weekly-post-header-styles button.active { border-color: #ffbb2d; background: #fffaf0; box-shadow: 0 0 0 2px rgba(255,187,45,.18); }
+.weekly-post-header-styles button > strong { align-self: end; color: #092b45; font-size: 11px; }
+.weekly-post-header-styles button > small { grid-column: 2; color: #718596; font-size: 9px; line-height: 1.25; }
+.weekly-post-header-style-sample { position: relative; display: block; grid-row: 1 / span 2; width: 54px; height: 42px; overflow: hidden; border-radius: 7px; background: linear-gradient(145deg, #173f5b, #d98c35); }
+.weekly-post-header-style-sample b { position: absolute; display: block; height: 4px; border-radius: 4px; }
+.weekly-post-header-style-sample b:first-child { top: 13px; left: 8px; width: 31px; background: #fff; }
+.weekly-post-header-style-sample b:last-child { top: 21px; left: 8px; width: 38px; background: #ffbb2d; }
+.weekly-post-header-style-sample.is-banner::before { position: absolute; inset: 7px 5px; border: 1px solid rgba(255,187,45,.8); border-radius: 5px; background: rgba(4,28,45,.75); content: ""; }
+.weekly-post-header-style-sample.is-banner b:first-child { top: 14px; left: 10px; width: 28px; }
+.weekly-post-header-style-sample.is-banner b:last-child { top: 22px; left: 10px; width: 34px; }
+.weekly-post-header-style-sample.is-editorial::before { position: absolute; top: 8px; bottom: 8px; left: 8px; width: 4px; border-radius: 3px; background: #ffbb2d; content: ""; }
+.weekly-post-header-style-sample.is-editorial b:first-child { left: 17px; width: 27px; background: #ffbb2d; }
+.weekly-post-header-style-sample.is-editorial b:last-child { left: 17px; width: 32px; background: #fff; }
 .weekly-post-global-scale > span { display: flex; min-height: 26px; justify-content: space-between; gap: 8px; align-items: end; }
 .weekly-post-global-scale output { color: #092b45; font-size: 11px; }
 .weekly-post-global-scale input[type="range"] { width: 100%; height: 30px; margin: 0; accent-color: #ffbb2d; cursor: pointer; }
@@ -12184,8 +12202,9 @@ button.admin-button-loading::after {
   .weekly-post-data-main { grid-template-columns: minmax(0, 1fr) auto; }
   .weekly-post-data-select { grid-template-columns: auto 58px minmax(0, 1fr); gap: 9px; }
   .weekly-post-global-editor { grid-template-columns: 1fr; }
-  .weekly-post-global-editor-head, .weekly-post-header-title-field { grid-column: auto; }
+  .weekly-post-global-editor-head, .weekly-post-header-title-field, .weekly-post-header-styles { grid-column: auto; }
   .weekly-post-global-editor-head { align-items: flex-start; flex-direction: column; }
+  .weekly-post-header-styles > div { grid-template-columns: 1fr; }
   .post-central-data-image { width: 58px; height: 54px; }
   .post-art-workspace { gap: 12px; margin-top: 12px; }
   .post-art-editor-column { gap: 12px; }

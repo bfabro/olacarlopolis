@@ -167,6 +167,13 @@ test("ajustes gerais editam o cabeçalho e padronizam as fontes de todos os card
   assert.equal(weeklyPostFontScale(125), 125);
   assert.equal(weeklyPostFontScale(180), 140);
   assert.match(panel, /weeklyPostHeaderTitle: WEEKLY_POST_DEFAULT_HEADER_TITLE/);
+  assert.match(panel, /weeklyPostHeaderStyle: "classic"/);
+  assert.match(panel, /key: "classic", label: "Clássico"/);
+  assert.match(panel, /key: "banner", label: "Faixa premium"/);
+  assert.match(panel, /key: "editorial", label: "Editorial"/);
+  assert.match(panel, /data-weekly-header-style/);
+  assert.match(panel, /style === "banner"/);
+  assert.match(panel, /style === "editorial"/);
   assert.match(panel, /weeklyPostHeaderTitleScale: 100/);
   assert.match(panel, /weeklyPostCardTitleScale: 100/);
   assert.match(panel, /weeklyPostCardDescriptionScale: 100/);
@@ -176,6 +183,9 @@ test("ajustes gerais editam o cabeçalho e padronizam as fontes de todos os card
   assert.match(panel, /centralPostSchedulePreview\("weekly"\)/);
   assert.match(panel, /weight: 950, color: theme\.navy/);
   assert.match(css, /\.weekly-post-global-editor/);
+  assert.match(css, /\.weekly-post-header-styles/);
+  assert.match(css, /\.weekly-post-header-style-sample\.is-banner/);
+  assert.match(css, /\.weekly-post-header-style-sample\.is-editorial/);
   assert.match(css, /\.weekly-post-image-thumbnails/);
 });
 
@@ -200,8 +210,8 @@ test("rodapé apresenta um único CTA textual sem botão falso", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=636/);
-  assert.match(html, /painel\.js\?v=946/);
-  assert.match(panel, /numero: 957/);
-  assert.match(panel, /label: "v957"/);
+  assert.match(html, /painel\.css\?v=637/);
+  assert.match(html, /painel\.js\?v=947/);
+  assert.match(panel, /numero: 958/);
+  assert.match(panel, /label: "v958"/);
 });
