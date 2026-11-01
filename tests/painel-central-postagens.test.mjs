@@ -98,18 +98,24 @@ test("layouts de story e feed se adaptam a quatro, cinco e seis cards", () => {
   const sixFeed = weeklyPostGridLayout({ key: "feed", width: 1080, height: 1350 }, 6);
   assert.equal(sixStory.dense, true);
   assert.equal(sixFeed.dense, true);
-  assert.ok(sixStory.cardHeight >= 400, "seis cards aproveitam a altura disponível no Story");
+  assert.ok(sixStory.cardHeight >= 390, "seis cards continuam legíveis com mais pôr do sol visível no Story");
   assert.ok(sixFeed.cardHeight >= 315, "seis cards aproveitam a altura disponível no Feed");
   assert.match(panel, /const isLastCentered = count % 2 === 1/);
 });
 
 test("campos ausentes e duplicados são omitidos sem inventar informações", () => {
   assert.deepEqual(weeklyPostCardFields({ estabelecimento: "Loja Real", tituloConteudo: "Produto X", acao: "Fotos atualizadas" }), {
-    client: "Loja Real", title: "Produto X", change: "Fotos atualizadas"
+    client: "Loja Real", title: "Produto X", change: "Fotos atualizadas", description: ""
   });
-  assert.deepEqual(weeklyPostCardFields({ tituloConteudo: "Serviço Y" }), { client: "", title: "Serviço Y", change: "" });
+  assert.deepEqual(weeklyPostCardFields({ tituloConteudo: "Serviço Y" }), { client: "", title: "Serviço Y", change: "", description: "" });
   assert.deepEqual(weeklyPostCardFields({ estabelecimento: "Casa Azul", tituloConteudo: "Casa Azul", acao: "Casa Azul" }), {
-    client: "", title: "Casa Azul", change: ""
+    client: "", title: "Casa Azul", change: "", description: ""
+  });
+  assert.deepEqual(weeklyPostCardFields({ estabelecimento: "Mercado Real", tituloConteudo: "Lenço umedecido", acao: "Promoção atualizada", descricao: "Promoção atualizada", valor: "R$ 12,90" }), {
+    client: "Mercado Real", title: "Lenço umedecido", change: "Promoção atualizada", description: "Valor: R$ 12,90"
+  });
+  assert.deepEqual(weeklyPostCardFields({ estabelecimento: "Heloisa Escorsin", tituloConteudo: "Grupo de clientes", acao: "Novo grupo de WhatsApp criado", descricao: "Novo grupo de WhatsApp criado", categoria: "Grupos WhatsApp" }), {
+    client: "Heloisa Escorsin", title: "Grupo de clientes", change: "Novo grupo de WhatsApp criado", description: "Grupos WhatsApp"
   });
   assert.equal(weeklyPostStatusKind({ acao: "Imóvel inserido" }), "new");
   assert.equal(weeklyPostStatusKind({ acao: "Fotos atualizadas" }), "updated");
@@ -130,17 +136,20 @@ test("arte usa a identidade oficial, foto real e tipografia sem contorno pesado"
   assert.match(panel, /desenharImagemCover\(ctx, assets\.headerImage/);
 });
 
-test("cards mantêm selo fora da foto, enquadramento inteligente e textos ajustáveis", () => {
-  assert.match(panel, /ctx\.fillText\(status\.label/);
+test("cards usam a ação real na tarja, descrição informativa e enquadramento ajustável", () => {
+  assert.match(panel, /status\.label/);
   assert.match(panel, /const imageY = y \+ badgeH/);
   assert.match(panel, /ctx\.imageSmoothingQuality = "high"/);
-  assert.match(panel, /const focusX = Math\.max/);
+  assert.match(panel, /const focusX = focus\.x/);
   assert.match(panel, /ctx\.drawImage\(image, sourceX, sourceY, sourceWidth, sourceHeight/);
   assert.match(panel, /function weeklyPostDrawFittedText/);
   assert.match(panel, /lines = lines\.slice\(0, maxLines\)/);
   assert.match(panel, /fields\.client/);
   assert.match(panel, /fields\.title/);
-  assert.match(panel, /fields\.change/);
+  assert.match(panel, /fields\.description/);
+  assert.match(panel, /weeklyPostImagePositions/);
+  assert.match(panel, /bindWeeklyPostCanvasDrag/);
+  assert.match(panel, /Arraste a foto dentro do card/);
   assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
 });
 
@@ -183,8 +192,8 @@ test("rodapé apresenta um único CTA textual sem botão falso", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=608/);
-  assert.match(html, /painel\.js\?v=910/);
-  assert.match(panel, /numero: 903/);
-  assert.match(panel, /label: "v910"/);
+  assert.match(html, /painel\.css\?v=634/);
+  assert.match(html, /painel\.js\?v=944/);
+  assert.match(panel, /numero: 955/);
+  assert.match(panel, /label: "v955"/);
 });

@@ -140,7 +140,7 @@ import {
   weeklyPostRecordReference,
   weeklyPostStatusKind,
   weeklyPostUniqueItems
-} from "./weekly-post-layout.js?v=3";
+} from "./weekly-post-layout.js?v=4";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDWHsZSHwVFpD88ChUywjw_GdZPifdrRGI",
@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 954,
-  label: "v954",
-  data: "2026-10-30",
-  nota: "Calendário de fertilidade salva a última configuração e destaca possíveis dias de TPM."
+  numero: 955,
+  label: "v955",
+  data: "2026-11-01",
+  nota: "Central de postagens detalha cada novidade, permite reposicionar fotos e valoriza o pôr do sol."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -408,6 +408,7 @@ let state = {
   weeklyPostHeaderTitleScale: 100,
   weeklyPostCardTitleScale: 100,
   weeklyPostCardDescriptionScale: 100,
+  weeklyPostImagePositions: {},
   weeklyPostLastGeneratedIds: [],
   weeklyPostSelectionReady: false,
   commercePostSelectedIds: new Set(),
@@ -11081,6 +11082,7 @@ async function registrarNovidadeAdmin(payload = {}) {
       acao: payload.acao || payload.titulo || "Novidade adicionada",
       tituloConteudo: payload.tituloConteudo || payload.destinoTitulo || payload.nomeItem || "",
       descricao: payload.descricao || payload.titulo || "",
+      resumo: payload.resumo || payload.descricaoItem || "",
       estabelecimento: payload.estabelecimento || payload.clienteNome || "",
       imagem: payload.imagem || "",
       imagens: Array.isArray(payload.imagens) ? payload.imagens.filter(Boolean) : (payload.imagem ? [payload.imagem] : []),
@@ -12197,6 +12199,7 @@ async function addClientPromocao() {
       titulo: acao,
       acao,
       descricao: acao,
+      resumo: payload.obs || [payload.volume, payload.embalagem, payload.unidade].filter(Boolean).join(" • "),
       tituloConteudo: tituloConteudoNovidadeAdmin("promocao", payload),
       estabelecimento: $("clientName")?.value.trim() || currentId,
       imagem: payload.imagem,
@@ -12220,6 +12223,7 @@ async function registrarProdutoNovidadeClienteAdmin({ clientId = "", clientName 
     titulo: acao,
     acao,
     descricao: acao,
+    resumo: payload.descricao || payload.informacoesEspecificas || payload.observacoes || [payload.marca, payload.modelo, payload.tamanho].filter(Boolean).join(" • "),
     tituloConteudo: tituloConteudoNovidadeAdmin("produto", payload),
     estabelecimento: clientName || clientId,
     imagem: payload.imagem,
@@ -12246,6 +12250,7 @@ async function registrarServicoNovidadeClienteAdmin({ clientId = "", clientName 
     titulo: acao,
     acao,
     descricao: payload.descricaoCurta || payload.descricaoCompleta || acao,
+    resumo: payload.descricaoCurta || payload.descricaoCompleta || payload.observacoes || "",
     tituloConteudo: tituloConteudoNovidadeAdmin("servico", payload),
     estabelecimento: clientName || clientId,
     imagem: payload.imagem,
@@ -26616,6 +26621,10 @@ const WEEKLY_POST_THEME = {
 };
 let centralPostPreviewRequest = 0;
 let centralPostPreviewTimer = null;
+let weeklyPostPreviewData = null;
+let weeklyPostCanvasSlots = [];
+let weeklyPostCanvasDrag = null;
+let weeklyPostCanvasDragFrame = 0;
 
 function centralPostFormat() {
   return POST_ART_FORMATS[state.postArtCentralFormat] || POST_ART_FORMATS.feed;
@@ -26763,9 +26772,20 @@ function drawCentralPostCards(ctx, items, assets, format, kind) {
 }
 
 function weeklyPostStatus(item = {}) {
+  const fields = weeklyPostArtFields(item);
   return weeklyPostStatusKind(item) === "new"
-    ? { label: "NOVO" }
-    : { label: "ATUALIZADO" };
+    ? { label: fields.change || "Novo conteúdo" }
+    : { label: fields.change || "Conteúdo atualizado" };
+}
+
+function weeklyPostImageFocus(item = {}) {
+  const override = state.weeklyPostImagePositions?.[String(item.id)] || {};
+  const stored = item?.imagePosition || item?.posicaoImagem || {};
+  const clamp = (value) => Math.max(0, Math.min(1, Number(value)));
+  return {
+    x: clamp(override.x ?? stored.x ?? item?.focoX ?? .5),
+    y: clamp(override.y ?? stored.y ?? item?.focoY ?? .5)
+  };
 }
 
 function drawWeeklyLogoTransparent(ctx, image, x, y, width, height) {
@@ -26783,9 +26803,9 @@ function drawWeeklyLogoTransparent(ctx, image, x, y, width, height) {
 
 function drawWeeklyClientImage(ctx, image, item, x, y, width, height, radius) {
   if (!image) return false;
-  const focus = item?.imagePosition || item?.posicaoImagem || {};
-  const focusX = Math.max(0, Math.min(1, Number(focus.x ?? item?.focoX ?? .5)));
-  const focusY = Math.max(0, Math.min(1, Number(focus.y ?? item?.focoY ?? .5)));
+  const focus = weeklyPostImageFocus(item);
+  const focusX = focus.x;
+  const focusY = focus.y;
   const scale = Math.max(width / image.width, height / image.height);
   const sourceWidth = width / scale;
   const sourceHeight = height / scale;
@@ -26858,6 +26878,7 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
   const { story, dense, count, columns, rows, margin, gap, cardWidth: cardW, cardHeight: cardH } = layout;
   const cardTitleScale = weeklyPostGlobalScale("weeklyPostCardTitleScale") / 100;
   const cardDescriptionScale = weeklyPostGlobalScale("weeklyPostCardDescriptionScale") / 100;
+  weeklyPostCanvasSlots = [];
   items.forEach((item, index) => {
     const isLastCentered = count % 2 === 1 && index === count - 1;
     const col = index % columns;
@@ -26876,16 +26897,19 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
     ctx.fillStyle = theme.accent;
     ctx.fillRect(x, y + badgeH - (story ? 4 : 3), cardW, story ? 4 : 3);
     ctx.fillStyle = theme.navy;
-    ctx.font = `900 ${story ? 18 : 15}px Arial`;
     ctx.textAlign = "left";
-    ctx.fillText(status.label, x + (story ? 18 : 15), y + badgeH * .68);
+    weeklyPostDrawFittedText(ctx, String(status.label).toUpperCase(), x + (story ? 18 : 15), y + (story ? 8 : 5), cardW - (story ? 36 : 30), 1, story ? 18 : 15, { minimum: story ? 12 : 10, weight: 900, color: theme.navy, lineHeight: 1 });
 
     const hasImage = Boolean(assets.images[index]);
     const compact = rows >= 3;
     const detailsH = hasImage ? (story ? (dense ? 164 : 176) : (dense ? 126 : 150)) : cardH - badgeH;
     const imageY = y + badgeH;
     const imageH = hasImage ? Math.max(0, cardH - badgeH - detailsH) : 0;
-    if (hasImage) drawWeeklyClientImage(ctx, assets.images[index], item, x + 7, imageY + 7, cardW - 14, imageH - 7, story ? 15 : 12);
+    if (hasImage) {
+      const imageRect = { x: x + 7, y: imageY + 7, width: cardW - 14, height: imageH - 7 };
+      drawWeeklyClientImage(ctx, assets.images[index], item, imageRect.x, imageRect.y, imageRect.width, imageRect.height, story ? 15 : 12);
+      weeklyPostCanvasSlots.push({ id: String(item.id), image: assets.images[index], focus: weeklyPostImageFocus(item), ...imageRect });
+    }
 
     const detailsY = hasImage ? imageY + imageH : imageY;
     const contentX = x + 18;
@@ -26904,9 +26928,9 @@ function drawWeeklyPostCards(ctx, items, assets, format, theme) {
       textY += titleHeight;
       textY += story ? 4 : 3;
     }
-    if (fields.change) {
+    if (fields.description) {
       const baseDescriptionSize = story ? (compact ? 16 : 17) : (compact ? 14 : 15);
-      weeklyPostDrawFittedText(ctx, fields.change, contentX, textY, contentWidth, compact ? 1 : 2, Math.round(baseDescriptionSize * cardDescriptionScale), { minimum: story ? 11 : 10, weight: 700, color: theme.muted, lineHeight: 1.08 });
+      weeklyPostDrawFittedText(ctx, fields.description, contentX, textY, contentWidth, compact ? 1 : 2, Math.round(baseDescriptionSize * cardDescriptionScale), { minimum: story ? 11 : 10, weight: 700, color: theme.muted, lineHeight: 1.08 });
     }
   });
   return layout;
@@ -26974,6 +26998,60 @@ function drawCentralPostCanvas(ctx, items, assets, title, subtitle, format, kind
   centralPostDrawBrand(ctx, width, height, assets.siteLogo, vertical);
 }
 
+function redrawWeeklyPostPreview() {
+  const canvas = $("weeklyPostCanvas");
+  if (!canvas || !weeklyPostPreviewData) return;
+  const { items, assets, format } = weeklyPostPreviewData;
+  drawCentralPostCanvas(canvas.getContext("2d"), items, assets, "", "", format, "weekly");
+}
+
+function weeklyPostCanvasPoint(canvas, event) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: (event.clientX - rect.left) * (canvas.width / Math.max(1, rect.width)),
+    y: (event.clientY - rect.top) * (canvas.height / Math.max(1, rect.height))
+  };
+}
+
+function finishWeeklyPostCanvasDrag(canvas) {
+  weeklyPostCanvasDrag = null;
+  canvas?.classList.remove("is-dragging");
+}
+
+function bindWeeklyPostCanvasDrag(canvas) {
+  if (!canvas) return;
+  canvas.addEventListener("pointerdown", (event) => {
+    const point = weeklyPostCanvasPoint(canvas, event);
+    const slot = weeklyPostCanvasSlots.find((entry) => point.x >= entry.x && point.x <= entry.x + entry.width && point.y >= entry.y && point.y <= entry.y + entry.height);
+    if (!slot) return;
+    event.preventDefault();
+    const startFocus = state.weeklyPostImagePositions?.[slot.id] || slot.focus;
+    weeklyPostCanvasDrag = { pointerId: event.pointerId, slot, point, startFocus: { ...startFocus } };
+    canvas.setPointerCapture?.(event.pointerId);
+    canvas.classList.add("is-dragging");
+  });
+  canvas.addEventListener("pointermove", (event) => {
+    if (!weeklyPostCanvasDrag || weeklyPostCanvasDrag.pointerId !== event.pointerId) return;
+    event.preventDefault();
+    const point = weeklyPostCanvasPoint(canvas, event);
+    const { slot, startFocus } = weeklyPostCanvasDrag;
+    const scale = Math.max(slot.width / slot.image.width, slot.height / slot.image.height);
+    const overflowX = Math.max(0, slot.image.width * scale - slot.width);
+    const overflowY = Math.max(0, slot.image.height * scale - slot.height);
+    const clamp = (value) => Math.max(0, Math.min(1, value));
+    state.weeklyPostImagePositions = {
+      ...(state.weeklyPostImagePositions || {}),
+      [slot.id]: {
+        x: overflowX > .5 ? clamp(startFocus.x - (point.x - weeklyPostCanvasDrag.point.x) / overflowX) : .5,
+        y: overflowY > .5 ? clamp(startFocus.y - (point.y - weeklyPostCanvasDrag.point.y) / overflowY) : .5
+      }
+    };
+    window.cancelAnimationFrame(weeklyPostCanvasDragFrame);
+    weeklyPostCanvasDragFrame = window.requestAnimationFrame(redrawWeeklyPostPreview);
+  });
+  ["pointerup", "pointercancel", "lostpointercapture"].forEach((eventName) => canvas.addEventListener(eventName, () => finishWeeklyPostCanvasDrag(canvas)));
+}
+
 async function atualizarPreviaPostSemanal() {
   const canvas = $("weeklyPostCanvas");
   if (!canvas) return;
@@ -26985,6 +27063,7 @@ async function atualizarPreviaPostSemanal() {
   if (request !== centralPostPreviewRequest || !$("weeklyPostCanvas")) return;
   canvas.dataset.recordRefs = JSON.stringify(items.map(weeklyPostRecordReference));
   canvas.dataset.pageCount = String(weeklyPostPages(items).length);
+  weeklyPostPreviewData = { items, assets, format };
   drawCentralPostCanvas(canvas.getContext("2d"), items, assets, "", "", format, "weekly");
 }
 
@@ -27037,7 +27116,7 @@ function weeklyPostSelectionCardHtml(item, selectedCount) {
   const selected = state.weeklyPostSelectedIds.has(id);
   const position = state.weeklyPostSelectedOrder.indexOf(id);
   const fields = weeklyPostArtFields(item);
-  return `<article class="post-central-data-card weekly-post-data-card ${selected ? "selected" : ""}" data-weekly-record-id="${escapeAttr(id)}" data-weekly-record-link="${escapeAttr(item.link || item.url || "")}"><div class="weekly-post-data-main"><label class="weekly-post-data-select"><input type="checkbox" data-weekly-post-id="${escapeAttr(id)}" ${selected ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-image"></i>`}</span><span class="weekly-post-data-copy"><strong>${escapeHtml(fields.title || fields.client || "Registro sem título")}</strong>${fields.change ? `<small>${escapeHtml(textoCurtoArte(fields.change, 95))}</small>` : ""}<em>${[fields.client, centralPostDate(item.dataCriacao || item.createdAt || item.updatedAt)].filter(Boolean).map(escapeHtml).join(" • ")}</em></span></label>${selected ? `<span class="weekly-post-order-actions"><button type="button" data-weekly-post-move="-1" data-weekly-post-order-id="${escapeAttr(id)}" ${position <= 0 ? "disabled" : ""} aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-weekly-post-move="1" data-weekly-post-order-id="${escapeAttr(id)}" ${position >= selectedCount - 1 ? "disabled" : ""} aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button></span>` : ""}</div></article>`;
+  return `<article class="post-central-data-card weekly-post-data-card ${selected ? "selected" : ""}" data-weekly-record-id="${escapeAttr(id)}" data-weekly-record-link="${escapeAttr(item.link || item.url || "")}"><div class="weekly-post-data-main"><label class="weekly-post-data-select"><input type="checkbox" data-weekly-post-id="${escapeAttr(id)}" ${selected ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-image"></i>`}</span><span class="weekly-post-data-copy"><strong>${escapeHtml(fields.title || fields.client || "Registro sem título")}</strong>${fields.change ? `<small><b>${escapeHtml(textoCurtoArte(fields.change, 70))}</b>${fields.description ? ` • ${escapeHtml(textoCurtoArte(fields.description, 80))}` : ""}</small>` : (fields.description ? `<small>${escapeHtml(textoCurtoArte(fields.description, 95))}</small>` : "")}<em>${[fields.client, centralPostDate(item.dataCriacao || item.createdAt || item.updatedAt)].filter(Boolean).map(escapeHtml).join(" • ")}</em></span></label>${selected ? `<span class="weekly-post-order-actions"><button type="button" data-weekly-post-move="-1" data-weekly-post-order-id="${escapeAttr(id)}" ${position <= 0 ? "disabled" : ""} aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-weekly-post-move="1" data-weekly-post-order-id="${escapeAttr(id)}" ${position >= selectedCount - 1 ? "disabled" : ""} aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button></span>` : ""}</div></article>`;
 }
 
 function weeklyPostGlobalEditorHtml() {
@@ -27065,7 +27144,7 @@ function renderWeeklyPostView() {
   mount.innerHTML = `<section class="post-central-generator"><div class="post-central-controls">
     <section class="panel-card post-art-step"><div class="post-art-step-title"><span>1</span><div><strong>Período, quantidade, formato e textos</strong><small>Seleção automática com novidades reais, recentes e variadas.</small></div></div><div class="post-central-inline-fields"><label class="post-central-field">Período<select id="weeklyPostDays"><option value="7" ${state.weeklyPostDays === 7 ? "selected" : ""}>Últimos 7 dias</option><option value="14" ${state.weeklyPostDays === 14 ? "selected" : ""}>Últimos 14 dias</option><option value="30" ${state.weeklyPostDays === 30 ? "selected" : ""}>Últimos 30 dias</option></select></label><label class="post-central-field">Quantidade na arte<select id="weeklyPostMaxItems">${Array.from({ length: WEEKLY_POST_MAX_ITEMS - WEEKLY_POST_MIN_ITEMS + 1 }, (_, index) => WEEKLY_POST_MIN_ITEMS + index).map((amount) => `<option value="${amount}" ${itemLimit === amount ? "selected" : ""}>${amount} novidades</option>`).join("")}</select></label></div>${weeklyPostFormatButtons()}${weeklyPostGlobalEditorHtml()}<div class="post-central-actions"><button id="weeklyPostRegenerate" type="button" class="primary-button"><i class="fa-solid fa-arrows-rotate"></i> Regenerar arte</button></div></section>
     <section class="panel-card post-art-step"><div class="section-head compact"><div><strong>2. Escolha e ordene as novidades</strong><p>${selectedCount} de ${itemLimit} selecionada(s)${items.length < WEEKLY_POST_MIN_ITEMS ? " • layout adaptado aos registros disponíveis" : ""}</p></div><span class="badge">Dados reais</span></div><div class="post-central-item-list weekly-post-item-list">${displayItems.length ? displayItems.map((item) => weeklyPostSelectionCardHtml(item, selectedCount)).join("") : `<div class="empty-state">Nenhuma novidade publicada neste período. A arte não cria dados de demonstração.</div>`}</div></section>
-    </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<div class="post-art-canvas-shell weekly-post-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
+    </div><aside class="panel-card post-art-preview-card"><div class="section-head compact"><div><strong>Pré-visualização</strong><span>${format.nome} • ${format.width} × ${format.height}</span></div><span class="post-art-live"><i></i> Ao vivo</span></div>${selectedCount ? `<p class="weekly-post-drag-help"><i class="fa-solid fa-hand-pointer"></i> Arraste a foto dentro do card para ajustar o enquadramento.</p><div class="post-art-canvas-shell weekly-post-canvas-shell is-${format.key}"><canvas id="weeklyPostCanvas"></canvas></div><div class="weekly-post-preview-actions"><button id="weeklyPostResetImages" type="button" class="ghost-button"><i class="fa-solid fa-crosshairs"></i> Centralizar fotos</button><button id="weeklyPostDownload" type="button" class="post-art-download"><i class="fa-solid fa-download"></i> Baixar resumo em PNG</button></div>` : `<div class="post-art-preview-empty"><i class="fa-regular fa-newspaper"></i><span>Selecione ao menos uma novidade.</span></div>`}</aside></section>`;
   $("weeklyPostDays")?.addEventListener("change", (event) => { state.weeklyPostDays = Number(event.target.value); state.weeklyPostSelectionReady = false; renderWeeklyPostView(); });
   $("weeklyPostMaxItems")?.addEventListener("change", (event) => {
     state.weeklyPostMaxItems = Number(event.target.value);
@@ -27093,6 +27172,12 @@ function renderWeeklyPostView() {
     });
   });
   $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
+  bindWeeklyPostCanvasDrag($("weeklyPostCanvas"));
+  $("weeklyPostResetImages")?.addEventListener("click", () => {
+    state.weeklyPostImagePositions = {};
+    redrawWeeklyPostPreview();
+    showToast("Fotos centralizadas na arte.");
+  });
   if (selectedCount) atualizarPreviaPostSemanal();
 }
 
@@ -27794,6 +27879,7 @@ function renderStaffPromocoesView() {
       titulo: acao,
       acao,
       descricao: acao,
+      resumo: payload.obs || [payload.volume, payload.embalagem, payload.unidade].filter(Boolean).join(" • "),
       tituloConteudo: tituloConteudoNovidadeAdmin("promocao", payload),
       estabelecimento: client.nome || selectedId,
       imagem: payload.imagem,
@@ -28691,6 +28777,7 @@ function renderClientOnlyEditor() {
       titulo: acao,
       acao,
       descricao: acao,
+      resumo: payload.obs || [payload.volume, payload.embalagem, payload.unidade].filter(Boolean).join(" • "),
       tituloConteudo: tituloConteudoNovidadeAdmin("promocao", payload),
       estabelecimento: client.nome || client.id,
       imagem: payload.imagem,
@@ -28892,6 +28979,7 @@ function renderClientOnlyEditor() {
         titulo: acao,
         acao,
         descricao: acao,
+        resumo: descricao,
         tituloConteudo: nome,
         estabelecimento: client.nome || client.id,
         imagem,
@@ -31794,6 +31882,7 @@ function bindEvents() {
       titulo: acao,
       acao,
       descricao: acao,
+      resumo: payload.descricao || payload.description || "",
       tituloConteudo: tituloConteudoNovidadeAdmin("grupoWhatsapp", payload),
       estabelecimento: payload.clienteNome || "Olá Carlópolis",
       imagem: imagemPrincipalNovidade(payload),

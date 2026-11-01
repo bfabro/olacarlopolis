@@ -11777,6 +11777,14 @@ button.admin-button-loading::after {
 .weekly-post-global-scale > span { display: flex; min-height: 26px; justify-content: space-between; gap: 8px; align-items: end; }
 .weekly-post-global-scale output { color: #092b45; font-size: 11px; }
 .weekly-post-global-scale input[type="range"] { width: 100%; height: 30px; margin: 0; accent-color: #ffbb2d; cursor: pointer; }
+.weekly-post-drag-help { display: flex; gap: 8px; align-items: center; margin: 0 0 10px; padding: 9px 11px; border: 1px solid #d7e2e9; border-radius: 10px; color: #496477; background: #f4f8fa; font-size: 11px; line-height: 1.35; }
+.weekly-post-drag-help i { color: #c88300; }
+.weekly-post-canvas-shell canvas { cursor: grab; touch-action: none; user-select: none; }
+.weekly-post-canvas-shell canvas.is-dragging { cursor: grabbing; }
+.weekly-post-preview-actions { display: grid; gap: 9px; margin-top: 12px; }
+.weekly-post-preview-actions .ghost-button { min-height: 42px; border: 1px solid #cbd8e1; border-radius: 11px; color: #29465c; background: #fff; font-weight: 800; }
+.weekly-post-preview-actions .ghost-button:hover { border-color: #ffbb2d; background: #fff9e8; }
+.weekly-post-preview-actions .post-art-download { margin-top: 0; }
 
 .post-art-intro {
   overflow: hidden;

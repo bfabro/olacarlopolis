@@ -40,10 +40,30 @@ export function weeklyPostCategoryKey(item = {}) {
 export function weeklyPostCardFields(item = {}) {
   const rawClient = plainText(item.estabelecimento || item.clienteNome || item.anunciante || item.empresaNome || item.nomeCliente);
   const rawTitle = plainText(item.tituloConteudo || item.destinoTitulo || item.nomeItem || item.titulo);
-  const rawChange = plainText(item.acao || item.descricao);
+  const rawChange = plainText(item.acao || item.titulo || item.statusNovidade);
   const client = normalized(rawClient) === normalized(rawTitle) ? "" : rawClient;
   const change = normalized(rawChange) === normalized(rawTitle) ? "" : rawChange;
-  return { client, title: rawTitle, change };
+  const descriptiveCandidates = [
+    item.resumo,
+    item.descricaoItem,
+    item.descricaoCurta,
+    item.breveDescricao,
+    item.subtitulo,
+    item.descricao,
+    item.informacoesEspecificas,
+    item.infoAdicional,
+    item.observacaoPreco,
+    item.valor ? `Valor: ${plainText(item.valor)}` : "",
+    item.categoria,
+    item.localAtendimento ? `Atendimento: ${plainText(item.localAtendimento)}` : "",
+    item.areasAtendidas ? `Áreas atendidas: ${plainText(item.areasAtendidas)}` : "",
+    item.duracao ? `Duração: ${plainText(item.duracao)}` : ""
+  ];
+  const blocked = new Set([rawClient, rawTitle, rawChange].map(normalized).filter(Boolean));
+  const description = descriptiveCandidates
+    .map(plainText)
+    .find((value) => value && !blocked.has(normalized(value))) || "";
+  return { client, title: rawTitle, change, description };
 }
 
 export function weeklyPostFontScale(value = 100) {
@@ -143,12 +163,12 @@ export function weeklyPostGridLayout(format = {}, itemCount = 0) {
   const rows = Math.ceil(count / columns);
   const dense = count >= 6;
   const margin = story ? (dense ? 36 : 42) : (dense ? 34 : 38);
-  const gap = story ? (dense ? 14 : 18) : (dense ? 12 : 14);
-  const headerHeight = story ? (dense ? 312 : 332) : (dense ? 218 : 232);
-  const cardStartY = headerHeight + (story ? (dense ? 14 : 18) : (dense ? 10 : 14));
+  const gap = story ? (dense ? 12 : 18) : (dense ? 10 : 14);
+  const headerHeight = story ? (dense ? 338 : 380) : (dense ? 244 : 270);
+  const cardStartY = headerHeight + (story ? (dense ? 12 : 20) : (dense ? 10 : 14));
   const ctaHeight = story ? 82 : 70;
   const ctaY = story ? height - 336 : height - 118;
-  const cardEndY = ctaY - (story ? 24 : 18);
+  const cardEndY = ctaY - (story ? 12 : 12);
   const cardWidth = columns === 1 ? Math.min(760, width - margin * 2) : (width - margin * 2 - gap) / 2;
   const cardHeight = (cardEndY - cardStartY - gap * Math.max(0, rows - 1)) / rows;
   return { story, dense, width, height, count, columns, rows, margin, gap, headerHeight, cardStartY, cardEndY, cardWidth, cardHeight, ctaY, ctaHeight };
