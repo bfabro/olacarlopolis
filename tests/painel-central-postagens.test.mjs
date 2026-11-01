@@ -151,6 +151,10 @@ test("cards usam a ação real na tarja, descrição informativa e enquadramento
   assert.match(panel, /weeklyPostImagePositions/);
   assert.match(panel, /id="weeklyPostImageZoom"/);
   assert.match(panel, /0%<\/b> mostra a imagem inteira/);
+  assert.match(panel, /function weeklyPostAvailableImages/);
+  assert.match(panel, /centralPostAssets\(items, weeklyPostImage\)/);
+  assert.match(panel, /data-weekly-post-image-url/);
+  assert.match(panel, /Escolha outra foto/);
   assert.match(panel, /bindWeeklyPostCanvasDrag/);
   assert.match(panel, /ajuste o zoom e arraste dentro do card/);
   assert.doesNotMatch(panel, /assets\.logos\?\.\[index\]/);
@@ -172,6 +176,7 @@ test("ajustes gerais editam o cabeçalho e padronizam as fontes de todos os card
   assert.match(panel, /centralPostSchedulePreview\("weekly"\)/);
   assert.match(panel, /weight: 950, color: theme\.navy/);
   assert.match(css, /\.weekly-post-global-editor/);
+  assert.match(css, /\.weekly-post-image-thumbnails/);
 });
 
 test("prévia e PNG usam o mesmo canvas nos formatos 1080 por 1920 e 1080 por 1350", () => {
@@ -195,8 +200,8 @@ test("rodapé apresenta um único CTA textual sem botão falso", () => {
 });
 
 test("versão da central acompanha a publicação", () => {
-  assert.match(html, /painel\.css\?v=635/);
-  assert.match(html, /painel\.js\?v=945/);
-  assert.match(panel, /numero: 956/);
-  assert.match(panel, /label: "v956"/);
+  assert.match(html, /painel\.css\?v=636/);
+  assert.match(html, /painel\.js\?v=946/);
+  assert.match(panel, /numero: 957/);
+  assert.match(panel, /label: "v957"/);
 });

@@ -156,10 +156,10 @@ const firebaseConfig = {
 const MASTER_EMAILS = ["bruno.4and@gmail.com"];
 const TERRAIN_UNLINK_ARCHIVE_ID = "__terrain_unlinked_archive__";
 const PANEL_VERSION = {
-  numero: 956,
-  label: "v956",
+  numero: 957,
+  label: "v957",
   data: "2026-11-01",
-  nota: "Central de postagens permite afastar, aproximar e reposicionar cada foto dos cards."
+  nota: "Central de postagens permite escolher outra foto disponível do mesmo item em cada card."
 };
 const DEFAULT_SOBRE_NOS_CONTENT = `Sobre o Olá Carlópolis
 
@@ -409,6 +409,7 @@ let state = {
   weeklyPostCardTitleScale: 100,
   weeklyPostCardDescriptionScale: 100,
   weeklyPostImagePositions: {},
+  weeklyPostSelectedImageUrls: {},
   weeklyPostSelectedImageId: "",
   weeklyPostLastGeneratedIds: [],
   weeklyPostSelectionReady: false,
@@ -26647,6 +26648,57 @@ function centralPostImage(item = {}) {
   return normalizarImagemArteAdmin(item.imagemPrincipal || item.fotoPrincipal || item.imagem || item.image || item.foto || (Array.isArray(item.imagens) ? item.imagens[0] : "") || "");
 }
 
+function weeklyPostRecordImages(record = {}) {
+  const values = [
+    record.imagemPrincipal,
+    record.fotoPrincipal,
+    record.imagem,
+    record.image,
+    record.foto,
+    record.fotoUrl,
+    record.imagemUrl,
+    ...(Array.isArray(record.imagens) ? record.imagens : []),
+    ...(Array.isArray(record.fotos) ? record.fotos : []),
+    ...(Array.isArray(record.images) ? record.images : [])
+  ];
+  return values.map((value) => {
+    const raw = typeof value === "string" ? value : (value?.url || value?.imagem || value?.image || "");
+    return normalizarImagemArteAdmin(raw);
+  }).filter(Boolean);
+}
+
+function weeklyPostCollectionRecords(collection) {
+  if (Array.isArray(collection)) return collection;
+  return Object.entries(collection || {}).map(([id, value]) => value && typeof value === "object" ? { id, ...value } : null).filter(Boolean);
+}
+
+function weeklyPostSourceRecord(item = {}) {
+  const targetIds = [item.itemId, item.destinoId, item.destinoCardId].map((value) => String(value || "")).filter(Boolean);
+  const targetTitle = normalizeName(item.tituloConteudo || item.destinoTitulo || item.nomeItem || "");
+  const direct = [state.imoveis, state.automoveis, state.casasVeraneio, state.eventos, state.noticias, state.gruposWhatsapp]
+    .flatMap(weeklyPostCollectionRecords);
+  const nested = (state.clientes || []).flatMap((client) => [
+    ...weeklyPostCollectionRecords(client.produtos),
+    ...weeklyPostCollectionRecords(client.promocoes),
+    ...weeklyPostCollectionRecords(client.servicos)
+  ]);
+  const candidates = [...direct, ...nested];
+  return candidates.find((record) => targetIds.includes(String(record.id || "")))
+    || (!targetIds.length ? candidates.find((record) => targetTitle && normalizeName(record.titulo || record.nome || record.name || "") === targetTitle) : null)
+    || null;
+}
+
+function weeklyPostAvailableImages(item = {}) {
+  const source = weeklyPostSourceRecord(item);
+  return [...new Set([...weeklyPostRecordImages(item), ...weeklyPostRecordImages(source || {})])].slice(0, 12);
+}
+
+function weeklyPostImage(item = {}) {
+  const images = weeklyPostAvailableImages(item);
+  const selected = normalizarImagemArteAdmin(state.weeklyPostSelectedImageUrls?.[String(item.id)] || "");
+  return selected && images.includes(selected) ? selected : (images[0] || centralPostImage(item));
+}
+
 function centralPostDate(value) {
   const date = new Date(Number(value) || value || 0);
   return Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" }).replace(".", "");
@@ -27054,9 +27106,11 @@ function selectWeeklyPostImage(itemId) {
   const label = $("weeklyPostSelectedImageName");
   const input = $("weeklyPostImageZoom");
   const output = $("weeklyPostImageZoomOutput");
+  const choices = $("weeklyPostImageChoices");
   if (label) label.textContent = fields.title || fields.client || "Foto selecionada";
   if (input) input.value = String(focus.zoom);
   if (output) output.textContent = weeklyPostZoomLabel(focus.zoom);
+  if (choices && item) choices.innerHTML = weeklyPostImageChoicesHtml(item);
 }
 
 function bindWeeklyPostCanvasDrag(canvas) {
@@ -27102,7 +27156,7 @@ async function atualizarPreviaPostSemanal() {
   const format = weeklyPostFormat();
   const items = weeklyPostSelectedItems();
   canvas.width = format.width; canvas.height = format.height;
-  const assets = await centralPostAssets(items, centralPostImage);
+  const assets = await centralPostAssets(items, weeklyPostImage);
   if (request !== centralPostPreviewRequest || !$("weeklyPostCanvas")) return;
   canvas.dataset.recordRefs = JSON.stringify(items.map(weeklyPostRecordReference));
   canvas.dataset.pageCount = String(weeklyPostPages(items).length);
@@ -27159,7 +27213,8 @@ function weeklyPostSelectionCardHtml(item, selectedCount) {
   const selected = state.weeklyPostSelectedIds.has(id);
   const position = state.weeklyPostSelectedOrder.indexOf(id);
   const fields = weeklyPostArtFields(item);
-  return `<article class="post-central-data-card weekly-post-data-card ${selected ? "selected" : ""}" data-weekly-record-id="${escapeAttr(id)}" data-weekly-record-link="${escapeAttr(item.link || item.url || "")}"><div class="weekly-post-data-main"><label class="weekly-post-data-select"><input type="checkbox" data-weekly-post-id="${escapeAttr(id)}" ${selected ? "checked" : ""}><span class="post-central-data-image">${centralPostImage(item) ? `<img src="${escapeAttr(displayImageUrl(centralPostImage(item)))}" alt="">` : `<i class="fa-regular fa-image"></i>`}</span><span class="weekly-post-data-copy"><strong>${escapeHtml(fields.title || fields.client || "Registro sem título")}</strong>${fields.change ? `<small><b>${escapeHtml(textoCurtoArte(fields.change, 70))}</b>${fields.description ? ` • ${escapeHtml(textoCurtoArte(fields.description, 80))}` : ""}</small>` : (fields.description ? `<small>${escapeHtml(textoCurtoArte(fields.description, 95))}</small>` : "")}<em>${[fields.client, centralPostDate(item.dataCriacao || item.createdAt || item.updatedAt)].filter(Boolean).map(escapeHtml).join(" • ")}</em></span></label>${selected ? `<span class="weekly-post-order-actions"><button type="button" data-weekly-post-move="-1" data-weekly-post-order-id="${escapeAttr(id)}" ${position <= 0 ? "disabled" : ""} aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-weekly-post-move="1" data-weekly-post-order-id="${escapeAttr(id)}" ${position >= selectedCount - 1 ? "disabled" : ""} aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button></span>` : ""}</div></article>`;
+  const image = weeklyPostImage(item);
+  return `<article class="post-central-data-card weekly-post-data-card ${selected ? "selected" : ""}" data-weekly-record-id="${escapeAttr(id)}" data-weekly-record-link="${escapeAttr(item.link || item.url || "")}"><div class="weekly-post-data-main"><label class="weekly-post-data-select"><input type="checkbox" data-weekly-post-id="${escapeAttr(id)}" ${selected ? "checked" : ""}><span class="post-central-data-image">${image ? `<img src="${escapeAttr(displayImageUrl(image))}" alt="">` : `<i class="fa-regular fa-image"></i>`}</span><span class="weekly-post-data-copy"><strong>${escapeHtml(fields.title || fields.client || "Registro sem título")}</strong>${fields.change ? `<small><b>${escapeHtml(textoCurtoArte(fields.change, 70))}</b>${fields.description ? ` • ${escapeHtml(textoCurtoArte(fields.description, 80))}` : ""}</small>` : (fields.description ? `<small>${escapeHtml(textoCurtoArte(fields.description, 95))}</small>` : "")}<em>${[fields.client, centralPostDate(item.dataCriacao || item.createdAt || item.updatedAt)].filter(Boolean).map(escapeHtml).join(" • ")}</em></span></label>${selected ? `<span class="weekly-post-order-actions"><button type="button" data-weekly-post-move="-1" data-weekly-post-order-id="${escapeAttr(id)}" ${position <= 0 ? "disabled" : ""} aria-label="Mover para cima"><i class="fa-solid fa-arrow-up"></i></button><button type="button" data-weekly-post-move="1" data-weekly-post-order-id="${escapeAttr(id)}" ${position >= selectedCount - 1 ? "disabled" : ""} aria-label="Mover para baixo"><i class="fa-solid fa-arrow-down"></i></button></span>` : ""}</div></article>`;
 }
 
 function weeklyPostGlobalEditorHtml() {
@@ -27171,13 +27226,20 @@ function weeklyPostGlobalEditorHtml() {
   return `<div class="weekly-post-global-editor"><div class="weekly-post-global-editor-head"><strong>Ajustes gerais da arte</strong><small>Os tamanhos são aplicados igualmente em todos os cards.</small></div><label class="weekly-post-header-title-field"><span>Texto do título do cabeçalho</span><input id="weeklyPostHeaderTitle" type="text" maxlength="60" value="${escapeAttr(state.weeklyPostHeaderTitle || WEEKLY_POST_DEFAULT_HEADER_TITLE)}"></label>${controls.map(([key, label]) => { const value = weeklyPostGlobalScale(key); return `<label class="weekly-post-global-scale"><span>${label}<output id="${key}Output">${value}%</output></span><input id="${key}" type="range" min="${WEEKLY_POST_FONT_SCALE_MIN}" max="${WEEKLY_POST_FONT_SCALE_MAX}" step="5" value="${value}"></label>`; }).join("")}</div>`;
 }
 
+function weeklyPostImageChoicesHtml(item = {}) {
+  const images = weeklyPostAvailableImages(item);
+  const current = weeklyPostImage(item);
+  if (images.length < 2) return `<span class="weekly-post-image-only"><i class="fa-regular fa-image"></i> Este item possui somente uma foto disponível.</span>`;
+  return `<div class="weekly-post-image-choice-label"><strong>Escolha outra foto</strong><span>${images.length} disponíveis</span></div><div class="weekly-post-image-thumbnails">${images.map((url, index) => `<button type="button" data-weekly-post-image-url="${escapeAttr(url)}" class="${url === current ? "active" : ""}" aria-pressed="${url === current ? "true" : "false"}" title="Usar foto ${index + 1}"><img src="${escapeAttr(displayImageUrl(url))}" alt="Foto ${index + 1}"></button>`).join("")}</div>`;
+}
+
 function weeklyPostImageEditorHtml(items = []) {
   const selected = items.find((item) => String(item.id) === String(state.weeklyPostSelectedImageId)) || items[0];
   if (!selected) return "";
   state.weeklyPostSelectedImageId = String(selected.id);
   const fields = weeklyPostArtFields(selected);
   const zoom = weeklyPostImageFocus(selected).zoom;
-  return `<div class="weekly-post-image-editor"><div><strong>Enquadramento da foto</strong><span id="weeklyPostSelectedImageName">${escapeHtml(fields.title || fields.client || "Foto selecionada")}</span></div><label><span>Zoom da imagem <output id="weeklyPostImageZoomOutput">${escapeHtml(weeklyPostZoomLabel(zoom))}</output></span><input id="weeklyPostImageZoom" type="range" min="0" max="180" step="5" value="${zoom}"></label><small><b>0%</b> mostra a imagem inteira; <b>100%</b> preenche o card. Depois, arraste a foto para posicioná-la.</small></div>`;
+  return `<div class="weekly-post-image-editor"><div class="weekly-post-image-editor-head"><strong>Enquadramento da foto</strong><span id="weeklyPostSelectedImageName">${escapeHtml(fields.title || fields.client || "Foto selecionada")}</span></div><div id="weeklyPostImageChoices" class="weekly-post-image-choices">${weeklyPostImageChoicesHtml(selected)}</div><label><span>Zoom da imagem <output id="weeklyPostImageZoomOutput">${escapeHtml(weeklyPostZoomLabel(zoom))}</output></span><input id="weeklyPostImageZoom" type="range" min="0" max="180" step="5" value="${zoom}"></label><small><b>0%</b> mostra a imagem inteira; <b>100%</b> preenche o card. Depois, arraste a foto para posicioná-la.</small></div>`;
 }
 
 function renderWeeklyPostView() {
@@ -27225,6 +27287,17 @@ function renderWeeklyPostView() {
   });
   $("weeklyPostDownload")?.addEventListener("click", () => downloadCentralPost("weekly"));
   bindWeeklyPostCanvasDrag($("weeklyPostCanvas"));
+  $("weeklyPostImageChoices")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-weekly-post-image-url]");
+    if (!button) return;
+    const id = String(state.weeklyPostSelectedImageId || "");
+    const item = selectedItems.find((entry) => String(entry.id) === id);
+    if (!item) return;
+    state.weeklyPostSelectedImageUrls = { ...(state.weeklyPostSelectedImageUrls || {}), [id]: button.dataset.weeklyPostImageUrl };
+    state.weeklyPostImagePositions = { ...(state.weeklyPostImagePositions || {}), [id]: { x: .5, y: .5, zoom: 100 } };
+    selectWeeklyPostImage(id);
+    atualizarPreviaPostSemanal();
+  });
   $("weeklyPostImageZoom")?.addEventListener("input", (event) => {
     const id = String(state.weeklyPostSelectedImageId || "");
     const item = selectedItems.find((entry) => String(entry.id) === id);
