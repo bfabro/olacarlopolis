@@ -1,4 +1,4 @@
-/* Painel B3 publico - v2 */
+/* Painel B3 publico - v4 */
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -22,6 +22,33 @@
     { id: "ibov", label: "Ibovespa" }, { id: "spx", label: "S&P 500" }, { id: "nasdaq", label: "Nasdaq" },
     { id: "dow", label: "Dow Jones" }, { id: "dax", label: "DAX" }, { id: "nikkei", label: "Nikkei 225" }, { id: "china", label: "Xangai" }
   ];
+
+  function newYorkOpenMinutes(now = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    for (let hour = 12; hour <= 15; hour += 1) {
+      const candidate = new Date(Date.UTC(Number(values.year), Number(values.month) - 1, Number(values.day), hour, 30));
+      const ny = new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "2-digit", minute: "2-digit", hour12: false }).format(candidate);
+      if (ny === "09:30") {
+        const sp = new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", hour12: false }).format(candidate).split(":").map(Number);
+        return sp[0] * 60 + sp[1];
+      }
+    }
+    return 690;
+  }
+
+  function tradeEvents(now = new Date()) {
+    const nyOpen = newYorkOpenMinutes(now); const nyLabel = `${String(Math.floor(nyOpen / 60)).padStart(2, "0")}:${String(nyOpen % 60).padStart(2, "0")}`;
+    return [
+      { time: 540, label: "Abertura de WIN e WDO", detail: "Futuros começam a formar a primeira referência local. Observe dólar, índice e o exterior antes de agir.", level: "high" },
+      { time: 585, label: "Pré-abertura das ações", detail: "Leilão entre 09:45 e 10:00. Preço teórico e desequilíbrio de ofertas podem mudar rapidamente.", level: "medium" },
+      { time: 600, label: "Abertura do mercado à vista", detail: "Janela de maior descoberta de preço. Evite confundir volatilidade inicial com tendência confirmada.", level: "high" },
+      { time: nyOpen, label: `Abertura de Nova York (${nyLabel})`, detail: "S&P 500, Nasdaq, dólar e juros americanos podem aumentar a volatilidade da B3.", level: "high" },
+      { time: 950, label: "Formação do ajuste do dólar", detail: "Entre 15:50 e 16:00, a apuração do ajuste de DOL/WDO pode elevar o fluxo e a volatilidade.", level: "medium" },
+      { time: 1075, label: "Call de fechamento das ações", detail: "Das 17:55 às 18:00. Rebalanceamentos e ordens de fechamento podem distorcer o movimento final.", level: "high" },
+      { time: 1110, label: "Encerramento do WDO", detail: "Fim da negociação regular do minidólar às 18:30, conforme a grade vigente.", level: "low" }
+    ].sort((a, b) => a.time - b.time);
+  }
 
   async function apiJson(url) {
     const response = await fetch(url, { cache: "no-store" }); const type = response.headers.get("content-type") || "";
@@ -53,6 +80,7 @@
     if (tab === "commodities") loadCommodity(state.commodity);
     if (tab === "bolsas") ensureOverview().then(renderSelectedIndex).catch(showIndexError);
     if (tab === "analise") { ensureOverview().then(renderAnalysis).catch(() => {}); renderTechnical(); }
+    if (tab === "daytrade") ensureOverview().then(renderTradeContext).catch(() => {});
     if (tab === "contratos") loadFutures();
     history.replaceState(null, "", `#${tab}`);
   }
@@ -160,6 +188,61 @@
     const levels = idx.ibov.levels; if (levels) { const current = idx.ibov.current; const rows = [["S2", levels.support2, "support"], ["S1", levels.support1, "support"], ["Pivô", levels.pivot, "pivot"], ["R1", levels.resistance1, "resistance"], ["R2", levels.resistance2, "resistance"]]; $("#supportLevels").innerHTML = rows.map(([label, value, type]) => `<span class="${type}"><small>${label}</small><strong>${number(value, 0)}</strong><em>${value < current ? "abaixo" : value > current ? "acima" : "no preço"}</em></span>`).join("") + `<p>Ibovespa atual: <b>${number(current, 0)}</b> · referência: ${dateBR(levels.referenceDate)}. Níveis aproximados, não ordens de operação.</p>`; }
   }
 
+  function marketMinutes(now = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(now);
+    const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+    return { weekday: values.weekday, minutes: Number(values.hour) * 60 + Number(values.minute) };
+  }
+
+  function renderTradeTimeline(now = new Date()) {
+    const clock = marketMinutes(now); const businessDay = !["Sat", "Sun"].includes(clock.weekday); const events = tradeEvents(now); const next = businessDay ? events.find((event) => event.time > clock.minutes) : null;
+    const timeLabel = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+    $("#tradeTimeline").innerHTML = events.map((event) => `<div class="trade-event ${businessDay && clock.minutes >= event.time ? "is-past" : ""} ${next === event ? "is-next" : ""}"><time>${timeLabel(event.time)}</time><i class="${event.level}"></i><p><strong>${esc(event.label)}</strong><small>${esc(event.detail)}</small></p></div>`).join("");
+
+    let phase = "Mercado fechado"; let phaseText = "Use o período sem negociação para preparar níveis, cenários e limite de perda."; let tone = "neutral";
+    if (businessDay && clock.minutes >= 535 && clock.minutes < 540) { phase = "Pré-abertura dos futuros"; phaseText = "Confira exterior, dólar e agenda antes do início de WIN e WDO."; tone = "attention"; }
+    else if (businessDay && clock.minutes >= 540 && clock.minutes < 585) { phase = "Futuros em negociação"; phaseText = "WIN e WDO já negociam; ações ainda não abriram. O primeiro movimento pode não sobreviver à abertura do à vista."; tone = "active"; }
+    else if (businessDay && clock.minutes >= 585 && clock.minutes < 600) { phase = "Pré-abertura das ações"; phaseText = "Observe preço teórico, volume e desequilíbrio do leilão sem antecipar uma entrada."; tone = "attention"; }
+    else if (businessDay && clock.minutes >= 600 && clock.minutes < 615) { phase = "Abertura: volatilidade elevada"; phaseText = "Primeiros 15 minutos: espere estrutura, liquidez e confirmação do nível planejado."; tone = "attention"; }
+    else if (businessDay && clock.minutes >= 615 && clock.minutes < 1075) { phase = "Pregão regular em andamento"; phaseText = "Valide tendência, gatilho, stop e retorno potencial antes de enviar a ordem."; tone = "active"; }
+    else if (businessDay && clock.minutes >= 1075 && clock.minutes < 1080) { phase = "Call de fechamento"; phaseText = "Ações estão em leilão de fechamento; spreads e execução seguem dinâmica própria."; tone = "attention"; }
+    else if (businessDay && clock.minutes >= 1080 && clock.minutes < 1110) { phase = "Ações encerradas; derivativos abertos"; phaseText = "WIN/WDO ainda podem negociar, mas a referência do mercado à vista já fechou."; tone = "active"; }
+    $("#tradeNow").dataset.tone = tone; $("#tradePhase").textContent = phase; $("#tradePhaseText").textContent = phaseText;
+    if (next) { $("#nextEventTime").textContent = timeLabel(next.time); $("#nextEventLabel").textContent = next.label; }
+    else { $("#nextEventTime").textContent = "Próximo pregão"; $("#nextEventLabel").textContent = "Revise a agenda econômica antes da abertura"; }
+  }
+
+  function renderTradeContext() {
+    if (!state.overview) return; const { indices: idx, macro } = state.overview; const levels = idx.ibov.levels; const abovePivot = levels ? idx.ibov.current >= levels.pivot : null;
+    const score = (idx.ibov.change1d * 1.2) + (idx.spx.change1d * .7) + (idx.nasdaq.change1d * .5) - (macro.usdbrl.change1d * .6) + (macro.brent.change1d * .25);
+    const badge = $("#tradeContextBadge"); const tone = score > .8 ? "positive" : score < -.8 ? "negative" : "neutral"; badge.className = `badge ${tone}`; badge.textContent = score > .8 ? "Contexto mais favorável à alta" : score < -.8 ? "Contexto mais favorável à baixa" : "Contexto misto";
+    const items = [
+      ["Ibovespa", percent(idx.ibov.change1d), idx.ibov.change1d],
+      ["S&P 500", percent(idx.spx.change1d), idx.spx.change1d],
+      ["Dólar/real", percent(macro.usdbrl.change1d), -macro.usdbrl.change1d],
+      ["Petróleo Brent", percent(macro.brent.change1d), macro.brent.change1d]
+    ];
+    $("#tradeContext").innerHTML = `<div class="context-quotes">${items.map(([label, value, signal]) => `<span><small>${label}</small><strong class="${signal >= 0 ? "positive" : "negative"}">${value}</strong></span>`).join("")}</div>${levels ? `<div class="pivot-position"><span>Ibovespa está <b>${abovePivot ? "acima" : "abaixo"}</b> do pivô diário</span><strong>${number(levels.pivot, 0)}</strong><small>S1 ${number(levels.support1, 0)} · R1 ${number(levels.resistance1, 0)}</small></div>` : ""}<p class="source-note">Contexto calculado com fechamentos públicos; pode haver atraso e não substitui o book e o gráfico da corretora.</p>`;
+  }
+
+  function updateTradeChecklist() {
+    const checks = $$('#tradeChecklist input[type="checkbox"]'); const done = checks.filter((input) => input.checked).length; $("#tradeCheckText").textContent = `${done} de ${checks.length} itens confirmados`; $("#tradeCheckBar").style.width = `${done / checks.length * 100}%`;
+  }
+
+  function calculateTradeRisk() {
+    const capital = Number($("#riskCapital").value); const riskPercent = Number($("#riskPercent").value); const entry = Number($("#riskEntry").value); const stop = Number($("#riskStop").value); const output = $("#riskResult");
+    if (!(capital > 0 && riskPercent > 0 && entry > 0 && stop > 0)) { output.innerHTML = "<span>Preencha entrada e stop para estimar a posição.</span>"; return; }
+    const distance = Math.abs(entry - stop); if (!distance) { output.innerHTML = '<span class="negative">Entrada e stop precisam ser diferentes.</span>'; return; }
+    const riskBudget = capital * riskPercent / 100; const byRisk = Math.floor(riskBudget / distance); const byCapital = Math.floor(capital / entry); const quantity = Math.max(0, Math.min(byRisk, byCapital)); const effectiveRisk = quantity * distance; const target = stop < entry ? entry + distance * 2 : entry - distance * 2;
+    output.innerHTML = `<div><small>Risco planejado</small><strong>${money(riskBudget)}</strong></div><div><small>Quantidade máxima</small><strong>${number(quantity)} ações</strong></div><div><small>Risco estimado</small><strong>${money(effectiveRisk)}</strong></div><div><small>Alvo teórico de 2R</small><strong>${money(target)}</strong></div>`;
+  }
+
+  function initDayTrade() {
+    renderTradeTimeline(); $$('#tradeChecklist input[type="checkbox"]').forEach((input) => input.addEventListener("change", updateTradeChecklist));
+    $("#resetTradeChecklist").addEventListener("click", () => { $$('#tradeChecklist input[type="checkbox"]').forEach((input) => { input.checked = false; }); updateTradeChecklist(); });
+    ["#riskCapital", "#riskPercent", "#riskEntry", "#riskStop"].forEach((selector) => $(selector).addEventListener("input", calculateTradeRisk)); updateTradeChecklist(); calculateTradeRisk();
+  }
+
   async function loadNews(force = false) {
     $("#refreshNews").disabled = true;
     try { const payload = await apiJson(`/api/b3-news${force ? "?refresh=1" : ""}`); state.news = (payload.items || []).slice(0, 9); renderNews(); }
@@ -178,10 +261,10 @@
 
   function updateClock() {
     const now = new Date(); const parts = new Intl.DateTimeFormat("en-US", { timeZone: "America/Sao_Paulo", weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(now); const values = Object.fromEntries(parts.map((part) => [part.type, part.value])); const minutes = Number(values.hour) * 60 + Number(values.minute); const open = !["Sat", "Sun"].includes(values.weekday) && minutes >= 600 && minutes <= 1075;
-    $("#marketStatus").textContent = open ? "Mercado em negociação" : "Mercado fechado"; $(".status-dot").classList.toggle("open", open); $("#marketClock").textContent = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }).format(now);
+    $("#marketStatus").textContent = open ? "Mercado em negociação" : "Mercado fechado"; $(".status-dot").classList.toggle("open", open); $("#marketClock").textContent = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }).format(now); renderTradeTimeline(now);
   }
 
   $("#refreshNews").addEventListener("click", () => loadNews(true));
-  initTicker(); renderCommodities(); renderIndices(); initTabs(); updateClock(); setInterval(updateClock, 60000);
+  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initTabs(); updateClock(); setInterval(updateClock, 60000);
   ensureOverview().catch((error) => { $("#quoteGrid").innerHTML = `<div class="panel-card" style="grid-column:1/-1"><strong>Cotações temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#quotesUpdated").textContent = "Fonte indisponível"; }); loadNews();
 })();

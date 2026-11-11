@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=3">
+  <link rel="stylesheet" href="b3.css?v=4">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -41,6 +41,7 @@
       <button class="tab" type="button" data-tab="commodities" aria-selected="false">Commodities</button>
       <button class="tab" type="button" data-tab="bolsas" aria-selected="false">Bolsas</button>
       <button class="tab" type="button" data-tab="analise" aria-selected="false">Análise</button>
+      <button class="tab" type="button" data-tab="daytrade" aria-selected="false">Day Trade</button>
       <button class="tab" type="button" data-tab="noticias" aria-selected="false">Notícias</button>
       <button class="tab" type="button" data-tab="contratos" aria-selected="false">Contratos &amp; fluxo</button>
     </nav>
@@ -110,6 +111,68 @@
       <article class="technical-card"><div class="card-title"><div><span class="eyebrow">SINAL TÉCNICO</span><h2>Ibovespa</h2></div><span class="source-pill">TradingView</span></div><div id="technicalWidget" class="technical-widget"></div><p>Médias móveis e osciladores são sinais auxiliares e podem mudar rapidamente.</p></article>
     </section>
 
+    <section class="tab-panel" id="panel-daytrade" data-panel="daytrade" hidden>
+      <div class="section-heading"><div><span class="eyebrow">PLANO INTRADIÁRIO</span><h2>Painel para decisão de entrada</h2></div><p>Contexto, horários de atenção e controle de risco. Não gera sinal automático.</p></div>
+
+      <article class="trade-now" id="tradeNow" data-tone="neutral">
+        <div><span class="eyebrow">AGORA EM SÃO PAULO</span><h2 id="tradePhase">Verificando fase do pregão…</h2><p id="tradePhaseText">Aguarde a atualização do relógio.</p></div>
+        <div class="trade-countdown"><small>Próximo evento</small><strong id="nextEventTime">—</strong><span id="nextEventLabel">Carregando agenda…</span></div>
+      </article>
+
+      <div class="daytrade-grid">
+        <article class="panel-card trade-schedule-card">
+          <div class="card-title"><div><span class="eyebrow">JANELAS DE ATENÇÃO</span><h2>Linha do tempo do pregão</h2></div><span class="source-pill">Horário de Brasília</span></div>
+          <div class="trade-timeline" id="tradeTimeline" aria-label="Horários relevantes do pregão"></div>
+          <p class="source-note">Grade B3 vigente desde 03/11/2026. Indicadores econômicos variam por dia: confirme a agenda oficial antes de operar.</p>
+        </article>
+
+        <article class="panel-card trade-context-card">
+          <div class="card-title"><div><span class="eyebrow">CONTEXTO AO VIVO</span><h2>Leitura antes da entrada</h2></div><span class="badge neutral" id="tradeContextBadge">Aguardando dados</span></div>
+          <div class="trade-context" id="tradeContext"><div class="chart-loading">Carregando mercado, dólar e commodities…</div></div>
+          <div class="entry-rule"><strong>Regra de prudência</strong><span>Se preço, contexto e risco não apontarem para o mesmo plano, não operar também é uma decisão.</span></div>
+        </article>
+      </div>
+
+      <div class="daytrade-grid top-gap">
+        <article class="panel-card">
+          <div class="card-title"><div><span class="eyebrow">ANTES DE ENVIAR A ORDEM</span><h2>Checklist de entrada</h2></div><button class="text-button" id="resetTradeChecklist" type="button">Limpar</button></div>
+          <div class="trade-checklist" id="tradeChecklist">
+            <label><input type="checkbox"> Sei qual é a tendência no período que estou operando</label>
+            <label><input type="checkbox"> Marquei suporte, resistência e ponto de invalidação</label>
+            <label><input type="checkbox"> Não há indicador ou notícia relevante nos próximos minutos</label>
+            <label><input type="checkbox"> Defini entrada, stop e alvo antes de enviar a ordem</label>
+            <label><input type="checkbox"> O retorno potencial é de pelo menos 2 vezes o risco</label>
+            <label><input type="checkbox"> O tamanho da posição respeita meu limite de perda</label>
+          </div>
+          <div class="check-progress"><span id="tradeCheckText">0 de 6 itens confirmados</span><div><i id="tradeCheckBar"></i></div></div>
+        </article>
+
+        <article class="panel-card risk-card">
+          <div class="card-title"><div><span class="eyebrow">RISCO POR OPERAÇÃO</span><h2>Calculadora para ações</h2></div><span class="source-pill">Referência educativa</span></div>
+          <div class="risk-form">
+            <label>Capital disponível (R$)<input id="riskCapital" type="number" min="0" step="100" value="10000" inputmode="decimal"></label>
+            <label>Risco máximo (%)<input id="riskPercent" type="number" min="0.1" max="10" step="0.1" value="1" inputmode="decimal"></label>
+            <label>Preço de entrada (R$)<input id="riskEntry" type="number" min="0" step="0.01" placeholder="Ex.: 32,50" inputmode="decimal"></label>
+            <label>Preço do stop (R$)<input id="riskStop" type="number" min="0" step="0.01" placeholder="Ex.: 31,90" inputmode="decimal"></label>
+          </div>
+          <div class="risk-result" id="riskResult"><span>Preencha entrada e stop para estimar a posição.</span></div>
+          <p class="source-note">Não inclui corretagem, emolumentos, slippage, liquidez nem gaps. O stop pode executar em preço pior que o planejado.</p>
+        </article>
+      </div>
+
+      <article class="panel-card top-gap decision-guide">
+        <div class="card-title"><div><span class="eyebrow">LEITURA PRÁTICA</span><h2>O que observar em cada momento</h2></div><button class="text-button" type="button" data-open-tab="analise">Ver níveis do Ibovespa</button></div>
+        <div class="decision-cards">
+          <div><b>Primeiros 15 minutos</b><span>Amplitude costuma ser maior. Observe abertura, volume e se o preço aceita ou rejeita o ajuste anterior.</span></div>
+          <div><b>Rompimento</b><span>Procure fechamento além do nível, aumento de volume e espaço até a próxima resistência ou suporte.</span></div>
+          <div><b>Reteste</b><span>Espere o antigo nível trocar de função. Falha no reteste é sinal de invalidação, não convite para aumentar risco.</span></div>
+          <div><b>Notícia ou leilão</b><span>Spreads e slippage podem crescer. Evite ordem a mercado sem conhecer liquidez e regra do leilão.</span></div>
+        </div>
+        <div class="official-agenda"><a href="https://www.bcb.gov.br/estabilidadefinanceira/agendaeconomica" target="_blank" rel="noopener">Agenda econômica do Banco Central ↗</a><a href="https://www.ibge.gov.br/calendario-indicadores-novoportal.html" target="_blank" rel="noopener">Calendário de indicadores do IBGE ↗</a><a href="https://www.b3.com.br/pt_br/solucoes/plataformas/puma-trading-system/para-participantes-e-traders/horario-de-negociacao/" target="_blank" rel="noopener">Horários oficiais da B3 ↗</a></div>
+      </article>
+      <div class="data-warning"><strong>Aviso importante</strong><span>Day trade envolve risco elevado e pode gerar perdas rápidas. Use ordens de proteção, considere custos e confirme todas as informações na sua corretora.</span></div>
+    </section>
+
     <section class="tab-panel" id="panel-noticias" data-panel="noticias" hidden>
       <div class="section-heading"><div><span class="eyebrow">NOTÍCIAS PÚBLICAS</span><h2>O que pode mexer com as ações</h2></div><button class="refresh-button" id="refreshNews" type="button">↻ Atualizar</button></div>
       <div id="newsFull" class="news-full" aria-live="polite"><div class="loading-line">Buscando nove notícias…</div></div>
@@ -148,6 +211,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=3"></script>
+  <script defer src="b3.js?v=4"></script>
 </body>
 </html>
