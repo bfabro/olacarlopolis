@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=8">
+  <link rel="stylesheet" href="b3.css?v=9">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -92,11 +92,17 @@
       </div>
 
       <article class="chart-card average-strength-card top-gap">
-        <div class="chart-card-head"><div><span class="eyebrow">CESTA DOS MAIORES PESOS</span><h2>Média intradiária dos 12 papéis</h2></div><span class="source-pill">Média simples · base 100</span></div>
+        <div class="chart-card-head"><div><span class="eyebrow">CESTA DOS MAIORES PESOS</span><h2>Índice médio dos 12 papéis</h2></div><span class="source-pill">Cada ação vale 1/12</span></div>
+        <div class="average-method" aria-label="Como o índice médio é calculado">
+          <div><b>1. Mesma largada</b><span>Cada ação começa em 100 na primeira cotação do gráfico.</span></div>
+          <div><b>2. Mesmo peso</b><span>Cada papel representa 1/12 da cesta, independentemente do preço.</span></div>
+          <div><b>3. Leitura direta</b><span>101 significa alta média de 1%; 99 significa queda média de 1%.</span></div>
+        </div>
         <div class="average-strength-value" id="strengthAverageValue"><span>Calculando média conjunta…</span></div>
         <div id="strengthAverageChart" class="market-chart" aria-label="Gráfico da média intradiária dos doze maiores papéis"><div class="chart-loading">Combinando as doze séries…</div></div>
+        <div class="average-summary" id="strengthAverageSummary"></div>
         <div class="average-strength-assets" id="strengthAverageAssets"></div>
-        <p class="source-note">Todos os papéis recebem o mesmo peso na média e começam em 100 na primeira cotação do dia. Assim, o preço nominal de cada ação não distorce a leitura.</p>
+        <p class="source-note">Este gráfico mede o comportamento médio da cesta e não replica o Ibovespa, porque o índice oficial atribui pesos diferentes a cada ação.</p>
       </article>
 
       <div class="strength-bottom top-gap">
@@ -286,6 +292,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=8"></script>
+  <script defer src="b3.js?v=9"></script>
 </body>
 </html>
