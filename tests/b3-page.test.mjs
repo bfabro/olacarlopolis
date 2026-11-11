@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=6/); assert.match(html, /b3\.js\?v=6/);
+  assert.match(html, /b3\.css\?v=7/); assert.match(html, /b3\.js\?v=7/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -17,6 +17,13 @@ test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
   assert.match(client, /renderStrengthChart/); assert.match(client, /renderStrengthInsights/); assert.match(html, /peso × variação do dia/i);
   assert.match(strength, /VALE3\.SA/); assert.match(strength, /BPAC11\.SA/); assert.match(strength, /interval=5m/); assert.match(strength, /weightDate: "2026-11-11"/);
   assert.match(config, /\/api\/b3-strength/); assert.match(preview, /b3-strength\.mjs/);
+});
+
+test("ranking de forca ordena colunas e calcula media dos doze papeis", async () => {
+  const [html, client] = await Promise.all([read("b3.html"), read("b3.js")]);
+  for (const column of ["ticker", "weight", "current", "change", "contribution"]) assert.match(client, new RegExp(`data-strength-column=\\"${column}\\"`));
+  assert.match(client, /strengthSort: "weight"/); assert.match(client, /strengthSortDirection: "desc"/); assert.match(client, /renderStrengthAverageChart/);
+  assert.match(html, /id="strengthAverageChart"/); assert.match(html, /Média intradiária dos 12 papéis/); assert.match(html, /Média simples · base 100/);
 });
 
 test("tela day trade inclui horarios, checklist, risco e fontes oficiais", async () => {

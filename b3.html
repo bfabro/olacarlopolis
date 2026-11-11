@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=6">
+  <link rel="stylesheet" href="b3.css?v=7">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -75,7 +75,7 @@
 
       <div class="strength-layout top-gap">
         <article class="panel-card strength-ranking-card">
-          <div class="card-title"><div><span class="eyebrow">MAIORES PESOS</span><h2>Quem move o índice</h2></div><div class="strength-sort" role="group" aria-label="Ordenar ações"><button class="is-active" type="button" data-strength-sort="impact">Impacto</button><button type="button" data-strength-sort="weight">Peso</button></div></div>
+          <div class="card-title"><div><span class="eyebrow">MAIORES PESOS</span><h2>Quem move o índice</h2></div><div class="strength-sort" role="group" aria-label="Ordenação rápida"><button type="button" data-strength-sort="impact">Impacto</button><button class="is-active" type="button" data-strength-sort="weight">Peso</button></div></div>
           <div class="strength-ranking" id="strengthRanking"><div class="chart-loading">Carregando ações…</div></div>
           <p class="source-note">Peso na carteira teórica de 11/11/2026. A contribuição aproximada é peso × variação do dia. <a href="https://www.b3.com.br/pt_br/market-data-e-indices/indices/indices-amplos/ibovespa.htm" target="_blank" rel="noopener">Consultar Ibovespa na B3 ↗</a></p>
         </article>
@@ -87,6 +87,14 @@
           <div class="strength-range" id="strengthRange"></div>
         </article>
       </div>
+
+      <article class="chart-card average-strength-card top-gap">
+        <div class="chart-card-head"><div><span class="eyebrow">CESTA DOS MAIORES PESOS</span><h2>Média intradiária dos 12 papéis</h2></div><span class="source-pill">Média simples · base 100</span></div>
+        <div class="average-strength-value" id="strengthAverageValue"><span>Calculando média conjunta…</span></div>
+        <div id="strengthAverageChart" class="market-chart" aria-label="Gráfico da média intradiária dos doze maiores papéis"><div class="chart-loading">Combinando as doze séries…</div></div>
+        <div class="average-strength-assets" id="strengthAverageAssets"></div>
+        <p class="source-note">Todos os papéis recebem o mesmo peso na média e começam em 100 na primeira cotação do dia. Assim, o preço nominal de cada ação não distorce a leitura.</p>
+      </article>
 
       <div class="strength-bottom top-gap">
         <article class="panel-card">
@@ -249,6 +257,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=6"></script>
+  <script defer src="b3.js?v=7"></script>
 </body>
 </html>
