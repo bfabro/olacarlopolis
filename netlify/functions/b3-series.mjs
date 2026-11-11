@@ -4,7 +4,7 @@ if (typeof tls.getCACertificates === "function" && typeof tls.setDefaultCACertif
   tls.setDefaultCACertificates([...tls.getCACertificates("default"), ...tls.getCACertificates("system")]);
 }
 
-const HEADERS = { "access-control-allow-origin": "*", "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=300, stale-while-revalidate=900", "x-content-type-options": "nosniff" };
+const HEADERS = { "access-control-allow-origin": "*", "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=45, stale-while-revalidate=60", "x-content-type-options": "nosniff" };
 const cache = new Map();
 const GROUPS = {
   brent: { commodity: ["BZ=F", "Petróleo Brent"], stocks: [["PETR4.SA", "PETR4"], ["PETR3.SA", "PETR3"], ["PRIO3.SA", "PRIO3"], ["RECV3.SA", "RECV3"]] },
@@ -19,9 +19,9 @@ const INDICES = {
   dax: ["^GDAXI", "DAX"], nikkei: ["^N225", "Nikkei 225"], china: ["000001.SS", "Xangai"]
 };
 
-async function yahooSeries(symbol, label) {
+async function yahooSeries(symbol, label, fresh = false) {
   const key = `yahoo:${symbol}`; const saved = cache.get(key);
-  if (saved && Date.now() - saved.time < 10 * 60 * 1000) return { ...saved.value, label };
+  if (!fresh && saved && Date.now() - saved.time < 45 * 1000) return { ...saved.value, label };
   const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 9000);
   try {
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=3mo&interval=1d&events=history`;
@@ -31,20 +31,20 @@ async function yahooSeries(symbol, label) {
     const quote = result.indicators?.quote?.[0] || {}; const closes = result.indicators?.adjclose?.[0]?.adjclose || quote.close || [];
     const points = (result.timestamp || []).map((time, index) => ({ date: new Date(time * 1000).toISOString().slice(0, 10), value: Number(closes[index]) })).filter((point) => Number.isFinite(point.value) && point.value > 0);
     if (points.length < 2) throw new Error(`Série ${symbol} insuficiente.`);
-    const current = points.at(-1).value; const at = (offset) => points.at(Math.max(-points.length, -1 - offset))?.value ?? current; const change = (offset) => (current / at(offset) - 1) * 100;
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date()); const historicalCurrent = points.at(-1).value; const livePrice = Number(result.meta?.regularMarketPrice); const current = livePrice > 0 ? livePrice : historicalCurrent; const fallbackPrevious = points.at(-1)?.date === today ? points.at(-2)?.value : points.at(-1)?.value; const previousClose = Number(result.meta?.regularMarketPreviousClose) || fallbackPrevious; const at = (offset) => points.at(Math.max(-points.length, -1 - offset))?.value ?? current; const change = (offset) => offset === 1 && previousClose > 0 ? (current / previousClose - 1) * 100 : (current / at(offset)) * 100 - 100;
     const candles = (result.timestamp || []).map((time, index) => ({ date: new Date(time * 1000).toISOString().slice(0, 10), high: Number(quote.high?.[index]), low: Number(quote.low?.[index]), close: Number(quote.close?.[index]) })).filter((row) => row.high > 0 && row.low > 0 && row.close > 0);
-    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date()); const reference = candles.at(candles.at(-1)?.date === today ? -2 : -1); let levels = null;
+    const reference = candles.at(candles.at(-1)?.date === today ? -2 : -1); let levels = null;
     if (reference) { const pivot = (reference.high + reference.low + reference.close) / 3; levels = { referenceDate: reference.date, pivot, resistance1: 2 * pivot - reference.low, resistance2: pivot + (reference.high - reference.low), support1: 2 * pivot - reference.high, support2: pivot - (reference.high - reference.low) }; }
-    const value = { symbol, label, currency: result.meta?.currency || "", volume: Number(result.meta?.regularMarketVolume || 0), current, change1d: change(1), change5d: change(5), change20d: change(20), points, levels };
+    const value = { symbol, label, currency: result.meta?.currency || "", volume: Number(result.meta?.regularMarketVolume || 0), open: Number(result.meta?.regularMarketOpen || 0), current, change1d: change(1), change5d: change(5), change20d: change(20), marketTime: result.meta?.regularMarketTime ? new Date(result.meta.regularMarketTime * 1000).toISOString() : null, points, levels };
     cache.set(key, { time: Date.now(), value }); return value;
   } finally { clearTimeout(timeout); }
 }
 
-async function overview() {
-  const indexEntries = await Promise.all(Object.entries(INDICES).map(async ([id, [symbol, label]]) => [id, await yahooSeries(symbol, label)]));
-  const extras = await Promise.all([yahooSeries("BRL=X", "Dólar/Real"), yahooSeries("BZ=F", "Brent"), yahooSeries("TIO=F", "Minério"), yahooSeries("GC=F", "Ouro")]);
+async function overview(fresh = false) {
+  const indexEntries = await Promise.all(Object.entries(INDICES).map(async ([id, [symbol, label]]) => [id, await yahooSeries(symbol, label, fresh)]));
+  const extras = await Promise.all([yahooSeries("BRL=X", "Dólar/Real", fresh), yahooSeries("BZ=F", "Brent", fresh), yahooSeries("TIO=F", "Minério", fresh), yahooSeries("GC=F", "Ouro", fresh)]);
   const quoteDefs = [["PETR4.SA", "PETR4"], ["VALE3.SA", "VALE3"], ["ITUB4.SA", "ITUB4"], ["MGLU3.SA", "MGLU3"]];
-  const quotes = await Promise.all(quoteDefs.map(([symbol, label]) => yahooSeries(symbol, label)));
+  const quotes = await Promise.all(quoteDefs.map(([symbol, label]) => yahooSeries(symbol, label, fresh)));
   return { indices: Object.fromEntries(indexEntries), macro: { usdbrl: extras[0], brent: extras[1], iron: extras[2], gold: extras[3] }, quotes };
 }
 
@@ -58,7 +58,7 @@ export async function handler(event) {
   if (event.httpMethod === "OPTIONS") return { statusCode: 204, headers: HEADERS, body: "" };
   if (event.httpMethod !== "GET") return { statusCode: 405, headers: HEADERS, body: JSON.stringify({ message: "Método não permitido." }) };
   try {
-    const id = event.queryStringParameters?.group; const data = id ? await group(id) : await overview();
+    const id = event.queryStringParameters?.group; const fresh = Boolean(event.queryStringParameters?.live); const data = id ? await group(id) : await overview(fresh);
     return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ source: "Yahoo Finance", updatedAt: new Date().toISOString(), delayed: true, ...data }) };
   } catch (error) { return { statusCode: 502, headers: { ...HEADERS, "cache-control": "no-store" }, body: JSON.stringify({ message: error.name === "AbortError" ? "A fonte demorou para responder." : error.message }) }; }
 }

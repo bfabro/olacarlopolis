@@ -1,4 +1,4 @@
-/* Painel B3 publico - v4 */
+/* Painel B3 publico - v5 */
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -8,7 +8,7 @@
   const number = (value, digits = 0) => Number(value).toLocaleString("pt-BR", { maximumFractionDigits: digits });
   const percent = (value) => `${Number(value) > 0 ? "+" : ""}${number(value, 2)}%`;
   const dateBR = (value) => new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`));
-  const state = { tab: "resumo", news: [], commodity: "brent", index: "ibov", overview: null, overviewPromise: null, groups: new Map(), groupRequests: new Map() };
+  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, groups: new Map(), groupRequests: new Map() };
 
   const commodities = [
     { id: "brent", title: "Petróleo Brent", group: "Energia", icon: "BR", assets: ["PETR4", "PETR3", "PRIO3", "RECV3"], summary: "Alta do Brent tende a elevar a receita em reais das produtoras. Refino, câmbio, política de preços e produção podem alterar o efeito." },
@@ -40,13 +40,13 @@
   function tradeEvents(now = new Date()) {
     const nyOpen = newYorkOpenMinutes(now); const nyLabel = `${String(Math.floor(nyOpen / 60)).padStart(2, "0")}:${String(nyOpen % 60).padStart(2, "0")}`;
     return [
-      { time: 540, label: "Abertura de WIN e WDO", detail: "Futuros começam a formar a primeira referência local. Observe dólar, índice e o exterior antes de agir.", level: "high" },
-      { time: 585, label: "Pré-abertura das ações", detail: "Leilão entre 09:45 e 10:00. Preço teórico e desequilíbrio de ofertas podem mudar rapidamente.", level: "medium" },
-      { time: 600, label: "Abertura do mercado à vista", detail: "Janela de maior descoberta de preço. Evite confundir volatilidade inicial com tendência confirmada.", level: "high" },
-      { time: nyOpen, label: `Abertura de Nova York (${nyLabel})`, detail: "S&P 500, Nasdaq, dólar e juros americanos podem aumentar a volatilidade da B3.", level: "high" },
-      { time: 950, label: "Formação do ajuste do dólar", detail: "Entre 15:50 e 16:00, a apuração do ajuste de DOL/WDO pode elevar o fluxo e a volatilidade.", level: "medium" },
-      { time: 1075, label: "Call de fechamento das ações", detail: "Das 17:55 às 18:00. Rebalanceamentos e ordens de fechamento podem distorcer o movimento final.", level: "high" },
-      { time: 1110, label: "Encerramento do WDO", detail: "Fim da negociação regular do minidólar às 18:30, conforme a grade vigente.", level: "low" }
+      { id: "futures", time: 540, label: "Abertura de WIN e WDO", detail: "Futuros começam a formar a primeira referência local. Observe dólar, índice e o exterior antes de agir.", level: "high" },
+      { id: "preopen", time: 585, label: "Pré-abertura das ações", detail: "Leilão entre 09:45 e 10:00. Preço teórico e desequilíbrio de ofertas podem mudar rapidamente.", level: "medium" },
+      { id: "stocks", time: 600, label: "Abertura do mercado à vista", detail: "Janela de maior descoberta de preço. Evite confundir volatilidade inicial com tendência confirmada.", level: "high" },
+      { id: "ny", time: nyOpen, label: `Abertura de Nova York (${nyLabel})`, detail: "S&P 500, Nasdaq, dólar e juros americanos podem aumentar a volatilidade da B3.", level: "high" },
+      { id: "dollar", time: 950, label: "Formação do ajuste do dólar", detail: "Entre 15:50 e 16:00, a apuração do ajuste de DOL/WDO pode elevar o fluxo e a volatilidade.", level: "medium" },
+      { id: "close", time: 1075, label: "Call de fechamento das ações", detail: "Das 17:55 às 18:00. Rebalanceamentos e ordens de fechamento podem distorcer o movimento final.", level: "high" },
+      { id: "wdo-close", time: 1110, label: "Encerramento do WDO", detail: "Fim da negociação regular do minidólar às 18:30, conforme a grade vigente.", level: "low" }
     ].sort((a, b) => a.time - b.time);
   }
 
@@ -149,7 +149,22 @@
     if (!state.overview) return; const listed = indices.map((item) => state.overview.indices[item.id]);
     $("#indexSummary").innerHTML = indices.slice(0, 4).map((item) => { const data = state.overview.indices[item.id]; const tone = data.change1d >= 0 ? "positive" : "negative"; return `<article><span>${item.label}</span><strong>${number(data.current, data.current < 1000 ? 2 : 0)}</strong><small class="${tone}">${percent(data.change1d)} no dia</small></article>`; }).join("");
     const sum = listed.reduce((total, item) => total + item.change1d, 0); const average = sum / listed.length; const highs = listed.filter((item) => item.change1d > 0).length;
-    $("#aggregateStats").innerHTML = `<article><span>Soma das variações</span><strong class="${sum >= 0 ? "positive" : "negative"}">${percent(sum)}</strong></article><article><span>Média das bolsas</span><strong class="${average >= 0 ? "positive" : "negative"}">${percent(average)}</strong></article><article><span>Amplitude global</span><strong>${highs} altas · ${listed.length - highs} baixas</strong></article>`;
+    $("#aggregateStats").innerHTML = `<article><span>Soma das variações</span><strong class="${sum >= 0 ? "positive" : "negative"}">${percent(sum)}</strong></article><article><span>Média das bolsas</span><strong class="${average >= 0 ? "positive" : "negative"}">${percent(average)}</strong></article><article><span>Amplitude global</span><strong>${highs} altas · ${listed.length - highs} baixas</strong></article>`; renderInfluenceProbability(); updateLiveTimestamps();
+  }
+
+  function renderInfluenceProbability() {
+    if (!state.overview) return; const weights = [
+      ["spx", "S&P 500", 35], ["nasdaq", "Nasdaq", 20], ["dow", "Dow Jones", 10], ["dax", "DAX", 12], ["china", "Xangai", 15], ["nikkei", "Nikkei", 8]
+    ];
+    const entries = weights.map(([id, label, weight]) => { const change = state.overview.indices[id]?.change1d || 0; return { label, weight, change, contribution: change * weight / 100 }; });
+    const pressure = entries.reduce((sum, item) => sum + item.contribution, 0); const highProbability = Math.max(10, Math.min(90, 50 + pressure * 18)); const lowProbability = 100 - highProbability; const maxContribution = Math.max(...entries.map((item) => Math.abs(item.contribution)), .01);
+    const direction = highProbability >= 57 ? "Pressão externa mais favorável à alta" : highProbability <= 43 ? "Pressão externa mais favorável à baixa" : "Pressão externa equilibrada";
+    $("#influenceProbability").innerHTML = `<div class="probability-head"><div><span>Leitura ponderada</span><strong>${direction}</strong></div><div class="probability-values"><b class="negative">${number(lowProbability, 0)}% baixa</b><b class="positive">${number(highProbability, 0)}% alta</b></div></div><div class="probability-track"><i style="width:${highProbability}%"></i></div><div class="influence-bars">${entries.map((item) => { const size = Math.abs(item.contribution) / maxContribution * 50; const side = item.contribution >= 0 ? "up" : "down"; return `<div><span>${item.label}<small>peso ${item.weight}%</small></span><section><i class="${side}" style="width:${size}%"></i></section><strong class="${item.change >= 0 ? "positive" : "negative"}">${percent(item.change)}</strong></div>`; }).join("")}</div>`;
+  }
+
+  function updateLiveTimestamps() {
+    if (!state.overview?.updatedAt) return; const value = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(state.overview.updatedAt));
+    $("#indicesUpdated").textContent = `${value} · possível atraso da fonte`; $("#tradeUpdatedAt").textContent = `${value} · automática a cada 60s`;
   }
 
   function renderSelectedIndex() {
@@ -163,9 +178,10 @@
   }
   function showIndexError(error) { $("#indexChart").innerHTML = `<div class="chart-error"><strong>Bolsas temporariamente indisponíveis.</strong><span>${esc(error.message)}</span></div>`; }
 
-  async function ensureOverview() {
-    if (state.overview) return state.overview;
-    if (!state.overviewPromise) state.overviewPromise = apiJson("/api/b3-series").then((payload) => { state.overview = payload; renderQuotes(); renderIndexSummary(); renderAnalysis(); return payload; }).catch((error) => { state.overviewPromise = null; throw error; }); return state.overviewPromise;
+  async function ensureOverview(force = false) {
+    if (state.overview && !force) return state.overview; if (state.overviewPromise) return state.overviewPromise;
+    const url = force ? `/api/b3-series?live=${Date.now()}` : "/api/b3-series";
+    state.overviewPromise = apiJson(url).then((payload) => { state.overview = payload; renderQuotes(); renderIndexSummary(); renderAnalysis(); renderTradeContext(); if (state.tab === "bolsas") renderSelectedIndex(); return payload; }).finally(() => { state.overviewPromise = null; }); return state.overviewPromise;
   }
 
   function renderQuotes() {
@@ -197,7 +213,15 @@
   function renderTradeTimeline(now = new Date()) {
     const clock = marketMinutes(now); const businessDay = !["Sat", "Sun"].includes(clock.weekday); const events = tradeEvents(now); const next = businessDay ? events.find((event) => event.time > clock.minutes) : null;
     const timeLabel = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-    $("#tradeTimeline").innerHTML = events.map((event) => `<div class="trade-event ${businessDay && clock.minutes >= event.time ? "is-past" : ""} ${next === event ? "is-next" : ""}"><time>${timeLabel(event.time)}</time><i class="${event.level}"></i><p><strong>${esc(event.label)}</strong><small>${esc(event.detail)}</small></p></div>`).join("");
+    const marketValue = (event) => {
+      if (!state.overview || !businessDay || clock.minutes < event.time) return ""; const { indices: idx, macro } = state.overview; const quote = (item, digits = 0) => item ? `${number(item.current, digits)} <b class="${item.change1d >= 0 ? "positive" : "negative"}">${percent(item.change1d)}</b>` : "—"; const opened = (item, digits = 0) => item?.open > 0 ? `abertura ${number(item.open, digits)} · atual ${quote(item, digits)}` : `valor atual ${quote(item, digits)}`;
+      if (event.id === "futures") return `<span class="event-market-values"><em>Referências após a abertura</em><span>Ibovespa ${quote(idx.ibov)}</span><span>USD/BRL ${quote(macro.usdbrl, 4)}</span></span>`;
+      if (event.id === "stocks" || event.id === "preopen") return `<span class="event-market-values"><em>Mercado à vista</em><span>Ibovespa: ${opened(idx.ibov)}</span></span>`;
+      if (event.id === "ny") return `<span class="event-market-values"><em>Mercados dos EUA</em><span>S&amp;P 500: ${opened(idx.spx)}</span><span>Nasdaq: ${opened(idx.nasdaq)}</span></span>`;
+      if (event.id === "dollar" || event.id === "wdo-close") return `<span class="event-market-values"><em>Referência cambial</em><span>USD/BRL: ${quote(macro.usdbrl, 4)}</span></span>`;
+      if (event.id === "close") return `<span class="event-market-values"><em>Referência do fechamento</em><span>Ibovespa: ${quote(idx.ibov)}</span></span>`; return "";
+    };
+    $("#tradeTimeline").innerHTML = events.map((event) => `<div class="trade-event ${businessDay && clock.minutes >= event.time ? "is-past" : ""} ${next === event ? "is-next" : ""}"><time>${timeLabel(event.time)}</time><i class="${event.level}"></i><p><strong>${esc(event.label)}</strong><small>${esc(event.detail)}</small>${marketValue(event)}</p></div>`).join("");
 
     let phase = "Mercado fechado"; let phaseText = "Use o período sem negociação para preparar níveis, cenários e limite de perda."; let tone = "neutral";
     if (businessDay && clock.minutes >= 535 && clock.minutes < 540) { phase = "Pré-abertura dos futuros"; phaseText = "Confira exterior, dólar e agenda antes do início de WIN e WDO."; tone = "attention"; }
@@ -222,7 +246,7 @@
       ["Dólar/real", percent(macro.usdbrl.change1d), -macro.usdbrl.change1d],
       ["Petróleo Brent", percent(macro.brent.change1d), macro.brent.change1d]
     ];
-    $("#tradeContext").innerHTML = `<div class="context-quotes">${items.map(([label, value, signal]) => `<span><small>${label}</small><strong class="${signal >= 0 ? "positive" : "negative"}">${value}</strong></span>`).join("")}</div>${levels ? `<div class="pivot-position"><span>Ibovespa está <b>${abovePivot ? "acima" : "abaixo"}</b> do pivô diário</span><strong>${number(levels.pivot, 0)}</strong><small>S1 ${number(levels.support1, 0)} · R1 ${number(levels.resistance1, 0)}</small></div>` : ""}<p class="source-note">Contexto calculado com fechamentos públicos; pode haver atraso e não substitui o book e o gráfico da corretora.</p>`;
+    $("#tradeContext").innerHTML = `<div class="context-quotes">${items.map(([label, value, signal]) => `<span><small>${label}</small><strong class="${signal >= 0 ? "positive" : "negative"}">${value}</strong></span>`).join("")}</div>${levels ? `<div class="pivot-position"><span>Ibovespa está <b>${abovePivot ? "acima" : "abaixo"}</b> do pivô diário</span><strong>${number(levels.pivot, 0)}</strong><small>S1 ${number(levels.support1, 0)} · R1 ${number(levels.resistance1, 0)}</small></div>` : ""}<p class="source-note">Atualização automática com dados públicos; pode haver atraso e não substitui o book e o gráfico da corretora.</p>`; updateLiveTimestamps(); renderTradeTimeline();
   }
 
   function updateTradeChecklist() {
@@ -245,12 +269,13 @@
 
   async function loadNews(force = false) {
     $("#refreshNews").disabled = true;
-    try { const payload = await apiJson(`/api/b3-news${force ? "?refresh=1" : ""}`); state.news = (payload.items || []).slice(0, 9); renderNews(); }
+    try { const payload = await apiJson(`/api/b3-news${force ? `?refresh=${Date.now()}` : ""}`); state.newsUpdatedAt = payload.updatedAt; state.news = (payload.items || []).sort((a, b) => new Date(b.publishedAt) - new Date(a.publishedAt)).slice(0, 9); renderNews(); }
     catch (error) { const message = `<div class="panel-card"><strong>Notícias temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#newsPreview").innerHTML = message; $("#newsFull").innerHTML = message; } finally { $("#refreshNews").disabled = false; }
   }
   function renderNews() {
     $("#newsPreview").innerHTML = state.news.slice(0, 3).map((item, index) => `<a class="news-mini" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-number">0${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.source)} · ${esc(item.relativeDate)}</small></span></a>`).join("");
-    $("#newsFull").innerHTML = state.news.map((item) => `<a class="news-card" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-tag">${esc(item.asset || "Mercado")}</span><h3>${esc(item.title)}</h3><p>${esc(item.description || "Abra para ler a notícia completa no veículo responsável.")}</p><span class="news-meta"><span>${esc(item.source)}</span><span>${esc(item.relativeDate)} ↗</span></span></a>`).join("");
+    $("#newsFull").innerHTML = state.news.map((item) => `<a class="news-card ${item.intradayImpact ? "has-intraday-impact" : ""}" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-tag-row"><span class="news-tag">${esc(item.asset || "Mercado")}</span>${item.intradayImpact ? '<span class="intraday-live"><i></i> Impacto no day trade · em tempo real</span>' : ""}</span><h3>${esc(item.title)}</h3><p>${esc(item.description || "Abra para ler a notícia completa no veículo responsável.")}</p><span class="news-meta"><span>${esc(item.source)}</span><span>${esc(item.relativeDate)} ↗</span></span></a>`).join("");
+    if (state.newsUpdatedAt) $("#newsUpdatedAt").textContent = `Atualizado às ${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(state.newsUpdatedAt))} · ordem cronológica`;
   }
 
   let futuresRequest = null;
@@ -265,6 +290,6 @@
   }
 
   $("#refreshNews").addEventListener("click", () => loadNews(true));
-  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initTabs(); updateClock(); setInterval(updateClock, 60000);
+  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) ensureOverview(true).catch(() => {}); }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000);
   ensureOverview().catch((error) => { $("#quoteGrid").innerHTML = `<div class="panel-card" style="grid-column:1/-1"><strong>Cotações temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#quotesUpdated").textContent = "Fonte indisponível"; }); loadNews();
 })();

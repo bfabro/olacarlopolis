@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=4">
+  <link rel="stylesheet" href="b3.css?v=5">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -82,13 +82,18 @@
     </section>
 
     <section class="tab-panel" id="panel-bolsas" data-panel="bolsas" hidden>
-      <div class="section-heading"><div><span class="eyebrow">MERCADOS GLOBAIS</span><h2>Principais bolsas</h2></div><p>Fechamento e evolução normalizada dos últimos três meses.</p></div>
+      <div class="section-heading"><div><span class="eyebrow">MERCADOS GLOBAIS</span><h2>Principais bolsas</h2></div><p><span class="live-dot" aria-hidden="true"></span> Atualização automática · <span id="indicesUpdated">carregando…</span></p></div>
       <div class="index-summary" id="indexSummary"></div>
       <div class="aggregate-stats" id="aggregateStats"></div>
       <div class="index-buttons" id="indexButtons"></div>
       <article class="chart-card main-chart">
         <div class="chart-card-head"><div><span class="eyebrow">GRÁFICO</span><h2 id="indexTitle">Ibovespa</h2></div><span class="source-pill">Dados possivelmente atrasados</span></div>
         <div id="indexChart" class="market-chart large" aria-label="Gráfico do índice selecionado"><div class="chart-loading">Carregando bolsas…</div></div>
+      </article>
+      <article class="influence-card top-gap">
+        <div class="card-title"><div><span class="eyebrow">PRESSÃO EXTERNA SOBRE A B3</span><h2>Probabilidade ponderada em tempo real</h2></div><span class="source-pill">Atualiza a cada 60s</span></div>
+        <div id="influenceProbability" class="influence-probability"><div class="chart-loading">Calculando influência das bolsas…</div></div>
+        <p class="source-note">Estimativa estatística baseada no movimento diário e no peso de influência de cada mercado. Não representa probabilidade garantida nem recomendação.</p>
       </article>
     </section>
 
@@ -112,7 +117,7 @@
     </section>
 
     <section class="tab-panel" id="panel-daytrade" data-panel="daytrade" hidden>
-      <div class="section-heading"><div><span class="eyebrow">PLANO INTRADIÁRIO</span><h2>Painel para decisão de entrada</h2></div><p>Contexto, horários de atenção e controle de risco. Não gera sinal automático.</p></div>
+      <div class="section-heading"><div><span class="eyebrow">PLANO INTRADIÁRIO</span><h2>Painel para decisão de entrada</h2></div><p><span class="live-dot" aria-hidden="true"></span> Última atualização: <span id="tradeUpdatedAt">carregando…</span></p></div>
 
       <article class="trade-now" id="tradeNow" data-tone="neutral">
         <div><span class="eyebrow">AGORA EM SÃO PAULO</span><h2 id="tradePhase">Verificando fase do pregão…</h2><p id="tradePhaseText">Aguarde a atualização do relógio.</p></div>
@@ -174,7 +179,7 @@
     </section>
 
     <section class="tab-panel" id="panel-noticias" data-panel="noticias" hidden>
-      <div class="section-heading"><div><span class="eyebrow">NOTÍCIAS PÚBLICAS</span><h2>O que pode mexer com as ações</h2></div><button class="refresh-button" id="refreshNews" type="button">↻ Atualizar</button></div>
+      <div class="section-heading"><div><span class="eyebrow">NOTÍCIAS PÚBLICAS</span><h2>Mais recentes primeiro</h2><small class="updated" id="newsUpdatedAt">Buscando atualização…</small></div><button class="refresh-button" id="refreshNews" type="button">↻ Atualizar</button></div>
       <div id="newsFull" class="news-full" aria-live="polite"><div class="loading-line">Buscando nove notícias…</div></div>
       <p class="source-note">Agregação por RSS do Google Notícias. A manchete leva ao veículo responsável; confirme data, contexto e fonte.</p>
     </section>
@@ -211,6 +216,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=4"></script>
+  <script defer src="b3.js?v=5"></script>
 </body>
 </html>
