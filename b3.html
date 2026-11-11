@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=2">
+  <link rel="stylesheet" href="b3.css?v=3">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -83,6 +83,7 @@
     <section class="tab-panel" id="panel-bolsas" data-panel="bolsas" hidden>
       <div class="section-heading"><div><span class="eyebrow">MERCADOS GLOBAIS</span><h2>Principais bolsas</h2></div><p>Fechamento e evolução normalizada dos últimos três meses.</p></div>
       <div class="index-summary" id="indexSummary"></div>
+      <div class="aggregate-stats" id="aggregateStats"></div>
       <div class="index-buttons" id="indexButtons"></div>
       <article class="chart-card main-chart">
         <div class="chart-card-head"><div><span class="eyebrow">GRÁFICO</span><h2 id="indexTitle">Ibovespa</h2></div><span class="source-pill">Dados possivelmente atrasados</span></div>
@@ -97,6 +98,10 @@
         <div class="direction-meter"><span>Baixa</span><div><i id="directionNeedle"></i></div><span>Alta</span></div>
         <div class="direction-signals" id="directionSignals"></div>
       </article>
+      <article class="support-card">
+        <div><span class="eyebrow">PIVÔ DO DIA</span><h2>Possíveis suportes e resistências</h2><p>Calculados com máxima, mínima e fechamento do pregão anterior.</p></div>
+        <div class="support-levels" id="supportLevels"><span>Calculando níveis…</span></div>
+      </article>
       <div class="analysis-grid">
         <article class="analysis-card macro"><span class="analysis-label">CENÁRIO MACRO</span><h3>Vetores para o Ibovespa</h3><ul><li><strong>Juros globais:</strong> queda nos Treasuries tende a favorecer bolsas emergentes.</li><li><strong>Dólar:</strong> alta pode ajudar exportadoras, mas pressiona inflação e empresas importadoras.</li><li><strong>China:</strong> atividade e estímulos afetam minério, siderurgia e o peso da Vale no índice.</li><li><strong>Brasil:</strong> fiscal, Selic e curva de DI determinam apetite por risco doméstico.</li></ul></article>
         <article class="analysis-card micro"><span class="analysis-label">CENÁRIO MICRO</span><h3>Como ler os setores</h3><ul><li><strong>Petróleo:</strong> preço internacional, câmbio e política de preços movem PETR4, PRIO3 e RECV3.</li><li><strong>Bancos:</strong> crédito, inadimplência e margem financeira pesam em ITUB4, BBAS3 e BBDC4.</li><li><strong>Varejo:</strong> juros longos e renda disponível são os principais gatilhos.</li><li><strong>Resultados:</strong> guidance e margens podem superar qualquer tendência macro no curto prazo.</li></ul></article>
@@ -107,7 +112,7 @@
 
     <section class="tab-panel" id="panel-noticias" data-panel="noticias" hidden>
       <div class="section-heading"><div><span class="eyebrow">NOTÍCIAS PÚBLICAS</span><h2>O que pode mexer com as ações</h2></div><button class="refresh-button" id="refreshNews" type="button">↻ Atualizar</button></div>
-      <div id="newsFull" class="news-full" aria-live="polite"><div class="loading-line">Buscando notícias…</div></div>
+      <div id="newsFull" class="news-full" aria-live="polite"><div class="loading-line">Buscando nove notícias…</div></div>
       <p class="source-note">Agregação por RSS do Google Notícias. A manchete leva ao veículo responsável; confirme data, contexto e fonte.</p>
     </section>
 
@@ -143,6 +148,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=2"></script>
+  <script defer src="b3.js?v=3"></script>
 </body>
 </html>

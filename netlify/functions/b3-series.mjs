@@ -28,11 +28,14 @@ async function yahooSeries(symbol, label) {
     const response = await fetch(url, { signal: controller.signal, headers: { accept: "application/json", "user-agent": "Mozilla/5.0 OlaCarlopolis/2.0" } });
     if (!response.ok) throw new Error(`Série ${symbol}: ${response.status}`);
     const result = (await response.json()).chart?.result?.[0]; if (!result) throw new Error(`Série ${symbol} sem dados.`);
-    const closes = result.indicators?.adjclose?.[0]?.adjclose || result.indicators?.quote?.[0]?.close || [];
+    const quote = result.indicators?.quote?.[0] || {}; const closes = result.indicators?.adjclose?.[0]?.adjclose || quote.close || [];
     const points = (result.timestamp || []).map((time, index) => ({ date: new Date(time * 1000).toISOString().slice(0, 10), value: Number(closes[index]) })).filter((point) => Number.isFinite(point.value) && point.value > 0);
     if (points.length < 2) throw new Error(`Série ${symbol} insuficiente.`);
     const current = points.at(-1).value; const at = (offset) => points.at(Math.max(-points.length, -1 - offset))?.value ?? current; const change = (offset) => (current / at(offset) - 1) * 100;
-    const value = { symbol, label, currency: result.meta?.currency || "", volume: Number(result.meta?.regularMarketVolume || 0), current, change1d: change(1), change5d: change(5), change20d: change(20), points };
+    const candles = (result.timestamp || []).map((time, index) => ({ date: new Date(time * 1000).toISOString().slice(0, 10), high: Number(quote.high?.[index]), low: Number(quote.low?.[index]), close: Number(quote.close?.[index]) })).filter((row) => row.high > 0 && row.low > 0 && row.close > 0);
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date()); const reference = candles.at(candles.at(-1)?.date === today ? -2 : -1); let levels = null;
+    if (reference) { const pivot = (reference.high + reference.low + reference.close) / 3; levels = { referenceDate: reference.date, pivot, resistance1: 2 * pivot - reference.low, resistance2: pivot + (reference.high - reference.low), support1: 2 * pivot - reference.high, support2: pivot - (reference.high - reference.low) }; }
+    const value = { symbol, label, currency: result.meta?.currency || "", volume: Number(result.meta?.regularMarketVolume || 0), current, change1d: change(1), change5d: change(5), change20d: change(20), points, levels };
     cache.set(key, { time: Date.now(), value }); return value;
   } finally { clearTimeout(timeout); }
 }

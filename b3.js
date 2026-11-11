@@ -83,7 +83,7 @@
     const width = 900, height = 360, left = 54, right = 18, top = 24, bottom = 44; const innerW = width - left - right, innerH = height - top - bottom;
     const x = (date) => left + dates.indexOf(date) / Math.max(dates.length - 1, 1) * innerW; const y = (value) => top + (max - value) / (max - min) * innerH;
     const grids = Array.from({ length: 5 }, (_, index) => { const value = max - index * (max - min) / 4; const yy = y(value); return `<line x1="${left}" y1="${yy}" x2="${width - right}" y2="${yy}"/><text x="${left - 8}" y="${yy + 4}" text-anchor="end">${number(value, 1)}</text>`; }).join("");
-    const paths = usable.map((item) => { const d = item.points.map((point, index) => `${index ? "L" : "M"}${x(point.date).toFixed(1)},${y(point.value).toFixed(1)}`).join(" "); return `<path d="${d}" stroke="${item.color}"/><circle cx="${x(item.points.at(-1).date)}" cy="${y(item.points.at(-1).value)}" r="4" fill="${item.color}"/>`; }).join("");
+    const paths = usable.map((item) => { const d = item.points.map((point, index) => `${index ? "L" : "M"}${x(point.date).toFixed(1)},${y(point.value).toFixed(1)}`).join(" "); return `<path d="${d}" stroke="${item.color}" style="stroke-width:${item.width || 3}px"/><circle cx="${x(item.points.at(-1).date)}" cy="${y(item.points.at(-1).value)}" r="4" fill="${item.color}"/>`; }).join("");
     const ticks = [dates[0], dates[Math.floor((dates.length - 1) / 2)], dates.at(-1)].filter(Boolean).map((date) => `<text class="date" x="${x(date)}" y="${height - 14}" text-anchor="middle">${dateBR(date)}</text>`).join("");
     const legend = usable.map((item) => { const change = item.points.at(-1).value - 100; return `<span><i style="background:${item.color}"></i><b>${esc(item.label)}</b><small class="${change >= 0 ? "positive" : "negative"}">${percent(change)} no período</small></span>`; }).join("");
     container.innerHTML = `<div class="chart-legend">${legend}</div><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(caption)}"><g class="grid">${grids}</g><g class="axis">${ticks}</g><g class="lines">${paths}</g></svg><small class="chart-caption">Base 100 no início do período · últimos três meses · fechamento diário</small>`;
@@ -108,22 +108,30 @@
   }
 
   function renderCommodityChart(id) {
-    const payload = state.groups.get(id); if (!payload) return; const average = { label: `Média: ${payload.stocks.map((stock) => stock.label).join(" + ")}`, color: "#146aa2", points: averageSeries(payload.stocks) };
-    renderLineChart($("#commodityChart"), [normalizeSeries(payload.commodity, payload.commodity.label, "#0a9667"), average], `${payload.commodity.label} comparado à média das ações relacionadas`);
+    const payload = state.groups.get(id); if (!payload) return; const average = { label: `Média: ${payload.stocks.map((stock) => stock.label).join(" + ")}`, color: "#2563eb", points: averageSeries(payload.stocks) };
+    renderLineChart($("#commodityChart"), [normalizeSeries(payload.commodity, payload.commodity.label, "#dc2626"), average], `${payload.commodity.label} comparado à média das ações relacionadas`);
   }
 
   function renderIndices() {
-    $("#indexButtons").innerHTML = indices.map((item) => `<button class="index-button ${item.id === state.index ? "is-active" : ""}" type="button" data-index="${item.id}">${item.label}</button>`).join("");
+    $("#indexButtons").innerHTML = [...indices, { id: "all", label: "Todas + média" }].map((item) => `<button class="index-button ${item.id === state.index ? "is-active" : ""}" type="button" data-index="${item.id}">${item.label}</button>`).join("");
     $$('[data-index]').forEach((button) => button.addEventListener("click", () => { state.index = button.dataset.index; renderSelectedIndex(); }));
   }
 
   function renderIndexSummary() {
-    if (!state.overview) return; $("#indexSummary").innerHTML = indices.slice(0, 4).map((item) => { const data = state.overview.indices[item.id]; const tone = data.change1d >= 0 ? "positive" : "negative"; return `<article><span>${item.label}</span><strong>${number(data.current, data.current < 1000 ? 2 : 0)}</strong><small class="${tone}">${percent(data.change1d)} no dia</small></article>`; }).join("");
+    if (!state.overview) return; const listed = indices.map((item) => state.overview.indices[item.id]);
+    $("#indexSummary").innerHTML = indices.slice(0, 4).map((item) => { const data = state.overview.indices[item.id]; const tone = data.change1d >= 0 ? "positive" : "negative"; return `<article><span>${item.label}</span><strong>${number(data.current, data.current < 1000 ? 2 : 0)}</strong><small class="${tone}">${percent(data.change1d)} no dia</small></article>`; }).join("");
+    const sum = listed.reduce((total, item) => total + item.change1d, 0); const average = sum / listed.length; const highs = listed.filter((item) => item.change1d > 0).length;
+    $("#aggregateStats").innerHTML = `<article><span>Soma das variações</span><strong class="${sum >= 0 ? "positive" : "negative"}">${percent(sum)}</strong></article><article><span>Média das bolsas</span><strong class="${average >= 0 ? "positive" : "negative"}">${percent(average)}</strong></article><article><span>Amplitude global</span><strong>${highs} altas · ${listed.length - highs} baixas</strong></article>`;
   }
 
   function renderSelectedIndex() {
-    if (!state.overview) return; const data = state.overview.indices[state.index]; if (!data) return;
-    $$('[data-index]').forEach((button) => button.classList.toggle("is-active", button.dataset.index === state.index)); $("#indexTitle").textContent = data.label; renderLineChart($("#indexChart"), [normalizeSeries(data, data.label, "#0a7a61")], `Evolução do ${data.label}`);
+    if (!state.overview) return; $$('[data-index]').forEach((button) => button.classList.toggle("is-active", button.dataset.index === state.index));
+    if (state.index === "all") {
+      const colors = ["#dc2626", "#2563eb", "#7c3aed", "#ea580c", "#0891b2", "#ca8a04", "#db2777"]; const listed = indices.map((item, index) => normalizeSeries(state.overview.indices[item.id], item.label, colors[index]));
+      const average = { label: "Média global", color: "#071c2b", width: 5, points: averageSeries(indices.map((item) => state.overview.indices[item.id])) }; $("#indexTitle").textContent = "Todas as bolsas + média global";
+      renderLineChart($("#indexChart"), [...listed, average], "Comparação de todas as bolsas e sua média global"); return;
+    }
+    const data = state.overview.indices[state.index]; if (!data) return; $("#indexTitle").textContent = data.label; renderLineChart($("#indexChart"), [normalizeSeries(data, data.label, "#0a7a61")], `Evolução do ${data.label}`);
   }
   function showIndexError(error) { $("#indexChart").innerHTML = `<div class="chart-error"><strong>Bolsas temporariamente indisponíveis.</strong><span>${esc(error.message)}</span></div>`; }
 
@@ -149,15 +157,16 @@
     const direction = score > .65 ? "Viés provável de alta" : score < -.65 ? "Viés provável de baixa" : "Direção lateral ou indefinida"; const tone = score > .65 ? "positive" : score < -.65 ? "negative" : "neutral";
     const title = $("#directionTitle"); title.textContent = direction; title.className = tone; $("#directionCard").dataset.tone = tone; $("#directionText").textContent = `Leitura quantitativa com ${confidence}. O placar combina tendência recente, exterior, câmbio, petróleo e minério; não é previsão nem recomendação.`; $("#directionNeedle").style.left = `${Math.max(5, Math.min(95, 50 + score * 13))}%`;
     $("#directionSignals").innerHTML = signals.map((item) => `<span><small>${item.label}</small><strong class="${item.value >= 0 ? "positive" : "negative"}">${percent(item.value)}</strong></span>`).join(""); $("#analysisTimestamp").textContent = `Consolidado em ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(state.overview.updatedAt))}.`;
+    const levels = idx.ibov.levels; if (levels) { const current = idx.ibov.current; const rows = [["S2", levels.support2, "support"], ["S1", levels.support1, "support"], ["Pivô", levels.pivot, "pivot"], ["R1", levels.resistance1, "resistance"], ["R2", levels.resistance2, "resistance"]]; $("#supportLevels").innerHTML = rows.map(([label, value, type]) => `<span class="${type}"><small>${label}</small><strong>${number(value, 0)}</strong><em>${value < current ? "abaixo" : value > current ? "acima" : "no preço"}</em></span>`).join("") + `<p>Ibovespa atual: <b>${number(current, 0)}</b> · referência: ${dateBR(levels.referenceDate)}. Níveis aproximados, não ordens de operação.</p>`; }
   }
 
   async function loadNews(force = false) {
     $("#refreshNews").disabled = true;
-    try { const payload = await apiJson(`/api/b3-news${force ? "?refresh=1" : ""}`); state.news = (payload.items || []).slice(0, 3); renderNews(); }
+    try { const payload = await apiJson(`/api/b3-news${force ? "?refresh=1" : ""}`); state.news = (payload.items || []).slice(0, 9); renderNews(); }
     catch (error) { const message = `<div class="panel-card"><strong>Notícias temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#newsPreview").innerHTML = message; $("#newsFull").innerHTML = message; } finally { $("#refreshNews").disabled = false; }
   }
   function renderNews() {
-    $("#newsPreview").innerHTML = state.news.map((item, index) => `<a class="news-mini" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-number">0${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.source)} · ${esc(item.relativeDate)}</small></span></a>`).join("");
+    $("#newsPreview").innerHTML = state.news.slice(0, 3).map((item, index) => `<a class="news-mini" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-number">0${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.source)} · ${esc(item.relativeDate)}</small></span></a>`).join("");
     $("#newsFull").innerHTML = state.news.map((item) => `<a class="news-card" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-tag">${esc(item.asset || "Mercado")}</span><h3>${esc(item.title)}</h3><p>${esc(item.description || "Abra para ler a notícia completa no veículo responsável.")}</p><span class="news-meta"><span>${esc(item.source)}</span><span>${esc(item.relativeDate)} ↗</span></span></a>`).join("");
   }
 
