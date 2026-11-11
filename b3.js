@@ -1,4 +1,4 @@
-/* Painel B3 publico - v5 */
+/* Painel B3 publico - v6 */
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -8,7 +8,7 @@
   const number = (value, digits = 0) => Number(value).toLocaleString("pt-BR", { maximumFractionDigits: digits });
   const percent = (value) => `${Number(value) > 0 ? "+" : ""}${number(value, 2)}%`;
   const dateBR = (value) => new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`));
-  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, groups: new Map(), groupRequests: new Map() };
+  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "impact", groups: new Map(), groupRequests: new Map() };
 
   const commodities = [
     { id: "brent", title: "Petróleo Brent", group: "Energia", icon: "BR", assets: ["PETR4", "PETR3", "PRIO3", "RECV3"], summary: "Alta do Brent tende a elevar a receita em reais das produtoras. Refino, câmbio, política de preços e produção podem alterar o efeito." },
@@ -78,6 +78,7 @@
     $$(".tab").forEach((button) => { const active = button.dataset.tab === tab; button.classList.toggle("is-active", active); button.setAttribute("aria-selected", String(active)); });
     $$(".tab-panel").forEach((panel) => { const active = panel.dataset.panel === tab; panel.hidden = !active; panel.classList.toggle("is-active", active); });
     if (tab === "commodities") loadCommodity(state.commodity);
+    if (tab === "forca") loadStrength();
     if (tab === "bolsas") ensureOverview().then(renderSelectedIndex).catch(showIndexError);
     if (tab === "analise") { ensureOverview().then(renderAnalysis).catch(() => {}); renderTechnical(); }
     if (tab === "daytrade") ensureOverview().then(renderTradeContext).catch(() => {});
@@ -138,6 +139,48 @@
   function renderCommodityChart(id) {
     const payload = state.groups.get(id); if (!payload) return; const average = { label: `Média: ${payload.stocks.map((stock) => stock.label).join(" + ")}`, color: "#2563eb", points: averageSeries(payload.stocks) };
     renderLineChart($("#commodityChart"), [normalizeSeries(payload.commodity, payload.commodity.label, "#dc2626"), average], `${payload.commodity.label} comparado à média das ações relacionadas`);
+  }
+
+  async function loadStrength(force = false) {
+    if (state.strength && !force) { renderStrength(); return state.strength; } if (state.strengthPromise) return state.strengthPromise;
+    const url = force ? `/api/b3-strength?live=${Date.now()}` : "/api/b3-strength";
+    state.strengthPromise = apiJson(url).then((payload) => { state.strength = payload; if (!payload.items.some((item) => item.ticker === state.strengthTicker)) state.strengthTicker = payload.items[0]?.ticker; renderStrength(); return payload; }).catch((error) => { $("#strengthRanking").innerHTML = `<div class="chart-error"><strong>Força B3 temporariamente indisponível.</strong><span>${esc(error.message)}</span></div>`; $("#strengthChart").innerHTML = `<div class="chart-error"><strong>Gráfico indisponível.</strong><span>${esc(error.message)}</span></div>`; throw error; }).finally(() => { state.strengthPromise = null; }); return state.strengthPromise;
+  }
+
+  function renderStrength() {
+    if (!state.strength) return; const items = state.strength.items; const net = items.reduce((sum, item) => sum + item.contribution, 0); const rising = items.filter((item) => item.change > 0).length; const topThree = [...items].sort((a, b) => b.weight - a.weight).slice(0, 3).reduce((sum, item) => sum + item.weight, 0);
+    $("#strengthUpdatedAt").textContent = `${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(state.strength.updatedAt))} · possível atraso`;
+    $("#strengthKpis").innerHTML = `<article><span>Peso monitorado</span><strong>${number(state.strength.totalWeight, 2)}%</strong><small>dos 12 maiores papéis</small></article><article><span>Contribuição estimada</span><strong class="${net >= 0 ? "positive" : "negative"}">${percent(net)}</strong><small>efeito aproximado no índice</small></article><article><span>Amplitude</span><strong>${rising} altas · ${items.length - rising} baixas</strong><small>entre os maiores pesos</small></article><article><span>Concentração do top 3</span><strong>${number(topThree, 2)}%</strong><small>VALE3, ITUB4 e PETR4</small></article>`;
+    renderStrengthRanking(); renderStrengthChart(); renderContributionChart(); renderStrengthInsights();
+  }
+
+  function renderStrengthRanking() {
+    const list = [...state.strength.items].sort((a, b) => state.strengthSort === "weight" ? b.weight - a.weight : Math.abs(b.contribution) - Math.abs(a.contribution));
+    $("#strengthRanking").innerHTML = `<div class="strength-row strength-head"><span>#</span><span>Ação</span><span>Peso</span><span>Preço</span><span>Dia</span><span>Impacto</span></div>${list.map((item, index) => `<button class="strength-row ${item.ticker === state.strengthTicker ? "is-active" : ""}" type="button" data-strength-ticker="${item.ticker}"><span>${String(index + 1).padStart(2, "0")}</span><span><b>${item.ticker}</b><small>${esc(item.name)}</small></span><strong>${number(item.weight, 2)}%</strong><strong>${money(item.current)}</strong><strong class="${item.change >= 0 ? "positive" : "negative"}">${percent(item.change)}</strong><strong class="${item.contribution >= 0 ? "positive" : "negative"}">${percent(item.contribution)}</strong></button>`).join("")}`;
+    $$('[data-strength-ticker]').forEach((button) => button.addEventListener("click", () => { state.strengthTicker = button.dataset.strengthTicker; renderStrengthRanking(); renderStrengthChart(); }));
+    $$('[data-strength-sort]').forEach((button) => button.classList.toggle("is-active", button.dataset.strengthSort === state.strengthSort));
+  }
+
+  function renderStrengthChart() {
+    const item = state.strength.items.find((entry) => entry.ticker === state.strengthTicker) || state.strength.items[0]; if (!item) return; const points = item.points || []; $("#strengthChartTitle").textContent = `${item.ticker} · ${item.name}`; $("#strengthChartSector").textContent = item.sector; $("#strengthPrice").innerHTML = `<strong>${money(item.current)}</strong><span class="${item.change >= 0 ? "positive" : "negative"}">${percent(item.change)} no dia</span><small>Peso ${number(item.weight, 2)}% · impacto ${percent(item.contribution)}</small>`;
+    if (points.length < 2) { $("#strengthChart").innerHTML = '<div class="chart-error"><strong>Série intradiária insuficiente.</strong><span>A cotação principal continua disponível.</span></div>'; return; }
+    const width = 900; const height = 330; const pad = { left: 58, right: 20, top: 24, bottom: 35 }; const values = points.map((point) => point.value); if (item.previousClose > 0) values.push(item.previousClose); let min = Math.min(...values); let max = Math.max(...values); const margin = Math.max((max - min) * .12, max * .002); min -= margin; max += margin; const x = (index) => pad.left + index / Math.max(points.length - 1, 1) * (width - pad.left - pad.right); const y = (value) => pad.top + (max - value) / (max - min || 1) * (height - pad.top - pad.bottom); const path = points.map((point, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(point.value).toFixed(1)}`).join(" "); const area = `${path} L${x(points.length - 1)},${height - pad.bottom} L${x(0)},${height - pad.bottom} Z`; const color = item.change >= 0 ? "#07845b" : "#c94444"; const ticks = [0, .25, .5, .75, 1].map((part) => { const value = min + (max - min) * part; return `<g><line x1="${pad.left}" y1="${y(value)}" x2="${width - pad.right}" y2="${y(value)}"></line><text x="${pad.left - 8}" y="${y(value) + 3}" text-anchor="end">${number(value, 2)}</text></g>`; }).join(""); const timeTicks = [0, Math.floor((points.length - 1) / 2), points.length - 1].map((index) => `<text x="${x(index)}" y="${height - 9}" text-anchor="middle">${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(new Date(points[index].time))}</text>`).join(""); const previousLine = item.previousClose > min && item.previousClose < max ? `<line class="previous-line" x1="${pad.left}" y1="${y(item.previousClose)}" x2="${width - pad.right}" y2="${y(item.previousClose)}"></line><text class="previous-label" x="${width - pad.right}" y="${y(item.previousClose) - 5}" text-anchor="end">fechamento anterior</text>` : "";
+    $("#strengthChart").innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Cotação intradiária de ${esc(item.ticker)}"><defs><linearGradient id="strengthArea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".25"/><stop offset="1" stop-color="${color}" stop-opacity=".02"/></linearGradient></defs><g class="grid">${ticks}</g>${previousLine}<path class="strength-area" d="${area}" fill="url(#strengthArea)"></path><path class="strength-line" d="${path}" stroke="${color}"></path><g class="axis">${timeTicks}</g></svg><small class="chart-caption">Linha intradiária de 5 minutos · atualização automática a cada 60 segundos</small>`;
+    const high = item.high || Math.max(...points.map((point) => point.value)); const low = item.low || Math.min(...points.map((point) => point.value)); $("#strengthRange").innerHTML = `<span><small>Abertura</small><strong>${item.open > 0 ? money(item.open) : "—"}</strong></span><span><small>Mínima</small><strong>${money(low)}</strong></span><span><small>Máxima</small><strong>${money(high)}</strong></span><span><small>Volume</small><strong>${number(item.volume)}</strong></span>`;
+  }
+
+  function renderContributionChart() {
+    const items = [...state.strength.items].sort((a, b) => Math.abs(b.contribution) - Math.abs(a.contribution)).slice(0, 10); const max = Math.max(...items.map((item) => Math.abs(item.contribution)), .001);
+    $("#contributionChart").innerHTML = items.map((item) => { const size = Math.abs(item.contribution) / max * 50; const side = item.contribution >= 0 ? "up" : "down"; return `<div><span>${item.ticker}<small>${number(item.weight, 2)}% do IBOV</small></span><section><i class="${side}" style="width:${size}%"></i></section><strong class="${item.contribution >= 0 ? "positive" : "negative"}">${percent(item.contribution)}</strong></div>`; }).join("");
+  }
+
+  function renderStrengthInsights() {
+    const items = state.strength.items; const net = items.reduce((sum, item) => sum + item.contribution, 0); const leader = [...items].sort((a, b) => b.contribution - a.contribution)[0]; const drag = [...items].sort((a, b) => a.contribution - b.contribution)[0]; const sectors = Object.entries(items.reduce((map, item) => { map[item.sector] = (map[item.sector] || 0) + item.contribution; return map; }, {})).sort((a, b) => Math.abs(b[1]) - Math.abs(a[1])); const rising = items.filter((item) => item.change > 0).length; const concentrated = Math.abs(leader.contribution) > Math.abs(net) * .6; const badge = $("#strengthBias"); badge.className = `badge ${net > .08 ? "positive" : net < -.08 ? "negative" : "neutral"}`; badge.textContent = net > .08 ? "Pressão positiva" : net < -.08 ? "Pressão negativa" : "Forças equilibradas";
+    $("#strengthInsights").innerHTML = `<div><span>Principal força</span><strong class="positive">${leader.ticker} · ${percent(leader.contribution)}</strong><small>${leader.name} combina peso de ${number(leader.weight, 2)}% com variação de ${percent(leader.change)}.</small></div><div><span>Principal detrator</span><strong class="negative">${drag.ticker} · ${percent(drag.contribution)}</strong><small>${drag.name} é o maior freio entre os papéis monitorados.</small></div><div><span>Setor dominante</span><strong>${sectors[0][0]} · ${percent(sectors[0][1])}</strong><small>Efeito agregado das empresas desse setor na amostra.</small></div><div><span>Qualidade do movimento</span><strong>${rising}/${items.length} papéis em alta</strong><small>${concentrated ? "Movimento concentrado em poucos nomes; exige cautela." : "Movimento relativamente distribuído entre os maiores pesos."}</small></div>`;
+  }
+
+  function initStrength() {
+    $$('[data-strength-sort]').forEach((button) => button.addEventListener("click", () => { state.strengthSort = button.dataset.strengthSort; if (state.strength) renderStrengthRanking(); }));
   }
 
   function renderIndices() {
@@ -290,6 +333,6 @@
   }
 
   $("#refreshNews").addEventListener("click", () => loadNews(true));
-  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) ensureOverview(true).catch(() => {}); }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000);
+  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initStrength(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) { ensureOverview(true).catch(() => {}); if (state.tab === "forca") loadStrength(true).catch(() => {}); } }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000);
   ensureOverview().catch((error) => { $("#quoteGrid").innerHTML = `<div class="panel-card" style="grid-column:1/-1"><strong>Cotações temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#quotesUpdated").textContent = "Fonte indisponível"; }); loadNews();
 })();

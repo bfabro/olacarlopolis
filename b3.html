@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=5">
+  <link rel="stylesheet" href="b3.css?v=6">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -38,6 +38,7 @@
 
     <nav class="tabs" aria-label="Seções do painel">
       <button class="tab is-active" type="button" data-tab="resumo" aria-selected="true">Resumo</button>
+      <button class="tab" type="button" data-tab="forca" aria-selected="false">Força B3</button>
       <button class="tab" type="button" data-tab="commodities" aria-selected="false">Commodities</button>
       <button class="tab" type="button" data-tab="bolsas" aria-selected="false">Bolsas</button>
       <button class="tab" type="button" data-tab="analise" aria-selected="false">Análise</button>
@@ -66,6 +67,38 @@
           <div id="newsPreview" class="news-list"><div class="loading-line">Buscando notícias públicas…</div></div>
         </article>
       </div>
+    </section>
+
+    <section class="tab-panel" id="panel-forca" data-panel="forca" hidden>
+      <div class="section-heading"><div><span class="eyebrow">PESO × MOVIMENTO</span><h2>Ações com mais força no Ibovespa</h2></div><p><span class="live-dot" aria-hidden="true"></span> Atualização automática · <span id="strengthUpdatedAt">carregando…</span></p></div>
+      <div class="strength-kpis" id="strengthKpis"><div class="chart-loading">Calculando força e contribuição…</div></div>
+
+      <div class="strength-layout top-gap">
+        <article class="panel-card strength-ranking-card">
+          <div class="card-title"><div><span class="eyebrow">MAIORES PESOS</span><h2>Quem move o índice</h2></div><div class="strength-sort" role="group" aria-label="Ordenar ações"><button class="is-active" type="button" data-strength-sort="impact">Impacto</button><button type="button" data-strength-sort="weight">Peso</button></div></div>
+          <div class="strength-ranking" id="strengthRanking"><div class="chart-loading">Carregando ações…</div></div>
+          <p class="source-note">Peso na carteira teórica de 11/11/2026. A contribuição aproximada é peso × variação do dia. <a href="https://www.b3.com.br/pt_br/market-data-e-indices/indices/indices-amplos/ibovespa.htm" target="_blank" rel="noopener">Consultar Ibovespa na B3 ↗</a></p>
+        </article>
+
+        <article class="chart-card strength-chart-card">
+          <div class="chart-card-head"><div><span class="eyebrow" id="strengthChartSector">MINERAÇÃO</span><h2 id="strengthChartTitle">VALE3 · Vale</h2></div><span class="source-pill">Intradiário · 5 minutos</span></div>
+          <div class="strength-price" id="strengthPrice"><span>Carregando cotação…</span></div>
+          <div id="strengthChart" class="market-chart strength-chart" aria-label="Gráfico intradiário da ação selecionada"><div class="chart-loading">Carregando gráfico em tempo real…</div></div>
+          <div class="strength-range" id="strengthRange"></div>
+        </article>
+      </div>
+
+      <div class="strength-bottom top-gap">
+        <article class="panel-card">
+          <div class="card-title"><div><span class="eyebrow">CONTRIBUIÇÃO ESTIMADA</span><h2>Quem puxa e quem segura o índice</h2></div><span class="source-pill">Pontos percentuais</span></div>
+          <div class="contribution-chart" id="contributionChart"><div class="chart-loading">Calculando contribuições…</div></div>
+        </article>
+        <article class="panel-card">
+          <div class="card-title"><div><span class="eyebrow">LEITURA DE ALTA UTILIDADE</span><h2>Diagnóstico da concentração</h2></div><span class="badge neutral" id="strengthBias">Aguardando</span></div>
+          <div class="strength-insights" id="strengthInsights"><div class="chart-loading">Comparando pesos, setores e amplitude…</div></div>
+        </article>
+      </div>
+      <div class="data-warning"><strong>Como interpretar</strong><span>Uma ação pode subir muito e ter pouco efeito no índice se seu peso for pequeno. Já uma variação moderada em VALE3, ITUB4 ou PETR4 pode dominar o Ibovespa. Valores gratuitos podem apresentar atraso.</span></div>
     </section>
 
     <section class="tab-panel" id="panel-commodities" data-panel="commodities" hidden>
@@ -216,6 +249,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=5"></script>
+  <script defer src="b3.js?v=6"></script>
 </body>
 </html>

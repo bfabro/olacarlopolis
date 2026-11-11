@@ -42,6 +42,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/b3-strength"
+  to = "/.netlify/functions/b3-strength"
+  status = 200
+
+[[redirects]]
   from = "/api/atualizar-combustivel"
   to = "/.netlify/functions/atualizar-combustivel"
   status = 200

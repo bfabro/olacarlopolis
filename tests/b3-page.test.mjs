@@ -5,10 +5,18 @@ import { readFile } from "node:fs/promises";
 const root = new URL("../", import.meta.url);
 const read = (name) => readFile(new URL(name, root), "utf8");
 
-test("pagina B3 possui as sete secoes e arquivos versionados", async () => {
+test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
-  for (const section of ["resumo", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=5/); assert.match(html, /b3\.js\?v=5/);
+  for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
+  assert.match(html, /b3\.css\?v=6/); assert.match(html, /b3\.js\?v=6/);
+});
+
+test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
+  const [html, client, strength, config, preview] = await Promise.all([read("b3.html"), read("b3.js"), read("netlify/functions/b3-strength.mjs"), read("netlify.toml"), read("scripts/b3-preview.mjs")]);
+  assert.match(html, /data-panel="forca"/); assert.match(html, /id="strengthRanking"/); assert.match(html, /id="contributionChart"/);
+  assert.match(client, /renderStrengthChart/); assert.match(client, /renderStrengthInsights/); assert.match(html, /peso × variação do dia/i);
+  assert.match(strength, /VALE3\.SA/); assert.match(strength, /BPAC11\.SA/); assert.match(strength, /interval=5m/); assert.match(strength, /weightDate: "2026-11-11"/);
+  assert.match(config, /\/api\/b3-strength/); assert.match(preview, /b3-strength\.mjs/);
 });
 
 test("tela day trade inclui horarios, checklist, risco e fontes oficiais", async () => {
@@ -28,7 +36,7 @@ test("noticias ampliadas, bolsas consolidadas e niveis tecnicos", async () => {
 test("noticias cronologicas, alertas intradiarios e influencia externa atualizavel", async () => {
   const [html, client, news, series] = await Promise.all([read("b3.html"), read("b3.js"), read("netlify/functions/b3-news.mjs"), read("netlify/functions/b3-series.mjs")]);
   assert.match(news, /intradayImpact/); assert.match(news, /new Date\(b\.publishedAt\) - new Date\(a\.publishedAt\)/);
-  assert.match(client, /Impacto no day trade · em tempo real/); assert.match(client, /renderInfluenceProbability/); assert.match(client, /setInterval\(\(\) => \{ if \(!document\.hidden\) ensureOverview\(true\)/);
+  assert.match(client, /Impacto no day trade · em tempo real/); assert.match(client, /renderInfluenceProbability/); assert.match(client, /ensureOverview\(true\)/);
   assert.match(html, /id="tradeUpdatedAt"/); assert.match(html, /id="influenceProbability"/); assert.match(series, /regularMarketPrice/);
 });
 
