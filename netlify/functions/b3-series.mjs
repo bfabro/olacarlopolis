@@ -29,7 +29,7 @@ async function yahooSeries(symbol, label) {
     if (!response.ok) throw new Error(`Série ${symbol}: ${response.status}`);
     const result = (await response.json()).chart?.result?.[0]; if (!result) throw new Error(`Série ${symbol} sem dados.`);
     const closes = result.indicators?.adjclose?.[0]?.adjclose || result.indicators?.quote?.[0]?.close || [];
-    const points = (result.timestamp || []).map((time, index) => ({ date: new Date(time * 1000).toISOString().slice(0, 10), value: Number(closes[index]) })).filter((point) => Number.isFinite(point.value));
+    const points = (result.timestamp || []).map((time, index) => ({ date: new Date(time * 1000).toISOString().slice(0, 10), value: Number(closes[index]) })).filter((point) => Number.isFinite(point.value) && point.value > 0);
     if (points.length < 2) throw new Error(`Série ${symbol} insuficiente.`);
     const current = points.at(-1).value; const at = (offset) => points.at(Math.max(-points.length, -1 - offset))?.value ?? current; const change = (offset) => (current / at(offset) - 1) * 100;
     const value = { symbol, label, currency: result.meta?.currency || "", volume: Number(result.meta?.regularMarketVolume || 0), current, change1d: change(1), change5d: change(5), change20d: change(20), points };

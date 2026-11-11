@@ -1,12 +1,13 @@
 import http from "node:http";
 import { readFile, stat } from "node:fs/promises";
 import { extname, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
 import { handler as market } from "../netlify/functions/b3-market.mjs";
 import { handler as news } from "../netlify/functions/b3-news.mjs";
 import { handler as series } from "../netlify/functions/b3-series.mjs";
 import { handler as futures } from "../netlify/functions/b3-futures.mjs";
 
-const root = resolve(new URL("../", import.meta.url).pathname.replace(/^\/(.:)/, "$1"));
+const root = resolve(fileURLToPath(new URL("../", import.meta.url)));
 const port = Number(process.env.B3_PREVIEW_PORT || 8766);
 const api = { "/api/b3-market": market, "/api/b3-news": news, "/api/b3-series": series, "/api/b3-futures": futures };
 const types = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json; charset=utf-8", ".png": "image/png", ".jpg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml" };
