@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=7">
+  <link rel="stylesheet" href="b3.css?v=8">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -70,7 +70,10 @@
     </section>
 
     <section class="tab-panel" id="panel-forca" data-panel="forca" hidden>
-      <div class="section-heading"><div><span class="eyebrow">PESO × MOVIMENTO</span><h2>Ações com mais força no Ibovespa</h2></div><p><span class="live-dot" aria-hidden="true"></span> Atualização automática · <span id="strengthUpdatedAt">carregando…</span></p></div>
+      <div class="section-heading"><div><span class="eyebrow">PESO × MOVIMENTO</span><h2 id="strengthViewTitle">Ações com mais força no Ibovespa</h2></div><p><span class="live-dot" aria-hidden="true"></span> Atualização automática · <span id="strengthUpdatedAt">carregando…</span></p></div>
+      <div class="strength-subtabs" role="tablist" aria-label="Visões da Força B3"><button class="is-active" type="button" data-strength-view="stocks" role="tab" aria-selected="true">Ações e pesos</button><button type="button" data-strength-view="commodities" role="tab" aria-selected="false">Commodities · 9h às 10h</button></div>
+
+      <div id="strengthViewStocks">
       <div class="strength-kpis" id="strengthKpis"><div class="chart-loading">Calculando força e contribuição…</div></div>
 
       <div class="strength-layout top-gap">
@@ -107,6 +110,32 @@
         </article>
       </div>
       <div class="data-warning"><strong>Como interpretar</strong><span>Uma ação pode subir muito e ter pouco efeito no índice se seu peso for pequeno. Já uma variação moderada em VALE3, ITUB4 ou PETR4 pode dominar o Ibovespa. Valores gratuitos podem apresentar atraso.</span></div>
+      </div>
+
+      <div id="strengthViewCommodities" hidden>
+        <article class="premarket-hero">
+          <div><span class="eyebrow">JANELA PRÉ-ABERTURA</span><h2 id="premarketPhase">Monitoramento das 9h às 10h</h2><p>Futuros e commodities já negociam enquanto as ações brasileiras ainda formam preço.</p></div>
+          <div><small>Atualização</small><strong id="premarketUpdatedAt">Carregando…</strong><span>Dados públicos · possível atraso</span></div>
+        </article>
+        <div class="premarket-kpis" id="premarketKpis"><div class="chart-loading">Calculando pressão das commodities…</div></div>
+        <div class="premarket-layout top-gap">
+          <article class="panel-card">
+            <div class="card-title"><div><span class="eyebrow">ORDEM DE INFLUÊNCIA</span><h2>Commodities que mais pesam</h2></div><span class="source-pill">Peso direto aproximado</span></div>
+            <div class="premarket-list" id="premarketList"><div class="chart-loading">Carregando commodities…</div></div>
+          </article>
+          <article class="chart-card premarket-chart-card">
+            <div class="chart-card-head"><div><span class="eyebrow" id="premarketChartWeight">15,51% DO IBOV</span><h2 id="premarketChartTitle">Petróleo Brent</h2></div><span class="source-pill">Intradiário · 5 minutos</span></div>
+            <div class="strength-price" id="premarketPrice"><span>Carregando cotação…</span></div>
+            <div id="premarketChart" class="market-chart" aria-label="Gráfico intradiário da commodity selecionada"><div class="chart-loading">Carregando gráfico…</div></div>
+            <div class="premarket-assets" id="premarketAssets"></div>
+          </article>
+        </div>
+        <article class="panel-card premarket-reading top-gap">
+          <div class="card-title"><div><span class="eyebrow">LEITURA PARA A ABERTURA</span><h2>O que observar antes das 10h</h2></div><span class="badge neutral" id="premarketBias">Calculando</span></div>
+          <div class="premarket-insights" id="premarketInsights"><div class="chart-loading">Cruzando petróleo, minério e metais…</div></div>
+        </article>
+        <div class="data-warning"><strong>Limite da leitura</strong><span>Commodity não determina sozinha a abertura. Câmbio, ADRs, notícias, política de preços, China e fluxo estrangeiro podem inverter o efeito esperado. O peso exibido soma ações diretamente relacionadas, não é um peso oficial da commodity.</span></div>
+      </div>
     </section>
 
     <section class="tab-panel" id="panel-commodities" data-panel="commodities" hidden>
@@ -257,6 +286,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=7"></script>
+  <script defer src="b3.js?v=8"></script>
 </body>
 </html>

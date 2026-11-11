@@ -1,4 +1,4 @@
-/* Painel B3 publico - v7 */
+/* Painel B3 publico - v8 */
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -8,7 +8,7 @@
   const number = (value, digits = 0) => Number(value).toLocaleString("pt-BR", { maximumFractionDigits: digits });
   const percent = (value) => `${Number(value) > 0 ? "+" : ""}${number(value, 2)}%`;
   const dateBR = (value) => new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`));
-  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", groups: new Map(), groupRequests: new Map() };
+  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", strengthView: "stocks", premarket: null, premarketPromise: null, premarketCommodity: "brent", groups: new Map(), groupRequests: new Map() };
 
   const commodities = [
     { id: "brent", title: "Petróleo Brent", group: "Energia", icon: "BR", assets: ["PETR4", "PETR3", "PRIO3", "RECV3"], summary: "Alta do Brent tende a elevar a receita em reais das produtoras. Refino, câmbio, política de preços e produção podem alterar o efeito." },
@@ -78,7 +78,7 @@
     $$(".tab").forEach((button) => { const active = button.dataset.tab === tab; button.classList.toggle("is-active", active); button.setAttribute("aria-selected", String(active)); });
     $$(".tab-panel").forEach((panel) => { const active = panel.dataset.panel === tab; panel.hidden = !active; panel.classList.toggle("is-active", active); });
     if (tab === "commodities") loadCommodity(state.commodity);
-    if (tab === "forca") loadStrength();
+    if (tab === "forca") { loadStrength(); if (state.strengthView === "commodities") loadPremarket(); }
     if (tab === "bolsas") ensureOverview().then(renderSelectedIndex).catch(showIndexError);
     if (tab === "analise") { ensureOverview().then(renderAnalysis).catch(() => {}); renderTechnical(); }
     if (tab === "daytrade") ensureOverview().then(renderTradeContext).catch(() => {});
@@ -192,6 +192,34 @@
 
   function initStrength() {
     $$('[data-strength-sort]').forEach((button) => button.addEventListener("click", () => { state.strengthSort = button.dataset.strengthSort; state.strengthSortDirection = "desc"; if (state.strength) renderStrengthRanking(); }));
+    $$('[data-strength-view]').forEach((button) => button.addEventListener("click", () => setStrengthView(button.dataset.strengthView)));
+  }
+
+  function setStrengthView(view) {
+    state.strengthView = view; const commoditiesView = view === "commodities"; $("#strengthViewStocks").hidden = commoditiesView; $("#strengthViewCommodities").hidden = !commoditiesView; $("#strengthViewTitle").textContent = commoditiesView ? "Commodities que antecipam a abertura" : "Ações com mais força no Ibovespa";
+    $$('[data-strength-view]').forEach((button) => { const active = button.dataset.strengthView === view; button.classList.toggle("is-active", active); button.setAttribute("aria-selected", String(active)); }); if (commoditiesView) loadPremarket(); else if (state.strength) renderStrength();
+  }
+
+  async function loadPremarket(force = false) {
+    if (state.premarket && !force) { renderPremarket(); return state.premarket; } if (state.premarketPromise) return state.premarketPromise; const url = force ? `/api/b3-premarket?live=${Date.now()}` : "/api/b3-premarket";
+    state.premarketPromise = apiJson(url).then((payload) => { state.premarket = payload; if (!payload.items.some((item) => item.id === state.premarketCommodity)) state.premarketCommodity = payload.items[0]?.id; renderPremarket(); return payload; }).catch((error) => { $("#premarketList").innerHTML = `<div class="chart-error"><strong>Commodities temporariamente indisponíveis.</strong><span>${esc(error.message)}</span></div>`; $("#premarketChart").innerHTML = `<div class="chart-error"><strong>Gráfico indisponível.</strong><span>${esc(error.message)}</span></div>`; throw error; }).finally(() => { state.premarketPromise = null; }); return state.premarketPromise;
+  }
+
+  function renderPremarket() {
+    if (!state.premarket) return; const items = state.premarket.items; const brent = items.find((item) => item.id === "brent"); const iron = items.find((item) => item.id === "iron"); const positive = items.filter((item) => item.change > 0).length; const coreWeight = (brent?.directWeight || 0) + (iron?.directWeight || 0); const corePressure = brent && iron ? (brent.change * brent.directWeight + iron.change * iron.directWeight) / coreWeight : 0;
+    $("#premarketUpdatedAt").textContent = new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(state.premarket.updatedAt)); $("#strengthUpdatedAt").textContent = `${$("#premarketUpdatedAt").textContent} · possível atraso`;
+    const clock = marketMinutes(); $("#premarketPhase").textContent = clock.minutes < 540 ? "Preparação antes das 9h" : clock.minutes < 600 ? "Janela ativa: futuros abertos, ações fechadas" : "Ações abertas: valide se o sinal foi confirmado";
+    $("#premarketKpis").innerHTML = `<article><span>Exposição petróleo + minério</span><strong>${number(coreWeight, 2)}%</strong><small>peso direto aproximado no Ibovespa</small></article><article><span>Pressão ponderada</span><strong class="${corePressure >= 0 ? "positive" : "negative"}">${percent(corePressure)}</strong><small>Brent e minério pelos pesos relacionados</small></article><article><span>Amplitude das commodities</span><strong>${positive} altas · ${items.length - positive} baixas</strong><small>na amostra monitorada</small></article>`;
+    $("#premarketList").innerHTML = [...items].sort((a, b) => (b.directWeight || -1) - (a.directWeight || -1)).map((item, index) => `<button class="premarket-item ${item.id === state.premarketCommodity ? "is-active" : ""}" type="button" data-premarket-id="${item.id}"><span>${String(index + 1).padStart(2, "0")}</span><span><b>${esc(item.name)}</b><small>${item.intraday ? item.assets.join(" · ") : `D-1 · ${item.assets.join(" · ")}`}</small></span><strong>${item.directWeight == null ? "Influência indireta" : `${number(item.directWeight, 2)}% do IBOV`}</strong><strong class="${item.change >= 0 ? "positive" : "negative"}">${percent(item.change)}</strong></button>`).join(""); $$('[data-premarket-id]').forEach((button) => button.addEventListener("click", () => { state.premarketCommodity = button.dataset.premarketId; renderPremarket(); })); renderPremarketChart(); renderPremarketInsights(brent, iron, corePressure);
+  }
+
+  function renderPremarketChart() {
+    const item = state.premarket.items.find((entry) => entry.id === state.premarketCommodity) || state.premarket.items[0]; if (!item) return; const points = item.points || []; $("#premarketChartTitle").textContent = item.name; $("#premarketChartWeight").textContent = item.directWeight == null ? "INFLUÊNCIA INDIRETA" : `${number(item.directWeight, 2)}% DO IBOV`; $("#premarketPrice").innerHTML = `<strong>${number(item.current, 2)}</strong><span class="${item.change >= 0 ? "positive" : "negative"}">${percent(item.change)} no dia</span><small>${esc(item.unit)}</small>`; $("#premarketAssets").innerHTML = `<p>${esc(item.note)}</p><div>${item.assets.map((asset) => `<span>${asset}</span>`).join("")}</div>`;
+    if (points.length < 2) { $("#premarketChart").innerHTML = '<div class="chart-error"><strong>Série insuficiente.</strong><span>A cotação principal continua disponível.</span></div>'; return; } const width = 900; const height = 330; const pad = { left: 58, right: 20, top: 24, bottom: 35 }; const values = points.map((point) => point.value); if (item.previousClose > 0) values.push(item.previousClose); let min = Math.min(...values); let max = Math.max(...values); const margin = Math.max((max - min) * .12, max * .002); min -= margin; max += margin; const x = (index) => pad.left + index / Math.max(points.length - 1, 1) * (width - pad.left - pad.right); const y = (value) => pad.top + (max - value) / (max - min || 1) * (height - pad.top - pad.bottom); const path = points.map((point, index) => `${index ? "L" : "M"}${x(index).toFixed(1)},${y(point.value).toFixed(1)}`).join(" "); const color = item.change >= 0 ? "#07845b" : "#c94444"; const ticks = [0, .25, .5, .75, 1].map((part) => { const value = min + (max - min) * part; return `<g><line x1="${pad.left}" y1="${y(value)}" x2="${width - pad.right}" y2="${y(value)}"></line><text x="${pad.left - 8}" y="${y(value) + 3}" text-anchor="end">${number(value, 2)}</text></g>`; }).join(""); const label = (point) => item.intraday ? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit" }).format(new Date(point.time)) : new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC", day: "2-digit", month: "2-digit" }).format(new Date(point.time)); const timeTicks = [0, Math.floor((points.length - 1) / 2), points.length - 1].map((index) => `<text x="${x(index)}" y="${height - 9}" text-anchor="middle">${label(points[index])}</text>`).join(""); $("#premarketChart").innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Cotação de ${esc(item.name)}"><g class="grid">${ticks}</g><path class="strength-line" d="${path}" stroke="${color}"></path><g class="axis">${timeTicks}</g></svg><small class="chart-caption">${item.intraday ? "Futuros internacionais · intervalo de 5 minutos" : "Referência diária D-1 · série intradiária gratuita indisponível"}</small>`;
+  }
+
+  function renderPremarketInsights(brent, iron, pressure) {
+    const badge = $("#premarketBias"); const aligned = brent && iron && Math.sign(brent.change) === Math.sign(iron.change); const tone = pressure > .25 ? "positive" : pressure < -.25 ? "negative" : "neutral"; badge.className = `badge ${tone}`; badge.textContent = tone === "positive" ? "Pressão favorável" : tone === "negative" ? "Pressão desfavorável" : "Sinais mistos"; $("#premarketInsights").innerHTML = `<div><span>Petróleo</span><strong class="${brent?.change >= 0 ? "positive" : "negative"}">Brent ${percent(brent?.change || 0)}</strong><small>Observe PETR4, PETR3 e PRIO3 no leilão e compare com as ADRs.</small></div><div><span>Mineração</span><strong class="${iron?.change >= 0 ? "positive" : "negative"}">Minério ${percent(iron?.change || 0)}</strong><small>Vale responde também a China, câmbio e prêmio/desconto do minério físico.</small></div><div><span>Convergência</span><strong>${aligned ? "Petróleo e minério alinhados" : "Sinais divergentes"}</strong><small>${aligned ? "Os dois maiores blocos apontam para o mesmo lado, mas ainda exigem confirmação." : "Evite extrapolar uma única commodity para todo o índice."}</small></div><div><span>Checklist 9h–10h</span><strong>WIN · WDO · ADRs · notícias</strong><small>Confirme se futuros locais e ativos no exterior validam a leitura das commodities.</small></div>`;
   }
 
   function renderIndices() {
@@ -344,6 +372,6 @@
   }
 
   $("#refreshNews").addEventListener("click", () => loadNews(true));
-  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initStrength(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) { ensureOverview(true).catch(() => {}); if (state.tab === "forca") loadStrength(true).catch(() => {}); } }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000);
+  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initStrength(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) { ensureOverview(true).catch(() => {}); if (state.tab === "forca") { loadStrength(true).catch(() => {}); if (state.strengthView === "commodities") loadPremarket(true).catch(() => {}); } } }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000);
   ensureOverview().catch((error) => { $("#quoteGrid").innerHTML = `<div class="panel-card" style="grid-column:1/-1"><strong>Cotações temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#quotesUpdated").textContent = "Fonte indisponível"; }); loadNews();
 })();
