@@ -22,6 +22,26 @@
   status = 200
 
 [[redirects]]
+  from = "/api/b3-market"
+  to = "/.netlify/functions/b3-market"
+  status = 200
+
+[[redirects]]
+  from = "/api/b3-news"
+  to = "/.netlify/functions/b3-news"
+  status = 200
+
+[[redirects]]
+  from = "/api/b3-series"
+  to = "/.netlify/functions/b3-series"
+  status = 200
+
+[[redirects]]
+  from = "/api/b3-futures"
+  to = "/.netlify/functions/b3-futures"
+  status = 200
+
+[[redirects]]
   from = "/api/atualizar-combustivel"
   to = "/.netlify/functions/atualizar-combustivel"
   status = 200

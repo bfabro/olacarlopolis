@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-11-01-weekly-post-header-styles-v1005'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-11-11-b3-market-v1007'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
@@ -31,6 +31,9 @@ const PRECACHE_ASSETS = [
   '/casas-veraneio.css',
   '/loterias.css',
   '/loterias.js',
+  '/b3.html',
+  '/b3.css',
+  '/b3.js',
   '/images/img_padrao_site/icon-192_2.png',
   '/images/img_padrao_site/icon-512_2.png',
 ];

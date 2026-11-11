@@ -8,9 +8,17 @@
   <!-- Home -->
   <url>
     <loc>https://www.olacarlopolis.com/</loc>
-    <lastmod>2025-11-15</lastmod>
+    <lastmod>2026-11-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.00</priority>
+  </url>
+
+  <!-- B3 e Mercados -->
+  <url>
+    <loc>https://www.olacarlopolis.com/b3.html</loc>
+    <lastmod>2026-11-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
   </url>
 
   <!-- Onde Comer -->

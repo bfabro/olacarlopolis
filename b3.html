@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#071c2b">
+  <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
+  <title>B3 | Olá Carlópolis</title>
+  <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
+  <link rel="stylesheet" href="b3.css?v=2">
+</head>
+<body>
+  <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
+  <header class="market-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html" aria-label="Voltar ao Olá Carlópolis">
+        <span class="brand-mark" aria-hidden="true">OC</span>
+        <span><strong>Olá Carlópolis</strong><small>Mercado &amp; investimentos</small></span>
+      </a>
+      <div class="market-clock"><span class="status-dot" aria-hidden="true"></span><span id="marketStatus">Verificando mercado</span><time id="marketClock"></time></div>
+      <a class="back-home" href="index.html">← Voltar ao início</a>
+    </div>
+  </header>
+
+  <div class="ticker-shell" aria-label="Cotações de referência">
+    <div class="tradingview-widget-container"><div class="tradingview-widget-container__widget"></div></div>
+  </div>
+
+  <main id="conteudo" class="dashboard">
+    <section class="hero" aria-labelledby="pageTitle">
+      <div>
+        <span class="eyebrow">PAINEL B3</span>
+        <h1 id="pageTitle">O que pode mover o mercado hoje</h1>
+        <p>Relações entre commodities e ações brasileiras, bolsas globais, leitura de tendência, notícias e posicionamento — com a data de cada informação sempre visível.</p>
+      </div>
+      <div class="hero-disclaimer"><strong>Informativo, não recomendação</strong><span>Preços podem ter atraso. Confirme os dados antes de investir.</span></div>
+    </section>
+
+    <nav class="tabs" aria-label="Seções do painel">
+      <button class="tab is-active" type="button" data-tab="resumo" aria-selected="true">Resumo</button>
+      <button class="tab" type="button" data-tab="commodities" aria-selected="false">Commodities</button>
+      <button class="tab" type="button" data-tab="bolsas" aria-selected="false">Bolsas</button>
+      <button class="tab" type="button" data-tab="analise" aria-selected="false">Análise</button>
+      <button class="tab" type="button" data-tab="noticias" aria-selected="false">Notícias</button>
+      <button class="tab" type="button" data-tab="contratos" aria-selected="false">Contratos &amp; fluxo</button>
+    </nav>
+
+    <section class="tab-panel is-active" id="panel-resumo" data-panel="resumo">
+      <div class="section-heading"><div><span class="eyebrow">TERMÔMETRO</span><h2>Principais ações</h2></div><span class="updated" id="quotesUpdated">Carregando cotações…</span></div>
+      <div class="quote-grid" id="quoteGrid" aria-live="polite">
+        <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
+      </div>
+
+      <div class="two-columns top-gap">
+        <article class="panel-card">
+          <div class="card-title"><div><span class="eyebrow">ANTES DO CLIQUE</span><h2>Radar do dia</h2></div><span class="badge neutral" id="marketBias">Leitura neutra</span></div>
+          <div class="radar-list" id="radarList">
+            <div><span class="radar-icon">US</span><p><strong>Exterior e dólar</strong><small>Dólar forte e juros americanos em alta costumam pressionar emergentes e empresas endividadas.</small></p></div>
+            <div><span class="radar-icon">CN</span><p><strong>China e minério</strong><small>Atividade e estímulos chineses afetam principalmente VALE3, CMIN3 e siderúrgicas.</small></p></div>
+            <div><span class="radar-icon">BR</span><p><strong>Juros e fiscal</strong><small>Curva de DI e percepção fiscal influenciam bancos, varejo, construção e o câmbio.</small></p></div>
+          </div>
+        </article>
+        <article class="panel-card news-preview">
+          <div class="card-title"><div><span class="eyebrow">ÚLTIMAS</span><h2>3 notícias em foco</h2></div><button class="text-button" type="button" data-open-tab="noticias">Ver notícias</button></div>
+          <div id="newsPreview" class="news-list"><div class="loading-line">Buscando notícias públicas…</div></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="tab-panel" id="panel-commodities" data-panel="commodities" hidden>
+      <div class="section-heading"><div><span class="eyebrow">EFEITO EM CADEIA</span><h2>Commodities → ações brasileiras</h2></div><p>Selecione uma commodity para ver o gráfico e os papéis mais sensíveis.</p></div>
+      <div class="commodity-layout">
+        <div class="commodity-list" id="commodityList"></div>
+        <article class="chart-card">
+          <div class="chart-card-head"><div><span class="eyebrow" id="commodityKicker">ENERGIA</span><h2 id="commodityTitle">Petróleo Brent</h2></div><span class="source-pill">Commodity × média das ações</span></div>
+          <div id="commodityChart" class="market-chart" aria-label="Gráfico da commodity e média das ações relacionadas"><div class="chart-loading">Carregando série histórica…</div></div>
+          <div id="commodityImpact" class="impact-box"></div>
+        </article>
+      </div>
+      <p class="source-note">Relações representam sensibilidade econômica geral, não garantem que os ativos se movam na mesma direção no pregão.</p>
+    </section>
+
+    <section class="tab-panel" id="panel-bolsas" data-panel="bolsas" hidden>
+      <div class="section-heading"><div><span class="eyebrow">MERCADOS GLOBAIS</span><h2>Principais bolsas</h2></div><p>Fechamento e evolução normalizada dos últimos três meses.</p></div>
+      <div class="index-summary" id="indexSummary"></div>
+      <div class="index-buttons" id="indexButtons"></div>
+      <article class="chart-card main-chart">
+        <div class="chart-card-head"><div><span class="eyebrow">GRÁFICO</span><h2 id="indexTitle">Ibovespa</h2></div><span class="source-pill">Dados possivelmente atrasados</span></div>
+        <div id="indexChart" class="market-chart large" aria-label="Gráfico do índice selecionado"><div class="chart-loading">Carregando bolsas…</div></div>
+      </article>
+    </section>
+
+    <section class="tab-panel" id="panel-analise" data-panel="analise" hidden>
+      <div class="section-heading"><div><span class="eyebrow">MACRO + MICRO</span><h2>Leitura de cenário</h2></div><p id="analysisTimestamp">Atualizada com os dados disponíveis.</p></div>
+      <article class="direction-card" id="directionCard">
+        <div><span class="eyebrow">CONSOLIDADO</span><h2 id="directionTitle">Calculando direção provável…</h2><p id="directionText">Combinando Ibovespa, exterior, dólar e commodities.</p></div>
+        <div class="direction-meter"><span>Baixa</span><div><i id="directionNeedle"></i></div><span>Alta</span></div>
+        <div class="direction-signals" id="directionSignals"></div>
+      </article>
+      <div class="analysis-grid">
+        <article class="analysis-card macro"><span class="analysis-label">CENÁRIO MACRO</span><h3>Vetores para o Ibovespa</h3><ul><li><strong>Juros globais:</strong> queda nos Treasuries tende a favorecer bolsas emergentes.</li><li><strong>Dólar:</strong> alta pode ajudar exportadoras, mas pressiona inflação e empresas importadoras.</li><li><strong>China:</strong> atividade e estímulos afetam minério, siderurgia e o peso da Vale no índice.</li><li><strong>Brasil:</strong> fiscal, Selic e curva de DI determinam apetite por risco doméstico.</li></ul></article>
+        <article class="analysis-card micro"><span class="analysis-label">CENÁRIO MICRO</span><h3>Como ler os setores</h3><ul><li><strong>Petróleo:</strong> preço internacional, câmbio e política de preços movem PETR4, PRIO3 e RECV3.</li><li><strong>Bancos:</strong> crédito, inadimplência e margem financeira pesam em ITUB4, BBAS3 e BBDC4.</li><li><strong>Varejo:</strong> juros longos e renda disponível são os principais gatilhos.</li><li><strong>Resultados:</strong> guidance e margens podem superar qualquer tendência macro no curto prazo.</li></ul></article>
+        <article class="analysis-card checklist"><span class="analysis-label">CHECKLIST INTRADIÁRIO</span><h3>Confirme antes de operar</h3><div class="check-grid"><span>✓ Direção do dólar</span><span>✓ Curva de juros DI</span><span>✓ Petróleo e minério</span><span>✓ Futuros dos EUA</span><span>✓ Agenda econômica</span><span>✓ Fatos relevantes</span></div></article>
+      </div>
+      <article class="technical-card"><div class="card-title"><div><span class="eyebrow">SINAL TÉCNICO</span><h2>Ibovespa</h2></div><span class="source-pill">TradingView</span></div><div id="technicalWidget" class="technical-widget"></div><p>Médias móveis e osciladores são sinais auxiliares e podem mudar rapidamente.</p></article>
+    </section>
+
+    <section class="tab-panel" id="panel-noticias" data-panel="noticias" hidden>
+      <div class="section-heading"><div><span class="eyebrow">NOTÍCIAS PÚBLICAS</span><h2>O que pode mexer com as ações</h2></div><button class="refresh-button" id="refreshNews" type="button">↻ Atualizar</button></div>
+      <div id="newsFull" class="news-full" aria-live="polite"><div class="loading-line">Buscando notícias…</div></div>
+      <p class="source-note">Agregação por RSS do Google Notícias. A manchete leva ao veículo responsável; confirme data, contexto e fonte.</p>
+    </section>
+
+    <section class="tab-panel" id="panel-contratos" data-panel="contratos" hidden>
+      <div class="section-heading"><div><span class="eyebrow">FECHAMENTO ANTERIOR</span><h2>Contratos em aberto e fluxo</h2></div><span class="updated" id="contractsUpdated">Carregando fechamento D−1…</span></div>
+      <div class="d1-futures" id="d1Futures"><div class="chart-loading">Buscando WIN e WDO do último fechamento…</div></div>
+      <div class="section-subtitle"><span>Posições em aberto</span><small>Último relatório público confirmado: 09/11/2026</small></div>
+      <div class="contract-grid">
+        <article class="contract-card"><span>Dólar futuro</span><strong>827.639</strong><small>contratos em aberto · <b class="negative">−11.417 no dia</b></small></article>
+        <article class="contract-card"><span>Minidólar</span><strong>1.065.168</strong><small>contratos em aberto · <b class="positive">+98.692 no dia</b></small></article>
+        <article class="contract-card"><span>Ibovespa futuro</span><strong>199.366</strong><small>contratos em aberto · <b class="positive">+3.405 no dia</b></small></article>
+        <article class="contract-card"><span>Mini-índice</span><strong>1.370.365</strong><small>contratos em aberto · <b class="positive">+87.708 no dia</b></small></article>
+      </div>
+      <div class="two-columns top-gap">
+        <article class="panel-card">
+          <div class="card-title"><div><span class="eyebrow">MERCADO À VISTA</span><h2>Saldo por investidor</h2></div><span class="source-pill">D−2</span></div>
+          <div class="flow-table" role="table" aria-label="Saldo dos investidores">
+            <div class="flow-row header" role="row"><span>Investidor</span><span>No dia</span><span>No mês</span></div>
+            <div class="flow-row" role="row"><span>Internacional</span><strong class="negative">−R$ 459,6 mi</strong><strong class="negative">−R$ 4,3 bi</strong></div>
+            <div class="flow-row" role="row"><span>Institucional nacional</span><strong class="positive">+R$ 28,4 mi</strong><strong class="positive">+R$ 1,3 bi</strong></div>
+            <div class="flow-row" role="row"><span>Pessoa física</span><strong class="positive">+R$ 80,3 mi</strong><strong class="positive">+R$ 2,1 bi</strong></div>
+            <div class="flow-row" role="row"><span>Instituições financeiras</span><strong class="positive">+R$ 196,4 mi</strong><strong class="positive">+R$ 549,3 mi</strong></div>
+          </div>
+        </article>
+        <article class="panel-card methodology">
+          <span class="eyebrow">COMO INTERPRETAR</span><h2>Posição não é previsão</h2>
+          <p>Contrato em aberto é o estoque de operações ainda não encerradas. Já o fluxo mostra compras menos vendas no mercado à vista. São medidas diferentes e não revelam, isoladamente, a direção futura.</p>
+          <div class="source-links"><a href="https://arquivos.b3.com.br/bdi/tabelas" target="_blank" rel="noopener">Consultar BDI oficial da B3 ↗</a><a href="https://observatoriobr.com.br/fluxo-b3/relatorio" target="_blank" rel="noopener">Relatório público de referência ↗</a></div>
+        </article>
+      </div>
+      <div class="data-warning"><strong>Atualização responsável</strong><span>A B3 restringe coleta automatizada em algumas páginas. Por isso, este quadro exibe uma fotografia datada e links para conferência oficial, em vez de apresentar números antigos como se fossem atuais.</span></div>
+    </section>
+  </main>
+
+  <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
+  <script defer src="b3.js?v=2"></script>
+</body>
+</html>
