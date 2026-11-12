@@ -33,7 +33,8 @@ async function intraday(definition, fresh = false) {
     const meta = result.meta || {}; const closes = result.indicators?.quote?.[0]?.close || [];
     const points = (result.timestamp || []).map((time, index) => ({ time: new Date(time * 1000).toISOString(), value: Number(closes[index]) })).filter((point) => point.value > 0);
     const current = Number(meta.regularMarketPrice) || points.at(-1)?.value; const previousClose = Number(meta.regularMarketPreviousClose) || Number(meta.chartPreviousClose); const change = current > 0 && previousClose > 0 ? (current / previousClose - 1) * 100 : 0;
-    const value = { symbol, ticker, name, sector, weight, current, previousClose, open: Number(meta.regularMarketOpen) || points[0]?.value || 0, high: Number(meta.regularMarketDayHigh) || Math.max(...points.map((point) => point.value)), low: Number(meta.regularMarketDayLow) || Math.min(...points.map((point) => point.value)), volume: Number(meta.regularMarketVolume || 0), change, contribution: weight * change / 100, marketTime: meta.regularMarketTime ? new Date(meta.regularMarketTime * 1000).toISOString() : null, points };
+    const open = Number(meta.regularMarketOpen) || points[0]?.value || 0; const changeFromOpen = current > 0 && open > 0 ? (current / open - 1) * 100 : 0;
+    const value = { symbol, ticker, name, sector, weight, current, previousClose, open, high: Number(meta.regularMarketDayHigh) || Math.max(...points.map((point) => point.value)), low: Number(meta.regularMarketDayLow) || Math.min(...points.map((point) => point.value)), volume: Number(meta.regularMarketVolume || 0), change, contribution: weight * change / 100, changeFromOpen, openContribution: weight * changeFromOpen / 100, marketTime: meta.regularMarketTime ? new Date(meta.regularMarketTime * 1000).toISOString() : null, points };
     cache.set(symbol, { time: Date.now(), value }); return value;
   } finally { clearTimeout(timeout); }
 }

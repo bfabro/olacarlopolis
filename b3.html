@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=16">
+  <link rel="stylesheet" href="b3.css?v=17">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -81,6 +81,13 @@
 
       <div id="strengthViewStocks">
       <div class="strength-kpis" id="strengthKpis"><div class="chart-loading">Calculando força e contribuição…</div></div>
+
+      <article class="panel-card open-move-card top-gap">
+        <div class="card-title"><div><span class="eyebrow">ABERTURA × AGORA</span><h2>Movimento intradiário dos 12 papéis</h2></div><span class="source-pill" id="strengthOpenUpdated">Calculando…</span></div>
+        <div class="open-move-summary" id="strengthOpenSummary"><div class="chart-loading">Comparando os preços com a abertura do dia…</div></div>
+        <div class="open-move-table" id="strengthOpenTable" role="table" aria-label="Movimento dos doze papéis desde a abertura"><div class="chart-loading">Calculando impacto desde a abertura…</div></div>
+        <p class="source-note">Impacto intradiário estimado = peso do papel no Ibovespa × variação desde a abertura. O valor indica contribuição percentual aproximada e não corresponde aos pontos oficiais divulgados pela B3.</p>
+      </article>
 
       <div class="strength-layout top-gap">
         <article class="panel-card strength-ranking-card">
@@ -306,6 +313,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=16"></script>
+  <script defer src="b3.js?v=17"></script>
 </body>
 </html>
