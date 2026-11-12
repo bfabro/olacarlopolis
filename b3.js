@@ -1,4 +1,4 @@
-/* Painel B3 publico - v11 */
+/* Painel B3 publico - v12 */
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -308,7 +308,7 @@
       if (event.id === "dollar" || event.id === "wdo-close") return `<span class="event-market-values"><em>Referência cambial</em><span>USD/BRL: ${quote(macro.usdbrl, 4)}</span></span>`;
       if (event.id === "close") return `<span class="event-market-values"><em>Referência do fechamento</em><span>Ibovespa: ${quote(idx.ibov)}</span></span>`; return "";
     };
-    const usImpact = (event) => event.country === "US" ? `<span class="us-event-scenarios"><em class="importance ${event.importance}">EUA · importância ${event.importance === "high" ? "alta" : "média"}${event.confirmed ? " · confirmado" : " · recorrente"}</em><span class="scenario-good"><b>Se vier favorável</b>${esc(event.good)}</span><span class="scenario-bad"><b>Se vier desfavorável</b>${esc(event.bad)}</span><a href="${esc(event.sourceUrl)}" target="_blank" rel="noopener">Fonte: ${esc(event.source)} ↗</a></span>` : "";
+    const usImpact = (event) => event.country === "US" ? `<span class="us-event-scenarios"><em class="importance ${event.importance}">EUA · importância ${event.importance === "high" ? "alta" : event.importance === "medium" ? "média" : "baixa"}${event.confirmed ? " · confirmado" : event.calendarType === "supplemental" ? " · agenda complementar" : " · recorrente"}</em>${event.actual || event.forecast || event.previous ? `<span class="event-expectations">${event.actual ? `<b>Divulgado ${esc(event.actual)}</b>` : ""}<b>Consenso ${esc(event.forecast || "—")}</b><b>Anterior ${esc(event.previous || "—")}</b></span>` : ""}<span class="scenario-good"><b>Se vier favorável</b>${esc(event.good)}</span><span class="scenario-bad"><b>Se vier desfavorável</b>${esc(event.bad)}</span><a href="${esc(event.sourceUrl)}" target="_blank" rel="noopener">Fonte: ${esc(event.source)} ↗</a></span>` : "";
     $("#tradeTimeline").innerHTML = events.map((event) => `<div class="trade-event ${event.country === "US" ? "is-us-event" : ""} ${businessDay && clock.minutes >= event.time ? "is-past" : ""} ${next === event ? "is-next" : ""}"><time>${timeLabel(event.time)}</time><i class="${event.level}"></i><p><strong>${esc(event.country === "US" ? `EUA · ${event.label}` : event.label)}</strong><small>${esc(event.detail)}</small>${usImpact(event)}${marketValue(event)}</p></div>`).join("");
 
     let phase = "Mercado fechado"; let phaseText = "Use o período sem negociação para preparar níveis, cenários e limite de perda."; let tone = "neutral";
@@ -325,13 +325,13 @@
   }
 
   async function loadUsEvents(force = false) {
-    if (state.usEvents.length && !force) { renderUsEventsUpcoming(); renderTradeTimeline(); return state.usEvents; } if (state.usEventsPromise) return state.usEventsPromise; const url = force ? `/api/b3-us-events?live=${Date.now()}` : "/api/b3-us-events";
+    if (state.usEvents.length && !force) { renderUsEventsUpcoming(); renderTradeTimeline(); return state.usEvents; } if (state.usEventsPromise) return state.usEventsPromise; const url = force ? `/api/b3-us-events?scope=us-expanded-v1&live=${Date.now()}` : "/api/b3-us-events?scope=us-expanded-v1";
     state.usEventsPromise = apiJson(url).then((payload) => { state.usEvents = payload.items || []; renderUsEventsUpcoming(); renderTradeTimeline(); return state.usEvents; }).catch((error) => { $("#usEventsUpcoming").innerHTML = `<div class="chart-error"><strong>Agenda dos EUA indisponível.</strong><span>${esc(error.message)}</span></div>`; return []; }).finally(() => { state.usEventsPromise = null; }); return state.usEventsPromise;
   }
 
   function renderUsEventsUpcoming(now = new Date()) {
-    const container = $("#usEventsUpcoming"); if (!container) return; const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(now); const upcoming = state.usEvents.filter((event) => event.localDate !== today && new Date(event.dateTime) >= now).slice(0, 5); if (!upcoming.length) { container.innerHTML = '<p class="source-note">Nenhum outro evento americano de alta ou média importância encontrado nas próximas semanas.</p>'; return; }
-    container.innerHTML = `<div class="section-subtitle"><span>Próximos eventos relevantes nos EUA</span><small>Horário de Brasília</small></div>${upcoming.map((event) => `<a href="${esc(event.sourceUrl)}" target="_blank" rel="noopener"><time>${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(event.dateTime))}</time><span><b>${esc(event.label)}</b><small>${event.importance === "high" ? "Importância alta" : "Importância média"} · ${esc(event.source)}</small></span><i class="${event.importance}"></i></a>`).join("")}`;
+    const container = $("#usEventsUpcoming"); if (!container) return; const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(now); const upcoming = state.usEvents.filter((event) => event.localDate !== today && new Date(event.dateTime) >= now).slice(0, 8); if (!upcoming.length) { container.innerHTML = '<p class="source-note">Nenhum outro evento americano relevante encontrado nas próximas semanas.</p>'; return; }
+    container.innerHTML = `<div class="section-subtitle"><span>Próximos eventos relevantes nos EUA</span><small>Horário de Brasília</small></div>${upcoming.map((event) => `<a href="${esc(event.sourceUrl)}" target="_blank" rel="noopener"><time>${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(event.dateTime))}</time><span><b>${esc(event.label)}</b><small>Importância ${event.importance === "high" ? "alta" : event.importance === "medium" ? "média" : "baixa"} · ${event.actual ? `divulgado ${esc(event.actual)} · ` : ""}${event.forecast ? `consenso ${esc(event.forecast)} · ` : ""}${esc(event.source)}</small></span><i class="${event.importance}"></i></a>`).join("")}`;
   }
 
   function renderTradeContext() {
@@ -388,6 +388,6 @@
   }
 
   $("#refreshNews").addEventListener("click", () => loadNews(true));
-  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initStrength(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) { ensureOverview(true).catch(() => {}); if (state.tab === "forca") { loadStrength(true).catch(() => {}); if (state.strengthView === "commodities") loadPremarket(true).catch(() => {}); } } }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000);
+  initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initStrength(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) { ensureOverview(true).catch(() => {}); if (state.tab === "forca") { loadStrength(true).catch(() => {}); if (state.strengthView === "commodities") loadPremarket(true).catch(() => {}); } } }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000); setInterval(() => { if (!document.hidden && state.tab === "daytrade") loadUsEvents(true).catch(() => {}); }, 900000);
   ensureOverview().catch((error) => { $("#quoteGrid").innerHTML = `<div class="panel-card" style="grid-column:1/-1"><strong>Cotações temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#quotesUpdated").textContent = "Fonte indisponível"; }); loadNews();
 })();

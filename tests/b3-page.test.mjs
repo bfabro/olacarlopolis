@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=11/); assert.match(html, /b3\.js\?v=11/);
+  assert.match(html, /b3\.css\?v=13/); assert.match(html, /b3\.js\?v=13/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -48,6 +48,8 @@ test("linha do tempo inclui eventos relevantes dos EUA e cenarios para a B3", as
   assert.match(html, /id="usEventsUpcoming"/); assert.match(html, /Agenda oficial BLS\/EUA/); assert.match(html, /Calendário do Federal Reserve/);
   assert.match(client, /loadUsEvents/); assert.match(client, /Se vier favorável/); assert.match(client, /Se vier desfavorável/); assert.match(client, /importância/);
   assert.match(events, /BLS_ICS/); assert.match(events, /Pedidos de seguro-desemprego/); assert.match(events, /FOMC · decisão de juros/);
+  assert.match(events, /PUBLIC_CALENDAR/); assert.match(events, /showmytrades\.com\/api\/public\/calendar\/v1/); assert.match(events, /Crude Oil Inventories/); assert.match(events, /Bond Auction/); assert.match(events, /forecast/);
+  assert.match(html, /Calendário ampliado Investing/); assert.match(client, /Consenso/); assert.match(client, /agenda complementar/);
   assert.match(config, /\/api\/b3-us-events/); assert.match(preview, /b3-us-events\.mjs/);
 });
 
