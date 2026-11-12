@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=13">
+  <link rel="stylesheet" href="b3.css?v=14">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -56,7 +56,7 @@
       <article class="summary-trend top-gap" id="summaryTrend">
         <div class="summary-trend-head"><div><span class="eyebrow">TENDÊNCIA DO MOMENTO</span><h2>Ibovespa e dólar</h2></div><span class="updated" id="summaryTrendUpdated">Calculando…</span></div>
         <div class="summary-trend-grid" id="summaryTrendGrid"><div class="chart-loading">Comparando abertura, variação diária e tendência recente…</div></div>
-        <p>Leitura automática dos dados disponíveis. Tendência descreve o movimento atual e pode mudar rapidamente.</p>
+        <p>A força de 0 a 100 combina amplitude do dia, movimento desde a abertura, cinco pregões e alinhamento dos sinais. Ela mede consistência do movimento — não probabilidade de acerto — e pode mudar rapidamente.</p>
       </article>
 
       <div class="two-columns top-gap">
@@ -195,6 +195,11 @@
         <article class="analysis-card micro"><span class="analysis-label">CENÁRIO MICRO</span><h3>Como ler os setores</h3><ul><li><strong>Petróleo:</strong> preço internacional, câmbio e política de preços movem PETR4, PRIO3 e RECV3.</li><li><strong>Bancos:</strong> crédito, inadimplência e margem financeira pesam em ITUB4, BBAS3 e BBDC4.</li><li><strong>Varejo:</strong> juros longos e renda disponível são os principais gatilhos.</li><li><strong>Resultados:</strong> guidance e margens podem superar qualquer tendência macro no curto prazo.</li></ul></article>
         <article class="analysis-card checklist"><span class="analysis-label">CHECKLIST INTRADIÁRIO</span><h3>Confirme antes de operar</h3><div class="check-grid"><span>✓ Direção do dólar</span><span>✓ Curva de juros DI</span><span>✓ Petróleo e minério</span><span>✓ Futuros dos EUA</span><span>✓ Agenda econômica</span><span>✓ Fatos relevantes</span></div></article>
       </div>
+      <div class="analysis-learning-grid top-gap">
+        <article class="analysis-card live-reading"><span class="analysis-label">LEITURA CRUZADA DO DIA</span><h3>O que os ativos estão dizendo juntos</h3><div class="analysis-insights" id="analysisInsights"><div class="chart-loading">Cruzando índice, dólar, exterior e commodities…</div></div></article>
+        <article class="analysis-card study-card"><span class="analysis-label">PARA ESTUDAR HOJE</span><h3>Dicas práticas de leitura</h3><div class="learning-list"><div><b>Contexto antes do gatilho</b><span>Marque tendência, suporte, resistência e invalidação antes de procurar entrada.</span></div><div><b>Compare períodos</b><span>Um movimento de 5 minutos pode ser apenas correção dentro da tendência de 60 minutos.</span></div><div><b>Volume confirma intenção</b><span>Rompimentos sem expansão de volume têm maior risco de falha e retorno ao nível.</span></div><div><b>Anote a hipótese</b><span>Registre por que entrou, onde estava errado e o resultado; isso revela padrões do seu processo.</span></div></div></article>
+        <article class="analysis-card curiosity-card"><span class="analysis-label">CURIOSIDADES ÚTEIS</span><h3>Detalhes que fazem diferença</h3><div class="learning-list"><div><b>Índice não é “a bolsa inteira”</b><span>Papéis de grande peso podem levar o Ibovespa para um lado mesmo com a maioria das ações no sentido oposto.</span></div><div><b>Dólar alto tem efeito duplo</b><span>Pode favorecer exportadoras e, ao mesmo tempo, pressionar empresas importadoras e a expectativa de inflação.</span></div><div><b>Leilões distorcem o preço</b><span>Abertura e fechamento concentram ordens; o último negócio nem sempre representa equilíbrio negociável.</span></div><div><b>Contrato aberto não revela lado</b><span>Cada contrato possui comprado e vendido. O aumento mostra exposição e interesse, não quem vencerá.</span></div></div></article>
+      </div>
       <article class="technical-card"><div class="card-title"><div><span class="eyebrow">SINAL TÉCNICO</span><h2>Ibovespa</h2></div><span class="source-pill">TradingView</span></div><div id="technicalWidget" class="technical-widget"></div><p>Médias móveis e osciladores são sinais auxiliares e podem mudar rapidamente.</p></article>
     </section>
 
@@ -273,11 +278,12 @@
       <div class="d1-futures" id="d1Futures"><div class="chart-loading">Buscando WIN e WDO do último fechamento…</div></div>
       <div class="section-subtitle"><span>Posições em aberto</span><small>Último relatório público confirmado: 09/11/2026</small></div>
       <div class="contract-grid">
-        <article class="contract-card"><span>Dólar futuro</span><strong>827.639</strong><small>contratos em aberto · <b class="negative">−11.417 no dia</b></small></article>
-        <article class="contract-card"><span>Minidólar</span><strong>1.065.168</strong><small>contratos em aberto · <b class="positive">+98.692 no dia</b></small></article>
-        <article class="contract-card"><span>Ibovespa futuro</span><strong>199.366</strong><small>contratos em aberto · <b class="positive">+3.405 no dia</b></small></article>
-        <article class="contract-card"><span>Mini-índice</span><strong>1.370.365</strong><small>contratos em aberto · <b class="positive">+87.708 no dia</b></small></article>
+        <article class="contract-card"><span>Dólar futuro</span><strong>827.639</strong><small>contratos em aberto · <b class="negative">−11.417 no dia</b></small><div class="contract-meaning"><b>O que significa</b><p>Usado principalmente por instituições, empresas e fundos para proteção e exposição ao câmbio.</p><b>O que observar</b><p>Queda do estoque sugere encerramento ou rolagem de posições. Compare com preço, volume e curva de juros para inferir pressão.</p></div></article>
+        <article class="contract-card"><span>Minidólar</span><strong>1.065.168</strong><small>contratos em aberto · <b class="positive">+98.692 no dia</b></small><div class="contract-meaning"><b>O que significa</b><p>Concentra muitos participantes de curto prazo e replica o dólar futuro em tamanho menor.</p><b>O que observar</b><p>Aumento forte indica mais posições e tende a ampliar liquidez; perto de notícias pode também elevar disputa e volatilidade.</p></div></article>
+        <article class="contract-card"><span>Ibovespa futuro</span><strong>199.366</strong><small>contratos em aberto · <b class="positive">+3.405 no dia</b></small><div class="contract-meaning"><b>O que significa</b><p>É muito usado por fundos para proteção de carteira, arbitragem e exposição ao índice.</p><b>O que observar</b><p>Estoque crescente mostra maior interesse institucional. A direção só ganha contexto quando preço e fluxo avançam juntos.</p></div></article>
+        <article class="contract-card"><span>Mini-índice</span><strong>1.370.365</strong><small>contratos em aberto · <b class="positive">+87.708 no dia</b></small><div class="contract-meaning"><b>O que significa</b><p>É o contrato mais acessível para operações curtas no índice e reúne grande atividade intradiária.</p><b>O que observar</b><p>Mais posições podem trazer liquidez, mas também movimentos rápidos. Observe absorção, volume e reação nos níveis técnicos.</p></div></article>
       </div>
+      <div class="contracts-overview"><strong>Leitura geral dos quatro</strong><span>Estoque subindo significa que novas posições permanecem abertas; estoque caindo indica encerramento ou vencimento. Como todo contrato tem um comprador e um vendedor, use a quantidade para medir participação e liquidez — e preço, volume e fluxo para avaliar direção.</span></div>
       <div class="two-columns top-gap">
         <article class="panel-card">
           <div class="card-title"><div><span class="eyebrow">MERCADO À VISTA</span><h2>Saldo por investidor</h2></div><span class="source-pill">D−2</span></div>
@@ -300,6 +306,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=13"></script>
+  <script defer src="b3.js?v=14"></script>
 </body>
 </html>

@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=13/); assert.match(html, /b3\.js\?v=13/);
+  assert.match(html, /b3\.css\?v=14/); assert.match(html, /b3\.js\?v=14/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -71,6 +71,15 @@ test("noticias recebem pontuacao de impacto e resumo mostra tendencia de indice 
   assert.match(news, /impactScores/); assert.match(news, /dayTradeScore/); assert.match(news, /assetScore/); assert.match(news, /scoreReason/);
   assert.match(client, /Impacto no day trade/); assert.match(client, /renderSummaryTrend/); assert.match(client, /Desde a abertura/);
   assert.match(html, /id="summaryTrend"/); assert.match(html, /TENDÊNCIA DO MOMENTO/); assert.match(html, /Ibovespa e dólar/);
+});
+
+test("resumo, analise, day trade e contratos recebem leituras explicativas", async () => {
+  const [html, client, css] = await Promise.all([read("b3.html"), read("b3.js"), read("b3.css")]);
+  assert.doesNotMatch(client, /<span>Dados públicos<\/span>/);
+  assert.match(client, /Força da tendência/); assert.match(client, /strengthScore/); assert.match(css, /trend-strength/);
+  assert.match(html, /LEITURA CRUZADA DO DIA/); assert.match(html, /PARA ESTUDAR HOJE/); assert.match(html, /CURIOSIDADES ÚTEIS/); assert.match(client, /analysisInsights/);
+  assert.match(client, /Peso estimado na B3/); assert.match(client, /usEventWeight/); assert.match(css, /event-weight/);
+  assert.match(html, /O que significa/); assert.match(html, /O que observar/); assert.match(html, /Leitura geral dos quatro/);
 });
 
 test("pagina identifica fontes e ressalva informativa", async () => {
