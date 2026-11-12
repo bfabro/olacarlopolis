@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=14/); assert.match(html, /b3\.js\?v=14/);
+  assert.match(html, /b3\.css\?v=16/); assert.match(html, /b3\.js\?v=16/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -78,8 +78,15 @@ test("resumo, analise, day trade e contratos recebem leituras explicativas", asy
   assert.doesNotMatch(client, /<span>Dados públicos<\/span>/);
   assert.match(client, /Força da tendência/); assert.match(client, /strengthScore/); assert.match(css, /trend-strength/);
   assert.match(html, /LEITURA CRUZADA DO DIA/); assert.match(html, /PARA ESTUDAR HOJE/); assert.match(html, /CURIOSIDADES ÚTEIS/); assert.match(client, /analysisInsights/);
-  assert.match(client, /Peso estimado na B3/); assert.match(client, /usEventWeight/); assert.match(css, /event-weight/);
+  assert.match(client, /Peso estimado da notícia na B3/); assert.match(client, /usEventWeight/); assert.match(css, /event-weight/);
   assert.match(html, /O que significa/); assert.match(html, /O que observar/); assert.match(html, /Leitura geral dos quatro/);
+});
+
+test("forca B3 informa horario e day trade avalia o resultado divulgado", async () => {
+  const [html, client, css, events] = await Promise.all([read("b3.html"), read("b3.js"), read("b3.css"), read("netlify/functions/b3-us-events.mjs")]);
+  assert.match(html, /Última atualização das informações/); assert.match(html, /Automática a cada 60 segundos/); assert.match(css, /strength-update/);
+  assert.match(client, /usEventOutcome/); assert.match(client, /Resultado provavelmente/); assert.match(client, /Peso do resultado/); assert.match(css, /event-outcome/);
+  assert.match(events, /existing\.actual = extra\.actual/); assert.match(css, /\.trade-event strong\{font-size:13px/);
 });
 
 test("pagina identifica fontes e ressalva informativa", async () => {
