@@ -1,4 +1,4 @@
-/* Painel B3 publico - v10 */
+/* Painel B3 publico - v11 */
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -8,7 +8,7 @@
   const number = (value, digits = 0) => Number(value).toLocaleString("pt-BR", { maximumFractionDigits: digits });
   const percent = (value) => `${Number(value) > 0 ? "+" : ""}${number(value, 2)}%`;
   const dateBR = (value) => new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`));
-  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", strengthView: "stocks", premarket: null, premarketPromise: null, premarketCommodity: "brent", groups: new Map(), groupRequests: new Map() };
+  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", strengthView: "stocks", premarket: null, premarketPromise: null, premarketCommodity: "brent", usEvents: [], usEventsPromise: null, groups: new Map(), groupRequests: new Map() };
 
   const commodities = [
     { id: "brent", title: "Petróleo Brent", group: "Energia", icon: "BR", assets: ["PETR4", "PETR3", "PRIO3", "RECV3"], summary: "Alta do Brent tende a elevar a receita em reais das produtoras. Refino, câmbio, política de preços e produção podem alterar o efeito." },
@@ -81,7 +81,7 @@
     if (tab === "forca") { loadStrength(); if (state.strengthView === "commodities") loadPremarket(); }
     if (tab === "bolsas") ensureOverview().then(renderSelectedIndex).catch(showIndexError);
     if (tab === "analise") { ensureOverview().then(renderAnalysis).catch(() => {}); renderTechnical(); }
-    if (tab === "daytrade") ensureOverview().then(renderTradeContext).catch(() => {});
+    if (tab === "daytrade") { ensureOverview().then(renderTradeContext).catch(() => {}); loadUsEvents(); }
     if (tab === "contratos") loadFutures();
     history.replaceState(null, "", `#${tab}`);
   }
@@ -298,7 +298,7 @@
   }
 
   function renderTradeTimeline(now = new Date()) {
-    const clock = marketMinutes(now); const businessDay = !["Sat", "Sun"].includes(clock.weekday); const events = tradeEvents(now); const next = businessDay ? events.find((event) => event.time > clock.minutes) : null;
+    const clock = marketMinutes(now); const businessDay = !["Sat", "Sun"].includes(clock.weekday); const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(now); const usToday = state.usEvents.filter((event) => event.localDate === today); const events = [...tradeEvents(now), ...usToday].sort((a, b) => a.time - b.time); const next = businessDay ? events.find((event) => event.time > clock.minutes) : null;
     const timeLabel = (minutes) => `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
     const marketValue = (event) => {
       if (!state.overview || !businessDay || clock.minutes < event.time) return ""; const { indices: idx, macro } = state.overview; const quote = (item, digits = 0) => item ? `${number(item.current, digits)} <b class="${item.change1d >= 0 ? "positive" : "negative"}">${percent(item.change1d)}</b>` : "—"; const opened = (item, digits = 0) => item?.open > 0 ? `abertura ${number(item.open, digits)} · atual ${quote(item, digits)}` : `valor atual ${quote(item, digits)}`;
@@ -308,7 +308,8 @@
       if (event.id === "dollar" || event.id === "wdo-close") return `<span class="event-market-values"><em>Referência cambial</em><span>USD/BRL: ${quote(macro.usdbrl, 4)}</span></span>`;
       if (event.id === "close") return `<span class="event-market-values"><em>Referência do fechamento</em><span>Ibovespa: ${quote(idx.ibov)}</span></span>`; return "";
     };
-    $("#tradeTimeline").innerHTML = events.map((event) => `<div class="trade-event ${businessDay && clock.minutes >= event.time ? "is-past" : ""} ${next === event ? "is-next" : ""}"><time>${timeLabel(event.time)}</time><i class="${event.level}"></i><p><strong>${esc(event.label)}</strong><small>${esc(event.detail)}</small>${marketValue(event)}</p></div>`).join("");
+    const usImpact = (event) => event.country === "US" ? `<span class="us-event-scenarios"><em class="importance ${event.importance}">EUA · importância ${event.importance === "high" ? "alta" : "média"}${event.confirmed ? " · confirmado" : " · recorrente"}</em><span class="scenario-good"><b>Se vier favorável</b>${esc(event.good)}</span><span class="scenario-bad"><b>Se vier desfavorável</b>${esc(event.bad)}</span><a href="${esc(event.sourceUrl)}" target="_blank" rel="noopener">Fonte: ${esc(event.source)} ↗</a></span>` : "";
+    $("#tradeTimeline").innerHTML = events.map((event) => `<div class="trade-event ${event.country === "US" ? "is-us-event" : ""} ${businessDay && clock.minutes >= event.time ? "is-past" : ""} ${next === event ? "is-next" : ""}"><time>${timeLabel(event.time)}</time><i class="${event.level}"></i><p><strong>${esc(event.country === "US" ? `EUA · ${event.label}` : event.label)}</strong><small>${esc(event.detail)}</small>${usImpact(event)}${marketValue(event)}</p></div>`).join("");
 
     let phase = "Mercado fechado"; let phaseText = "Use o período sem negociação para preparar níveis, cenários e limite de perda."; let tone = "neutral";
     if (businessDay && clock.minutes >= 535 && clock.minutes < 540) { phase = "Pré-abertura dos futuros"; phaseText = "Confira exterior, dólar e agenda antes do início de WIN e WDO."; tone = "attention"; }
@@ -321,6 +322,16 @@
     $("#tradeNow").dataset.tone = tone; $("#tradePhase").textContent = phase; $("#tradePhaseText").textContent = phaseText;
     if (next) { $("#nextEventTime").textContent = timeLabel(next.time); $("#nextEventLabel").textContent = next.label; }
     else { $("#nextEventTime").textContent = "Próximo pregão"; $("#nextEventLabel").textContent = "Revise a agenda econômica antes da abertura"; }
+  }
+
+  async function loadUsEvents(force = false) {
+    if (state.usEvents.length && !force) { renderUsEventsUpcoming(); renderTradeTimeline(); return state.usEvents; } if (state.usEventsPromise) return state.usEventsPromise; const url = force ? `/api/b3-us-events?live=${Date.now()}` : "/api/b3-us-events";
+    state.usEventsPromise = apiJson(url).then((payload) => { state.usEvents = payload.items || []; renderUsEventsUpcoming(); renderTradeTimeline(); return state.usEvents; }).catch((error) => { $("#usEventsUpcoming").innerHTML = `<div class="chart-error"><strong>Agenda dos EUA indisponível.</strong><span>${esc(error.message)}</span></div>`; return []; }).finally(() => { state.usEventsPromise = null; }); return state.usEventsPromise;
+  }
+
+  function renderUsEventsUpcoming(now = new Date()) {
+    const container = $("#usEventsUpcoming"); if (!container) return; const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(now); const upcoming = state.usEvents.filter((event) => event.localDate !== today && new Date(event.dateTime) >= now).slice(0, 5); if (!upcoming.length) { container.innerHTML = '<p class="source-note">Nenhum outro evento americano de alta ou média importância encontrado nas próximas semanas.</p>'; return; }
+    container.innerHTML = `<div class="section-subtitle"><span>Próximos eventos relevantes nos EUA</span><small>Horário de Brasília</small></div>${upcoming.map((event) => `<a href="${esc(event.sourceUrl)}" target="_blank" rel="noopener"><time>${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }).format(new Date(event.dateTime))}</time><span><b>${esc(event.label)}</b><small>${event.importance === "high" ? "Importância alta" : "Importância média"} · ${esc(event.source)}</small></span><i class="${event.importance}"></i></a>`).join("")}`;
   }
 
   function renderTradeContext() {

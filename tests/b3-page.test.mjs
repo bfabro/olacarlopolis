@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=10/); assert.match(html, /b3\.js\?v=10/);
+  assert.match(html, /b3\.css\?v=11/); assert.match(html, /b3\.js\?v=11/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -41,6 +41,14 @@ test("tela day trade inclui horarios, checklist, risco e fontes oficiais", async
   assert.match(html, /Agenda econômica do Banco Central/); assert.match(html, /Horários oficiais da B3/);
   assert.match(client, /renderTradeTimeline/); assert.match(client, /calculateTradeRisk/); assert.match(client, /renderTradeContext/);
   assert.match(client, /Referências após a abertura/); assert.match(client, /Mercados dos EUA/); assert.match(series, /regularMarketOpen/);
+});
+
+test("linha do tempo inclui eventos relevantes dos EUA e cenarios para a B3", async () => {
+  const [html, client, events, config, preview] = await Promise.all([read("b3.html"), read("b3.js"), read("netlify/functions/b3-us-events.mjs"), read("netlify.toml"), read("scripts/b3-preview.mjs")]);
+  assert.match(html, /id="usEventsUpcoming"/); assert.match(html, /Agenda oficial BLS\/EUA/); assert.match(html, /Calendário do Federal Reserve/);
+  assert.match(client, /loadUsEvents/); assert.match(client, /Se vier favorável/); assert.match(client, /Se vier desfavorável/); assert.match(client, /importância/);
+  assert.match(events, /BLS_ICS/); assert.match(events, /Pedidos de seguro-desemprego/); assert.match(events, /FOMC · decisão de juros/);
+  assert.match(config, /\/api\/b3-us-events/); assert.match(preview, /b3-us-events\.mjs/);
 });
 
 test("noticias ampliadas, bolsas consolidadas e niveis tecnicos", async () => {
