@@ -1,4 +1,4 @@
-/* Painel B3 publico - v9 */
+/* Painel B3 publico - v10 */
 (() => {
   "use strict";
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -263,7 +263,7 @@
   async function ensureOverview(force = false) {
     if (state.overview && !force) return state.overview; if (state.overviewPromise) return state.overviewPromise;
     const url = force ? `/api/b3-series?live=${Date.now()}` : "/api/b3-series";
-    state.overviewPromise = apiJson(url).then((payload) => { state.overview = payload; renderQuotes(); renderIndexSummary(); renderAnalysis(); renderTradeContext(); if (state.tab === "bolsas") renderSelectedIndex(); return payload; }).finally(() => { state.overviewPromise = null; }); return state.overviewPromise;
+    state.overviewPromise = apiJson(url).then((payload) => { state.overview = payload; renderQuotes(); renderSummaryTrend(); renderIndexSummary(); renderAnalysis(); renderTradeContext(); if (state.tab === "bolsas") renderSelectedIndex(); return payload; }).finally(() => { state.overviewPromise = null; }); return state.overviewPromise;
   }
 
   function renderQuotes() {
@@ -271,6 +271,11 @@
     $("#quoteGrid").innerHTML = quotes.map((quote) => { const tone = quote.change1d > 0 ? "positive" : quote.change1d < 0 ? "negative" : "neutral"; return `<article class="quote-card"><div class="quote-top"><div><span class="quote-ticker">${esc(quote.label)}</span><span class="quote-name">B3 · fechamento mais recente</span></div><span class="quote-change ${tone}">${percent(quote.change1d)}</span></div><strong class="quote-price">${money(quote.current)}</strong><div class="quote-foot"><span>Volume ${number(quote.volume || 0)}</span><span>Dados públicos</span></div></article>`; }).join("");
     $("#quotesUpdated").textContent = `Atualizado ${new Intl.DateTimeFormat("pt-BR", { dateStyle: "short", timeStyle: "short" }).format(new Date(state.overview.updatedAt))} · Yahoo Finance`;
     const average = quotes.reduce((sum, quote) => sum + quote.change1d, 0) / Math.max(quotes.length, 1); const bias = $("#marketBias"); bias.className = `badge ${average > .35 ? "positive" : average < -.35 ? "negative" : "neutral"}`; bias.textContent = average > .35 ? "Amostra com viés positivo" : average < -.35 ? "Amostra com viés negativo" : "Leitura mista na amostra";
+  }
+
+  function renderSummaryTrend() {
+    if (!state.overview) return; const ibov = state.overview.indices.ibov; const dollar = state.overview.macro.usdbrl; const classify = (item) => { const fromOpen = item.open > 0 ? (item.current / item.open - 1) * 100 : item.change1d; const aligned = Math.sign(fromOpen) === Math.sign(item.change1d) || Math.abs(fromOpen) < .05; const strength = Math.abs(item.change1d); const direction = strength < .15 ? "Lateral" : item.change1d > 0 ? (strength >= .8 && aligned ? "Alta forte" : "Alta") : (strength >= .8 && aligned ? "Baixa forte" : "Baixa"); const tone = item.change1d > .15 ? "positive" : item.change1d < -.15 ? "negative" : "neutral"; return { fromOpen, direction, tone, aligned }; }; const cards = [["Ibovespa", ibov, "Pontos"], ["Dólar/Real", dollar, "R$/US$"]];
+    $("#summaryTrendGrid").innerHTML = cards.map(([label, item, unit]) => { const trend = classify(item); return `<div class="summary-trend-card ${trend.tone}"><div><span>${label}</span><b class="trend-pill ${trend.tone}">${trend.direction}</b></div><strong>${label === "Ibovespa" ? number(item.current, 0) : number(item.current, 4)}</strong><small>${unit} · <b class="${item.change1d >= 0 ? "positive" : "negative"}">${percent(item.change1d)} no dia</b></small><div class="trend-details"><span>Desde a abertura <b class="${trend.fromOpen >= 0 ? "positive" : "negative"}">${percent(trend.fromOpen)}</b></span><span>Em 5 pregões <b class="${item.change5d >= 0 ? "positive" : "negative"}">${percent(item.change5d)}</b></span></div><p>${trend.aligned ? "Preço e variação diária apontam para a mesma direção." : "Movimento desde a abertura diverge do saldo do dia; sinal exige cautela."}</p></div>`; }).join(""); $("#summaryTrendUpdated").textContent = `Atualizado às ${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(state.overview.updatedAt))}`;
   }
 
   function renderAnalysis() {
@@ -355,8 +360,8 @@
     catch (error) { const message = `<div class="panel-card"><strong>Notícias temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#newsPreview").innerHTML = message; $("#newsFull").innerHTML = message; } finally { $("#refreshNews").disabled = false; }
   }
   function renderNews() {
-    $("#newsPreview").innerHTML = state.news.slice(0, 3).map((item, index) => `<a class="news-mini" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-number">0${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.source)} · ${esc(item.relativeDate)}</small></span></a>`).join("");
-    $("#newsFull").innerHTML = state.news.map((item) => `<a class="news-card ${item.intradayImpact ? "has-intraday-impact" : ""}" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-tag-row"><span class="news-tag">${esc(item.asset || "Mercado")}</span>${item.intradayImpact ? '<span class="intraday-live"><i></i> Impacto no day trade · em tempo real</span>' : ""}</span><h3>${esc(item.title)}</h3><p>${esc(item.description || "Abra para ler a notícia completa no veículo responsável.")}</p><span class="news-meta"><span>${esc(item.source)}</span><span>${esc(item.relativeDate)} ↗</span></span></a>`).join("");
+    $("#newsPreview").innerHTML = state.news.slice(0, 3).map((item, index) => `<a class="news-mini" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-number">0${index + 1}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.source)} · ${esc(item.relativeDate)} · Day trade ${number(item.dayTradeScore || 0)}/100</small></span></a>`).join("");
+    $("#newsFull").innerHTML = state.news.map((item) => `<a class="news-card ${item.intradayImpact ? "has-intraday-impact" : ""}" href="${esc(item.link)}" target="_blank" rel="noopener"><span class="news-tag-row"><span class="news-tag">${esc(item.asset || "Mercado")}</span>${item.intradayImpact ? '<span class="intraday-live"><i></i> Impacto no day trade · em tempo real</span>' : ""}</span><h3>${esc(item.title)}</h3><p>${esc(item.description || "Abra para ler a notícia completa no veículo responsável.")}</p><div class="news-impact-scores"><div><span>Impacto no day trade</span><b>${number(item.dayTradeScore || 0)}/100 · ${esc(item.dayTradeLevel || "Baixo")}</b><i><em style="width:${number(item.dayTradeScore || 0)}%"></em></i></div><div><span>Impacto em ${esc(item.asset || "ação")}</span><b>${number(item.assetScore || 0)}/100 · ${esc(item.assetLevel || "Baixo")}</b><i><em style="width:${number(item.assetScore || 0)}%"></em></i></div></div><div class="news-score-note"><b>${esc(item.direction || "Direção incerta")}</b><span>${esc(item.scoreReason || "Pontuação estimada por atualidade e tipo de catalisador.")}</span></div><span class="news-meta"><span>${esc(item.source)}</span><span>${esc(item.relativeDate)} ↗</span></span></a>`).join("");
     if (state.newsUpdatedAt) $("#newsUpdatedAt").textContent = `Atualizado às ${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(state.newsUpdatedAt))} · ordem cronológica`;
   }
 

@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=9">
+  <link rel="stylesheet" href="b3.css?v=10">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -52,6 +52,12 @@
       <div class="quote-grid" id="quoteGrid" aria-live="polite">
         <div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div><div class="skeleton-card"></div>
       </div>
+
+      <article class="summary-trend top-gap" id="summaryTrend">
+        <div class="summary-trend-head"><div><span class="eyebrow">TENDÊNCIA DO MOMENTO</span><h2>Ibovespa e dólar</h2></div><span class="updated" id="summaryTrendUpdated">Calculando…</span></div>
+        <div class="summary-trend-grid" id="summaryTrendGrid"><div class="chart-loading">Comparando abertura, variação diária e tendência recente…</div></div>
+        <p>Leitura automática dos dados disponíveis. Tendência descreve o movimento atual e pode mudar rapidamente.</p>
+      </article>
 
       <div class="two-columns top-gap">
         <article class="panel-card">
@@ -257,6 +263,7 @@
     <section class="tab-panel" id="panel-noticias" data-panel="noticias" hidden>
       <div class="section-heading"><div><span class="eyebrow">NOTÍCIAS PÚBLICAS</span><h2>Mais recentes primeiro</h2><small class="updated" id="newsUpdatedAt">Buscando atualização…</small></div><button class="refresh-button" id="refreshNews" type="button">↻ Atualizar</button></div>
       <div id="newsFull" class="news-full" aria-live="polite"><div class="loading-line">Buscando nove notícias…</div></div>
+      <div class="data-warning"><strong>Como ler a pontuação</strong><span>Escala estimada de 0 a 100 baseada em atualidade, tipo de catalisador e relação com o ativo. Não mede a reação real do preço e não substitui volume, contexto, confirmação do gráfico ou fonte oficial.</span></div>
       <p class="source-note">Agregação por RSS do Google Notícias. A manchete leva ao veículo responsável; confirme data, contexto e fonte.</p>
     </section>
 
@@ -292,6 +299,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=9"></script>
+  <script defer src="b3.js?v=10"></script>
 </body>
 </html>
