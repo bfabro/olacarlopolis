@@ -3,7 +3,139 @@
 // Use somente admin/painel.html, que cria usuarios via Firebase Auth e perfis por UID.
 
 
-// Release do site v724.
+// Release do site v725.
+const recursosDinamicosSite = new Map();
+
+function carregarScriptSite(src, chave = src) {
+  if (recursosDinamicosSite.has(chave)) return recursosDinamicosSite.get(chave);
+  const promise = new Promise((resolve, reject) => {
+    const existente = document.querySelector(`script[data-recurso-site="${chave}"]`);
+    if (existente?.dataset.loaded === "true") return resolve(existente);
+    const script = existente || document.createElement("script");
+    script.dataset.recursoSite = chave;
+    script.async = true;
+    script.onload = () => {
+      script.dataset.loaded = "true";
+      resolve(script);
+    };
+    script.onerror = () => reject(new Error(`Nao foi possivel carregar ${src}`));
+    if (!existente) {
+      script.src = src;
+      document.head.appendChild(script);
+    }
+  }).catch((error) => {
+    recursosDinamicosSite.delete(chave);
+    throw error;
+  });
+  recursosDinamicosSite.set(chave, promise);
+  return promise;
+}
+
+function carregarEstiloSite(href, chave = href) {
+  if (recursosDinamicosSite.has(chave)) return recursosDinamicosSite.get(chave);
+  const promise = new Promise((resolve, reject) => {
+    const existente = document.querySelector(`link[data-recurso-site="${chave}"]`);
+    if (existente?.dataset.loaded === "true") return resolve(existente);
+    const link = existente || document.createElement("link");
+    link.dataset.recursoSite = chave;
+    link.rel = "stylesheet";
+    link.onload = () => {
+      link.dataset.loaded = "true";
+      resolve(link);
+    };
+    link.onerror = () => reject(new Error(`Nao foi possivel carregar ${href}`));
+    if (!existente) {
+      link.href = href;
+      document.head.appendChild(link);
+    }
+  }).catch((error) => {
+    recursosDinamicosSite.delete(chave);
+    throw error;
+  });
+  recursosDinamicosSite.set(chave, promise);
+  return promise;
+}
+
+function garantirHtml2Canvas() {
+  if (typeof window.html2canvas === "function") return Promise.resolve(window.html2canvas);
+  return carregarScriptSite("https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js", "html2canvas")
+    .then(() => window.html2canvas);
+}
+
+function carregarLeaflet() {
+  if (window.L?.map) return Promise.resolve(window.L);
+  return Promise.all([
+    carregarEstiloSite("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css", "leaflet-css"),
+    carregarScriptSite("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js", "leaflet-js")
+  ]).then(() => window.L);
+}
+
+async function carregarOlaPesca() {
+  await Promise.all([
+    carregarEstiloSite("ola-pesca.css?v=109", "ola-pesca-css"),
+    carregarScriptSite("ola-pesca.js?v=109", "ola-pesca-js")
+  ]);
+}
+
+async function abrirOlaPesca() {
+  try {
+    await carregarOlaPesca();
+    window.mostrarOlaPesca?.();
+  } catch (error) {
+    console.error("Nao foi possivel abrir o Ola Pesca.", error);
+    mostrarToast("Nao foi possivel carregar o jogo agora.");
+  }
+}
+
+async function abrirLoteriasSobDemanda(slug = "") {
+  try {
+    await Promise.all([
+      carregarEstiloSite("loterias.css?v=8", "loterias-css"),
+      carregarScriptSite("loterias.js?v=11", "loterias-js")
+    ]);
+    window.mostrarLoterias?.(slug);
+  } catch (error) {
+    console.error("Nao foi possivel abrir as loterias.", error);
+    mostrarToast("Nao foi possivel carregar as loterias agora.");
+  }
+}
+
+async function abrirEventosSobDemanda() {
+  try {
+    await carregarScriptSite("eventos-page.js?v=7", "eventos-page-js");
+    window.mostrarEventosPublicos?.();
+  } catch (error) {
+    console.error("Nao foi possivel abrir os eventos.", error);
+    mostrarToast("Nao foi possivel carregar os eventos agora.");
+  }
+}
+
+function carregarConstrutorCurriculo() {
+  return Promise.all([
+    carregarEstiloSite("resume-builder.css?v=1", "resume-builder-css"),
+    carregarScriptSite("resume-builder.js?v=40", "resume-builder-js"),
+    garantirHtml2Canvas()
+  ]);
+}
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest?.("#climaStoryTrigger");
+  if (!button || button.dataset.climaStoryReady === "true") return;
+  event.preventDefault();
+  button.disabled = true;
+  carregarScriptSite("clima-story.js?v=16", "clima-story-js")
+    .then(() => {
+      button.dataset.climaStoryReady = "true";
+      button.disabled = false;
+      button.click();
+    })
+    .catch((error) => {
+      button.disabled = false;
+      console.error("Nao foi possivel carregar o gerador de Story.", error);
+      mostrarToast("Nao foi possivel carregar o gerador agora.");
+    });
+});
+
 function isAppInstalado() {
   const isStandaloneAndroid = window.matchMedia('(display-mode: standalone)').matches;
   const isStandaloneIos = ('standalone' in window.navigator) && window.navigator.standalone;
@@ -132,6 +264,7 @@ function formatarTelefonePublico(value) {
 
 async function gerarImagemCardImovel(imovel, categoriaAtual) {
   try {
+    await garantirHtml2Canvas();
     const corDestaque = "#0095f6";
     const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
 
@@ -272,6 +405,7 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
 
 async function gerarImagemCardEstabelecimentoLegado(establishment, categoriaAtual, slugId) {
   try {
+    await garantirHtml2Canvas();
     const nomeRaw = (establishment.name ?? establishment.nome ?? establishment.title ?? "");
     const nomeLimpo = String(nomeRaw)
       .replace(/<[^>]*>/g, "")
@@ -1250,8 +1384,11 @@ function criarSombraRasterArteComercial(width, height, effect = "soft", rounded 
 
 async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slugId) {
   if (!establishment || document.querySelector(".business-art-dialog")) return;
-  if (typeof html2canvas !== "function") {
-    mostrarToast("O gerador de imagens ainda esta carregando. Tente novamente.");
+  try {
+    await garantirHtml2Canvas();
+  } catch (error) {
+    console.error("Nao foi possivel carregar o gerador de imagens.", error);
+    mostrarToast("Nao foi possivel carregar o gerador de imagens agora.");
     return;
   }
 
@@ -4521,7 +4658,9 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     });
 
     const listaUnica = [...new Map(listaTodos.map((est) => [est.nomeNormalizado, est])).values()];
-    const LIMITE_DESTAQUES_HOME = 20;
+    // Mantem a pagina inicial leve: os demais clientes continuam acessiveis
+    // pelas categorias e pela busca, sem baixar dezenas de fotos de uma vez.
+    const LIMITE_DESTAQUES_HOME = 10;
     const totalExibir = [...listaUnica]
       .sort(() => Math.random() - 0.5)
       .slice(0, LIMITE_DESTAQUES_HOME);
@@ -4568,7 +4707,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
       const idEst = est.nomeNormalizado || normalizeName(est.name || "");
 
       slide.innerHTML = `
-      <img class="content_image" src="${imagemInicial}" alt="${est.name}" loading="lazy">
+      <img class="content_image" src="${imagemInicial}" alt="${est.name}" loading="lazy" decoding="async" fetchpriority="low">
       <div class="info_divulgacao">
         <h3>${categoria ? categoria + " - " + est.name : est.name}</h3>
         <p>${texto}</p>
@@ -4597,7 +4736,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
         card.innerHTML = `
         <div class="card-divulgacao-img-wrap">
-          <img src="${imagemInicial}" alt="${est.name}" loading="lazy">
+          <img src="${imagemInicial}" alt="${est.name}" loading="lazy" decoding="async" fetchpriority="low">
         </div>
         <div class="card-divulgacao-info">
           <span class="card-divulgacao-categoria">
@@ -4633,18 +4772,6 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
             ev.stopPropagation();
 
           });
-        }
-
-        // 👉 MINI CARROSSEL: troca automática das imagens desse estabelecimento
-        if (imagens.length > 1) {
-          const imgTag = card.querySelector(".card-divulgacao-img-wrap img");
-          let idx = imagens.indexOf(imagemInicial);
-          if (idx < 0) idx = 0;
-
-          setInterval(() => {
-            idx = (idx + 1) % imagens.length;
-            imgTag.src = imagens[idx];
-          }, 5000); // troca a cada 4 segundos (ajuste se quiser)
         }
 
         gradeDivulgacao.appendChild(card);
@@ -6662,6 +6789,9 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
     }
     prepararMenuParaCategoria(categoria);
     loadContent(categoria.title, categoria.establishments || []);
+    carregarConstrutorCurriculo().catch((error) => {
+      console.warn("Nao foi possivel carregar o construtor de curriculo.", error);
+    });
   }
 
   // Observa o hash (#alguma-coisa) e, se for um estabelecimento válido,
@@ -7863,7 +7993,7 @@ carlopdiesel:"s",
     window.destroyOlaPesca?.();
     if (jogo === "ola-pesca") {
       if (location.hash !== "#ola-pesca") history.pushState(null, "", "#ola-pesca");
-      window.mostrarOlaPesca?.();
+      abrirOlaPesca();
       return false;
     }
     if (jogo === "canos") {
@@ -9937,7 +10067,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   window.addEventListener("DOMContentLoaded", () => {
     const h = (location.hash || "").replace("#", "");
     if (h === "jogos") mostrarJogos();
-    else if (h === "ola-pesca") window.mostrarOlaPesca?.();
+    else if (h === "ola-pesca") abrirOlaPesca();
     else if (h === "tetrix") mostrarTetrix();
     else if (h === "canos") mostrarCanos();
     else if (h === "xadrez") mostrarXadrez();
@@ -9946,7 +10076,7 @@ ${(cardapioVisivel(est) || getContatosEstabelecimento(est).length) ? `
   window.addEventListener("hashchange", () => {
     const h = (location.hash || "").replace("#", "");
     if (h === "jogos") mostrarJogos();
-    else if (h === "ola-pesca") window.mostrarOlaPesca?.();
+    else if (h === "ola-pesca") abrirOlaPesca();
     else if (h === "tetrix") mostrarTetrix();
     else if (h === "canos") mostrarCanos();
     else if (h === "xadrez") mostrarXadrez();
@@ -15200,6 +15330,7 @@ plotarPinsImoveis(stateImoveis.filtered);
   }
 
   async function mostrarCasasVeraneio() {
+    await carregarEstiloSite("casas-veraneio.css?v=9", "casas-veraneio-css");
     const $ = (id) => document.getElementById(id);
     if (location.hash !== "#casas-veraneio") history.pushState(null, "", "#casas-veraneio");
     prepararNavegacaoMenuEspecial();
@@ -25446,7 +25577,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!h) return;
 
     try {
-      if (h === "#eventos") return window.mostrarEventosPublicos?.();
+      if (h === "#eventos") return abrirEventosSobDemanda();
       if (h === "#novidades") return mostrarNovidadesCidadePublicas();
       if (h === "#ondecomer") return mostrarOndeComer();
       if (h === "#produtos") return mostrarProdutosPublicos();
@@ -26674,18 +26805,6 @@ ${servicosIniciaisLoja.length ? `
 
   }
 
-  async function loadPaidEstablishments() {
-    // Renderiza apenas a rota atual para nao sobrescrever a categoria escolhida.
-    renderizarTelaAtualComDadosAdmin();
-    aplicarDadosAdminClientesEmSegundoPlano(() => {
-      renderizarTelaAtualComDadosAdmin();
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", function () {
-    loadPaidEstablishments();
-  });
-
   // Função para esconder o novidades e mostrar o conteúdo
   function mostrarConteudo() {
     if (novidades) {
@@ -27076,9 +27195,10 @@ ${servicosIniciaisLoja.length ? `
     if (h === "#produtos") { return mostrarProdutosPublicos(); }
     if (h === "#promocoes") { return mostrarPromocoes(); }
     if (h === "#novidades") { return mostrarNovidadesCidadePublicas(); }
+    if (h === "#eventos") { return abrirEventosSobDemanda(); }
     if (h === "#coletalixo" || h === "#menucoletralixo") return montarPaginaColetaLixo();
     if (h === "#jogos") { return mostrarJogos(); }
-    if (h === "#ola-pesca") { return window.mostrarOlaPesca?.(); }
+    if (h === "#ola-pesca") { return abrirOlaPesca(); }
     if (h === "#canos") { return mostrarCanos(); }
     if (h === "#xadrez") { return mostrarXadrez(); }
     if (h === "#grupos") { return mostrarGruposWhatsApp(); }
@@ -27086,7 +27206,7 @@ ${servicosIniciaisLoja.length ? `
     if (h === "#ranking-xadrez") { return mostrarRankingXadrez(); }
     if (h === "#cep") { return mostrarConsultaCEP(); }
     if (h === "#combustivel") { return mostrarCombustivel(); }
-    if (h === "#loterias" || h.startsWith("#loterias-")) { return window.mostrarLoterias?.(h.replace("#loterias-", "").replace("#loterias", "")); }
+    if (h === "#loterias" || h.startsWith("#loterias-")) { return abrirLoteriasSobDemanda(h.replace("#loterias-", "").replace("#loterias", "")); }
     if (h === "#imoveis") { return mostrarImoveisV2(); }
     if (h === "#automoveis" || h === "#veiculos") { return mostrarAutomoveis(); }
     if (h === "#casas-veraneio") { return mostrarCasasVeraneio(); }
@@ -27725,7 +27845,13 @@ ${servicosIniciaisLoja.length ? `
     });
 
     carregar(dataInicial);
-    iniciarMapaClima();
+    carregarLeaflet()
+      .then(() => iniciarMapaClima())
+      .catch((error) => {
+        console.warn("Nao foi possivel carregar o mapa do clima.", error);
+        const status = document.getElementById("climaMapaStatus");
+        if (status) status.textContent = "Mapa indisponivel no momento.";
+      });
   }
 
 
