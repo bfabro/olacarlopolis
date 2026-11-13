@@ -4,7 +4,7 @@ if (typeof tls.getCACertificates === "function" && typeof tls.setDefaultCACertif
   tls.setDefaultCACertificates([...tls.getCACertificates("default"), ...tls.getCACertificates("system")]);
 }
 
-const HEADERS = { "access-control-allow-origin": "*", "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=1800, stale-while-revalidate=3600", "x-content-type-options": "nosniff" };
+const HEADERS = { "access-control-allow-origin": "*", "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=120, stale-while-revalidate=300", "x-content-type-options": "nosniff" };
 const BLS_ICS = "https://www.bls.gov/schedule/news_release/bls.ics";
 const FOMC_URL = "https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm";
 const PUBLIC_CALENDAR = "https://nfs.faireconomy.media/ff_calendar_thisweek.json";
@@ -69,7 +69,7 @@ async function supplementalEvents(now) {
       rows = await response.json(); sourceUrl = PUBLIC_CALENDAR; source = "Forex Factory · exportação pública";
     }
     const selectedLow = /FOMC.*Speaks|Fed.*Speaks|Fed's.*speech|Crude Oil Inventories|Existing Home Sales|Bond Auction|Note Auction|Federal Budget Balance|Retail Sales|Consumer Confidence|Michigan|ISM|PMI|GDP/i;
-    return rows.filter((item) => item.country === "USD" && (item.impact === "High" || item.impact === "Medium" || selectedLow.test(item.title))).map((item) => { const date = new Date(item.date); const rule = supplementalRule(item.title); const importance = item.impact === "High" ? "high" : item.impact === "Medium" ? "medium" : "low"; return { ...toEvent(date, { ...rule, importance }, source, sourceUrl, item.confidence === "official"), detail: "Evento de agenda complementar; confirme horário e resultado na fonte oficial.", calendarType: "supplemental", forecast: item.forecast || null, previous: item.previous || null, actual: item.actual || null, originalTitle: item.title }; }).filter((event) => new Date(event.dateTime) >= new Date(now.getTime() - 6 * 36e5) && new Date(event.dateTime) <= new Date(now.getTime() + 8 * 864e5));
+    return rows.filter((item) => item.country === "USD" && (item.impact === "High" || item.impact === "Medium" || selectedLow.test(item.title))).map((item) => { const date = new Date(item.date); const rule = supplementalRule(item.title); const importance = item.impact === "High" ? "high" : item.impact === "Medium" ? "medium" : "low"; return { ...toEvent(date, { ...rule, importance }, source, sourceUrl, item.confidence === "official"), detail: "Evento de agenda complementar; confirme horário e resultado na fonte oficial.", calendarType: "supplemental", forecast: item.forecast || null, previous: item.previous || null, actual: item.actual || null, originalTitle: item.title }; }).filter((event) => new Date(event.dateTime) >= new Date(now.getTime() - 24 * 36e5) && new Date(event.dateTime) <= new Date(now.getTime() + 8 * 864e5));
   }
   finally { clearTimeout(timeout); }
 }

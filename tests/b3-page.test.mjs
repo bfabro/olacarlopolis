@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=20/); assert.match(html, /b3\.js\?v=20/);
+  assert.match(html, /b3\.css\?v=21/); assert.match(html, /b3\.js\?v=21/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -86,7 +86,7 @@ test("resumo, analise, day trade e contratos recebem leituras explicativas", asy
 test("forca B3 informa horario e day trade avalia o resultado divulgado", async () => {
   const [html, client, css, events] = await Promise.all([read("b3.html"), read("b3.js"), read("b3.css"), read("netlify/functions/b3-us-events.mjs")]);
   assert.match(html, /Última atualização das informações/); assert.match(html, /Automática a cada 60 segundos/); assert.match(css, /strength-update/);
-  assert.match(client, /usEventOutcome/); assert.match(client, /Resultado provavelmente/); assert.match(client, /RESULTADO DIVULGADO/); assert.match(client, /Peso do resultado/); assert.match(css, /event-outcome/);
+  assert.match(client, /usEventOutcome/); assert.match(client, /expectsNumericResult/); assert.match(client, /Resultado provavelmente/); assert.match(client, /RESULTADO DIVULGADO/); assert.match(client, /RESULTADO AGUARDANDO DADO/); assert.match(client, /Peso do resultado/); assert.match(css, /event-outcome\.pending/);
   assert.match(events, /existing\.actual = extra\.actual/); assert.match(css, /\.trade-event strong\{font-size:13px/);
 });
 
