@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=18/); assert.match(html, /b3\.js\?v=18/);
+  assert.match(html, /b3\.css\?v=20/); assert.match(html, /b3\.js\?v=20/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -23,6 +23,7 @@ test("ranking de forca ordena colunas e calcula media dos doze papeis", async ()
   const [html, client] = await Promise.all([read("b3.html"), read("b3.js")]);
   for (const column of ["ticker", "weight", "current", "change", "contribution"]) assert.match(client, new RegExp(`data-strength-column=\\"${column}\\"`));
   assert.match(client, /strengthSort: "weight"/); assert.match(client, /strengthSortDirection: "desc"/); assert.match(client, /renderStrengthAverageChart/);
+  assert.match(client, /const valueFor = \(item\) => state\.strengthSort === "ticker" \? item\.ticker : item\[state\.strengthSort\]/); assert.match(client, /button\.dataset\.strengthSort === "impact" \? "contribution"/);
   assert.match(html, /id="strengthAverageChart"/); assert.match(html, /Índice médio dos 12 papéis/); assert.match(html, /Cada ação vale 1\/12/);
   assert.match(html, /id="strengthAverageSummary"/); assert.match(client, /strength-total-row/); assert.match(client, /peso somado/); assert.match(client, /impacto líquido/);
 });
@@ -85,7 +86,7 @@ test("resumo, analise, day trade e contratos recebem leituras explicativas", asy
 test("forca B3 informa horario e day trade avalia o resultado divulgado", async () => {
   const [html, client, css, events] = await Promise.all([read("b3.html"), read("b3.js"), read("b3.css"), read("netlify/functions/b3-us-events.mjs")]);
   assert.match(html, /Última atualização das informações/); assert.match(html, /Automática a cada 60 segundos/); assert.match(css, /strength-update/);
-  assert.match(client, /usEventOutcome/); assert.match(client, /Resultado provavelmente/); assert.match(client, /Peso do resultado/); assert.match(css, /event-outcome/);
+  assert.match(client, /usEventOutcome/); assert.match(client, /Resultado provavelmente/); assert.match(client, /RESULTADO DIVULGADO/); assert.match(client, /Peso do resultado/); assert.match(css, /event-outcome/);
   assert.match(events, /existing\.actual = extra\.actual/); assert.match(css, /\.trade-event strong\{font-size:13px/);
 });
 
@@ -93,7 +94,7 @@ test("forca B3 compara os doze papeis com a abertura do dia", async () => {
   const [html, client, css, strength] = await Promise.all([read("b3.html"), read("b3.js"), read("b3.css"), read("netlify/functions/b3-strength.mjs")]);
   assert.match(html, /Movimento intradiário dos 12 papéis/); assert.match(html, /id="strengthOpenTable"/); assert.match(html, /Impacto estimado/);
   assert.match(client, /renderStrengthOpenTable/); assert.match(client, /Impacto líquido desde a abertura/); assert.match(client, /openContribution/);
-  assert.match(client, /data-strength-open-column/); assert.match(client, /strengthOpenSortDirection/); assert.match(html, /última cotação disponível, nunca a máxima/);
+  assert.match(client, /data-strength-open-column/); assert.match(client, /strengthOpenSortDirection/); assert.match(client, /\(\(current - open\) \/ open\) \* 100/); assert.doesNotMatch(client, /Math\.abs\(item\.openContribution\)/); assert.match(html, /recalculado diretamente dos dois preços exibidos/);
   assert.match(strength, /changeFromOpen/); assert.match(strength, /openContribution/); assert.match(css, /open-move-table/); assert.match(css, /open-move-head button/);
 });
 
