@@ -1,39 +1,11 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-11-13-b3-market-v1027'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-11-13-loading-v1028'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/clima-story.js',
   '/images/img_padrao_site/logo_1.png',
-  '/images/turismo/ponte.jpg',
-  '/ola-pesca.css',
-  '/ola-pesca.js',
-  '/images/jogos/ola-pesca/peixes-sprites-v2.png',
-  '/images/jogos/ola-pesca/pescador-sprites-v1.png',
-  '/images/jogos/ola-pesca/pescador-sprites-v2.png',
-  '/images/jogos/ola-pesca/pescadores-ficticios-sprites-v1.png',
-  '/images/jogos/ola-pesca/pescador-sprites-v3.png',
-  '/images/jogos/ola-pesca/pescadores-ficticios-sprites-v2.png',
-  '/images/jogos/ola-pesca/pescadores-ficticios-sprites-v3.png',
-  '/images/jogos/ola-pesca/pescadores-referencias-sprites-v2.png',
-  '/images/jogos/ola-pesca/pescadores-mapa1-sprites-v1.png',
-  '/images/jogos/ola-pesca/pescadores-ponte-extras-v77.png',
-  '/images/jogos/ola-pesca/lanchas-sprites-v1.png',
-  '/images/jogos/ola-pesca/tucunare-azulao-v3.png',
-  '/images/jogos/ola-pesca/tucunare-vermelho-v3.png',
-  '/images/jogos/ola-pesca/tucunare-dourado-v13.png',
-  '/images/jogos/ola-pesca/dourado-rio-v50.png',
-  '/images/jogos/ola-pesca/piranha-v54.png',
-  '/images/jogos/ola-pesca/pacu-cd-v54.png',
-  '/images/jogos/ola-pesca/piracanjuba-v73.png',
-  '/casas-veraneio.css',
-  '/loterias.css',
-  '/loterias.js',
-  '/b3.html',
-  '/b3.css',
-  '/b3.js',
   '/images/img_padrao_site/icon-192_2.png',
   '/images/img_padrao_site/icon-512_2.png',
 ];
@@ -90,7 +62,7 @@ self.addEventListener('fetch', (event) => {
 
   // STALE-WHILE-REVALIDATE para arquivos estáticos (css/js/img)
   if (req.destination === 'script' || req.destination === 'style') {
-    event.respondWith(networkFirst(req));
+    event.respondWith(staleWhileRevalidate(req));
     return;
   }
 

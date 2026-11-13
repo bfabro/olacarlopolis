@@ -28498,18 +28498,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // (seu conteúdo original permanece acima)
 
-// ✅ REGISTRO DO SERVICE WORKER
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/service-worker.js?v=962', { updateViaCache: 'none' })
-    .then(reg => {
-      reg.update();
-      console.log('🛡️ Service Worker registrado com sucesso:', reg.scope);
-    })
-    .catch(err => {
-      console.error('❌ Falha ao registrar o Service Worker:', err);
-    });
-}
-
 // ✅ DETECÇÃO DE INSTALAÇÃO DO PWA
 window.addEventListener('appinstalled', () => {
   console.log('✅ PWA instalado detectado');

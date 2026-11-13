@@ -175,10 +175,13 @@
          var loader = document.getElementById('loader');
          if (loader) loader.classList.add('loader-hidden');
       };
-      setTimeout(window.__hideInitialLoader, 1400);
-      window.addEventListener('load', function () {
-         setTimeout(window.__hideInitialLoader, 250);
+      // Libera a interface assim que o HTML e os scripts deferidos terminarem.
+      // Nao espera imagens e outros recursos secundarios baixarem.
+      document.addEventListener('DOMContentLoaded', function () {
+         setTimeout(window.__hideInitialLoader, 100);
       });
+      // Fallback para que uma falha isolada nunca prenda o visitante no loader.
+      setTimeout(window.__hideInitialLoader, 2000);
    </script>
    <div class="container">
       <!-- navbar -->
@@ -1687,18 +1690,11 @@
    <script>
       if ('serviceWorker' in navigator) {
          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js?v=986', { updateViaCache: 'none' })
+            navigator.serviceWorker.register('/service-worker.js?v=1028', { updateViaCache: 'none' })
                .then((reg) => {
-                  reg.update();
                   console.log("✅ Service Worker registrado:", reg.scope);
                })
                .catch((err) => console.error("❌ Falha ao registrar Service Worker:", err));
-         });
-         navigator.serviceWorker.addEventListener('controllerchange', () => {
-            const reloadKey = 'ola_sw_reloaded_v1005';
-            if (sessionStorage.getItem(reloadKey)) return;
-            sessionStorage.setItem(reloadKey, '1');
-            window.location.reload();
          });
       }
    </script>
@@ -1707,7 +1703,7 @@
    <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
    <script defer src="ola-pesca.js?v=109"></script>
-   <script defer src="script.js?v=851"></script>
+   <script defer src="script.js?v=852"></script>
    <script defer src="clima-story.js?v=16"></script>
    <script defer src="loterias.js?v=11"></script>
    <script defer src="item-share.js?v=3"></script>
