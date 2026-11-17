@@ -3123,13 +3123,15 @@ async function loadAllData(onProgress = null) {
   const cadastrosBasicosOverrides = cadastrosBasicosSnap?.exists?.() ? (cadastrosBasicosSnap.val() || {}) : {};
   const fontesCadastrosBasicos = window.FONTES_CADASTROS_BASICOS || {};
   state.cadastrosBasicos = (Array.isArray(window.CADASTROS_BASICOS_PUBLICOS) ? window.CADASTROS_BASICOS_PUBLICOS : [])
-    .map((base) => {
+    .map((base, ordemBase) => {
       const override = cadastrosBasicosOverrides[base.id] || {};
       const tem = (campo) => Object.prototype.hasOwnProperty.call(override, campo);
       return {
         ...base,
         nomeOriginal: base.name,
         name: tem("nome") ? (override.nome || base.name) : base.name,
+        addressOriginal: base.address || "",
+        contactOriginal: base.contact || "",
         address: tem("endereco") ? (override.endereco || "") : (base.address || ""),
         contact: tem("telefone") ? (override.telefone || "") : (base.contact || ""),
         instagram: tem("instagram") ? (override.instagram || "") : (base.instagram || ""),
@@ -3139,6 +3141,8 @@ async function loadAllData(onProgress = null) {
         clienteVinculadoId: override.clienteVinculadoId || "",
         mesclarComId: override.mesclarComId || "",
         fontePublicaUrl: fontesCadastrosBasicos[base.fonte] || "",
+        duplicateHint: base.duplicateHint || null,
+        ordemBase,
         atualizadoEm: override.atualizadoEm || 0,
         overrideSalvo: Boolean(cadastrosBasicosOverrides[base.id])
       };
@@ -13590,7 +13594,72 @@ function basicListingSituation(item = {}) {
   if (item.clienteVinculadoId) return "vinculado";
   if (item.mesclarComId) return "mesclado";
   if (item.status === "inativo") return "inativo";
+  if (item.duplicadoAutomatico) return "descartado";
   return "ativo";
+}
+
+function normalizeBasicListingPhone(value) {
+  let digits = String(value || "").replace(/\D/g, "");
+  if (digits.startsWith("55") && digits.length >= 12) digits = digits.slice(2);
+  return digits.length >= 8 ? digits : "";
+}
+
+function normalizeBasicListingAddress(value) {
+  return String(value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\b(rua|r|avenida|av|rodovia|rod)\b/g, " ")
+    .replace(/\b(centro|carlopolis|parana|pr)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, "")
+    .trim();
+}
+
+function basicListingDuplicateReason(item, existing) {
+  const itemName = normalizeName(item?.name || item?.nome || "");
+  const existingName = normalizeName(existing?.name || existing?.nome || "");
+  if (itemName && itemName === existingName) return "nome";
+
+  const itemPhone = normalizeBasicListingPhone(item?.contact || item?.contato || item?.telefone || "");
+  const existingPhones = new Set(normalizeClientContacts(existing).map(normalizeBasicListingPhone).filter(Boolean));
+  const directPhone = normalizeBasicListingPhone(existing?.contact || existing?.contato || existing?.telefone || "");
+  if (directPhone) existingPhones.add(directPhone);
+  if (itemPhone && existingPhones.has(itemPhone)) return "telefone";
+
+  const itemAddress = normalizeBasicListingAddress(item?.address || item?.endereco || "");
+  const existingAddress = normalizeBasicListingAddress(existing?.address || existing?.endereco || "");
+  return itemAddress.length >= 6 && itemAddress === existingAddress ? "endereco" : "";
+}
+
+function annotateBasicListingDuplicates() {
+  const existing = state.clientes.map((client) => ({ ...client, name: client.nome || client.name || "" }));
+  state.cadastrosBasicos
+    .slice()
+    .sort((a, b) => Number(a.ordemBase || 0) - Number(b.ordemBase || 0))
+    .forEach((item) => {
+      item.duplicadoAutomatico = null;
+      if (item.clienteVinculadoId || item.mesclarComId || item.status === "inativo") return;
+      const conflict = existing
+        .map((entry) => ({ entry, reason: basicListingDuplicateReason(item, entry) }))
+        .find((candidate) => candidate.reason);
+      if (conflict) {
+        item.duplicadoAutomatico = {
+          motivo: conflict.reason,
+          conflitaCom: conflict.entry.name || conflict.entry.nome || "outro cadastro"
+        };
+        return;
+      }
+      const hintedFieldUnchanged = item.duplicateHint?.motivo === "nome"
+        ? normalizeName(item.name) === normalizeName(item.nomeOriginal)
+        : (item.duplicateHint?.motivo === "telefone"
+          ? normalizeBasicListingPhone(item.contact) === normalizeBasicListingPhone(item.contactOriginal)
+          : normalizeBasicListingAddress(item.address) === normalizeBasicListingAddress(item.addressOriginal));
+      if (item.duplicateHint && hintedFieldUnchanged) {
+        item.duplicadoAutomatico = { ...item.duplicateHint };
+        return;
+      }
+      existing.push(item);
+    });
 }
 
 function fillBasicListingAdminSelects(current = null) {
@@ -13711,6 +13780,7 @@ async function saveBasicListingAdmin(event) {
 function renderBasicListingsAdmin() {
   const box = $("basicListingsAdminList");
   if (!box) return;
+  annotateBasicListingDuplicates();
   const queryText = normalizeName($("basicListingsAdminSearch")?.value || "");
   const filter = $("basicListingsAdminFilter")?.value || "todos";
   const activeCount = state.cadastrosBasicos.filter((item) => basicListingSituation(item) === "ativo").length;
@@ -13729,7 +13799,11 @@ function renderBasicListingsAdmin() {
     const mergeTarget = item.mesclarComId ? state.cadastrosBasicos.find((entry) => entry.id === item.mesclarComId) : null;
     const detail = linkedClient
       ? `Vinculado ao cliente completo: ${linkedClient.nome || linkedClient.id}`
-      : (mergeTarget ? `Unido com: ${mergeTarget.name}` : "Perfil público somente com dados básicos");
+      : (mergeTarget
+        ? `Unido com: ${mergeTarget.name}`
+        : (item.duplicadoAutomatico
+          ? `Descartado por ${item.duplicadoAutomatico.motivo}: conflita com ${item.duplicadoAutomatico.conflitaCom}. Edite o dado conflitante para publicar.`
+          : "Perfil público somente com dados básicos"));
     return `<article class="basic-listing-admin-card is-${escapeAttr(situation)}">
       <div class="basic-listing-admin-main">
         <span class="basic-listing-admin-status">${escapeHtml(situation)}</span>

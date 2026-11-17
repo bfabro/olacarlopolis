@@ -21,7 +21,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Padaria", "Panificadora Bom Jesus", "Rua Alfeneiro, 245 - Centro", "(43) 3566-2780", "padarias"],
   ["Padaria", "Edmilson Belizario Santos Panificadora", "Rua Benedito Salles, 881 - Centro", "(43) 3566-1345", "padarias"],
   ["Padaria", "Sonho Doces Panificadora e Confeitaria", "Rua Dra. Paula e Silva, 658 - Centro", "", "padarias"],
-  ["Moveis", "Mercadomoveis", "Rua Benedito Salles, 1232 - Centro", "(42) 3220-6000", "moveis"],
+  ["Moveis", "Mercadomoveis", "Rua Benedito Salles, 1232 - Centro", "(42) 3220-6000", "moveis", "comercio", ["endereco", "Copel"]],
   ["Moveis", "Donizete Aparecido Sanches", "Rua Maria Keder Soares, 91 - Novo Horizonte", "(41) 99819-1165", "moveis"],
   ["Moveis", "Liberatti", "Rua Benedito Salles, 867, Loja B - Centro", "(43) 3566-1898", "moveis"],
   ["Moveis", "D'Almeida's Planejados", "Rua Benedito Salles, 962 - Centro", "(43) 99861-0530", "moveis"],
@@ -42,7 +42,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Estudio De Beleza", "Fernanda Alves Nogueira", "Rua Benedito Salles, 1174", "(43) 3566-1644", "manicure"],
   ["Supermercado", "Bar e Mercearia Tiuman", "Rua Calil Keder, 640", "", "mercados"],
   ["Supermercado", "Joiceley da Silva", "Rua Padre Hugo, 363 D - Jardim Itália", "", "mercados"],
-  ["Supermercado", "Fussako Tsubota e Cia", "Rua Benedito Salles, 341", "", "mercados"],
+  ["Supermercado", "Fussako Tsubota e Cia", "Rua Benedito Salles, 341", "", "mercados", "comercio", ["endereco", "Carreiro"]],
   ["Supermercado", "Karimar Supermercado", "Rua Benedito Salles, 427", "", "mercados"],
   ["Supermercado", "Emporio São Victor Bar e Restaurante", "Rua Marcos Rodrigues do Amaral, 268", "", "mercados"],
   ["Material de Construção", "Irmãos Soldera", "Rua Benedito Salles, 420", "", "construcao"],
@@ -60,7 +60,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Auto Center", "Jeferson Nascimento dos Santos", "Rua Jorge Barros, 872", "(43) 99667-9796", "oficinas"],
   ["Auto Center", "Diego e Benedett", "Rua Joaquim do Carmo Vilela, 02", "", "oficinas"],
   ["Auto Center", "Oficina e Funilaria Damin", "Rua das Industrias, 260", "", "oficinas"],
-  ["Moda e Vestuário", "Gloss", "Rua Benedito Salles, 1132", "(43) 3566-1345", "roupas"],
+  ["Moda e Vestuário", "Gloss", "Rua Benedito Salles, 1132", "(43) 3566-1345", "roupas", "comercio", ["telefone", "Edmilson Belizario Santos Panificadora"]],
   ["Moda e Vestuário", "N&N Confecções", "Rua Padre Hugo, 380", "", "roupas"],
   ["Moda e Vestuário", "Bazar Lima", "Rua Benedito Salles, 1230", "", "roupas"],
   ["Moda e Vestuário", "Yellow Jeans Confecções", "Rua Maria Pereira da Rocha Aleixo, 435", "(43) 3566-2151", "roupas"],
@@ -70,7 +70,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Moda e Vestuário", "Dany Modas", "Rua Benedito Salles, 393", "(43) 3566-1117", "roupas"],
   ["Moda e Vestuário", "Brechó das Amigas", "Avenida Elson Soares, 1012", "(43) 3536-1379", "roupas"],
   ["Moda e Vestuário", "Casa Nova", "Rua Benedito Salles, 1030", "", "roupas"],
-  ["Moda e Vestuário", "Linda Rosa", "Rua Benedito Salles, 583", "(43) 3566-2816", "roupas"],
+  ["Moda e Vestuário", "Linda Rosa", "Rua Benedito Salles, 583", "(43) 3566-2816", "roupas", "comercio", ["endereco", "Otica Visual Center"]],
   ["Moda e Vestuário", "Fios e Acessórios", "Praça Coronel Leite, 28", "", "roupas"],
   ["Moda e Vestuário", "Tropicalia Espaço da Mulher", "Rua Benedito Salles, 848", "(43) 3566-1089", "roupas"],
   ["Moda e Vestuário", "Loja da Eliane", "Rua Benedito Salles, 961", "", "roupas"],
@@ -107,7 +107,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
 
   ["Lanchonete", "Jose Gotardi", "Rua Ataliba Leonel, 424 - Centro", "", "lanchonetes"],
   ["Lanchonete", "Cassia Yamamoto", "Rua Laurindo Franco de Godoy, 427 - Centro", "(43) 3566-2481", "lanchonetes"],
-  ["Lanchonete", "O Casarão Pizzaria e Hamburgueria", "Rua Benedito Salles, 1340 - Centro", "(43) 3566-1843", "lanchonetes"],
+  ["Lanchonete", "O Casarão Pizzaria e Hamburgueria", "Rua Benedito Salles, 1340 - Centro", "(43) 3566-1843", "lanchonetes", "comercio", ["endereco", "O Casarao"]],
   ["Lanchonete", "Eryck Diegho Salles e Silva", "Avenida Elson Soares, 756 - Centro", "(43) 99695-0911", "lanchonetes"],
   ["Lanchonete", "Tiago Kendi Nagaki", "Ilha do Ponciano, s/n - Jaboticabal", "(43) 99669-7299", "lanchonetes"],
   ["Lanchonete", "Luiz Carlos da Silva", "Rua Laurindo Franco de Godoy, 453 - Centro", "(43) 99976-7449", "lanchonetes"],
@@ -119,8 +119,8 @@ window.CADASTROS_BASICOS_PUBLICOS = [
 
   ["Restaurante", "Paiva's", "Rua Adorema Ana Rech, 546 - Jardim Primavera", "(43) 99821-7607", "bares"],
   ["Restaurante", "Maria Aparecida Pacheco", "Rua Edwirges Benedito do Amaral, 00 - Bela Vista", "(43) 99195-3748", "bares"],
-  ["Restaurante", "Luciane Marques dos Santos", "Chácara São Domingues, s/n - Jaboticabal", "(43) 3566-1345", "bares"]
-].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio"]) => {
+  ["Restaurante", "Luciane Marques dos Santos", "Chácara São Domingues, s/n - Jaboticabal", "(43) 3566-1345", "bares", "comercio", ["telefone", "Edmilson Belizario Santos Panificadora"]]
+].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
     .normalize("NFD")
@@ -134,6 +134,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
     address,
     contact,
     fonte,
-    tipoCliente
+    tipoCliente,
+    duplicateHint: duplicateHint ? { motivo: duplicateHint[0], conflitaCom: duplicateHint[1] } : null
   };
 });

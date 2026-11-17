@@ -13289,6 +13289,7 @@ button.admin-button-loading::after {
 
 .basic-listing-admin-card.is-vinculado { border-left-color: #2563eb; }
 .basic-listing-admin-card.is-mesclado { border-left-color: #7c3aed; }
+.basic-listing-admin-card.is-descartado { border-left-color: #dc2626; background: #fffafa; }
 .basic-listing-admin-card.is-inativo { border-left-color: #94a3b8; opacity: .78; }
 .basic-listing-admin-main h3 { margin: 4px 0; }
 .basic-listing-admin-main p { margin: 3px 0; color: #475569; }
@@ -13306,6 +13307,7 @@ button.admin-button-loading::after {
 
 .is-vinculado .basic-listing-admin-status { background: #eff6ff; color: #1d4ed8; }
 .is-mesclado .basic-listing-admin-status { background: #f5f3ff; color: #6d28d9; }
+.is-descartado .basic-listing-admin-status { background: #fef2f2; color: #b91c1c; }
 .is-inativo .basic-listing-admin-status { background: #f1f5f9; color: #64748b; }
 .basic-listing-admin-actions { display: flex; flex: 0 0 auto; gap: 8px; }
 .basic-listing-admin-actions a { text-decoration: none; }
