@@ -29,7 +29,11 @@ window.FONTES_CADASTROS_BASICOS = {
   transportadoras: "https://www.solutudo.com.br/empresas/pr/carlopolis/transportadoras",
   academias: "https://www.solutudo.com.br/empresas/pr/carlopolis/academias/academia-corpo-e-mente-22171824",
   perfumarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/busca?q=loja+de+cremes",
-  postos: "https://www.solutudo.com.br/empresas/pr/carlopolis/postos%2Be%2Bconveniencias?mais_buscadas=1&pagina=1"
+  postos: "https://www.solutudo.com.br/empresas/pr/carlopolis/postos%2Be%2Bconveniencias?mais_buscadas=1&pagina=1",
+  acougues: "https://www.solutudo.com.br/empresas/pr/carlopolis/acougues",
+  racoes: "https://www.solutudo.com.br/empresas/pr/carlopolis/casas%2Bde%2Bracao",
+  contabilidade: "https://www.solutudo.com.br/empresas/pr/carlopolis/contabilidade",
+  gas: "https://www.solutudo.com.br/empresas/pr/carlopolis/gas"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -261,7 +265,34 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Transportadora", "Frunort Transportes Ltda", "Sítio Frunort, s/n - Matão", "(43) 9648-0633", "transportadoras", "servico"],
   ["Transportadora", "M O Bueno & Cia Ltda", "Rua Benedito Salles, 615 - Centro", "(43) 9985-6935", "transportadoras", "servico"],
   ["Transportadora", "Rocha Carlopolense Produtos e Transportes", "Rua Luiz Carlos Consolmagno, 540 - Parque Industrial Jorge Leite da Rosa", "(43) 3566-1324", "transportadoras", "servico"],
-  ["Transportadora", "L B Transportes", "Rua Joaquim do Carmo Vilela, 128 - Centro", "(43) 9134-7471", "transportadoras", "servico"]
+  ["Transportadora", "L B Transportes", "Rua Joaquim do Carmo Vilela, 128 - Centro", "(43) 9134-7471", "transportadoras", "servico"],
+
+  ["Açougue", "Aparecido Carlos de Camargo Carlópolis", "Rua Quaresmeira Roxa, 295 - Vista Alegre", "(43) 3566-2481", "acougues"],
+  ["Açougue", "B. Aparecido de Azevedo Açougue", "Rua Benedito Salles, 1124 - Centro", "", "acougues"],
+  ["Açougue", "Discaluz Gourmet", "Rua Kalil Keder, 680 - Centro", "(43) 3566-1706", "acougues"],
+  ["Açougue", "Casa de Carnes Rildo Ltda", "Rua Kalil Keder, 680 - Centro", "(43) 3566-1345", "acougues"],
+  ["Açougue", "Carlito de Natal Camargo - Açougue", "Rua Benedito Salles, 409 - Centro", "(43) 3566-1345", "acougues"],
+  ["Açougue", "C. N. Camargo & Camargo Ltda", "Rua Benedito Salles, 409 - Centro", "", "acougues"],
+  ["Açougue", "Elaine Agostinho da Silva Souza - Carlópolis", "Rua Benedito Salles, 929 - Centro", "", "acougues"],
+
+  ["Casa de Ração", "C. F. V. Agropecuária Ltda", "Rua Jorge Barros, 861 - Centro", "(43) 3566-1324", "racoes"],
+  ["Casa de Ração", "Hudson Ivasita Ltda", "Avenida Elson Soares, 747 - Centro", "(43) 99181-1268", "racoes"],
+  ["Casa de Ração", "Mariangela Dognani Bernardo Gonçalves Ivasita", "Rua Jorge de Barros, 1586 - Centro", "(43) 99180-7968", "racoes"],
+  ["Casa de Ração", "Setti Alimentos Limitada", "Rua Marcos Rodrigues do Amaral, 248", "", "racoes", "comercio", ["fonte", "cadastro identificado como falido"]],
+  ["Casa de Ração", "Jorge Ivasita", "Rua Kalil Keder, 670 - Centro", "(43) 99911-1707", "racoes"],
+
+  ["Contabilidade", "DBM - Estratégia Contábil", "Rua Elídia Maria de Jesus, 97 - Vista Bella", "(43) 98853-9624", "contabilidade", "servico"],
+  ["Contabilidade", "Jusselete Escritório de Contabilidade", "Avenida Elson Soares, 1134 - Centro", "(43) 99651-0142", "contabilidade", "servico"],
+  ["Contabilidade", "Marcia Cristina Spirandio", "Rua Padre Hugo, 398 - Centro", "(43) 3566-2422", "contabilidade", "servico"],
+  ["Contabilidade", "Orgacentro Organizações Contábeis Ltda", "Rua Dra. Paula e Silva, 665 - Centro", "(43) 3566-1345", "contabilidade", "servico"],
+
+  ["Gás", "Nassar Comércio de Gás Ltda", "Rua Jorge de Barros, 903 - Centro", "", "gas"],
+  ["Gás", "Sebastião Agostinho Torres", "Rua Alfeneiros, 408 - Vista Alegre", "(41) 99576-5545", "gas"],
+  ["Gás", "Cristiano de Almeida Paula", "Rua Kalil Keder, 910 - Centro", "(43) 3566-2761", "gas"],
+  ["Gás", "Distribuidora Rodrigues Ltda", "Avenida Murador, 50 - Murador", "(43) 99603-3777", "gas"],
+  ["Gás", "Michel de Abreu Carriel Prestadora de Serviços", "Rua Napoles, 68 - Residencial Italia II", "(43) 3566-2744", "gas"],
+  ["Gás", "Rogerio Cater Souza - Carlópolis", "Avenida Elson Soares, 1048 A - Centro", "(43) 3566-1345", "gas"],
+  ["Gás", "Dirceu Ito de Oliveira", "Rua Chuva de Ouro, 184 - Jardim Vista Alegre", "(43) 99192-9235", "gas"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
