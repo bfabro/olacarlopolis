@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=23/); assert.match(html, /b3\.js\?v=23/);
+  assert.match(html, /b3\.css\?v=24/); assert.match(html, /b3\.js\?v=24/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -65,6 +65,18 @@ test("bolsas permitem escolher periodo e intervalo personalizado", async () => {
   for (const period of ["1d", "5d", "1mo", "3mo", "6mo", "1y"]) assert.match(html, new RegExp(`data-index-period="${period}"`));
   assert.match(html, /id="indexDateFrom"/); assert.match(html, /id="indexDateTo"/); assert.match(client, /loadIndexPeriod/); assert.match(client, /Cotação.*data\.marketTime/);
   assert.match(series, /const PERIODS/); assert.match(series, /period1=/); assert.match(series, /interval=\$\{encodeURIComponent\(interval\)\}/); assert.match(css, /index-period-toolbar/);
+});
+
+test("bolsas usam linhas finas e identificam todos os pregoes no eixo", async () => {
+  const [client, css] = await Promise.all([read("b3.js"), read("b3.css")]);
+  assert.match(client, /lineWidth: 1\.35/); assert.match(client, /const tickDates = options\.intraday/); assert.match(client, /: dates;/);
+  assert.match(client, /class="chart-scroll"/); assert.match(css, /\.chart-scroll/);
+});
+
+test("noticias priorizam o dia atual e atualizam a cada cinco minutos", async () => {
+  const [html, client, news] = await Promise.all([read("b3.html"), read("b3.js"), read("netlify/functions/b3-news.mjs")]);
+  assert.match(news, /when:1d/); assert.match(news, /CORPORATE_QUERY/); assert.match(news, /MARKET_QUERY/); assert.match(news, /todayCount/); assert.match(news, /36 \* 36e5/);
+  assert.match(client, /newsTodayCount/); assert.match(client, /automática a cada 5 min/); assert.match(client, /300000/); assert.match(html, /Relevantes de hoje/);
 });
 
 test("noticias cronologicas, alertas intradiarios e influencia externa atualizavel", async () => {
