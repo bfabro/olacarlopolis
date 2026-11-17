@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=637">
+  <link rel="stylesheet" href="painel.css?v=638">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -82,6 +82,7 @@
           <span class="nav-admin-group-title"><i class="fa-solid fa-database"></i> Cadastros</span>
           <button data-view="categorias" data-role="staff"><i class="fa-solid fa-layer-group"></i> Categorias</button>
           <button data-view="clientes" data-role="staff"><i class="fa-solid fa-store"></i> Clientes</button>
+          <button data-view="cadastrosBasicos" data-master="true"><i class="fa-solid fa-address-card"></i> Cadastros básicos</button>
           <button data-view="usuarios" data-role="staff"><i class="fa-solid fa-users-gear"></i> Usuários</button>
         </section>
         <section class="nav-admin-group nav-theme-content" data-role="staff">
@@ -1522,6 +1523,58 @@
 
       <section id="produtosServicosClientesView" class="panel-view hidden">
         <div id="staffCatalogMount" class="staff-promos-view"></div>
+      </section>
+
+      <section id="cadastrosBasicosView" class="panel-view hidden" data-master="true">
+        <section class="panel-card basic-listings-admin-hero">
+          <div>
+            <span><i class="fa-solid fa-address-card"></i> Diretório público</span>
+            <h2>Cadastros básicos sem usuário</h2>
+            <p>Corrija os dados públicos, desative uma ficha ou una nomes diferentes que pertencem ao mesmo estabelecimento.</p>
+          </div>
+          <strong id="basicListingsAdminCount">0 ativos</strong>
+        </section>
+
+        <section id="basicListingFormCard" class="panel-card form-collapsed">
+          <div class="section-head">
+            <div><h2 id="basicListingFormTitle">Editar cadastro básico</h2><p>As alterações ficam no Firebase e aparecem no site público.</p></div>
+            <button id="closeBasicListingForm" class="ghost-button hidden" type="button"><i class="fa-solid fa-xmark"></i> Fechar</button>
+          </div>
+          <form id="basicListingForm" class="grid-form">
+            <input id="basicListingId" type="hidden">
+            <label>Nome público<input id="basicListingName" required maxlength="160"></label>
+            <label>Categoria<input id="basicListingCategory" required list="basicListingCategoryOptions" maxlength="80"><datalist id="basicListingCategoryOptions"></datalist></label>
+            <label>Tipo
+              <select id="basicListingType"><option value="comercio">Comércio</option><option value="servico">Serviço</option></select>
+            </label>
+            <label>Status
+              <select id="basicListingStatus"><option value="ativo">Ativo</option><option value="inativo">Inativo</option></select>
+            </label>
+            <label>Telefone<input id="basicListingPhone" maxlength="40" placeholder="(43) 99999-9999"></label>
+            <label>Instagram<input id="basicListingInstagram" maxlength="180" placeholder="https://instagram.com/..."></label>
+            <label class="wide">Endereço<input id="basicListingAddress" maxlength="240"></label>
+            <label class="wide">Este cadastro é o mesmo que um cliente completo
+              <select id="basicListingLinkedClient"><option value="">Não vincular a cliente</option></select>
+              <small>Ao vincular, a ficha básica deixa de aparecer e o cliente completo assume as pesquisas pelo nome antigo.</small>
+            </label>
+            <label class="wide">Unir com outro cadastro básico
+              <select id="basicListingMergeTarget"><option value="">Não unir</option></select>
+              <small>Use quando dois nomes da lista representam o mesmo comércio ou prestador. A ficha atual será ocultada.</small>
+            </label>
+            <div class="form-actions wide">
+              <button type="submit"><i class="fa-solid fa-floppy-disk"></i> Salvar alterações</button>
+              <button id="cancelBasicListingEdit" class="ghost-button" type="button">Cancelar</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel-card">
+          <div class="basic-listings-admin-toolbar">
+            <label><i class="fa-solid fa-magnifying-glass"></i><input id="basicListingsAdminSearch" placeholder="Pesquisar nome, telefone, endereço ou categoria"></label>
+            <select id="basicListingsAdminFilter"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="vinculado">Vinculados</option><option value="mesclado">Unidos</option><option value="inativo">Inativos</option></select>
+          </div>
+          <div id="basicListingsAdminList" class="basic-listings-admin-list"></div>
+        </section>
       </section>
 
       <section id="categoriasView" class="panel-view hidden">
@@ -3601,6 +3654,7 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script type="module" src="painel.js?v=947"></script>
+  <script src="../basic-listings.js?v=3"></script>
+  <script type="module" src="painel.js?v=948"></script>
 </body>
 </html>

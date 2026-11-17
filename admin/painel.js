@@ -304,6 +304,7 @@ let state = {
   notasFalecimento: [],
   gruposWhatsapp: [],
   categorias: [],
+  cadastrosBasicos: [],
   pagamentoSistema: {},
   integracaoPagamento: { config: {}, charges: [], events: [], loaded: false },
   paginaInicialSite: {},
@@ -917,6 +918,7 @@ const views = {
   artesPostagem: $("artesPostagemView"),
   encartes: $("encartesView"),
   clientes: $("clientesView"),
+  cadastrosBasicos: $("cadastrosBasicosView"),
   acompanhamentoClientes: $("acompanhamentoClientesView"),
   promocoesClientes: $("promocoesClientesView"),
   produtosServicosClientes: $("produtosServicosClientesView"),
@@ -958,6 +960,7 @@ const viewCopy = {
   artesPostagem: ["Central de postagens", "Crie artes com dados reais de novidades, comércios, produtos, promoções e serviços."],
   encartes: ["Gerar encarte", "Monte encartes de produtos e promoções com até 10 itens e seis opções de layout."],
   clientes: ["Clientes", "Cadastre e edite os dados comerciais."],
+  cadastrosBasicos: ["Cadastros básicos", "Edite, desative ou una fichas públicas que não possuem usuário."],
   acompanhamentoClientes: ["Acompanhamento de clientes", "Organize postagens, acessos, visitas e próximos passos de cada cliente."],
   promocoesClientes: ["Promocoes", "Cadastre e ajuste promocoes em nome dos clientes."],
   produtosServicosClientes: ["Produtos e serviços", "Acesse diretamente as vitrines e os atendimentos cadastrados por cliente."],
@@ -1367,6 +1370,7 @@ function canAccessView(viewName) {
   if (viewName === "relatorioExclusoes") return isMaster();
   if (viewName === "acompanhamentoClientes") return isMaster();
   if (viewName === "gestaoTerrenos") return isMaster();
+  if (viewName === "cadastrosBasicos") return isMaster();
   if (viewName === "dashboard") return canManageClients();
   if (viewName === "eventos") return canManageClients() || hasPermission("eventos");
   if (viewName === "combustiveisPrecos") return canManageClients() || hasPermission("combustiveis_precos");
@@ -3030,6 +3034,7 @@ async function loadAllData(onProgress = null) {
     automoveisSnap,
     casasVeraneioSnap,
     categoriasSnap,
+    cadastrosBasicosSnap,
     notasFalecimentoSnap,
     gruposWhatsappSnap,
     pagamentoSnap,
@@ -3076,6 +3081,7 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("conteudosInformativos/automoveis"),
     getPanelSnapshot("conteudosInformativos/casasVeraneio"),
     getPanelSnapshot("categorias"),
+    getPanelSnapshot("cadastrosBasicos", { enabled: isMaster() }),
     getPanelSnapshot("conteudosInformativos/notaFalecimento"),
     getPanelSnapshot("conteudosInformativos/gruposWhatsapp"),
     getPanelSnapshot("configuracoes/pagamento"),
@@ -3113,6 +3119,31 @@ async function loadAllData(onProgress = null) {
     getPanelSnapshot("instalacoesPWA", { enabled: false }),
     getPanelSnapshot("usoPWA", { enabled: false })
   ]);
+
+  const cadastrosBasicosOverrides = cadastrosBasicosSnap?.exists?.() ? (cadastrosBasicosSnap.val() || {}) : {};
+  const fontesCadastrosBasicos = window.FONTES_CADASTROS_BASICOS || {};
+  state.cadastrosBasicos = (Array.isArray(window.CADASTROS_BASICOS_PUBLICOS) ? window.CADASTROS_BASICOS_PUBLICOS : [])
+    .map((base) => {
+      const override = cadastrosBasicosOverrides[base.id] || {};
+      const tem = (campo) => Object.prototype.hasOwnProperty.call(override, campo);
+      return {
+        ...base,
+        nomeOriginal: base.name,
+        name: tem("nome") ? (override.nome || base.name) : base.name,
+        address: tem("endereco") ? (override.endereco || "") : (base.address || ""),
+        contact: tem("telefone") ? (override.telefone || "") : (base.contact || ""),
+        instagram: tem("instagram") ? (override.instagram || "") : (base.instagram || ""),
+        categoria: override.categoria || base.categoria,
+        tipoCliente: override.tipoCliente || base.tipoCliente || "comercio",
+        status: override.status || "ativo",
+        clienteVinculadoId: override.clienteVinculadoId || "",
+        mesclarComId: override.mesclarComId || "",
+        fontePublicaUrl: fontesCadastrosBasicos[base.fonte] || "",
+        atualizadoEm: override.atualizadoEm || 0,
+        overrideSalvo: Boolean(cadastrosBasicosOverrides[base.id])
+      };
+    })
+    .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "pt-BR"));
   const noticiasSnap = await getPanelSnapshot("noticias");
 
   progress(58, "Organizando clientes e acessos...");
@@ -3346,6 +3377,7 @@ async function loadAllData(onProgress = null) {
   renderStats();
   renderTerrainManagement();
   renderClientsList();
+  renderBasicListingsAdmin();
   renderUsersList();
   if (isMaster()) renderClientWorkflow();
   renderCategoriesList();
@@ -10419,6 +10451,7 @@ function switchView(name) {
   if (target === "encartes") renderFlyerView();
   if (target === "faturas") renderClientInvoices();
   if (target === "pagamentoSistema") renderPaymentSettings();
+  if (target === "cadastrosBasicos") renderBasicListingsAdmin();
   if (target === "acompanhamentoClientes") {
     renderClientWorkflow();
     loadAuditLogs().then(renderClientWorkflow);
@@ -13551,6 +13584,167 @@ function fillCategoryParentSelect(selectedId = "") {
     .filter((cat) => cat.id !== currentId && !cat.parentId && cat.status !== "inativo")
     .map((cat) => `<option value="${escapeAttr(cat.id)}" ${cat.id === selectedId ? "selected" : ""}>${escapeHtml(cat.nome || cat.id)}</option>`);
   select.innerHTML = `<option value="">Categoria principal</option>` + options.join("");
+}
+
+function basicListingSituation(item = {}) {
+  if (item.clienteVinculadoId) return "vinculado";
+  if (item.mesclarComId) return "mesclado";
+  if (item.status === "inativo") return "inativo";
+  return "ativo";
+}
+
+function fillBasicListingAdminSelects(current = null) {
+  const categoryOptions = $("basicListingCategoryOptions");
+  if (categoryOptions) {
+    const names = new Set([
+      ...state.categorias.map((item) => item.nome || item.title || item.id),
+      ...state.cadastrosBasicos.map((item) => item.categoria)
+    ].filter(Boolean));
+    categoryOptions.innerHTML = [...names]
+      .sort((a, b) => String(a).localeCompare(String(b), "pt-BR"))
+      .map((name) => `<option value="${escapeAttr(name)}"></option>`)
+      .join("");
+  }
+
+  const clientSelect = $("basicListingLinkedClient");
+  if (clientSelect) {
+    clientSelect.innerHTML = `<option value="">Não vincular a cliente</option>` + state.clientes
+      .slice()
+      .sort((a, b) => String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"))
+      .map((client) => `<option value="${escapeAttr(client.id)}">${escapeHtml(client.nome || client.id)} — ${escapeHtml(client.categoria || "Sem categoria")}</option>`)
+      .join("");
+    clientSelect.value = current?.clienteVinculadoId || "";
+  }
+
+  const mergeSelect = $("basicListingMergeTarget");
+  if (mergeSelect) {
+    mergeSelect.innerHTML = `<option value="">Não unir</option>` + state.cadastrosBasicos
+      .filter((item) => item.id !== current?.id && basicListingSituation(item) !== "mesclado")
+      .map((item) => `<option value="${escapeAttr(item.id)}">${escapeHtml(item.name)} — ${escapeHtml(item.categoria || "Sem categoria")}</option>`)
+      .join("");
+    mergeSelect.value = current?.mesclarComId || "";
+  }
+}
+
+function resetBasicListingAdminForm() {
+  const form = $("basicListingForm");
+  if (!form) return;
+  form.reset();
+  $("basicListingId").value = "";
+  fillBasicListingAdminSelects();
+  setFormCardOpen("basicListingForm", false);
+  $("closeBasicListingForm")?.classList.add("hidden");
+}
+
+function openBasicListingAdminEditor(id) {
+  const item = state.cadastrosBasicos.find((entry) => entry.id === id);
+  if (!item) return;
+  $("basicListingId").value = item.id;
+  $("basicListingName").value = item.name || "";
+  $("basicListingCategory").value = item.categoria || "";
+  $("basicListingType").value = item.tipoCliente || "comercio";
+  $("basicListingStatus").value = item.status || "ativo";
+  $("basicListingPhone").value = item.contact || "";
+  $("basicListingInstagram").value = item.instagram || "";
+  $("basicListingAddress").value = item.address || "";
+  fillBasicListingAdminSelects(item);
+  $("basicListingFormTitle").textContent = `Editar: ${item.name}`;
+  $("closeBasicListingForm")?.classList.remove("hidden");
+  openFormForEdit("basicListingForm");
+  $("basicListingName")?.focus();
+}
+
+async function saveBasicListingAdmin(event) {
+  event.preventDefault();
+  if (!isMaster()) return showToast("Somente o master pode editar cadastros básicos.");
+  const id = $("basicListingId").value;
+  const item = state.cadastrosBasicos.find((entry) => entry.id === id);
+  if (!item) return showToast("Cadastro básico não encontrado.");
+  const button = event.submitter || event.currentTarget.querySelector("button[type='submit']");
+  const clienteVinculadoId = $("basicListingLinkedClient").value;
+  const mesclarComId = clienteVinculadoId ? "" : $("basicListingMergeTarget").value;
+  const payload = {
+    nome: $("basicListingName").value.trim(),
+    nomeOriginal: item.nomeOriginal || item.name || "",
+    categoria: $("basicListingCategory").value.trim(),
+    tipoCliente: $("basicListingType").value,
+    status: $("basicListingStatus").value,
+    telefone: $("basicListingPhone").value.trim(),
+    endereco: $("basicListingAddress").value.trim(),
+    instagram: $("basicListingInstagram").value.trim(),
+    clienteVinculadoId,
+    mesclarComId,
+    fontePublicaUrl: item.fontePublicaUrl || "",
+    atualizadoEm: serverTimestamp(),
+    atualizadoPor: state.user?.uid || ""
+  };
+  if (!payload.nome || !payload.categoria) return showToast("Informe nome e categoria.");
+  setBusy(button, true, "Salvando...");
+  try {
+    await firebaseSet(ref(db, `cadastrosBasicos/${id}`), payload);
+    Object.assign(item, {
+      name: payload.nome,
+      categoria: payload.categoria,
+      tipoCliente: payload.tipoCliente,
+      status: payload.status,
+      contact: payload.telefone,
+      address: payload.endereco,
+      instagram: payload.instagram,
+      clienteVinculadoId,
+      mesclarComId,
+      overrideSalvo: true,
+      atualizadoEm: Date.now()
+    });
+    await registrarLogAuditoria("update", "Cadastros básicos", `Cadastro básico atualizado: ${payload.nome}`, `cadastrosBasicos/${id}`);
+    state.cadastrosBasicos.sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "pt-BR"));
+    renderBasicListingsAdmin();
+    resetBasicListingAdminForm();
+    showToast(clienteVinculadoId ? "Cadastro vinculado ao cliente completo." : (mesclarComId ? "Cadastros unidos com sucesso." : "Cadastro básico atualizado."));
+  } catch (error) {
+    console.error("Falha ao salvar cadastro básico.", error);
+    showToast("Não foi possível salvar o cadastro básico.");
+  } finally {
+    setBusy(button, false);
+  }
+}
+
+function renderBasicListingsAdmin() {
+  const box = $("basicListingsAdminList");
+  if (!box) return;
+  const queryText = normalizeName($("basicListingsAdminSearch")?.value || "");
+  const filter = $("basicListingsAdminFilter")?.value || "todos";
+  const activeCount = state.cadastrosBasicos.filter((item) => basicListingSituation(item) === "ativo").length;
+  if ($("basicListingsAdminCount")) $("basicListingsAdminCount").textContent = `${activeCount} ativos de ${state.cadastrosBasicos.length}`;
+  fillBasicListingAdminSelects(state.cadastrosBasicos.find((item) => item.id === $("basicListingId")?.value));
+  const filtered = state.cadastrosBasicos.filter((item) => {
+    const situation = basicListingSituation(item);
+    if (filter !== "todos" && situation !== filter) return false;
+    if (!queryText) return true;
+    return normalizeName(`${item.name} ${item.nomeOriginal} ${item.categoria} ${item.contact} ${item.address}`).includes(queryText);
+  });
+
+  box.innerHTML = filtered.length ? filtered.map((item) => {
+    const situation = basicListingSituation(item);
+    const linkedClient = item.clienteVinculadoId ? state.clientes.find((client) => client.id === item.clienteVinculadoId) : null;
+    const mergeTarget = item.mesclarComId ? state.cadastrosBasicos.find((entry) => entry.id === item.mesclarComId) : null;
+    const detail = linkedClient
+      ? `Vinculado ao cliente completo: ${linkedClient.nome || linkedClient.id}`
+      : (mergeTarget ? `Unido com: ${mergeTarget.name}` : "Perfil público somente com dados básicos");
+    return `<article class="basic-listing-admin-card is-${escapeAttr(situation)}">
+      <div class="basic-listing-admin-main">
+        <span class="basic-listing-admin-status">${escapeHtml(situation)}</span>
+        <h3>${escapeHtml(item.name)}</h3>
+        ${item.name !== item.nomeOriginal ? `<small>Nome original da fonte: ${escapeHtml(item.nomeOriginal)}</small>` : ""}
+        <p><strong>${escapeHtml(item.categoria || "Sem categoria")}</strong> · ${escapeHtml(item.tipoCliente === "servico" ? "Serviço" : "Comércio")}</p>
+        <p>${escapeHtml(item.contact || "Sem telefone")} · ${escapeHtml(item.address || "Sem endereço")}</p>
+        <small>${escapeHtml(detail)}</small>
+      </div>
+      <div class="basic-listing-admin-actions">
+        ${item.fontePublicaUrl ? `<a class="ghost-button" href="${escapeAttr(item.fontePublicaUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Fonte</a>` : ""}
+        <button type="button" data-basic-listing-edit="${escapeAttr(item.id)}"><i class="fa-solid fa-pen"></i> Editar</button>
+      </div>
+    </article>`;
+  }).join("") : `<div class="list-meta">Nenhum cadastro básico encontrado com esse filtro.</div>`;
 }
 
 function resetCategoryForm() {
@@ -31087,6 +31281,21 @@ function bindEvents() {
   $("acompanhamentoClientesView")?.addEventListener("change", (event) => {
     const select = event.target.closest("[data-client-workflow-status]");
     if (select) updateClientWorkflowTaskStatus(select.dataset.clientWorkflowStatus, select.value);
+  });
+  $("basicListingForm")?.addEventListener("submit", saveBasicListingAdmin);
+  $("closeBasicListingForm")?.addEventListener("click", resetBasicListingAdminForm);
+  $("cancelBasicListingEdit")?.addEventListener("click", resetBasicListingAdminForm);
+  $("basicListingsAdminSearch")?.addEventListener("input", renderBasicListingsAdmin);
+  $("basicListingsAdminFilter")?.addEventListener("change", renderBasicListingsAdmin);
+  $("basicListingsAdminList")?.addEventListener("click", (event) => {
+    const button = event.target.closest("[data-basic-listing-edit]");
+    if (button) openBasicListingAdminEditor(button.dataset.basicListingEdit);
+  });
+  $("basicListingLinkedClient")?.addEventListener("change", (event) => {
+    if (event.target.value && $("basicListingMergeTarget")) $("basicListingMergeTarget").value = "";
+  });
+  $("basicListingMergeTarget")?.addEventListener("change", (event) => {
+    if (event.target.value && $("basicListingLinkedClient")) $("basicListingLinkedClient").value = "";
   });
   $("newUserButton")?.addEventListener("click", () => {
     resetUserForm();

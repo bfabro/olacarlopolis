@@ -571,6 +571,14 @@
       ".write": false
     },
 
+    "cadastrosBasicos": {
+      ".read": true,
+      ".write": "auth != null && root.child('usuariosByUid').child(auth.uid).child('role').val() === 'master'",
+      "$cadastroId": {
+        ".validate": "!newData.exists() || (newData.hasChildren(['nome', 'nomeOriginal', 'categoria', 'tipoCliente', 'status', 'telefone', 'endereco', 'instagram', 'clienteVinculadoId', 'mesclarComId']) && newData.child('nome').isString() && newData.child('nomeOriginal').isString() && newData.child('categoria').isString() && (newData.child('tipoCliente').val() === 'comercio' || newData.child('tipoCliente').val() === 'servico') && (newData.child('status').val() === 'ativo' || newData.child('status').val() === 'inativo') && newData.child('telefone').isString() && newData.child('endereco').isString() && newData.child('instagram').isString() && newData.child('clienteVinculadoId').isString() && newData.child('mesclarComId').isString())"
+      }
+    },
+
     "$other": {
       ".read": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'onlineUserHistory' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente' && $other !== 'studioFeatureFlags' && $other !== 'studioProjects' && $other !== 'studioJobs' && $other !== 'studioUsage' && $other !== 'studioCredits' && $other !== 'studioCreditLedger' && $other !== 'studioAdminCosts'",
       ".write": "$other !== 'jogos' && $other !== 'acompanhamentoClientes' && $other !== 'combustiveisLinks' && $other !== 'combustiveisHistorico' && $other !== 'eventos' && $other !== 'beneficiosParceiros' && $other !== 'beneficiosUtilizacoes' && $other !== 'beneficiosSolicitacoes' && $other !== 'beneficiosSolicitacoesPorCliente' && $other !== 'beneficiosDuvidas' && $other !== 'beneficiosDuvidasPorCliente' && $other !== 'beneficiosNotificacoesParceiro' && $other !== 'beneficiosNotificacoesCliente' && $other !== 'studioFeatureFlags' && $other !== 'studioProjects' && $other !== 'studioJobs' && $other !== 'studioUsage' && $other !== 'studioCredits' && $other !== 'studioCreditLedger' && $other !== 'studioAdminCosts'"

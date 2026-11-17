@@ -24035,6 +24035,168 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     ];
 
+  function normalizarTelefoneCadastroBasicoPublico(valor) {
+    let digitos = somenteDigitos(valor || "");
+    if (digitos.startsWith("55") && digitos.length >= 12) digitos = digitos.slice(2);
+    return digitos.length >= 8 ? digitos : "";
+  }
+
+  function normalizarEnderecoCadastroBasicoPublico(valor) {
+    return String(valor || "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/\b(rua|r|avenida|av|rodovia|rod)\b/g, " ")
+      .replace(/\b(centro|carlopolis|parana|pr)\b/g, " ")
+      .replace(/[^a-z0-9]+/g, "")
+      .trim();
+  }
+
+  function motivoDuplicidadeCadastroBasico(cadastro, estabelecimento) {
+    const nomeCadastro = normalizeName(cadastro?.name || cadastro?.nome || "");
+    const nomeEstabelecimento = normalizeName(estabelecimento?.name || estabelecimento?.nome || "");
+    if (nomeCadastro && nomeCadastro === nomeEstabelecimento) return "nome";
+
+    const telefonesCadastro = getContatosDetalhadosEstabelecimento(cadastro)
+      .map((item) => normalizarTelefoneCadastroBasicoPublico(item.numero))
+      .filter(Boolean);
+    const telefonesEstabelecimento = new Set(getContatosDetalhadosEstabelecimento(estabelecimento)
+      .map((item) => normalizarTelefoneCadastroBasicoPublico(item.numero))
+      .filter(Boolean));
+    if (telefonesCadastro.some((telefone) => telefonesEstabelecimento.has(telefone))) return "telefone";
+
+    const enderecoCadastro = normalizarEnderecoCadastroBasicoPublico(cadastro?.address || cadastro?.endereco || "");
+    const enderecoEstabelecimento = normalizarEnderecoCadastroBasicoPublico(estabelecimento?.address || estabelecimento?.endereco || "");
+    return enderecoCadastro.length >= 6 && enderecoCadastro === enderecoEstabelecimento ? "endereco" : "";
+  }
+
+  function cadastroBasicoPublicoCombina(cadastro, estabelecimento) {
+    return Boolean(motivoDuplicidadeCadastroBasico(cadastro, estabelecimento));
+  }
+
+  function aplicarCadastrosBasicosPublicos() {
+    const cadastros = Array.isArray(window.CADASTROS_BASICOS_PUBLICOS) ? window.CADASTROS_BASICOS_PUBLICOS : [];
+    const fontes = window.FONTES_CADASTROS_BASICOS || {};
+    const existentes = categories.flatMap((categoria) => categoria.establishments || []);
+    let adicionados = 0;
+    let ignorados = 0;
+    const ignoradosDetalhes = [];
+
+    cadastros.forEach((cadastro) => {
+      const duplicado = existentes
+        .map((estabelecimento) => ({ estabelecimento, motivo: motivoDuplicidadeCadastroBasico(cadastro, estabelecimento) }))
+        .find((item) => item.motivo);
+      if (duplicado) {
+        ignorados += 1;
+        ignoradosDetalhes.push({
+          nome: cadastro.name,
+          motivo: duplicado.motivo,
+          conflitaCom: duplicado.estabelecimento.name || duplicado.estabelecimento.nome || ""
+        });
+        return;
+      }
+      let categoria = categories.find((item) => normalizeName(item.title || "") === normalizeName(cadastro.categoria || ""));
+      if (!categoria && typeof garantirCategoriaAdmin === "function") {
+        categoria = garantirCategoriaAdmin(cadastro.categoria || "Outros", {
+          menuGroup: cadastro.tipoCliente === "servico" ? "servicos" : "comercios"
+        });
+      }
+      if (!categoria) {
+        ignorados += 1;
+        return;
+      }
+      const estabelecimento = {
+        cadastroBasicoId: cadastro.id || normalizeName(`${cadastro.categoria}-${cadastro.name}`),
+        name: cadastro.name,
+        address: cadastro.address || "",
+        contact: cadastro.contact || "",
+        instagram: cadastro.instagram || "",
+        image: "",
+        cadastroBasico: true,
+        tipoCadastro: "basico",
+        tipoCliente: cadastro.tipoCliente || "comercio",
+        semPainelAdministrativo: true,
+        fontePublicaNome: "Solutudo",
+        fontePublicaUrl: fontes[cadastro.fonte] || "",
+        fonteVerificadaEm: "2026-11-17"
+      };
+      categoria.establishments = categoria.establishments || [];
+      categoria.establishments.push(estabelecimento);
+      existentes.push(estabelecimento);
+      statusEstabelecimentos[normalizeName(estabelecimento.name)] = "s";
+      adicionados += 1;
+    });
+
+    window.__cadastrosBasicosResumo = { encontrados: cadastros.length, adicionados, ignorados, ignoradosDetalhes };
+    document.documentElement.dataset.cadastrosBasicosEncontrados = String(cadastros.length);
+    document.documentElement.dataset.cadastrosBasicosAdicionados = String(adicionados);
+    document.documentElement.dataset.cadastrosBasicosIgnorados = String(ignorados);
+    document.documentElement.dataset.cadastrosBasicosIgnoradosDetalhes = JSON.stringify(ignoradosDetalhes);
+  }
+
+  function aplicarOverridesCadastrosBasicosPublicos(overrides = {}, clientes = {}) {
+    const todosBasicos = () => categories.flatMap((categoria) => (categoria.establishments || [])
+      .map((estabelecimento) => ({ categoria, estabelecimento })))
+      .filter(({ estabelecimento }) => estabelecimento?.cadastroBasico === true);
+    const localizar = (id) => todosBasicos().find(({ estabelecimento }) => estabelecimento.cadastroBasicoId === id) || null;
+    const remover = (registro) => {
+      if (!registro) return;
+      registro.categoria.establishments = (registro.categoria.establishments || [])
+        .filter((item) => item !== registro.estabelecimento);
+    };
+
+    Object.entries(overrides || {}).forEach(([id, override]) => {
+      const registro = localizar(id);
+      if (!registro || !override || typeof override !== "object") return;
+      const est = registro.estabelecimento;
+      const categoriaAnterior = registro.categoria;
+      if (override.nome) est.name = override.nome;
+      if (Object.prototype.hasOwnProperty.call(override, "telefone")) est.contact = override.telefone || "";
+      if (Object.prototype.hasOwnProperty.call(override, "endereco")) est.address = override.endereco || "";
+      if (Object.prototype.hasOwnProperty.call(override, "instagram")) est.instagram = override.instagram || "";
+      if (override.categoria && normalizeName(override.categoria) !== normalizeName(categoriaAnterior.title || "")) {
+        const novaCategoria = categories.find((item) => normalizeName(item.title || "") === normalizeName(override.categoria))
+          || garantirCategoriaAdmin(override.categoria, { menuGroup: (override.tipoCliente || est.tipoCliente) === "servico" ? "servicos" : "comercios" });
+        if (novaCategoria) {
+          remover(registro);
+          novaCategoria.establishments = novaCategoria.establishments || [];
+          novaCategoria.establishments.push(est);
+        }
+      }
+      est.tipoCliente = override.tipoCliente || est.tipoCliente || "comercio";
+      est.fontePublicaUrl = override.fontePublicaUrl || est.fontePublicaUrl || "";
+      statusEstabelecimentos[normalizeName(est.name)] = "s";
+    });
+
+    Object.entries(overrides || {}).forEach(([id, override]) => {
+      const registro = localizar(id);
+      if (!registro || !override || typeof override !== "object") return;
+      const est = registro.estabelecimento;
+      const clienteVinculadoId = String(override.clienteVinculadoId || "").trim();
+      if (clienteVinculadoId && clientes[clienteVinculadoId]) {
+        const cliente = clientes[clienteVinculadoId];
+        const aliasesAtuais = Array.isArray(cliente.aliases)
+          ? Object.fromEntries(cliente.aliases.map((alias) => [alias, true]))
+          : { ...(cliente.aliases || {}) };
+        [est.name, override.nomeOriginal].filter(Boolean).forEach((alias) => { aliasesAtuais[alias] = true; });
+        clientes[clienteVinculadoId] = { ...cliente, aliases: aliasesAtuais };
+        remover(registro);
+        return;
+      }
+      const mesclarComId = String(override.mesclarComId || "").trim();
+      if (mesclarComId && mesclarComId !== id) {
+        const destino = localizar(mesclarComId);
+        if (destino) {
+          const aliases = new Set([...(destino.estabelecimento.aliasesCadastroBasico || []), est.name, override.nomeOriginal].filter(Boolean));
+          destino.estabelecimento.aliasesCadastroBasico = Array.from(aliases);
+          remover(registro);
+          return;
+        }
+      }
+      if (String(override.status || "ativo").toLowerCase() === "inativo") remover(registro);
+    });
+  }
+
   function ocultarColetaDeLixoDoMenuPublico() {
     const slugColeta = "coletadelixo";
     for (let index = categories.length - 1; index >= 0; index -= 1) {
@@ -24193,7 +24355,8 @@ plotarPinsImoveis(stateImoveis.filtered);
       normalizeName(est?.nomeNormalizado || ""),
       normalizeName(est?.__adminOriginalSlug || ""),
       normalizeName(est?.__adminOriginalName || ""),
-      normalizeName(est?.name || "")
+      normalizeName(est?.name || ""),
+      ...(Array.isArray(est?.aliasesCadastroBasico) ? est.aliasesCadastroBasico.map((alias) => normalizeName(alias)) : [])
     ].filter(Boolean);
   }
 
@@ -24217,6 +24380,18 @@ plotarPinsImoveis(stateImoveis.filtered);
     if (!estSlugs.length) return 0;
 
     let melhor = 0;
+    const telefonesCliente = getContatosDetalhadosEstabelecimento(cliente)
+      .map((item) => normalizarTelefoneCadastroBasicoPublico(item.numero))
+      .filter(Boolean);
+    const telefonesEstabelecimento = new Set(getContatosDetalhadosEstabelecimento(est)
+      .map((item) => normalizarTelefoneCadastroBasicoPublico(item.numero))
+      .filter(Boolean));
+    if (telefonesCliente.some((telefone) => telefonesEstabelecimento.has(telefone))) melhor = Math.max(melhor, 140);
+
+    const enderecoCliente = normalizarEnderecoCadastroBasicoPublico(cliente?.endereco || cliente?.address || "");
+    const enderecoEstabelecimento = normalizarEnderecoCadastroBasicoPublico(est?.address || est?.endereco || "");
+    if (enderecoCliente.length >= 6 && enderecoCliente === enderecoEstabelecimento) melhor = Math.max(melhor, 120);
+
     estSlugs.forEach((estId) => {
       const categoriaMaisEst = categoriaSlug ? `${categoriaSlug}${estId}` : "";
       if (alvoNome && estId === alvoNome) melhor = Math.max(melhor, 100);
@@ -24297,6 +24472,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
     if (campoExiste(cliente, "nome")) est.name = cliente.nome || est.name;
     est.clienteId = clienteId || cliente.id || est.clienteId || "";
+    est.cadastroBasico = false;
+    est.tipoCadastro = "cliente";
+    est.semPainelAdministrativo = false;
     est.clienteNome = cliente.nome || est.clienteNome || "";
     if (cliente.aliases) est.aliases = cliente.aliases;
     est.nomeNormalizado = est.__adminOriginalSlug || normalizeName(est.name);
@@ -25032,7 +25210,7 @@ plotarPinsImoveis(stateImoveis.filtered);
           console.warn(`Dado publico indisponivel em ${caminho}; seguindo com os demais.`, error);
           return null;
         });
-        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, combustiveisSnap, gruposWhatsappSnap, sobreNosSnap] = await Promise.all([
+        const [clientesSnap, categoriasSnap, notasFalecimentoSnap, eventosSnap, paginaInicialSnap, combustiveisSnap, gruposWhatsappSnap, sobreNosSnap, cadastrosBasicosSnap] = await Promise.all([
           lerDadoPublicoAdmin("clientes"),
           lerDadoPublicoAdmin("categorias"),
           lerDadoPublicoAdmin("conteudosInformativos/notaFalecimento"),
@@ -25040,9 +25218,12 @@ plotarPinsImoveis(stateImoveis.filtered);
           lerDadoPublicoAdmin("configuracoes/paginaInicial"),
           lerDadoPublicoAdmin("configuracoes/combustiveis"),
           lerDadoPublicoAdmin("conteudosInformativos/gruposWhatsapp"),
-          lerDadoPublicoAdmin("configuracoes/sobreNos")
+          lerDadoPublicoAdmin("configuracoes/sobreNos"),
+          lerDadoPublicoAdmin("cadastrosBasicos")
         ]);
         const clientes = clientesSnap?.val?.() || {};
+        const cadastrosBasicosAdmin = cadastrosBasicosSnap?.val?.() || {};
+        aplicarOverridesCadastrosBasicosPublicos(cadastrosBasicosAdmin, clientes);
         window.__clientesPublicosCache = clientes;
         dbAdmin.ref("usuariosByUid").once("value")
           .then((usuariosSnap) => {
@@ -25122,12 +25303,12 @@ plotarPinsImoveis(stateImoveis.filtered);
 
         if (clientesConsolidados.length) {
           const categoriasFixasBase = categories
-            .filter((cat) => cat?.link?.id)
+            .filter((cat) => cat?.link?.id || (cat.establishments || []).some((est) => est?.cadastroBasico === true))
             .map((cat) => ({
               ...cat,
               establishments: categoriaAdminPreservaEstabelecimentosFixos(cat.title || "")
                 ? (cat.establishments || [])
-                : [],
+                : (cat.establishments || []).filter((est) => est?.cadastroBasico === true),
               metaAdmin: {
                 ...(cat.metaAdmin || {}),
                 menuGroup: categoriaAdminEhSetorPublico(cat.title || "")
@@ -25175,7 +25356,16 @@ plotarPinsImoveis(stateImoveis.filtered);
             const tipoCliente = normalizeName(cliente.tipoCliente || cliente.tipo || "");
             const categoria = garantirCategoriaAdmin(cliente.categoria || "Outros", { menuGroup: tipoCliente === "servico" || tipoCliente === "servicos" ? "servicos" : "comercios" });
             categoria.establishments = categoria.establishments || [];
-            categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
+            const estabelecimentoBase = encontrarEstabelecimentoBaseAdmin(
+              clienteId,
+              cliente,
+              cliente.categoria || cliente.categoriaId || ""
+            );
+            if (estabelecimentoBase) {
+              aplicarClienteAdminNoEstabelecimento(estabelecimentoBase, cliente, clienteId);
+            } else {
+              categoria.establishments.push(montarEstabelecimentoDoClienteAdmin(cliente, clienteId));
+            }
             definirStatusClienteAdmin(cliente, clienteId);
           });
           aplicarVagasTrabalhoClientesAdmin(clientesConsolidados);
@@ -25184,6 +25374,9 @@ plotarPinsImoveis(stateImoveis.filtered);
 
           try { window.categories = categories; } catch (e) { }
           try { window.statusEstabelecimentos = statusEstabelecimentos; } catch (e) { }
+          document.documentElement.dataset.cadastrosBasicosAtivos = String(
+            categories.flatMap((cat) => cat.establishments || []).filter((est) => est?.cadastroBasico === true).length
+          );
           ADMIN_CLIENTES_LAST_APPLIED = Date.now();
           return;
         }
@@ -25645,6 +25838,8 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
     mostrarSol(); // abre a página
   });
 
+
+  aplicarCadastrosBasicosPublicos();
 
   function agendarDadosPublicosEmSegundoPlano() {
     const iniciar = () => aplicarDadosAdminClientesEmSegundoPlano(renderizarTelaAtualComDadosAdmin);
@@ -26221,7 +26416,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
 
 
               
-     <li id="${normalizeName(establishment.name)}" data-id="${normalizeName(establishment.name)}">
+     <li id="${normalizeName(establishment.name)}" data-id="${normalizeName(establishment.name)}" class="${establishment.cadastroBasico ? "cadastro-basico-card" : ""}">
 
 
 
@@ -26238,6 +26433,7 @@ document.getElementById("menuCombustivel")?.addEventListener("click", function (
      
      
   <span class="locais_nomes">${establishment.name}</span>
+  ${establishment.cadastroBasico ? `<span class="cadastro-basico-selo"><i class="fa-solid fa-circle-info"></i> Cadastro básico</span>` : ""}
 ${!establishment.descricaoFalecido ? `
   <button 
     class="share-btn" 
@@ -26306,6 +26502,19 @@ ${!establishment.descricaoFalecido ? `
 <div class="abas-conteudo" data-estab="${slugEstabelecimentoPublico}" data-business-art-token="${escapePromoHtml(businessArtToken)}">
   <div class="aba aba-info visible" id="info-${slugEstabelecimentoPublico}">
        <!-- TODO: aqui ficam as info-box (funcionamento, endereço, etc.) -->
+
+        ${establishment.cadastroBasico ? `
+          <div class="cadastro-basico-aviso">
+            <div>
+              <strong>Informações públicas básicas</strong>
+              <span>Este perfil ainda não possui fotos, produtos, cardápio ou painel administrativo.</span>
+            </div>
+            <a href="https://wa.me/5543991766639?text=${encodeURIComponent(`Olá! O estabelecimento ${establishment.name} é meu e quero saber como completar o perfil no Olá Carlópolis.`)}"
+               target="_blank" rel="noopener noreferrer">
+              <i class="fa-brands fa-whatsapp"></i> Este comércio é seu?
+            </a>
+          </div>
+        ` : ""}
 
          ${renderFuncionamentoClientePublico(establishment, statusAberto)}
 
