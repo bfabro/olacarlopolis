@@ -24,7 +24,10 @@ window.FONTES_CADASTROS_BASICOS = {
   refrigeracao: "https://www.solutudo.com.br/empresas/pr/carlopolis/refrigeracao-assistencia-tecnica/e-naddeo-mn-refrigeracao-mn-utilidades-15345037",
   marmoraria: "https://www.solutudo.com.br/empresas/pr/carlopolis/marmorarias/destak-marmores-16352013",
   limpeza: "https://www.solutudo.com.br/empresas/pr/carlopolis/produtos-de-limpeza/renato-ferraz-carlopolis-12183634",
-  lavarapido: "https://www.solutudo.com.br/empresas/pr/carlopolis/lava%2Brapido%2Bestetica%2Bautomotiva"
+  lavarapido: "https://www.solutudo.com.br/empresas/pr/carlopolis/lava%2Brapido%2Bestetica%2Bautomotiva",
+  imobiliarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/imobiliarias%2Bcorretores%2Bde%2Bimoveis",
+  transportadoras: "https://www.solutudo.com.br/empresas/pr/carlopolis/transportadoras",
+  academias: "https://www.solutudo.com.br/empresas/pr/carlopolis/academias/academia-corpo-e-mente-22171824"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -189,7 +192,41 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Marmoraria", "Destak Mármores", "Rua Benedito Salles, 462 B - Centro", "", "marmoraria", "servico"],
   ["Produtos de Limpeza", "Renato Ferraz - Acqua Blue Piscinas", "Rua Ataliba Leonel, 402 - Centro", "(14) 99640-5100", "limpeza"],
   ["Estética Automotiva", "Rodrigo Aparecido Moura Rosa", "Rua Fidencio de Melo, 144 - Centro", "(43) 99912-9618", "lavarapido", "servico"],
-  ["Estética Automotiva", "Reinaldo Abdon", "Rua Joaquim do Carmo Vilela, 1311 - Centro", "", "lavarapido", "servico"]
+  ["Estética Automotiva", "Reinaldo Abdon", "Rua Joaquim do Carmo Vilela, 1311 - Centro", "", "lavarapido", "servico"],
+
+  ["Imobiliária", "Aquaville Empreendimentos Imobiliários Ltda", "Chácara Jaboticabal, s/n - Jaboticabal", "(14) 8124-8971", "imobiliarias", "servico"],
+  ["Imobiliária", "Rgv Empreendimentos Imobiliários Ltda", "Rua Jose Aleixo Sobrinho, 336 - Centro", "(43) 3534-1208", "imobiliarias", "servico"],
+  ["Imobiliária", "Empreendimentos Imobiliários Takenori Ltda", "Rua Padre Hugo, 1076 - Centro", "(43) 3566-1919", "imobiliarias", "servico"],
+  ["Imobiliária", "Kf Empreendimentos Imobiliários Ltda", "Rua Benedito Salles, 572 - Centro", "", "imobiliarias", "servico"],
+  ["Imobiliária", "Jlm Incorporadora Ltda", "Avenida Anezio Fernandes Machado, 354 - Residencial Vista Bela", "(43) 3566-1044", "imobiliarias", "servico"],
+  ["Imobiliária", "Rafael Willians Bandeira & Cia Ltda", "Rua Benedito Salles, 1033 - Centro", "(43) 8851-8354", "imobiliarias", "servico"],
+  ["Imobiliária", "T Q Costa Administradora de Bens Ltda", "Rua Padre Hugo, 460 - Centro Comercial Thac Thal", "(43) 9111-4400", "imobiliarias", "servico"],
+  ["Imobiliária", "Jara Empreendimentos Imobiliários Ltda", "Rua Benedito Salles, 2639 - Jaboticabal", "(43) 99837-5390", "imobiliarias", "servico"],
+  ["Imobiliária", "Hamada Incorporadora Ltda", "Rua Benedito Salles, s/n - Pinheirinho", "(11) 2888-4945", "imobiliarias", "servico"],
+  ["Imobiliária", "Esteves Administração de Imóveis Ltda", "Avenida das Palmeiras, 185 - Jardim do Cedro", "(43) 3566-1715", "imobiliarias", "servico"],
+  ["Imobiliária", "Empreendimentos Imobiliários Murador Ltda", "Rua Calil Keder, 583 - Centro", "(14) 3372-1029", "imobiliarias", "servico"],
+  ["Imobiliária", "Fs Empreendimentos e Negócios Imobiliários Ltda", "Rua Jorge Barros, 1175 - Centro", "(43) 3566-2374", "imobiliarias", "servico"],
+  ["Imobiliária", "Gigliuci & Panichi Ltda", "Rua Jorge Barros, 1175 - Centro", "(43) 3566-2374", "imobiliarias", "servico"],
+  ["Imobiliária", "Hvb Empreendimentos Imobiliários Ltda", "Avenida Anezio Fernandes Machado, 354 - Residencial Vista Bela", "(14) 3236-3817", "imobiliarias", "servico"],
+  ["Imobiliária", "Nova Ética Administração e Assessoria de Bens Imóveis", "Rua Andre Jorge Clele, 440 - Centro", "(43) 3566-1345", "imobiliarias", "servico"],
+  ["Imobiliária", "Fhama Incorporadora e Empreendedora Ltda", "Rua Jorge Barros, 1175 - Centro", "(43) 3566-2374", "imobiliarias", "servico"],
+  ["Imobiliária", "Jomac Empreendimentos Ltda", "Avenida Elson Soares, 1502 - Centro", "(11) 7391-3958", "imobiliarias", "servico"],
+  ["Imobiliária", "Nova G H", "Rua Capitão Estácio, 440 - Centro", "(43) 3566-1345", "imobiliarias", "servico"],
+
+  ["Transportadora", "L J S Sanches & Sanches Ltda", "Rua Francisco Avelino Paiva, 878 - Centro", "(43) 3566-1835", "transportadoras", "servico"],
+  ["Transportadora", "Transportadora Domingues da Costa", "Avenida Elson Soares, 1210 - Centro", "(43) 3566-1345", "transportadoras", "servico"],
+  ["Transportadora", "Trans Oliveira", "Sítio Oliveira, s/n - Ribeirão do Meio", "(43) 3559-1514", "transportadoras", "servico"],
+  ["Transportadora", "Yoshitani Transportes", "Rua Laurindo Franco de Godoy, 578 - Centro", "(43) 8815-3100", "transportadoras", "servico"],
+  ["Transportadora", "D.L. Transportes", "Rua Jorge Barros, 1380 - Centro", "(43) 9699-0500", "transportadoras", "servico"],
+  ["Transportadora", "Emerson Domingues da Costa e Cia Ltda", "Avenida Elson Soares, 1210 - Centro", "(43) 3566-1345", "transportadoras", "servico"],
+  ["Transportadora", "Transcamargo Ltda", "Rua Antonio Jonas Ferreira Pinto, 569 - Centro", "", "transportadoras", "servico"],
+  ["Transportadora", "Bsc Transportes", "Rua Joaquim do Carmo Vilela, 22 - Centro", "(43) 8849-9551", "transportadoras", "servico"],
+  ["Transportadora", "Assao Comércio e Transportes de Carnes Ltda", "Rua Benedito Salles, 1551 - Centro", "(43) 9910-5760", "transportadoras", "servico"],
+  ["Transportadora", "Trans-Abucarub", "Rua Xavantes, 454 - Centro", "(43) 8801-0814", "transportadoras", "servico"],
+  ["Transportadora", "Transrocha Transportes", "Rua Benedito Salles, 1063 - Centro", "(14) 3382-2052", "transportadoras", "servico"],
+  ["Transportadora", "Piracicabana Transporte de Cargas e Encomendas Ltda", "Avenida Elson Soares, s/n - Centro", "", "transportadoras", "servico"],
+
+  ["Academia", "Academia Corpo e Mente", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academias", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
