@@ -24081,6 +24081,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     let adicionados = 0;
     let ignorados = 0;
     const ignoradosDetalhes = [];
+    const revisaoEnderecoDetalhes = [];
 
     cadastros.forEach((cadastro) => {
       if (cadastro.duplicateHint?.motivo) {
@@ -24094,7 +24095,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       }
       const duplicado = existentes
         .map((estabelecimento) => ({ estabelecimento, motivo: motivoDuplicidadeCadastroBasico(cadastro, estabelecimento) }))
-        .find((item) => item.motivo);
+        .find((item) => item.motivo && item.motivo !== "endereco");
       if (duplicado) {
         ignorados += 1;
         ignoradosDetalhes.push({
@@ -24103,6 +24104,20 @@ plotarPinsImoveis(stateImoveis.filtered);
           conflitaCom: duplicado.estabelecimento.name || duplicado.estabelecimento.nome || ""
         });
         return;
+      }
+      const conflitoEndereco = existentes
+        .map((estabelecimento) => ({ estabelecimento, motivo: motivoDuplicidadeCadastroBasico(cadastro, estabelecimento) }))
+        .find((item) => item.motivo === "endereco");
+      const revisaoEndereco = cadastro.addressReviewHint || (conflitoEndereco ? {
+        motivo: "endereco",
+        conflitaCom: conflitoEndereco.estabelecimento.name || conflitoEndereco.estabelecimento.nome || "outro cadastro"
+      } : null);
+      if (revisaoEndereco) {
+        revisaoEnderecoDetalhes.push({
+          nome: cadastro.name,
+          motivo: "endereco",
+          conflitaCom: revisaoEndereco.conflitaCom || "outro cadastro"
+        });
       }
       let categoria = categories.find((item) => normalizeName(item.title || "") === normalizeName(cadastro.categoria || ""));
       if (!categoria && typeof garantirCategoriaAdmin === "function") {
@@ -24136,11 +24151,13 @@ plotarPinsImoveis(stateImoveis.filtered);
       adicionados += 1;
     });
 
-    window.__cadastrosBasicosResumo = { encontrados: cadastros.length, adicionados, ignorados, ignoradosDetalhes };
+    window.__cadastrosBasicosResumo = { encontrados: cadastros.length, adicionados, ignorados, ignoradosDetalhes, revisaoEnderecoDetalhes };
     document.documentElement.dataset.cadastrosBasicosEncontrados = String(cadastros.length);
     document.documentElement.dataset.cadastrosBasicosAdicionados = String(adicionados);
     document.documentElement.dataset.cadastrosBasicosIgnorados = String(ignorados);
     document.documentElement.dataset.cadastrosBasicosIgnoradosDetalhes = JSON.stringify(ignoradosDetalhes);
+    document.documentElement.dataset.cadastrosBasicosRevisaoEndereco = String(revisaoEnderecoDetalhes.length);
+    document.documentElement.dataset.cadastrosBasicosRevisaoEnderecoDetalhes = JSON.stringify(revisaoEnderecoDetalhes);
   }
 
   function aplicarOverridesCadastrosBasicosPublicos(overrides = {}, clientes = {}) {

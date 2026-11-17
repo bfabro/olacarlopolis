@@ -3142,6 +3142,7 @@ async function loadAllData(onProgress = null) {
         mesclarComId: override.mesclarComId || "",
         fontePublicaUrl: fontesCadastrosBasicos[base.fonte] || "",
         duplicateHint: base.duplicateHint || null,
+        addressReviewHint: base.addressReviewHint || null,
         ordemBase,
         atualizadoEm: override.atualizadoEm || 0,
         overrideSalvo: Boolean(cadastrosBasicosOverrides[base.id])
@@ -13595,6 +13596,7 @@ function basicListingSituation(item = {}) {
   if (item.mesclarComId) return "mesclado";
   if (item.status === "inativo") return "inativo";
   if (item.duplicadoAutomatico) return "descartado";
+  if (item.revisaoEndereco) return "revisar";
   return "ativo";
 }
 
@@ -13626,9 +13628,13 @@ function basicListingDuplicateReason(item, existing) {
   if (directPhone) existingPhones.add(directPhone);
   if (itemPhone && existingPhones.has(itemPhone)) return "telefone";
 
+  return "";
+}
+
+function basicListingAddressMatches(item, existing) {
   const itemAddress = normalizeBasicListingAddress(item?.address || item?.endereco || "");
   const existingAddress = normalizeBasicListingAddress(existing?.address || existing?.endereco || "");
-  return itemAddress.length >= 6 && itemAddress === existingAddress ? "endereco" : "";
+  return itemAddress.length >= 6 && itemAddress === existingAddress;
 }
 
 function annotateBasicListingDuplicates() {
@@ -13638,6 +13644,7 @@ function annotateBasicListingDuplicates() {
     .sort((a, b) => Number(a.ordemBase || 0) - Number(b.ordemBase || 0))
     .forEach((item) => {
       item.duplicadoAutomatico = null;
+      item.revisaoEndereco = null;
       if (item.clienteVinculadoId || item.mesclarComId || item.status === "inativo") return;
       const conflict = existing
         .map((entry) => ({ entry, reason: basicListingDuplicateReason(item, entry) }))
@@ -13657,6 +13664,14 @@ function annotateBasicListingDuplicates() {
       if (item.duplicateHint && hintedFieldUnchanged) {
         item.duplicadoAutomatico = { ...item.duplicateHint };
         return;
+      }
+      const addressConflict = existing.find((entry) => basicListingAddressMatches(item, entry));
+      const reviewFieldUnchanged = item.addressReviewHint
+        && normalizeBasicListingAddress(item.address) === normalizeBasicListingAddress(item.addressOriginal);
+      if (reviewFieldUnchanged || addressConflict) {
+        item.revisaoEndereco = reviewFieldUnchanged
+          ? { ...item.addressReviewHint }
+          : { motivo: "endereco", conflitaCom: addressConflict.name || addressConflict.nome || "outro cadastro" };
       }
       existing.push(item);
     });
@@ -13783,8 +13798,8 @@ function renderBasicListingsAdmin() {
   annotateBasicListingDuplicates();
   const queryText = normalizeName($("basicListingsAdminSearch")?.value || "");
   const filter = $("basicListingsAdminFilter")?.value || "todos";
-  const activeCount = state.cadastrosBasicos.filter((item) => basicListingSituation(item) === "ativo").length;
-  if ($("basicListingsAdminCount")) $("basicListingsAdminCount").textContent = `${activeCount} ativos de ${state.cadastrosBasicos.length}`;
+  const publishedCount = state.cadastrosBasicos.filter((item) => ["ativo", "revisar"].includes(basicListingSituation(item))).length;
+  if ($("basicListingsAdminCount")) $("basicListingsAdminCount").textContent = `${publishedCount} publicados de ${state.cadastrosBasicos.length}`;
   fillBasicListingAdminSelects(state.cadastrosBasicos.find((item) => item.id === $("basicListingId")?.value));
   const filtered = state.cadastrosBasicos.filter((item) => {
     const situation = basicListingSituation(item);
@@ -13803,7 +13818,9 @@ function renderBasicListingsAdmin() {
         ? `Unido com: ${mergeTarget.name}`
         : (item.duplicadoAutomatico
           ? `Descartado por ${item.duplicadoAutomatico.motivo}: conflita com ${item.duplicadoAutomatico.conflitaCom}. Edite o dado conflitante para publicar.`
-          : "Perfil público somente com dados básicos"));
+          : (item.revisaoEndereco
+            ? `Publicado, mas revise o complemento: o endereço também aparece em ${item.revisaoEndereco.conflitaCom}. Informe sala, bloco ou andar quando houver.`
+            : "Perfil público somente com dados básicos")));
     return `<article class="basic-listing-admin-card is-${escapeAttr(situation)}">
       <div class="basic-listing-admin-main">
         <span class="basic-listing-admin-status">${escapeHtml(situation)}</span>

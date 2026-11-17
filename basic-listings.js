@@ -17,14 +17,21 @@ window.FONTES_CADASTROS_BASICOS = {
   bares: "https://www.solutudo.com.br/empresas/pr/carlopolis/bares%2Bpubs?pagina=1",
   eletricistas: "https://www.solutudo.com.br/empresas/pr/carlopolis/eletricistas/listas/10-opcoes-em-eletricistas-que-voce-deveria-conhecer-em-carlopolis-pr",
   psicologia: "https://www.solutudo.com.br/empresas/pr/carlopolis/psicologia?mais_buscadas=1",
-  advocacias: "https://www.solutudo.com.br/empresas/pr/carlopolis/advocacias"
+  advocacias: "https://www.solutudo.com.br/empresas/pr/carlopolis/advocacias",
+  papelarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/papelarias",
+  industrias: "https://www.solutudo.com.br/empresas/pr/carlopolis/industrias",
+  marcenarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/moveis%2Bplanejados%2Bmarcenarias",
+  refrigeracao: "https://www.solutudo.com.br/empresas/pr/carlopolis/refrigeracao-assistencia-tecnica/e-naddeo-mn-refrigeracao-mn-utilidades-15345037",
+  marmoraria: "https://www.solutudo.com.br/empresas/pr/carlopolis/marmorarias/destak-marmores-16352013",
+  limpeza: "https://www.solutudo.com.br/empresas/pr/carlopolis/produtos-de-limpeza/renato-ferraz-carlopolis-12183634",
+  lavarapido: "https://www.solutudo.com.br/empresas/pr/carlopolis/lava%2Brapido%2Bestetica%2Bautomotiva"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
   ["Padaria", "Panificadora Bom Jesus", "Rua Alfeneiro, 245 - Centro", "(43) 3566-2780", "padarias"],
   ["Padaria", "Edmilson Belizario Santos Panificadora", "Rua Benedito Salles, 881 - Centro", "(43) 3566-1345", "padarias"],
   ["Padaria", "Sonho Doces Panificadora e Confeitaria", "Rua Dra. Paula e Silva, 658 - Centro", "", "padarias"],
-  ["Moveis", "Mercadomoveis", "Rua Benedito Salles, 1232 - Centro", "(42) 3220-6000", "moveis", "comercio", ["endereco", "Copel"]],
+  ["Moveis", "Mercadomoveis", "Rua Benedito Salles, 1232 - Centro", "(42) 3220-6000", "moveis", "comercio", null, ["endereco", "Copel"]],
   ["Moveis", "Donizete Aparecido Sanches", "Rua Maria Keder Soares, 91 - Novo Horizonte", "(41) 99819-1165", "moveis"],
   ["Moveis", "Liberatti", "Rua Benedito Salles, 867, Loja B - Centro", "(43) 3566-1898", "moveis"],
   ["Moveis", "D'Almeida's Planejados", "Rua Benedito Salles, 962 - Centro", "(43) 99861-0530", "moveis"],
@@ -45,7 +52,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Estudio De Beleza", "Fernanda Alves Nogueira", "Rua Benedito Salles, 1174", "(43) 3566-1644", "manicure"],
   ["Supermercado", "Bar e Mercearia Tiuman", "Rua Calil Keder, 640", "", "mercados"],
   ["Supermercado", "Joiceley da Silva", "Rua Padre Hugo, 363 D - Jardim Itália", "", "mercados"],
-  ["Supermercado", "Fussako Tsubota e Cia", "Rua Benedito Salles, 341", "", "mercados", "comercio", ["endereco", "Carreiro"]],
+  ["Supermercado", "Fussako Tsubota e Cia", "Rua Benedito Salles, 341", "", "mercados", "comercio", null, ["endereco", "Carreiro"]],
   ["Supermercado", "Karimar Supermercado", "Rua Benedito Salles, 427", "", "mercados"],
   ["Supermercado", "Emporio São Victor Bar e Restaurante", "Rua Marcos Rodrigues do Amaral, 268", "", "mercados"],
   ["Material de Construção", "Irmãos Soldera", "Rua Benedito Salles, 420", "", "construcao"],
@@ -73,7 +80,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Moda e Vestuário", "Dany Modas", "Rua Benedito Salles, 393", "(43) 3566-1117", "roupas"],
   ["Moda e Vestuário", "Brechó das Amigas", "Avenida Elson Soares, 1012", "(43) 3536-1379", "roupas"],
   ["Moda e Vestuário", "Casa Nova", "Rua Benedito Salles, 1030", "", "roupas"],
-  ["Moda e Vestuário", "Linda Rosa", "Rua Benedito Salles, 583", "(43) 3566-2816", "roupas", "comercio", ["endereco", "Otica Visual Center"]],
+  ["Moda e Vestuário", "Linda Rosa", "Rua Benedito Salles, 583", "(43) 3566-2816", "roupas", "comercio", null, ["endereco", "Otica Visual Center"]],
   ["Moda e Vestuário", "Fios e Acessórios", "Praça Coronel Leite, 28", "", "roupas"],
   ["Moda e Vestuário", "Tropicalia Espaço da Mulher", "Rua Benedito Salles, 848", "(43) 3566-1089", "roupas"],
   ["Moda e Vestuário", "Loja da Eliane", "Rua Benedito Salles, 961", "", "roupas"],
@@ -110,7 +117,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
 
   ["Lanchonete", "Jose Gotardi", "Rua Ataliba Leonel, 424 - Centro", "", "lanchonetes"],
   ["Lanchonete", "Cassia Yamamoto", "Rua Laurindo Franco de Godoy, 427 - Centro", "(43) 3566-2481", "lanchonetes"],
-  ["Lanchonete", "O Casarão Pizzaria e Hamburgueria", "Rua Benedito Salles, 1340 - Centro", "(43) 3566-1843", "lanchonetes", "comercio", ["endereco", "O Casarao"]],
+  ["Lanchonete", "O Casarão Pizzaria e Hamburgueria", "Rua Benedito Salles, 1340 - Centro", "(43) 3566-1843", "lanchonetes", "comercio", ["nome", "O Casarao"]],
   ["Lanchonete", "Eryck Diegho Salles e Silva", "Avenida Elson Soares, 756 - Centro", "(43) 99695-0911", "lanchonetes"],
   ["Lanchonete", "Tiago Kendi Nagaki", "Ilha do Ponciano, s/n - Jaboticabal", "(43) 99669-7299", "lanchonetes"],
   ["Lanchonete", "Luiz Carlos da Silva", "Rua Laurindo Franco de Godoy, 453 - Centro", "(43) 99976-7449", "lanchonetes"],
@@ -142,22 +149,48 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Psicologia", "T A de Azevedo Serviços de Psicologia", "Rua Fidencio de Melo, 240 - Centro", "(43) 99860-4291", "psicologia", "servico"],
   ["Psicologia", "F. F. Silva Pontes Clínica de Psicologia", "Rua Antonio Jonas Ferreira Pinto, 657 - Centro", "(43) 99920-7928", "psicologia", "servico"],
   ["Psicologia", "Meire Leticia Martins Siqueira", "Rua Benedito Salles, 693 - Centro", "(43) 99122-4758", "psicologia", "servico"],
-  ["Psicologia", "Dra. Daniela R. Viana Diogo", "Rua Padre Hugo, 985 - Centro", "(43) 99650-0459", "psicologia", "servico", ["endereco", "Dr Vilma"]],
+  ["Psicologia", "Dra. Daniela R. Viana Diogo", "Rua Padre Hugo, 985 - Centro", "(43) 99650-0459", "psicologia", "servico", null, ["endereco", "Dr Vilma"]],
   ["Psicologia", "Natal e Rosa Clínica de Psicologia e Psicopedagogia Ltda", "Rua Nicolau Miguel, 641 - Centro", "(43) 99644-4889", "psicologia", "servico"],
 
   ["Advocacia", "Carlópolis Cartório de Notas", "Rua Jorge Barros, 810 - Centro", "", "advocacias", "servico"],
   ["Advocacia", "Advocacia Julio César de Lima", "Rua Antônio Jonas Ferreira Pinto, 281 - Centro", "(43) 98802-2272", "advocacias", "servico"],
   ["Advocacia", "Djalma Salles Junior Sociedade Individual de Advocacia", "Rua Padre Hugo, 863 - Centro", "(41) 9914-7077", "advocacias", "servico"],
-  ["Advocacia", "Rolim & Rolim Advocacia", "Rua Benedito Salles, 832 - Centro", "(43) 9696-4267", "advocacias", "servico", ["endereco", "Forty Shake"]],
-  ["Advocacia", "Julio C. de Lima Sociedade Individual de Advocacia", "Rua Antonio Jonas Ferreira Pinto, 281 - Centro", "(43) 3566-1477", "advocacias", "servico", ["endereco", "Advocacia Julio César de Lima"]],
+  ["Advocacia", "Rolim & Rolim Advocacia", "Rua Benedito Salles, 832 - Centro", "(43) 9696-4267", "advocacias", "servico", null, ["endereco", "Forty Shake"]],
+  ["Advocacia", "Julio C. de Lima Sociedade Individual de Advocacia", "Rua Antonio Jonas Ferreira Pinto, 281 - Centro", "(43) 3566-1477", "advocacias", "servico", ["nome", "Advocacia Julio César de Lima"]],
   ["Advocacia", "Assistência Jurídica Advogado", "Rua Jorge Barros, 1500 - Centro", "(43) 98830-0700", "advocacias", "servico"],
   ["Advocacia", "Tatyane Nogueira Ribeiro Sociedade Individual de Advocacia", "Rua Massanori Tiuman, 38 - Takenori Tiuman", "(43) 9921-6838", "advocacias", "servico"],
-  ["Advocacia", "Marino Train Neto Sociedade Individual de Advocacia", "Rua Benedito Salles, 443 - Centro", "(43) 9952-7820", "advocacias", "servico", ["endereco", "Visual 10 Filial III"]],
+  ["Advocacia", "Marino Train Neto Sociedade Individual de Advocacia", "Rua Benedito Salles, 443 - Centro", "(43) 9952-7820", "advocacias", "servico", null, ["endereco", "Visual 10 Filial III"]],
   ["Advocacia", "Ajuri Assessoria Jurídica e Imobiliária", "Rua Kalil Keder, 569 - Centro", "(43) 3552-1484", "advocacias", "servico"],
   ["Advocacia", "Miranda Prioli Sociedade Individual de Advocacia", "Rua Jose Salles, 637 - Centro", "(43) 9667-0053", "advocacias", "servico"],
   ["Advocacia", "Damin Hamada Maia e Ramos Advogados Associados", "Rua Laurindo Franco de Godoi, 575 - Centro", "(43) 9985-6514", "advocacias", "servico"],
-  ["Advocacia", "Francielle Gotardi Advocacia", "Rua Jorge Barros, 844 - Centro", "(43) 99604-3849", "advocacias", "servico"]
-].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null]) => {
+  ["Advocacia", "Francielle Gotardi Advocacia", "Rua Jorge Barros, 844 - Centro", "(43) 99604-3849", "advocacias", "servico"],
+
+  ["Papelaria", "Endo & Nunes Ltda", "Rua Benedito Salles, 1334 - Centro", "(43) 9908-4808", "papelarias"],
+  ["Papelaria", "Papelaria Moreira Biruski Ltda", "Avenida Dr. João Pessoa, 181 - Centro", "(43) 9619-7523", "papelarias"],
+  ["Papelaria", "A Marques Pereira & Pereira Ltda", "Rua Benedito Salles, 919 - Centro", "(43) 3566-2371", "papelarias"],
+  ["Papelaria", "Papelaria Arco-Íris", "Rua Benedito Salles, esquina com Calil Keder, 583 - Centro", "", "papelarias"],
+  ["Papelaria", "Claudiane Coelho Neto da Luz", "Rua Benedito Salles, 848 - Centro", "", "papelarias"],
+  ["Papelaria", "Papelaria Novo Mundo", "Rua Dra. Paula e Silva, 671 - Centro", "(43) 3566-1345", "papelarias"],
+
+  ["Indústria", "Carrocerias Tramonto Ltda", "Rua Luiz Carlos Consolmagno de Proença, 357 A - Parque Industrial", "(43) 3566-2481", "industrias"],
+  ["Indústria", "Indústria Metalúrgica Hashimoto", "Rua Jose Talim, 514 - Centro", "(43) 3566-2469", "industrias"],
+  ["Indústria", "Araucalhas", "Rua Benedito Salles, 1152 - Centro", "", "industrias"],
+  ["Indústria", "Antonio Wenzel", "Rua Benedito Salles, 1112 - Centro", "", "industrias"],
+
+  ["Marcenaria", "Almeida e Ferreira Marcenaria Ltda", "Avenida Elson Soares, 204 - Centro", "(43) 99861-0530", "marcenarias", "servico"],
+  ["Marcenaria", "Paiva Utilidades Domésticas", "Rua das Indústrias, s/n - Parque Comercial e Industrial", "(43) 8404-4313", "marcenarias"],
+  ["Marcenaria", "Rrr Móveis Sob Medida", "Rua Joaquim do Carmo Vilela, 120 - Centro", "(43) 9607-2208", "marcenarias", "servico"],
+  ["Marcenaria", "Mobil Designer Marcenaria", "Rodovia PR-151, s/n - Jaboticabal", "(43) 9950-2513", "marcenarias", "servico"],
+  ["Marcenaria", "Marcelo Romano & Cia Ltda", "Rua das Indústrias, 411 - Parque Industrial Jorge Leite da Rosa", "(43) 3566-1369", "marcenarias", "servico"],
+  ["Marcenaria", "Fábrica de Móveis São Pedro", "Rua Kalil Keder, 808 - Centro", "(43) 3566-2422", "marcenarias"],
+  ["Marcenaria", "Marcenaria Romano", "Rua Joaquim do Carmo Vilela, 314 - Centro", "(43) 9669-0663", "marcenarias", "servico"],
+
+  ["Refrigeração", "E Naddeo - MN Refrigeração e Utilidades", "Rua Kalil Keder, 578 - Centro", "(43) 99933-5465", "refrigeracao", "servico"],
+  ["Marmoraria", "Destak Mármores", "Rua Benedito Salles, 462 B - Centro", "", "marmoraria", "servico"],
+  ["Produtos de Limpeza", "Renato Ferraz - Acqua Blue Piscinas", "Rua Ataliba Leonel, 402 - Centro", "(14) 99640-5100", "limpeza"],
+  ["Estética Automotiva", "Rodrigo Aparecido Moura Rosa", "Rua Fidencio de Melo, 144 - Centro", "(43) 99912-9618", "lavarapido", "servico"],
+  ["Estética Automotiva", "Reinaldo Abdon", "Rua Joaquim do Carmo Vilela, 1311 - Centro", "", "lavarapido", "servico"]
+].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
     .normalize("NFD")
@@ -172,6 +205,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
     contact,
     fonte,
     tipoCliente,
-    duplicateHint: duplicateHint ? { motivo: duplicateHint[0], conflitaCom: duplicateHint[1] } : null
+    duplicateHint: duplicateHint ? { motivo: duplicateHint[0], conflitaCom: duplicateHint[1] } : null,
+    addressReviewHint: addressReviewHint ? { motivo: addressReviewHint[0], conflitaCom: addressReviewHint[1] } : null
   };
 });
