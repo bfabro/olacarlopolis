@@ -38,7 +38,10 @@ window.FONTES_CADASTROS_BASICOS = {
   ferramentas: "https://www.solutudo.com.br/empresas/pr/carlopolis/ferramentas%2Butilidades",
   calcados: "https://www.solutudo.com.br/empresas/pr/carlopolis/calcados",
   pintores: "https://www.solutudo.com.br/empresas/pr/carlopolis/pintores",
-  engenharia: "https://www.solutudo.com.br/empresas/pr/carlopolis/engenharia%2Bengenheiros"
+  engenharia: "https://www.solutudo.com.br/empresas/pr/carlopolis/engenharia%2Bengenheiros",
+  serralherias: "https://www.solutudo.com.br/empresas/pr/carlopolis/serralherias%2Bestruturas",
+  vansEscolares: "https://www.solutudo.com.br/empresas/pr/carlopolis/vans%2Btransportes%2Bescolares",
+  bebidas: "https://www.solutudo.com.br/empresas/pr/carlopolis/depositos%2Bde%2Bbebidas"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -329,7 +332,38 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Engenharia", "Energy Brasil Carlópolis", "Rua Benedito Salles, 1135 - Centro", "(43) 99117-1790", "engenharia", "servico"],
   ["Engenharia", "Mining Solutions Engenharia Ltda", "Rua Profeta Joao de Maria, 1732 - Industrial", "(43) 99808-0665", "engenharia", "servico"],
   ["Engenharia", "M. A. C. Prestação de Serviços", "Estrada Gracioso, s/n - Gracioso", "(11) 97732-9058", "engenharia", "servico"],
-  ["Engenharia", "C. F. V. Engenharia Ltda", "Avenida Elson Soares, 202 - Centro", "(43) 99657-7021", "engenharia", "servico"]
+  ["Engenharia", "C. F. V. Engenharia Ltda", "Avenida Elson Soares, 202 - Centro", "(43) 99657-7021", "engenharia", "servico"],
+
+  ["Serralheria", "Marcos Rodrigo de Oliveira Martini", "Avenida Elson Soares, 1397 - Centro", "(43) 99840-2928", "serralherias", "servico"],
+  ["Serralheria", "Serralheria Adrifer", "Avenida Murador, 20 - Murador", "(43) 99663-7457", "serralherias", "servico"],
+  ["Serralheria", "Daniel Roberto da Rosa", "Rua Padre Hugo, 109 - Vista Bela II", "(43) 99682-9539", "serralherias", "servico"],
+  ["Serralheria", "Luciano Domingues - Carlópolis", "Rua Profeta Joao de Maria, 1712 - Parque Industrial", "(43) 3566-2831", "serralherias", "servico"],
+  ["Serralheria", "Erickson Jose Garcia", "Rua Extremosa, 662 - Vista Alegre", "(43) 99611-5261", "serralherias", "servico"],
+  ["Serralheria", "Estruturas Metálicas Irmãos Etore Ltda", "Rodovia PR-218, s/n - Santa Maria", "(14) 99799-7473", "serralherias", "servico"],
+  ["Serralheria", "KMJ Estruturas Metálicas e Montagens Ltda", "Estrada do Monge, 20 - Industrial", "(15) 99834-6436", "serralherias", "servico"],
+  ["Serralheria", "Flavio Ribeiro Martini", "Rua G, s/n - Loteamento Social Novo Horizonte", "(43) 99131-4267", "serralherias", "servico"],
+
+  ["Transporte Escolar", "A. Caetano Transportes", "Rua Veneza, 257 - Loteamento Italia", "(43) 99637-9484", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Valdeci de Moura Transportes", "Rua Rita Rosa de Oliveira Leite, 1080 - Jardim Eldorado", "(15) 99798-2888", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Clayton Ramos Transportes e Turismo Ltda", "Rua Bauinea, 164 - Vista Alegre", "(43) 99600-0585", "vansEscolares", "servico"],
+  ["Transporte Escolar", "A. J. de Oliveira Transportes", "Rua Iziquiel Bueno, 2173 - Jardim Americana II", "(43) 99953-5928", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Heleana Pereira Aparecido", "Rua Benedito Salles, 1120 - Centro", "(43) 3566-1681", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Valdemir de Moura", "Rua Maria Pereira da Rocha Aleixo, 466 - Centro", "(43) 99922-0426", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Jefferson J. R. Abucarub", "Sítio São Benedito, Estrada da Alemoa, s/n - Murzilos", "(43) 99138-5343", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Valdomiro de Souza Transporte", "Rua Ataliba Leonel, 194 - Centro", "(43) 3566-2206", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Rocha e Gabriel Transportes Ltda", "Rua Haroldo Jose Barbosa, 356 - Vila Bandeirantes", "(43) 99957-4259", "vansEscolares", "servico"],
+  ["Transporte Escolar", "C. A. Bueno Transportes Ltda", "Chácara Benedito Fogaça, Estrada do Monge, 180 - Pinheirinho", "(43) 99855-6959", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Alcibides Abucarub", "Sítio São Benedito, s/n - Murzilos", "(43) 3566-1279", "vansEscolares", "servico"],
+  ["Transporte Escolar", "W Revelino Transportes", "Sítio Bom Jesus, s/n - Ribeirão do Meio", "(43) 3566-1345", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Rogerson Ariovaldo Perez Gonçalves", "Rua Padre Hugo, 978 - Centro", "(43) 99832-7367", "vansEscolares", "servico"],
+  ["Transporte Escolar", "Miria de Campos Moraes de Camargo Transportes", "Avenida Elson Soares, 1068 - Centro", "(43) 3566-1039", "vansEscolares", "servico"],
+
+  ["Depósito de Bebidas", "Salete Rocha David", "Rua Joaquim do Carmo Vilela, 200 - Centro", "(43) 9637-5022", "bebidas"],
+  ["Depósito de Bebidas", "Skinao Lanchonete e Restaurante", "Rua Benedito Salles, 794 - Centro", "(43) 3566-1345", "bebidas"],
+  ["Depósito de Bebidas", "Rosana Aparecida da Silva - Carlópolis", "Praça Leovegildo Salles, 647 - Centro", "", "bebidas"],
+  ["Depósito de Bebidas", "Maria Lourenço Teles e Cia Ltda", "Rua Antonio Jonas Ferreira Pinto, 261 - Centro", "(43) 3566-1345", "bebidas"],
+  ["Depósito de Bebidas", "Bar e Mercearia São Sebastião", "Rua Benedito Salles, s/n - Centro", "", "bebidas"],
+  ["Depósito de Bebidas", "Amauri Marques Junior - Carlópolis", "Rua Marcos Rodrigues do Amaral, 264 - Centro", "", "bebidas"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
