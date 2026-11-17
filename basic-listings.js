@@ -33,7 +33,12 @@ window.FONTES_CADASTROS_BASICOS = {
   acougues: "https://www.solutudo.com.br/empresas/pr/carlopolis/acougues",
   racoes: "https://www.solutudo.com.br/empresas/pr/carlopolis/casas%2Bde%2Bracao",
   contabilidade: "https://www.solutudo.com.br/empresas/pr/carlopolis/contabilidade",
-  gas: "https://www.solutudo.com.br/empresas/pr/carlopolis/gas"
+  gas: "https://www.solutudo.com.br/empresas/pr/carlopolis/gas",
+  materiaisEletricos: "https://www.solutudo.com.br/empresas/pr/carlopolis/materiais%2Beletricos",
+  ferramentas: "https://www.solutudo.com.br/empresas/pr/carlopolis/ferramentas%2Butilidades",
+  calcados: "https://www.solutudo.com.br/empresas/pr/carlopolis/calcados",
+  pintores: "https://www.solutudo.com.br/empresas/pr/carlopolis/pintores",
+  engenharia: "https://www.solutudo.com.br/empresas/pr/carlopolis/engenharia%2Bengenheiros"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -292,7 +297,39 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Gás", "Distribuidora Rodrigues Ltda", "Avenida Murador, 50 - Murador", "(43) 99603-3777", "gas"],
   ["Gás", "Michel de Abreu Carriel Prestadora de Serviços", "Rua Napoles, 68 - Residencial Italia II", "(43) 3566-2744", "gas"],
   ["Gás", "Rogerio Cater Souza - Carlópolis", "Avenida Elson Soares, 1048 A - Centro", "(43) 3566-1345", "gas"],
-  ["Gás", "Dirceu Ito de Oliveira", "Rua Chuva de Ouro, 184 - Jardim Vista Alegre", "(43) 99192-9235", "gas"]
+  ["Gás", "Dirceu Ito de Oliveira", "Rua Chuva de Ouro, 184 - Jardim Vista Alegre", "(43) 99192-9235", "gas"],
+
+  ["Materiais Elétricos", "Original Cesar Equipamentos Elétricos, Hidráulicos e Acabamentos Ltda", "Rua Laurindo Franco de Godoy, 787 - Centro", "(43) 98853-1982", "materiaisEletricos"],
+  ["Materiais Elétricos", "Acende Materiais Elétricos", "Rua Benedito Salles, 467 - Centro", "(43) 99185-2185", "materiaisEletricos"],
+  ["Materiais Elétricos", "Carlos Manoel Dognani Bernardo Gonçalves", "Rua Padre Hugo, 290 - Centro", "(43) 3566-1345", "materiaisEletricos"],
+  ["Materiais Elétricos", "Energy Brasil Carlópolis", "Rua Benedito Salles, 1135 - Centro", "(43) 99117-1790", "materiaisEletricos"],
+  ["Materiais Elétricos", "M. A. Domingues - Carlópolis", "Rua Jose Candido Souza, 160 - Novo Horizonte", "(43) 99653-0385", "materiaisEletricos"],
+
+  ["Ferramentas e Utilidades", "Pereira Material de Construção Ltda", "Estrada do Monge, 112 - Jardim do Cedro", "(43) 3566-2481", "ferramentas"],
+  ["Ferramentas e Utilidades", "R Martins - Sucatas", "Rodovia PR-218, s/n - Vicente de Oliveira", "(43) 3566-2505", "ferramentas"],
+  ["Ferramentas e Utilidades", "L & Martins Metais Ltda", "Rua Luiz Carlos Proença, 598 - Industrial", "(43) 99842-8091", "ferramentas"],
+  ["Ferramentas e Utilidades", "Tarfil Irrigação, Máquinas e Ferramentas Carlópolis", "Rua Benedito Salles, 1449 - Centro", "(43) 3566-2455", "ferramentas"],
+  ["Ferramentas e Utilidades", "Oliveira Soluções e Fotovoltaica Ltda", "Rua Silvio Jose Banik, 691 - Novo Horizonte I", "(43) 99956-9011", "ferramentas"],
+
+  ["Calçados", "Heloisa Escorsin Ltda", "Rua Antonio Jonas Ferreira Pinto, 186 - Centro", "(43) 99914-0056", "calcados"],
+  ["Calçados", "Elidiani Maria Camargo Coppi - Carlópolis", "Rua Benedito Salles, 870 - Centro", "(43) 3566-2481", "calcados"],
+  ["Calçados", "M. E. Comércio de Calçados Ltda", "Rua Kalil Keder, 583 - Centro", "(41) 99828-9060", "calcados"],
+  ["Calçados", "Loja Martins Araujo Ltda", "Rua Benedito Salles, 733 - Centro", "(43) 99907-1599", "calcados"],
+  ["Calçados", "Gehlen Alexandra Gama Zolin de Almeida - Carlópolis", "Rua Nicolau Miguel, 371 A - Centro", "(43) 3566-1345", "calcados"],
+  ["Calçados", "Duda Comércio de Calçados e Acessórios Ltda", "Rua Kalil Keder, 583 - Centro", "(41) 99828-9060", "calcados"],
+
+  ["Pintor", "Ricardo Lourenço da Silva", "Rua Marcos Rodrigues do Amaral, 329 - Centro", "", "pintores", "servico"],
+  ["Pintor", "Clebson de Araujo Silva Ltda", "Rua Eugenio Neves Soares, 704 - Bela Vista", "(43) 99693-1430", "pintores", "servico"],
+
+  ["Engenharia", "Enduron Engenharia e Transmissão Ltda", "Rua Salvira Marques, 445 - Centro", "(14) 98115-9723", "engenharia", "servico"],
+  ["Engenharia", "Adonis Construção e Engenharia Ltda", "Rua Ataliba Leonel, 43 - Centro", "(43) 99814-0861", "engenharia", "servico"],
+  ["Engenharia", "Trindade Serviços de Engenharia Ltda", "Rua Dra. Paula e Silva, 637 - Centro", "(13) 97410-5321", "engenharia", "servico"],
+  ["Engenharia", "Innova Build Engenharia Ltda", "Rua Manuel Francisco dos Santos, 562 - Amaral", "(14) 99986-6793", "engenharia", "servico"],
+  ["Engenharia", "DA2 Engenharia Ltda", "Rua Antonio Jonas Ferreira Pinto, 395 - Centro", "(43) 99128-6761", "engenharia", "servico"],
+  ["Engenharia", "Energy Brasil Carlópolis", "Rua Benedito Salles, 1135 - Centro", "(43) 99117-1790", "engenharia", "servico"],
+  ["Engenharia", "Mining Solutions Engenharia Ltda", "Rua Profeta Joao de Maria, 1732 - Industrial", "(43) 99808-0665", "engenharia", "servico"],
+  ["Engenharia", "M. A. C. Prestação de Serviços", "Estrada Gracioso, s/n - Gracioso", "(11) 97732-9058", "engenharia", "servico"],
+  ["Engenharia", "C. F. V. Engenharia Ltda", "Avenida Elson Soares, 202 - Centro", "(43) 99657-7021", "engenharia", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
