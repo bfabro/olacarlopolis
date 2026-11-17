@@ -27,7 +27,9 @@ window.FONTES_CADASTROS_BASICOS = {
   lavarapido: "https://www.solutudo.com.br/empresas/pr/carlopolis/lava%2Brapido%2Bestetica%2Bautomotiva",
   imobiliarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/imobiliarias%2Bcorretores%2Bde%2Bimoveis",
   transportadoras: "https://www.solutudo.com.br/empresas/pr/carlopolis/transportadoras",
-  academias: "https://www.solutudo.com.br/empresas/pr/carlopolis/academias/academia-corpo-e-mente-22171824"
+  academias: "https://www.solutudo.com.br/empresas/pr/carlopolis/academias/academia-corpo-e-mente-22171824",
+  perfumarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/busca?q=loja+de+cremes",
+  postos: "https://www.solutudo.com.br/empresas/pr/carlopolis/postos%2Be%2Bconveniencias?mais_buscadas=1&pagina=1"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -226,7 +228,40 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Transportadora", "Transrocha Transportes", "Rua Benedito Salles, 1063 - Centro", "(14) 3382-2052", "transportadoras", "servico"],
   ["Transportadora", "Piracicabana Transporte de Cargas e Encomendas Ltda", "Avenida Elson Soares, s/n - Centro", "", "transportadoras", "servico"],
 
-  ["Academia", "Academia Corpo e Mente", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academias", "servico"]
+  ["Academia", "Academia Corpo e Mente", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academias", "servico"],
+
+  ["Perfumaria e Cosméticos", "Maria de Fatima Bianchi", "Rua Laurindo Franco de Godoy, 567 - Centro", "(43) 99612-2241", "perfumarias"],
+  ["Perfumaria e Cosméticos", "Espaço do Perfume", "Rua Benedito Salles, 832 A - Centro", "(43) 99111-2049", "perfumarias"],
+  ["Perfumaria e Cosméticos", "Mille Comércio de Cosméticos Ltda", "Rua Benedito Salles, 583 - Centro", "(43) 3566-1770", "perfumarias"],
+  ["Perfumaria e Cosméticos", "Milena Cristina Mariano Pereira Ltda", "Rua Benedito Salles, 365 - Centro", "(43) 99914-7807", "perfumarias"],
+  ["Perfumaria e Cosméticos", "Gben Comércio de Produtos Naturais Manufaturados", "Rua Jose Talin, 148 - Jardim Primavera II", "(41) 3012-7001", "perfumarias"],
+  ["Perfumaria e Cosméticos", "Botanic Brasil Comércio de Produtos Naturais", "Rua Laudelino S. de Azevedo, 88 - Vista Bella", "(41) 3523-4001", "perfumarias"],
+  ["Perfumaria e Cosméticos", "Milena Cosméticos e Perfumaria", "Rua Benedito Salles, 365 - Centro", "(43) 99914-7807", "perfumarias"],
+
+  ["Posto de Combustível", "Angra Doce Comércio de Combustíveis Ltda", "Rua Paul Harris, 20 - Vista Bella", "(43) 3566-1412", "postos"],
+  ["Posto de Combustível", "Sentinela Comércio de Combustíveis Ltda", "Rua Benedito Salles, 1485 - Centro", "(43) 3566-1345", "postos"],
+  ["Posto de Combustível", "A Godoy & Cia Ltda", "Rua Benedito Salles, 532 - Centro", "(43) 3566-1412", "postos"],
+  ["Posto de Combustível", "Comercial de Petróleo Carlopolense Ltda", "Rua Benedito Salles, 982", "", "postos"],
+  ["Posto de Combustível", "Fox Milenium Carlópolis Comércio de Combustíveis Ltda", "Rua Benedito Salles, 2609 - Jaboticabal", "(43) 3534-5531", "postos"],
+  ["Posto de Combustível", "M. V. Escorsin Godoy & Godoy Ltda", "Rua Benedito Salles, 10 A - Centro", "(43) 3566-1412", "postos"],
+  ["Posto de Combustível", "Gd Carlópolis Comércio de Combustíveis Ltda", "Rua Benedito Salles, 10 - Centro", "(43) 3535-1558", "postos"],
+  ["Posto de Combustível", "Pedra Forte Comércio de Produtos Alimentícios Ltda", "Avenida Getulio Vargas, 696 - Centro", "(43) 9643-8082", "postos"],
+
+  ["Transportadora", "Sanches & Martines Ltda", "Avenida Elson Soares, 307 - Centro", "(43) 3566-1105", "transportadoras", "servico"],
+  ["Transportadora", "Camargo & Otani Transportes Ltda", "Alameda Colibri, 70 - Residencial Ilha Bela", "(15) 9605-6470", "transportadoras", "servico"],
+  ["Transportadora", "Aparecida de Fatima Buchaka Soares & Cia Ltda", "Rua Alfeneiro, 372 - Vista Alegre", "(43) 3566-2118", "transportadoras", "servico"],
+  ["Transportadora", "D. J. Massaruti Transportadora Ltda", "Rua Luiz Carlos Consolmagno de Proença, 610 - Centro", "(43) 9620-1830", "transportadoras", "servico"],
+  ["Transportadora", "D. J. Massaruti Serviços Ltda", "Rua Luiz Carlos Consolmagno de Proença, 600 - Centro", "(14) 3382-3294", "transportadoras", "servico"],
+  ["Transportadora", "Sanches Transportes", "Rua Joaquim do Carmo Vilela, 184 - Centro", "(43) 9617-9934", "transportadoras", "servico"],
+  ["Transportadora", "Rhafael Assi Transportadora Ltda", "Rua Carlos Consolmagno Proença, 600 - Parque Industrial Jorge Leite da Rosa", "(43) 3566-2077", "transportadoras", "servico"],
+  ["Transportadora", "T E C Transportes Ltda", "Chácara Santa Luzia, s/n - Jaboticabal", "(43) 3566-1345", "transportadoras", "servico"],
+  ["Transportadora", "D K Transporte", "Rua Joaquim do Carmo Vilela, s/n - Centro", "(43) 9623-7986", "transportadoras", "servico"],
+  ["Transportadora", "Transportadora Santos", "Rua Benedito Salles, 1188 - Centro", "", "transportadoras", "servico"],
+  ["Transportadora", "Montanher Transporte", "Rua Joaquim do Carmo Vilela, 215 - Centro", "(43) 9654-2347", "transportadoras", "servico"],
+  ["Transportadora", "Frunort Transportes Ltda", "Sítio Frunort, s/n - Matão", "(43) 9648-0633", "transportadoras", "servico"],
+  ["Transportadora", "M O Bueno & Cia Ltda", "Rua Benedito Salles, 615 - Centro", "(43) 9985-6935", "transportadoras", "servico"],
+  ["Transportadora", "Rocha Carlopolense Produtos e Transportes", "Rua Luiz Carlos Consolmagno, 540 - Parque Industrial Jorge Leite da Rosa", "(43) 3566-1324", "transportadoras", "servico"],
+  ["Transportadora", "L B Transportes", "Rua Joaquim do Carmo Vilela, 128 - Centro", "(43) 9134-7471", "transportadoras", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
