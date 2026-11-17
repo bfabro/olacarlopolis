@@ -14,7 +14,10 @@ window.FONTES_CADASTROS_BASICOS = {
   lanchonetes: "https://www.solutudo.com.br/empresas/pr/carlopolis/lanches%2Blanchonetes?pagina=1",
   odontologia: "https://www.solutudo.com.br/empresas/pr/carlopolis/odontologia",
   assistencia: "https://www.solutudo.com.br/empresas/pr/carlopolis/assistencia%2Btecnica/listas/8-opcoes-em-assistencia%2Btecnica-que-voce-deveria-conhecer-em-carlopolis-pr",
-  bares: "https://www.solutudo.com.br/empresas/pr/carlopolis/bares%2Bpubs?pagina=1"
+  bares: "https://www.solutudo.com.br/empresas/pr/carlopolis/bares%2Bpubs?pagina=1",
+  eletricistas: "https://www.solutudo.com.br/empresas/pr/carlopolis/eletricistas/listas/10-opcoes-em-eletricistas-que-voce-deveria-conhecer-em-carlopolis-pr",
+  psicologia: "https://www.solutudo.com.br/empresas/pr/carlopolis/psicologia?mais_buscadas=1",
+  advocacias: "https://www.solutudo.com.br/empresas/pr/carlopolis/advocacias"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -119,7 +122,41 @@ window.CADASTROS_BASICOS_PUBLICOS = [
 
   ["Restaurante", "Paiva's", "Rua Adorema Ana Rech, 546 - Jardim Primavera", "(43) 99821-7607", "bares"],
   ["Restaurante", "Maria Aparecida Pacheco", "Rua Edwirges Benedito do Amaral, 00 - Bela Vista", "(43) 99195-3748", "bares"],
-  ["Restaurante", "Luciane Marques dos Santos", "Chácara São Domingues, s/n - Jaboticabal", "(43) 3566-1345", "bares", "comercio", ["telefone", "Edmilson Belizario Santos Panificadora"]]
+  ["Restaurante", "Luciane Marques dos Santos", "Chácara São Domingues, s/n - Jaboticabal", "(43) 3566-1345", "bares", "comercio", ["telefone", "Edmilson Belizario Santos Panificadora"]],
+
+  ["Eletricista", "Cyberneticos Instalações Elétricas Industriais Ltda", "Rua Laurindo Franco Godoi, 1028 - Centro", "(43) 98854-4318", "eletricistas", "servico", ["telefone", "Cyberneticos instalações"]],
+  ["Eletricista", "Ronney Leite de Miranda", "Área Rural, s/n", "(43) 99646-8880", "eletricistas", "servico"],
+  ["Eletricista", "Walter Abelardo Barbosa", "Rua Pedro Balbino de Souza, 111 - Santa Clara", "(43) 99662-3781", "eletricistas", "servico"],
+  ["Eletricista", "Maria Lucia de Oliveira Antunes", "Rua Capitão Estácio, 823 - Centro", "(14) 99776-1400", "eletricistas", "servico"],
+  ["Eletricista", "Rogerio de Camargo Ferreira", "Rua Sibipiruna, 241 - Jardim Vista Alegre", "(43) 99625-7265", "eletricistas", "servico", ["telefone", "Gago"]],
+  ["Eletricista", "Luciano Leite", "Rua Benedito Salles, 472 - Centro", "(43) 99623-4736", "eletricistas", "servico"],
+  ["Eletricista", "Rafael Eduardo Pereira Soares", "Rua Kalil Keder, 559 - Centro", "(43) 99606-6971", "eletricistas", "servico"],
+  ["Eletricista", "Danilo da Silva Morais", "Rua Chuva de Ouro, 233 - Centro", "(43) 99660-3858", "eletricistas", "servico"],
+  ["Eletricista", "Diego Willians de Paula Iope", "Rua Januario Francisco Fallars, 92 - Centro", "(43) 98849-8949", "eletricistas", "servico", ["telefone", "Ponto Certo"]],
+  ["Eletricista", "Nelson Souza de Oliveira", "Rua Maria Keder Soares, 130 - Novo Horizonte", "(43) 99809-0031", "eletricistas", "servico"],
+
+  ["Psicologia", "Luciana M D David", "Rua Jorge Barros, 845 - Centro", "(43) 99653-0167", "psicologia", "servico"],
+  ["Psicologia", "Luciana Vieira Amaral", "Rua Maria Keder Soares, 121 - Novo Horizonte", "(43) 99846-2701", "psicologia", "servico"],
+  ["Psicologia", "Psicologia Reilane S Auerswald Ltda", "Rua Andre Jorge Clele, 420 - Centro", "(43) 98841-0290", "psicologia", "servico"],
+  ["Psicologia", "G. M. S. Organo Ltda", "Rua Sadatoshi Hamada, 119 - Vista Bella", "(43) 99159-6234", "psicologia", "servico"],
+  ["Psicologia", "T A de Azevedo Serviços de Psicologia", "Rua Fidencio de Melo, 240 - Centro", "(43) 99860-4291", "psicologia", "servico"],
+  ["Psicologia", "F. F. Silva Pontes Clínica de Psicologia", "Rua Antonio Jonas Ferreira Pinto, 657 - Centro", "(43) 99920-7928", "psicologia", "servico"],
+  ["Psicologia", "Meire Leticia Martins Siqueira", "Rua Benedito Salles, 693 - Centro", "(43) 99122-4758", "psicologia", "servico"],
+  ["Psicologia", "Dra. Daniela R. Viana Diogo", "Rua Padre Hugo, 985 - Centro", "(43) 99650-0459", "psicologia", "servico", ["endereco", "Dr Vilma"]],
+  ["Psicologia", "Natal e Rosa Clínica de Psicologia e Psicopedagogia Ltda", "Rua Nicolau Miguel, 641 - Centro", "(43) 99644-4889", "psicologia", "servico"],
+
+  ["Advocacia", "Carlópolis Cartório de Notas", "Rua Jorge Barros, 810 - Centro", "", "advocacias", "servico"],
+  ["Advocacia", "Advocacia Julio César de Lima", "Rua Antônio Jonas Ferreira Pinto, 281 - Centro", "(43) 98802-2272", "advocacias", "servico"],
+  ["Advocacia", "Djalma Salles Junior Sociedade Individual de Advocacia", "Rua Padre Hugo, 863 - Centro", "(41) 9914-7077", "advocacias", "servico"],
+  ["Advocacia", "Rolim & Rolim Advocacia", "Rua Benedito Salles, 832 - Centro", "(43) 9696-4267", "advocacias", "servico", ["endereco", "Forty Shake"]],
+  ["Advocacia", "Julio C. de Lima Sociedade Individual de Advocacia", "Rua Antonio Jonas Ferreira Pinto, 281 - Centro", "(43) 3566-1477", "advocacias", "servico", ["endereco", "Advocacia Julio César de Lima"]],
+  ["Advocacia", "Assistência Jurídica Advogado", "Rua Jorge Barros, 1500 - Centro", "(43) 98830-0700", "advocacias", "servico"],
+  ["Advocacia", "Tatyane Nogueira Ribeiro Sociedade Individual de Advocacia", "Rua Massanori Tiuman, 38 - Takenori Tiuman", "(43) 9921-6838", "advocacias", "servico"],
+  ["Advocacia", "Marino Train Neto Sociedade Individual de Advocacia", "Rua Benedito Salles, 443 - Centro", "(43) 9952-7820", "advocacias", "servico", ["endereco", "Visual 10 Filial III"]],
+  ["Advocacia", "Ajuri Assessoria Jurídica e Imobiliária", "Rua Kalil Keder, 569 - Centro", "(43) 3552-1484", "advocacias", "servico"],
+  ["Advocacia", "Miranda Prioli Sociedade Individual de Advocacia", "Rua Jose Salles, 637 - Centro", "(43) 9667-0053", "advocacias", "servico"],
+  ["Advocacia", "Damin Hamada Maia e Ramos Advogados Associados", "Rua Laurindo Franco de Godoi, 575 - Centro", "(43) 9985-6514", "advocacias", "servico"],
+  ["Advocacia", "Francielle Gotardi Advocacia", "Rua Jorge Barros, 844 - Centro", "(43) 99604-3849", "advocacias", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()

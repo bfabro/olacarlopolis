@@ -24083,6 +24083,15 @@ plotarPinsImoveis(stateImoveis.filtered);
     const ignoradosDetalhes = [];
 
     cadastros.forEach((cadastro) => {
+      if (cadastro.duplicateHint?.motivo) {
+        ignorados += 1;
+        ignoradosDetalhes.push({
+          nome: cadastro.name,
+          motivo: cadastro.duplicateHint.motivo,
+          conflitaCom: cadastro.duplicateHint.conflitaCom || "outro cadastro"
+        });
+        return;
+      }
       const duplicado = existentes
         .map((estabelecimento) => ({ estabelecimento, motivo: motivoDuplicidadeCadastroBasico(cadastro, estabelecimento) }))
         .find((item) => item.motivo);
