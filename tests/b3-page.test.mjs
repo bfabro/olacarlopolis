@@ -8,7 +8,7 @@ const read = (name) => readFile(new URL(name, root), "utf8");
 test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
   const html = await read("b3.html");
   for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=22/); assert.match(html, /b3\.js\?v=22/);
+  assert.match(html, /b3\.css\?v=23/); assert.match(html, /b3\.js\?v=23/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {
@@ -58,6 +58,13 @@ test("noticias ampliadas, bolsas consolidadas e niveis tecnicos", async () => {
   const [html, client, news, series] = await Promise.all([read("b3.html"), read("b3.js"), read("netlify/functions/b3-news.mjs"), read("netlify/functions/b3-series.mjs")]);
   assert.match(client, /slice\(0, 9\)/); assert.match(news, /EMBR3/); assert.match(client, /Todas \+ média/); assert.match(client, /Média global/);
   assert.match(html, /id="supportLevels"/); assert.match(series, /resistance1/); assert.match(series, /support2/);
+});
+
+test("bolsas permitem escolher periodo e intervalo personalizado", async () => {
+  const [html, client, series, css] = await Promise.all([read("b3.html"), read("b3.js"), read("netlify/functions/b3-series.mjs"), read("b3.css")]);
+  for (const period of ["1d", "5d", "1mo", "3mo", "6mo", "1y"]) assert.match(html, new RegExp(`data-index-period="${period}"`));
+  assert.match(html, /id="indexDateFrom"/); assert.match(html, /id="indexDateTo"/); assert.match(client, /loadIndexPeriod/); assert.match(client, /Cotação.*data\.marketTime/);
+  assert.match(series, /const PERIODS/); assert.match(series, /period1=/); assert.match(series, /interval=\$\{encodeURIComponent\(interval\)\}/); assert.match(css, /index-period-toolbar/);
 });
 
 test("noticias cronologicas, alertas intradiarios e influencia externa atualizavel", async () => {

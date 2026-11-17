@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=22">
+  <link rel="stylesheet" href="b3.css?v=23">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -174,9 +174,13 @@
       <div class="section-heading"><div><span class="eyebrow">MERCADOS GLOBAIS</span><h2>Principais bolsas</h2></div><p><span class="live-dot" aria-hidden="true"></span> Atualização automática · <span id="indicesUpdated">carregando…</span></p></div>
       <div class="index-summary" id="indexSummary"></div>
       <div class="aggregate-stats" id="aggregateStats"></div>
+      <div class="index-period-toolbar" aria-label="Período do gráfico">
+        <div class="index-period-buttons"><button class="is-active" type="button" data-index-period="1d">Hoje · 5 min</button><button type="button" data-index-period="5d">5 dias · 15 min</button><button type="button" data-index-period="1mo">1 mês</button><button type="button" data-index-period="3mo">3 meses</button><button type="button" data-index-period="6mo">6 meses</button><button type="button" data-index-period="1y">1 ano</button></div>
+        <form class="index-date-form" id="indexDateForm"><label>De <input id="indexDateFrom" type="date" required></label><label>Até <input id="indexDateTo" type="date" required></label><button type="submit">Aplicar datas</button></form>
+      </div>
       <div class="index-buttons" id="indexButtons"></div>
       <article class="chart-card main-chart">
-        <div class="chart-card-head"><div><span class="eyebrow">GRÁFICO</span><h2 id="indexTitle">Ibovespa</h2></div><span class="source-pill">Dados possivelmente atrasados</span></div>
+        <div class="chart-card-head"><div><span class="eyebrow">GRÁFICO</span><h2 id="indexTitle">Ibovespa</h2><small class="updated" id="indexPeriodStatus">Carregando período…</small></div><span class="source-pill">Dados possivelmente atrasados</span></div>
         <div id="indexChart" class="market-chart large" aria-label="Gráfico do índice selecionado"><div class="chart-loading">Carregando bolsas…</div></div>
       </article>
       <article class="influence-card top-gap">
@@ -313,6 +317,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=22"></script>
+  <script defer src="b3.js?v=23"></script>
 </body>
 </html>

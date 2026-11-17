@@ -7,9 +7,9 @@
   const money = (value) => Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
   const number = (value, digits = 0) => Number(value).toLocaleString("pt-BR", { maximumFractionDigits: digits });
   const percent = (value) => `${Number(value) > 0 ? "+" : ""}${number(value, 2)}%`;
-  const dateBR = (value) => new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(new Date(`${value}T12:00:00Z`));
+  const dateBR = (value) => { const raw = String(value || ""); const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T12:00:00Z` : raw); return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(date); };
   const timeBR = (value) => { const date = new Date(value); return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(date) : "—"; };
-  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", strengthOpenSort: "openContribution", strengthOpenSortDirection: "desc", strengthView: "stocks", premarket: null, premarketPromise: null, premarketCommodity: "brent", usEvents: [], usEventsPromise: null, groups: new Map(), groupRequests: new Map() };
+  const state = { tab: "resumo", news: [], newsUpdatedAt: null, commodity: "brent", index: "ibov", indexPeriod: "1d", indexPeriodData: null, indexPeriodKey: null, indexPeriodRequests: new Map(), overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", strengthOpenSort: "openContribution", strengthOpenSortDirection: "desc", strengthView: "stocks", premarket: null, premarketPromise: null, premarketCommodity: "brent", usEvents: [], usEventsPromise: null, groups: new Map(), groupRequests: new Map() };
 
   const commodities = [
     { id: "brent", title: "Petróleo Brent", group: "Energia", icon: "BR", assets: ["PETR4", "PETR3", "PRIO3", "RECV3"], summary: "Alta do Brent tende a elevar a receita em reais das produtoras. Refino, câmbio, política de preços e produção podem alterar o efeito." },
@@ -23,6 +23,15 @@
     { id: "ibov", label: "Ibovespa" }, { id: "spx", label: "S&P 500" }, { id: "nasdaq", label: "Nasdaq" },
     { id: "dow", label: "Dow Jones" }, { id: "dax", label: "DAX" }, { id: "nikkei", label: "Nikkei 225" }, { id: "china", label: "Xangai" }
   ];
+  const indexPeriods = {
+    "1d": { label: "Hoje", caption: "Base 100 na abertura do período · pontos a cada 5 minutos", intraday: true },
+    "5d": { label: "5 dias", caption: "Base 100 no início do período · pontos a cada 15 minutos", intraday: true },
+    "1mo": { label: "1 mês", caption: "Base 100 no início do período · fechamento diário", intraday: false },
+    "3mo": { label: "3 meses", caption: "Base 100 no início do período · fechamento diário", intraday: false },
+    "6mo": { label: "6 meses", caption: "Base 100 no início do período · fechamento diário", intraday: false },
+    "1y": { label: "1 ano", caption: "Base 100 no início do período · fechamento diário", intraday: false },
+    custom: { label: "Datas escolhidas", caption: "Base 100 na primeira data selecionada · fechamento diário", intraday: false }
+  };
 
   function newYorkOpenMinutes(now = new Date()) {
     const parts = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo", year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now);
@@ -80,7 +89,7 @@
     $$(".tab-panel").forEach((panel) => { const active = panel.dataset.panel === tab; panel.hidden = !active; panel.classList.toggle("is-active", active); });
     if (tab === "commodities") loadCommodity(state.commodity);
     if (tab === "forca") { loadStrength(); if (state.strengthView === "commodities") loadPremarket(); }
-    if (tab === "bolsas") ensureOverview().then(renderSelectedIndex).catch(showIndexError);
+    if (tab === "bolsas") { ensureOverview().catch(showIndexError); loadIndexPeriod(state.indexPeriod).catch(showIndexError); }
     if (tab === "analise") { ensureOverview().then(renderAnalysis).catch(() => {}); renderTechnical(); }
     if (tab === "daytrade") { ensureOverview().then(renderTradeContext).catch(() => {}); loadUsEvents(); }
     if (tab === "contratos") loadFutures();
@@ -104,8 +113,8 @@
     return [...values.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, row]) => ({ date, value: row.reduce((sum, value) => sum + value, 0) / row.length }));
   }
 
-  function renderLineChart(container, series, caption) {
-    const usable = series.filter((item) => item.points?.length > 1);
+  function renderLineChart(container, series, caption, options = {}) {
+    const usable = series.filter((item) => item.points?.length > 0);
     if (!usable.length) { container.innerHTML = '<div class="chart-error">Série histórica indisponível.</div>'; return; }
     const dates = [...new Set(usable.flatMap((item) => item.points.map((point) => point.date)))].sort();
     const allValues = usable.flatMap((item) => item.points.map((point) => point.value)); let min = Math.min(...allValues); let max = Math.max(...allValues);
@@ -114,9 +123,10 @@
     const x = (date) => left + dates.indexOf(date) / Math.max(dates.length - 1, 1) * innerW; const y = (value) => top + (max - value) / (max - min) * innerH;
     const grids = Array.from({ length: 5 }, (_, index) => { const value = max - index * (max - min) / 4; const yy = y(value); return `<line x1="${left}" y1="${yy}" x2="${width - right}" y2="${yy}"/><text x="${left - 8}" y="${yy + 4}" text-anchor="end">${number(value, 1)}</text>`; }).join("");
     const paths = usable.map((item) => { const d = item.points.map((point, index) => `${index ? "L" : "M"}${x(point.date).toFixed(1)},${y(point.value).toFixed(1)}`).join(" "); return `<path d="${d}" stroke="${item.color}" style="stroke-width:${item.width || 3}px"/><circle cx="${x(item.points.at(-1).date)}" cy="${y(item.points.at(-1).value)}" r="4" fill="${item.color}"/>`; }).join("");
-    const ticks = [dates[0], dates[Math.floor((dates.length - 1) / 2)], dates.at(-1)].filter(Boolean).map((date) => `<text class="date" x="${x(date)}" y="${height - 14}" text-anchor="middle">${dateBR(date)}</text>`).join("");
+    const axisLabel = (value) => { if (!options.intraday) return dateBR(value); const date = new Date(value); return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", ...(options.period === "1d" ? { hour: "2-digit", minute: "2-digit" } : { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" }) }).format(date); };
+    const ticks = [...new Set([dates[0], dates[Math.floor((dates.length - 1) / 2)], dates.at(-1)].filter(Boolean))].map((date) => `<text class="date" x="${x(date)}" y="${height - 14}" text-anchor="middle">${axisLabel(date)}</text>`).join("");
     const legend = usable.map((item) => { const change = item.points.at(-1).value - 100; return `<span><i style="background:${item.color}"></i><b>${esc(item.label)}</b><small class="${change >= 0 ? "positive" : "negative"}">${percent(change)} no período</small></span>`; }).join("");
-    container.innerHTML = `<div class="chart-legend">${legend}</div><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(caption)}"><g class="grid">${grids}</g><g class="axis">${ticks}</g><g class="lines">${paths}</g></svg><small class="chart-caption">Base 100 no início do período · últimos três meses · fechamento diário</small>`;
+    container.innerHTML = `<div class="chart-legend">${legend}</div><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(caption)}"><g class="grid">${grids}</g><g class="axis">${ticks}</g><g class="lines">${paths}</g></svg><small class="chart-caption">${esc(options.caption || "Base 100 no início do período · últimos três meses · fechamento diário")}</small>`;
   }
 
   function renderCommodities() {
@@ -236,11 +246,14 @@
   function renderIndices() {
     $("#indexButtons").innerHTML = [...indices, { id: "all", label: "Todas + média" }].map((item) => `<button class="index-button ${item.id === state.index ? "is-active" : ""}" type="button" data-index="${item.id}">${item.label}</button>`).join("");
     $$('[data-index]').forEach((button) => button.addEventListener("click", () => { state.index = button.dataset.index; renderSelectedIndex(); }));
+    $$('[data-index-period]').forEach((button) => button.addEventListener("click", () => { state.indexPeriod = button.dataset.indexPeriod; loadIndexPeriod(state.indexPeriod).catch(showIndexError); }));
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(new Date()); const monthAgo = new Date(); monthAgo.setDate(monthAgo.getDate() - 30); $("#indexDateTo").value = today; $("#indexDateFrom").value = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Sao_Paulo" }).format(monthAgo);
+    $("#indexDateForm").addEventListener("submit", (event) => { event.preventDefault(); const from = $("#indexDateFrom").value; const to = $("#indexDateTo").value; if (!from || !to || from >= to) { $("#indexPeriodStatus").textContent = "Escolha uma data inicial anterior à final."; return; } state.indexPeriod = "custom"; loadIndexPeriod("custom", from, to).catch(showIndexError); });
   }
 
   function renderIndexSummary() {
     if (!state.overview) return; const listed = indices.map((item) => state.overview.indices[item.id]);
-    $("#indexSummary").innerHTML = indices.slice(0, 4).map((item) => { const data = state.overview.indices[item.id]; const tone = data.change1d >= 0 ? "positive" : "negative"; return `<article><span>${item.label}</span><strong>${number(data.current, data.current < 1000 ? 2 : 0)}</strong><small class="${tone}">${percent(data.change1d)} no dia</small></article>`; }).join("");
+    $("#indexSummary").innerHTML = indices.map((item) => { const data = state.overview.indices[item.id]; const tone = data.change1d >= 0 ? "positive" : "negative"; return `<article><span>${item.label}</span><strong>${number(data.current, data.current < 1000 ? 2 : 0)}</strong><small class="${tone}">${percent(data.change1d)} no dia</small><em>Cotação ${timeBR(data.marketTime)}</em></article>`; }).join("");
     const sum = listed.reduce((total, item) => total + item.change1d, 0); const average = sum / listed.length; const highs = listed.filter((item) => item.change1d > 0).length;
     $("#aggregateStats").innerHTML = `<article><span>Soma das variações</span><strong class="${sum >= 0 ? "positive" : "negative"}">${percent(sum)}</strong></article><article><span>Média das bolsas</span><strong class="${average >= 0 ? "positive" : "negative"}">${percent(average)}</strong></article><article><span>Amplitude global</span><strong>${highs} altas · ${listed.length - highs} baixas</strong></article>`; renderInfluenceProbability(); updateLiveTimestamps();
   }
@@ -261,15 +274,22 @@
   }
 
   function renderSelectedIndex() {
-    if (!state.overview) return; $$('[data-index]').forEach((button) => button.classList.toggle("is-active", button.dataset.index === state.index));
+    const source = state.indexPeriodData?.indices ? state.indexPeriodData : state.overview; if (!source) return; $$('[data-index]').forEach((button) => button.classList.toggle("is-active", button.dataset.index === state.index)); $$('[data-index-period]').forEach((button) => button.classList.toggle("is-active", button.dataset.indexPeriod === state.indexPeriod)); const period = indexPeriods[state.indexPeriod] || indexPeriods["3mo"];
     if (state.index === "all") {
-      const colors = ["#dc2626", "#2563eb", "#7c3aed", "#ea580c", "#0891b2", "#ca8a04", "#db2777"]; const listed = indices.map((item, index) => normalizeSeries(state.overview.indices[item.id], item.label, colors[index]));
-      const average = { label: "Média global", color: "#071c2b", width: 5, points: averageSeries(indices.map((item) => state.overview.indices[item.id])) }; $("#indexTitle").textContent = "Todas as bolsas + média global";
-      renderLineChart($("#indexChart"), [...listed, average], "Comparação de todas as bolsas e sua média global"); return;
+      const colors = ["#dc2626", "#2563eb", "#7c3aed", "#ea580c", "#0891b2", "#ca8a04", "#db2777"]; const listed = indices.map((item, index) => normalizeSeries(source.indices[item.id], item.label, colors[index]));
+      const average = { label: "Média global", color: "#071c2b", width: 5, points: averageSeries(indices.map((item) => source.indices[item.id])) }; $("#indexTitle").textContent = "Todas as bolsas + média global"; $("#indexPeriodStatus").textContent = `${source.period?.fallback ? "Hoje / última sessão disponível" : period.label} · comparação normalizada`;
+      renderLineChart($("#indexChart"), [...listed, average], "Comparação de todas as bolsas e sua média global", { intraday: period.intraday, period: state.indexPeriod, caption: period.caption }); return;
     }
-    const data = state.overview.indices[state.index]; if (!data) return; $("#indexTitle").textContent = data.label; renderLineChart($("#indexChart"), [normalizeSeries(data, data.label, "#0a7a61")], `Evolução do ${data.label}`);
+    const data = source.indices[state.index]; if (!data) return; const shownPeriod = data.period?.fallback ? "Última sessão disponível" : period.label; $("#indexTitle").textContent = data.label; $("#indexPeriodStatus").textContent = `${shownPeriod} · atual ${number(data.current, data.current < 1000 ? 2 : 0)} · cotação ${timeBR(data.marketTime)}`; renderLineChart($("#indexChart"), [normalizeSeries(data, data.label, "#0a7a61")], `Evolução do ${data.label}`, { intraday: period.intraday, period: state.indexPeriod, caption: data.period?.fallback ? "Base 100 na última sessão disponível · pontos a cada 5 minutos" : period.caption });
   }
   function showIndexError(error) { $("#indexChart").innerHTML = `<div class="chart-error"><strong>Bolsas temporariamente indisponíveis.</strong><span>${esc(error.message)}</span></div>`; }
+
+  async function loadIndexPeriod(period, from = "", to = "") {
+    const key = `${period}:${from}:${to}`; state.indexPeriod = period; state.indexPeriodKey = key; $$('[data-index-period]').forEach((button) => button.classList.toggle("is-active", button.dataset.indexPeriod === period)); $("#indexPeriodStatus").textContent = "Carregando período…"; $("#indexChart").innerHTML = '<div class="chart-loading">Buscando histórico das bolsas…</div>';
+    if (state.indexPeriodRequests.has(key)) { state.indexPeriodData = await state.indexPeriodRequests.get(key); if (state.indexPeriodKey === key) renderSelectedIndex(); return state.indexPeriodData; }
+    const query = period === "custom" ? `from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}` : `period=${encodeURIComponent(period)}`; const request = apiJson(`/api/b3-series?${query}&live=${Date.now()}`); state.indexPeriodRequests.set(key, request);
+    try { const payload = await request; if (state.indexPeriodKey === key) { state.indexPeriodData = payload; renderSelectedIndex(); } return payload; } catch (error) { state.indexPeriodRequests.delete(key); throw error; }
+  }
 
   async function ensureOverview(force = false) {
     if (state.overview && !force) return state.overview; if (state.overviewPromise) return state.overviewPromise;
