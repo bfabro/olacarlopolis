@@ -64,6 +64,7 @@ window.FONTES_CADASTROS_BASICOS = {
   borracharias: "https://www.solutudo.com.br/empresas/pr/carlopolis/borracharias",
   vidracarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/vidracarias/listas/5-opcoes-em-vidracarias-que-voce-deveria-conhecer-em-carlopolis-pr",
   taxis: "https://www.solutudo.com.br/empresas/pr/carlopolis/taxis",
+  joias: "https://www.solutudo.com.br/empresas/pr/carlopolis/busca?pagina=1&q=lojas+de+joias",
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -568,7 +569,14 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Vidraçaria", "B Salles Lima - Carlópolis", "Rua Benedito Salles, 1225 - Centro", "(43) 99821-7139", "vidracarias", "comercio", ["endereco", "Salles Vidros"]],
   ["Vidraçaria", "Brizalle Mármores e Vidros", "Rua Luiz Carlos Consulmagno de Proença, 430 - Distrito Industrial", "(43) 99668-0535", "vidracarias"],
   ["Táxi", "Marcilio Tavares Silverio", "Rua Joaquim do Carmo Vilela, 509 - Centro", "(43) 3536-1631", "taxis", "servico", ["telefone", "Viviane Aparecida Carreiro Alves"]],
-  ["Táxi", "Rivelino da Silva Rocha", "Rua Joaquim do Carmo Vilela, 386 - Centro", "(43) 8812-0380", "taxis", "servico"]
+  ["Táxi", "Rivelino da Silva Rocha", "Rua Joaquim do Carmo Vilela, 386 - Centro", "(43) 8812-0380", "taxis", "servico"],
+  ["Joias e Bijuterias", "Lindaura Simão Fernandes Fonseca", "Rua Edwirges Benedito do Amaral, 864 - Centro", "(15) 98148-6819", "joias"],
+  ["Joias e Bijuterias", "Luciana Presentes", "Rua Benedito Salles, 605 - Centro", "(14) 3761-3000", "joias"],
+  ["Joias e Bijuterias", "Jair Spina", "Rua Projetada C, 621 - Jardim Vista Alegre", "(43) 99806-1835", "joias"],
+  ["Joias e Bijuterias", "Amaral Maia MDF Ltda", "Rua Benedito Salles, 939 - Centro", "(43) 99837-5390", "joias", "comercio", ["telefone", "Jara Empreendimentos Imobiliários Ltda"]],
+  ["Joias e Bijuterias", "Kelia Bergamo Acessórios", "Rua Marcos Rodrigues do Amaral, 248 - Centro", "(43) 99175-3990", "joias"],
+  ["Joias e Bijuterias", "Dani Benevenutti - Acessórios Finos", "Rua Joaquim do Carmo Vilela, 366 - Centro", "(43) 9657-3076", "joias"],
+  ["Joias e Bijuterias", "Luciana Estevam Barone Bueno", "Rua Laurindo Franco de Godoy, 428 - Centro", "(43) 3566-1345", "joias", "comercio", ["fonte", "informações públicas conflitantes e telefone já repetido na base"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
