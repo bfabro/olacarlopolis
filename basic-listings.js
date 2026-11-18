@@ -27,7 +27,7 @@ window.FONTES_CADASTROS_BASICOS = {
   lavarapido: "https://www.solutudo.com.br/empresas/pr/carlopolis/lava%2Brapido%2Bestetica%2Bautomotiva",
   imobiliarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/imobiliarias%2Bcorretores%2Bde%2Bimoveis",
   transportadoras: "https://www.solutudo.com.br/empresas/pr/carlopolis/transportadoras",
-  academias: "https://www.solutudo.com.br/empresas/pr/carlopolis/academias/academia-corpo-e-mente-22171824",
+  academias: "https://www.solutudo.com.br/empresas/pr/carlopolis/academias",
   perfumarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/busca?q=loja+de+cremes",
   postos: "https://www.solutudo.com.br/empresas/pr/carlopolis/postos%2Be%2Bconveniencias?mais_buscadas=1&pagina=1",
   acougues: "https://www.solutudo.com.br/empresas/pr/carlopolis/acougues",
@@ -557,7 +557,9 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Borracharia", "Rosiane Oliveira da Costa - Borracharia", "Rua Dra. Paula e Silva, 826 - Centro", "(43) 99153-1939", "borracharias", "servico"],
   ["Borracharia", "Edson Alves da Silva", "Rua Andrino Soares, 172 - Centro", "(43) 99673-5985", "borracharias", "servico"],
   ["Borracharia", "Geni Dalva Paiva de Camargo", "Rua Gênova, 10 - Residencial Itália", "(43) 99620-4663", "borracharias", "servico"],
-  ["Borracharia", "Lucirene Franco da Rosa", "Rua Kalil Keder, 808 - Centro", "(43) 99693-6134", "borracharias", "servico"]
+  ["Borracharia", "Lucirene Franco da Rosa", "Rua Kalil Keder, 808 - Centro", "(43) 99693-6134", "borracharias", "servico"],
+  ["Academia", "Corpo e Mente Academia", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academias", "servico"],
+  ["Academia", "Kaduda Esportes - Treinamentos e Eventos Esportivos", "Rua José Salles, 94 - Centro", "(43) 98815-4779", "academias", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
