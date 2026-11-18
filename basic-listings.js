@@ -61,6 +61,7 @@ window.FONTES_CADASTROS_BASICOS = {
   lojasCarros: "https://www.solutudo.com.br/empresas/pr/carlopolis/lojas-de-carros",
   aluguelCarros: "https://www.solutudo.com.br/empresas/pr/carlopolis/aluguel%2Bde%2Bcarros",
   produtosAgricolas: "https://www.solutudo.com.br/empresas/pr/carlopolis/produtos%2Bagricolas",
+  borracharias: "https://www.solutudo.com.br/empresas/pr/carlopolis/borracharias",
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -551,7 +552,12 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Produtos Agrícolas", "Agro Vida Comércio de Produtos Agropecuários Ltda", "Rua Benedito Salles, 309 - Vila Bandeirantes", "(43) 99158-9047", "produtosAgricolas"],
   ["Produtos Agrícolas", "Eliane Aparecida Rodrigues & Cia Ltda", "Estrada Municipal do Monge, 112 - Jardim do Cedro", "(43) 3569-1027", "produtosAgricolas"],
   ["Produtos Agrícolas", "Agropecuária do Fabiano", "Rua Benedito Salles, 322 - Centro", "(43) 3566-2481", "produtosAgricolas"],
-  ["Produtos Agrícolas", "Comercial Agropecuária Almeida Ltda", "Rua André Jorge Cele, 201 - Centro", "(43) 3566-1165", "produtosAgricolas"]
+  ["Produtos Agrícolas", "Comercial Agropecuária Almeida Ltda", "Rua André Jorge Cele, 201 - Centro", "(43) 3566-1165", "produtosAgricolas"],
+  ["Borracharia", "Lubrityres Importadora e Distribuidora Ltda", "Rua Paul Harris, 62-C - Industrial", "(43) 99915-2690", "borracharias", "servico"],
+  ["Borracharia", "Rosiane Oliveira da Costa - Borracharia", "Rua Dra. Paula e Silva, 826 - Centro", "(43) 99153-1939", "borracharias", "servico"],
+  ["Borracharia", "Edson Alves da Silva", "Rua Andrino Soares, 172 - Centro", "(43) 99673-5985", "borracharias", "servico"],
+  ["Borracharia", "Geni Dalva Paiva de Camargo", "Rua Gênova, 10 - Residencial Itália", "(43) 99620-4663", "borracharias", "servico"],
+  ["Borracharia", "Lucirene Franco da Rosa", "Rua Kalil Keder, 808 - Centro", "(43) 99693-6134", "borracharias", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
