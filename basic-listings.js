@@ -62,6 +62,7 @@ window.FONTES_CADASTROS_BASICOS = {
   aluguelCarros: "https://www.solutudo.com.br/empresas/pr/carlopolis/aluguel%2Bde%2Bcarros",
   produtosAgricolas: "https://www.solutudo.com.br/empresas/pr/carlopolis/produtos%2Bagricolas",
   borracharias: "https://www.solutudo.com.br/empresas/pr/carlopolis/borracharias",
+  vidracarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/vidracarias/listas/5-opcoes-em-vidracarias-que-voce-deveria-conhecer-em-carlopolis-pr",
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -559,7 +560,12 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Borracharia", "Geni Dalva Paiva de Camargo", "Rua Gênova, 10 - Residencial Itália", "(43) 99620-4663", "borracharias", "servico"],
   ["Borracharia", "Lucirene Franco da Rosa", "Rua Kalil Keder, 808 - Centro", "(43) 99693-6134", "borracharias", "servico"],
   ["Academia", "Corpo e Mente Academia", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academias", "servico"],
-  ["Academia", "Kaduda Esportes - Treinamentos e Eventos Esportivos", "Rua José Salles, 94 - Centro", "(43) 98815-4779", "academias", "servico"]
+  ["Academia", "Kaduda Esportes - Treinamentos e Eventos Esportivos", "Rua José Salles, 94 - Centro", "(43) 98815-4779", "academias", "servico"],
+  ["Vidraçaria", "Vidraco Comércio de Vidros e Alumínios Ltda", "Avenida Turística Elias Merhi Mansur, 1146 - Condomínio Residencial Tomodati - Jardim Americana", "(41) 99559-0044", "vidracarias"],
+  ["Vidraçaria", "Michele da Cunha Frota - Vidraçaria", "Rua Benedito Salles, 462 - Centro", "(43) 3566-1345", "vidracarias", "comercio", ["endereco", "Destak Mármores"]],
+  ["Vidraçaria", "R D K Azevedo Vidros", "Rua Benedito Salles, 1225 - Centro", "(43) 99618-4867", "vidracarias", "comercio", ["telefone", "Salles Vidros"]],
+  ["Vidraçaria", "B Salles Lima - Carlópolis", "Rua Benedito Salles, 1225 - Centro", "(43) 99821-7139", "vidracarias", "comercio", ["endereco", "Salles Vidros"]],
+  ["Vidraçaria", "Brizalle Mármores e Vidros", "Rua Luiz Carlos Consulmagno de Proença, 430 - Distrito Industrial", "(43) 99668-0535", "vidracarias"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
