@@ -41,7 +41,9 @@ window.FONTES_CADASTROS_BASICOS = {
   engenharia: "https://www.solutudo.com.br/empresas/pr/carlopolis/engenharia%2Bengenheiros",
   serralherias: "https://www.solutudo.com.br/empresas/pr/carlopolis/serralherias%2Bestruturas",
   vansEscolares: "https://www.solutudo.com.br/empresas/pr/carlopolis/vans%2Btransportes%2Bescolares",
-  bebidas: "https://www.solutudo.com.br/empresas/pr/carlopolis/depositos%2Bde%2Bbebidas"
+  bebidas: "https://www.solutudo.com.br/empresas/pr/carlopolis/depositos%2Bde%2Bbebidas",
+  construtoras: "https://www.solutudo.com.br/empresas/pr/carlopolis/construtoras",
+  pedreiros: "https://www.solutudo.com.br/empresas/pr/carlopolis/construtores%2Bpedreiros"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -363,7 +365,41 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Depósito de Bebidas", "Rosana Aparecida da Silva - Carlópolis", "Praça Leovegildo Salles, 647 - Centro", "", "bebidas"],
   ["Depósito de Bebidas", "Maria Lourenço Teles e Cia Ltda", "Rua Antonio Jonas Ferreira Pinto, 261 - Centro", "(43) 3566-1345", "bebidas"],
   ["Depósito de Bebidas", "Bar e Mercearia São Sebastião", "Rua Benedito Salles, s/n - Centro", "", "bebidas"],
-  ["Depósito de Bebidas", "Amauri Marques Junior - Carlópolis", "Rua Marcos Rodrigues do Amaral, 264 - Centro", "", "bebidas"]
+  ["Depósito de Bebidas", "Amauri Marques Junior - Carlópolis", "Rua Marcos Rodrigues do Amaral, 264 - Centro", "", "bebidas"],
+
+  ["Construtora", "Panichi Construtora Ltda", "Rua Jorge Barros, 1175 - Centro", "(43) 99926-0976", "construtoras", "servico"],
+  ["Construtora", "M. S. Projetos e Construção Ltda", "Rua Benedito Salles, 1132 - Centro", "(43) 99920-6842", "construtoras", "servico"],
+  ["Construtora", "Onix Engenharia e Construtora Ltda", "Rua Antonio Jonas Ferreira Pinto, 310 - Centro", "(43) 3566-1345", "construtoras", "servico"],
+  ["Construtora", "Avyon Engenharia e Infraestrutura Ltda", "Rua Tadashi Uto, 37 - Residencial Amaral II", "(43) 99649-6641", "construtoras", "servico"],
+  ["Construtora", "Consbarra Construções Ltda", "Rodovia PR-218, s/n - Fazenda Boa Esperança", "(43) 3546-6027", "construtoras", "servico"],
+  ["Construtora", "Construtora Alicaht Ltda", "Rua Benedito Salles, 637 - Centro", "(43) 3566-1345", "construtoras", "servico"],
+  ["Construtora", "Construhouse Ltda", "Rua Emilio da Silva, 321 - CTG", "(11) 98166-7505", "construtoras", "servico"],
+  ["Construtora", "J. de Ornelas - Construtora", "Rua Professora Marina Jane de Moraes, 421 - Caminho do Vale", "(43) 99956-6676", "construtoras", "servico"],
+  ["Construtora", "Capa Estruturas e Coberturas Ltda", "Rua Jose Gonçalves Mendes, 88 - Jardim das Paineiras", "(47) 99993-2578", "construtoras", "servico"],
+  ["Construtora", "A. D. M. Construtora Civil e Pavimentação Ltda", "Rua Dr. Alberto Merhi Mansur, 40 - Centro", "(43) 99831-9629", "construtoras", "servico"],
+  ["Construtora", "J. P. de Sousa Construções", "Sítio São João, s/n - Água da Limeira", "(43) 99147-2915", "construtoras", "servico"],
+  ["Construtora", "Moraes e Moraes Construções Ltda", "Rua Haroldo Jose Barbosa, 75 - Centro", "(43) 3566-1345", "construtoras", "servico"],
+  ["Construtora", "Suelen Damin Construtora", "Rua Jorge Barros, 887 - Centro", "(43) 99960-1558", "construtoras", "servico"],
+  ["Construtora", "Ronega Construção Civil Ltda", "Rua Benedito Salles com Kalil Keder, 583 - Centro", "(43) 3566-1868", "construtoras", "servico"],
+
+  ["Pedreiro", "Adrieli Camargo Rodrigues", "Rua Elidia Maria de Jesus, 59 - Vista Bella", "(43) 99119-1675", "pedreiros", "servico"],
+  ["Pedreiro", "Silvio Aparecido Calegari", "Rua Evaristo Sanches Garcia, 250 - Novo Horizonte", "(43) 99662-6420", "pedreiros", "servico"],
+  ["Pedreiro", "Empreiteira Nando Valim", "Rua Laudelino Sales de Azevedo, 624 - Jardim Primavera", "(43) 99625-7420", "pedreiros", "servico"],
+  ["Pedreiro", "Edu Calhas", "Rua Joaquim do Carmo Vilela, 1433 - Centro", "(43) 9668-1086", "pedreiros", "servico"],
+  ["Pedreiro", "Ronivaldo Batista - Carlópolis", "Rua Benedito Salles, 320 - Industrial", "(43) 3559-1246", "pedreiros", "servico"],
+  ["Pedreiro", "Fabio Batista", "Rua Manguinha, 396 - Vista Alegre", "(43) 99609-4183", "pedreiros", "servico"],
+  ["Pedreiro", "Rafael Francisco Messias de Almeida", "Rua Evaristo Sanches Garcia, 61 - Novo Horizonte", "(43) 98849-4814", "pedreiros", "servico"],
+  ["Pedreiro", "Mario Sergio Martini", "Rua Benedito Salles, 1168 - Centro", "(43) 3566-1523", "pedreiros", "servico"],
+  ["Pedreiro", "Luis Carlos Faganelli", "Rua Sadatoshi Hamada, 12 - Jardim Vista Bella", "(43) 99668-0253", "pedreiros", "servico"],
+  ["Pedreiro", "Marcelo de Souza Valim", "Rua Sibipiruna, 309 - Vista Alegre", "(43) 98817-3063", "pedreiros", "servico"],
+  ["Pedreiro", "JC Construtora", "Rua Professora Marina Jane de Moraes, 421 - Caminho do Vale", "(43) 99108-2948", "pedreiros", "servico"],
+  ["Pedreiro", "Luis Carlos de Almeida", "Avenida Elson Soares, 1553 - Centro", "(43) 99901-0118", "pedreiros", "servico"],
+  ["Pedreiro", "Anderson Francisco Domingos", "Rua Extremosa, 499 - Vista Alegre", "(43) 99673-1089", "pedreiros", "servico"],
+  ["Pedreiro", "Wagner Pedro da Silva", "Rua Extremosa, 634 - Vista Alegre", "(43) 3566-2335", "pedreiros", "servico"],
+  ["Pedreiro", "Claudinei Mendes da Silva", "Rua Maria Lourdes N. Leonarduzzi, 339 - Caminho do Vale", "(43) 99989-0245", "pedreiros", "servico"],
+  ["Pedreiro", "Antonio Luiz Faria", "Estrada Espírito Santo, 127 - Vista Alegre", "(43) 99616-2963", "pedreiros", "servico"],
+  ["Pedreiro", "Joao Felipe de Oliveira", "Área Rural, s/n - Área Rural", "(43) 99819-6404", "pedreiros", "servico"],
+  ["Pedreiro", "Pedra Forte Empréstimos Imobiliários", "Rua A, 546 - Parque Industrial Jorge Leite da Rosa", "(43) 99643-8082", "pedreiros", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
