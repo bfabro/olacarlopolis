@@ -63,6 +63,7 @@ window.FONTES_CADASTROS_BASICOS = {
   produtosAgricolas: "https://www.solutudo.com.br/empresas/pr/carlopolis/produtos%2Bagricolas",
   borracharias: "https://www.solutudo.com.br/empresas/pr/carlopolis/borracharias",
   vidracarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/vidracarias/listas/5-opcoes-em-vidracarias-que-voce-deveria-conhecer-em-carlopolis-pr",
+  taxis: "https://www.solutudo.com.br/empresas/pr/carlopolis/taxis",
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -565,7 +566,9 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Vidraçaria", "Michele da Cunha Frota - Vidraçaria", "Rua Benedito Salles, 462 - Centro", "(43) 3566-1345", "vidracarias", "comercio", ["endereco", "Destak Mármores"]],
   ["Vidraçaria", "R D K Azevedo Vidros", "Rua Benedito Salles, 1225 - Centro", "(43) 99618-4867", "vidracarias", "comercio", ["telefone", "Salles Vidros"]],
   ["Vidraçaria", "B Salles Lima - Carlópolis", "Rua Benedito Salles, 1225 - Centro", "(43) 99821-7139", "vidracarias", "comercio", ["endereco", "Salles Vidros"]],
-  ["Vidraçaria", "Brizalle Mármores e Vidros", "Rua Luiz Carlos Consulmagno de Proença, 430 - Distrito Industrial", "(43) 99668-0535", "vidracarias"]
+  ["Vidraçaria", "Brizalle Mármores e Vidros", "Rua Luiz Carlos Consulmagno de Proença, 430 - Distrito Industrial", "(43) 99668-0535", "vidracarias"],
+  ["Táxi", "Marcilio Tavares Silverio", "Rua Joaquim do Carmo Vilela, 509 - Centro", "(43) 3536-1631", "taxis", "servico", ["telefone", "Viviane Aparecida Carreiro Alves"]],
+  ["Táxi", "Rivelino da Silva Rocha", "Rua Joaquim do Carmo Vilela, 386 - Centro", "(43) 8812-0380", "taxis", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
