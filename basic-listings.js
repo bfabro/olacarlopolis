@@ -504,7 +504,26 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Peixaria", "Leandro da Veiga", "Rua Nelson Golveia, 290 - Residencial Murador", "(43) 99857-8095", "peixarias"],
   ["Floricultura", "Fabio Alessandro Martins", "Rua Benedito Salles, 1521 - Centro", "(43) 3566-2544", "floriculturas"],
   ["Floricultura", "L. Sebastião Filho Flor Arte", "Rua Benedito Salles, 2814 - Residencial Amaral", "(41) 99269-0440", "floriculturas"],
-  ["Floricultura", "Iassan Produtos Alimentícios, Paisagismo e Urbanismo", "Rua Benedita da Cruz Domingues, 157 - Centro", "(43) 3566-2481", "floriculturas"]
+  ["Floricultura", "Iassan Produtos Alimentícios, Paisagismo e Urbanismo", "Rua Benedita da Cruz Domingues, 157 - Centro", "(43) 3566-2481", "floriculturas"],
+  ["Autopeças", "Gilberto Paulino da Silva - Carlópolis", "Rua Paul Harris, 110 - Residencial Vista Bella", "(43) 3566-1331", "autopecas"],
+  ["Autopeças", "D. J. Panichi Auto Peças", "Estrada do Monge, 350 - Pinheirinho", "(43) 99615-6527", "autopecas"],
+  ["Autopeças", "Leonardo Pereira", "Rua Paul Harris, 96-A - Vista Bela", "(43) 99173-0190", "autopecas"],
+  ["Autopeças", "Technical Motors - Centro Automotivo Ltda", "Rua Benedito Salles, 2679 - Área Industrial e Comercial", "(43) 99904-5502", "autopecas"],
+  ["Autopeças", "Cleide de Fatima Pereira Marthos - Carlópolis", "Rua Paul Harris, 100 - Vista Bella", "(43) 3566-1345", "autopecas"],
+  ["Autopeças", "D. C. Panichi Centro Automotivo", "Rua Jose Aleixo Sobrinho, 462 - Centro", "(43) 99615-6527", "autopecas"],
+  ["Autopeças", "Sebastiana Ribeiro Conceição", "Rua Benedito Salles, 583 - Centro", "(11) 2495-5250", "autopecas"],
+  ["Autopeças", "Luis Roberto Cassoni - Carlópolis", "Rua das Industrias, 255 - Área Industrial", "(43) 3566-1345", "autopecas"],
+  ["Autopeças", "P. H. de Oliveira Desmontcar", "Rua Paul Harris, 118 - Residencial Vista Bella", "(43) 3566-1659", "autopecas"],
+  ["Autopeças", "Renato Pereira Neto", "Rua Paul Harris, 96 - Vista Bela", "(43) 99173-0190", "autopecas"],
+  ["Autopeças", "Edea de Azevedo Pereira", "Rua Padre Hugo, 488 - Centro", "(43) 3566-2260", "autopecas"],
+  ["Autopeças", "Nayara Nelyana Martines Irao Murador", "Estrada do Monge, 9 - Bairro Industrial", "(43) 99971-0907", "autopecas"],
+  ["Autopeças", "C. P. de Oliveira - Comércio de Peças", "Rua Benedito Salles, 2533 - Parque Industrial Jorge Leite da Rosa", "(43) 99164-9518", "autopecas"],
+  ["Autopeças", "Marcelo Motta Cestaro - Carlópolis", "Rua Benedito Salles, 1449 - Centro", "", "autopecas"],
+  ["Autopeças", "Adrenalina - Motos e Motosserras", "Rua Marcos Rodrigues do Amaral, 248 - Centro", "(43) 3566-1292", "autopecas"],
+  ["Autopeças", "Elielton Freitas da Silva", "Rua Chuva de Ouro, 184 - Jardim Vista Alegre", "(41) 98717-4213", "autopecas"],
+  ["Autopeças", "Willian Rocha de Almeida", "Rua Ipê Amarelo, 283 - Vista Alegre", "(43) 99696-8455", "autopecas"],
+  ["Autopeças", "Helio Kenji Hamada e Cia Ltda", "Rua Benedito Salles, 262 - Centro", "(43) 3566-1345", "autopecas"],
+  ["Autopeças", "AAGNF Comércio de Peças e Acessórios Ltda", "Rua Andrino Soares, 982 - Centro", "(43) 3566-1345", "autopecas"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
