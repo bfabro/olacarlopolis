@@ -60,6 +60,7 @@ window.FONTES_CADASTROS_BASICOS = {
   autopecas: "https://www.solutudo.com.br/empresas/pr/carlopolis/autopecas",
   lojasCarros: "https://www.solutudo.com.br/empresas/pr/carlopolis/lojas-de-carros",
   aluguelCarros: "https://www.solutudo.com.br/empresas/pr/carlopolis/aluguel%2Bde%2Bcarros",
+  produtosAgricolas: "https://www.solutudo.com.br/empresas/pr/carlopolis/produtos%2Bagricolas",
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -541,7 +542,16 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Loja de Veículos", "A. de Assis - Multimarcas", "Rua José Cândido de Souza, 130 - Novo Horizonte I", "(13) 98111-3186", "lojasCarros"],
   ["Locadora de Veículos", "R Four E-Commerce e Empreendimentos", "Rua Jorge Barros, 680 - Anexo A - Centro", "(43) 99666-1972", "aluguelCarros", "servico"],
   ["Locadora de Veículos", "Oncar Locadora de Veículos Ltda", "Rua Ataliba Leonel, 457 - Sala 3 - Centro", "(14) 3342-9400", "aluguelCarros", "servico"],
-  ["Locadora de Veículos", "Rent Car Locadora de Veículos Ltda", "Avenida Beija Flor, s/n - Sala 2 - Ilha Bela", "(43) 99189-2826", "aluguelCarros", "servico"]
+  ["Locadora de Veículos", "Rent Car Locadora de Veículos Ltda", "Avenida Beija Flor, s/n - Sala 2 - Ilha Bela", "(43) 99189-2826", "aluguelCarros", "servico"],
+  ["Produtos Agrícolas", "Central Agrícola Brasil Rural Ltda", "Rua Luiz Carlos C. de Proença, s/n - Área Industrial II", "", "produtosAgricolas"],
+  ["Produtos Agrícolas", "Capal Cooperativa Agroindustrial", "Rua Benedito Salles, s/n - Quadra 1, Lote 1 - Parque Industrial", "(43) 3512-1000", "produtosAgricolas"],
+  ["Produtos Agrícolas", "Agrofabro Comércio de Produtos Agropecuários Ltda", "Rua Benedito Salles, 615 - Centro", "(43) 3566-2481", "produtosAgricolas"],
+  ["Produtos Agrícolas", "Biomega Hufapex Indústria, Comércio, Transporte e Representação de Produtos Orgânicos Ltda", "Rodovia Prefeito José Alves Pereira, km 1 - Pinheirinho", "(14) 3386-1402", "produtosAgricolas"],
+  ["Produtos Agrícolas", "MCR Comércio de Cereais Ltda", "Chácara São Bento, Rodovia PR-218, s/n - Pinheirinho", "(14) 3386-1242", "produtosAgricolas"],
+  ["Produtos Agrícolas", "Agro Vida Comércio de Produtos Agropecuários Ltda", "Rua Benedito Salles, 309 - Vila Bandeirantes", "(43) 99158-9047", "produtosAgricolas"],
+  ["Produtos Agrícolas", "Eliane Aparecida Rodrigues & Cia Ltda", "Estrada Municipal do Monge, 112 - Jardim do Cedro", "(43) 3569-1027", "produtosAgricolas"],
+  ["Produtos Agrícolas", "Agropecuária do Fabiano", "Rua Benedito Salles, 322 - Centro", "(43) 3566-2481", "produtosAgricolas"],
+  ["Produtos Agrícolas", "Comercial Agropecuária Almeida Ltda", "Rua André Jorge Cele, 201 - Centro", "(43) 3566-1165", "produtosAgricolas"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
