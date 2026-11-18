@@ -65,6 +65,14 @@ window.FONTES_CADASTROS_BASICOS = {
   vidracarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/vidracarias/listas/5-opcoes-em-vidracarias-que-voce-deveria-conhecer-em-carlopolis-pr",
   taxis: "https://www.solutudo.com.br/empresas/pr/carlopolis/taxis",
   joias: "https://www.solutudo.com.br/empresas/pr/carlopolis/busca?pagina=1&q=lojas+de+joias",
+  oficinasMotosReceita: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/manutencao-e-reparacao-de-motocicletas-e-motonetas"
+  },
+  oficinasMotosAlfeu: {
+    nome: "Apontador",
+    url: "https://www.apontador.com.br/em/centro-carlopolis-pr/automoveis-e-veiculos/pecas-e-acessorios-para-veiculos"
+  },
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -576,7 +584,14 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Joias e Bijuterias", "Amaral Maia MDF Ltda", "Rua Benedito Salles, 939 - Centro", "(43) 99837-5390", "joias", "comercio", ["telefone", "Jara Empreendimentos Imobiliários Ltda"]],
   ["Joias e Bijuterias", "Kelia Bergamo Acessórios", "Rua Marcos Rodrigues do Amaral, 248 - Centro", "(43) 99175-3990", "joias"],
   ["Joias e Bijuterias", "Dani Benevenutti - Acessórios Finos", "Rua Joaquim do Carmo Vilela, 366 - Centro", "(43) 9657-3076", "joias"],
-  ["Joias e Bijuterias", "Luciana Estevam Barone Bueno", "Rua Laurindo Franco de Godoy, 428 - Centro", "(43) 3566-1345", "joias", "comercio", ["fonte", "informações públicas conflitantes e telefone já repetido na base"]]
+  ["Joias e Bijuterias", "Luciana Estevam Barone Bueno", "Rua Laurindo Franco de Godoy, 428 - Centro", "(43) 3566-1345", "joias", "comercio", ["fonte", "informações públicas conflitantes e telefone já repetido na base"]],
+  ["Oficina de Motos", "D. F. Moto Peças - Adenilson José do Prado", "Rua Ataliba Leonel, 141 - Centro", "", "oficinasMotosReceita", "servico"],
+  ["Oficina de Motos", "Fernando Aparecido da Silva", "Rua Ataliba Leonel, 236 - Centro", "", "oficinasMotosReceita", "servico"],
+  ["Oficina de Motos", "Alfeu Rosa da Costa", "Rua Ataliba Leonel, 138 - Centro", "(43) 98839-3290", "oficinasMotosAlfeu", "servico"],
+  ["Oficina de Motos", "M C Motos - Cibele Paulo da Silva", "Rua Andrino Soares, 610 - Centro", "", "oficinasMotosReceita", "servico"],
+  ["Oficina de Motos", "Natanael Meneses", "Rua Ibisco, 175 - Vista Alegre", "", "oficinasMotosReceita", "servico"],
+  ["Oficina de Motos", "Alex Sandro de Paulo Cezar", "Rua Magnólia, 399 - Vista Alegre", "", "oficinasMotosReceita", "servico"],
+  ["Oficina de Motos", "Luís Gustavo Butchaka", "Rua Januário Francisco Fallars, 156 - Centro", "", "oficinasMotosReceita", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()

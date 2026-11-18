@@ -3125,6 +3125,7 @@ async function loadAllData(onProgress = null) {
   state.cadastrosBasicos = (Array.isArray(window.CADASTROS_BASICOS_PUBLICOS) ? window.CADASTROS_BASICOS_PUBLICOS : [])
     .map((base, ordemBase) => {
       const override = cadastrosBasicosOverrides[base.id] || {};
+      const fonteConfig = fontesCadastrosBasicos[base.fonte] || "";
       const tem = (campo) => Object.prototype.hasOwnProperty.call(override, campo);
       return {
         ...base,
@@ -3140,7 +3141,8 @@ async function loadAllData(onProgress = null) {
         status: override.status || "ativo",
         clienteVinculadoId: override.clienteVinculadoId || "",
         mesclarComId: override.mesclarComId || "",
-        fontePublicaUrl: fontesCadastrosBasicos[base.fonte] || "",
+        fontePublicaNome: typeof fonteConfig === "string" ? "Solutudo" : (fonteConfig.nome || "Fonte pública"),
+        fontePublicaUrl: typeof fonteConfig === "string" ? fonteConfig : (fonteConfig.url || ""),
         duplicateHint: base.duplicateHint || null,
         addressReviewHint: base.addressReviewHint || null,
         ordemBase,

@@ -24129,6 +24129,9 @@ plotarPinsImoveis(stateImoveis.filtered);
         ignorados += 1;
         return;
       }
+      const fonteConfig = fontes[cadastro.fonte] || "";
+      const fontePublicaNome = typeof fonteConfig === "string" ? "Solutudo" : (fonteConfig.nome || "Fonte pública");
+      const fontePublicaUrl = typeof fonteConfig === "string" ? fonteConfig : (fonteConfig.url || "");
       const estabelecimento = {
         cadastroBasicoId: cadastro.id || normalizeName(`${cadastro.categoria}-${cadastro.name}`),
         name: cadastro.name,
@@ -24140,8 +24143,8 @@ plotarPinsImoveis(stateImoveis.filtered);
         tipoCadastro: "basico",
         tipoCliente: cadastro.tipoCliente || "comercio",
         semPainelAdministrativo: true,
-        fontePublicaNome: "Solutudo",
-        fontePublicaUrl: fontes[cadastro.fonte] || "",
+        fontePublicaNome,
+        fontePublicaUrl,
         fonteVerificadaEm: "2026-11-18"
       };
       categoria.establishments = categoria.establishments || [];
