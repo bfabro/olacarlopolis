@@ -56,7 +56,11 @@ window.FONTES_CADASTROS_BASICOS = {
   autoescolas: "https://www.solutudo.com.br/empresas/pr/carlopolis/autoescolas-centro-de-formacao-condutores",
   funerarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/funerarias",
   escolasInfantis: "https://www.solutudo.com.br/empresas/pr/carlopolis/escolas-infantis",
-  clinicasMedicas: "https://www.solutudo.com.br/empresas/pr/carlopolis/clinica%2Bmedica%2Bou%2Bmedicina%2Binterna"
+  clinicasMedicas: "https://www.solutudo.com.br/empresas/pr/carlopolis/clinica%2Bmedica%2Bou%2Bmedicina%2Binterna",
+  autopecas: "https://www.solutudo.com.br/empresas/pr/carlopolis/autopecas",
+  agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
+  peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
+  floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -476,7 +480,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Clínica Médica", "Isaac Tavares da Silva Atividades Médicas", "Rua Salvira Marques, 591 - Centro", "(43) 3566-1391", "clinicasMedicas", "servico"],
   ["Clínica Médica", "Alberto Rossi Salles", "Rua Padre Hugo, 863 - Centro", "(43) 3566-1400", "clinicasMedicas", "servico"],
   ["Clínica Médica", "A. L. Moreno da Silva Atividades Médicas Ltda", "Rua Salvira Marques, 591 - Centro", "(43) 3566-1345", "clinicasMedicas", "servico"],
-  ["Clínica Médica", "Instituto Médico Keder Moura Ltda", "Rua Eugenio Neves Soares, 645 - Jardim Bela Vista", "(43) 98842-0919", "clinicasMedicas", "servico"]
+  ["Clínica Médica", "Instituto Médico Keder Moura Ltda", "Rua Eugenio Neves Soares, 645 - Jardim Bela Vista", "(43) 98842-0919", "clinicasMedicas", "servico"],
+  ["Autopeças", "Baterias Tonini Ltda", "Rua Benedito Salles, 1284 - Centro", "(14) 99858-4255", "autopecas"],
+  ["Autopeças", "C. N. da Silva - Centro Automotivo", "Rua Benedito Salles, 1363 - Centro", "(14) 99836-8343", "autopecas"],
+  ["Autopeças", "Aline Priscila Ribeiro Custodio", "Rua Benedito Salles, 1200 - Centro", "(43) 3559-1246", "autopecas"],
+  ["Autopeças", "Alessandra Aparecida de Godoi - Carlópolis", "Rua Benedito Salles, 27 - Centro", "(43) 3566-1345", "autopecas"],
+  ["Autopeças", "Oficina e Funilaria Damin", "Rua das Industrias, 260 - Loteamento Vicente de Oliveira", "(43) 3566-1725", "autopecas"],
+  ["Autopeças", "Auto Elétrica Bernardo Ltda", "Rua Benedito Salles, 1426", "", "autopecas"],
+  ["Autopeças", "C. Bertolini Bernardo - Borracharia", "Rua João Gervasio, 112 - Centro", "(43) 99611-1963", "autopecas"],
+  ["Autopeças", "Pedro Roberto Varrasquim Junior", "Rua Padre Hugo, 374 - Centro", "(43) 3566-1345", "autopecas"],
+  ["Autopeças", "Norba Comércio de Peças Ltda", "Avenida Anesio Fernandes Machado, 341 - Vista Bella", "(43) 99620-3108", "autopecas"],
+  ["Autopeças", "Altair Jose Ciofi Junior e Cia Ltda", "Rua Nicolau Miguel, 577 - Centro", "(43) 3566-1345", "autopecas"],
+  ["Autopeças", "Juliana M. A. Martins", "Rodovia PR-218, km 13, s/n - Área Industrial", "(43) 3566-1405", "autopecas"],
+  ["Autopeças", "Cleber Roberto da Silva e Cia Ltda", "Rua Luiz Carlos Consolmagno de Proença, 451 - Área Industrial e Comercial", "(43) 3566-1345", "autopecas"],
+  ["Autopeças", "Hamada & Sato Ltda", "Avenida Anesio Fernandes Machado, 85 - Vista Bella", "(43) 99650-3707", "autopecas"],
+  ["Autopeças", "Teco Auto Peças Ltda", "Rua Benedito Salles, 47 - Centro", "(43) 99906-3247", "autopecas"],
+  ["Autopeças", "P. C. de Araujo Junior Auto Peças Ltda", "Rua Paul Harris, 98 - Vista Bella", "(43) 3566-1306", "autopecas"],
+  ["Agência de Turismo", "A. P. I. Prestação de Serviços Ltda", "Rua Itararema, s/n - Residencial Porto Belo, Jaboticabal", "(43) 98829-1528", "agenciasTurismo", "servico"],
+  ["Agência de Turismo", "Jones Travel Agência de Viagens Ltda", "Rua Anesio Fernandes Machado, 355 - Vista Bella", "(43) 99105-3736", "agenciasTurismo", "servico"],
+  ["Peixaria", "Bubina Empreendimentos Ltda", "Rua Kalil Keder, 680 - Centro", "(14) 99744-1015", "peixarias"],
+  ["Peixaria", "V. C. Jacob e Santos Comércio de Peixes Ltda", "Rua Kalil Keder, 680 - Centro", "(43) 99100-5505", "peixarias"],
+  ["Peixaria", "Peixaria do Bobina", "Rua Kalil Keder, 680 - Centro", "(14) 99744-1015", "peixarias"],
+  ["Peixaria", "Leandro da Veiga", "Rua Nelson Golveia, 290 - Residencial Murador", "(43) 99857-8095", "peixarias"],
+  ["Floricultura", "Fabio Alessandro Martins", "Rua Benedito Salles, 1521 - Centro", "(43) 3566-2544", "floriculturas"],
+  ["Floricultura", "L. Sebastião Filho Flor Arte", "Rua Benedito Salles, 2814 - Residencial Amaral", "(41) 99269-0440", "floriculturas"],
+  ["Floricultura", "Iassan Produtos Alimentícios, Paisagismo e Urbanismo", "Rua Benedita da Cruz Domingues, 157 - Centro", "(43) 3566-2481", "floriculturas"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
