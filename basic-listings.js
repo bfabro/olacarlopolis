@@ -47,7 +47,11 @@ window.FONTES_CADASTROS_BASICOS = {
   farmacias: "https://www.solutudo.com.br/empresas/pr/carlopolis/farmacias",
   hoteis: "https://www.solutudo.com.br/empresas/pr/carlopolis/hoteis",
   doces: "https://www.solutudo.com.br/empresas/pr/carlopolis/doces",
-  pousadas: "https://www.solutudo.com.br/empresas/pr/carlopolis/pousadas"
+  pousadas: "https://www.solutudo.com.br/empresas/pr/carlopolis/pousadas",
+  fotografias: "https://www.solutudo.com.br/empresas/pr/carlopolis/fotografias",
+  petshops: "https://www.solutudo.com.br/empresas/pr/carlopolis/pet%2Bshop",
+  clinicasVeterinarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/clinicas-veterinarias",
+  fisioterapia: "https://www.solutudo.com.br/empresas/pr/carlopolis/fisioterapia"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -422,7 +426,27 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Doceria", "Doceria Carlopolense Ltda", "Avenida Elson Soares, 1134 - Centro", "(43) 3566-2481", "doces"],
   ["Doceria", "J. de Lurdes Queiroz Costa Chocolateria & Cafeteria", "Rua Padre Hugo, Centro Comercial Thac Thal, 460 - Centro", "(43) 3566-2392", "doces"],
   ["Doceria", "Sanches & Martines Ltda", "Avenida Elson Soares, 307 - Centro", "(43) 3566-1105", "doces"],
-  ["Hotel e Pousada", "Silvana Zurdo Costa", "Rua Benedito Salles, 556 - Centro", "(43) 99136-9196", "pousadas"]
+  ["Hotel e Pousada", "Silvana Zurdo Costa", "Rua Benedito Salles, 556 - Centro", "(43) 99136-9196", "pousadas"],
+  ["Fotografia", "Marcelo Rossi", "Rua João Coença Borrego, 149 - Centro", "(43) 98818-4681", "fotografias", "servico"],
+  ["Fotografia", "Glaucia Patricia Moreira Barth", "Rua Professor Alfredo Mansur, 410 - Caminho do Vale", "(43) 3566-1197", "fotografias", "servico"],
+  ["Fotografia", "Diego Fernando de Oliveira", "Rua Principal Lazara Maria Alves, 181 - Novo Horizonte", "(43) 3566-2789", "fotografias", "servico"],
+  ["Fotografia", "Helio Inumaru e Cia Ltda", "Rua Jorge Barros, 1419 - Centro", "(43) 3566-1302", "fotografias", "servico"],
+  ["Pet Shop", "Renata Daiane Jorge da Silva", "Rua Benedito Salles, 1150 - Centro", "(43) 99190-5026", "petshops"],
+  ["Pet Shop", "Vivian Valeria Simonario de Miranda", "Rua Francisco Avelino de Paiva, 227 - Centro", "(43) 99103-4362", "petshops"],
+  ["Clínica Veterinária", "Clínica Veterinária Carlópolis - Dr. Jurandir Machado", "Rua Ataliba Leonel, 410 - Centro", "(43) 99642-1494", "clinicasVeterinarias", "servico"],
+  ["Clínica Veterinária", "Victor Jose Gervasio - Atividades Veterinárias", "Rua Benedito Salles, 806 - Centro", "(41) 99979-7603", "clinicasVeterinarias", "servico"],
+  ["Clínica Veterinária", "Consultório Veterinário Horizonte Ltda", "Rua Silvio José Banik, 670 - Novo Horizonte", "(11) 3804-4638", "clinicasVeterinarias", "servico"],
+  ["Clínica Veterinária", "Clínica Veterinária Carlópolis Ltda", "Rua Ataliba Leonel, 410 - Centro", "(43) 3566-2481", "clinicasVeterinarias", "servico"],
+  ["Clínica Veterinária", "Emanuelle Ribeiro da L. Magalhães Serviços Veterinários", "Rua Capitão Estácio, 118 - Vista Bella", "(43) 3559-1246", "clinicasVeterinarias", "servico"],
+  ["Clínica Veterinária", "L. C. Brambilla Junior Serviços Veterinários", "Fazenda São José, s/n - Ribeirão do Meio", "(43) 99634-2842", "clinicasVeterinarias", "servico"],
+  ["Clínica Veterinária", "Clínica Veterinária e Estética Animal Senhor Bom Jesus Ltda", "Avenida Elson Soares, 1433 - Centro", "(14) 99798-3695", "clinicasVeterinarias", "servico"],
+  ["Fisioterapia", "Jose Henrique Oliveira França", "Rua Padre Hugo, 1036 - Centro", "(43) 99909-5972", "fisioterapia", "servico"],
+  ["Fisioterapia", "Instituto Espaço Saúde Ltda", "Avenida Turística Elias Merhi Mansur, 695 - Jardim Americana", "(41) 99963-1825", "fisioterapia", "servico"],
+  ["Fisioterapia", "H. H. Yoshitani e R. K. Dias Ltda", "Rua Jorge Barros, 845 - Centro", "(43) 99950-7771", "fisioterapia", "servico"],
+  ["Fisioterapia", "Evoluir Pilates e Fisioterapia Ltda", "Rua Capitão Estácio, 151 - Residencial Itália II", "(43) 99683-5477", "fisioterapia", "servico"],
+  ["Fisioterapia", "Marsão Fisioterapia Ltda", "Rua Padre Hugo, 985 - Centro", "(43) 99811-8261", "fisioterapia", "servico"],
+  ["Fisioterapia", "Evoluir Pilates e Fisioterapia", "Rua Capitão Estácio, 151 - Residencial Itália II", "(43) 99683-5477", "fisioterapia", "servico"],
+  ["Fisioterapia", "Energizzare Saúde e Bem-Estar Ltda", "Rua Padre Hugo, 160 - Centro", "(43) 3025-0606", "fisioterapia", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
