@@ -58,6 +58,8 @@ window.FONTES_CADASTROS_BASICOS = {
   escolasInfantis: "https://www.solutudo.com.br/empresas/pr/carlopolis/escolas-infantis",
   clinicasMedicas: "https://www.solutudo.com.br/empresas/pr/carlopolis/clinica%2Bmedica%2Bou%2Bmedicina%2Binterna",
   autopecas: "https://www.solutudo.com.br/empresas/pr/carlopolis/autopecas",
+  lojasCarros: "https://www.solutudo.com.br/empresas/pr/carlopolis/lojas-de-carros",
+  aluguelCarros: "https://www.solutudo.com.br/empresas/pr/carlopolis/aluguel%2Bde%2Bcarros",
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -523,7 +525,23 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Autopeças", "Elielton Freitas da Silva", "Rua Chuva de Ouro, 184 - Jardim Vista Alegre", "(41) 98717-4213", "autopecas"],
   ["Autopeças", "Willian Rocha de Almeida", "Rua Ipê Amarelo, 283 - Vista Alegre", "(43) 99696-8455", "autopecas"],
   ["Autopeças", "Helio Kenji Hamada e Cia Ltda", "Rua Benedito Salles, 262 - Centro", "(43) 3566-1345", "autopecas"],
-  ["Autopeças", "AAGNF Comércio de Peças e Acessórios Ltda", "Rua Andrino Soares, 982 - Centro", "(43) 3566-1345", "autopecas"]
+  ["Autopeças", "AAGNF Comércio de Peças e Acessórios Ltda", "Rua Andrino Soares, 982 - Centro", "(43) 3566-1345", "autopecas"],
+  ["Loja de Veículos", "H2 Motors Veículos e Serviços Automotivos Ltda", "Rua Benedito Salles, 2539 - Residencial Amaral II", "(11) 4735-6625", "lojasCarros"],
+  ["Loja de Veículos", "Daniel Martins Veículos Multimarcas", "Rua Benedito Salles, 1406 - Parque Industrial", "(43) 3566-1405", "lojasCarros"],
+  ["Loja de Veículos", "Carlos Roberto Panichi Veículos", "Rodovia PR-218, s/n - Área Industrial II", "(43) 3566-1744", "lojasCarros"],
+  ["Loja de Veículos", "Cristo Rei Veículos de Carlópolis Ltda", "Rua Paul Harris, 90 - Vista Bella", "(43) 99846-8028", "lojasCarros"],
+  ["Loja de Veículos", "R Barros e Barros Veículos Ltda", "Rua Benedito Salles, 2500 - Área Industrial e Comercial", "(43) 3566-1695", "lojasCarros"],
+  ["Loja de Veículos", "FR Comércio e Locação de Veículos Ltda", "Rua Paul Harris, 36 - Vista Bella", "(43) 99603-8737", "lojasCarros"],
+  ["Loja de Veículos", "Yellow Car Multimarcas Ltda", "Rua Espatódia, 210 - Vista Alegre", "(43) 98874-0072", "lojasCarros"],
+  ["Loja de Veículos", "ER Car Veículos Ltda", "Rua Benedito Salles, 2569 - Industrial", "(44) 99115-6445", "lojasCarros"],
+  ["Loja de Veículos", "C3 Car Veículos Multimarcas", "Rua Ataliba Leonel, 327 - Centro", "(43) 99902-3039", "lojasCarros"],
+  ["Loja de Veículos", "Roney Barros e Cia Ltda", "Rodovia PR-218, km 13, 200 - Parque Industrial Jorge Leite da Rosa", "(43) 3566-1345", "lojasCarros"],
+  ["Loja de Veículos", "Irmãos Keder Multimarcas Ltda", "Rua Padre Hugo, 975 - Centro", "(43) 99649-6641", "lojasCarros"],
+  ["Loja de Veículos", "Aguinaldo A. A. Perez - Veículos Multimarcas", "Rua Felizardo Leite de Paula e Silva, 214 - Jardim Vista Alegre", "(43) 99147-2507", "lojasCarros"],
+  ["Loja de Veículos", "A. de Assis - Multimarcas", "Rua José Cândido de Souza, 130 - Novo Horizonte I", "(13) 98111-3186", "lojasCarros"],
+  ["Locadora de Veículos", "R Four E-Commerce e Empreendimentos", "Rua Jorge Barros, 680 - Anexo A - Centro", "(43) 99666-1972", "aluguelCarros", "servico"],
+  ["Locadora de Veículos", "Oncar Locadora de Veículos Ltda", "Rua Ataliba Leonel, 457 - Sala 3 - Centro", "(14) 3342-9400", "aluguelCarros", "servico"],
+  ["Locadora de Veículos", "Rent Car Locadora de Veículos Ltda", "Avenida Beija Flor, s/n - Sala 2 - Ilha Bela", "(43) 99189-2826", "aluguelCarros", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
