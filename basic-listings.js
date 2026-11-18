@@ -51,7 +51,12 @@ window.FONTES_CADASTROS_BASICOS = {
   fotografias: "https://www.solutudo.com.br/empresas/pr/carlopolis/fotografias",
   petshops: "https://www.solutudo.com.br/empresas/pr/carlopolis/pet%2Bshop",
   clinicasVeterinarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/clinicas-veterinarias",
-  fisioterapia: "https://www.solutudo.com.br/empresas/pr/carlopolis/fisioterapia"
+  fisioterapia: "https://www.solutudo.com.br/empresas/pr/carlopolis/fisioterapia",
+  oticas: "https://www.solutudo.com.br/empresas/pr/carlopolis/otica",
+  autoescolas: "https://www.solutudo.com.br/empresas/pr/carlopolis/autoescolas-centro-de-formacao-condutores",
+  funerarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/funerarias",
+  escolasInfantis: "https://www.solutudo.com.br/empresas/pr/carlopolis/escolas-infantis",
+  clinicasMedicas: "https://www.solutudo.com.br/empresas/pr/carlopolis/clinica%2Bmedica%2Bou%2Bmedicina%2Binterna"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -446,7 +451,32 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Fisioterapia", "Evoluir Pilates e Fisioterapia Ltda", "Rua Capitão Estácio, 151 - Residencial Itália II", "(43) 99683-5477", "fisioterapia", "servico"],
   ["Fisioterapia", "Marsão Fisioterapia Ltda", "Rua Padre Hugo, 985 - Centro", "(43) 99811-8261", "fisioterapia", "servico"],
   ["Fisioterapia", "Evoluir Pilates e Fisioterapia", "Rua Capitão Estácio, 151 - Residencial Itália II", "(43) 99683-5477", "fisioterapia", "servico"],
-  ["Fisioterapia", "Energizzare Saúde e Bem-Estar Ltda", "Rua Padre Hugo, 160 - Centro", "(43) 3025-0606", "fisioterapia", "servico"]
+  ["Fisioterapia", "Energizzare Saúde e Bem-Estar Ltda", "Rua Padre Hugo, 160 - Centro", "(43) 3025-0606", "fisioterapia", "servico"],
+  ["Ótica", "Ótica Visual Center", "Rua Benedito Salles, 583 - Centro", "(43) 99922-7340", "oticas"],
+  ["Ótica", "H. N. Slomski & Cia Ltda", "Rua Benedito Salles com Calil Keder, 583 - Centro", "(43) 3566-2732", "oticas"],
+  ["Ótica", "Juliana Andrea Dias", "Rua Benedito Salles, 671 - Centro", "(14) 3322-2178", "oticas"],
+  ["Ótica", "Óticas Prizma Ltda", "Rua Benedito Salles, 693 - Centro", "(14) 99159-6616", "oticas"],
+  ["Ótica", "Rossetto & Miranda Produtos Óticos Ltda", "Rua Laurindo Franco de Godoi, 428 - Centro", "(14) 99813-8300", "oticas"],
+  ["Ótica", "Gassebner & Pagliari Ltda", "Rua Benedito Salles, 918 - Centro", "(43) 3525-0754", "oticas"],
+  ["Ótica", "Pedro Jose Aleixo Ltda", "Avenida Elson Soares, 787 - Centro", "(14) 3382-3232", "oticas"],
+  ["Autoescola", "Centro de Formação de Condutores Almarc Ltda", "Estrada do Monge, 92 - Parque Industrial Jorge Leite da Rosa", "(43) 99938-2992", "autoescolas", "servico"],
+  ["Funerária", "Funerária Carlópolis", "Rua Capitão Estácio, 329 - Centro", "(43) 3566-2541", "funerarias", "servico"],
+  ["Escola Infantil", "Voluntariado da Creche Municipal Ainzara Rossi Salles", "Rua Residencial Osmar R. de Oliveira, s/n - Centro", "", "escolasInfantis", "servico"],
+  ["Clínica Médica", "Marilia de Imperio Tosato Ltda", "Rua Arthur de Andrade, 555 - Morada do Sol", "(11) 9188-2341", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Mabila Rodrigues Ltda", "Rua Laurindo Francisco de Godoy, 415-B - Centro", "(43) 99651-2712", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Consultório Médico Dra. Paloma V. Gallina Abucarub", "Rua Andre Jorge Clelle, 316 - Centro", "(43) 3566-2481", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Clínica Vipmed - Serviços de Saúde Ltda", "Rua Jorge Barros, 1380 - Centro", "(43) 99127-0021", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Dra. Suellen Bagatim Otorrino e Rinoplastia Ltda", "Avenida Elson Soares, 222 - Centro", "(43) 99601-7969", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "M. T. S. Clínica de Psiquiatria Ltda", "Rua Jorge Barros, 845 - Centro", "(43) 3056-0991", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Fernando Merhi Mansur - Carlópolis", "Rua Laurindo Franco de Godoy, 534 - Centro", "(43) 9802-4488", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Clínica Cardiovit", "Rua Padre Hugo, 985 - Centro", "(43) 3566-1360", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Circe da Cunha Dutra Almeida - Carlópolis", "Avenida Elson Soares, 1404 - Centro", "(43) 3566-1345", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "HMP Anestesiologia Ltda", "Rua Adorema Ana Rech, 720 - Primavera", "(44) 3301-9570", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "M. Eduarda Salles Imagawa Said - Clínica Médica", "Rua Ataliba Leonel, 355 - Centro", "(43) 3566-1345", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Isaac Tavares da Silva Atividades Médicas", "Rua Salvira Marques, 591 - Centro", "(43) 3566-1391", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Alberto Rossi Salles", "Rua Padre Hugo, 863 - Centro", "(43) 3566-1400", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "A. L. Moreno da Silva Atividades Médicas Ltda", "Rua Salvira Marques, 591 - Centro", "(43) 3566-1345", "clinicasMedicas", "servico"],
+  ["Clínica Médica", "Instituto Médico Keder Moura Ltda", "Rua Eugenio Neves Soares, 645 - Jardim Bela Vista", "(43) 98842-0919", "clinicasMedicas", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
