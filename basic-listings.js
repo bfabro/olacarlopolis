@@ -43,7 +43,11 @@ window.FONTES_CADASTROS_BASICOS = {
   vansEscolares: "https://www.solutudo.com.br/empresas/pr/carlopolis/vans%2Btransportes%2Bescolares",
   bebidas: "https://www.solutudo.com.br/empresas/pr/carlopolis/depositos%2Bde%2Bbebidas",
   construtoras: "https://www.solutudo.com.br/empresas/pr/carlopolis/construtoras",
-  pedreiros: "https://www.solutudo.com.br/empresas/pr/carlopolis/construtores%2Bpedreiros"
+  pedreiros: "https://www.solutudo.com.br/empresas/pr/carlopolis/construtores%2Bpedreiros",
+  farmacias: "https://www.solutudo.com.br/empresas/pr/carlopolis/farmacias",
+  hoteis: "https://www.solutudo.com.br/empresas/pr/carlopolis/hoteis",
+  doces: "https://www.solutudo.com.br/empresas/pr/carlopolis/doces",
+  pousadas: "https://www.solutudo.com.br/empresas/pr/carlopolis/pousadas"
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -399,7 +403,26 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Pedreiro", "Claudinei Mendes da Silva", "Rua Maria Lourdes N. Leonarduzzi, 339 - Caminho do Vale", "(43) 99989-0245", "pedreiros", "servico"],
   ["Pedreiro", "Antonio Luiz Faria", "Estrada Espírito Santo, 127 - Vista Alegre", "(43) 99616-2963", "pedreiros", "servico"],
   ["Pedreiro", "Joao Felipe de Oliveira", "Área Rural, s/n - Área Rural", "(43) 99819-6404", "pedreiros", "servico"],
-  ["Pedreiro", "Pedra Forte Empréstimos Imobiliários", "Rua A, 546 - Parque Industrial Jorge Leite da Rosa", "(43) 99643-8082", "pedreiros", "servico"]
+  ["Pedreiro", "Pedra Forte Empréstimos Imobiliários", "Rua A, 546 - Parque Industrial Jorge Leite da Rosa", "(43) 99643-8082", "pedreiros", "servico"],
+  ["Farmácia", "Bergamo & Faiz Comércio de Medicamentos Ltda", "Rua Benedito Salles, 574 - Centro", "(43) 3566-1119", "farmacias"],
+  ["Farmácia", "Camargo & Romano Medicamentos Ltda", "Rua Benedito Salles, 979 - Centro", "(43) 99956-8938", "farmacias"],
+  ["Farmácia", "A. L. de Lima - Farmácia", "Rua Benedito Salles, 353-C - Centro", "(43) 99129-9130", "farmacias"],
+  ["Farmácia", "Romano & Camargo Medicamentos Ltda", "Rua Benedito Salles, 951 - Centro", "(43) 99924-0348", "farmacias"],
+  ["Farmácia", "Yago Vieira Martins Ltda", "Rua Benedito Salles, 353-C - Centro", "(43) 3566-1541", "farmacias"],
+  ["Farmácia", "Claudinei David & Cia Ltda", "Rua Laurindo Franco de Godoy, 438 - Centro", "(43) 3566-1473", "farmacias"],
+  ["Farmácia", "Rede de Farmácias Mais", "Rua Benedito Salles, 269 - Centro", "(43) 3571-1641", "farmacias"],
+  ["Farmácia", "Farmácia Central Carlopolense Ltda", "Rua Benedito Salles, 903 - Centro", "(43) 3566-1141", "farmacias"],
+  ["Farmácia", "M. S. Furlan Comércio de Medicamentos Ltda", "Rua Quaresmeira Roxa, esquina com Rua Manguba, 320 - Vista Alegre", "(43) 99148-8478", "farmacias"],
+  ["Farmácia", "P M Ido Ltda", "Avenida Elson Soares - Centro Comercial Popular Mais, 787 - Centro", "(43) 99631-3701", "farmacias"],
+  ["Farmácia", "Farmácia Central Carlopolense Ltda", "Rua Laurindo Franco de Godoi, 90 - Centro", "(43) 3566-1141", "farmacias"],
+  ["Farmácia", "Darcio José de Oliveira", "Rua Benedito Salles, 1442 - Centro", "", "farmacias"],
+  ["Hotel e Pousada", "J. Moraes Construções Ltda", "Rua Benedito Salles, 233 - Centro", "(43) 99642-1490", "hoteis"],
+  ["Hotel e Pousada", "Bernadete Garcia Ribeiro Dyniewicz - Parque Vila do Café", "Sítio Passos dos Leite, s/n - Passos do Leite", "(14) 3382-3294", "hoteis"],
+  ["Hotel e Pousada", "Hotel Portal Ltda", "Rua Benedito Salles, 2023 - Parque Industrial", "(43) 3566-1544", "hoteis"],
+  ["Doceria", "Doceria Carlopolense Ltda", "Avenida Elson Soares, 1134 - Centro", "(43) 3566-2481", "doces"],
+  ["Doceria", "J. de Lurdes Queiroz Costa Chocolateria & Cafeteria", "Rua Padre Hugo, Centro Comercial Thac Thal, 460 - Centro", "(43) 3566-2392", "doces"],
+  ["Doceria", "Sanches & Martines Ltda", "Avenida Elson Soares, 307 - Centro", "(43) 3566-1105", "doces"],
+  ["Hotel e Pousada", "Silvana Zurdo Costa", "Rua Benedito Salles, 556 - Centro", "(43) 99136-9196", "pousadas"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
