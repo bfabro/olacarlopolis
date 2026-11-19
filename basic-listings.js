@@ -259,6 +259,22 @@ window.FONTES_CADASTROS_BASICOS = {
   claudiaPet: {
     nome: "CNPJ.biz / X-CNPJ / Receita Federal",
     url: "https://cnpj.biz/cnae-atividade/9609-2-08-higiene-e-embelezamento-de-animais-domesticos?id=73760377"
+  },
+  ejTecnologias: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/69399528000181"
+  },
+  mirandaInformatica: {
+    nome: "Guia Fácil",
+    url: "https://guiafacil.com/site/miranda-informatica/carlopolis/pr/89439463"
+  },
+  jcInformatica: {
+    nome: "Cirtrox / Receita Federal e Solutudo",
+    url: "https://www.cirtrox.com.br/consulta-empresas/empresa/33221566000100-j-c-informatica"
+  },
+  unlimitedFibra: {
+    nome: "CNPJ Dados / Receita Federal",
+    url: "https://www.cnpjdados.com/empresas/pr/carlopolis"
   }
 };
 
@@ -873,7 +889,11 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Banho e Tosa", "Pet Feliz - Luceia Rocado Ruy Menezes", "Avenida Senhor Bom Jesus, Lote 06, Quadra B, Fundos", "", "petFelizLuceia", "servico"],
   ["Banho e Tosa", "Flavieli Brisola Damasio", "Rua Benedito Salles, 309 - Centro", "", "flavieliPet", "servico", null, ["mesmo endereço, atividade distinta", "Agro Vida Comércio de Produtos Agropecuários Ltda"]],
   ["Banho e Tosa", "Tayssa Fernanda Costa de Azevedo", "Rua Eugênio Neves Soares, 1888 - Tomodati", "", "tayssaPet", "servico"],
-  ["Banho e Tosa", "Claudia Maria de Souza Barbosa", "Bairro Santa Clara - Carlópolis", "", "claudiaPet", "servico", ["endereço público incompleto", "fontes confirmam apenas o bairro Santa Clara"]]
+  ["Banho e Tosa", "Claudia Maria de Souza Barbosa", "Bairro Santa Clara - Carlópolis", "", "claudiaPet", "servico", ["endereço público incompleto", "fontes confirmam apenas o bairro Santa Clara"]],
+  ["Desenvolvimento de Software", "EJ Tecnologias e Sistemas Ltda", "Avenida Elson Soares, 1421 - Centro", "", "ejTecnologias", "servico"],
+  ["Assistência Técnica de Informática", "Miranda Informática", "Rua Nicolau Miguel, 1001 - Centro", "(43) 99917-6487", "mirandaInformatica", "servico"],
+  ["Suporte de Informática", "J C Informática - José Claudio Custodio", "Avenida Turística Elias Merhi Mansur, 881 - Centro", "(43) 99938-7494", "jcInformatica", "servico", null, ["mesmo endereço, profissionais distintos", "CIM Contabilidade e Informática Municipal Ltda"]],
+  ["Provedor de Internet", "Unlimited Fibra Ltda", "Bairro Novo Horizonte - Carlópolis", "", "unlimitedFibra", "servico", ["endereço público incompleto", "fontes confirmam apenas o bairro Novo Horizonte"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
