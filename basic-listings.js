@@ -127,6 +127,34 @@ window.FONTES_CADASTROS_BASICOS = {
   sorveteriaPontoAzul: {
     nome: "Solutudo / Apontador",
     url: "https://www.solutudo.com.br/empresas/pr/carlopolis/lanches-lanchonetes/sorveteria-ponto-azul-10224774"
+  },
+  jumaCafe: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/consulta-empresa/08988819000110-elisangela-margareth-da-silvacarlopolis"
+  },
+  cafeeiraDoisIrmaos: {
+    nome: "Grupo 2 Irmãos (site oficial)",
+    url: "https://grupo2irmaos.com.br/sac/"
+  },
+  cafeeiraParana: {
+    nome: "Econodata / Apontador",
+    url: "https://www.econodata.com.br/maiores-empresas/pr-carlopolis/busca-cafe"
+  },
+  aliancaCafe: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/maiores-empresas/pr-carlopolis/busca-cafe"
+  },
+  cafeteriasPlaneta: {
+    nome: "Planeta Brasileiro",
+    url: "https://www.planetabrasileiro.com/carlopolis/cafeterias"
+  },
+  cafeeiraDonatti: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/15606001000151"
+  },
+  cafeeirasPublicas: {
+    nome: "Diretórios públicos / Receita Federal",
+    url: "https://brfirmas.org/PR-Carl%C3%B3polis/Alimentos-e-Agricultura"
   }
 };
 
@@ -705,7 +733,17 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Sorveteria e Açaí", "Limoné Sorvetes", "Rua Paraná - Centro", "(43) 99915-8629", "sorveteriaLimone", "comercio", ["telefone", "Soberano Lanches"]],
   ["Sorveteria e Açaí", "Sorvetes Salles", "Rua Kalil Keder, 525 - Centro", "(43) 9972-6168", "sorveteriasCylex", "comercio", ["nome semelhante e endereço", "Sorvetes Salles Ferreira"]],
   ["Sorveteria e Açaí", "Sorveteria Cylus / Rei do Lanche", "Rua Benedito Salles, 1306 - Centro", "(43) 99633-7037", "sorveteriasCylex", "comercio", ["identidade pública conflitante", "Sorveteria Cylus / Rei do Lanche"]],
-  ["Sorveteria e Açaí", "Sorveteria Ponto Azul", "Rua Joaquim do Carmo Vilela, 410-A - Centro", "(43) 3566-1345", "sorveteriaPontoAzul", "comercio", ["dados públicos antigos e conflitantes", "endereços divergentes nas fontes"]]
+  ["Sorveteria e Açaí", "Sorveteria Ponto Azul", "Rua Joaquim do Carmo Vilela, 410-A - Centro", "(43) 3566-1345", "sorveteriaPontoAzul", "comercio", ["dados públicos antigos e conflitantes", "endereços divergentes nas fontes"]],
+  ["Cafeteria e Estética", "Juma Café e Estética", "Rua Maria José da Silva, 14-A - Vista Bella II", "(43) 99118-1774", "jumaCafe"],
+  ["Beneficiamento de Café", "Cafeeira Dois Irmãos - Cafeeira Guidelli Ltda", "Rua Benedito Salles, 305 - Centro", "(43) 3566-1579", "cafeeiraDoisIrmaos", "comercio", null, null, "https://grupo2irmaos.com.br/wp-content/uploads/2020/08/logo_grupo2irmaos.png", "https://grupo2irmaos.com.br/sac/", "https://www.instagram.com/grupo2irmaos/"],
+  ["Beneficiamento de Café", "Cafeeira Paraná - F. A. Almeida Cereais", "Avenida Elson Soares, 210 - Centro", "", "cafeeiraParana"],
+  ["Comércio de Café", "Aliança Café - Aliança Exportação de Café Ltda", "Rua Padre Hugo, 374 - Centro", "", "aliancaCafe", "comercio", null, ["mesmo endereço, atividade distinta", "Pedro Roberto Varrasquim Junior"]],
+  ["Cafeteria", "My Coffee", "Rua Benedito Salles, 1205 - Centro", "(43) 99126-5705", "cafeteriasPlaneta", "comercio", ["nome, telefone e endereço", "My Coffee (cliente completo)"]],
+  ["Cafeteria", "Caldo de Cana Amaral", "Rua Benedito Salles, 2639 - Centro", "(43) 99977-8839", "cafeteriasPlaneta", "comercio", ["nome, telefone e endereço", "Caldo de Cana Amaral (cliente completo)"]],
+  ["Cafeteria", "Café Com Mistura", "Endereço divergente entre as fontes", "(43) 3566-1345", "cafeeirasPublicas", "comercio", ["endereço conflitante e telefone repetido em cadastros sem relação", "fontes públicas divergentes"]],
+  ["Cafeteria", "Sabor da Casa Ani", "Rua Benedito Salles, 1341 - Centro", "", "cafeteriasPlaneta", "comercio", ["identidade atual do ponto não confirmada", "Zap Burguer no mesmo endereço"]],
+  ["Beneficiamento de Café", "Cafeeira Calin", "Rua Nicolau Miguel, 494 - Centro", "", "cafeeirasPublicas", "comercio", ["empresa baixada", "cadastro público encerrado"]],
+  ["Comércio de Café", "Cafeeira Donatti", "Carlópolis - PR", "", "cafeeiraDonatti", "comercio", ["situação cadastral inapta desde 2018", "CNPJ 15.606.001/0001-51"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
