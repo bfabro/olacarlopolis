@@ -95,7 +95,39 @@ window.FONTES_CADASTROS_BASICOS = {
   },
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
-  floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
+  floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas",
+  sorveteriaKaique: {
+    nome: "Cylex / Cybo",
+    url: "https://www.cylex.com.br/carlopolis/kaique-sorveteria-e-a%C3%A7a%C3%AD-12078115.html"
+  },
+  sorveteriaTunico: {
+    nome: "Planeta Brasileiro / NPDiário",
+    url: "https://www.planetabrasileiro.com/carlopolis/sorveterias"
+  },
+  sorveteriaSaborGelado: {
+    nome: "Restaurant Guru",
+    url: "https://restaurantguru.com.br/Sorveteria-Sabor-Gelado-Carlopolis"
+  },
+  sorvetesLivia: {
+    nome: "Restaurant Guru / Cylex",
+    url: "https://restaurantguru.com.br/Sorvetes-da-livia-Carlopolis"
+  },
+  sorveteriasCylex: {
+    nome: "Cylex",
+    url: "https://www.cylex.com.br/carlopolis/sorveterias/"
+  },
+  sorveteriasPlaneta: {
+    nome: "Planeta Brasileiro",
+    url: "https://www.planetabrasileiro.com/carlopolis/sorveterias"
+  },
+  sorveteriaLimone: {
+    nome: "Restaurant Guru / Tripadvisor",
+    url: "https://restaurantguru.com.br/Limone-Sorvetes-Carlopolis"
+  },
+  sorveteriaPontoAzul: {
+    nome: "Solutudo / Apontador",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/lanches-lanchonetes/sorveteria-ponto-azul-10224774"
+  }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -662,7 +694,18 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Marmitaria e Delivery", "Danieli Aparecida Ribeiro Polato", "Rua Lazara Maria Alves, 201 - Novo Horizonte", "", "marmitariasReceita"],
   ["Marmitaria e Delivery", "Maiara Margarida Ana Benedetti Gotardi", "Rua Benedita da Cruz Domingues, 191 - São Pedro", "", "marmitariasReceita"],
   ["Marmitaria e Delivery", "Danilo Otavio Vaz", "Rua Kalil Keder, 753 - Centro", "", "marmitariasReceita"],
-  ["Marmitaria e Delivery", "João Nilson Ferreira Matos", "Rua Padre Hugo, 21-A - Vista Bella", "", "marmitariasReceita"]
+  ["Marmitaria e Delivery", "João Nilson Ferreira Matos", "Rua Padre Hugo, 21-A - Vista Bella", "", "marmitariasReceita"],
+  ["Sorveteria e Açaí", "Kaique Sorveteria e Açaí", "Rua Marcos Rodrigues do Amaral, 250 - Centro", "(43) 3566-2342", "sorveteriaKaique"],
+  ["Sorveteria e Açaí", "Sorveteria do Tunico", "Rua Laurindo Franco de Godoy - Centro", "(43) 3566-2288", "sorveteriaTunico"],
+  ["Sorveteria e Açaí", "Sorveteria Sabor Gelado", "Rua Benedito Salles, 411 - Centro", "(43) 99643-4907", "sorveteriaSaborGelado", "comercio", null, null, "https://img4.restaurantguru.com/w550/h367/r6e9-Sorveteria-Sabor-Gelado-chocolate-mousse.jpg", "https://restaurantguru.com.br/Sorveteria-Sabor-Gelado-Carlopolis"],
+  ["Sorveteria e Açaí", "Sorvetes da Lívia", "Rua Kalil Keder, 964 - Centro", "(43) 98873-4361", "sorvetesLivia", "comercio", null, null, "https://img.restaurantguru.com/w550/h367/rca0-Sorvetes-da-livia-interior.jpg", "https://restaurantguru.com.br/Sorvetes-da-livia-Carlopolis"],
+  ["Sorveteria e Açaí", "Sorvetes Salles Ferreira", "Rua Kalil Keder, 525 - Centro", "(43) 99600-1919", "sorveteriasPlaneta", "comercio", ["nome, telefone e endereço", "Sorvetes Salles Ferreira (cliente completo)"]],
+  ["Sorveteria e Açaí", "Santtino Gelateria", "Rua Kalil Keder, 583 - Centro", "(43) 99971-3535", "sorveteriasCylex", "comercio", ["nome, telefone e endereço", "Santtino Gelateria (cliente completo)"]],
+  ["Sorveteria e Açaí", "Forty Shake", "Rua Benedito Salles, 832 - Centro", "(43) 99630-9935", "sorveteriasPlaneta", "comercio", ["nome, telefone e endereço", "Forty Shake (cliente completo)"]],
+  ["Sorveteria e Açaí", "Limoné Sorvetes", "Rua Paraná - Centro", "(43) 99915-8629", "sorveteriaLimone", "comercio", ["telefone", "Soberano Lanches"]],
+  ["Sorveteria e Açaí", "Sorvetes Salles", "Rua Kalil Keder, 525 - Centro", "(43) 9972-6168", "sorveteriasCylex", "comercio", ["nome semelhante e endereço", "Sorvetes Salles Ferreira"]],
+  ["Sorveteria e Açaí", "Sorveteria Cylus / Rei do Lanche", "Rua Benedito Salles, 1306 - Centro", "(43) 99633-7037", "sorveteriasCylex", "comercio", ["identidade pública conflitante", "Sorveteria Cylus / Rei do Lanche"]],
+  ["Sorveteria e Açaí", "Sorveteria Ponto Azul", "Rua Joaquim do Carmo Vilela, 410-A - Centro", "(43) 3566-1345", "sorveteriaPontoAzul", "comercio", ["dados públicos antigos e conflitantes", "endereços divergentes nas fontes"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
