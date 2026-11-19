@@ -13292,6 +13292,17 @@ button.admin-button-loading::after {
 .basic-listing-admin-card.is-revisar { border-left-color: #d97706; background: #fffbeb; }
 .basic-listing-admin-card.is-descartado { border-left-color: #dc2626; background: #fffafa; }
 .basic-listing-admin-card.is-inativo { border-left-color: #94a3b8; opacity: .78; }
+.basic-listing-admin-thumb {
+  flex: 0 0 76px;
+  width: 76px;
+  height: 76px;
+  overflow: hidden;
+  border: 1px solid #dbe3ee;
+  border-radius: 12px;
+  background: #f8fafc;
+}
+.basic-listing-admin-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.basic-listing-admin-main { min-width: 0; flex: 1; }
 .basic-listing-admin-main h3 { margin: 4px 0; }
 .basic-listing-admin-main p { margin: 3px 0; color: #475569; }
 .basic-listing-admin-main small { color: #64748b; }

@@ -6,7 +6,7 @@
   <title>Painel Admin - Ola Carlopolis</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="icon" href="../images/img_padrao_site/logo_1.png">
-  <link rel="stylesheet" href="painel.css?v=640">
+  <link rel="stylesheet" href="painel.css?v=641">
   <link rel="stylesheet" href="casas-veraneio-admin.css?v=4">
 </head>
 <body>
@@ -1552,6 +1552,8 @@
             </label>
             <label>Telefone<input id="basicListingPhone" maxlength="40" placeholder="(43) 99999-9999"></label>
             <label>Instagram<input id="basicListingInstagram" maxlength="180" placeholder="https://instagram.com/..."></label>
+            <label class="wide">Imagem pública<input id="basicListingImage" type="url" maxlength="1000" placeholder="https://.../imagem.jpg"><small>Use somente uma imagem oficial ou autorizada do estabelecimento. Se ficar vazio, nenhuma imagem será exibida.</small></label>
+            <label class="wide">Fonte da imagem<input id="basicListingImageSource" type="url" maxlength="1000" placeholder="https://site-oficial-ou-rede-social/..."><small>Link da página pública onde a imagem foi confirmada.</small></label>
             <label class="wide">Endereço<input id="basicListingAddress" maxlength="240" placeholder="Rua, número, sala/bloco/andar e bairro"><small>Quando dois profissionais atendem no mesmo prédio, informe a sala ou outro complemento para diferenciá-los.</small></label>
             <label class="wide">Este cadastro é o mesmo que um cliente completo
               <select id="basicListingLinkedClient"><option value="">Não vincular a cliente</option></select>
@@ -3654,7 +3656,7 @@
       <div class="admin-action-loading-bar"><span></span></div>
     </div>
   </div>
-  <script src="../basic-listings.js?v=31"></script>
-  <script type="module" src="painel.js?v=951"></script>
+  <script src="../basic-listings.js?v=32"></script>
+  <script type="module" src="painel.js?v=952"></script>
 </body>
 </html>

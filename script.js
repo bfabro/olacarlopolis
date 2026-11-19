@@ -24078,6 +24078,20 @@ plotarPinsImoveis(stateImoveis.filtered);
     const cadastros = Array.isArray(window.CADASTROS_BASICOS_PUBLICOS) ? window.CADASTROS_BASICOS_PUBLICOS : [];
     const fontes = window.FONTES_CADASTROS_BASICOS || {};
     const existentes = categories.flatMap((categoria) => categoria.establishments || []);
+    const indiceNomes = new Map();
+    const indiceTelefones = new Map();
+    const indiceEnderecos = new Map();
+    const indexarEstabelecimento = (estabelecimento) => {
+      const nome = normalizeName(estabelecimento?.name || estabelecimento?.nome || "");
+      if (nome && !indiceNomes.has(nome)) indiceNomes.set(nome, estabelecimento);
+      getContatosDetalhadosEstabelecimento(estabelecimento).forEach((contato) => {
+        const telefone = normalizarTelefoneCadastroBasicoPublico(contato.numero);
+        if (telefone && !indiceTelefones.has(telefone)) indiceTelefones.set(telefone, estabelecimento);
+      });
+      const endereco = normalizarEnderecoCadastroBasicoPublico(estabelecimento?.address || estabelecimento?.endereco || "");
+      if (endereco.length >= 6 && !indiceEnderecos.has(endereco)) indiceEnderecos.set(endereco, estabelecimento);
+    };
+    existentes.forEach(indexarEstabelecimento);
     let adicionados = 0;
     let ignorados = 0;
     const ignoradosDetalhes = [];
@@ -24093,9 +24107,17 @@ plotarPinsImoveis(stateImoveis.filtered);
         });
         return;
       }
-      const duplicado = existentes
-        .map((estabelecimento) => ({ estabelecimento, motivo: motivoDuplicidadeCadastroBasico(cadastro, estabelecimento) }))
-        .find((item) => item.motivo && item.motivo !== "endereco");
+      const nomeCadastro = normalizeName(cadastro?.name || cadastro?.nome || "");
+      const telefonesCadastro = getContatosDetalhadosEstabelecimento(cadastro)
+        .map((item) => normalizarTelefoneCadastroBasicoPublico(item.numero))
+        .filter(Boolean);
+      let duplicado = nomeCadastro && indiceNomes.has(nomeCadastro)
+        ? { estabelecimento: indiceNomes.get(nomeCadastro), motivo: "nome" }
+        : null;
+      if (!duplicado) {
+        const telefoneDuplicado = telefonesCadastro.find((telefone) => indiceTelefones.has(telefone));
+        if (telefoneDuplicado) duplicado = { estabelecimento: indiceTelefones.get(telefoneDuplicado), motivo: "telefone" };
+      }
       if (duplicado) {
         ignorados += 1;
         ignoradosDetalhes.push({
@@ -24105,9 +24127,10 @@ plotarPinsImoveis(stateImoveis.filtered);
         });
         return;
       }
-      const conflitoEndereco = existentes
-        .map((estabelecimento) => ({ estabelecimento, motivo: motivoDuplicidadeCadastroBasico(cadastro, estabelecimento) }))
-        .find((item) => item.motivo === "endereco");
+      const enderecoCadastro = normalizarEnderecoCadastroBasicoPublico(cadastro?.address || cadastro?.endereco || "");
+      const conflitoEndereco = enderecoCadastro.length >= 6 && indiceEnderecos.has(enderecoCadastro)
+        ? { estabelecimento: indiceEnderecos.get(enderecoCadastro), motivo: "endereco" }
+        : null;
       const revisaoEndereco = cadastro.addressReviewHint || (conflitoEndereco ? {
         motivo: "endereco",
         conflitaCom: conflitoEndereco.estabelecimento.name || conflitoEndereco.estabelecimento.nome || "outro cadastro"
@@ -24137,8 +24160,11 @@ plotarPinsImoveis(stateImoveis.filtered);
         name: cadastro.name,
         address: cadastro.address || "",
         contact: cadastro.contact || "",
+        whatsapp: cadastro.contact || "",
+        contatosDetalhados: cadastro.contact ? [{ numero: cadastro.contact, whatsapp: true }] : [],
         instagram: cadastro.instagram || "",
-        image: "",
+        image: cadastro.image || "",
+        imageSourceUrl: cadastro.imageSourceUrl || "",
         cadastroBasico: true,
         tipoCadastro: "basico",
         tipoCliente: cadastro.tipoCliente || "comercio",
@@ -24150,6 +24176,7 @@ plotarPinsImoveis(stateImoveis.filtered);
       categoria.establishments = categoria.establishments || [];
       categoria.establishments.push(estabelecimento);
       existentes.push(estabelecimento);
+      indexarEstabelecimento(estabelecimento);
       statusEstabelecimentos[normalizeName(estabelecimento.name)] = "s";
       adicionados += 1;
     });
@@ -24183,6 +24210,12 @@ plotarPinsImoveis(stateImoveis.filtered);
       if (Object.prototype.hasOwnProperty.call(override, "telefone")) est.contact = override.telefone || "";
       if (Object.prototype.hasOwnProperty.call(override, "endereco")) est.address = override.endereco || "";
       if (Object.prototype.hasOwnProperty.call(override, "instagram")) est.instagram = override.instagram || "";
+      if (Object.prototype.hasOwnProperty.call(override, "imagem")) est.image = override.imagem || "";
+      if (Object.prototype.hasOwnProperty.call(override, "imagemFonteUrl")) est.imageSourceUrl = override.imagemFonteUrl || "";
+      if (Object.prototype.hasOwnProperty.call(override, "telefone")) {
+        est.whatsapp = override.telefone || "";
+        est.contatosDetalhados = override.telefone ? [{ numero: override.telefone, whatsapp: true }] : [];
+      }
       if (override.categoria && normalizeName(override.categoria) !== normalizeName(categoriaAnterior.title || "")) {
         const novaCategoria = categories.find((item) => normalizeName(item.title || "") === normalizeName(override.categoria))
           || garantirCategoriaAdmin(override.categoria, { menuGroup: (override.tipoCliente || est.tipoCliente) === "servico" ? "servicos" : "comercios" });

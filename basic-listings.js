@@ -663,7 +663,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Marmitaria e Delivery", "Maiara Margarida Ana Benedetti Gotardi", "Rua Benedita da Cruz Domingues, 191 - São Pedro", "", "marmitariasReceita"],
   ["Marmitaria e Delivery", "Danilo Otavio Vaz", "Rua Kalil Keder, 753 - Centro", "", "marmitariasReceita"],
   ["Marmitaria e Delivery", "João Nilson Ferreira Matos", "Rua Padre Hugo, 21-A - Vista Bella", "", "marmitariasReceita"]
-].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
+].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
     .normalize("NFD")
@@ -678,6 +678,9 @@ window.CADASTROS_BASICOS_PUBLICOS = [
     contact,
     fonte,
     tipoCliente,
+    image,
+    imageSourceUrl,
+    instagram,
     duplicateHint: duplicateHint ? { motivo: duplicateHint[0], conflitaCom: duplicateHint[1] } : null,
     addressReviewHint: addressReviewHint ? { motivo: addressReviewHint[0], conflitaCom: addressReviewHint[1] } : null
   };

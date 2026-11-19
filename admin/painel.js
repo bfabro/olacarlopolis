@@ -3136,6 +3136,8 @@ async function loadAllData(onProgress = null) {
         address: tem("endereco") ? (override.endereco || "") : (base.address || ""),
         contact: tem("telefone") ? (override.telefone || "") : (base.contact || ""),
         instagram: tem("instagram") ? (override.instagram || "") : (base.instagram || ""),
+        image: tem("imagem") ? (override.imagem || "") : (base.image || ""),
+        imageSourceUrl: tem("imagemFonteUrl") ? (override.imagemFonteUrl || "") : (base.imageSourceUrl || ""),
         categoria: override.categoria || base.categoria,
         tipoCliente: override.tipoCliente || base.tipoCliente || "comercio",
         status: override.status || "ativo",
@@ -13732,6 +13734,8 @@ function openBasicListingAdminEditor(id) {
   $("basicListingStatus").value = item.status || "ativo";
   $("basicListingPhone").value = item.contact || "";
   $("basicListingInstagram").value = item.instagram || "";
+  $("basicListingImage").value = item.image || "";
+  $("basicListingImageSource").value = item.imageSourceUrl || "";
   $("basicListingAddress").value = item.address || "";
   fillBasicListingAdminSelects(item);
   $("basicListingFormTitle").textContent = `Editar: ${item.name}`;
@@ -13758,6 +13762,8 @@ async function saveBasicListingAdmin(event) {
     telefone: $("basicListingPhone").value.trim(),
     endereco: $("basicListingAddress").value.trim(),
     instagram: $("basicListingInstagram").value.trim(),
+    imagem: $("basicListingImage").value.trim(),
+    imagemFonteUrl: $("basicListingImageSource").value.trim(),
     clienteVinculadoId,
     mesclarComId,
     fontePublicaUrl: item.fontePublicaUrl || "",
@@ -13765,6 +13771,11 @@ async function saveBasicListingAdmin(event) {
     atualizadoPor: state.user?.uid || ""
   };
   if (!payload.nome || !payload.categoria) return showToast("Informe nome e categoria.");
+  if (payload.imagem && !payload.imagemFonteUrl) return showToast("Informe também a fonte pública da imagem.");
+  const urlPublicaValida = (value) => !value || /^https:\/\//i.test(value) || /^(?:\/|\.\.\/|images\/)/i.test(value);
+  if (!urlPublicaValida(payload.imagem) || !urlPublicaValida(payload.imagemFonteUrl)) {
+    return showToast("Use endereços HTTPS válidos para a imagem e sua fonte.");
+  }
   setBusy(button, true, "Salvando...");
   try {
     await firebaseSet(ref(db, `cadastrosBasicos/${id}`), payload);
@@ -13776,6 +13787,8 @@ async function saveBasicListingAdmin(event) {
       contact: payload.telefone,
       address: payload.endereco,
       instagram: payload.instagram,
+      image: payload.imagem,
+      imageSourceUrl: payload.imagemFonteUrl,
       clienteVinculadoId,
       mesclarComId,
       overrideSalvo: true,
@@ -13807,7 +13820,7 @@ function renderBasicListingsAdmin() {
     const situation = basicListingSituation(item);
     if (filter !== "todos" && situation !== filter) return false;
     if (!queryText) return true;
-    return normalizeName(`${item.name} ${item.nomeOriginal} ${item.categoria} ${item.contact} ${item.address}`).includes(queryText);
+    return normalizeName(`${item.name} ${item.nomeOriginal} ${item.categoria} ${item.contact} ${item.address} ${item.instagram}`).includes(queryText);
   });
 
   box.innerHTML = filtered.length ? filtered.map((item) => {
@@ -13824,6 +13837,7 @@ function renderBasicListingsAdmin() {
             ? `Publicado, mas revise o complemento: o endereço também aparece em ${item.revisaoEndereco.conflitaCom}. Informe sala, bloco ou andar quando houver.`
             : "Perfil público somente com dados básicos")));
     return `<article class="basic-listing-admin-card is-${escapeAttr(situation)}">
+      ${item.image ? `<a class="basic-listing-admin-thumb" href="${escapeAttr(item.imageSourceUrl || item.image)}" target="_blank" rel="noopener noreferrer" title="Abrir fonte da imagem"><img src="${escapeAttr(item.image)}" alt="Imagem de ${escapeAttr(item.name)}" loading="lazy" decoding="async"></a>` : ""}
       <div class="basic-listing-admin-main">
         <span class="basic-listing-admin-status">${escapeHtml(situation)}</span>
         <h3>${escapeHtml(item.name)}</h3>
@@ -13834,6 +13848,7 @@ function renderBasicListingsAdmin() {
       </div>
       <div class="basic-listing-admin-actions">
         ${item.fontePublicaUrl ? `<a class="ghost-button" href="${escapeAttr(item.fontePublicaUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-solid fa-arrow-up-right-from-square"></i> Fonte</a>` : ""}
+        ${item.imageSourceUrl ? `<a class="ghost-button" href="${escapeAttr(item.imageSourceUrl)}" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-image"></i> Fonte da imagem</a>` : ""}
         <button type="button" data-basic-listing-edit="${escapeAttr(item.id)}"><i class="fa-solid fa-pen"></i> Editar</button>
       </div>
     </article>`;

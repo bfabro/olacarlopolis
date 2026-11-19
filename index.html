@@ -31,8 +31,10 @@
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
    <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
+   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+   <link rel="preconnect" href="https://unpkg.com" crossorigin>
    <link rel="preconnect" href="https://contadoracessos-default-rtdb.firebaseio.com" crossorigin>
-   <link rel="dns-prefetch" href="https://unpkg.com">
+   <link rel="dns-prefetch" href="//www.googletagmanager.com">
 
 
    <!-- ✅ Bloco de dados estruturados Schema.org -->
@@ -121,7 +123,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=651" />
+   <link rel="stylesheet" href="style.css?v=652" />
    <link rel="stylesheet" href="client-gallery.css?v=3" />
 
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
@@ -154,23 +156,61 @@
 
    <h1 style="display:none;">Olá Carlópolis</h1>
    <div id="loader" class="loader-overlay">
-      <div class="loader-content">
-         <div class="loader-spinner"></div>
-         <span>Carregando Olá Carlópolis...</span>
+      <div class="loader-content" role="status" aria-live="polite">
+         <div class="loader-spinner" aria-hidden="true"></div>
+         <span id="loaderStatus">Preparando o Olá Carlópolis...</span>
+         <strong id="loaderPercent">5%</strong>
+         <div id="loaderProgress" class="loader-progress" role="progressbar" aria-label="Carregamento do site" aria-valuemin="0" aria-valuemax="100" aria-valuenow="5">
+            <span id="loaderProgressBar" style="width:5%"></span>
+         </div>
       </div>
    </div>
    <script>
+      (function () {
+         var progress = 5;
+         var timers = [];
+         window.__setInitialLoaderProgress = function (value, status) {
+            progress = Math.max(progress, Math.min(100, Number(value) || 0));
+            var percent = document.getElementById('loaderPercent');
+            var bar = document.getElementById('loaderProgressBar');
+            var track = document.getElementById('loaderProgress');
+            var label = document.getElementById('loaderStatus');
+            if (percent) percent.textContent = Math.round(progress) + '%';
+            if (bar) bar.style.width = progress + '%';
+            if (track) track.setAttribute('aria-valuenow', String(Math.round(progress)));
+            if (label && status) label.textContent = status;
+         };
+         [
+            [120, 18, 'Carregando a estrutura...'],
+            [350, 34, 'Preparando os recursos...'],
+            [700, 52, 'Organizando comércios e serviços...'],
+            [1200, 68, 'Carregando informações públicas...'],
+            [1900, 82, 'Finalizando...'],
+            [2800, 92, 'Quase pronto...']
+         ].forEach(function (step) {
+            timers.push(setTimeout(function () {
+               window.__setInitialLoaderProgress(step[1], step[2]);
+            }, step[0]));
+         });
+         window.__clearInitialLoaderTimers = function () {
+            timers.forEach(clearTimeout);
+            timers.length = 0;
+         };
+      })();
       window.__hideInitialLoader = function () {
          var loader = document.getElementById('loader');
+         window.__setInitialLoaderProgress(100, 'Tudo pronto!');
+         if (window.__clearInitialLoaderTimers) window.__clearInitialLoaderTimers();
          if (loader) loader.classList.add('loader-hidden');
       };
       // Libera a interface assim que o HTML e os scripts deferidos terminarem.
       // Nao espera imagens e outros recursos secundarios baixarem.
       document.addEventListener('DOMContentLoaded', function () {
-         setTimeout(window.__hideInitialLoader, 100);
+         window.__setInitialLoaderProgress(100, 'Tudo pronto!');
+         setTimeout(window.__hideInitialLoader, 180);
       });
       // Fallback para que uma falha isolada nunca prenda o visitante no loader.
-      setTimeout(window.__hideInitialLoader, 2000);
+      setTimeout(window.__hideInitialLoader, 5000);
    </script>
    <div class="container">
       <!-- navbar -->
@@ -1679,7 +1719,7 @@
    <script>
       if ('serviceWorker' in navigator) {
          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js?v=1062', { updateViaCache: 'none' })
+            navigator.serviceWorker.register('/service-worker.js?v=1063', { updateViaCache: 'none' })
                .then((reg) => {
                   console.log("✅ Service Worker registrado:", reg.scope);
                })
@@ -1689,8 +1729,8 @@
    </script>
 
    <!--  JavaScript -->
-   <script defer src="basic-listings.js?v=31"></script>
-   <script defer src="script.js?v=867"></script>
+   <script defer src="basic-listings.js?v=32"></script>
+   <script defer src="script.js?v=868"></script>
    <script defer src="item-share.js?v=3"></script>
    <script defer src="client-gallery.js?v=3"></script>
 
