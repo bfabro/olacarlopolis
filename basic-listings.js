@@ -227,6 +227,22 @@ window.FONTES_CADASTROS_BASICOS = {
   topTerraCarlopolis: {
     nome: "Top Terra (site oficial)",
     url: "https://topterra.com.br/servicos/infraestrutura/terraplanagem-em-carlopolis"
+  },
+  jairoCamargoNautica: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/contato/jairo-francisco-camargo-22c54f205a3b3f634a73405b1a4eac68"
+  },
+  evertonBuenoNautica: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/68899612000100"
+  },
+  robertRomanoNautica: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/69-162-970-robert-philip-dos-santos-romano-69162970000190"
+  },
+  decorTintasNovaRazao: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/69009908000162"
   }
 };
 
@@ -833,7 +849,11 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Terraplenagem", "Kadu Terraplenagem - J K Carvalho Ltda", "Rua Laurindo Franco de Godoy, 426, Letra A - Centro", "(43) 98858-8280", "kaduTerraplenagem", "servico"],
   ["Terraplenagem", "Alemão Terraplenagem - J C Mainardes Serviços de Terraplenagem", "Rua Eleutério Camilo de Oliveira, 302, Anexo B - Jardim Americana", "", "alemaoTerraplenagem", "servico"],
   ["Terraplenagem", "DB Arquitetura, Terraplenagem, Imóveis e Construção", "Avenida Elson Soares, 222, Sala A - Centro", "(43) 99955-4023", "dbTerraplenagem", "servico", ["nome, telefone e endereço", "DB Arquitetura Terraplenagem Imóveis e Construção (cadastro básico existente)"]],
-  ["Terraplenagem", "Top Terra", "Ponta Grossa - PR", "(42) 99956-1393", "topTerraCarlopolis", "servico", ["atende Carlópolis, mas não possui estabelecimento local confirmado", "sede informada em Ponta Grossa/PR"]]
+  ["Terraplenagem", "Top Terra", "Ponta Grossa - PR", "(42) 99956-1393", "topTerraCarlopolis", "servico", ["atende Carlópolis, mas não possui estabelecimento local confirmado", "sede informada em Ponta Grossa/PR"]],
+  ["Manutenção Náutica", "Jairo Francisco Camargo", "Rua Sibipiruna, 324 - Vista Alegre", "", "jairoCamargoNautica", "servico"],
+  ["Manutenção Náutica", "Everton Bueno da Rocha", "Rua Eugênio Neves Soares, 1800 - Tomodati", "", "evertonBuenoNautica", "servico"],
+  ["Manutenção Náutica", "Robert Philip dos Santos Romano", "Rua Alfeneiro, 462 - Vista Alegre", "(43) 99192-9582", "robertRomanoNautica", "servico"],
+  ["Material de Construção", "Decor Tintas - Clayton Silva Construtora e Comércio de Tintas Ltda", "Rua Padre Hugo, 836, Sala A - Centro", "", "decorTintasNovaRazao", "comercio", ["mesmo nome e endereço", "R Bandeira Construtora e Comércio de Tintas / Decor Tintas (cadastro básico existente)"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
