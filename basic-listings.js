@@ -155,6 +155,42 @@ window.FONTES_CADASTROS_BASICOS = {
   cafeeirasPublicas: {
     nome: "Diretórios públicos / Receita Federal",
     url: "https://brfirmas.org/PR-Carl%C3%B3polis/Alimentos-e-Agricultura"
+  },
+  montesegSeguros: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/cattin-transportadora-e-cerealista-eireli-35493286000179"
+  },
+  osvaldinhoDespachante: {
+    nome: "Apontador / TeleListas / Socorro Auto",
+    url: "https://www.apontador.com.br/local/pr/carlopolis/despachantes/842466XT/osvaldinho_despachante_oficial_do_detran.html"
+  },
+  promissorSegurosOficial: {
+    nome: "Promissor Corretora de Seguros (site oficial)",
+    url: "https://promissor.com.br/"
+  },
+  rodriguinhoDespachanteDetran: {
+    nome: "DETRAN-PR / Receita Federal",
+    url: "https://g1pr.rpc.com.br/Despachantes%20credenciados%20no%20Paran%C3%A1.pdf"
+  },
+  hashitaniSeguros: {
+    nome: "Serasa Experian / Receita Federal",
+    url: "https://empresas.serasaexperian.com.br/consulta-gratis/HASHITANI-CORRETOR-DE-SEGUROS-LTDA-ME-50725851000170"
+  },
+  fabioDespachante: {
+    nome: "Consulta Processos / Receita Federal",
+    url: "https://www.jusbrasil.com.br/nome/fabio-despachante/cnpj-85AHW2eecEH"
+  },
+  joaoCrisostomoSeguros: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/empresas/pr-jacarezinho/busca-corretora-de-seguro"
+  },
+  dalSeguros: {
+    nome: "DAL Corretora de Seguros (site oficial)",
+    url: "https://www.dalcorretoradeseguros.com.br/"
+  },
+  sallesDespachante: {
+    nome: "Consultas Plus / Receita Federal",
+    url: "https://consultas.plus/lista-de-empresas/parana/carlopolis/"
   }
 };
 
@@ -743,7 +779,16 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Cafeteria", "Café Com Mistura", "Endereço divergente entre as fontes", "(43) 3566-1345", "cafeeirasPublicas", "comercio", ["endereço conflitante e telefone repetido em cadastros sem relação", "fontes públicas divergentes"]],
   ["Cafeteria", "Sabor da Casa Ani", "Rua Benedito Salles, 1341 - Centro", "", "cafeteriasPlaneta", "comercio", ["identidade atual do ponto não confirmada", "Zap Burguer no mesmo endereço"]],
   ["Beneficiamento de Café", "Cafeeira Calin", "Rua Nicolau Miguel, 494 - Centro", "", "cafeeirasPublicas", "comercio", ["empresa baixada", "cadastro público encerrado"]],
-  ["Comércio de Café", "Cafeeira Donatti", "Carlópolis - PR", "", "cafeeiraDonatti", "comercio", ["situação cadastral inapta desde 2018", "CNPJ 15.606.001/0001-51"]]
+  ["Comércio de Café", "Cafeeira Donatti", "Carlópolis - PR", "", "cafeeiraDonatti", "comercio", ["situação cadastral inapta desde 2018", "CNPJ 15.606.001/0001-51"]],
+  ["Corretora de Seguros", "Monteseg Corretora de Seguros", "Avenida Beija Flor, s/n, Quadra N, Lote 09 - Ilha Bella", "(43) 99164-6036", "montesegSeguros", "servico", null, ["endereço próximo", "Rent Car Locadora de Veículos Ltda"]],
+  ["Despachante", "Osvaldinho Despachante Oficial do Detran", "Rua Benedito Salles, 1168 - Centro", "(43) 3566-1573", "osvaldinhoDespachante", "servico", null, ["mesmo endereço, atividade distinta", "Mario Sergio Martini"]],
+  ["Corretora de Seguros", "Promissor Seguros", "Rua Fidêncio de Melo, 240, Sala B - Centro", "(43) 99144-7164", "promissorSegurosOficial", "servico", ["nome, telefone e endereço", "Promissor Seguros (cliente completo)"]],
+  ["Despachante", "Despachante Rodriguinho", "Rodovia PR-218, 91, Sala 01 - Parque Industrial", "(43) 99812-5120", "rodriguinhoDespachanteDetran", "servico", ["nome, telefone e endereço", "Rodriguinho (cliente completo)"]],
+  ["Corretora de Seguros", "Hashitani Corretor de Seguros Ltda", "Rua Andrino Soares, 470, Quadra 64 - Centro", "", "hashitaniSeguros", "servico", ["empresa baixada", "CNPJ 50.725.851/0001-70"]],
+  ["Despachante", "Fábio Despachante", "Rua Antônio Jonas Ferreira Pinto, 431 - Centro", "(43) 3566-1253", "fabioDespachante", "servico", ["empresa baixada", "CNPJ 10.571.378/0001-07"]],
+  ["Corretora de Seguros", "João Crisóstomo Corretora de Seguros", "Avenida Manoel Ribas, 420 - Centro, Jacarezinho/PR", "(43) 3527-1701", "joaoCrisostomoSeguros", "servico", ["sede em outro município e sem unidade local confirmada", "Jacarezinho/PR"]],
+  ["Corretora de Seguros", "DAL Corretora de Seguros", "Ourinhos/SP", "(43) 99165-1209", "dalSeguros", "servico", ["atende Carlópolis, mas não possui endereço local confirmado", "sede informada em Ourinhos/SP"]],
+  ["Despachante", "Salles Despachante", "Rua Nicolau Miguel, 393 - Centro", "(43) 99753-8616", "sallesDespachante", "servico", ["dois CNPJs públicos para a mesma identidade, telefone e endereço sem situação atual suficientemente confirmada", "CNPJs 43.703.833/0001-21 e 43.874.849/0001-05"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
