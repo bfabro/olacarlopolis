@@ -13252,7 +13252,7 @@ button.admin-button-loading::after {
 
 .basic-listings-admin-toolbar {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) minmax(150px, 220px);
+  grid-template-columns: minmax(240px, 1fr) minmax(150px, 220px) auto;
   gap: 12px;
   margin-bottom: 16px;
 }
@@ -13272,6 +13272,26 @@ button.admin-button-loading::after {
   border: 0;
   outline: 0;
   box-shadow: none;
+}
+
+.basic-listings-admin-toolbar > button {
+  min-width: 132px;
+  justify-content: center;
+}
+
+.basic-listings-admin-empty {
+  padding: 28px 18px;
+  border: 1px dashed #cbd5e1;
+  border-radius: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+.basic-listings-admin-empty i {
+  display: block;
+  margin-bottom: 8px;
+  color: #2563eb;
+  font-size: 1.35rem;
 }
 
 .basic-listings-admin-list { display: grid; gap: 12px; }
@@ -13329,6 +13349,7 @@ button.admin-button-loading::after {
   .basic-listings-admin-hero,
   .basic-listing-admin-card { align-items: stretch; flex-direction: column; }
   .basic-listings-admin-toolbar { grid-template-columns: 1fr; }
+  .basic-listings-admin-toolbar > button { width: 100%; }
   .basic-listing-admin-actions { width: 100%; }
   .basic-listing-admin-actions>* { flex: 1; justify-content: center; }
 }

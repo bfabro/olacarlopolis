@@ -1574,8 +1574,9 @@
           <div class="basic-listings-admin-toolbar">
             <label><i class="fa-solid fa-magnifying-glass"></i><input id="basicListingsAdminSearch" placeholder="Pesquisar nome, telefone, endereço ou categoria"></label>
             <select id="basicListingsAdminFilter"><option value="todos">Todos</option><option value="ativo">Ativos</option><option value="revisar">Revisar endereço</option><option value="descartado">Descartados</option><option value="vinculado">Vinculados</option><option value="mesclado">Unidos</option><option value="inativo">Inativos</option></select>
+            <button id="basicListingsAdminSearchButton" type="button"><i class="fa-solid fa-magnifying-glass"></i> Pesquisar</button>
           </div>
-          <div id="basicListingsAdminList" class="basic-listings-admin-list"></div>
+          <div id="basicListingsAdminList" class="basic-listings-admin-list" aria-live="polite"></div>
         </section>
       </section>
 
@@ -3657,6 +3658,6 @@
     </div>
   </div>
   <script src="../basic-listings.js?v=34"></script>
-  <script type="module" src="painel.js?v=952"></script>
+  <script type="module" src="painel.js?v=953"></script>
 </body>
 </html>

@@ -305,6 +305,7 @@ let state = {
   gruposWhatsapp: [],
   categorias: [],
   cadastrosBasicos: [],
+  basicListingsSearch: { query: "", filter: "todos", hasSearched: false, annotationsReady: false },
   pagamentoSistema: {},
   integracaoPagamento: { config: {}, charges: [], events: [], loaded: false },
   paginaInicialSite: {},
@@ -3153,6 +3154,7 @@ async function loadAllData(onProgress = null) {
       };
     })
     .sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "pt-BR"));
+  state.basicListingsSearch = { query: "", filter: "todos", hasSearched: false, annotationsReady: false };
   const noticiasSnap = await getPanelSnapshot("noticias");
 
   progress(58, "Organizando clientes e acessos...");
@@ -13796,6 +13798,7 @@ async function saveBasicListingAdmin(event) {
     });
     await registrarLogAuditoria("update", "Cadastros básicos", `Cadastro básico atualizado: ${payload.nome}`, `cadastrosBasicos/${id}`);
     state.cadastrosBasicos.sort((a, b) => String(a.name || "").localeCompare(String(b.name || ""), "pt-BR"));
+    state.basicListingsSearch.annotationsReady = false;
     renderBasicListingsAdmin();
     resetBasicListingAdminForm();
     showToast(clienteVinculadoId ? "Cadastro vinculado ao cliente completo." : (mesclarComId ? "Cadastros unidos com sucesso." : "Cadastro básico atualizado."));
@@ -13807,15 +13810,30 @@ async function saveBasicListingAdmin(event) {
   }
 }
 
+function applyBasicListingsAdminSearch() {
+  state.basicListingsSearch.query = normalizeName($("basicListingsAdminSearch")?.value || "");
+  state.basicListingsSearch.filter = $("basicListingsAdminFilter")?.value || "todos";
+  state.basicListingsSearch.hasSearched = true;
+  renderBasicListingsAdmin();
+}
+
 function renderBasicListingsAdmin() {
   const box = $("basicListingsAdminList");
   if (!box) return;
-  annotateBasicListingDuplicates();
-  const queryText = normalizeName($("basicListingsAdminSearch")?.value || "");
-  const filter = $("basicListingsAdminFilter")?.value || "todos";
+  const searchState = state.basicListingsSearch || (state.basicListingsSearch = { query: "", filter: "todos", hasSearched: false, annotationsReady: false });
+  if (!searchState.hasSearched) {
+    if ($("basicListingsAdminCount")) $("basicListingsAdminCount").textContent = `${state.cadastrosBasicos.length} cadastros disponíveis`;
+    box.innerHTML = `<div class="basic-listings-admin-empty"><i class="fa-solid fa-magnifying-glass"></i>Digite um nome, telefone, endereço ou categoria e clique em <strong>Pesquisar</strong>. Para listar tudo, deixe a busca vazia.</div>`;
+    return;
+  }
+  if (!searchState.annotationsReady) {
+    annotateBasicListingDuplicates();
+    searchState.annotationsReady = true;
+  }
+  const queryText = searchState.query;
+  const filter = searchState.filter;
   const publishedCount = state.cadastrosBasicos.filter((item) => ["ativo", "revisar"].includes(basicListingSituation(item))).length;
   if ($("basicListingsAdminCount")) $("basicListingsAdminCount").textContent = `${publishedCount} publicados de ${state.cadastrosBasicos.length}`;
-  fillBasicListingAdminSelects(state.cadastrosBasicos.find((item) => item.id === $("basicListingId")?.value));
   const filtered = state.cadastrosBasicos.filter((item) => {
     const situation = basicListingSituation(item);
     if (filter !== "todos" && situation !== filter) return false;
@@ -31393,8 +31411,12 @@ function bindEvents() {
   $("basicListingForm")?.addEventListener("submit", saveBasicListingAdmin);
   $("closeBasicListingForm")?.addEventListener("click", resetBasicListingAdminForm);
   $("cancelBasicListingEdit")?.addEventListener("click", resetBasicListingAdminForm);
-  $("basicListingsAdminSearch")?.addEventListener("input", renderBasicListingsAdmin);
-  $("basicListingsAdminFilter")?.addEventListener("change", renderBasicListingsAdmin);
+  $("basicListingsAdminSearchButton")?.addEventListener("click", applyBasicListingsAdminSearch);
+  $("basicListingsAdminSearch")?.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    applyBasicListingsAdminSearch();
+  });
   $("basicListingsAdminList")?.addEventListener("click", (event) => {
     const button = event.target.closest("[data-basic-listing-edit]");
     if (button) openBasicListingAdminEditor(button.dataset.basicListingEdit);
