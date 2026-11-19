@@ -89,6 +89,10 @@ window.FONTES_CADASTROS_BASICOS = {
     nome: "CNPJ Dados / Receita Federal",
     url: "https://cnpjdados.com/empresas/pr/carlopolis/lanchonetes"
   },
+  marmitariasReceita: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/fornecimento-de-alimentos-preparados-preponderantemente-para-consumo-domiciliar"
+  },
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -643,7 +647,22 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Lanchonete", "Di Dog Ltda", "Rua Benedito Salles, 338 - Centro", "", "lanchonetesReceita", "comercio", ["nome", "Di Dog"]],
   ["Lanchonete", "Xis Bauinea - Kiara Caroline Fontana de Carvalho", "Rua Benedito Salles, 1188 - Centro", "", "lanchonetesReceita", "comercio", ["nome e endereço", "Xis Bauinea"]],
   ["Lanchonete", "Vitoria dos Santos Azevedo", "Rua José Ferraz, 50-D - Novo Horizonte", "", "lanchonetesReceita"],
-  ["Lanchonete", "The Best Açaí - Soares Comércio Ltda", "Rua Benedito Salles, 519 - Centro", "", "lanchonetesReceita", "comercio", ["nome e endereço", "The Best Açaí"]]
+  ["Lanchonete", "The Best Açaí - Soares Comércio Ltda", "Rua Benedito Salles, 519 - Centro", "", "lanchonetesReceita", "comercio", ["nome e endereço", "The Best Açaí"]],
+  ["Marmitaria e Delivery", "Marli Aparecida Coimbra", "Avenida Jaboticabal, s/n - Jaboticabal", "", "marmitariasReceita", "comercio", null, ["endereço genérico", "Setuko Abe"]],
+  ["Marmitaria e Delivery", "Ivone Nunes", "Rua Quaresmeira Roxa, 295 - Vista Alegre", "", "marmitariasReceita", "comercio", null, ["endereço", "Aparecido Carlos de Camargo Carlópolis"]],
+  ["Marmitaria e Delivery", "Patricia Fogaça Rocha Caetano", "Rua Marcos Rodrigues do Amaral, 603 - Jardim das Paineiras", "", "marmitariasReceita"],
+  ["Pizzaria", "Tonny Pizzaria - Detoni e Barroso Ltda", "Rua Paul Harris, 52 - Vista Bella", "", "marmitariasReceita", "comercio", ["nome e endereço", "Tonny Pizzaria"]],
+  ["Marmitaria e Delivery", "Carlos Henrique Salvego da Silva", "Rua Ataliba Leonel, 194 - Centro", "", "marmitariasReceita", "comercio", null, ["endereço", "Valdomiro de Souza Transporte"]],
+  ["Marmitaria e Delivery", "Pesqueiro Água Marine - Sonia Santos de Souza Silva", "Estância Santa Maria, s/n - Jaboticabal", "", "marmitariasReceita"],
+  ["Doceria", "Clelia Bolos e Doces - Clelia Ramos", "Rua Kalil Keder, 762 - Centro", "", "marmitariasReceita"],
+  ["Salgados", "Salgados & Cia - Rosangela Lopes Barbosa", "Rua Francisco Avelino de Paiva, 1278 - Centro", "", "marmitariasReceita"],
+  ["Marmitaria e Delivery", "Pastelaria Vista Bella - José Carlos Ribeiro da Silva Filho", "Avenida Anesio Fernandes Machado, 353 - Vista Bella", "", "marmitariasReceita", "comercio", null, ["endereço próximo", "Vagner de Freitas"]],
+  ["Marmitaria e Delivery", "Vania Jucemara Tanaka", "Rua Edwirges Benedito do Amaral, 866 - Bela Vista", "", "marmitariasReceita"],
+  ["Marmitaria e Delivery", "Francieli Penteado dos Santos", "Rua Francisco Teixeira da Luz, 128, 10A - Vista Bella", "", "marmitariasReceita"],
+  ["Marmitaria e Delivery", "Danieli Aparecida Ribeiro Polato", "Rua Lazara Maria Alves, 201 - Novo Horizonte", "", "marmitariasReceita"],
+  ["Marmitaria e Delivery", "Maiara Margarida Ana Benedetti Gotardi", "Rua Benedita da Cruz Domingues, 191 - São Pedro", "", "marmitariasReceita"],
+  ["Marmitaria e Delivery", "Danilo Otavio Vaz", "Rua Kalil Keder, 753 - Centro", "", "marmitariasReceita"],
+  ["Marmitaria e Delivery", "João Nilson Ferreira Matos", "Rua Padre Hugo, 21-A - Vista Bella", "", "marmitariasReceita"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
