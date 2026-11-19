@@ -77,6 +77,10 @@ window.FONTES_CADASTROS_BASICOS = {
     nome: "MaisCNPJ / Receita Federal",
     url: "https://maiscnpj.com.br/empresas/pr/carlopolis/reparacao-e-manutencao-de-computadores-e-de-equipamentos-perifericos"
   },
+  eventosReceita: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/servicos-de-organizacao-de-feiras-congressos-exposicoes-e-festas"
+  },
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -599,7 +603,19 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Assistência Técnica de Informática", "Eduardo Antonio Rodrigues de Miranda", "Rua Nicolau Miguel, 1000 - Jardim Bela Vista", "", "informaticaReceita", "servico", ["nome", "Eduardo Antonio Rodrigues de Miranda"]],
   ["Assistência Técnica de Informática", "Bruno Faganelli de Oliveira", "Rua Ataliba Leonel, 196 - Centro", "(43) 9191-9701", "informaticaReceita", "servico"],
   ["Assistência Técnica de Informática", "William Kawakami Leite", "Rua Alfeneiro, 373 - Vista Alegre", "", "informaticaReceita", "servico"],
-  ["Assistência Técnica de Informática", "Lets GO Informática", "Rua Benedito Salles, 251, Anexo A - Centro", "(14) 3762-3092", "informaticaReceita", "servico"]
+  ["Assistência Técnica de Informática", "Lets GO Informática", "Rua Benedito Salles, 251, Anexo A - Centro", "(14) 3762-3092", "informaticaReceita", "servico"],
+  ["Organização de Eventos", "Arena Seu Luiz - V C Barone Locação e Eventos", "Estrada Jaboticabal - Chácara Bela Manhã, s/n - Jaboticabal", "(43) 99104-7984", "eventosReceita", "servico"],
+  ["Organização de Eventos", "Genival Antonio dos Santos", "Rua Camilo Eleuterio de Oliveira, 462 - Jardim Americana", "(43) 99113-3551", "eventosReceita", "servico"],
+  ["Organização de Eventos", "Andrea Ferreira da Silva Lima", "Rua José Talim, 200 - Jardim Itália", "", "eventosReceita", "servico"],
+  ["Organização de Eventos", "Ponto Forte - Minoru Yamamoto", "Rua Marcos Rodrigues do Amaral, 384 - Centro", "", "eventosReceita", "servico"],
+  ["Organização de Eventos", "Nilson Ferreira", "Rua Benedito Salles, 1152 - Centro", "", "eventosReceita", "servico", null, ["endereco", "Araucalhas"]],
+  ["Organização de Eventos", "Aparecida de Jesus Sigolo Vieira", "Rua Benedito Salles, 2281 - Chácara Vieira", "", "eventosReceita", "servico"],
+  ["Organização de Eventos", "Tiago de Souza", "Rua Dra. Paula e Silva, 1182 - Centro", "", "eventosReceita", "servico", null, ["endereco", "Team Vieira"]],
+  ["Organização de Eventos", "Maria Dalva Ribeiro", "Rua Sibipiruna, 208 - Jardim Vista Alegre", "", "eventosReceita", "servico"],
+  ["Organização de Eventos", "Thaynara Maria Machado Muniz", "Rua Laurindo Franco de Godoi, 464 - Centro", "", "eventosReceita", "servico", null, ["endereco", "Bio Farma"]],
+  ["Organização de Eventos", "Kauanny Xavier Dias", "Rua Padre Hugo, 488 - Centro", "", "eventosReceita", "servico", null, ["endereco", "Edea de Azevedo Pereira"]],
+  ["Organização de Eventos", "Jorge Costa Netto", "Rua Januário Francisco Falarz, 308 - Centro", "", "eventosReceita", "servico"],
+  ["Organização de Eventos", "Gustavo Alves de Castro", "Rua Antonio Jonas Ferreira Pinto, 665 - Centro", "", "eventosReceita", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()

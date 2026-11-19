@@ -24145,7 +24145,7 @@ plotarPinsImoveis(stateImoveis.filtered);
         semPainelAdministrativo: true,
         fontePublicaNome,
         fontePublicaUrl,
-        fonteVerificadaEm: "2026-11-18"
+        fonteVerificadaEm: "2026-11-19"
       };
       categoria.establishments = categoria.establishments || [];
       categoria.establishments.push(estabelecimento);
