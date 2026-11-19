@@ -243,6 +243,22 @@ window.FONTES_CADASTROS_BASICOS = {
   decorTintasNovaRazao: {
     nome: "CNPJ.biz / Receita Federal",
     url: "https://cnpj.biz/69009908000162"
+  },
+  petFelizLuceia: {
+    nome: "Econodata / Serasa Experian / Receita Federal",
+    url: "https://www.econodata.com.br/empresas/pr-carlopolis/atividades-de-servicos-pessoais-nao-especificadas-anteriormente-s-9609208"
+  },
+  flavieliPet: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/empresas/pr-carlopolis/atividades-de-servicos-pessoais-nao-especificadas-anteriormente-s-9609208"
+  },
+  tayssaPet: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/66473288000120"
+  },
+  claudiaPet: {
+    nome: "CNPJ.biz / X-CNPJ / Receita Federal",
+    url: "https://cnpj.biz/cnae-atividade/9609-2-08-higiene-e-embelezamento-de-animais-domesticos?id=73760377"
   }
 };
 
@@ -853,7 +869,11 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Manutenção Náutica", "Jairo Francisco Camargo", "Rua Sibipiruna, 324 - Vista Alegre", "", "jairoCamargoNautica", "servico"],
   ["Manutenção Náutica", "Everton Bueno da Rocha", "Rua Eugênio Neves Soares, 1800 - Tomodati", "", "evertonBuenoNautica", "servico"],
   ["Manutenção Náutica", "Robert Philip dos Santos Romano", "Rua Alfeneiro, 462 - Vista Alegre", "(43) 99192-9582", "robertRomanoNautica", "servico"],
-  ["Material de Construção", "Decor Tintas - Clayton Silva Construtora e Comércio de Tintas Ltda", "Rua Padre Hugo, 836, Sala A - Centro", "", "decorTintasNovaRazao", "comercio", ["mesmo nome e endereço", "R Bandeira Construtora e Comércio de Tintas / Decor Tintas (cadastro básico existente)"]]
+  ["Material de Construção", "Decor Tintas - Clayton Silva Construtora e Comércio de Tintas Ltda", "Rua Padre Hugo, 836, Sala A - Centro", "", "decorTintasNovaRazao", "comercio", ["mesmo nome e endereço", "R Bandeira Construtora e Comércio de Tintas / Decor Tintas (cadastro básico existente)"]],
+  ["Banho e Tosa", "Pet Feliz - Luceia Rocado Ruy Menezes", "Avenida Senhor Bom Jesus, Lote 06, Quadra B, Fundos", "", "petFelizLuceia", "servico"],
+  ["Banho e Tosa", "Flavieli Brisola Damasio", "Rua Benedito Salles, 309 - Centro", "", "flavieliPet", "servico", null, ["mesmo endereço, atividade distinta", "Agro Vida Comércio de Produtos Agropecuários Ltda"]],
+  ["Banho e Tosa", "Tayssa Fernanda Costa de Azevedo", "Rua Eugênio Neves Soares, 1888 - Tomodati", "", "tayssaPet", "servico"],
+  ["Banho e Tosa", "Claudia Maria de Souza Barbosa", "Bairro Santa Clara - Carlópolis", "", "claudiaPet", "servico", ["endereço público incompleto", "fontes confirmam apenas o bairro Santa Clara"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
