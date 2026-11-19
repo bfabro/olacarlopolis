@@ -275,6 +275,22 @@ window.FONTES_CADASTROS_BASICOS = {
   unlimitedFibra: {
     nome: "CNPJ Dados / Receita Federal",
     url: "https://www.cnpjdados.com/empresas/pr/carlopolis"
+  },
+  mdTechCarlopolis: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/50864817000186"
+  },
+  befFabroInformatica: {
+    nome: "Jusbrasil / Receita Federal",
+    url: "https://www.jusbrasil.com.br/nome/b-e-f-fabro-informatica-ltda/cnpj-Q0TpeRQdb_n"
+  },
+  ribasoftOficial: {
+    nome: "RibaSoft (site oficial) / Receita Federal",
+    url: "https://ribasoft.com.br/"
+  },
+  cbsSistemasCarlopolis: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/empresas/pr-carlopolis/tecnologia"
   }
 };
 
@@ -893,7 +909,11 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Desenvolvimento de Software", "EJ Tecnologias e Sistemas Ltda", "Avenida Elson Soares, 1421 - Centro", "", "ejTecnologias", "servico"],
   ["Assistência Técnica de Informática", "Miranda Informática", "Rua Nicolau Miguel, 1001 - Centro", "(43) 99917-6487", "mirandaInformatica", "servico"],
   ["Suporte de Informática", "J C Informática - José Claudio Custodio", "Avenida Turística Elias Merhi Mansur, 881 - Centro", "(43) 99938-7494", "jcInformatica", "servico", null, ["mesmo endereço, profissionais distintos", "CIM Contabilidade e Informática Municipal Ltda"]],
-  ["Provedor de Internet", "Unlimited Fibra Ltda", "Bairro Novo Horizonte - Carlópolis", "", "unlimitedFibra", "servico", ["endereço público incompleto", "fontes confirmam apenas o bairro Novo Horizonte"]]
+  ["Provedor de Internet", "Unlimited Fibra Ltda", "Bairro Novo Horizonte - Carlópolis", "", "unlimitedFibra", "servico", ["endereço público incompleto", "fontes confirmam apenas o bairro Novo Horizonte"]],
+  ["Consultoria em Tecnologia", "MD Tech Ltda", "Rua Ypê Roxo, 744 - Centro", "", "mdTechCarlopolis", "servico"],
+  ["Suporte de Informática", "B. E. F. Fabro Informática Ltda", "Avenida Turística Elias Mehri Mansur, 562 - Centro", "", "befFabroInformatica", "servico"],
+  ["Desenvolvimento de Software", "RibaSoft - R. Manoel dos Santos", "Rua Dr. Rogério Ignácio da Silva, 290, Anexo A - Residencial Murador", "(43) 99661-4387", "ribasoftOficial", "servico"],
+  ["Desenvolvimento de Software", "CBS Sistemas - C. B. Sanches", "Rua Laurindo Franco de Godoy, 525 - Centro", "", "cbsSistemasCarlopolis", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
