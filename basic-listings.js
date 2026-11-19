@@ -323,6 +323,22 @@ window.FONTES_CADASTROS_BASICOS = {
   academiasCarlopolisReceita: {
     nome: "Jornal Esporte e Saúde / Receita Federal",
     url: "https://jornalesporteesaude.com.br/pr/carlopolis/"
+  },
+  laboratoriosCarlopolis: {
+    nome: "Assistência Médica",
+    url: "https://assistenciamedica.com.br/categorias/exames-laboratoriais/carlopolis-pr"
+  },
+  labcenterOficial: {
+    nome: "Labcenter (site oficial) / Receita Federal",
+    url: "https://grupojz.uniexames.com.br/site/contato"
+  },
+  ultramedCarlopolis: {
+    nome: "Ultramed (site oficial)",
+    url: "https://www.ultramedsra.com.br/unidade/ultramed-carlopolis/"
+  },
+  laboratoriosAntigosCarlopolis: {
+    nome: "Apontador / CNES",
+    url: "https://www.apontador.com.br/em/carlopolis-pr/clinicas-e-diagnosticos/laboratorios/"
   }
 };
 
@@ -955,7 +971,14 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Academia e Estúdio", "Cláudia Silva Studio Ltda", "Rua Benedita da Cruz Domingues, 330 - São Pedro", "", "claudiaSilvaStudio", "servico"],
   ["Treinamento Esportivo", "Kaduda Esportes - Ivanildo de Castro Camargo", "Rua José Salles, 94 - Centro", "", "kadudaEsportes", "servico"],
   ["Artes Marciais", "Yamada Ha Mashinkan Shitoryu Shukokai do Brasil", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academiesCarlopolis", "servico", ["telefone e endereço", "Academia Corpo e Mente"]],
-  ["Academia", "Corpo e Mente Academia", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academiasCarlopolisReceita", "servico", ["nome, telefone e endereço", "Academia Corpo e Mente (cadastro básico existente)"]]
+  ["Academia", "Corpo e Mente Academia", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academiasCarlopolisReceita", "servico", ["nome, telefone e endereço", "Academia Corpo e Mente (cadastro básico existente)"]],
+  ["Laboratório de Análises Clínicas", "Popular Lab Mais", "Avenida Elson Soares, 787, Sala 06 - Centro", "(43) 99109-0285", "laboratoriosCarlopolis", "servico"],
+  ["Laboratório de Análises Clínicas", "Labcenter - J. S. Camargo & Zurdo Ltda", "Rua Januário Francisco Fallars, 422 - Centro", "(43) 98402-7484", "labcenterOficial", "servico"],
+  ["Posto de Coleta Laboratorial", "Laboratório de Análises Clínicas Cristo Rei", "Rua Laurindo Franco de Godoy, 575, Sala 02 - Centro", "(43) 3566-1467", "laboratoriosCarlopolis", "servico"],
+  ["Diagnóstico por Imagem", "Ultramed Carlópolis", "Rua Capitão Estácio, 460 - Vista Bella", "(43) 3306-8208", "ultramedCarlopolis", "servico", null, null, "https://painel-ultramed.codiehost.com.br/uploads/133443747092809836.png", "https://www.ultramedsra.com.br/unidade/ultramed-carlopolis/"],
+  ["Laboratório de Análises Clínicas", "Laboratório Central", "Rua Nicolau Miguel, 414 - Centro", "(43) 3566-2746", "laboratoriosAntigosCarlopolis", "servico", ["mesma identidade empresarial e dados antigos conflitantes", "Labcenter - J. S. Camargo & Zurdo Ltda"]],
+  ["Laboratório de Análises Clínicas", "Laboratório de Análises Clínicas São Lucas", "Rua Andrino Soares, 282 - Centro", "(43) 3566-1467", "laboratoriosAntigosCarlopolis", "servico", ["telefone coincidente e identidade atual não confirmada", "Laboratório de Análises Clínicas Cristo Rei"]],
+  ["Laboratório de Análises Clínicas", "Laboratório de Análises Clínicas Oswaldo Cruz", "Avenida Elson Soares, 736 - Centro", "(43) 3566-1144", "laboratoriosAntigosCarlopolis", "servico", ["cadastro público antigo sem situação atual minimamente verificável", "registro histórico de diretório"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
