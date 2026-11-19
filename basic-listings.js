@@ -73,6 +73,10 @@ window.FONTES_CADASTROS_BASICOS = {
     nome: "Apontador",
     url: "https://www.apontador.com.br/em/centro-carlopolis-pr/automoveis-e-veiculos/pecas-e-acessorios-para-veiculos"
   },
+  informaticaReceita: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/reparacao-e-manutencao-de-computadores-e-de-equipamentos-perifericos"
+  },
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -591,7 +595,11 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Oficina de Motos", "M C Motos - Cibele Paulo da Silva", "Rua Andrino Soares, 610 - Centro", "", "oficinasMotosReceita", "servico"],
   ["Oficina de Motos", "Natanael Meneses", "Rua Ibisco, 175 - Vista Alegre", "", "oficinasMotosReceita", "servico"],
   ["Oficina de Motos", "Alex Sandro de Paulo Cezar", "Rua Magnólia, 399 - Vista Alegre", "", "oficinasMotosReceita", "servico"],
-  ["Oficina de Motos", "Luís Gustavo Butchaka", "Rua Januário Francisco Fallars, 156 - Centro", "", "oficinasMotosReceita", "servico"]
+  ["Oficina de Motos", "Luís Gustavo Butchaka", "Rua Januário Francisco Fallars, 156 - Centro", "", "oficinasMotosReceita", "servico"],
+  ["Assistência Técnica de Informática", "Eduardo Antonio Rodrigues de Miranda", "Rua Nicolau Miguel, 1000 - Jardim Bela Vista", "", "informaticaReceita", "servico", ["nome", "Eduardo Antonio Rodrigues de Miranda"]],
+  ["Assistência Técnica de Informática", "Bruno Faganelli de Oliveira", "Rua Ataliba Leonel, 196 - Centro", "(43) 9191-9701", "informaticaReceita", "servico"],
+  ["Assistência Técnica de Informática", "William Kawakami Leite", "Rua Alfeneiro, 373 - Vista Alegre", "", "informaticaReceita", "servico"],
+  ["Assistência Técnica de Informática", "Lets GO Informática", "Rua Benedito Salles, 251, Anexo A - Centro", "(14) 3762-3092", "informaticaReceita", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
