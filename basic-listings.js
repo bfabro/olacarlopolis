@@ -339,6 +339,26 @@ window.FONTES_CADASTROS_BASICOS = {
   laboratoriosAntigosCarlopolis: {
     nome: "Apontador / CNES",
     url: "https://www.apontador.com.br/em/carlopolis-pr/clinicas-e-diagnosticos/laboratorios/"
+  },
+  yolloFoxOficial: {
+    nome: "Yollo Fox (site oficial) / Receita Federal",
+    url: "https://yollofox.com.br/"
+  },
+  agenciasMarketingCarlopolis: {
+    nome: "Solutudo / Receita Federal",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias-de-marketing"
+  },
+  luksProducaoVideo: {
+    nome: "MonitorCNPJ / Receita Federal",
+    url: "https://monitorcnpj.com.br/cnpj/49623877000128/"
+  },
+  comunicacaoCarlopolisAntigos: {
+    nome: "Lista Amarela / Consulta Empresas Brasil",
+    url: "https://listaamarela.com.br/pr-carlopolis/propaganda-e-publicidade/enigma"
+  },
+  serigrafReceita: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/04864928000175"
   }
 };
 
@@ -978,7 +998,13 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Diagnóstico por Imagem", "Ultramed Carlópolis", "Rua Capitão Estácio, 460 - Vista Bella", "(43) 3306-8208", "ultramedCarlopolis", "servico", null, null, "https://painel-ultramed.codiehost.com.br/uploads/133443747092809836.png", "https://www.ultramedsra.com.br/unidade/ultramed-carlopolis/"],
   ["Laboratório de Análises Clínicas", "Laboratório Central", "Rua Nicolau Miguel, 414 - Centro", "(43) 3566-2746", "laboratoriosAntigosCarlopolis", "servico", ["mesma identidade empresarial e dados antigos conflitantes", "Labcenter - J. S. Camargo & Zurdo Ltda"]],
   ["Laboratório de Análises Clínicas", "Laboratório de Análises Clínicas São Lucas", "Rua Andrino Soares, 282 - Centro", "(43) 3566-1467", "laboratoriosAntigosCarlopolis", "servico", ["telefone coincidente e identidade atual não confirmada", "Laboratório de Análises Clínicas Cristo Rei"]],
-  ["Laboratório de Análises Clínicas", "Laboratório de Análises Clínicas Oswaldo Cruz", "Avenida Elson Soares, 736 - Centro", "(43) 3566-1144", "laboratoriosAntigosCarlopolis", "servico", ["cadastro público antigo sem situação atual minimamente verificável", "registro histórico de diretório"]]
+  ["Laboratório de Análises Clínicas", "Laboratório de Análises Clínicas Oswaldo Cruz", "Avenida Elson Soares, 736 - Centro", "(43) 3566-1144", "laboratoriosAntigosCarlopolis", "servico", ["cadastro público antigo sem situação atual minimamente verificável", "registro histórico de diretório"]],
+  ["Agência de Marketing", "Yollo Fox - Marketing Digital Ltda", "Rua Benedito Salles, 794, 3º andar - Centro", "(43) 98867-6408", "yolloFoxOficial", "servico", null, null, "https://yollofox.com.br/og-image.jpg", "https://yollofox.com.br/"],
+  ["Agência de Marketing", "Agência One Start - LVS Marketing Digital Ltda", "Rua Jorge Barros, 1491 - Centro", "(43) 99190-1035", "agenciasMarketingCarlopolis", "servico"],
+  ["Produção Audiovisual", "LUKS Produção de Vídeo Ltda", "Rua Manguinha, 208 - Vista Alegre", "", "luksProducaoVideo", "servico"],
+  ["Gráfica e Comunicação Visual", "Serigraf - Yamacita & Ferraz Gráfica Ltda", "Rua Padre Hugo, 486 - Centro", "(43) 99906-4434", "serigrafReceita", "servico", ["nome, telefone e endereço", "Serigraf (cliente completo)"]],
+  ["Publicidade", "Tatiana Soldera Benatto", "Avenida Murador, 91 - Murador", "(14) 98212-3746", "comunicacaoCarlopolisAntigos", "servico", ["atividade pública conflitante", "fontes classificam o mesmo CNPJ como publicidade e mercado"]],
+  ["Publicidade", "Enigma Propaganda e Publicidade", "Centro - Carlópolis", "", "comunicacaoCarlopolisAntigos", "servico", ["cadastro antigo e dados insuficientes", "sem telefone, endereço completo ou situação atual confirmada"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
