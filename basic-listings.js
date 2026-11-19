@@ -211,6 +211,22 @@ window.FONTES_CADASTROS_BASICOS = {
   hiroshiroDesentupidora: {
     nome: "Dica Hoje",
     url: "https://desentupidora.dicahoje.com.br/pr/carlopolis"
+  },
+  kaduTerraplenagem: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/j-k-carvalho-ltda-70159134000135"
+  },
+  alemaoTerraplenagem: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/23998075000109"
+  },
+  dbTerraplenagem: {
+    nome: "Solutudo / Receita Federal",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/materiais-para-construcao/db-arquitetura-terraplenagem-imoveis-e-construcao-16208998"
+  },
+  topTerraCarlopolis: {
+    nome: "Top Terra (site oficial)",
+    url: "https://topterra.com.br/servicos/infraestrutura/terraplanagem-em-carlopolis"
   }
 };
 
@@ -813,7 +829,11 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Dedetizadora e Controle de Pragas", "DDTEC - Rafael da Costa", "Rua Benedito Salles, 1406, Loja C - Industrial", "", "ddtecCarlopolis", "servico"],
   ["Limpeza Urbana", "Pires Limpeza Urbana - JL Limpeza Ltda", "Rua André Jorge Clele, 224 - Centro", "", "piresLimpezaUrbana", "servico"],
   ["Dedetizadora e Controle de Pragas", "MS Dedetizadora", "Endereço divergente entre as fontes", "(43) 3566-1552", "msDedetizadora", "servico", ["endereço conflitante e dados públicos antigos", "Rua Joaquim do Carmo Vilela, 840 / Rua José Talim, 840"]],
-  ["Desentupidora", "Hiroshiro Desentupidora", "Carlópolis - PR", "(11) 93407-8838", "hiroshiroDesentupidora", "servico", ["atendimento nacional sem estabelecimento local confirmado", "telefone DDD 11 e ausência de endereço em Carlópolis"]]
+  ["Desentupidora", "Hiroshiro Desentupidora", "Carlópolis - PR", "(11) 93407-8838", "hiroshiroDesentupidora", "servico", ["atendimento nacional sem estabelecimento local confirmado", "telefone DDD 11 e ausência de endereço em Carlópolis"]],
+  ["Terraplenagem", "Kadu Terraplenagem - J K Carvalho Ltda", "Rua Laurindo Franco de Godoy, 426, Letra A - Centro", "(43) 98858-8280", "kaduTerraplenagem", "servico"],
+  ["Terraplenagem", "Alemão Terraplenagem - J C Mainardes Serviços de Terraplenagem", "Rua Eleutério Camilo de Oliveira, 302, Anexo B - Jardim Americana", "", "alemaoTerraplenagem", "servico"],
+  ["Terraplenagem", "DB Arquitetura, Terraplenagem, Imóveis e Construção", "Avenida Elson Soares, 222, Sala A - Centro", "(43) 99955-4023", "dbTerraplenagem", "servico", ["nome, telefone e endereço", "DB Arquitetura Terraplenagem Imóveis e Construção (cadastro básico existente)"]],
+  ["Terraplenagem", "Top Terra", "Ponta Grossa - PR", "(42) 99956-1393", "topTerraCarlopolis", "servico", ["atende Carlópolis, mas não possui estabelecimento local confirmado", "sede informada em Ponta Grossa/PR"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
