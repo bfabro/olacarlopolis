@@ -81,6 +81,14 @@ window.FONTES_CADASTROS_BASICOS = {
     nome: "MaisCNPJ / Receita Federal",
     url: "https://maiscnpj.com.br/empresas/pr/carlopolis/servicos-de-organizacao-de-feiras-congressos-exposicoes-e-festas"
   },
+  lanchonetesReceita: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/lanchonetes-casas-de-cha-de-sucos-e-similares"
+  },
+  lanchonetesRecentesReceita: {
+    nome: "CNPJ Dados / Receita Federal",
+    url: "https://cnpjdados.com/empresas/pr/carlopolis/lanchonetes"
+  },
   agenciasTurismo: "https://www.solutudo.com.br/empresas/pr/carlopolis/agencias%2Bde%2Bturismo",
   peixarias: "https://www.solutudo.com.br/empresas/pr/carlopolis/peixarias",
   floriculturas: "https://www.solutudo.com.br/empresas/pr/carlopolis/floriculturas"
@@ -615,7 +623,27 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Organização de Eventos", "Thaynara Maria Machado Muniz", "Rua Laurindo Franco de Godoi, 464 - Centro", "", "eventosReceita", "servico", null, ["endereco", "Bio Farma"]],
   ["Organização de Eventos", "Kauanny Xavier Dias", "Rua Padre Hugo, 488 - Centro", "", "eventosReceita", "servico", null, ["endereco", "Edea de Azevedo Pereira"]],
   ["Organização de Eventos", "Jorge Costa Netto", "Rua Januário Francisco Falarz, 308 - Centro", "", "eventosReceita", "servico"],
-  ["Organização de Eventos", "Gustavo Alves de Castro", "Rua Antonio Jonas Ferreira Pinto, 665 - Centro", "", "eventosReceita", "servico"]
+  ["Organização de Eventos", "Gustavo Alves de Castro", "Rua Antonio Jonas Ferreira Pinto, 665 - Centro", "", "eventosReceita", "servico"],
+  ["Lanchonete", "Bar Caravela - Cuenca Ltda", "Rua Salvira Marques, 508, Anexo Caravela Country Club - Centro", "", "lanchonetesRecentesReceita"],
+  ["Lanchonete", "Anderson da Silva Julio", "Rua Benedito Salles, 1318 - Centro", "(43) 99634-1257", "lanchonetesRecentesReceita"],
+  ["Lanchonete", "Leandro Paula Garcia", "Rua Dra. Paula e Silva, 630 - Centro", "", "lanchonetesRecentesReceita"],
+  ["Lanchonete", "Daiane de Oliveira Vicente", "Rua Benedito Salles, 2790 - Centro", "(11) 4159-3239", "lanchonetesRecentesReceita"],
+  ["Lanchonete", "Sabrina de Oliveira Costa", "Rua Padre Hugo, 180 - Centro", "", "lanchonetesRecentesReceita"],
+  ["Lanchonete", "Ivanete Marques de Carvalho Santos", "Rua Padre Hugo, 488, 10A - Centro", "", "lanchonetesRecentesReceita", "comercio", null, ["endereco", "Edea de Azevedo Pereira / Kauanny Xavier Dias"]],
+  ["Lanchonete", "Jucier Daniel da Silva", "Rua Florença, 152 - Itália", "", "lanchonetesReceita"],
+  ["Lanchonete", "Lanchonete e Sorveteria Espaço Gourmet - Alexandre José da Silva", "Avenida Turística Elias Merhi Mansur, 738 - Centro", "", "lanchonetesReceita", "comercio", ["nome e endereço", "Espaço Gourmet"]],
+  ["Lanchonete", "Alessandra Candida Pereira da Fonseca", "Rua Marcos Rodrigues do Amaral, 212 - Centro", "", "lanchonetesReceita"],
+  ["Lanchonete", "Jelda Maria dos Santos da Silva", "Rua das Palmeiras, 477 - Parque Industrial", "", "lanchonetesReceita"],
+  ["Lanchonete", "Vera Lucia Ribeiro da Silva", "Rua Manuel Francisco dos Santos, 576-A - Amaral", "", "lanchonetesReceita"],
+  ["Lanchonete", "Anderson Santos Rasquinho", "Rua Padre Hugo, 488 - Centro", "", "lanchonetesReceita", "comercio", null, ["endereco", "Edea de Azevedo Pereira / Kauanny Xavier Dias"]],
+  ["Lanchonete", "Elisabete Cristina Viana", "Rua Benedito Salles, 550 - Centro", "", "lanchonetesReceita"],
+  ["Lanchonete", "Maria Dolores Costa Teles", "Rua Laurindo Franco de Godoi, 425 - Centro", "", "lanchonetesReceita"],
+  ["Lanchonete", "Andrezza de Araujo Claro", "Rua Padre Hugo, 488-A - Centro", "", "lanchonetesReceita", "comercio", null, ["endereco próximo", "Edea de Azevedo Pereira / Kauanny Xavier Dias"]],
+  ["Lanchonete", "Vitor José Jorge de Souza", "Rua Chuva de Ouro, 381 - Vista Alegre", "", "lanchonetesReceita"],
+  ["Lanchonete", "Di Dog Ltda", "Rua Benedito Salles, 338 - Centro", "", "lanchonetesReceita", "comercio", ["nome", "Di Dog"]],
+  ["Lanchonete", "Xis Bauinea - Kiara Caroline Fontana de Carvalho", "Rua Benedito Salles, 1188 - Centro", "", "lanchonetesReceita", "comercio", ["nome e endereço", "Xis Bauinea"]],
+  ["Lanchonete", "Vitoria dos Santos Azevedo", "Rua José Ferraz, 50-D - Novo Horizonte", "", "lanchonetesReceita"],
+  ["Lanchonete", "The Best Açaí - Soares Comércio Ltda", "Rua Benedito Salles, 519 - Centro", "", "lanchonetesReceita", "comercio", ["nome e endereço", "The Best Açaí"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
