@@ -307,6 +307,22 @@ window.FONTES_CADASTROS_BASICOS = {
   academiesCarlopolis: {
     nome: "Planeta Brasileiro",
     url: "https://www.planetabrasileiro.com/carlopolis/escolas"
+  },
+  academiaLoboFitness: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/36345021000196"
+  },
+  claudiaSilvaStudio: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/maiores-empresas/pr-carlopolis/esporte-e-recreacao"
+  },
+  kadudaEsportes: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/maiores-empresas/pr-carlopolis/esporte-e-recreacao"
+  },
+  academiasCarlopolisReceita: {
+    nome: "Jornal Esporte e Saúde / Receita Federal",
+    url: "https://jornalesporteesaude.com.br/pr/carlopolis/"
   }
 };
 
@@ -934,7 +950,12 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Apoio à Educação", "ASSOCIVIDA - Associação Vida e Educação de Carlópolis", "Rua Nicolau Miguel, 920 - Centro", "", "assocividaCarlopolis", "servico"],
   ["Estética e Cursos", "Instituto Aline Frana Ltda", "Rua André Jorge Clele, 420, Sala 04 - Centro", "", "institutoAlineFrana", "servico", null, ["mesmo endereço, salas ou atividades distintas", "Psicologia Reilane S. Auerswald Ltda"]],
   ["Cursos de Beleza", "Naiara Oliveira Academy", "Rua Marcos Rodrigues do Amaral, 248 - Centro", "", "academiesCarlopolis", "servico", ["identidade pública insuficientemente confirmada", "apenas diretório agregador, sem cadastro oficial ou canal próprio localizado"]],
-  ["Cursos de Beleza", "Brenda Miranda Clinic Academy", "Avenida Turística Elias Merhi Mansur, 781 - Centro", "", "academiesCarlopolis", "servico", ["identidade pública insuficientemente confirmada", "apenas diretório agregador, sem cadastro oficial ou canal próprio localizado"]]
+  ["Cursos de Beleza", "Brenda Miranda Clinic Academy", "Avenida Turística Elias Merhi Mansur, 781 - Centro", "", "academiesCarlopolis", "servico", ["identidade pública insuficientemente confirmada", "apenas diretório agregador, sem cadastro oficial ou canal próprio localizado"]],
+  ["Academia", "Academia Lobo Fitness - Raldiani Rodrigues de Oliveira", "Rua Benedito Salles, 85 - Centro", "", "academiaLoboFitness", "servico"],
+  ["Academia e Estúdio", "Cláudia Silva Studio Ltda", "Rua Benedita da Cruz Domingues, 330 - São Pedro", "", "claudiaSilvaStudio", "servico"],
+  ["Treinamento Esportivo", "Kaduda Esportes - Ivanildo de Castro Camargo", "Rua José Salles, 94 - Centro", "", "kadudaEsportes", "servico"],
+  ["Artes Marciais", "Yamada Ha Mashinkan Shitoryu Shukokai do Brasil", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academiesCarlopolis", "servico", ["telefone e endereço", "Academia Corpo e Mente"]],
+  ["Academia", "Corpo e Mente Academia", "Rua Benedito Salles, 325 - Centro", "(43) 99912-6655", "academiasCarlopolisReceita", "servico", ["nome, telefone e endereço", "Academia Corpo e Mente (cadastro básico existente)"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
