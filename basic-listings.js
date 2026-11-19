@@ -291,6 +291,22 @@ window.FONTES_CADASTROS_BASICOS = {
   cbsSistemasCarlopolis: {
     nome: "Econodata / Receita Federal",
     url: "https://www.econodata.com.br/empresas/pr-carlopolis/tecnologia"
+  },
+  escolaEducacionalCarlopolis: {
+    nome: "Consulta Escolas Paraná / Secretaria da Educação",
+    url: "https://www.consultaescolas.pr.gov.br/consultaescolas/pages/templates/initial2.xhtml?codigoEstab=437&codigoMunicipio=471"
+  },
+  assocividaCarlopolis: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/21374302000108"
+  },
+  institutoAlineFrana: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/32811452000140"
+  },
+  academiesCarlopolis: {
+    nome: "Planeta Brasileiro",
+    url: "https://www.planetabrasileiro.com/carlopolis/escolas"
   }
 };
 
@@ -913,7 +929,12 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Consultoria em Tecnologia", "MD Tech Ltda", "Rua Ypê Roxo, 744 - Centro", "", "mdTechCarlopolis", "servico"],
   ["Suporte de Informática", "B. E. F. Fabro Informática Ltda", "Avenida Turística Elias Mehri Mansur, 562 - Centro", "", "befFabroInformatica", "servico"],
   ["Desenvolvimento de Software", "RibaSoft - R. Manoel dos Santos", "Rua Dr. Rogério Ignácio da Silva, 290, Anexo A - Residencial Murador", "(43) 99661-4387", "ribasoftOficial", "servico"],
-  ["Desenvolvimento de Software", "CBS Sistemas - C. B. Sanches", "Rua Laurindo Franco de Godoy, 525 - Centro", "", "cbsSistemasCarlopolis", "servico"]
+  ["Desenvolvimento de Software", "CBS Sistemas - C. B. Sanches", "Rua Laurindo Franco de Godoy, 525 - Centro", "", "cbsSistemasCarlopolis", "servico"],
+  ["Escola Particular", "Escola Educacional de Carlópolis", "Rua Salvira Marques, 410 - Centro", "(43) 3566-2792", "escolaEducacionalCarlopolis", "servico"],
+  ["Apoio à Educação", "ASSOCIVIDA - Associação Vida e Educação de Carlópolis", "Rua Nicolau Miguel, 920 - Centro", "", "assocividaCarlopolis", "servico"],
+  ["Estética e Cursos", "Instituto Aline Frana Ltda", "Rua André Jorge Clele, 420, Sala 04 - Centro", "", "institutoAlineFrana", "servico", null, ["mesmo endereço, salas ou atividades distintas", "Psicologia Reilane S. Auerswald Ltda"]],
+  ["Cursos de Beleza", "Naiara Oliveira Academy", "Rua Marcos Rodrigues do Amaral, 248 - Centro", "", "academiesCarlopolis", "servico", ["identidade pública insuficientemente confirmada", "apenas diretório agregador, sem cadastro oficial ou canal próprio localizado"]],
+  ["Cursos de Beleza", "Brenda Miranda Clinic Academy", "Avenida Turística Elias Merhi Mansur, 781 - Centro", "", "academiesCarlopolis", "servico", ["identidade pública insuficientemente confirmada", "apenas diretório agregador, sem cadastro oficial ou canal próprio localizado"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
