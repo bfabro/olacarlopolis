@@ -191,6 +191,26 @@ window.FONTES_CADASTROS_BASICOS = {
   sallesDespachante: {
     nome: "Consultas Plus / Receita Federal",
     url: "https://consultas.plus/lista-de-empresas/parana/carlopolis/"
+  },
+  chaveiroCentralPublico: {
+    nome: "Apontador / cadastro completo do site",
+    url: "https://www.apontador.com.br/local/pr/carlopolis/automoveis_e_veiculos/C413554258092N0928/chaveiro_central.html"
+  },
+  ddtecCarlopolis: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/22250335000109"
+  },
+  piresLimpezaUrbana: {
+    nome: "Monitor CNPJ / Receita Federal",
+    url: "https://monitorcnpj.com.br/cnpj/07438662000197/"
+  },
+  msDedetizadora: {
+    nome: "Solutudo / BR Firmas",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/dedetizadoras"
+  },
+  hiroshiroDesentupidora: {
+    nome: "Dica Hoje",
+    url: "https://desentupidora.dicahoje.com.br/pr/carlopolis"
   }
 };
 
@@ -788,7 +808,12 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Despachante", "Fábio Despachante", "Rua Antônio Jonas Ferreira Pinto, 431 - Centro", "(43) 3566-1253", "fabioDespachante", "servico", ["empresa baixada", "CNPJ 10.571.378/0001-07"]],
   ["Corretora de Seguros", "João Crisóstomo Corretora de Seguros", "Avenida Manoel Ribas, 420 - Centro, Jacarezinho/PR", "(43) 3527-1701", "joaoCrisostomoSeguros", "servico", ["sede em outro município e sem unidade local confirmada", "Jacarezinho/PR"]],
   ["Corretora de Seguros", "DAL Corretora de Seguros", "Ourinhos/SP", "(43) 99165-1209", "dalSeguros", "servico", ["atende Carlópolis, mas não possui endereço local confirmado", "sede informada em Ourinhos/SP"]],
-  ["Despachante", "Salles Despachante", "Rua Nicolau Miguel, 393 - Centro", "(43) 99753-8616", "sallesDespachante", "servico", ["dois CNPJs públicos para a mesma identidade, telefone e endereço sem situação atual suficientemente confirmada", "CNPJs 43.703.833/0001-21 e 43.874.849/0001-05"]]
+  ["Despachante", "Salles Despachante", "Rua Nicolau Miguel, 393 - Centro", "(43) 99753-8616", "sallesDespachante", "servico", ["dois CNPJs públicos para a mesma identidade, telefone e endereço sem situação atual suficientemente confirmada", "CNPJs 43.703.833/0001-21 e 43.874.849/0001-05"]],
+  ["Chaveiro", "Chaveiro Central", "Rua Ataliba Leonel, 287 - Centro", "(43) 99632-3898", "chaveiroCentralPublico", "servico", ["nome, telefone e endereço", "Chaveiro Central (cliente completo)"]],
+  ["Dedetizadora e Controle de Pragas", "DDTEC - Rafael da Costa", "Rua Benedito Salles, 1406, Loja C - Industrial", "", "ddtecCarlopolis", "servico"],
+  ["Limpeza Urbana", "Pires Limpeza Urbana - JL Limpeza Ltda", "Rua André Jorge Clele, 224 - Centro", "", "piresLimpezaUrbana", "servico"],
+  ["Dedetizadora e Controle de Pragas", "MS Dedetizadora", "Endereço divergente entre as fontes", "(43) 3566-1552", "msDedetizadora", "servico", ["endereço conflitante e dados públicos antigos", "Rua Joaquim do Carmo Vilela, 840 / Rua José Talim, 840"]],
+  ["Desentupidora", "Hiroshiro Desentupidora", "Carlópolis - PR", "(11) 93407-8838", "hiroshiroDesentupidora", "servico", ["atendimento nacional sem estabelecimento local confirmado", "telefone DDD 11 e ausência de endereço em Carlópolis"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
