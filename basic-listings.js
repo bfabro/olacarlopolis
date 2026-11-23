@@ -435,6 +435,38 @@ window.FONTES_CADASTROS_BASICOS = {
   joaoCarlosTornearia: {
     nome: "CNPJ.biz / Receita Federal",
     url: "https://cnpj.biz/28108851000171"
+  },
+  edsonFernandoEletricista: {
+    nome: "Solutudo / Receita Federal",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/eletricistas/edson-fernando-leite-15445514"
+  },
+  eletricistasAtivosCarlopolis: {
+    nome: "Civvico / Receita Federal",
+    url: "https://civvico.com.br/atividade/instalacao-e-manutencao-eletrica/pr/carlopolis?todas=1"
+  },
+  edsonGomesEletricista: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/30846027000160"
+  },
+  robsonCostaEletricista: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/32891567000191"
+  },
+  ademirWagnerEletricista: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/49505843000139"
+  },
+  nivaldoSantosEletricista: {
+    nome: "EcoBigData / Receita Federal",
+    url: "https://ecobigdata.com.br/empresa/pr/carlopolis/nivaldo-dos-santos-17351819000104"
+  },
+  ederMuradorEletricista: {
+    nome: "EcoBigData / Receita Federal",
+    url: "https://ecobigdata.com.br/empresa/pr/carlopolis/eder-murador-gama-18179585000114"
+  },
+  cristianoSalviEletricista: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/44634065000164"
   }
 };
 
@@ -1107,7 +1139,15 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Serralheria", "Serralheria SD - Dougraci Luiz Pedroso de Oliveira", "Rua Francisco Avelino Paiva, 646 - Centro", "(43) 99170-2368", "serralheriaSdCarlopolis", "servico"],
   ["Tornearia e Solda", "J. Magno Liutti Torno e Solda", "Rua Luiz Carlos Consolmagno Proença, 286 - Carlópolis", "", "magnoLiuttiTornoSolda", "servico"],
   ["Usinagem, Tornearia e Solda", "João Carlos Ferreira", "Rua Profeta João de Maria, 1712 - CTG", "", "joaoCarlosTornearia", "servico", null, ["mesmo endereço, CNPJs e responsáveis distintos", "Luciano Domingues - Carlópolis / Carlos Eduardo dos Santos Ferreira"]],
-  ["Serralheria", "Luciano Domingues - Carlópolis - Grani Piso", "Rua Profeta João de Maria, 1712 - Parque Industrial", "(43) 99637-2848", "serralherias", "servico", ["nome, telefone e endereço", "Luciano Domingues - Carlópolis (cadastro básico existente)"]]
+  ["Serralheria", "Luciano Domingues - Carlópolis - Grani Piso", "Rua Profeta João de Maria, 1712 - Parque Industrial", "(43) 99637-2848", "serralherias", "servico", ["nome, telefone e endereço", "Luciano Domingues - Carlópolis (cadastro básico existente)"]],
+  ["Eletricista", "Edson Fernando Leite", "Rua Padre Hugo, 290 - Centro", "", "edsonFernandoEletricista", "servico"],
+  ["Eletricista", "Edson Gomes Moraes", "Rua Sibipiruna, 209 - Vista Alegre", "", "edsonGomesEletricista", "servico"],
+  ["Eletricista e Refrigeração", "Robson da Costa", "Rua Antônio Jonas Ferreira Pinto, 550 - Centro", "", "robsonCostaEletricista", "servico"],
+  ["Eletricista", "Ademir Wagner Cassiano de Lima", "Rua Benedito Salles, 719 - Centro", "", "ademirWagnerEletricista", "servico"],
+  ["Eletricista", "Nivaldo dos Santos", "Rua Eugênio Neves Soares, 657 - Quadra 03, Lote 92", "", "nivaldoSantosEletricista", "servico"],
+  ["Eletricista", "Eder Murador Gama", "Rua Laurindo Franco de Godoy, 966 - Centro", "", "ederMuradorEletricista", "servico"],
+  ["Energia Solar", "Energy Brasil Carlópolis", "Rua Benedito Salles, 1135 - Centro", "(43) 99117-1790", "materiaisEletricos", "servico", ["nome, telefone e endereço", "Energy Brasil Carlópolis (cadastros básicos existentes)"]],
+  ["Eletricista", "Cristiano Salvi", "Jardim Vista Alegre - Carlópolis", "", "cristianoSalviEletricista", "servico", ["empresa inapta", "situação cadastral inapta desde 19/06/2026"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
