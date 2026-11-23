@@ -943,6 +943,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,hbbMidiaDigital2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64096968000146" }
   ,msnHolding2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64061539000133" }
   ,renanCaetanoBorracharia2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64003402000122" }
+  ,gilmarSantosAlvenaria2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63988286000185" }
+  ,lucasMarquesVideo2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63991829000113" }
+  ,vestcalce2026: { nome: "Casa dos Dados / dados públicos da Receita Federal", url: "https://casadosdados.com.br/solucao/cnpj/vestcalce-comercio-de-vestuario-e-calcados-ltda-63947608000148" }
+  ,melrianRibeiroPromocao2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63949038000125" }
+  ,reginaDiasVestuario2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63898748000173" }
+  ,kauaneSilvaVelas2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63877895000167" }
+  ,pauloLemeAlvenaria2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63818081000151" }
+  ,luisMarquesFuneraria2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63806576000160" }
+  ,jetchulaMotors2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/59157551000297" }
+  ,pedroViveirosVestuario2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63747047000133" }
+  ,joaoFernandesVestuario2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63694592000109" }
+  ,ameliaMorescoPoda2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63695439000104" }
+  ,mariaRibeiroDomesticos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63696365000112" }
+  ,vilmaraNascimentoArtesanato2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/63709677000113" }
+  ,thauanGomesBeleza2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/69856257000146" }
+  ,inaaOliveiraLaticinios2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68270055000155" }
+  ,carlosMeloAlvenaria2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68271610000163" }
+  ,cafeAgronobre2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68248405000187" }
+  ,h3NovoCarlopolisI2026: { nome: "H3 Empreendimentos / dados públicos da Receita Federal", url: "https://h3empreendimentos.com/" }
+  ,h3NovoCarlopolisII2026: { nome: "H3 Empreendimentos / dados públicos da Receita Federal", url: "https://h3empreendimentos.com/" }
+  ,ex2Empreendimentos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/69582501000120" }
+  ,nayaraOliveiraPromocao2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/69562974000165" }
+  ,zrComercialCafe2026: { nome: "Empresite / dados públicos da Receita Federal", url: "https://empresite.com/br/empresa/zr-comercial-parana-weex" }
+  ,rafaelAlexandreAlvenaria2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68327067000179" }
+  ,thiagoBicudoLavanderia2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68309899000162" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1876,6 +1901,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Publicidade e Mídia Digital", "HBB Mídia Digital Ltda", "Rua Andrino Soares, 470 - Centro", "", "hbbMidiaDigital2026", "servico", null, ["mesmo endereço, empresas e atividades distintas", "Hashitani Corretor de Seguros Ltda"]]
   ,["Holding e Administração de Bens", "MSN Holding Ltda", "Rua Benedito Salles, 854, Sala 02 - Centro", "", "msnHolding2026", "servico"]
   ,["Borracharia", "Renan de Oliveira Caetano", "Rua Benedito Salles, 1589 - Centro", "", "renanCaetanoBorracharia2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Gilmar Lourenço dos Santos", "Rua Jorge Barros, 1692, Casa 1 - Centro", "", "gilmarSantosAlvenaria2026", "servico"]
+  ,["Produção e Edição de Vídeos", "Lucas de Lima Marques", "Rua Fidêncio de Mello, 172 - Centro", "", "lucasMarquesVideo2026", "servico"]
+  ,["Vestuário e Calçados", "Vestcalce Comércio de Vestuário e Calçados Ltda", "Rua Benedito Salles, 1006 - Centro", "(43) 99645-8279", "vestcalce2026"]
+  ,["Promoção de Vendas", "Melrian dos Santos Ribeiro", "Rua Manguinha, 289 - Vista Alegre", "", "melrianRibeiroPromocao2026", "servico"]
+  ,["Vestuário e Acessórios", "Regina Xavier Dias", "Rua Ataliba Leonel, 402 - Centro", "", "reginaDiasVestuario2026", "comercio", null, ["mesmo endereço, empresas e atividades distintas", "Acqua Blue Piscinas / C M Agronegócios Ltda"]]
+  ,["Velas e Artigos Decorativos", "Kauane Gabriele dos Santos da Silva", "Rua Salvira Marques, 301 - Centro", "", "kauaneSilvaVelas2026", "comercio", null, ["mesmo endereço, empresas e atividades distintas", "Maria Lucia da Silva Confecções"]]
+  ,["Pedreiro e Alvenaria", "Paulo Marcelino Leme", "Rua Laudelino Salles de Azevedo, 164 - Centro", "", "pauloLemeAlvenaria2026", "servico"]
+  ,["Serviços Funerários", "Luis Guilherme Gonçalves Marques", "Rua Ipê Roxo, 473 - Vista Alegre", "", "luisMarquesFuneraria2026", "servico"]
+  ,["Embarcações e Veículos Recreativos", "Jetchula Motors do Brasil Ltda", "Rua José Salles, 208, Sala B - Jardim Itália", "", "jetchulaMotors2026"]
+  ,["Vestuário e Acessórios", "Pedro Henrique de Viveiros", "Rua Bauínia, 600 - Vista Alegre", "", "pedroViveirosVestuario2026"]
+  ,["Vestuário e Acessórios", "João Machado Fernandes Filho", "Rua Capitão Estácio, 752 - Centro", "", "joaoFernandesVestuario2026"]
+  ,["Poda de Árvores", "Amelia Moresco", "Rua Três, s/n - Nova Brasília do Itararé", "", "ameliaMorescoPoda2026", "servico"]
+  ,["Serviços Domésticos", "Maria Aparecida Santos Ribeiro", "Rua Nicolau Miguel, 1012 - Centro", "", "mariaRibeiroDomesticos2026", "servico"]
+  ,["Bijuterias e Artesanato", "Vilmara dos Santos Faria Nascimento", "Rua Quaresmeira Rosa, 282, Casa - Vista Alegre", "", "vilmaraNascimentoArtesanato2026"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Thauan Ramos Gomes", "Rua Kalil Keder, 706 - Centro", "", "thauanGomesBeleza2026", "servico"]
+  ,["Laticínios e Frios", "Inaã Caroline de Oliveira", "Rua Evaristo Sanches Garcia, 331 - Novo Horizonte", "", "inaaOliveiraLaticinios2026"]
+  ,["Pedreiro e Alvenaria", "Carlos Henrique de Melo", "Rua Faride José Ciofi, 1194 - Jardim Americana", "", "carlosMeloAlvenaria2026", "servico"]
+  ,["Café Torrado", "Café Agronobre Ltda", "Sítio Nova Brasília, 01 - Nova Brasília", "", "cafeAgronobre2026"]
+  ,["Empreendimentos Imobiliários", "Residencial Novo Carlópolis I - H3 Empreendimentos Imobiliários Ltda", "Rua José Salles, 965, Quadras A a D - Vista Bella", "(44) 99175-3784", "h3NovoCarlopolisI2026", "servico", null, null, "https://h3empreendimentos.com/logo/files/169504319644_logo-com_fundo_branco-2.svg", "https://h3empreendimentos.com/", "https://www.instagram.com/h3empreendimentos/"]
+  ,["Empreendimentos Imobiliários", "Residencial Novo Carlópolis II - H3 Empreendimentos Imobiliários Ltda", "Rua Aldair Aparecida Ciofi da Silva, 280, Quadras A e B - Novo Horizonte", "(44) 99175-3784", "h3NovoCarlopolisII2026", "servico", null, null, "https://h3empreendimentos.com/logo/files/169504319644_logo-com_fundo_branco-2.svg", "https://h3empreendimentos.com/", "https://www.instagram.com/h3empreendimentos/"]
+  ,["Empreendimentos Imobiliários", "EX2 Empreendimentos Ltda", "Rua Benedito Salles, 290 - Centro", "", "ex2Empreendimentos2026", "servico", null, ["mesmo endereço e grupo empresarial, CNPJs distintos", "EX1 Empreendimentos Ltda"]]
+  ,["Promoção de Vendas", "Nayara Santos de Oliveira", "Rua Paul Harris, 62 - Vista Bella", "", "nayaraOliveiraPromocao2026", "servico", null, ["mesmo número, empresas e atividades distintas", "Jeffery Burguer / Lubrityres"]]
+  ,["Café em Grão", "ZR Comercial Ltda", "Rua Anésio Fernandes Machado, 346 - Vista Bella", "(43) 98804-1102", "zrComercialCafe2026"]
+  ,["Pedreiro e Alvenaria", "Rafael Marcos Alexandre", "Área Rural - Carlópolis", "", "rafaelAlexandreAlvenaria2026", "servico"]
+  ,["Lavanderia", "Thiago Bicudo de Oliveira", "Rua Sibipiruna, 434 - Vista Alegre", "", "thiagoBicudoLavanderia2026", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
