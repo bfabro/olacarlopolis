@@ -893,6 +893,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,nsIntermediacoes2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65609012000163" }
   ,alexAlvesAutopecas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65590068000113" }
   ,thaisCabralAlimentacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65567739000125" }
+  ,aPlanejados2026: { nome: "Solutudo / dados públicos da Receita Federal", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/moveis%2Bplanejados%2Bmarcenarias/listas/6-opcoes-em-moveis%2Bplanejados%2Bmarcenarias-que-voce-deveria-conhecer-em-carlopolis-pr" }
+  ,mauricioDiasCosmeticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65522887000123" }
+  ,ovosCarlopolis2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65570387000167" }
+  ,jonatanSilvaAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65414803000138" }
+  ,silvioBarreiroCalcados2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65422288000138" }
+  ,williamMispiretaTreinamento2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65386614000107" }
+  ,doisIrmaosMarmoraria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65407500000198" }
+  ,pmVazBarretoFruticultura2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65349197000114" }
+  ,ariRibeiroLimpeza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65293603000174" }
+  ,aleilsoProencaMecanica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65261466000196" }
+  ,andressaNunesVideo2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65210461000134" }
+  ,lucianoSilvaMalote2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65189951000104" }
+  ,willianCorreaMecanica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65200961000195" }
+  ,joaoRodriguesRestaurante2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65115955000130" }
+  ,marceloPradoPesca2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65117018000113" }
+  ,simoneFerreiraDomesticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65077654000169" }
+  ,arthurAzevedoFretes2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65009883000146" }
+  ,eduardoYamamotoMotores2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64982698000170" }
+  ,brunaMaltaMotopecas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64955929000157" }
+  ,emilliOliveiraMedicos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64988269000100" }
+  ,marcellaArrudaMedicos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64931201000195" }
+  ,julianoNogueiraFretes2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64795094000115" }
+  ,wandaMarthosPadaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64780467000184" }
+  ,luisOliveiraMarmoraria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64696328000177" }
+  ,vcBagatimMedicos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64678471000136" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1776,6 +1801,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Intermediação de Negócios", "NS Intermediações de Negócios Ltda", "Estrada Gracioso, s/n - Zona Rural", "", "nsIntermediacoes2026", "servico", null, ["mesma estrada, responsáveis e atividades distintos", "M. A. C. Prestação de Serviços"]]
   ,["Autopeças", "Alex de Souza Alves", "Centro - Carlópolis", "", "alexAlvesAutopecas2026"]
   ,["Alimentação Ambulante", "Thais Cordeiro Cabral", "Primavera - Carlópolis", "", "thaisCabralAlimentacao2026"]
+  ,["Móveis Planejados e Marcenaria", "A Planejados Ltda", "Rua Elidia Maria de Jesus, 34 - Vista Bella", "(43) 98805-1386", "aPlanejados2026", "servico"]
+  ,["Cosméticos e Perfumaria", "Mauricio Marques Dias", "Centro - Carlópolis", "", "mauricioDiasCosmeticos2026"]
+  ,["Ovos e Hortifrúti", "Ovos Carlópolis - Hionask Comércio e Transporte de Ovos Ltda", "Sítio São Jorge, 02 - Pinheirinho", "", "ovosCarlopolis2026"]
+  ,["Pedreiro e Alvenaria", "Jonatan Alisson de Paula Silva", "Novo Horizonte - Carlópolis", "", "jonatanSilvaAlvenaria2026", "servico"]
+  ,["Calçados", "Silvio Vieira Barreiro", "Centro - Carlópolis", "", "silvioBarreiroCalcados2026"]
+  ,["Treinamento Profissional e Gerencial", "William Mitsuo Nagaki Mispireta", "Centro - Carlópolis", "", "williamMispiretaTreinamento2026", "servico"]
+  ,["Marmoraria", "Dois Irmãos Marmoraria Ltda", "Rua Paul Harris, 116, Anexo A - Vista Bella", "", "doisIrmaosMarmoraria2026", "servico"]
+  ,["Fruticultura", "P. M. Vaz Barreto Ltda", "Rua Doutora Paula e Silva, 1145, Sala 01 - Centro", "", "pmVazBarretoFruticultura2026"]
+  ,["Serviços de Limpeza", "Ari Ribeiro da Silva", "Área Rural - Carlópolis", "", "ariRibeiroLimpeza2026", "servico"]
+  ,["Mecânica Automotiva", "Aleilso Narcizo de Proença", "CTG - Carlópolis", "", "aleilsoProencaMecanica2026", "servico"]
+  ,["Produção e Edição de Vídeos", "Andressa Galindo Nunes", "Vista Alegre - Carlópolis", "", "andressaNunesVideo2026", "servico"]
+  ,["Serviço de Malote", "Luciano da Silva", "Centro - Carlópolis", "", "lucianoSilvaMalote2026", "servico"]
+  ,["Mecânica Automotiva", "Willian da Costa Correa", "Novo Horizonte - Carlópolis", "", "willianCorreaMecanica2026", "servico"]
+  ,["Restaurante", "João Paulo Mendes Teodoro Rodrigues", "Centro - Carlópolis", "", "joaoRodriguesRestaurante2026"]
+  ,["Artigos de Pesca e Camping", "Marcelo Aparecido do Prado", "Centro - Carlópolis", "", "marceloPradoPesca2026"]
+  ,["Serviços Domésticos", "Simone Alves de Oliveira Ferreira", "Vista Bella - Carlópolis", "", "simoneFerreiraDomesticos2026", "servico"]
+  ,["Fretes e Transporte de Cargas", "Arthur Rafael Riato de Azevedo", "Vista Bella - Carlópolis", "", "arthurAzevedoFretes2026", "servico"]
+  ,["Manutenção de Motores Elétricos", "Eduardo Haruo Yamamoto", "Centro - Carlópolis", "", "eduardoYamamotoMotores2026", "servico"]
+  ,["Peças e Acessórios para Motos", "Bruna Ribeiro Malta", "Centro - Carlópolis", "", "brunaMaltaMotopecas2026"]
+  ,["Serviços Médicos", "Emilli Oliveira Serviços Médicos Ltda", "Rua Veneza, 242 - Jardim Itália", "", "emilliOliveiraMedicos2026", "servico"]
+  ,["Serviços Médicos", "Marcella Arruda Serviços Médicos Ltda", "Rua Antonio Jonas Ferreira Pinto, 204 - Centro", "", "marcellaArrudaMedicos2026", "servico"]
+  ,["Fretes e Transporte de Cargas", "Juliano Alves Nogueira", "Centro - Carlópolis", "", "julianoNogueiraFretes2026", "servico"]
+  ,["Padaria e Confeitaria", "Wanda Ferreira da Silva Marthos", "Centro - Carlópolis", "", "wandaMarthosPadaria2026"]
+  ,["Marmoraria", "Luis Silva de Oliveira Neto", "Centro - Carlópolis", "", "luisOliveiraMarmoraria2026", "servico"]
+  ,["Serviços Médicos", "V. C. Bagatim e Cia Ltda", "Rua André Jorge Clele, 116, Sala 01 - Centro", "", "vcBagatimMedicos2026", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
