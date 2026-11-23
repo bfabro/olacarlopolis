@@ -872,6 +872,27 @@ window.FONTES_CADASTROS_BASICOS = {
   ,evertonNunesPromocao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66297345000167" }
   ,julianaDiasFarmaceuticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66214023000107" }
   ,carlosOliveiraAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66191405000162" }
+  ,machadoIndustrial2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66255929000170" }
+  ,valeriaLeiteDomesticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66147840000190" }
+  ,dhionathanPromocao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66153458000199" }
+  ,caioLemesEletricaAutomotiva2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66125211000169" }
+  ,henriqueOliveiraSerralheria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66084314000128" }
+  ,suelenCoelhoAdministrativo2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66051360000120" }
+  ,gustavoMottaArte2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66056222000134" }
+  ,clariceLimaDomesticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66025562000106" }
+  ,janeteSouzaMadeira2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65924686000152" }
+  ,amandaThiemyEstetica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66023651000105" }
+  ,evelynOliveiraEnsino2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65896304000124" }
+  ,gabrielRibeiroBebidas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65864906000108" }
+  ,nucleoIntegrarEvoluir2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65865006000177" }
+  ,rosanaCodognotoDomesticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65841252000199" }
+  ,augustoRamosLavaRapido2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65786977000121" }
+  ,erickSouzaPaisagismo2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65749362000125" }
+  ,mariaClaraSantosBeleza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65735728000107" }
+  ,eltonEmidioFretes2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65716027000120" }
+  ,nsIntermediacoes2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65609012000163" }
+  ,alexAlvesAutopecas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65590068000113" }
+  ,thaisCabralAlimentacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/65567739000125" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1734,6 +1755,27 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Promoção de Vendas", "Everton D. Nunes Coelho Ltda", "Rua Elidia Maria de Jesus, 114 - Vista Bella", "", "evertonNunesPromocao2026", "servico"]
   ,["Serviços Farmacêuticos", "Juliana Andrea Dias - Serviços Farmacêuticos Ltda", "Rua Benedito Salles, 185 - Centro", "", "julianaDiasFarmaceuticos2026", "servico"]
   ,["Pedreiro e Alvenaria", "Carlos Eduardo de Oliveira", "Área Rural - Carlópolis", "", "carlosOliveiraAlvenaria2026", "servico"]
+  ,["Manutenção Industrial", "Machado Industrial Service & Solutions Ltda", "Rua Aldair Aparecida Ciofi da Silva, 690 - Novo Horizonte", "", "machadoIndustrial2026", "servico"]
+  ,["Serviços Domésticos", "Valeria Mendes Leite", "Área Rural - Carlópolis", "", "valeriaLeiteDomesticos2026", "servico"]
+  ,["Promoção de Vendas", "Dhionathan dos Santos", "Centro - Carlópolis", "", "dhionathanPromocao2026", "servico"]
+  ,["Elétrica Automotiva", "Caio Augusto Lemes da Silva", "Centro - Carlópolis", "", "caioLemesEletricaAutomotiva2026", "servico"]
+  ,["Serralheria", "Henrique José Alves de Oliveira", "Itália - Carlópolis", "", "henriqueOliveiraSerralheria2026", "servico"]
+  ,["Apoio Administrativo", "Suelen de Fatima Natal Coelho", "Vista Bella - Carlópolis", "", "suelenCoelhoAdministrativo2026", "servico"]
+  ,["Objetos de Arte", "Gustavo Freitas Motta", "Vista Bella - Carlópolis", "", "gustavoMottaArte2026"]
+  ,["Serviços Domésticos", "Clarice Aparecida Schio de Lima", "Vista Alegre - Carlópolis", "", "clariceLimaDomesticos2026", "servico"]
+  ,["Artefatos de Madeira", "Janete Queiroz de Souza", "Novo Horizonte - Carlópolis", "", "janeteSouzaMadeira2026"]
+  ,["Estética e Treinamentos", "Amanda Thiemy Estética e Treinamentos Ltda", "Rua André Jorge Clele, 316, Sala 04 - Centro", "", "amandaThiemyEstetica2026", "servico"]
+  ,["Ensino e Cursos", "Evelyn Amabile dos Santos Wenzel de Oliveira", "Jardim Americana - Carlópolis", "", "evelynOliveiraEnsino2026", "servico"]
+  ,["Bebidas", "Gabriel Vinicius Ribeiro da Silva", "Vista Alegre - Carlópolis", "", "gabrielRibeiroBebidas2026"]
+  ,["Psicopedagogia e Apoio Educacional", "Núcleo Integrar e Evoluir Ltda", "Rua Eugênio Neves Soares, 1696, Anexo A - Tomodati", "", "nucleoIntegrarEvoluir2026", "servico"]
+  ,["Serviços Domésticos", "Rosana Gabriel Codognoto", "Murador - Carlópolis", "", "rosanaCodognotoDomesticos2026", "servico"]
+  ,["Lava Rápido e Estética Automotiva", "Augusto Ramos da Silva", "Itália - Carlópolis", "", "augustoRamosLavaRapido2026", "servico"]
+  ,["Paisagismo", "Erick Vinicius Silva de Souza", "Novo Horizonte - Carlópolis", "", "erickSouzaPaisagismo2026", "servico"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Maria Clara Alves dos Santos", "Centro - Carlópolis", "", "mariaClaraSantosBeleza2026", "servico"]
+  ,["Fretes e Transporte de Cargas", "Elton Cesar Emidio", "Murador - Carlópolis", "", "eltonEmidioFretes2026", "servico"]
+  ,["Intermediação de Negócios", "NS Intermediações de Negócios Ltda", "Estrada Gracioso, s/n - Zona Rural", "", "nsIntermediacoes2026", "servico", null, ["mesma estrada, responsáveis e atividades distintos", "M. A. C. Prestação de Serviços"]]
+  ,["Autopeças", "Alex de Souza Alves", "Centro - Carlópolis", "", "alexAlvesAutopecas2026"]
+  ,["Alimentação Ambulante", "Thais Cordeiro Cabral", "Primavera - Carlópolis", "", "thaisCabralAlimentacao2026"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
