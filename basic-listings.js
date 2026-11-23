@@ -467,6 +467,26 @@ window.FONTES_CADASTROS_BASICOS = {
   cristianoSalviEletricista: {
     nome: "CNPJ.biz / Receita Federal",
     url: "https://cnpj.biz/44634065000164"
+  },
+  djalminhaFunilaria: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/consulta-empresa/07184412000178-djalma-pio-pereira"
+  },
+  magdielSousaFunilaria: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/49869352000177"
+  },
+  garciaFunilariaCarlopolis: {
+    nome: "Consultas Plus / Receita Federal",
+    url: "https://consultas.plus/lista-de-empresas/parana/carlopolis/"
+  },
+  autoEsteticaAlmeidaCarlopolis: {
+    nome: "Consultas Plus / Receita Federal",
+    url: "https://consultas.plus/lista-de-empresas/parana/carlopolis/"
+  },
+  daminFunilariaReceita: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/jldamin-carlopolis-05939346000173"
   }
 };
 
@@ -1147,7 +1167,12 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Eletricista", "Nivaldo dos Santos", "Rua Eugênio Neves Soares, 657 - Quadra 03, Lote 92", "", "nivaldoSantosEletricista", "servico"],
   ["Eletricista", "Eder Murador Gama", "Rua Laurindo Franco de Godoy, 966 - Centro", "", "ederMuradorEletricista", "servico"],
   ["Energia Solar", "Energy Brasil Carlópolis", "Rua Benedito Salles, 1135 - Centro", "(43) 99117-1790", "materiaisEletricos", "servico", ["nome, telefone e endereço", "Energy Brasil Carlópolis (cadastros básicos existentes)"]],
-  ["Eletricista", "Cristiano Salvi", "Jardim Vista Alegre - Carlópolis", "", "cristianoSalviEletricista", "servico", ["empresa inapta", "situação cadastral inapta desde 19/06/2026"]]
+  ["Eletricista", "Cristiano Salvi", "Jardim Vista Alegre - Carlópolis", "", "cristianoSalviEletricista", "servico", ["empresa inapta", "situação cadastral inapta desde 19/06/2026"]],
+  ["Funilaria e Pintura", "Oficina do Djalminha - Djalma Pio Pereira", "Rua Benedito Salles, 1508 - Centro", "", "djalminhaFunilaria", "servico", null, ["mesmo endereço, CNPJs ou responsáveis distintos", "Ariovaldo de Alvarenga"]],
+  ["Funilaria e Pintura", "Magdiel Sousa Leite", "Sítio São Benedito, s/n - Água Seca", "", "magdielSousaFunilaria", "servico"],
+  ["Funilaria e Pintura", "Garcia Funilaria e Pintura - Marcos Garcia", "Rua Munguba, 599 - Vista Alegre", "", "garciaFunilariaCarlopolis", "servico"],
+  ["Funilaria e Pintura", "Auto Estética Almeida - Thauan de Almeida Pereira", "Rua Silvio José Banik, 710 - Centro", "", "autoEsteticaAlmeidaCarlopolis", "servico"],
+  ["Funilaria e Pintura", "Oficina e Funilaria Damin - J. L. Damin Carlópolis", "Rua das Indústrias, 260 - Loteamento Vicente de Oliveira", "(43) 3566-1725", "daminFunilariaReceita", "servico", ["nome, telefone e endereço", "Oficina e Funilaria Damin (cadastros básicos existentes)"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
