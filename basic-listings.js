@@ -771,6 +771,29 @@ window.FONTES_CADASTROS_BASICOS = {
   consertaEletroSemUnidade: {
     nome: "Conserta Eletro",
     url: "https://www.consertasmart.com/conserto-de-eletrodomestico/carl%C3%B3polis"
+  },
+  brendonAcabamento2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69918090000109" },
+  leticiaBeleza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69883159000106" },
+  marcosAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69882231000172" },
+  andersonMecanica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69807850000100" },
+  claudioApoioAdministrativo2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69798335000101" },
+  paolaLanchonete2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69769098000142" },
+  antonioDoces2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69736849000124" },
+  fernandaMotopecas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69734312000125" },
+  mariaGabrielaEstetica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69671335000138" },
+  brincoOuroImoveis2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69647680000136" },
+  wesleiPesca2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69627889000138" },
+  inamariaApoioAdministrativo2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69613360000165" },
+  willianAnaniasRoupas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69560574000110" },
+  gustavoCorreaPetshop2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69558341000183" },
+  vanderleiAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69549028000189" },
+  wellingtonLavaRapido2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69503607000190" },
+  anaClaudiaBeleza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69495697000115" },
+  pamelaRoupas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69492633000160" },
+  michelePescaBaixada2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69599758000194" },
+  empresasRecentesCarlopolis2026: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/empresas/carlopolis-pr?id=65302823"
   }
 };
 
@@ -1535,6 +1558,28 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Lavanderia Industrial", "Color Jeans Lavanderia Ltda", "Carlópolis - PR", "", "colorJeansInapta", "servico", ["empresa inapta", "CNPJ 05.460.674/0001-92 inapto desde 27/11/2018"]],
   ["Assistência Técnica de Eletrodomésticos", "Conserta Eletro", "Atendimento anunciado em Carlópolis - PR", "", "consertaEletroSemUnidade", "servico", ["estabelecimento local não confirmado", "página informa somente unidades em Londrina e Curitiba"]],
   ["Reparação de Eletroeletrônicos", "Willian de Lima Ferreira", "Rua Grevília Ana, 138 - Vista Alegre", "(11) 99162-6265", "willianFerreiraMontador", "servico", ["nome, telefone e endereço", "Willian de Lima Ferreira já cadastrado em montagem e manutenção de móveis"]]
+  ,["Acabamento de Construção", "Brendon William Barbosa dos Santos", "Centro - Carlópolis", "", "brendonAcabamento2026", "servico"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Leticia Fernanda de Lima Guerra", "Centro - Carlópolis", "", "leticiaBeleza2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Marcos de Oliveira Baldo", "Vista Alegre - Carlópolis", "", "marcosAlvenaria2026", "servico"]
+  ,["Mecânica Automotiva", "Anderson Cardoso da Silva", "Vista Alegre - Carlópolis", "", "andersonMecanica2026", "servico"]
+  ,["Apoio Administrativo", "Claudio Piaia", "Área Rural - Carlópolis", "", "claudioApoioAdministrativo2026", "servico"]
+  ,["Lanchonete", "Paola Gabriela Alonso dos Santos", "São Pedro - Carlópolis", "", "paolaLanchonete2026"]
+  ,["Doces e Bomboniere", "Antonio Carlos Pereira", "Novo Horizonte - Carlópolis", "", "antonioDoces2026"]
+  ,["Peças e Acessórios para Motos", "Fernanda de Fatima Silva", "Centro - Carlópolis", "", "fernandaMotopecas2026"]
+  ,["Estética e Cuidados com a Beleza", "Maria Gabriela Pedroso Benedetti", "Centro - Carlópolis", "", "mariaGabrielaEstetica2026", "servico"]
+  ,["Corretora de Imóveis", "Brinco de Ouro Empreendimentos Ltda", "Rua André Jorge Clele, 116 - Centro", "", "brincoOuroImoveis2026", "servico"]
+  ,["Artigos de Pesca e Camping", "Weslei Fernando Teixeira", "Caminho do Vale - Carlópolis", "", "wesleiPesca2026"]
+  ,["Apoio Administrativo", "Inamaria de Paula Chagas", "Novo Horizonte - Carlópolis", "", "inamariaApoioAdministrativo2026", "servico"]
+  ,["Roupas e Acessórios", "Willian Rodrigo Ananias", "Centro - Carlópolis", "", "willianAnaniasRoupas2026"]
+  ,["Pet Shop", "Gustavo Henrique Correa", "Jardim Americana - Carlópolis", "", "gustavoCorreaPetshop2026"]
+  ,["Pedreiro e Alvenaria", "Vanderlei de Almeida Lobo", "Vista Bella - Carlópolis", "", "vanderleiAlvenaria2026", "servico"]
+  ,["Lava Rápido e Estética Automotiva", "Wellington Henrique Braz", "Centro - Carlópolis", "", "wellingtonLavaRapido2026", "servico"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Ana Claudia da Silva Rosa", "Centro - Carlópolis", "", "anaClaudiaBeleza2026", "servico"]
+  ,["Roupas e Acessórios", "Pamela Rodrigues Carneiro Nunes dos Santos", "Centro - Carlópolis", "", "pamelaRoupas2026"]
+  ,["Artigos de Pesca e Camping", "Michele Aparecida Leandro", "Caminho do Vale - Carlópolis", "", "michelePescaBaixada2026", "comercio", ["empresa baixada", "CNPJ 69.599.758/0001-94 baixado"]]
+  ,["Terraplenagem", "Kadu Terraplenagem - J K Carvalho Ltda", "Carlópolis - PR", "", "empresasRecentesCarlopolis2026", "servico", ["nome comercial", "Kadu Terraplenagem já cadastrado"]]
+  ,["Atividade não identificada", "Keytty Shizuko Tubota", "Carlópolis - PR", "", "empresasRecentesCarlopolis2026", "servico", ["dados públicos insuficientes", "cadastro recente ainda sem atividade e endereço disponíveis para confirmação"]]
+  ,["Atividade não identificada", "Bianca Pereira Maximo da Veiga", "Carlópolis - PR", "", "empresasRecentesCarlopolis2026", "servico", ["dados públicos insuficientes", "cadastro recente ainda sem atividade e endereço disponíveis para confirmação"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
