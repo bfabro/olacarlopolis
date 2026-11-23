@@ -968,6 +968,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,zrComercialCafe2026: { nome: "Empresite / dados públicos da Receita Federal", url: "https://empresite.com/br/empresa/zr-comercial-parana-weex" }
   ,rafaelAlexandreAlvenaria2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68327067000179" }
   ,thiagoBicudoLavanderia2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68309899000162" }
+  ,rosangelaSanchesDomesticos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68245635000192" }
+  ,flaviaLimaPromocao2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68227956000164" }
+  ,carlosGeraldoSolda2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68179606000170" }
+  ,novoSorrisoOdonto2026: { nome: "CNPJ do Brasil / dados públicos da Receita Federal", url: "https://cnpjdobrasil.com.br/cnpj/jfs-centro-pro-saude-oral-ltda-68191318000130" }
+  ,cercarPiscinas2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68131361000100" }
+  ,delimaConfiagro2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68132381000104" }
+  ,jefersonCoelhoMotorista2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68098430000121" }
+  ,greenFieldsImoveis2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/46722644000275" }
+  ,antonioFernandesPapel2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68059078000115" }
+  ,kedersonRefrigeracao2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68028110000103" }
+  ,rafaelaPiresPromocao2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67991429000169" }
+  ,bluestructConstrutora2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68001471000158" }
+  ,anaPaulaCamargoEstetica2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68001595000133" }
+  ,renatoOliveiraAlvenaria2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/68001762000146" }
+  ,mayaraAlexandreFretes2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67966430000133" }
+  ,marcosCostaPapel2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67971893000193" }
+  ,angraDoceIlhaBelaImoveis2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67969604000111" }
+  ,ernestoUedaFotografia2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67921530000143" }
+  ,rcmBlocos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67931216000141" }
+  ,jefersonPalmaPromocao2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67868821000115" }
+  ,lucianaGarciaPromocao2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67880686000123" }
+  ,pedroGoncalvesFumo2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67882181000106" }
+  ,richardsonTeodoroUsados2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67846743000158" }
+  ,elo2jSolucoes2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67869192000148" }
+  ,dayProteticaLab2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67904973000126" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1926,6 +1951,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Café em Grão", "ZR Comercial Ltda", "Rua Anésio Fernandes Machado, 346 - Vista Bella", "(43) 98804-1102", "zrComercialCafe2026"]
   ,["Pedreiro e Alvenaria", "Rafael Marcos Alexandre", "Área Rural - Carlópolis", "", "rafaelAlexandreAlvenaria2026", "servico"]
   ,["Lavanderia", "Thiago Bicudo de Oliveira", "Rua Sibipiruna, 434 - Vista Alegre", "", "thiagoBicudoLavanderia2026", "servico"]
+  ,["Serviços Domésticos", "Rosangela Aparecida Sanches", "Rua Jacarandá Mimoso, 198 - Vista Alegre", "", "rosangelaSanchesDomesticos2026", "servico"]
+  ,["Promoção de Vendas", "Flavia Consolin de Lima", "Rua Sadatoshi Hamada, 59-A - Vista Bella", "", "flaviaLimaPromocao2026", "servico"]
+  ,["Usinagem, Tornearia e Solda", "Carlos Eduardo dos Santos Geraldo", "Rua Anésio Fernandes Machado, s/n - Vista Bella", "", "carlosGeraldoSolda2026", "servico"]
+  ,["Odontologia", "Novo Sorriso Centro Odontológico - JFS Centro Pró Saúde Oral Ltda", "Rua João Cuenca Borrego, 203 - Centro", "(11) 96419-7630", "novoSorrisoOdonto2026", "servico"]
+  ,["Segurança para Piscinas", "Cercar Segurança para Piscinas Ltda", "Rua Veneza, 395 - Jardim Primavera II", "", "cercarPiscinas2026"]
+  ,["Agronomia e Consultoria Agrícola", "Delima Confiagro Ltda", "Rua José Talin, 91 - Centro", "", "delimaConfiagro2026", "servico"]
+  ,["Transporte com Motorista", "Jeferson Adriano Coelho", "Área Rural, 03 - Carlópolis", "", "jefersonCoelhoMotorista2026", "servico"]
+  ,["Empreendimentos Imobiliários", "Green Fields Empreendimentos e Administração de Imóveis Ltda", "Avenida Itararema, 09, Quadra B, Lote 09 - Centro", "", "greenFieldsImoveis2026", "servico"]
+  ,["Produtos de Papel e Papelão", "Antonio Fernandes Neto", "Área Rural - Carlópolis", "", "antonioFernandesPapel2026"]
+  ,["Ar-Condicionado e Refrigeração", "Kederson Soares Moreira", "Rua José Cândido Souza, 170 - Novo Horizonte", "", "kedersonRefrigeracao2026", "servico"]
+  ,["Promoção de Vendas", "Rafaela Gonçalves Pires", "Rua Manoel Dias, 122 - Centro", "", "rafaelaPiresPromocao2026", "servico"]
+  ,["Construtora e Incorporadora", "Bluestruct Inc Incorporadora e Construtora Ltda", "Alameda Gralha Azul, 73 - Ilha Bela", "", "bluestructConstrutora2026", "servico"]
+  ,["Estética e Cuidados com a Beleza", "Ana Paula Ferreira Calixto Camargo", "Rua Quaresmeira Rosa, 294 - Vista Alegre", "", "anaPaulaCamargoEstetica2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Renato Alves de Oliveira", "Rua Antonio Joaquim Queiroz Barone, 2036 - Jardim Americana", "", "renatoOliveiraAlvenaria2026", "servico"]
+  ,["Fretes e Transporte de Cargas", "Mayara Cristina de Souza Conick Alexandre", "Rua Alfeneiro, 381 - Vista Alegre", "", "mayaraAlexandreFretes2026", "servico"]
+  ,["Produtos de Papel e Papelão", "Marcos Vinicius de Miranda Costa", "Rua Espatódia, 258 - Vista Alegre", "", "marcosCostaPapel2026"]
+  ,["Imobiliária", "Angra Doce Ilha Bela Imóveis Ltda", "Rua Benedito Salles, 932 - Centro", "", "angraDoceIlhaBelaImoveis2026", "servico"]
+  ,["Fotografia e Laboratório Fotográfico", "Ernesto Yoshio Ueda", "Rua Adorema Ana Rech, 571, Casa B - Primavera", "", "ernestoUedaFotografia2026", "servico"]
+  ,["Blocos e Artefatos de Cimento", "RCM Blocos de Solo-Cimento Ltda", "Estrada do Monge, 540 - Industrial", "", "rcmBlocos2026"]
+  ,["Promoção de Vendas", "Jeferson Tavares Palma", "Rua Capitão Estácio, 652 - Centro", "", "jefersonPalmaPromocao2026", "servico"]
+  ,["Promoção de Vendas", "Luciana Brenda Garcia", "Rua João Cuenca Borrego, 211 - Centro", "", "lucianaGarciaPromocao2026", "servico"]
+  ,["Produtos do Fumo", "Pedro Gonçalves Neto", "Rua Benedito Salles, 1360 - Centro", "", "pedroGoncalvesFumo2026"]
+  ,["Artigos Usados", "Richardson Oliveira Teodoro", "Rua Marcos Rodrigues do Amaral, 263 - Centro", "", "richardsonTeodoroUsados2026"]
+  ,["Consultoria Empresarial", "Elo2J Soluções Empresariais Ltda", "Rua Felizardo Leite de Paula e Silva, 262 - Vila Ray", "", "elo2jSolucoes2026", "servico"]
+  ,["Prótese Dentária", "Day Protetic Lab - Soluções Protéticas para Reabilitação Oral Ltda", "Rua João Cuenca Borrego, 203, Anexo A - Centro", "", "dayProteticaLab2026", "servico", null, ["mesmo número, anexo e atividades distintas", "Novo Sorriso Centro Odontológico"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
