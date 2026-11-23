@@ -1118,6 +1118,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,maykonNovacoskiVestuario2020: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
   ,rogerioAlmeidaVestuario2020: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
   ,olimperCalhas2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/reformas-e-acabamentos?pagina=2" }
+  ,cednetCarlopolis2021: { nome: "Grupo CedNet / dados públicos da Receita Federal", url: "https://grupocednet.com.br/" }
+  ,anaAmaralHortifruti2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/43131064000134-ana-claudia-camargo-do-amaral" }
+  ,tatianeAmaralAdministrativo2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/43134276000175-tatiane-de-oliveira-amaral" }
+  ,brunoRafaelAlvenaria2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/43132928000132-bruno-rafael-da-silva" }
+  ,gabrielPereiraAlvenaria2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/43011145000109-gabriel-da-silva-pereira" }
+  ,yasminConceicaoTattoo2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42983020000170-yasmin-proenca-da-conceicao" }
+  ,daianiBernardesCantina2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42970917000169-daiani-mamedes-bernardes" }
+  ,josePedrozoAlvenaria2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42863168000170-jose-carlos-pedrozo" }
+  ,ilesioSanchesPromocao2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42843911000120-ilesio-negrini-sanches-ltda" }
+  ,sirleiSantosDomestico2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42771585000193-sirlei-dos-santos" }
+  ,mikaeleSilvaEstetica2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42723029000141-mikaele-de-deus-mota-da-silva" }
+  ,olindaSimaoPromocao2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42731676000103-olinda-simao" }
+  ,brambillaVetservices2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42678875000197-brambilla-vetservices" }
+  ,arSallesMedicina2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42678569000150-a-r-salles" }
+  ,francieleCostaTelefonia2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42567969000199-franciele-daiane-da-costa" }
+  ,mahPaivaNutricionista2021: { nome: "Econodata / dados públicos da Receita Federal", url: "https://www.econodata.com.br/consulta-empresa/42525209000119-m-h-paiva-e-cia-ltda" }
+  ,isabelaFernandesSaude2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42427076000148-isabela-sanches-fernandes" }
+  ,jeanFagacaResiduos2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42297733000180-jean-rene-fogaca" }
+  ,jessicaRosaDomestico2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42259282000196-jessica-dias-de-oliveira-rosa" }
+  ,keikoNagakiPromocao2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42064088000155-keiko-aparecida-nagaki" }
+  ,cleideLeiteHomeCare2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/42064944000172-cleide-aparecida-de-azevedo-leite" }
+  ,emiliaLimaBar2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/41974489000180-emilia-da-silva-lima" }
+  ,suziNogueiraConfeccao2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/41973352000100-suzi-carla-nogueira" }
+  ,lucasOrlandiniAdministrativo2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/41967270000153-lucas-eduardo-orlandini" }
+  ,chinaArOficina2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/41849203000134-china-ar" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2226,6 +2251,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Vestuário e Acessórios", "Maykon Jose Goncalves Novacoski", "Centro - Carlópolis", "", "maykonNovacoskiVestuario2020"]
   ,["Vestuário e Acessórios", "Rogerio da Silva Almeida", "Centro - Carlópolis", "", "rogerioAlmeidaVestuario2020"]
   ,["Calhas e Impermeabilização", "Olimper Calhas", "Centro - Carlópolis", "", "olimperCalhas2021", "servico"]
+  ,["Provedor de Internet", "CedNet Provedor de Internet Ltda", "Rua Benedito Salles, 866 - Centro", "0800 1001-101", "cednetCarlopolis2021", "comercio", null, null, "https://grupocednet.com.br/wp-content/uploads/2023/08/logo-ced-net.png", "https://grupocednet.com.br/", "https://www.instagram.com/grupo_cednet"]
+  ,["Hortifrúti", "Ana Claudia Camargo do Amaral", "Vista Alegre - Carlópolis", "", "anaAmaralHortifruti2021"]
+  ,["Apoio Administrativo", "Tatiane de Oliveira Amaral", "Pinheirinho - Carlópolis", "", "tatianeAmaralAdministrativo2021", "servico"]
+  ,["Pedreiro e Alvenaria", "Bruno Rafael da Silva", "Jardim Vista Alegre - Carlópolis", "", "brunoRafaelAlvenaria2021", "servico"]
+  ,["Pedreiro e Alvenaria", "Gabriel da Silva Pereira", "Jardim Itália - Carlópolis", "", "gabrielPereiraAlvenaria2021", "servico"]
+  ,["Tatuagem e Piercing", "Yasmin Proença da Conceição", "São Pedro - Carlópolis", "", "yasminConceicaoTattoo2021", "servico"]
+  ,["Cantina e Alimentação", "Daiani Mamedes Bernardes", "Residencial Ilha Bela - Carlópolis", "", "daianiBernardesCantina2021"]
+  ,["Pedreiro e Alvenaria", "Jose Carlos Pedrozo", "Centro - Carlópolis", "", "josePedrozoAlvenaria2021", "servico"]
+  ,["Promoção de Vendas", "Ilesio Negrini Sanches Ltda", "Centro - Carlópolis", "", "ilesioSanchesPromocao2021", "servico"]
+  ,["Serviços Domésticos", "Sirlei dos Santos", "CTG - Carlópolis", "", "sirleiSantosDomestico2021", "servico"]
+  ,["Estética e Cuidados com a Beleza", "Mikaele de Deus Mota da Silva", "Centro - Carlópolis", "", "mikaeleSilvaEstetica2021", "servico"]
+  ,["Promoção de Vendas", "Olinda Simão", "Centro - Carlópolis", "", "olindaSimaoPromocao2021", "servico"]
+  ,["Veterinário", "Brambilla Vetservices", "Ribeirão do Meio - Carlópolis", "", "brambillaVetservices2021", "servico"]
+  ,["Serviços Médicos", "A R Salles", "Centro - Carlópolis", "", "arSallesMedicina2021", "servico"]
+  ,["Telefonia e Comunicação", "Franciele Daiane da Costa", "Centro - Carlópolis", "", "francieleCostaTelefonia2021"]
+  ,["Nutricionista", "Mah Paiva Nutricionista", "Rua José Talim, 363 - Centro", "", "mahPaivaNutricionista2021", "servico"]
+  ,["Gestão de Saúde", "Isabela Sanches Fernandes", "Centro - Carlópolis", "", "isabelaFernandesSaude2021", "servico"]
+  ,["Coleta de Resíduos", "Jean Rene Fogaça", "Centro - Carlópolis", "", "jeanFagacaResiduos2021", "servico"]
+  ,["Serviços Domésticos", "Jessica Dias de Oliveira Rosa", "Teolândia - Carlópolis", "", "jessicaRosaDomestico2021", "servico"]
+  ,["Promoção de Vendas", "Keiko Aparecida Nagaki", "Centro - Carlópolis", "", "keikoNagakiPromocao2021", "servico"]
+  ,["Assistência Domiciliar", "Cleide Aparecida de Azevedo Leite", "Vila Bandeirantes - Carlópolis", "", "cleideLeiteHomeCare2021", "servico"]
+  ,["Bar", "Emilia da Silva Lima", "Centro - Carlópolis", "", "emiliaLimaBar2021"]
+  ,["Confecção Sob Medida", "Suzi Carla Nogueira", "Teolândia - Carlópolis", "", "suziNogueiraConfeccao2021", "servico"]
+  ,["Apoio Administrativo", "Lucas Eduardo Orlandini", "Centro - Carlópolis", "", "lucasOrlandiniAdministrativo2021", "servico"]
+  ,["Oficina Mecânica", "China Ar", "Centro - Carlópolis", "", "chinaArOficina2021", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
