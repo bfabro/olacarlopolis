@@ -395,6 +395,22 @@ window.FONTES_CADASTROS_BASICOS = {
   turismoCarlopolisAntigos: {
     nome: "AppLocal / BR Firmas",
     url: "https://applocal.com.br/empresa/j-r-turismo/carlopolis/pr/10958631"
+  },
+  grupoG3Seguranca: {
+    nome: "Consultas Plus / Receita Federal",
+    url: "https://consultas.plus/lista-de-empresas/parana/carlopolis/55644152000119-grupo-g3-de-seguranca-ltda/"
+  },
+  agapeMonitoramento: {
+    nome: "Solutudo / Receita Federal",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/organizacao-de-festas-e-eventos/agape-monitoramento-13587424"
+  },
+  bm3sSeguranca: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/consulta-empresa/18827379000254-bm3s-seguranca-privada-ltda"
+  },
+  teslaEngenhariaSeguranca: {
+    nome: "Diário Oficial dos Municípios / Receita Federal",
+    url: "https://www.diariomunicipal.com.br/amp/download/edicao/056AC2DC"
   }
 };
 
@@ -1056,7 +1072,11 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Turismo e Transporte", "J R Turismo", "Rua Benedito Salles, 627-B - Centro", "(43) 99151-7867", "turismoCarlopolisAntigos", "servico", ["cadastro público antigo sem situação empresarial atual confirmada", "última atualização pública localizada em 2022"]],
   ["Agência de Viagens", "FAMA", "Rua Nicolau Miguel, 551 - Centro", "", "turismoCarlopolisAntigos", "servico", ["dados públicos insuficientes", "sem telefone, razão social ou situação empresarial atual confirmada"]],
   ["Operador Turístico", "Luis Fernando Mendes", "Rua Casa, 484 - Carlópolis", "", "operadoresTurismoCarlopolis", "servico", ["endereço público inconsistente", "logradouro cadastrado apenas como Rua Casa"]],
-  ["Operador Turístico", "Galindo's Barber Shop - Anderson Galindo", "Rua Laurindo Franco de Godoy, 1103 - Centro", "", "operadoresTurismoCarlopolis", "servico", ["atividade pública conflitante", "identidade comercial indica barbearia, embora haja CNAE secundário de operador turístico"]]
+  ["Operador Turístico", "Galindo's Barber Shop - Anderson Galindo", "Rua Laurindo Franco de Godoy, 1103 - Centro", "", "operadoresTurismoCarlopolis", "servico", ["atividade pública conflitante", "identidade comercial indica barbearia, embora haja CNAE secundário de operador turístico"]],
+  ["Segurança Privada", "Grupo G3 de Segurança Ltda", "Chácara Cinco Irmãos, s/n - Teolândia", "", "grupoG3Seguranca", "servico"],
+  ["Monitoramento", "Ágape Monitoramento - André Moreira dos Santos", "Rua Joaquim do Carmo Vilela, 46 - Centro", "", "agapeMonitoramento", "servico", ["atividade pública conflitante", "fonte classifica o estabelecimento como organização de festas e eventos, sem confirmar serviço de monitoramento"]],
+  ["Segurança Privada", "BM3S Segurança Privada Ltda", "Rodovia PR-218, s/n - Centro", "", "bm3sSeguranca", "servico", ["empresa inapta", "filial de Carlópolis com situação cadastral inapta"]],
+  ["Câmeras e Segurança Eletrônica", "Tesla Engenharia - Samantha Baggio Gomes Ltda", "Rua Expedicionários, 668 - Centro, Ribeirão Claro/PR", "(43) 98847-1054", "teslaEngenhariaSeguranca", "servico", ["sede em outro município e sem unidade local confirmada", "forneceu câmeras ao município, mas o estabelecimento fica em Ribeirão Claro/PR"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
