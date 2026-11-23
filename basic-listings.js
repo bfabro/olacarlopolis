@@ -359,6 +359,26 @@ window.FONTES_CADASTROS_BASICOS = {
   serigrafReceita: {
     nome: "CNPJ.biz / Receita Federal",
     url: "https://cnpj.biz/04864928000175"
+  },
+  confeccoesCarlopolisReceita: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/confeccao-de-pecas-de-vestuario-exceto-roupas-intimas-e-as-confeccionadas-sob-medida"
+  },
+  rjLuizConfeccao: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/cnpj/20716926000195-r-j-luiz-confeccoes-ltda"
+  },
+  trLimaLuizConfeccoes: {
+    nome: "Mapa Industrial / Receita Federal",
+    url: "https://mapaindustrial.com.br/cnpj/50282264000153"
+  },
+  nhJeansConfeccoes: {
+    nome: "Pesquisa Empresas / Receita Federal",
+    url: "https://pesquisaempresas.com.br/listas-de-empresas/PR/carlopolis/setor/confeccao-de-artigos-do-vestuario-e-acessorios"
+  },
+  mariaLuciaConfeccao: {
+    nome: "Adv Dinâmico / Receita Federal",
+    url: "https://advdinamico.com.br/empresas/29444142000120"
   }
 };
 
@@ -1004,7 +1024,15 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Produção Audiovisual", "LUKS Produção de Vídeo Ltda", "Rua Manguinha, 208 - Vista Alegre", "", "luksProducaoVideo", "servico"],
   ["Gráfica e Comunicação Visual", "Serigraf - Yamacita & Ferraz Gráfica Ltda", "Rua Padre Hugo, 486 - Centro", "(43) 99906-4434", "serigrafReceita", "servico", ["nome, telefone e endereço", "Serigraf (cliente completo)"]],
   ["Publicidade", "Tatiana Soldera Benatto", "Avenida Murador, 91 - Murador", "(14) 98212-3746", "comunicacaoCarlopolisAntigos", "servico", ["atividade pública conflitante", "fontes classificam o mesmo CNPJ como publicidade e mercado"]],
-  ["Publicidade", "Enigma Propaganda e Publicidade", "Centro - Carlópolis", "", "comunicacaoCarlopolisAntigos", "servico", ["cadastro antigo e dados insuficientes", "sem telefone, endereço completo ou situação atual confirmada"]]
+  ["Publicidade", "Enigma Propaganda e Publicidade", "Centro - Carlópolis", "", "comunicacaoCarlopolisAntigos", "servico", ["cadastro antigo e dados insuficientes", "sem telefone, endereço completo ou situação atual confirmada"]],
+  ["Confecção", "R J Luiz Confecção - R J Luiz Confecções Ltda", "Rua Laudelino Salles de Azevedo, 90 - Vista Bella", "(43) 3566-2252", "rjLuizConfeccao", "servico"],
+  ["Confecção", "T R de Lima Luiz Confecções Ltda", "Rua Laudelino Salles de Azevedo, 90, Setor B - Vista Bella", "", "trLimaLuizConfeccoes", "servico", null, ["mesmo endereço, CNPJs distintos", "R J Luiz Confecção - R J Luiz Confecções Ltda"]],
+  ["Confecção", "NH Jeans Confecções Ltda", "Rua Yassuta Ono, 312 - Jardim Americana", "", "nhJeansConfeccoes", "servico"],
+  ["Confecção", "Maria Lucia da Silva Confecções", "Rua Salvira Marques, 301 - Centro", "", "mariaLuciaConfeccao", "servico"],
+  ["Costura", "Celinha Costuras - Celia Maria de Souza Silva", "Rua Yoneo Yoshitani, 256 - Bela Vista", "", "confeccoesCarlopolisReceita", "servico"],
+  ["Confecção", "NH Confecções - Nilva Antunes da Silva Brito", "Rua Yassuta Ono, 312 - Jardim Americana", "", "confeccoesCarlopolisReceita", "servico", ["mesmo endereço e identidade comercial substituída por cadastro empresarial mais recente", "NH Jeans Confecções Ltda"]],
+  ["Confecção", "Panacea Confecção - S. A. Ferraz", "Rua Padre Hugo, 475 - Centro", "(43) 99606-1356", "confeccoesCarlopolisReceita", "servico", ["nome, telefone e endereço", "Panacea (cliente completo)"]],
+  ["Confecção", "Yellow Jeans Confecção - Rima Jeans Confecções Ltda", "Rua Maria Pereira da Rocha Aleixo, 435 - Carlópolis", "(43) 3566-2151", "confeccoesCarlopolisReceita", "servico", ["nome, telefone e endereço", "Yellow Jeans Confecções (cadastro básico existente)"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
