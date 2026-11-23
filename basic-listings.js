@@ -841,6 +841,20 @@ window.FONTES_CADASTROS_BASICOS = {
   ,luizOliveiraBar2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66852366000105" }
   ,valdeciCabralMercado2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66836692000110" }
   ,mariaEduardaServicos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66782289000156" }
+  ,marcoBezerraAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68793960000190" }
+  ,joseCordobaMecanica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68779734000154" }
+  ,nataliaConickUtilidades2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68689122000170" }
+  ,brenoSilveiraMalote2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68693897000110" }
+  ,veridianeGomesPromocao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68673867000141" }
+  ,doceInfanciaModa2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68644309000158" }
+  ,carlosLimaSerralheria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68619381000125" }
+  ,speedtorkAutoCenter2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68639615000104" }
+  ,jairCruzSerralheria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68591330000132" }
+  ,tyagoFariaAgricola2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68601909000139" }
+  ,brunoRodriguesInformatica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68489135000104" }
+  ,choperiaCarlopolis2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68514805000197" }
+  ,joaoMatosAlimentos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68449114000157" }
+  ,simoneMarianoStore2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68339887000180" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1672,6 +1686,20 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Bar com Entretenimento", "Luiz Antonio de Oliveira", "Centro - Carlópolis", "", "luizOliveiraBar2026"]
   ,["Mercado e Mercearia", "Valdeci Jose Cabral", "Vista Alegre - Carlópolis", "", "valdeciCabralMercado2026"]
   ,["Serviços Pessoais", "Maria Eduarda Liduario de Paula", "Vista Alegre - Carlópolis", "", "mariaEduardaServicos2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Marco Aparecido Bezerra Filho", "Centro - Carlópolis", "", "marcoBezerraAlvenaria2026", "servico"]
+  ,["Mecânica Automotiva", "José Luiz Cordoba", "Rua Joaquim do Carmo de Oliveira Vilela, 66 - Centro", "", "joseCordobaMecanica2026", "servico"]
+  ,["Utilidades Domésticas", "Natália Fabricio Conick", "Área Rural - Carlópolis", "", "nataliaConickUtilidades2026"]
+  ,["Serviço de Malote", "Breno Giovani Silveira", "Centro - Carlópolis", "", "brenoSilveiraMalote2026", "servico"]
+  ,["Promoção de Vendas", "Veridiane Franco Gomes", "Centro - Carlópolis", "", "veridianeGomesPromocao2026", "servico"]
+  ,["Moda Infantil", "Doce Infância Moda Infantil Ltda", "Rua Kalil Keder, 583, Sala 08 - Centro", "", "doceInfanciaModa2026"]
+  ,["Serralheria, Usinagem e Solda", "Carlos Henrique Vieira Lima", "Vista Bella - Carlópolis", "", "carlosLimaSerralheria2026", "servico"]
+  ,["Mecânica Automotiva", "Speedtork Auto Center - Khattabi Fernandes Ltda", "Rua Paul Harris, 30 - Vista Bella", "", "speedtorkAutoCenter2026", "servico"]
+  ,["Serralheria", "Jair Antonio da Cruz", "Centro - Carlópolis", "", "jairCruzSerralheria2026", "servico"]
+  ,["Serviços Agrícolas", "Tyago Faria", "Cedro - Carlópolis", "", "tyagoFariaAgricola2026", "servico"]
+  ,["Informática e Suprimentos", "Bruno Cassimiro Rodrigues", "Centro - Carlópolis", "", "brunoRodriguesInformatica2026"]
+  ,["Bebidas e Choperia", "Choperia Carlópolis Ltda", "Rua Benedito Salles, 1409 - Centro", "", "choperiaCarlopolis2026"]
+  ,["Alimentos Preparados", "João Nilson Ferreira Matos", "Vista Bella - Carlópolis", "", "joaoMatosAlimentos2026"]
+  ,["Roupas, Calçados e Acessórios", "Simone Mariano Store Ltda", "Rua Marcos Rodrigues do Amaral, 192 - Centro", "", "simoneMarianoStore2026"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
