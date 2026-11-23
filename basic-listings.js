@@ -647,6 +647,66 @@ window.FONTES_CADASTROS_BASICOS = {
   estrelaDaviFechada: {
     nome: "Todos Negócios",
     url: "https://br.todosnegocios.com/pt/confec%C3%A7%C3%B5es-estrela-de-davi"
+  },
+  luendreEntregas: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/61668556000145"
+  },
+  evandroMalote: {
+    nome: "Jurídico Online / Receita Federal",
+    url: "https://juridicoonline.com.br/empresa/66576834000158-66576834-evandro-ruiz-de-oliveira"
+  },
+  diegoMalote: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/63-035-499-diego-henrique-ferreira-de-melo-63035499000192"
+  },
+  pauloJulianoMalote: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/consulta-empresa/49127993000156-paulo-juliano-de-souza"
+  },
+  thaisMirandaEntregas: {
+    nome: "Jusbrasil / Receita Federal",
+    url: "https://www.jusbrasil.com.br/nome/69556252-thais-aparecida-de-miranda/cnpj-2LpLrGDF3Uv"
+  },
+  danrleyMontador: {
+    nome: "Brasil CNPJ / Receita Federal",
+    url: "https://brasilcnpj.net/cnpj/62-175-417-danrley-jose-coelho-62175417000142"
+  },
+  fernandoCoelhoMontador: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/62173906000165"
+  },
+  willianFerreiraMontador: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/68-075-451-willian-de-lima-ferreira-68075451000121"
+  },
+  ariovaldoRevolution: {
+    nome: "Prefeitura de Carlópolis / contrato público de 2026",
+    url: "https://www-storage.voxtecnologia.com.br/?f=4410&i=publicado_118117_2026-06-11_b3cb41c273e3a6fdc9aeb66498946b4d.pdf&m=sigpub.publicacao"
+  },
+  mariaEuniceEventos: {
+    nome: "Solutudo / Receita Federal",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/aluguel-de-saloes-de-festa/maria-eunice-goncalves-leite-de-oliveira-15979815"
+  },
+  alineVazEstruturas: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/65-586-456-aline-martins-da-costa-vaz-65586456000120"
+  },
+  marcenariaAlmeidaDuplicada: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/almeida-e-ferreira-marcenaria-ltda-27389478000101"
+  },
+  montadorExpressSemUnidade: {
+    nome: "Montador Express",
+    url: "https://montadorexpresspr.com.br/montador-moveis-carlopolis/"
+  },
+  thallesSomBaixado: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/65-634-682-thalles-akio-yamamoto-sacamoto-65634682000130"
+  },
+  decioSomDiretorios: {
+    nome: "ListaTudo",
+    url: "https://www.listatudo.com.br/parana/norte-pioneiro-paranaense/carlopolis/festas-e-eventos/organizacao-e-promocao-de-eventos/equipamentos-de-som-e-iluminacao/decio-som/"
   }
 };
 
@@ -1378,7 +1438,22 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Costura e Confecção", "Simone Aparecida da Silva", "Rua Salvira Marques, 198 - Centro", "", "confeccoesAtivasCarlopolis", "servico"],
   ["Costura", "Sara Costureira", "Rua Nicolau Miguel, 393 - Centro", "(43) 99185-9942", "saraCostureiraDiretorio", "servico", ["identidade empresarial insuficientemente confirmada", "diretório não informa razão social ou CNPJ que vincule o nome ao endereço e telefone"]],
   ["Costura e Confecção", "Leonardo Xavier Dias", "Carlópolis - PR", "", "leonardoXavierInapto", "servico", ["empresa inapta", "CNPJ 48.977.471/0001-80 inapto desde 15/08/2024"]],
-  ["Costura e Confecção", "Confecções Estrela de Davi", "Rua Delfino Mendes, 264 - Carlópolis", "(43) 3566-2524", "estrelaDaviFechada", "servico", ["estabelecimento marcado como fechado", "diretório informa encerramento e telefone apenas histórico"]]
+  ["Costura e Confecção", "Confecções Estrela de Davi", "Rua Delfino Mendes, 264 - Carlópolis", "(43) 3566-2524", "estrelaDaviFechada", "servico", ["estabelecimento marcado como fechado", "diretório informa encerramento e telefone apenas histórico"]],
+  ["Entrega Rápida", "Luendre Santos de Oliveira", "Rua Andrino Soares, 355 - Centro", "", "luendreEntregas", "servico"],
+  ["Serviço de Malote", "Evandro Ruiz de Oliveira", "Estrada do Monge, 10 - Industrial", "", "evandroMalote", "servico"],
+  ["Serviço de Malote", "Diego Henrique Ferreira de Melo", "Rua Capitão Estácio, 714 - Vista Bella", "(43) 99956-7041", "diegoMalote", "servico"],
+  ["Serviço de Malote", "Paulo Juliano de Souza", "Rua Francisco Avelino Paiva, 250 - Centro", "", "pauloJulianoMalote", "servico"],
+  ["Entrega Rápida", "Thais Aparecida de Miranda", "Centro - Carlópolis", "", "thaisMirandaEntregas", "servico"],
+  ["Montagem e Manutenção de Móveis", "Danrley Jose Coelho", "Rua Benedito Salles, 309 - Centro", "(43) 99687-5289", "danrleyMontador", "servico"],
+  ["Montagem e Manutenção de Móveis", "Fernando Henrique Coelho", "Chácara das Araucárias, s/n - Matão", "", "fernandoCoelhoMontador", "servico"],
+  ["Montagem e Manutenção de Móveis", "Willian de Lima Ferreira", "Rua Grevília Ana, 138 - Vista Alegre", "(11) 99162-6265", "willianFerreiraMontador", "servico"],
+  ["Som e Produção Musical", "Revolution - Ariovaldo de Lima", "Rua José Talim, 200 - Jardim Itália", "(43) 3566-1423", "ariovaldoRevolution", "servico"],
+  ["Salão de Festas e Locação de Som", "Maria Eunice Gonçalves Leite de Oliveira", "Chácara Bela Vista, s/n - Jaboticabal", "(43) 99670-7847", "mariaEuniceEventos", "servico"],
+  ["Locação de Palcos e Estruturas para Eventos", "Aline Martins da Costa Vaz", "Rua Ipê Roxo, 124 - Vista Alegre", "(43) 99938-5318", "alineVazEstruturas", "servico"],
+  ["Marcenaria", "Almeida e Ferreira Marcenaria Ltda", "Rua Antônio Jonas Ferreira Pinto, 398 - Centro", "", "marcenariaAlmeidaDuplicada", "servico", ["nome e identidade empresarial", "Marcenaria Almeida's já cadastrada"]],
+  ["Montagem de Móveis", "Montador Express", "Atendimento anunciado em Carlópolis - PR", "", "montadorExpressSemUnidade", "servico", ["estabelecimento local não confirmado", "página genérica por cidade, sem endereço ou unidade em Carlópolis"]],
+  ["Som e Iluminação", "Thalles Akio Yamamoto Sacamoto", "Carlópolis - PR", "", "thallesSomBaixado", "servico", ["empresa baixada", "CNPJ 65.634.682/0001-30 baixado em 23/08/2026"]],
+  ["Som e Iluminação", "Decio Som", "Rua Chuva de Ouro, 469 - Vista Alegre", "", "decioSomDiretorios", "servico", ["telefone e identidade pública conflitantes", "diretórios informam telefones diferentes e não foi localizado CNPJ que confirme a identidade atual"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
