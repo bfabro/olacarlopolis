@@ -1018,6 +1018,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,dielicaRodriguesConstrucao2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/43891457000146-dielica-fernanda-rodrigues" }
   ,depositoTiririka2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/39492482000180-deposito-tiririka" }
   ,colorTintasCarlopolis2026: { nome: "Econodata / dados públicos da Receita Federal", url: "https://www.econodata.com.br/consulta-empresa/35273615000176-comercio-de-tintas-carlopolis-ltda" }
+  ,laboratorioCarlopolis2025: { nome: "Casa dos Dados / dados públicos da Receita Federal", url: "https://casadosdados.com.br/solucao/cnpj/laboratorio-carlopolis-ltda-63647731000143" }
+  ,adrianoSilvaMotopecas2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63627303000159-adriano-da-silva" }
+  ,jullyGomesBeleza2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63636730000101-jully-gomes-da-silva" }
+  ,brunaSilverioPromocao2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63608999000176-bruna-fernanda-nunes-silverio" }
+  ,moacirSilvaAlvenaria2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63615185000169-moacir-cassemiro-da-silva" }
+  ,ultralinkInternet2025: { nome: "CNPJ.biz / dados públicos da Receita Federal", url: "https://cnpj.biz/63618333000107" }
+  ,cristianVidaAlvenaria2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63541500000150-cristian-ferrari-garbeloti-vida" }
+  ,celeiroProducoes2025: { nome: "Casa dos Dados / dados públicos da Receita Federal", url: "https://casadosdados.com.br/solucao/cnpj/celeiro-producoes-e-eventos-ltda-63554775000129" }
+  ,reginaldoPereiraAlvenaria2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63531335000156-reginaldo-aparecido-pereira" }
+  ,aguiarEmpreendimentos2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63398255000174-aguiar-empreendimentos-e-negocios" }
+  ,odairLemesAlimentos2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63339497000197-odair-jose-lemes-da-silva" }
+  ,evertonOliveiraAdministrativo2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63336865000143-everton-franco-de-oliveira" }
+  ,pabuloRochaVideo2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63294133000138-pabulo-artigas-rocha" }
+  ,camilaRoqueEstetica2025: { nome: "Desassossegada / dados públicos da Receita Federal", url: "https://diretorio.desassossegada.com.br/clinica-de-estetica/dra-camila-roque-nogueira-servicos-de-estetica-carlopolis-000207/" }
+  ,marcianaSilvaCosmeticos2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63278892000107-marciana-bento-da-silva" }
+  ,sindyVilelaVestuario2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63259084000100-sindy-magda-vilela" }
+  ,brunaPereiraVestuario2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63238426000106-bruna-gabriele-moraes-vieira-pereira" }
+  ,lucasMotos2025: { nome: "CNPJ.biz / dados públicos da Receita Federal", url: "https://cnpj.biz/63225918000159" }
+  ,wilsonAlexandreMotorista2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63155828000139-wilson-correa-alexandre" }
+  ,dmNautica2025: { nome: "Casa dos Dados / dados públicos da Receita Federal", url: "https://casadosdados.com.br/solucao/cnpj/dm-nautica-servicos-and-assessoria-ltda-63161744000108" }
+  ,usinaToka2025: { nome: "Casa dos Dados / dados públicos da Receita Federal", url: "https://casadosdados.com.br/solucao/cnpj/usina-toka-63121493000138" }
+  ,martaOliveiraDomesticos2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63028770000162-marta-rosa-giron-de-oliveira" }
+  ,agropecuariaSantaLuzia2025: { nome: "CNPJ.ai / dados públicos da Receita Federal", url: "https://cnpj.ai/63084914000106" }
+  ,joaoFernandesVideo2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63054404000188-joao-vitor-fernandes-silva" }
+  ,mrAgroFrutas2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63031844000110-mr-agro-comercio-de-frutas-ltda" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2026,6 +2051,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Materiais de Construção", "Dielica Fernanda Rodrigues", "Centro - Carlópolis", "", "dielicaRodriguesConstrucao2026"]
   ,["Areia, Pedra, Tijolos e Telhas", "Depósito Tiririka", "Vista Bella - Carlópolis", "", "depositoTiririka2026"]
   ,["Tintas e Materiais para Pintura", "Color Tintas Carlópolis - Comércio de Tintas Carlópolis Ltda", "Rua Benedito Salles, 312 - Centro", "", "colorTintasCarlopolis2026"]
+  ,["Laboratório Clínico", "Laboratório Carlópolis Ltda", "Rua Fidêncio de Mello, 283, Salas 3 a 5 - Centro", "(41) 99614-8520", "laboratorioCarlopolis2025", "servico"]
+  ,["Peças e Acessórios para Motos", "Adriano da Silva", "Centro - Carlópolis", "", "adrianoSilvaMotopecas2025"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Jully Gomes da Silva", "Centro - Carlópolis", "", "jullyGomesBeleza2025", "servico"]
+  ,["Promoção de Vendas", "Bruna Fernanda Nunes Silverio", "Novo Horizonte - Carlópolis", "", "brunaSilverioPromocao2025", "servico"]
+  ,["Pedreiro e Alvenaria", "Moacir Cassemiro da Silva", "Murador - Carlópolis", "", "moacirSilvaAlvenaria2025", "servico"]
+  ,["Provedor de Internet", "Ultralink Internet Ltda", "Rua Padre Hugo, 985, 2º andar, Sala 01 - Centro", "", "ultralinkInternet2025", "servico", null, null, "", "https://linktr.ee/ultralinkoficial", "https://www.instagram.com/ultralinkoficial/"]
+  ,["Pedreiro e Alvenaria", "Cristian Ferrari Garbeloti Vida", "Centro - Carlópolis", "", "cristianVidaAlvenaria2025", "servico"]
+  ,["Alimentação Ambulante e Eventos", "Celeiro Produções e Eventos Ltda", "Rua Marcos Rodrigues do Amaral, 430 - Centro", "(43) 99965-2084", "celeiroProducoes2025", "servico"]
+  ,["Pedreiro e Alvenaria", "Reginaldo Aparecido Pereira", "Vista Alegre - Carlópolis", "", "reginaldoPereiraAlvenaria2025", "servico"]
+  ,["Clube e Empreendimentos", "Aguiar Empreendimentos e Negócios", "Santa Maria - Carlópolis", "", "aguiarEmpreendimentos2025", "servico"]
+  ,["Alimentos Preparados", "Odair Jose Lemes da Silva", "Área Rural - Carlópolis", "", "odairLemesAlimentos2025"]
+  ,["Apoio Administrativo", "Everton Franco de Oliveira", "Centro - Carlópolis", "", "evertonOliveiraAdministrativo2025", "servico"]
+  ,["Produção e Edição de Vídeos", "Pabulo Artigas Rocha", "Vista Alegre - Carlópolis", "", "pabuloRochaVideo2025", "servico"]
+  ,["Estética e Cuidados com a Beleza", "Dra. Camila Roque Nogueira Serviços de Estética Ltda", "Rua Nicolau Miguel, 494 - Centro", "(14) 3313-9957", "camilaRoqueEstetica2025", "servico", null, ["mesmo endereço, empresas e atividades distintas", "Cafeeira Calin"]]
+  ,["Cosméticos e Perfumaria", "Marciana Bento da Silva", "Vista Alegre - Carlópolis", "", "marcianaSilvaCosmeticos2025"]
+  ,["Vestuário e Acessórios", "Sindy Magda Vilela", "Centro - Carlópolis", "", "sindyVilelaVestuario2025"]
+  ,["Vestuário e Acessórios", "Bruna Gabriele Moraes Vieira Pereira", "Centro - Carlópolis", "", "brunaPereiraVestuario2025"]
+  ,["Motos e Veículos Recreativos", "Lucas Motos - V M O Comércio de Motocicletas Ltda", "Avenida Elson Soares, 843 - Centro", "", "lucasMotos2025"]
+  ,["Transporte com Motorista", "Wilson Correa Alexandre", "Vista Alegre - Carlópolis", "", "wilsonAlexandreMotorista2025", "servico"]
+  ,["Náutica e Embarcações", "DM Náutica Serviços & Assessoria Ltda", "Avenida Murador, 192 - Murador", "(43) 99149-9438", "dmNautica2025", "servico"]
+  ,["Locação de Máquinas e Equipamentos", "Usina Toka", "Rua Diogos, Gleba C - Vista Bella", "(11) 99977-4690", "usinaToka2025", "servico"]
+  ,["Serviços Domésticos", "Marta Rosa Giron de Oliveira", "Vista Alegre - Carlópolis", "", "martaOliveiraDomesticos2025", "servico"]
+  ,["Agropecuária e Cafeicultura", "Agropecuária Santa Luzia Ltda", "Sítio São Bento, s/n - Bairro dos Teodoros", "(14) 3762-1800", "agropecuariaSantaLuzia2025"]
+  ,["Produção e Edição de Vídeos", "João Vitor Fernandes Silva", "Centro - Carlópolis", "", "joaoFernandesVideo2025", "servico"]
+  ,["Comércio de Frutas e Hortaliças", "MR Agro Comércio de Frutas Ltda", "Área Rural - Carlópolis", "", "mrAgroFrutas2025"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
