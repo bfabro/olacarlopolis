@@ -918,6 +918,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,wandaMarthosPadaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64780467000184" }
   ,luisOliveiraMarmoraria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64696328000177" }
   ,vcBagatimMedicos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/64678471000136" }
+  ,katiaChagasDomesticos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64649039000117" }
+  ,segLuminaAdministrativo2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64683582000130" }
+  ,amandaBagatimMedicina2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64693710000127" }
+  ,rodrigoRodriguesTaxi2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64627450000191" }
+  ,edCarlosEnsino2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64601876000176" }
+  ,solangeAbreuCosmeticos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64565766000104" }
+  ,pocosTresFontes2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64659753000196" }
+  ,marliSantosUtilidades2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64502574000140" }
+  ,leonardoMoreiraSucatas2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64506877000131" }
+  ,aglaupiMarquesBeleza2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64464107000173" }
+  ,joseRibeiroLavaRapido2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64459760000144" }
+  ,angelicaCostaHospedagem2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64418744000103" }
+  ,antonioLeiteLavaRapido2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64373985000183" }
+  ,cristianeDavidCosmeticos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64349086000145" }
+  ,luizCordeiroPintura2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64309327000122" }
+  ,marmoglassPremium2026: { nome: "Empresite / dados públicos da Receita Federal", url: "https://empresite.com/br/empresa/marmoglass-premium-marmoraria-vidracaria" }
+  ,rennanSilvaComputadores2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64286056000137" }
+  ,marcosSoaresMotorista2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64289734000115" }
+  ,rafaelGarciaMaquinas2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64253232000134" }
+  ,joaoBenedettiPaisagismo2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64241218000110" }
+  ,clodoaldoCamposGraficos2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64177406000127" }
+  ,comunicaMaisFono2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64313567000109" }
+  ,hbbMidiaDigital2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64096968000146" }
+  ,msnHolding2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64061539000133" }
+  ,renanCaetanoBorracharia2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/64003402000122" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1826,6 +1851,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Padaria e Confeitaria", "Wanda Ferreira da Silva Marthos", "Centro - Carlópolis", "", "wandaMarthosPadaria2026"]
   ,["Marmoraria", "Luis Silva de Oliveira Neto", "Centro - Carlópolis", "", "luisOliveiraMarmoraria2026", "servico"]
   ,["Serviços Médicos", "V. C. Bagatim e Cia Ltda", "Rua André Jorge Clele, 116, Sala 01 - Centro", "", "vcBagatimMedicos2026", "servico"]
+  ,["Serviços Domésticos", "Katia Fernanda Chagas", "Rua Nelson Gouveia, 510 - Murador", "", "katiaChagasDomesticos2026", "servico"]
+  ,["Apoio Administrativo", "S. E. G. Lumina Ltda", "Alameda Uirapuru, 198 - Jaboticabal", "", "segLuminaAdministrativo2026", "servico"]
+  ,["Serviços Médicos", "Amanda Bagatim Avelino Serviços de Medicina Ltda", "Rua Jorge Barros, 651 - Centro", "", "amandaBagatimMedicina2026", "servico"]
+  ,["Táxi", "Rodrigo Dias Rodrigues", "Rua Andrino Soares, 355, Sala - Centro", "", "rodrigoRodriguesTaxi2026", "servico", null, ["mesmo endereço, profissionais e atividades distintos", "Luendre Santos de Oliveira"]]
+  ,["Ensino e Cursos", "Ed Carlos Fonseca", "Rua Edwirges B. do Amaral, 864 - Centro", "", "edCarlosEnsino2026", "servico"]
+  ,["Cosméticos e Perfumaria", "Solange Aparecida de Oliveira Abreu", "Rua Edwirges B. do Amaral, 811A - Centro", "", "solangeAbreuCosmeticos2026"]
+  ,["Perfuração de Poços", "Poços Três Fontes - Iago Resende Rodrigues da Silva", "Rua Capitão Estácio, 88 - Vista Bella", "", "pocosTresFontes2026", "servico"]
+  ,["Utilidades Domésticas", "Marli Magalhães dos Santos", "Rua Antonio Jonas Ferreira Pinto, 891 - Centro", "", "marliSantosUtilidades2026"]
+  ,["Recuperação de Sucatas", "Leonardo Cezar Moreira", "Rua Benedito Salles, 1540 - Centro", "", "leonardoMoreiraSucatas2026", "servico"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Aglaupi Janaina Amaral Machado Marques", "Rua Padre Hugo, 551 - Jardim Itália", "", "aglaupiMarquesBeleza2026", "servico"]
+  ,["Lava Rápido e Estética Automotiva", "José Roberto Ribeiro", "Avenida Murador, 152 - Murador", "", "joseRibeiroLavaRapido2026", "servico"]
+  ,["Hospedagem", "Angelica Zurdo Costa", "Rua Capitão Estácio, 800 - Centro", "", "angelicaCostaHospedagem2026", "servico"]
+  ,["Lava Rápido e Estética Automotiva", "Antonio Cesar Teixeira Leite", "Rua Andrino Soares, 606 - Centro", "", "antonioLeiteLavaRapido2026", "servico"]
+  ,["Cosméticos e Perfumaria", "Cristiane Aparecida de Souza David", "Rua Kalil Keder, 834 - Centro", "", "cristianeDavidCosmeticos2026"]
+  ,["Pintura de Imóveis", "Luiz Alberto Cordeiro", "Rua Magnólia, 500 - Vista Alegre", "", "luizCordeiroPintura2026", "servico"]
+  ,["Marmoraria e Vidraçaria", "Marmoglass Premium Marmoraria e Vidraçaria Ltda", "Avenida Murador, 244 - Murador", "(14) 99806-8651", "marmoglassPremium2026", "servico"]
+  ,["Informática e Manutenção", "Rennan José da Silva", "Rua Evaristo Sanches Garcia, 21 - Novo Horizonte", "", "rennanSilvaComputadores2026", "servico"]
+  ,["Transporte com Motorista", "Marcos Bruno Soares", "Rua Noemia Antonia Machado Varasquim, 70 - Novo Horizonte", "", "marcosSoaresMotorista2026", "servico"]
+  ,["Instalação de Máquinas", "Rafael Okada Garcia", "Rua Jorge Barros, 955 - Centro", "", "rafaelGarciaMaquinas2026", "servico"]
+  ,["Paisagismo", "João Pedro Benedetti Neto", "Rua José Gonçalves Mendes, 105 - Centro", "", "joaoBenedettiPaisagismo2026", "servico"]
+  ,["Serviços Gráficos", "Clodoaldo José Miranda Campos", "Praça da Amizade, s/n - Centro", "", "clodoaldoCamposGraficos2026", "servico"]
+  ,["Fonoaudiologia", "Comunica + Ltda", "Rua Benedito Salles, 1284, Anexo Fundos - Centro", "", "comunicaMaisFono2026", "servico", null, ["mesmo número, anexo e atividade distintos", "Baterias Tonini Ltda"]]
+  ,["Publicidade e Mídia Digital", "HBB Mídia Digital Ltda", "Rua Andrino Soares, 470 - Centro", "", "hbbMidiaDigital2026", "servico", null, ["mesmo endereço, empresas e atividades distintas", "Hashitani Corretor de Seguros Ltda"]]
+  ,["Holding e Administração de Bens", "MSN Holding Ltda", "Rua Benedito Salles, 854, Sala 02 - Centro", "", "msnHolding2026", "servico"]
+  ,["Borracharia", "Renan de Oliveira Caetano", "Rua Benedito Salles, 1589 - Centro", "", "renanCaetanoBorracharia2026", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
