@@ -993,6 +993,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,richardsonTeodoroUsados2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67846743000158" }
   ,elo2jSolucoes2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67869192000148" }
   ,dayProteticaLab2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/67904973000126" }
+  ,lgzFashion2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,andreaGalegoApicultura2026: { nome: "Casa dos Dados / dados públicos da Receita Federal", url: "https://casadosdados.com.br/solucao/cnpj/67799333-andrea-madoenho-galego-67799333000101" }
+  ,robsonTerraPromocao2026: { nome: "MaisCNPJ / dados públicos da Receita Federal", url: "https://maiscnpj.com.br/empresas/pr/carlopolis/promocao-de-vendas" }
+  ,dvFrutasTransportes2026: { nome: "CNPJ do Brasil / dados públicos da Receita Federal", url: "https://cnpjdobrasil.com.br/cnpj/d-v-frutas-e-transportes-ltda-67664918000106" }
+  ,santaClaraMedicina2026: { nome: "CNPJ do Brasil / dados públicos da Receita Federal", url: "https://cnpjdobrasil.com.br/cnpj/ana-clara-varaschin-assistencia-medica-ltda-67858461000170" }
+  ,mariaVitoriaDiasVestuario2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,geanRibeiroMalote2026: { nome: "Jurídico Online / dados públicos da Receita Federal", url: "https://juridicoonline.com.br/empresa/67642026000104-67642026-gean-carlos-santos-ribeiro" }
+  ,lourdesAlmeidaAgricola2026: { nome: "Econodata / dados públicos da Receita Federal", url: "https://www.econodata.com.br/empresas/pr-carlopolis/art615-a" }
+  ,adevaldoFerreiraConstrucao2026: { nome: "Pesquisa Empresas / dados públicos da Receita Federal", url: "https://www.pesquisaempresas.com.br/listas-de-empresas/PR/carlopolis/cnae/43991" }
+  ,ecOvcarSaude2026: { nome: "Pesquisa Empresas / dados públicos da Receita Federal", url: "https://pesquisaempresas.com.br/consultando-empresa/67558489000192-e-c-ovcar-ltda" }
+  ,franciscaSoaresAgricola2026: { nome: "Econodata / dados públicos da Receita Federal", url: "https://www.econodata.com.br/empresas/pr-carlopolis/art615-a" }
+  ,gaCarassaHolding2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/66302459000158" }
+  ,kbHoldingPatrimonial2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/65917091000170" }
+  ,saintOmerParticipacoes2026: { nome: "ConsultarCNPJ / dados públicos da Receita Federal", url: "https://xcnpj.com.br/cnpj/66096563000133" }
+  ,construcasaAcabamentos2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/81193336001353-construcasa-solucao-em-acabamentos-ltda" }
+  ,depositoAreiaMagrao2026: { nome: "Informe Cadastral / dados públicos da Receita Federal", url: "https://www.informecadastral.com.br/cnpj/m-j-rodrigues-comercio-de-areia-e-pedra-60079170000135" }
+  ,serrariaMatoGrosso2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/55853475000112-serraria-mato-grosso" }
+  ,vaniceCastroMadeiras2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/54688770000106-vanice-aparecida-de-castro" }
+  ,originalCesarAquecedores2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49891824000198-original-cesar-aquecedores" }
+  ,terezinhaCamargoConstrucao2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49023733000130-terezinha-de-fatima-camargo" }
+  ,ilhaBelaPiscinas2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/46273144000112-ilha-bela-piscinas" }
+  ,imperioMarmoresGranitos2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/23276999000282-imperio-marmores-e-granitos" }
+  ,dielicaRodriguesConstrucao2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/43891457000146-dielica-fernanda-rodrigues" }
+  ,depositoTiririka2026: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/39492482000180-deposito-tiririka" }
+  ,colorTintasCarlopolis2026: { nome: "Econodata / dados públicos da Receita Federal", url: "https://www.econodata.com.br/consulta-empresa/35273615000176-comercio-de-tintas-carlopolis-ltda" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1976,6 +2001,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Artigos Usados", "Richardson Oliveira Teodoro", "Rua Marcos Rodrigues do Amaral, 263 - Centro", "", "richardsonTeodoroUsados2026"]
   ,["Consultoria Empresarial", "Elo2J Soluções Empresariais Ltda", "Rua Felizardo Leite de Paula e Silva, 262 - Vila Ray", "", "elo2jSolucoes2026", "servico"]
   ,["Prótese Dentária", "Day Protetic Lab - Soluções Protéticas para Reabilitação Oral Ltda", "Rua João Cuenca Borrego, 203, Anexo A - Centro", "", "dayProteticaLab2026", "servico", null, ["mesmo número, anexo e atividades distintas", "Novo Sorriso Centro Odontológico"]]
+  ,["Vestuário e Acessórios", "LGZ Fashion Ltda", "Centro - Carlópolis", "", "lgzFashion2026"]
+  ,["Apicultura", "Andrea Madoenho Galego", "Rua Benedito Salles, 11 - Centro", "(43) 99638-9845", "andreaGalegoApicultura2026"]
+  ,["Promoção de Vendas", "Robson de Paula Terra", "Rua Jorge Barros, 898 - Centro", "", "robsonTerraPromocao2026", "servico"]
+  ,["Comércio de Frutas e Hortaliças", "D&V Frutas e Transportes Ltda", "Rua Noêmia Antônia Machado Varasquim, 161 - Novo Horizonte", "(41) 99272-2853", "dvFrutasTransportes2026"]
+  ,["Serviços Médicos", "Santa Clara Medicina - Ana Clara Varaschin Assistência Médica Ltda", "Rua Ipê Roxo, 232 - Vista Alegre", "(43) 99676-1276", "santaClaraMedicina2026", "servico"]
+  ,["Vestuário e Acessórios", "Maria Vitoria Pedroso Dias", "Centro - Carlópolis", "", "mariaVitoriaDiasVestuario2026"]
+  ,["Serviço de Malote", "Gean Carlos Santos Ribeiro", "Rua Nicolau Miguel, 1012 - Centro", "(43) 99651-5915", "geanRibeiroMalote2026", "servico", null, ["mesmo endereço, empresas e atividades distintas", "Maria Aparecida Santos Ribeiro"]]
+  ,["Serviços Agrícolas", "Lourdes Rodrigues de Almeida", "Área Rural - Carlópolis", "", "lourdesAlmeidaAgricola2026", "servico"]
+  ,["Serviços de Construção", "Adevaldo Francisco Ferreira", "Carlópolis - PR", "", "adevaldoFerreiraConstrucao2026", "servico"]
+  ,["Serviços de Saúde", "E C OVCAR Ltda", "Carlópolis - PR", "", "ecOvcarSaude2026", "servico"]
+  ,["Serviços Agrícolas", "Francisca Maria dos Santos Soares", "Área Rural - Carlópolis", "", "franciscaSoaresAgricola2026", "servico"]
+  ,["Holding e Administração de Bens", "G.A. Carassa Holding e Participações Ltda", "Ilha Bela - Carlópolis", "", "gaCarassaHolding2026", "servico"]
+  ,["Holding e Administração de Bens", "KB Holding Patrimonial Ltda", "Centro - Carlópolis", "", "kbHoldingPatrimonial2026", "servico"]
+  ,["Holding e Administração de Bens", "Saint-Omer Participações Societárias Ltda", "Vista Bella - Carlópolis", "", "saintOmerParticipacoes2026", "servico"]
+  ,["Materiais de Construção", "Construcasa Solução em Acabamentos Ltda", "Centro - Carlópolis", "", "construcasaAcabamentos2026"]
+  ,["Areia, Pedra, Tijolos e Telhas", "Depósito de Areia Magrão", "Rua Benedito Salles, 2354, Lote 05, Quadra A - Rota do Sol", "(43) 99144-6832", "depositoAreiaMagrao2026"]
+  ,["Madeiras e Artefatos", "Serraria Mato Grosso", "Água da Piçarra - Carlópolis", "", "serrariaMatoGrosso2026"]
+  ,["Madeiras e Artefatos", "Vanice Aparecida de Castro", "Jardim Americana - Carlópolis", "", "vaniceCastroMadeiras2026"]
+  ,["Aquecedores e Material Elétrico", "Original Cesar Aquecedores", "Centro - Carlópolis", "", "originalCesarAquecedores2026"]
+  ,["Materiais de Construção", "Terezinha de Fatima Camargo", "Residencial Vista Bella - Carlópolis", "", "terezinhaCamargoConstrucao2026"]
+  ,["Piscinas e Acessórios", "Ilha Bela Piscinas", "Centro - Carlópolis", "", "ilhaBelaPiscinas2026"]
+  ,["Marmoraria", "Império Mármores e Granitos", "Parque Industrial e Comercial Jorge Leite da Rosa - Carlópolis", "", "imperioMarmoresGranitos2026", "servico"]
+  ,["Materiais de Construção", "Dielica Fernanda Rodrigues", "Centro - Carlópolis", "", "dielicaRodriguesConstrucao2026"]
+  ,["Areia, Pedra, Tijolos e Telhas", "Depósito Tiririka", "Vista Bella - Carlópolis", "", "depositoTiririka2026"]
+  ,["Tintas e Materiais para Pintura", "Color Tintas Carlópolis - Comércio de Tintas Carlópolis Ltda", "Rua Benedito Salles, 312 - Centro", "", "colorTintasCarlopolis2026"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
