@@ -543,6 +543,38 @@ window.FONTES_CADASTROS_BASICOS = {
   sandroJardinagemBaixada: {
     nome: "CNPJ.biz / Receita Federal",
     url: "https://cnpj.biz/44298166000101"
+  },
+  clodoaldoEzequiasHidraulica: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/69325048000176"
+  },
+  gilbertoMottaHidraulica: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/52670995000100"
+  },
+  emersonLimaHidraulica: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/27809481000137"
+  },
+  franciscoLineroHidraulica: {
+    nome: "EcoBigData / Receita Federal",
+    url: "https://ecobigdata.com.br/empresa/pr/carlopolis/francisco-carlos-linero-garcia-18162591000169"
+  },
+  claudioBatistaHidraulica: {
+    nome: "Guia do CNPJ / Receita Federal",
+    url: "https://guiadocnpj.com.br/pr/carlopolis/claudio-batista-de-oliveira/14427164000104"
+  },
+  araucalhasGuias: {
+    nome: "Acharei / Solutudo",
+    url: "https://acharei.com.br/pr/carlopolis/empresas/casa_e_construcao"
+  },
+  joseLemeHidraulicaInapta: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/14071950000111"
+  },
+  masterHouseEncanador: {
+    nome: "Master House",
+    url: "https://www.masterhousesolucoes.com.br/servico/encanador/pr/carlopolis/"
   }
 };
 
@@ -1245,7 +1277,15 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Jardinagem", "Aparecido Donizete de Araújo", "Rua Jacarandá Mimoso, 270 - Vista Alegre", "", "aparecidoDonizeteJardinagem", "servico"],
   ["Jardinagem", "Jardinagem Miranda", "Rua Andrino Soares, 473 - Centro", "(43) 3566-1118", "jardinagemMirandaAntiga", "servico", ["identidade pública atual insuficientemente confirmada", "apenas diretório antigo, sem cadastro oficial ou canal próprio localizado"]],
   ["Jardinagem", "Edson Jardinagem", "Carlópolis - PR", "", "edsonJardinagemDiretorio", "servico", ["dados públicos insuficientes", "diretório informa somente o nome, sem telefone, endereço ou situação empresarial"]],
-  ["Jardinagem", "Sandro Jardinagem - Sandro Aparecido de Oliveira", "Rua Ipê Amarelo, 525 - Vista Alegre", "", "sandroJardinagemBaixada", "servico", ["empresa baixada", "CNPJ 44.298.166/0001-01 baixado em 03/05/2022"]]
+  ["Jardinagem", "Sandro Jardinagem - Sandro Aparecido de Oliveira", "Rua Ipê Amarelo, 525 - Vista Alegre", "", "sandroJardinagemBaixada", "servico", ["empresa baixada", "CNPJ 44.298.166/0001-01 baixado em 03/05/2022"]],
+  ["Encanador e Pedreiro", "Clodoaldo Ezequias de Oliveira", "Rua Adorema Ana Rech, 627 - Primavera", "", "clodoaldoEzequiasHidraulica", "servico"],
+  ["Encanador e Pedreiro", "Gilberto Eurico da Motta", "Rua Benedita da Cruz Domingues, 170 - Centro", "", "gilbertoMottaHidraulica", "servico"],
+  ["Encanador e Pedreiro", "Emerson de Lima", "Sítio Boa Sorte, s/n - Matão", "", "emersonLimaHidraulica", "servico"],
+  ["Encanador e Pedreiro", "Francisco Carlos Linero Garcia", "Rua Sibipiruna, 397 - Vista Alegre", "", "franciscoLineroHidraulica", "servico", null, ["mesmo endereço, responsáveis e CNPJs distintos", "Fernando Roque"]],
+  ["Encanador e Pedreiro", "4 de Julho Prestação de Serviços - Claudio Batista de Oliveira", "Carlópolis - PR", "", "claudioBatistaHidraulica", "servico"],
+  ["Calhas e Rufos", "Araucalhas - Ronivaldo Batista", "Rua Benedito Salles, 1152 - Centro", "(43) 98815-1318", "araucalhasGuias", "servico", ["mesma identidade comercial e responsável", "Araucalhas e Ronivaldo Batista - Carlópolis já cadastrados"]],
+  ["Encanador e Pedreiro", "José Leme da Silva", "Carlópolis - PR", "", "joseLemeHidraulicaInapta", "servico", ["empresa inapta", "CNPJ 14.071.950/0001-11 inapto desde 15/08/2024"]],
+  ["Encanador", "Master House Manutenção e Reformas", "Atendimento anunciado em Carlópolis - PR", "", "masterHouseEncanador", "servico", ["estabelecimento local não confirmado", "página genérica de atendimento por cidade, sem endereço ou unidade em Carlópolis"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
