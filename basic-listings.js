@@ -379,6 +379,22 @@ window.FONTES_CADASTROS_BASICOS = {
   mariaLuciaConfeccao: {
     nome: "Adv Dinâmico / Receita Federal",
     url: "https://advdinamico.com.br/empresas/29444142000120"
+  },
+  laTurCadastur: {
+    nome: "SuperTur / Cadastur / Ministério do Turismo",
+    url: "https://supertur.com.br/empresa/aparecida-de-fatima-buchaka-soares-cia-ltda-carlopolis-pr"
+  },
+  paisFilhosTurismoCadastur: {
+    nome: "SuperTur / Cadastur / Ministério do Turismo",
+    url: "https://supertur.com.br/empresa/neudi-roberto-da-silva-ltda-carlopolis-pr"
+  },
+  operadoresTurismoCarlopolis: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/empresas/pr-carlopolis/agencias-de-viagens-operadores-turisticos-e-servicos-de-reservas-n-79"
+  },
+  turismoCarlopolisAntigos: {
+    nome: "AppLocal / BR Firmas",
+    url: "https://applocal.com.br/empresa/j-r-turismo/carlopolis/pr/10958631"
   }
 };
 
@@ -1032,7 +1048,15 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Costura", "Celinha Costuras - Celia Maria de Souza Silva", "Rua Yoneo Yoshitani, 256 - Bela Vista", "", "confeccoesCarlopolisReceita", "servico"],
   ["Confecção", "NH Confecções - Nilva Antunes da Silva Brito", "Rua Yassuta Ono, 312 - Jardim Americana", "", "confeccoesCarlopolisReceita", "servico", ["mesmo endereço e identidade comercial substituída por cadastro empresarial mais recente", "NH Jeans Confecções Ltda"]],
   ["Confecção", "Panacea Confecção - S. A. Ferraz", "Rua Padre Hugo, 475 - Centro", "(43) 99606-1356", "confeccoesCarlopolisReceita", "servico", ["nome, telefone e endereço", "Panacea (cliente completo)"]],
-  ["Confecção", "Yellow Jeans Confecção - Rima Jeans Confecções Ltda", "Rua Maria Pereira da Rocha Aleixo, 435 - Carlópolis", "(43) 3566-2151", "confeccoesCarlopolisReceita", "servico", ["nome, telefone e endereço", "Yellow Jeans Confecções (cadastro básico existente)"]]
+  ["Confecção", "Yellow Jeans Confecção - Rima Jeans Confecções Ltda", "Rua Maria Pereira da Rocha Aleixo, 435 - Carlópolis", "(43) 3566-2151", "confeccoesCarlopolisReceita", "servico", ["nome, telefone e endereço", "Yellow Jeans Confecções (cadastro básico existente)"]],
+  ["Transporte Turístico", "L A Tur - Aparecida de Fatima Buchaka Soares & Cia. Ltda", "Rua Alfeneiro, 372, Sala - Vista Alegre", "(43) 3566-2118", "laTurCadastur", "servico"],
+  ["Transporte Turístico", "Pais e Filhos Viagem e Turismo - Neudi Roberto da Silva Ltda", "Rua José Gonçalves Mendes, 61-A - Centro", "", "paisFilhosTurismoCadastur", "servico"],
+  ["Operador Turístico", "Rolê da Pesca - Romis Antonio de Oliveira", "Rua Capitão Estácio, 555 - Centro", "", "operadoresTurismoCarlopolis", "servico"],
+  ["Serviços de Turismo", "Ronaldo Molina Esteves", "Avenida Elson Soares, 706 - Centro", "", "operadoresTurismoCarlopolis", "servico"],
+  ["Turismo e Transporte", "J R Turismo", "Rua Benedito Salles, 627-B - Centro", "(43) 99151-7867", "turismoCarlopolisAntigos", "servico", ["cadastro público antigo sem situação empresarial atual confirmada", "última atualização pública localizada em 2022"]],
+  ["Agência de Viagens", "FAMA", "Rua Nicolau Miguel, 551 - Centro", "", "turismoCarlopolisAntigos", "servico", ["dados públicos insuficientes", "sem telefone, razão social ou situação empresarial atual confirmada"]],
+  ["Operador Turístico", "Luis Fernando Mendes", "Rua Casa, 484 - Carlópolis", "", "operadoresTurismoCarlopolis", "servico", ["endereço público inconsistente", "logradouro cadastrado apenas como Rua Casa"]],
+  ["Operador Turístico", "Galindo's Barber Shop - Anderson Galindo", "Rua Laurindo Franco de Godoy, 1103 - Centro", "", "operadoresTurismoCarlopolis", "servico", ["atividade pública conflitante", "identidade comercial indica barbearia, embora haja CNAE secundário de operador turístico"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
