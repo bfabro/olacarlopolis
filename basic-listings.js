@@ -575,6 +575,78 @@ window.FONTES_CADASTROS_BASICOS = {
   masterHouseEncanador: {
     nome: "Master House",
     url: "https://www.masterhousesolucoes.com.br/servico/encanador/pr/carlopolis/"
+  },
+  gessoCarlopolis: {
+    nome: "Solutudo",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/gesso?mais_buscadas=1"
+  },
+  gessoSantaCruzReceita: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/21990137000100"
+  },
+  baianoGessoReceita: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/consulta-empresa/46659138000106-lucenir-aparecida-de-almeida"
+  },
+  idealGessoReceita: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/25988165000144"
+  },
+  atenasGessoSite: {
+    nome: "Atenas Gesso",
+    url: "https://atenasgesso.webnode.page/contato/"
+  },
+  transtataaCarlopolis: {
+    nome: "CNPJ.ai / Receita Federal e ANTT",
+    url: "https://cnpj.ai/31255415000130"
+  },
+  luisDuarteTransportes: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/48962321000101"
+  },
+  beneditoCostaTransportes: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/33497064000107"
+  },
+  leticiaSoaresTransportes: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/51442384000133"
+  },
+  joseRicardoMudancas: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/62428071000147"
+  },
+  francoMudancasDiretorio: {
+    nome: "Solutudo",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/diversos/franco-transportes-mudancas-22171887"
+  },
+  transcarBaixada: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/47341098000104"
+  },
+  atelieDoceCostura: {
+    nome: "Solutudo / Diário Oficial dos Municípios",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/confeccoes-de-roupas/atelie-doce-costura-12689885"
+  },
+  victoriaJeansCostura: {
+    nome: "Lista Amarela / Receita Federal",
+    url: "https://listaamarela.com.br/pr-carlopolis/costureiras/victoria-jeans"
+  },
+  confeccoesAtivasCarlopolis: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/confeccao-de-pecas-de-vestuario-exceto-roupas-intimas-e-as-confeccionadas-sob-medida"
+  },
+  saraCostureiraDiretorio: {
+    nome: "Cybo",
+    url: "https://galego.cybo.com/BR/carl%C3%B3polis/tendas-de-roupa"
+  },
+  leonardoXavierInapto: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/48977471000180"
+  },
+  estrelaDaviFechada: {
+    nome: "Todos Negócios",
+    url: "https://br.todosnegocios.com/pt/confec%C3%A7%C3%B5es-estrela-de-davi"
   }
 };
 
@@ -1285,7 +1357,28 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Encanador e Pedreiro", "4 de Julho Prestação de Serviços - Claudio Batista de Oliveira", "Carlópolis - PR", "", "claudioBatistaHidraulica", "servico"],
   ["Calhas e Rufos", "Araucalhas - Ronivaldo Batista", "Rua Benedito Salles, 1152 - Centro", "(43) 98815-1318", "araucalhasGuias", "servico", ["mesma identidade comercial e responsável", "Araucalhas e Ronivaldo Batista - Carlópolis já cadastrados"]],
   ["Encanador e Pedreiro", "José Leme da Silva", "Carlópolis - PR", "", "joseLemeHidraulicaInapta", "servico", ["empresa inapta", "CNPJ 14.071.950/0001-11 inapto desde 15/08/2024"]],
-  ["Encanador", "Master House Manutenção e Reformas", "Atendimento anunciado em Carlópolis - PR", "", "masterHouseEncanador", "servico", ["estabelecimento local não confirmado", "página genérica de atendimento por cidade, sem endereço ou unidade em Carlópolis"]]
+  ["Encanador", "Master House Manutenção e Reformas", "Atendimento anunciado em Carlópolis - PR", "", "masterHouseEncanador", "servico", ["estabelecimento local não confirmado", "página genérica de atendimento por cidade, sem endereço ou unidade em Carlópolis"]],
+  ["Gesso e Drywall", "Gesso Santa Cruz - Valderly José Miranda", "Estrada dos Teixeiras, s/n - Jaboticabal", "", "gessoSantaCruzReceita", "servico"],
+  ["Gesso e Drywall", "Baiano Gesso - Lucenir Aparecida de Almeida", "Rua Quaresmeira Roxa, 211 - Vista Alegre", "(43) 99111-1124", "baianoGessoReceita", "servico"],
+  ["Gesso e Drywall", "Ideal Gesso Decorações - Rogério José de Queiroz", "Chácara Gonçalves, s/n - Santa Maria", "(43) 99954-3084", "idealGessoReceita", "servico"],
+  ["Gesso e Drywall", "Marcio Vieira de Queiroz", "Rua Joaquim do Carmo Oliveira Vilela, 56 - Centro", "(43) 99174-4408", "gessoCarlopolis", "servico"],
+  ["Gesso e Drywall", "Atenas Gesso", "Atendimento anunciado em Carlópolis e região", "(41) 99647-8386", "atenasGessoSite", "servico", ["estabelecimento local não confirmado", "site informa apenas atendimento na região e telefone DDD 41, sem endereço local"]],
+  ["Gesso e Drywall", "Master House Gesseiro e Drywall", "Atendimento anunciado em Carlópolis - PR", "", "masterHouseEncanador", "servico", ["estabelecimento local não confirmado", "página genérica por cidade, sem endereço ou unidade em Carlópolis"]],
+  ["Fretes e Mudanças", "Transtata Carlópolis - Juliano Sebastião Marques", "Rua Antônio Jonas Ferreira Pinto, 100 - Centro", "(43) 99883-0968", "transtataaCarlopolis", "servico"],
+  ["Fretes e Mudanças", "Luis Augusto Duarte", "Rua Fidêncio de Mello, 527 - Centro", "", "luisDuarteTransportes", "servico"],
+  ["Fretes e Mudanças", "Benedito Santos da Costa", "Rua Elidia Maria de Jesus, 22 - Vista Bella", "", "beneditoCostaTransportes", "servico"],
+  ["Fretes e Mudanças", "Leticia Fernanda Soares", "Rua Ipê Roxo, 396 - Vista Alegre", "", "leticiaSoaresTransportes", "servico"],
+  ["Fretes, Mudanças e Montagem de Móveis", "José Ricardo Coelho", "Carlópolis - PR", "", "joseRicardoMudancas", "servico"],
+  ["Fretes e Mudanças", "Franco Transportes Mudanças", "Alameda Quero-Quero, 137 - Centro", "(14) 3203-1136", "francoMudancasDiretorio", "servico", ["identidade local inconsistente", "telefone e identidade empresarial correspondem à Franco Mudanças de Bauru/Piratininga-SP"]],
+  ["Fretes e Mudanças", "Transcar - Minemura e Teixeira Ltda", "Carlópolis - PR", "", "transcarBaixada", "servico", ["empresa baixada", "CNPJ 47.341.098/0001-04 baixado em 02/03/2023"]],
+  ["Costura e Confecção", "Ateliê Doce Costura - Juliana Aparecida da Silva", "Rua Sebastião Leite da Silva, 23 - Jardim das Paineiras", "", "atelieDoceCostura", "servico"],
+  ["Costura e Confecção", "Victoria Jeans - Cleonice Moreira Silva", "Rua Francisco Avelino Paiva, 735 - Centro", "", "victoriaJeansCostura", "servico"],
+  ["Costura e Confecção", "Vera Lucia Faganelli", "Rua Ataliba Leonel, 196 - Centro", "", "confeccoesAtivasCarlopolis", "servico"],
+  ["Costura e Confecção", "Maria Marta do Nascimento Ramos", "Rua Nicolau Miguel, 151 - Centro", "", "confeccoesAtivasCarlopolis", "servico"],
+  ["Costura e Confecção", "Simone Aparecida da Silva", "Rua Salvira Marques, 198 - Centro", "", "confeccoesAtivasCarlopolis", "servico"],
+  ["Costura", "Sara Costureira", "Rua Nicolau Miguel, 393 - Centro", "(43) 99185-9942", "saraCostureiraDiretorio", "servico", ["identidade empresarial insuficientemente confirmada", "diretório não informa razão social ou CNPJ que vincule o nome ao endereço e telefone"]],
+  ["Costura e Confecção", "Leonardo Xavier Dias", "Carlópolis - PR", "", "leonardoXavierInapto", "servico", ["empresa inapta", "CNPJ 48.977.471/0001-80 inapto desde 15/08/2024"]],
+  ["Costura e Confecção", "Confecções Estrela de Davi", "Rua Delfino Mendes, 264 - Carlópolis", "(43) 3566-2524", "estrelaDaviFechada", "servico", ["estabelecimento marcado como fechado", "diretório informa encerramento e telefone apenas histórico"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
