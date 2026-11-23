@@ -1093,6 +1093,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,marceloRosaPromocao2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49158809000135-marcelo-antonio-rosa" }
   ,laisRibeiroPromocao2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49125831000189-lais-goncalves-silva-ribeiro" }
   ,lisianeOliveiraAgricola2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49126250000161-lisiane-da-silva-oliveira" }
+  ,edersonTelesManutencao2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49040771000100-ederson-teles-dos-reis" }
+  ,luizNorciaAudiovisual2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49045988000102-luiz-garbellotti-norcia" }
+  ,mmplEmpreendimentos2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/48935367000123-m-m-p-l-empreendimentos" }
+  ,edilsonOliveiraMercado2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/48871526000173-edilson-jose-de-oliveira" }
+  ,jcraTresMarias2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/48878866000126-jcra-3-marias-administracao-de-bens-ltda" }
+  ,casinhaEspacoTerapeutico2022: { nome: "CNES / Ministério da Saúde", url: "https://cnes2.datasus.gov.br/Mod_Conjunto.asp?VCo_Unidade=4104704248074" }
+  ,tabelionatoProtestos2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/49882726000194-tabelionato-de-titulos-e-protestos-de-carlopolis" }
+  ,davidMotaBeleza2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/48791773000160-david-mota-garcias" }
+  ,ezelitaGamaConfeccao2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/48779936000199-ezelita-rosa-gama" }
+  ,juceleneSantillDomestico2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/servicos-pessoais" }
+  ,koisasKasa2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/comercio-varejista" }
+  ,lojao2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/comercio-varejista" }
+  ,laryssaTrindadeVestuario2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,julianaPedrosoVestuario2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,glMachadoVestuario2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,glamourVestuario2022: { nome: "Consultas Plus / dados públicos da Receita Federal", url: "https://consultas.plus/lista-de-empresas/parana/carlopolis/" }
+  ,saraAlvesVestuario2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,antonioMarcosVestuario2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,gabrieliBezerraVestuario2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,daianeCarvalhoVestuario2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,vanessaRamosVestuario2020: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,simonePaivaVestuario2020: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,maykonNovacoskiVestuario2020: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,rogerioAlmeidaVestuario2020: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/lojas-de-roupas" }
+  ,olimperCalhas2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/empresas/pr/carlopolis/reformas-e-acabamentos?pagina=2" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2176,6 +2201,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Promoção de Vendas", "Marcelo Antonio Rosa", "Centro - Carlópolis", "", "marceloRosaPromocao2023", "servico"]
   ,["Promoção de Vendas", "Lais Gonçalves Silva Ribeiro", "Centro - Carlópolis", "", "laisRibeiroPromocao2023", "servico"]
   ,["Serviços Agrícolas", "Lisiane da Silva Oliveira", "Vista Bella - Carlópolis", "", "lisianeOliveiraAgricola2023", "servico"]
+  ,["Manutenção Industrial", "Ederson Teles dos Reis", "Vista Bella - Carlópolis", "", "edersonTelesManutencao2023", "servico"]
+  ,["Produção Audiovisual", "Luiz Garbellotti Norcia", "Jardim Itália - Carlópolis", "", "luizNorciaAudiovisual2023", "servico"]
+  ,["Empreendimentos Imobiliários", "M.M.P.L Empreendimentos", "Ilha Bela - Carlópolis", "", "mmplEmpreendimentos2022", "servico"]
+  ,["Mercados e Mercearias", "Edilson Jose de Oliveira", "Novo Horizonte - Carlópolis", "", "edilsonOliveiraMercado2022"]
+  ,["Administração de Bens", "JCRA 3 Marias Administração de Bens Ltda", "Ilha Bela - Carlópolis", "", "jcraTresMarias2022", "servico"]
+  ,["Terapia Ocupacional", "A Casinha: Espaço Terapêutico - A Arte de Reabilitar", "Rua Antônio Jonas Ferreira Pinto, 657 - Centro", "", "casinhaEspacoTerapeutico2022", "servico", null, ["endereco_compartilhado", "F. F. Silva Pontes Clínica de Psicologia"]]
+  ,["Cartório", "Tabelionato de Títulos e Protestos de Carlópolis", "Centro - Carlópolis", "", "tabelionatoProtestos2022", "servico"]
+  ,["Cabeleireiro e Beleza", "David Mota Garcias", "Centro - Carlópolis", "", "davidMotaBeleza2022", "servico"]
+  ,["Confecção", "Ezelita Rosa Gama", "Área Rural - Carlópolis", "", "ezelitaGamaConfeccao2022", "servico"]
+  ,["Serviços Domésticos", "Jucelene de Agostinho Santil", "Vista Alegre - Carlópolis", "", "juceleneSantillDomestico2022", "servico"]
+  ,["Utilidades Domésticas", "Koisas da Kasa - Carlópolis", "Centro - Carlópolis", "", "koisasKasa2022"]
+  ,["Utilidades Domésticas", "Lojão", "Centro - Carlópolis", "", "lojao2022"]
+  ,["Vestuário e Acessórios", "Laryssa Schio Trindade", "Jardim Itália II - Carlópolis", "", "laryssaTrindadeVestuario2022"]
+  ,["Vestuário e Acessórios", "Juliana Cristina Pedroso Dias", "Centro - Carlópolis", "", "julianaPedrosoVestuario2022"]
+  ,["Vestuário e Acessórios", "G L Machado Ltda", "Centro - Carlópolis", "", "glMachadoVestuario2022"]
+  ,["Vestuário e Acessórios", "Glamour", "Rua Benedito Salles, 693 - Centro", "", "glamourVestuario2022", "comercio", null, ["endereco_compartilhado", "Meire Leticia Martins Siqueira / Óticas Prizma Ltda"]]
+  ,["Vestuário e Acessórios", "Sara Morgana Pires de Lima Alves", "Jacinto - Carlópolis", "", "saraAlvesVestuario2022"]
+  ,["Vestuário e Acessórios", "Antonio Marcos dos Santos", "Vista Bella - Carlópolis", "", "antonioMarcosVestuario2021"]
+  ,["Vestuário e Acessórios", "Gabrieli Alves Ferreira Dugnani Bezerra", "Centro - Carlópolis", "", "gabrieliBezerraVestuario2021"]
+  ,["Vestuário e Acessórios", "Daiane Nazira Domingues Carvalho", "Centro - Carlópolis", "", "daianeCarvalhoVestuario2021"]
+  ,["Vestuário e Acessórios", "Vanessa Maria Ramos", "Vista Alegre - Carlópolis", "", "vanessaRamosVestuario2020"]
+  ,["Vestuário e Acessórios", "Simone Paiva", "Vista Alegre - Carlópolis", "", "simonePaivaVestuario2020"]
+  ,["Vestuário e Acessórios", "Maykon Jose Goncalves Novacoski", "Centro - Carlópolis", "", "maykonNovacoskiVestuario2020"]
+  ,["Vestuário e Acessórios", "Rogerio da Silva Almeida", "Centro - Carlópolis", "", "rogerioAlmeidaVestuario2020"]
+  ,["Calhas e Impermeabilização", "Olimper Calhas", "Centro - Carlópolis", "", "olimperCalhas2021", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
