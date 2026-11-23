@@ -1043,6 +1043,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,agropecuariaSantaLuzia2025: { nome: "CNPJ.ai / dados públicos da Receita Federal", url: "https://cnpj.ai/63084914000106" }
   ,joaoFernandesVideo2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63054404000188-joao-vitor-fernandes-silva" }
   ,mrAgroFrutas2025: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/63031844000110-mr-agro-comercio-de-frutas-ltda" }
+  ,bassoConstrutora2024: { nome: "Econodata / dados públicos da Receita Federal", url: "https://www.econodata.com.br/consulta-empresa/58515827000118-basso-construtora-e-incorporadora-ltda" }
+  ,rogerioSousaAdministrativo2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58506097000199-rogerio-de-sousa-silva" }
+  ,manassesBuenoVestuario2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58494879000155-manasses-de-oliveira-bueno" }
+  ,danielLuizVestuario2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58457426000159-daniel-jose-luiz" }
+  ,claudioSoaresConcreto2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58438434000158-claudio-matias-soares" }
+  ,jairRamosMalote2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58425250000153-jair-leno-ribeiro-ramos" }
+  ,renanSantosAlvenaria2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58412132000100-renan-da-costa-santos" }
+  ,sebastianaCoelhoDomesticos2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58356393000150-sebastiana-aparecida-coelho" }
+  ,josileneNogueiraAgricola2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58360863000150-josilene-de-fatima-nogueira" }
+  ,anaMedeirosVestuario2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58351141000139-ana-carolina-lemes-medeiros" }
+  ,joseBatistaAgricola2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58326502000197-jose-carlos-batista-da-silva" }
+  ,thiagoLimaBebidas2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58327292000151-thiago-araujo-de-lima" }
+  ,lucasMartinowskiLocacao2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58267432000143-lucas-gabriel-martinowski-pereira" }
+  ,genivaldoCunhaPadaria2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58265845000199-genivaldo-antonio-da-cunha" }
+  ,darleneCostaBar2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58177834000157-darlene-oliveira-da-costa" }
+  ,tatianeSantosArmarinho2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58163928000177-tatiane-domingues-dos-santos" }
+  ,zeSilvaSupermercado2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58121516000174-ze-da-silva-supermercado-ltda" }
+  ,claudineiaFrateConfeccao2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58112421000194-claudineia-frate" }
+  ,deltaParkMoveis2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58091340000155-delta-park-ltda" }
+  ,gislaineFerrariHortifruti2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58086832000152-gislaine-koga-ferrari" }
+  ,fsrConsultoria2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58070647000170-fsr-consultoria-sm" }
+  ,joaoLemesAlvenaria2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/58010387000147-joao-batista-lemes" }
+  ,neusaSuguimotoPadaria2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/57937987000192-neusa-hiromi-suguimoto" }
+  ,juanAbilioAdvocacia2024: { nome: "CNPJ.biz / dados públicos da Receita Federal", url: "https://cnpj.biz/57979625000164" }
+  ,llrRecrutamentoTransportes2024: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/consulta-empresa/57955919000156-l-l-r-recrutamento-e-transportes" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2076,6 +2101,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Agropecuária e Cafeicultura", "Agropecuária Santa Luzia Ltda", "Sítio São Bento, s/n - Bairro dos Teodoros", "(14) 3762-1800", "agropecuariaSantaLuzia2025"]
   ,["Produção e Edição de Vídeos", "João Vitor Fernandes Silva", "Centro - Carlópolis", "", "joaoFernandesVideo2025", "servico"]
   ,["Comércio de Frutas e Hortaliças", "MR Agro Comércio de Frutas Ltda", "Área Rural - Carlópolis", "", "mrAgroFrutas2025"]
+  ,["Construtora e Incorporadora", "Basso Construtora e Incorporadora Ltda", "Rua Ana Rodrigues Amaral, 175 - Amaral", "", "bassoConstrutora2024", "servico"]
+  ,["Apoio Administrativo", "Rogerio de Sousa Silva", "Vista Alegre - Carlópolis", "", "rogerioSousaAdministrativo2024", "servico"]
+  ,["Vestuário e Acessórios", "Manasses de Oliveira Bueno", "Centro - Carlópolis", "", "manassesBuenoVestuario2024"]
+  ,["Vestuário e Acessórios", "Daniel Jose Luiz", "Murador - Carlópolis", "", "danielLuizVestuario2024"]
+  ,["Artefatos de Concreto e Cimento", "Claudio Matias Soares", "Residencial Murador - Carlópolis", "", "claudioSoaresConcreto2024"]
+  ,["Serviço de Malote", "Jair Leno Ribeiro Ramos", "Novo Horizonte II - Carlópolis", "", "jairRamosMalote2024", "servico"]
+  ,["Pedreiro e Alvenaria", "Renan da Costa Santos", "Centro - Carlópolis", "", "renanSantosAlvenaria2024", "servico"]
+  ,["Serviços Domésticos", "Sebastiana Aparecida Coelho", "Jardim Bela Vista - Carlópolis", "", "sebastianaCoelhoDomesticos2024", "servico"]
+  ,["Serviços Agrícolas", "Josilene de Fatima Nogueira", "Vista Alegre - Carlópolis", "", "josileneNogueiraAgricola2024", "servico"]
+  ,["Vestuário e Acessórios", "Ana Carolina Lemes Medeiros", "Vista Alegre - Carlópolis", "", "anaMedeirosVestuario2024"]
+  ,["Serviços Agrícolas", "Jose Carlos Batista da Silva", "Residencial Vista Bella - Carlópolis", "", "joseBatistaAgricola2024", "servico"]
+  ,["Bebidas", "Thiago Araujo de Lima", "Novo Horizonte - Carlópolis", "", "thiagoLimaBebidas2024"]
+  ,["Locação de Máquinas e Equipamentos", "Lucas Gabriel Martinowski Pereira", "Garden Club Residence - Carlópolis", "", "lucasMartinowskiLocacao2024", "servico"]
+  ,["Padaria e Confeitaria", "Genivaldo Antonio da Cunha", "Centro - Carlópolis", "", "genivaldoCunhaPadaria2024"]
+  ,["Bar com Entretenimento", "Darlene Oliveira da Costa", "Centro - Carlópolis", "", "darleneCostaBar2024"]
+  ,["Armarinho e Aviamentos", "Tatiane Domingues dos Santos", "Centro - Carlópolis", "", "tatianeSantosArmarinho2024"]
+  ,["Mercado e Mercearia", "Zé da Silva Supermercado Ltda", "Vista Alegre - Carlópolis", "", "zeSilvaSupermercado2024"]
+  ,["Confecção", "Claudineia Frate", "Centro - Carlópolis", "", "claudineiaFrateConfeccao2024", "servico"]
+  ,["Móveis e Marcenaria", "Delta Park Ltda", "Centro - Carlópolis", "", "deltaParkMoveis2024"]
+  ,["Hortifrúti", "Gislaine Koga Ferrari", "Ribeirão Bonito - Carlópolis", "", "gislaineFerrariHortifruti2024"]
+  ,["Apoio Administrativo", "FSR Consultoria SM", "Centro - Carlópolis", "", "fsrConsultoria2024", "servico"]
+  ,["Pedreiro e Alvenaria", "João Batista Lemes", "Centro - Carlópolis", "", "joaoLemesAlvenaria2024", "servico"]
+  ,["Padaria e Confeitaria", "Neusa Hiromi Suguimoto", "Jardim Itália II - Carlópolis", "", "neusaSuguimotoPadaria2024"]
+  ,["Advocacia", "Juan Abilio Sociedade Individual de Advocacia", "Rua Salvira Marques, 315 - Centro", "(43) 3546-2964", "juanAbilioAdvocacia2024", "servico"]
+  ,["Recrutamento, Apoio e Transportes", "L L R Recrutamento e Transportes", "Centro - Carlópolis", "", "llrRecrutamentoTransportes2024", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
