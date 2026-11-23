@@ -1168,6 +1168,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,rafaelRastelliTelefonia2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/43841762000123-rafael-goncalves-rastelli" }
   ,marilzaPaulaDomestico2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/43777179000109-marilza-aparecida-tavares-de-paula" }
   ,marcosVazAgricola2021: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/43679718000169-marcos-mendes-vaz" }
+  ,pauloLeiteAlvenaria2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46851919000190-paulo-teixeira-leite" }
+  ,claudiaWatanabePet2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46821888000124-claudia-mitsuko-watanabe" }
+  ,biomaConsultoriaAgricola2022: { nome: "CNPJ.biz / dados públicos da Receita Federal", url: "https://cnpj.biz/46729772000160" }
+  ,marceloCamargoAlvenaria2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46690290000143-marcelo-adriano-camargo" }
+  ,claudineiAmaralRefrigeracao2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46675797000128-claudinei-do-amaral" }
+  ,jandiraOliveiraAgricola2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46677906000146-jandira-da-luz-oliveira" }
+  ,raimilsonMoraesBeleza2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46641251000156-raimilson-henrique-de-moraes" }
+  ,mayconAlmeidaBar2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46609527000119-maycon-rafael-de-almeida" }
+  ,rsVianaAgronomia2022: { nome: "MaisCNPJ / dados públicos da Receita Federal", url: "https://maiscnpj.com.br/empresas/pr/carlopolis/treinamento-em-desenvolvimento-profissional-e-gerencial" }
+  ,micheleTsubotaEstetica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46534540000156-michele-amaral-imoto-tsubota" }
+  ,felipeBertoliEletrica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46489598000125-felipe-cesar-ruiz-bertoli" }
+  ,veraPerezCobranca2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46478328000119-vera-lucia-perez" }
+  ,jovaneOliveiraBar2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46479195000103-jovane-de-oliveira" }
+  ,vilaCafeEmpreendimento2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46453747000104-condominio-residencial-em-lotes-vila-do-cafe-spe-ltda" }
+  ,wagnerTeodoroHortifruti2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46412552000108-wagner-gabriel-teodoro" }
+  ,tiemiIshiaiCalcados2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46312255000190-tiemi-tina-iza-ishiai" }
+  ,bfImagemRadiologia2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46250124000126-b-f-imagem-prestacao-de-servicos-radiologicos" }
+  ,oleandroCamargoMercado2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46253953000162-oleandro-rodrigues-de-camargo" }
+  ,fernandaDomicianoArte2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46220203000194-fernanda-brisola-murador-domiciano" }
+  ,vaniaCamargoPoda2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46200808000113-vania-vieira-de-camargo" }
+  ,jcFrutasLegumes2022: { nome: "Distribuidoras de Alimentos / dados públicos da Receita Federal", url: "https://distribuidorasdealimentos.com.br/pr/carlopolis/jc-frutas-legumes" }
+  ,elisianiJorgeMercado2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46094263000108-elisiani-batista-correa-jorge" }
+  ,edkelleyPereiraEstetica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46072430000110-edkelley-azevedo-pereira" }
+  ,lorenaMendesSaude2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/45965816000198-lorena-m-de-souza-b-mendes" }
+  ,clemilsonGoncalvesMoveis2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/45883799000140-clemilson-vicente-goncalves" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2326,6 +2351,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Telefonia e Comunicação", "Rafael Goncalves Rastelli", "Centro - Carlópolis", "", "rafaelRastelliTelefonia2021"]
   ,["Serviços Domésticos", "Marilza Aparecida Tavares de Paula", "Espírito Santo - Carlópolis", "", "marilzaPaulaDomestico2021", "servico"]
   ,["Serviços Agrícolas", "Marcos Mendes Vaz", "Vista Alegre - Carlópolis", "", "marcosVazAgricola2021", "servico"]
+  ,["Pedreiro e Alvenaria", "Paulo Teixeira Leite", "Jardim Vista Alegre - Carlópolis", "", "pauloLeiteAlvenaria2022", "servico"]
+  ,["Pet Shop", "Claudia Mitsuko Watanabe", "Centro - Carlópolis", "", "claudiaWatanabePet2022"]
+  ,["Consultoria Agrícola", "Bioma Consultoria Agrícola Ltda", "Rua Kalil Keder, 2340, sala B - Centro", "", "biomaConsultoriaAgricola2022", "servico"]
+  ,["Pedreiro e Alvenaria", "Marcelo Adriano Camargo", "Vista Alegre - Carlópolis", "", "marceloCamargoAlvenaria2022", "servico"]
+  ,["Refrigeração e Ar-Condicionado", "Claudinei do Amaral", "Pinheirinho - Carlópolis", "", "claudineiAmaralRefrigeracao2022", "servico"]
+  ,["Serviços Agrícolas", "Jandira da Luz Oliveira", "Parque Industrial Isaac F. Machado - Carlópolis", "", "jandiraOliveiraAgricola2022", "servico"]
+  ,["Cabeleireiro e Beleza", "Raimilson Henrique de Moraes", "CTG - Carlópolis", "", "raimilsonMoraesBeleza2022", "servico"]
+  ,["Bar", "Maycon Rafael de Almeida", "Centro - Carlópolis", "", "mayconAlmeidaBar2022"]
+  ,["Agronomia e Treinamentos", "R S Viana Agronomia", "Rua Capitão Estácio, 114 - Vista Bella", "", "rsVianaAgronomia2022", "servico"]
+  ,["Estética e Cuidados com a Beleza", "Michele Amaral Imoto Tsubota", "Novo Horizonte II - Carlópolis", "", "micheleTsubotaEstetica2022", "servico"]
+  ,["Eletricista", "Felipe Cesar Ruiz Bertoli", "Vista Bella - Carlópolis", "", "felipeBertoliEletrica2022", "servico"]
+  ,["Cobrança e Cadastro", "Vera Lucia Perez", "Centro - Carlópolis", "", "veraPerezCobranca2022", "servico"]
+  ,["Bar", "Jovane de Oliveira", "Vista Alegre - Carlópolis", "", "jovaneOliveiraBar2022"]
+  ,["Empreendimentos Imobiliários", "Condomínio Residencial em Lotes Vila do Café SPE Ltda", "Centro - Carlópolis", "", "vilaCafeEmpreendimento2022", "servico"]
+  ,["Hortifrúti", "Wagner Gabriel Teodoro", "Vista Bella - Carlópolis", "", "wagnerTeodoroHortifruti2022"]
+  ,["Calçados", "Tiemi Tina Iza Ishiai", "Centro - Carlópolis", "", "tiemiIshiaiCalcados2022"]
+  ,["Radiologia e Diagnóstico por Imagem", "B.F. Imagem Prestação de Serviços Radiológicos", "Novo Horizonte - Carlópolis", "", "bfImagemRadiologia2022", "servico"]
+  ,["Mercados e Mercearias", "Oleandro Rodrigues de Camargo", "Centro - Carlópolis", "", "oleandroCamargoMercado2022"]
+  ,["Ensino de Arte e Cultura", "Fernanda Brisola Murador Domiciano", "CTG - Industrial - Carlópolis", "", "fernandaDomicianoArte2022", "servico"]
+  ,["Poda e Serviços Agrícolas", "Vania Vieira de Camargo", "Jaboticabal - Carlópolis", "", "vaniaCamargoPoda2022", "servico"]
+  ,["Atacado de Hortifrúti", "JC Frutas & Legumes", "Estrada Barreira, Sítio Monte Líbano, 31345 - Espírito Santo", "(14) 9601-7800", "jcFrutasLegumes2022"]
+  ,["Mercados e Mercearias", "Elisiani Batista Correa Jorge", "Centro - Carlópolis", "", "elisianiJorgeMercado2022"]
+  ,["Estética e Cuidados com a Beleza", "Edkelley Azevedo Pereira", "Centro - Carlópolis", "", "edkelleyPereiraEstetica2022", "servico"]
+  ,["Gestão de Saúde", "Lorena M de Souza B Mendes", "Jardim Primavera II - Carlópolis", "", "lorenaMendesSaude2022", "servico"]
+  ,["Montagem de Móveis", "Clemilson Vicente Gonçalves", "Vila Teolândia - Carlópolis", "", "clemilsonGoncalvesMoveis2022", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
