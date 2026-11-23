@@ -707,6 +707,70 @@ window.FONTES_CADASTROS_BASICOS = {
   decioSomDiretorios: {
     nome: "ListaTudo",
     url: "https://www.listatudo.com.br/parana/norte-pioneiro-paranaense/carlopolis/festas-e-eventos/organizacao-e-promocao-de-eventos/equipamentos-de-som-e-iluminacao/decio-som/"
+  },
+  rafaelCamargoNautica2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/70118549000160"
+  },
+  joaoMarcondesTransporte2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/70067019000130"
+  },
+  thiagoCaetanoFretamento2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/70060677000109"
+  },
+  mariaClaraLanchonete2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/70057800000124"
+  },
+  igorCoelhoAgricola2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/70031053000155"
+  },
+  maikonMateriaisHidraulicos2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/70015117000124"
+  },
+  pedroFeletteFunilaria2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/70004785000156"
+  },
+  kaykyMalote2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/69971186000122"
+  },
+  daianeDominguesLanchonete2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/69934807000106"
+  },
+  acougueBomJesus2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/69875004000110"
+  },
+  jmfAgropecuaria2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/69870761000109"
+  },
+  megaPecas2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/69864426000190"
+  },
+  laveyCarlopolis2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/69723783000138"
+  },
+  marcioMaloteBaixado2026: {
+    nome: "BrasilAPI / Receita Federal",
+    url: "https://brasilapi.com.br/api/cnpj/v1/69991582000111"
+  },
+  colorJeansInapta: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/05460674000192"
+  },
+  consertaEletroSemUnidade: {
+    nome: "Conserta Eletro",
+    url: "https://www.consertasmart.com/conserto-de-eletrodomestico/carl%C3%B3polis"
   }
 };
 
@@ -1453,7 +1517,24 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Marcenaria", "Almeida e Ferreira Marcenaria Ltda", "Rua Antônio Jonas Ferreira Pinto, 398 - Centro", "", "marcenariaAlmeidaDuplicada", "servico", ["nome e identidade empresarial", "Marcenaria Almeida's já cadastrada"]],
   ["Montagem de Móveis", "Montador Express", "Atendimento anunciado em Carlópolis - PR", "", "montadorExpressSemUnidade", "servico", ["estabelecimento local não confirmado", "página genérica por cidade, sem endereço ou unidade em Carlópolis"]],
   ["Som e Iluminação", "Thalles Akio Yamamoto Sacamoto", "Carlópolis - PR", "", "thallesSomBaixado", "servico", ["empresa baixada", "CNPJ 65.634.682/0001-30 baixado em 23/08/2026"]],
-  ["Som e Iluminação", "Decio Som", "Rua Chuva de Ouro, 469 - Vista Alegre", "", "decioSomDiretorios", "servico", ["telefone e identidade pública conflitantes", "diretórios informam telefones diferentes e não foi localizado CNPJ que confirme a identidade atual"]]
+  ["Som e Iluminação", "Decio Som", "Rua Chuva de Ouro, 469 - Vista Alegre", "", "decioSomDiretorios", "servico", ["telefone e identidade pública conflitantes", "diretórios informam telefones diferentes e não foi localizado CNPJ que confirme a identidade atual"]],
+  ["Manutenção Náutica", "Rafael Soares de Camargo", "Área Rural - Carlópolis", "", "rafaelCamargoNautica2026", "servico"],
+  ["Transporte com Motorista", "João Marcondes Maia Filho", "Centro - Carlópolis", "", "joaoMarcondesTransporte2026", "servico"],
+  ["Transporte por Fretamento", "Thiago Fabricio Rocha Caetano", "Primavera - Carlópolis", "", "thiagoCaetanoFretamento2026", "servico"],
+  ["Serviços Agrícolas", "Igor Alexandre Coelho", "Vista Alegre - Carlópolis", "", "igorCoelhoAgricola2026", "servico"],
+  ["Funilaria e Pintura", "Pedro Henrique Leão Felette", "Centro - Carlópolis", "", "pedroFeletteFunilaria2026", "servico"],
+  ["Serviço de Malote", "Kayky Alexandre de Souza", "Tomodati - Carlópolis", "", "kaykyMalote2026", "servico"],
+  ["Lanchonete", "Maria Clara Marques Belizario Santos", "Centro - Carlópolis", "", "mariaClaraLanchonete2026"],
+  ["Lanchonete", "Daiane Domingues", "Centro - Carlópolis", "", "daianeDominguesLanchonete2026"],
+  ["Açougue e Mercearia", "Açougue e Mercearia Bom Jesus - Carlos Eduardo Silveira de Camargo Ltda", "Rua Espatódia, 295, Loja 01 - Vista Alegre", "", "acougueBomJesus2026"],
+  ["Materiais Hidráulicos", "Maikon Sales Ribeiro", "Centro - Carlópolis", "", "maikonMateriaisHidraulicos2026"],
+  ["Comércio de Cereais", "JMF Agropecuária Ltda", "Rua André Jorge Clele, 429 - Centro", "", "jmfAgropecuaria2026"],
+  ["Autopeças", "Mega Peças Automotivas Ltda", "Rua Laurindo Franco de Godoy, 721 - Centro", "", "megaPecas2026"],
+  ["Lavanderia", "Lavey Carlópolis - Lavanderia GV de Carlópolis Ltda", "Rua Laurindo Franco de Godoy, 787, Sala 16 - Centro", "", "laveyCarlopolis2026", "servico"],
+  ["Serviço de Malote", "Marcio Martins Brisida de Lima", "Vista Bella - Carlópolis", "", "marcioMaloteBaixado2026", "servico", ["empresa baixada", "CNPJ 69.991.582/0001-11 baixado"]],
+  ["Lavanderia Industrial", "Color Jeans Lavanderia Ltda", "Carlópolis - PR", "", "colorJeansInapta", "servico", ["empresa inapta", "CNPJ 05.460.674/0001-92 inapto desde 27/11/2018"]],
+  ["Assistência Técnica de Eletrodomésticos", "Conserta Eletro", "Atendimento anunciado em Carlópolis - PR", "", "consertaEletroSemUnidade", "servico", ["estabelecimento local não confirmado", "página informa somente unidades em Londrina e Curitiba"]],
+  ["Reparação de Eletroeletrônicos", "Willian de Lima Ferreira", "Rua Grevília Ana, 138 - Vista Alegre", "(11) 99162-6265", "willianFerreiraMontador", "servico", ["nome, telefone e endereço", "Willian de Lima Ferreira já cadastrado em montagem e manutenção de móveis"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
