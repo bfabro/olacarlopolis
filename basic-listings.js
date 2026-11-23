@@ -855,6 +855,23 @@ window.FONTES_CADASTROS_BASICOS = {
   ,choperiaCarlopolis2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68514805000197" }
   ,joaoMatosAlimentos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68449114000157" }
   ,simoneMarianoStore2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68339887000180" }
+  ,marliSantosDomesticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66755546000160" }
+  ,amaacCarlopolis2026: { nome: "Econodata / dados cadastrais públicos", url: "https://www.econodata.com.br/consulta-empresa/68630229000143-amaac-associacao-de-maes-e-amigos-dos-autistas-de-carlopolis-pr" }
+  ,raphaelGoncalvesPaisagismo2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66712588000114" }
+  ,dmRepresentacao2026: { nome: "Casa dos Dados / Receita Federal", url: "https://casadosdados.com.br/solucao/cnpj/dm-representacao-comercial-ltda-66739571000150" }
+  ,ericaQuintilianoRoupas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66658771000189" }
+  ,feiraoEstofadosCarlopolis2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/56060695000666" }
+  ,marianoFreitasRoupas2026: { nome: "Solutudo / dados públicos da Receita Federal", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/roupas-e-acessorios/comercial-mariano-freitas-ltda-29030445" }
+  ,andreiaAugustoBar2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66587070000104" }
+  ,lucianaOliveiraDomesticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66521604000191" }
+  ,casaExtintorEngenharia2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66500555000100" }
+  ,joseOliveiraAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66458440000103" }
+  ,nmSolucoesEletrica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66516988000154" }
+  ,andreMoreiraUtilidades2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66329161000131" }
+  ,elitecompCompensados2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66318034000137" }
+  ,evertonNunesPromocao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66297345000167" }
+  ,julianaDiasFarmaceuticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66214023000107" }
+  ,carlosOliveiraAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66191405000162" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1700,6 +1717,23 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Bebidas e Choperia", "Choperia Carlópolis Ltda", "Rua Benedito Salles, 1409 - Centro", "", "choperiaCarlopolis2026"]
   ,["Alimentos Preparados", "João Nilson Ferreira Matos", "Vista Bella - Carlópolis", "", "joaoMatosAlimentos2026"]
   ,["Roupas, Calçados e Acessórios", "Simone Mariano Store Ltda", "Rua Marcos Rodrigues do Amaral, 192 - Centro", "", "simoneMarianoStore2026"]
+  ,["Serviços Domésticos", "Marli Aparecida dos Santos", "Primavera - Carlópolis", "", "marliSantosDomesticos2026", "servico"]
+  ,["Associação e Apoio Social", "AMAAC - Associação de Mães e Amigos dos Autistas de Carlópolis", "Rua Yassuta Ono, 232 - Tomodati", "(43) 99665-7638", "amaacCarlopolis2026", "servico"]
+  ,["Paisagismo", "Raphael Henrique Gonçalves", "Área Rural - Carlópolis", "", "raphaelGoncalvesPaisagismo2026", "servico"]
+  ,["Representação Comercial e Promoção de Vendas", "DM Representação Comercial Ltda", "Rua José Gonçalves Mendes, 102 - Centro", "(41) 99786-3477", "dmRepresentacao2026", "servico"]
+  ,["Roupas e Acessórios", "Erica Micaelen Felicio Ferreira Quintiliano", "Novo Horizonte - Carlópolis", "", "ericaQuintilianoRoupas2026"]
+  ,["Móveis e Estofados", "Feirão dos Estofados Carlópolis Ltda", "Rua Benedito Salles, 962 - Centro", "", "feiraoEstofadosCarlopolis2026"]
+  ,["Roupas e Acessórios", "Mariano & Freitas Ltda", "Rua Marcos Rodrigues do Amaral, 224, Salas 01 e 02 - Centro", "(43) 99196-0843", "marianoFreitasRoupas2026", "comercio", null, ["mesmo número, atividades e contatos distintos", "Lincoln Campos de Almeida"]]
+  ,["Bar", "Andreia Assunção Augusto", "Vista Alegre - Carlópolis", "", "andreiaAugustoBar2026"]
+  ,["Serviços Domésticos", "Luciana Marcolino de Oliveira", "Área Rural - Carlópolis", "", "lucianaOliveiraDomesticos2026", "servico"]
+  ,["Extintores e Segurança contra Incêndio", "Casa do Extintor Engenharia Ltda", "Rua Padre Hugo, 853, Térreo - Centro", "", "casaExtintorEngenharia2026", "servico"]
+  ,["Pedreiro e Alvenaria", "José Aparecido de Jesus de Oliveira", "Caminho do Vale - Carlópolis", "", "joseOliveiraAlvenaria2026", "servico"]
+  ,["Eletricista", "NM Soluções - Nivaldo Gomes de Sousa", "Ribeirão Bonito - Carlópolis", "", "nmSolucoesEletrica2026", "servico"]
+  ,["Utilidades Domésticas", "André Moreira dos Santos", "Área Rural - Carlópolis", "", "andreMoreiraUtilidades2026"]
+  ,["Madeiras e Compensados", "Elitecomp Compensados Ltda", "Rodovia PR-218, km 4, Barracão 1 - Área Rural", "", "elitecompCompensados2026"]
+  ,["Promoção de Vendas", "Everton D. Nunes Coelho Ltda", "Rua Elidia Maria de Jesus, 114 - Vista Bella", "", "evertonNunesPromocao2026", "servico"]
+  ,["Serviços Farmacêuticos", "Juliana Andrea Dias - Serviços Farmacêuticos Ltda", "Rua Benedito Salles, 185 - Centro", "", "julianaDiasFarmaceuticos2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Carlos Eduardo de Oliveira", "Área Rural - Carlópolis", "", "carlosOliveiraAlvenaria2026", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
