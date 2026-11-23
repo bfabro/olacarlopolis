@@ -487,6 +487,26 @@ window.FONTES_CADASTROS_BASICOS = {
   daminFunilariaReceita: {
     nome: "Casa dos Dados / Receita Federal",
     url: "https://casadosdados.com.br/solucao/cnpj/jldamin-carlopolis-05939346000173"
+  },
+  bicicletariasAtivasCarlopolis: {
+    nome: "MaisCNPJ / Receita Federal",
+    url: "https://maiscnpj.com.br/empresas/pr/carlopolis/comercio-varejista-de-bicicletas-e-triciclos-pecas-e-acessorios"
+  },
+  bicicletariaSidnei: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/consulta-empresa/17410020000133-sidnei-edson-batista"
+  },
+  hmBicicletas: {
+    nome: "CNPJ Brasil / Receita Federal",
+    url: "https://cnpjbrasil.inf.br/07648494000164"
+  },
+  fernandoRoqueBicicletas: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/60-216-766-fernando-roque-60216766000130"
+  },
+  bicicletariasAntigasCarlopolis: {
+    nome: "Solutudo",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/bicicletarias"
   }
 };
 
@@ -1172,7 +1192,15 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Funilaria e Pintura", "Magdiel Sousa Leite", "Sítio São Benedito, s/n - Água Seca", "", "magdielSousaFunilaria", "servico"],
   ["Funilaria e Pintura", "Garcia Funilaria e Pintura - Marcos Garcia", "Rua Munguba, 599 - Vista Alegre", "", "garciaFunilariaCarlopolis", "servico"],
   ["Funilaria e Pintura", "Auto Estética Almeida - Thauan de Almeida Pereira", "Rua Silvio José Banik, 710 - Centro", "", "autoEsteticaAlmeidaCarlopolis", "servico"],
-  ["Funilaria e Pintura", "Oficina e Funilaria Damin - J. L. Damin Carlópolis", "Rua das Indústrias, 260 - Loteamento Vicente de Oliveira", "(43) 3566-1725", "daminFunilariaReceita", "servico", ["nome, telefone e endereço", "Oficina e Funilaria Damin (cadastros básicos existentes)"]]
+  ["Funilaria e Pintura", "Oficina e Funilaria Damin - J. L. Damin Carlópolis", "Rua das Indústrias, 260 - Loteamento Vicente de Oliveira", "(43) 3566-1725", "daminFunilariaReceita", "servico", ["nome, telefone e endereço", "Oficina e Funilaria Damin (cadastros básicos existentes)"]],
+  ["Bicicletaria", "Bicicletaria do Sidnei - Sidnei Edson Batista", "Rua Ataliba Leonel, 182 - Centro", "(43) 3566-2336", "bicicletariaSidnei", "servico"],
+  ["Bicicletaria", "H M - H C de Oliveira Moura Ltda", "Rua Antônio Jonas Ferreira Pinto, 434 - Centro", "", "hmBicicletas", "comercio"],
+  ["Bicicletaria", "Melquior Okubo Mendes", "Rua Benedito Salles, 1428 - Centro", "(43) 3566-2852", "bicicletariasAtivasCarlopolis", "servico"],
+  ["Bicicletaria", "Street Bike - Emílio Loterio Pereira", "Rua Benedito Salles, 696 - Centro", "", "bicicletariasAtivasCarlopolis", "servico"],
+  ["Bicicletaria", "Fernando Roque", "Rua Sibipirunas, 397 - Vista Alegre", "(11) 97034-5290", "fernandoRoqueBicicletas", "servico"],
+  ["Bicicletaria", "Matheus Henrique Soares Luiz", "Rua Ataliba Leonel, 325 - Centro", "", "bicicletariasAtivasCarlopolis", "servico"],
+  ["Bicicletaria", "Edson do Amaral", "Rua Joaquim do Carmo Vilela, 792 - Centro", "(43) 8808-2356", "bicicletariasAntigasCarlopolis", "servico", ["cadastro público antigo sem situação empresarial atual confirmada", "não aparece entre as seis bicicletarias ativas na base da Receita Federal de outubro de 2026"]],
+  ["Bicicletaria", "Karbon4Bike", "Rua Joaquim do Carmo Vilela, 337 - Centro", "(43) 3566-1425", "bicicletariasAntigasCarlopolis", "servico", ["identidade local atual não confirmada", "cadastro empresarial localizado para Karbon4Bike pertence a Curitiba/PR"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
