@@ -507,6 +507,42 @@ window.FONTES_CADASTROS_BASICOS = {
   bicicletariasAntigasCarlopolis: {
     nome: "Solutudo",
     url: "https://www.solutudo.com.br/empresas/pr/carlopolis/bicicletarias"
+  },
+  sidneiVitalPaisagismo: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/13910522000172"
+  },
+  diegoTakahashiPoda: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/64025064-diego-alves-takahashi-64025064000120"
+  },
+  alineGuiraldelliPoda: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/empresas/pr-carlopolis/art615-a"
+  },
+  joaoPedrosoPoda: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/61964455000111"
+  },
+  andreiaDiogoPoda: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/19378759000130"
+  },
+  aparecidoDonizeteJardinagem: {
+    nome: "Diário Oficial dos Municípios / Câmara de Carlópolis",
+    url: "https://www.diariomunicipal.com.br/amp/download/edicao/A4916633"
+  },
+  jardinagemMirandaAntiga: {
+    nome: "Apontador",
+    url: "https://www.apontador.com.br/local/pr/carlopolis/servicos_em_agricultura_e_pecuaria/C41235225E2B2Q2B2B/jardinagem_miranda.html"
+  },
+  edsonJardinagemDiretorio: {
+    nome: "Solutudo",
+    url: "https://www.solutudo.com.br/empresas/pr/carlopolis/paisagismo"
+  },
+  sandroJardinagemBaixada: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/44298166000101"
   }
 };
 
@@ -1200,7 +1236,16 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Bicicletaria", "Fernando Roque", "Rua Sibipirunas, 397 - Vista Alegre", "(11) 97034-5290", "fernandoRoqueBicicletas", "servico"],
   ["Bicicletaria", "Matheus Henrique Soares Luiz", "Rua Ataliba Leonel, 325 - Centro", "", "bicicletariasAtivasCarlopolis", "servico"],
   ["Bicicletaria", "Edson do Amaral", "Rua Joaquim do Carmo Vilela, 792 - Centro", "(43) 8808-2356", "bicicletariasAntigasCarlopolis", "servico", ["cadastro público antigo sem situação empresarial atual confirmada", "não aparece entre as seis bicicletarias ativas na base da Receita Federal de outubro de 2026"]],
-  ["Bicicletaria", "Karbon4Bike", "Rua Joaquim do Carmo Vilela, 337 - Centro", "(43) 3566-1425", "bicicletariasAntigasCarlopolis", "servico", ["identidade local atual não confirmada", "cadastro empresarial localizado para Karbon4Bike pertence a Curitiba/PR"]]
+  ["Bicicletaria", "Karbon4Bike", "Rua Joaquim do Carmo Vilela, 337 - Centro", "(43) 3566-1425", "bicicletariasAntigasCarlopolis", "servico", ["identidade local atual não confirmada", "cadastro empresarial localizado para Karbon4Bike pertence a Curitiba/PR"]],
+  ["Paisagismo", "Sidnei Vital Rangel", "Rua Jorge Barros, 595 - Centro", "", "sidneiVitalPaisagismo", "servico"],
+  ["Poda de Árvores", "Diego Alves Takahashi", "Rua Quaresmeira Rosa, 246 - Vista Alegre", "(43) 99840-1456", "diegoTakahashiPoda", "servico"],
+  ["Poda de Árvores", "Aline da Silva Guiraldelli Alves", "Sítio Terras de Tuco e Tuca, s/n - Diogos", "", "alineGuiraldelliPoda", "servico"],
+  ["Poda de Árvores", "João Aparecido Pedroso", "Rua Quaresmeira Rosa, 151 - Vista Alegre", "", "joaoPedrosoPoda", "servico"],
+  ["Poda de Árvores", "Andreia Aparecida Diogo", "Rua José Talim, 778 - Centro", "(43) 99152-8958", "andreiaDiogoPoda", "servico"],
+  ["Jardinagem", "Aparecido Donizete de Araújo", "Rua Jacarandá Mimoso, 270 - Vista Alegre", "", "aparecidoDonizeteJardinagem", "servico"],
+  ["Jardinagem", "Jardinagem Miranda", "Rua Andrino Soares, 473 - Centro", "(43) 3566-1118", "jardinagemMirandaAntiga", "servico", ["identidade pública atual insuficientemente confirmada", "apenas diretório antigo, sem cadastro oficial ou canal próprio localizado"]],
+  ["Jardinagem", "Edson Jardinagem", "Carlópolis - PR", "", "edsonJardinagemDiretorio", "servico", ["dados públicos insuficientes", "diretório informa somente o nome, sem telefone, endereço ou situação empresarial"]],
+  ["Jardinagem", "Sandro Jardinagem - Sandro Aparecido de Oliveira", "Rua Ipê Amarelo, 525 - Vista Alegre", "", "sandroJardinagemBaixada", "servico", ["empresa baixada", "CNPJ 44.298.166/0001-01 baixado em 03/05/2022"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()

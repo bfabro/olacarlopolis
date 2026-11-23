@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-11-23-basic-listings-bicicletarias-v1083'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-11-23-basic-listings-jardinagem-v1084'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
