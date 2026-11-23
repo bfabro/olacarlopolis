@@ -411,6 +411,30 @@ window.FONTES_CADASTROS_BASICOS = {
   teslaEngenhariaSeguranca: {
     nome: "Diário Oficial dos Municípios / Receita Federal",
     url: "https://www.diariomunicipal.com.br/amp/download/edicao/056AC2DC"
+  },
+  fernandoTornoSolda: {
+    nome: "Diário Oficial dos Municípios / Prefeitura de Carlópolis",
+    url: "https://www.diariomunicipal.com.br/amp/materia/4B83E243"
+  },
+  carlosEduardoSerralheria: {
+    nome: "Casa dos Dados / Receita Federal",
+    url: "https://casadosdados.com.br/solucao/cnpj/65-117-270-carlos-eduardo-dos-santos-ferreira-65117270000122"
+  },
+  c3Usinagem: {
+    nome: "Consultas Plus / Receita Federal",
+    url: "https://consultas.plus/lista-de-empresas/parana/carlopolis/"
+  },
+  serralheriaSdCarlopolis: {
+    nome: "Econodata / Receita Federal",
+    url: "https://www.econodata.com.br/consulta-empresa/52586178000160-dougraci-luiz-pedroso-de-oliveira"
+  },
+  magnoLiuttiTornoSolda: {
+    nome: "Diário Oficial dos Municípios / Prefeitura de Carlópolis",
+    url: "https://www-storage.voxtecnologia.com.br/?f=4410&i=publicado_110169_2025-06-30_1d58c7aa786bc1720025535aa22d0e16.pdf&m=sigpub.publicacao"
+  },
+  joaoCarlosTornearia: {
+    nome: "CNPJ.biz / Receita Federal",
+    url: "https://cnpj.biz/28108851000171"
   }
 };
 
@@ -1076,7 +1100,14 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Segurança Privada", "Grupo G3 de Segurança Ltda", "Chácara Cinco Irmãos, s/n - Teolândia", "", "grupoG3Seguranca", "servico"],
   ["Monitoramento", "Ágape Monitoramento - André Moreira dos Santos", "Rua Joaquim do Carmo Vilela, 46 - Centro", "", "agapeMonitoramento", "servico", ["atividade pública conflitante", "fonte classifica o estabelecimento como organização de festas e eventos, sem confirmar serviço de monitoramento"]],
   ["Segurança Privada", "BM3S Segurança Privada Ltda", "Rodovia PR-218, s/n - Centro", "", "bm3sSeguranca", "servico", ["empresa inapta", "filial de Carlópolis com situação cadastral inapta"]],
-  ["Câmeras e Segurança Eletrônica", "Tesla Engenharia - Samantha Baggio Gomes Ltda", "Rua Expedicionários, 668 - Centro, Ribeirão Claro/PR", "(43) 98847-1054", "teslaEngenhariaSeguranca", "servico", ["sede em outro município e sem unidade local confirmada", "forneceu câmeras ao município, mas o estabelecimento fica em Ribeirão Claro/PR"]]
+  ["Câmeras e Segurança Eletrônica", "Tesla Engenharia - Samantha Baggio Gomes Ltda", "Rua Expedicionários, 668 - Centro, Ribeirão Claro/PR", "(43) 98847-1054", "teslaEngenhariaSeguranca", "servico", ["sede em outro município e sem unidade local confirmada", "forneceu câmeras ao município, mas o estabelecimento fica em Ribeirão Claro/PR"]],
+  ["Tornearia e Solda", "Fernando Torno e Solda - Carlos Fernando Ribeiro", "Rua Sadatoshi Hamada, 118-A - Vista Bella", "", "fernandoTornoSolda", "servico"],
+  ["Serralheria e Tornearia", "Carlos Eduardo dos Santos Ferreira", "Rua Profeta João de Maria, 1712 - Industrial", "(43) 99673-4911", "carlosEduardoSerralheria", "servico", null, ["mesmo endereço, CNPJs e responsáveis distintos", "Luciano Domingues - Carlópolis / João Carlos Ferreira"]],
+  ["Usinagem, Torno e Solda", "C3 Usinagem - C E Lima Usinagem e Serviços de Torno e Solda", "Rua Gênova, 30 - Jardim Itália II", "", "c3Usinagem", "servico"],
+  ["Serralheria", "Serralheria SD - Dougraci Luiz Pedroso de Oliveira", "Rua Francisco Avelino Paiva, 646 - Centro", "(43) 99170-2368", "serralheriaSdCarlopolis", "servico"],
+  ["Tornearia e Solda", "J. Magno Liutti Torno e Solda", "Rua Luiz Carlos Consolmagno Proença, 286 - Carlópolis", "", "magnoLiuttiTornoSolda", "servico"],
+  ["Usinagem, Tornearia e Solda", "João Carlos Ferreira", "Rua Profeta João de Maria, 1712 - CTG", "", "joaoCarlosTornearia", "servico", null, ["mesmo endereço, CNPJs e responsáveis distintos", "Luciano Domingues - Carlópolis / Carlos Eduardo dos Santos Ferreira"]],
+  ["Serralheria", "Luciano Domingues - Carlópolis - Grani Piso", "Rua Profeta João de Maria, 1712 - Parque Industrial", "(43) 99637-2848", "serralherias", "servico", ["nome, telefone e endereço", "Luciano Domingues - Carlópolis (cadastro básico existente)"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
