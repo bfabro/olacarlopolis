@@ -794,7 +794,20 @@ window.FONTES_CADASTROS_BASICOS = {
   empresasRecentesCarlopolis2026: {
     nome: "CNPJ.biz / Receita Federal",
     url: "https://cnpj.biz/empresas/carlopolis-pr?id=65302823"
-  }
+  },
+  alaideHomeCare2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69351359000100" },
+  ex1Empreendimentos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69326819000140" },
+  aiimportsPersonalizados2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69300331000143" },
+  joseAugustoPromocao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69279496000180" },
+  biancaAzevedoPromocao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69277228000120" },
+  angelaQuintilianoBeleza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69261480000140" },
+  albertoRastelliAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69259197000184" },
+  nicolleAbdonBeleza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69230566000106" },
+  amandaMiguelLocacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69227467000175" },
+  jtMagreloSucatas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69196524000104" },
+  elcioCruzAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69177702000141" },
+  leonardoPrudencioConstrucao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69170867000191" },
+  edisonCoelhoBaixado2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69329453000162" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1403,7 +1416,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ["Terraplenagem", "Top Terra", "Ponta Grossa - PR", "(42) 99956-1393", "topTerraCarlopolis", "servico", ["atende Carlópolis, mas não possui estabelecimento local confirmado", "sede informada em Ponta Grossa/PR"]],
   ["Manutenção Náutica", "Jairo Francisco Camargo", "Rua Sibipiruna, 324 - Vista Alegre", "", "jairoCamargoNautica", "servico"],
   ["Manutenção Náutica", "Everton Bueno da Rocha", "Rua Eugênio Neves Soares, 1800 - Tomodati", "", "evertonBuenoNautica", "servico"],
-  ["Manutenção Náutica", "Robert Philip dos Santos Romano", "Rua Alfeneiro, 462 - Vista Alegre", "(43) 99192-9582", "robertRomanoNautica", "servico"],
+  ["Manutenção Náutica", "Robert Philip dos Santos Romano", "Rua Alfeneiro, 462 - Vista Alegre", "(43) 99192-9582", "robertRomanoNautica", "servico", ["empresa baixada", "CNPJ 69.162.970/0001-90 baixado"]],
   ["Material de Construção", "Decor Tintas - Clayton Silva Construtora e Comércio de Tintas Ltda", "Rua Padre Hugo, 836, Sala A - Centro", "", "decorTintasNovaRazao", "comercio", ["mesmo nome e endereço", "R Bandeira Construtora e Comércio de Tintas / Decor Tintas (cadastro básico existente)"]],
   ["Banho e Tosa", "Pet Feliz - Luceia Rocado Ruy Menezes", "Avenida Senhor Bom Jesus, Lote 06, Quadra B, Fundos", "", "petFelizLuceia", "servico"],
   ["Banho e Tosa", "Flavieli Brisola Damasio", "Rua Benedito Salles, 309 - Centro", "", "flavieliPet", "servico", null, ["mesmo endereço, atividade distinta", "Agro Vida Comércio de Produtos Agropecuários Ltda"]],
@@ -1580,6 +1593,19 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Terraplenagem", "Kadu Terraplenagem - J K Carvalho Ltda", "Carlópolis - PR", "", "empresasRecentesCarlopolis2026", "servico", ["nome comercial", "Kadu Terraplenagem já cadastrado"]]
   ,["Atividade não identificada", "Keytty Shizuko Tubota", "Carlópolis - PR", "", "empresasRecentesCarlopolis2026", "servico", ["dados públicos insuficientes", "cadastro recente ainda sem atividade e endereço disponíveis para confirmação"]]
   ,["Atividade não identificada", "Bianca Pereira Maximo da Veiga", "Carlópolis - PR", "", "empresasRecentesCarlopolis2026", "servico", ["dados públicos insuficientes", "cadastro recente ainda sem atividade e endereço disponíveis para confirmação"]]
+  ,["Assistência Domiciliar", "Alaide Rosa de Oliveira da Costa", "Murador - Carlópolis", "", "alaideHomeCare2026", "servico"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Angela Cristina Bento Quintiliano de Oliveira", "Vila Ray - Carlópolis", "", "angelaQuintilianoBeleza2026", "servico"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Nicolle Aparecida dos Santos Abdon", "Centro - Carlópolis", "", "nicolleAbdonBeleza2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Alberto Tamerr Rastelli de Oliveira", "Primavera - Carlópolis", "", "albertoRastelliAlvenaria2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Elcio Oliveira da Cruz", "Vista Bella - Carlópolis", "", "elcioCruzAlvenaria2026", "servico"]
+  ,["Serviços de Construção", "Leonardo Ocumoto Prudencio", "Jardim Americana - Carlópolis", "", "leonardoPrudencioConstrucao2026", "servico"]
+  ,["Empreendimentos Imobiliários", "EX1 Empreendimentos Ltda", "Rua Benedito Salles, 290 - Centro", "", "ex1Empreendimentos2026", "servico"]
+  ,["Cosméticos e Personalizados", "AIImports e Personalizados - Abeimports Ltda", "Rua Marcos Rodrigues do Amaral, 212 - Centro", "", "aiimportsPersonalizados2026"]
+  ,["Promoção de Vendas", "Jose Augusto dos Santos Camargo", "Vista Bella - Carlópolis", "", "joseAugustoPromocao2026", "servico"]
+  ,["Promoção de Vendas", "Bianca Rocha Azevedo", "Vista Bella - Carlópolis", "", "biancaAzevedoPromocao2026", "servico"]
+  ,["Locação de Máquinas e Equipamentos", "Amanda Lauro Miguel", "Centro - Carlópolis", "", "amandaMiguelLocacao2026", "servico"]
+  ,["Sucatas e Reciclagem", "J T Magrelo Sucatas Ltda", "Rua Alfeneiro, 446 - Vista Alegre", "", "jtMagreloSucatas2026"]
+  ,["Locação de Máquinas e Equipamentos", "Edison Aparecido Coelho", "Vista Alegre - Carlópolis", "", "edisonCoelhoBaixado2026", "servico", ["empresa baixada", "CNPJ 69.329.453/0001-62 baixado"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
