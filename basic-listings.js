@@ -833,6 +833,14 @@ window.FONTES_CADASTROS_BASICOS = {
   ,fabianaDominguesEstetica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67035488000163" }
   ,janainaGamaAlimentacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67005790000179" }
   ,juliaNagakiBaixada2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67207950000162" }
+  ,douglasPalmaAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66986210000109" }
+  ,marcioLucianoAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66963906000110" }
+  ,rmeFrutas2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66912394000162" }
+  ,anaPaulaNakamuraAlimentacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66882405000109" }
+  ,antonioVieiraAlimentacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66861577000104" }
+  ,luizOliveiraBar2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66852366000105" }
+  ,valdeciCabralMercado2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66836692000110" }
+  ,mariaEduardaServicos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/66782289000156" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1656,6 +1664,14 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Estética e Cuidados com a Beleza", "Fabiana Costa Caiana Domingues", "Centro - Carlópolis", "", "fabianaDominguesEstetica2026", "servico"]
   ,["Alimentação Ambulante", "Janaina Graziele Aparecida Gama", "Centro - Carlópolis", "", "janainaGamaAlimentacao2026"]
   ,["Mecânica Automotiva", "Julia Naomi Camargo Nagaki", "Vista Alegre - Carlópolis", "", "juliaNagakiBaixada2026", "servico", ["empresa baixada", "CNPJ 67.207.950/0001-62 baixado"]]
+  ,["Pedreiro e Alvenaria", "Douglas Teixeira Palma", "Área Rural - Carlópolis", "", "douglasPalmaAlvenaria2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Marcio Antonio Luciano", "Vista Alegre - Carlópolis", "", "marcioLucianoAlvenaria2026", "servico"]
+  ,["Comércio de Frutas e Hortaliças", "R.M.E. Frutas e Transportes Ltda", "Rua Maria Pereira da Rocha Aleixo, 489 - Centro", "", "rmeFrutas2026"]
+  ,["Alimentação Ambulante", "Ana Paula Serrato Ruiz Nakamura", "Centro - Carlópolis", "", "anaPaulaNakamuraAlimentacao2026"]
+  ,["Alimentação Ambulante", "Antonio Sergio Vieira", "Centro - Carlópolis", "", "antonioVieiraAlimentacao2026"]
+  ,["Bar com Entretenimento", "Luiz Antonio de Oliveira", "Centro - Carlópolis", "", "luizOliveiraBar2026"]
+  ,["Mercado e Mercearia", "Valdeci Jose Cabral", "Vista Alegre - Carlópolis", "", "valdeciCabralMercado2026"]
+  ,["Serviços Pessoais", "Maria Eduarda Liduario de Paula", "Vista Alegre - Carlópolis", "", "mariaEduardaServicos2026", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
