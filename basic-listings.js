@@ -819,6 +819,20 @@ window.FONTES_CADASTROS_BASICOS = {
   ,eAgros2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68923546000158" }
   ,luizJacominiAlimentos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68845554000123" }
   ,infanteFarmaceuticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68820858000136" }
+  ,mariaHerreroDomesticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67505114000164" }
+  ,ernestoAzevedoLocacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67497908000123" }
+  ,lucasOliveiraConstrucao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67303814000176" }
+  ,adonisEngenharia2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67289265000122" }
+  ,laisTavaresArtesanato2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67272176000173" }
+  ,adrianoEletroeletronicos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67153099000132" }
+  ,joaoVitorTransporte2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67115124000193" }
+  ,zaqueuTransporte2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67114533000175" }
+  ,kellyCamaMesaBanho2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67098991000168" }
+  ,leonardoAlmeidaAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67042620000164" }
+  ,taisSantanaBeleza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67042005000158" }
+  ,fabianaDominguesEstetica2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67035488000163" }
+  ,janainaGamaAlimentacao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67005790000179" }
+  ,juliaNagakiBaixada2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/67207950000162" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1628,6 +1642,20 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Promoção de Vendas", "Elvis Roberto Teles", "Vista Alegre - Carlópolis", "", "elvisTelesPromocao2026", "servico"]
   ,["Agronegócio", "C M Agronegócios Ltda", "Rua Ataliba Leonel, 402, Anexo 2 - Centro", "", "cmAgronegocios2026"]
   ,["Serviços Agrícolas", "E Agros - E A da Silva Agro Ltda", "Sítio São Manoel, s/n - Matão", "", "eAgros2026", "servico"]
+  ,["Serviços Domésticos", "Maria de Fatima da Silva Herrero", "Área Rural - Carlópolis", "", "mariaHerreroDomesticos2026", "servico"]
+  ,["Locação de Máquinas e Equipamentos", "Ernesto de Azevedo", "Jardim Americana - Carlópolis", "", "ernestoAzevedoLocacao2026", "servico"]
+  ,["Serviços de Construção", "Lucas Gabriel de Oliveira", "Novo Horizonte - Carlópolis", "", "lucasOliveiraConstrucao2026", "servico"]
+  ,["Engenharia e Construção", "Adonis Construção e Engenharia Ltda", "Rua Ataliba Leonel, 43 - Centro", "", "adonisEngenharia2026", "servico"]
+  ,["Reparação de Eletroeletrônicos", "Adriano dos Santos", "Vista Alegre - Carlópolis", "", "adrianoEletroeletronicos2026", "servico"]
+  ,["Pedreiro e Alvenaria", "Leonardo dos Santos Almeida", "CTG - Carlópolis", "", "leonardoAlmeidaAlvenaria2026", "servico"]
+  ,["Transporte com Motorista", "João Vitor Albertino da Silva", "Centro - Carlópolis", "", "joaoVitorTransporte2026", "servico"]
+  ,["Transporte com Motorista", "Zaqueu Martins de Carvalho", "Murador - Carlópolis", "", "zaqueuTransporte2026", "servico"]
+  ,["Artesanato, Bijuterias e Suvenires", "Lais Stefany Rodrigues Tavares", "Centro - Carlópolis", "", "laisTavaresArtesanato2026"]
+  ,["Cama, Mesa e Banho", "Kelly Aparecida Fernandes", "Novo Horizonte - Carlópolis", "", "kellyCamaMesaBanho2026"]
+  ,["Cabeleireiro, Manicure e Pedicure", "Tais Santana de Souza", "CTG - Carlópolis", "", "taisSantanaBeleza2026", "servico"]
+  ,["Estética e Cuidados com a Beleza", "Fabiana Costa Caiana Domingues", "Centro - Carlópolis", "", "fabianaDominguesEstetica2026", "servico"]
+  ,["Alimentação Ambulante", "Janaina Graziele Aparecida Gama", "Centro - Carlópolis", "", "janainaGamaAlimentacao2026"]
+  ,["Mecânica Automotiva", "Julia Naomi Camargo Nagaki", "Vista Alegre - Carlópolis", "", "juliaNagakiBaixada2026", "servico", ["empresa baixada", "CNPJ 67.207.950/0001-62 baixado"]]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
