@@ -808,6 +808,17 @@ window.FONTES_CADASTROS_BASICOS = {
   elcioCruzAlvenaria2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69177702000141" },
   leonardoPrudencioConstrucao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69170867000191" },
   edisonCoelhoBaixado2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69329453000162" }
+  ,kleberDallaApoio2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69129900000130" }
+  ,gfTransporte2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69106350000133" }
+  ,milenaBarbosaBeleza2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69079475000111" }
+  ,jeucimariEstetica2026: { nome: "CNPJ.biz / Receita Federal", url: "https://cnpj.biz/69050306000159" }
+  ,matheusBuenoTransporte2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69050108000195" }
+  ,ewertonMalote2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/69026587000104" }
+  ,elvisTelesPromocao2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68943733000101" }
+  ,cmAgronegocios2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68930654000158" }
+  ,eAgros2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68923546000158" }
+  ,luizJacominiAlimentos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68845554000123" }
+  ,infanteFarmaceuticos2026: { nome: "BrasilAPI / Receita Federal", url: "https://brasilapi.com.br/api/cnpj/v1/68820858000136" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -1606,6 +1617,17 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Locação de Máquinas e Equipamentos", "Amanda Lauro Miguel", "Centro - Carlópolis", "", "amandaMiguelLocacao2026", "servico"]
   ,["Sucatas e Reciclagem", "J T Magrelo Sucatas Ltda", "Rua Alfeneiro, 446 - Vista Alegre", "", "jtMagreloSucatas2026"]
   ,["Locação de Máquinas e Equipamentos", "Edison Aparecido Coelho", "Vista Alegre - Carlópolis", "", "edisonCoelhoBaixado2026", "servico", ["empresa baixada", "CNPJ 69.329.453/0001-62 baixado"]]
+  ,["Estética e Cuidados com a Beleza", "Milena Nayara Barbosa dos Santos", "Centro - Carlópolis", "", "milenaBarbosaBeleza2026", "servico"]
+  ,["Estética e Cuidados com a Beleza", "Jeucimari Quintiliano Leandro", "Rua André Jorge Clele, 235, Sala - Centro", "", "jeucimariEstetica2026", "servico"]
+  ,["Serviços Farmacêuticos", "Infante Serviços Farmacêuticos Ltda", "Alameda Siriema, 500, Condomínio Residencial Ilha Bela - Ilha Bela", "", "infanteFarmaceuticos2026", "servico"]
+  ,["Transporte por Fretamento", "GF Transporte de Carlópolis Ltda", "Rua Vera Regina Salles Soares, 72-A - Vila Ray", "", "gfTransporte2026", "servico"]
+  ,["Transporte Rodoviário de Cargas", "Matheus Henrique Bueno", "São Pedro - Carlópolis", "", "matheusBuenoTransporte2026", "servico"]
+  ,["Serviço de Malote", "Ewerton Freitas de Souza", "Caminho do Vale - Carlópolis", "", "ewertonMalote2026", "servico"]
+  ,["Comércio de Alimentos", "Luiz Antonio Lansa Jacomini", "Área Rural - Carlópolis", "", "luizJacominiAlimentos2026"]
+  ,["Apoio Administrativo", "Kleber Antonio Dalla de Oliveira", "Vista Bella - Carlópolis", "", "kleberDallaApoio2026", "servico"]
+  ,["Promoção de Vendas", "Elvis Roberto Teles", "Vista Alegre - Carlópolis", "", "elvisTelesPromocao2026", "servico"]
+  ,["Agronegócio", "C M Agronegócios Ltda", "Rua Ataliba Leonel, 402, Anexo 2 - Centro", "", "cmAgronegocios2026"]
+  ,["Serviços Agrícolas", "E Agros - E A da Silva Agro Ltda", "Sítio São Manoel, s/n - Matão", "", "eAgros2026", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
