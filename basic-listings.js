@@ -1243,6 +1243,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,victorRodriguesBeleza2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50837737000131-victor-hugo-fernandes-rodrigues" }
   ,metaBusines2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50684512000192-meta-busines-administradora" }
   ,wesleyPereiraMercado2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50651286000143-wesley-correa-santos-pereira" }
+  ,joaoGabrielVestuario2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52743439000108-joao-gabriel-oliveira-da-luz" }
+  ,beneditoCamaraArtesanato2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52682735000146-benedito-izidorio-camara" }
+  ,jsConstrucoes2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52683381000154-j-s-construcoes" }
+  ,lucasNorteAlvenaria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52623582000166-lucas-ribeiro-severiano-do-norte" }
+  ,maryaneSallesVestuario2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52615130000132-maryane-santos-da-silva-salles" }
+  ,corpusRenovare2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/32430768000272-v-reis-de-freitas-corpus-renovare-estetica-e-fisioterapia-esportiva" }
+  ,carlosCuranRevestimentos2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52571093000108-carlos-henrique-daniel-de-almeida-curan" }
+  ,jmFrutasTransportes2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52554075000118-j-m-frutas-e-transportes-ltda" }
+  ,rayssaSilvaEstetica2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52551772000115-rayssa-da-silva" }
+  ,brunaAlmeidaLocacao2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52539975000196-bruna-juvencio-lopes-de-almeida" }
+  ,adrianaPradoMotopecas2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52433847000163-adriana-sanches-segura-do-prado" }
+  ,josePalmaAgricola2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52431979000156-jose-carlos-palma-junior" }
+  ,mdfVoAna2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52409236000180-mdf-vo-ana" }
+  ,mdAgricola2023: { nome: "CNPJ Dados e Solutudo / dados públicos", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/equipamentos-agricolas/md-agricola-ltda-34690932" }
+  ,jllRosaIntermediacao2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52297148000133-j-l-l-da-rosa-cia-ltda" }
+  ,gilbertoMoreiraPapelaria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52279559000104-gilberto-horevitch-moreira" }
+  ,tricotGarden2023: { nome: "Tricot Garden / site oficial e CNPJ Dados", url: "https://www.moveisareaexterna.com/" }
+  ,byGestaoImobiliaria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52256822000131-b-y-gestao-e-consultoria-imobiliaria" }
+  ,genivaldoCarvalhoAlvenaria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52237750000185-genivaldo-fernandes-de-carvalho" }
+  ,diegoMimiHortifruti2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52208597000168-diego-de-souza-mimi" }
+  ,natanaelSaTransporte2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52171163000130-natanael-henrique-bacili-de-sa" }
+  ,diogoSilvaAlvenaria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52090703000151-diogo-jose-da-silva" }
+  ,rosangelaSilvaBar2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52085604000181-rosangela-fernandes-da-silva" }
+  ,evelynSilvaBeleza2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52067265000100-evelyn-patrocinio-da-silva" }
+  ,jfMultimarcas2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52046657000193-j-f-multimarcas" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2476,6 +2501,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Cabeleireiro e Beleza", "Victor Hugo Fernandes Rodrigues", "Centro - Carlópolis", "", "victorRodriguesBeleza2023", "servico"]
   ,["Administração de Imóveis", "Meta Busines Administradora", "Garden Club Residence - Carlópolis", "", "metaBusines2023", "servico"]
   ,["Mercados e Mercearias", "Wesley Correa Santos Pereira", "CTG - Carlópolis", "", "wesleyPereiraMercado2023"]
+  ,["Vestuário e Acessórios", "João Gabriel Oliveira da Luz", "Centro - Carlópolis", "", "joaoGabrielVestuario2023"]
+  ,["Artesanato e Bijuterias", "Benedito Izidorio Camara", "Enseada do Tucunaré - Carlópolis", "", "beneditoCamaraArtesanato2023"]
+  ,["Construção Civil", "J & S Construções", "Água da Limeira - Carlópolis", "", "jsConstrucoes2023", "servico"]
+  ,["Pedreiro e Alvenaria", "Lucas Ribeiro Severiano do Norte", "Santa Maria - Carlópolis", "", "lucasNorteAlvenaria2023", "servico"]
+  ,["Vestuário e Acessórios", "Maryane Santos da Silva Salles", "Vila São Pedro - Carlópolis", "", "maryaneSallesVestuario2023"]
+  ,["Estética e Fisioterapia", "Corpus Renovare Estética e Fisioterapia Esportiva", "Centro - Carlópolis", "", "corpusRenovare2023", "servico"]
+  ,["Revestimentos", "Carlos Henrique Daniel de Almeida Curan", "Espírito Santo - Carlópolis", "", "carlosCuranRevestimentos2023", "servico"]
+  ,["Atacado de Hortifrúti", "J.M. Frutas e Transportes Ltda", "Jaboticabal - Carlópolis", "", "jmFrutasTransportes2023"]
+  ,["Estética e Cuidados com a Beleza", "Rayssa da Silva", "Caminho do Vale - Carlópolis", "", "rayssaSilvaEstetica2023", "servico"]
+  ,["Locação de Equipamentos", "Bruna Juvencio Lopes de Almeida", "Vista Bela - Carlópolis", "", "brunaAlmeidaLocacao2023", "servico"]
+  ,["Peças e Acessórios para Motos", "Adriana Sanches Segura do Prado", "Novo Horizonte - Carlópolis", "", "adrianaPradoMotopecas2023"]
+  ,["Serviços Agrícolas", "Jose Carlos Palma Junior", "Área Rural - Carlópolis", "", "josePalmaAgricola2023", "servico"]
+  ,["Artesanato e Bijuterias", "MDF Vó Ana", "Centro - Carlópolis", "", "mdfVoAna2023"]
+  ,["Equipamentos Agrícolas", "MD Agrícola Ltda", "Rua Paul Harris, 62 A - Industrial", "", "mdAgricola2023"]
+  ,["Intermediação de Negócios", "J L L da Rosa & Cia Ltda", "Centro - Carlópolis", "", "jllRosaIntermediacao2023", "servico"]
+  ,["Papelaria", "Gilberto Horevitch Moreira", "Centro - Carlópolis", "", "gilbertoMoreiraPapelaria2023"]
+  ,["Móveis para Área Externa", "Tricot Garden", "Rua Benedito Salles, 2622 - Carlópolis", "(43) 98849-3614", "tricotGarden2023"]
+  ,["Gestão e Consultoria Imobiliária", "B & Y Gestão e Consultoria Imobiliária", "Centro - Carlópolis", "", "byGestaoImobiliaria2023", "servico"]
+  ,["Pedreiro e Alvenaria", "Genivaldo Fernandes de Carvalho", "Vista Bela - Carlópolis", "", "genivaldoCarvalhoAlvenaria2023", "servico"]
+  ,["Hortifrúti", "Diego de Souza Mimi", "Santa Maria - Carlópolis", "", "diegoMimiHortifruti2023"]
+  ,["Transporte de Passageiros", "Natanael Henrique Bacili de Sa", "Vista Bela - Carlópolis", "", "natanaelSaTransporte2023", "servico"]
+  ,["Pedreiro e Alvenaria", "Diogo Jose da Silva", "Vista Alegre - Carlópolis", "", "diogoSilvaAlvenaria2023", "servico"]
+  ,["Bar", "Rosangela Fernandes da Silva", "Centro - Carlópolis", "", "rosangelaSilvaBar2023"]
+  ,["Cabeleireiro e Beleza", "Evelyn Patrocinio da Silva", "Residencial Murador - Carlópolis", "", "evelynSilvaBeleza2023", "servico"]
+  ,["Veículos Seminovos", "J F - Multimarcas", "Novo Horizonte I - Carlópolis", "", "jfMultimarcas2023"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
