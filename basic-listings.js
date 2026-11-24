@@ -1269,6 +1269,11 @@ window.FONTES_CADASTROS_BASICOS = {
   ,evelynSilvaBeleza2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52067265000100-evelyn-patrocinio-da-silva" }
   ,jfMultimarcas2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52046657000193-j-f-multimarcas" }
   ,sraDiagnostico2023: { nome: "Grupo SRA / site oficial e Receita Federal", url: "https://www.gruposra.com.br/" }
+  ,solutudoMateriaisNov2026: { nome: "Solutudo - Materiais para Construção em Carlópolis", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/materiais%2Bpara%2Bconstrucao" }
+  ,solutudoOficinasNov2026: { nome: "Solutudo - Oficinas Mecânicas em Carlópolis", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/oficinas%2Bde%2Bcarros%2Be%2Bcentros%2Bautomotivos?mais_buscadas=1" }
+  ,solutudoMercadosNov2026: { nome: "Solutudo - Mercados em Carlópolis", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/mercados?pagina=1" }
+  ,solutudoManicuresNov2026: { nome: "Solutudo - Manicures e Pedicures em Carlópolis", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/manicures%2Be%2Bpedicures?pagina=1" }
+  ,solutudoObrasNov2026: { nome: "Solutudo - Obras e Construção em Carlópolis", url: "https://www.solutudo.com.br/empresas/pr/carlopolis/busca?mais_buscadas=1&q=obras" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2528,6 +2533,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Cabeleireiro e Beleza", "Evelyn Patrocinio da Silva", "Residencial Murador - Carlópolis", "", "evelynSilvaBeleza2023", "servico"]
   ,["Veículos Seminovos", "J F - Multimarcas", "Novo Horizonte I - Carlópolis", "", "jfMultimarcas2023"]
   ,["Radiologia e Diagnóstico por Imagem", "SRA - Clínica de Diagnóstico por Imagem Ltda", "Rua Capitão Estácio, 460, sala 40 - Vista Bella", "(43) 4000-1457", "sraDiagnostico2023", "servico", null, null, "https://www.gruposra.com.br/images/logo-sra-header.png", "https://www.gruposra.com.br/"]
+  ,["Materiais de Construção", "Irmãos Ferreira Materiais de Construção Ltda", "Sítio Ferreira, s/n - Pinheirinho", "(43) 3566-1583", "solutudoMateriaisNov2026"]
+  ,["Materiais de Construção", "Construção Carriel 2", "Rua Benedito Salles, 107 - Centro", "(43) 3566-1597", "solutudoMateriaisNov2026"]
+  ,["Cerâmica e Materiais de Construção", "Cerâmica Mazini", "Rua Espatódia, s/n - Centro", "(43) 3566-1616", "solutudoMateriaisNov2026", "comercio", null, null, "https://linktr.ee/og/image/ceramicamaziniclps.jpg", "https://linktr.ee/ceramicamaziniclps", "https://www.instagram.com/ceramicamazinicarlopolis/"]
+  ,["Piscinas e Materiais de Construção", "Águas Claras Piscinas", "Rua Benedito Salles, 35 - Centro", "(44) 3323-2740", "solutudoMateriaisNov2026"]
+  ,["Materiais de Construção", "Franco Casa & Construção Ltda", "Rua Benedito Salles, 233 - Centro", "(43) 3566-2649", "solutudoMateriaisNov2026"]
+  ,["Areia e Materiais de Construção", "S B N Pereira Fernandes Comércio de Areia", "Rua Paul Harris, 15 - Vista Bella", "(14) 9879-7603", "solutudoMateriaisNov2026"]
+  ,["Materiais de Construção", "Construcar", "Rodovia PR-218, s/n - Pinheirinho", "(43) 9986-0475", "solutudoMateriaisNov2026"]
+  ,["Piscinas e Materiais de Construção", "Ilha Bela Piscinas Ltda", "Rodovia PR-218, km 3,4, s/n - Teolândia", "(43) 7400-2024", "solutudoMateriaisNov2026"]
+  ,["Materiais de Construção", "Lopes Junior Materiais de Construção", "Rodovia PR-218, km 13, s/n - Área Industrial", "(43) 3566-1146", "solutudoMateriaisNov2026"]
+  ,["Máquinas e Ferramentas", "Agrinil Máquinas e Ferramentas Ltda", "Rua Benedito Salles, 1449 - Centro", "(43) 3559-1387", "solutudoMateriaisNov2026"]
+  ,["Mecânica e Elétrica Automotiva", "S.E.M.D. Serviços Elétricos e Mecânica Diesel Ltda", "Rua Dona Maria Angélica, 101 - Ayrosa", "(11) 3977-9978", "solutudoOficinasNov2026", "servico"]
+  ,["Oficina Mecânica", "Orlando Garbelotto Pinto", "Rua Capitão Estácio, 60 - Centro", "(14) 99721-7839", "solutudoOficinasNov2026", "servico"]
+  ,["Oficina Mecânica", "Aleilso Narcizo de Proença", "Rua Luiz Carlos Consomagno de Proença, 357 - CTG", "(41) 99847-1344", "solutudoOficinasNov2026", "servico"]
+  ,["Centro Automotivo", "Detroit Motors Centro Automotivo", "Avenida Elson Soares, 234 - Centro", "(43) 3566-2444", "solutudoOficinasNov2026", "servico"]
+  ,["Mercados e Mercearias", "Supermercado Vitória", "Avenida Jaboticabal, 2213 - Jardim Americana", "(43) 3566-2745", "solutudoMercadosNov2026"]
+  ,["Mercados e Mercearias", "Wesley Correa Santos Pereira", "Rua Emílio da Silva, 907 - CTG", "(14) 99171-9822", "solutudoMercadosNov2026"]
+  ,["Mercados e Mercearias", "Carlos Eduardo Leite da Rosa Ltda", "Rua Benedito Salles, 1155 - Centro", "(43) 3252-9065", "solutudoMercadosNov2026"]
+  ,["Mercados e Mercearias", "Joiceley da Silva", "Rua Padre Hugo, 363-D - Jardim Itália", "(43) 99607-1844", "solutudoMercadosNov2026"]
+  ,["Mercados e Mercearias", "Sugiyama Alimentos Ltda", "Rua Ari Pereira Camargo, 616 - Residencial Carlópolis I", "(43) 99114-4809", "solutudoMercadosNov2026"]
+  ,["Mercados e Mercearias", "Lucimar Paula da Silva de Oliveira", "Rua Profeta João de Maria, 1751-B - CTG", "(43) 99618-9457", "solutudoMercadosNov2026"]
+  ,["Manicure e Pedicure", "Daniel Dias do Couto - Vidraçaria", "Rua Benedito Salles, 1140 - Centro", "(43) 99901-0093", "solutudoManicuresNov2026", "servico"]
+  ,["Manicure e Pedicure", "Rosangela de Paula Terra", "Rua Benedito Salles, 1305 - Centro", "(43) 99652-5102", "solutudoManicuresNov2026", "servico"]
+  ,["Manicure e Pedicure", "Fabio de Freitas", "Rua Padre Hugo, 1012 - Centro", "(43) 99814-8351", "solutudoManicuresNov2026", "servico"]
+  ,["Manicure e Pedicure", "Hairdresser Studio", "Rua Joaquim do Carmo Vilela, 985 - Centro", "(16) 9713-4550", "solutudoManicuresNov2026", "servico"]
+  ,["Arquitetura", "Alison RF - Arquitetura Ltda", "Rua Ana Camila de Souza Camargo, 70 - Residencial Murador", "(43) 99908-5343", "solutudoObrasNov2026", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()

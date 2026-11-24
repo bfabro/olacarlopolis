@@ -1,5 +1,5 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-11-24-onde-comer-logo-quadrada-v1115'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-11-24-cadastros-basicos-lote-82-v1116'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
