@@ -9872,6 +9872,7 @@ carlopdiesel:"s",
   ///
   // mostrar onde comer
   function mostrarOndeComer(filtroCategoria = "Todos") {
+    const imagemPadraoOndeComer = "images/img_padrao_site/logo-ola-carlopolis.png.png";
     const categoriasComida = [
       "Abertos", "Açai", "Doces e Chocolates", "Lanchonete", "Padaria", "Pizzaria", "Restaurante", "Salgados para Festas", "Sorveteria",
     ];
@@ -9923,6 +9924,8 @@ carlopdiesel:"s",
 
     // 3. Renderiza cards
     lista.forEach(est => {
+      const imagemOndeComer = String(est.image || "").trim() || imagemPadraoOndeComer;
+      const imagemOndeComerEhPadrao = imagemOndeComer === imagemPadraoOndeComer;
       // ...código anterior...
       let statusAberto = '';
       if (est.funcionamento24Horas || est.horarios) {
@@ -9942,7 +9945,8 @@ carlopdiesel:"s",
   
     <div class="onde-comer-card-esq">
 
-      <img src="${est.image}" alt="${est.name}" class="onde-comer-img imagem-expandivel" loading="lazy" decoding="async"
+      <img src="${imagemOndeComer}" alt="${est.name}" class="onde-comer-img imagem-expandivel${imagemOndeComerEhPadrao ? " onde-comer-img-fallback" : ""}" loading="lazy" decoding="async"
+        onerror="this.onerror=null;this.src='${imagemPadraoOndeComer}';this.classList.add('onde-comer-img-fallback')"
         onclick="registrarCliqueOndeComer('${normalizeName(est.name)}', 'imagem')">
   ${est.novidadesImages && est.novidadesImages.length ? `
    <button class="btn-fotos_onde" onclick="registrarCliqueFotosOndeComer('${normalizeName(est.name)}'); mostrarFotos('${normalizeName(est.name)}')">

@@ -3831,6 +3831,14 @@ a:focus {
   flex: 0 0 auto;
 }
 
+.onde-comer-img.onde-comer-img-fallback {
+  padding: 7px;
+  border: 1px solid rgba(7, 45, 91, 0.1);
+  background: #fff;
+  object-fit: contain;
+  box-sizing: border-box;
+}
+
 .onde-comer-info h3 {
   margin: 0 0 3px 0;
   font-size: 1.1em;
