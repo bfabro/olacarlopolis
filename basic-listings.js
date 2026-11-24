@@ -1193,6 +1193,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,edkelleyPereiraEstetica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/46072430000110-edkelley-azevedo-pereira" }
   ,lorenaMendesSaude2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/45965816000198-lorena-m-de-souza-b-mendes" }
   ,clemilsonGoncalvesMoveis2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/45883799000140-clemilson-vicente-goncalves" }
+  ,agostinhoGas2022: { nome: "Econodata / dados públicos da Receita Federal", url: "https://www.econodata.com.br/consulta-empresa/48551396000191-sebastiao-agostinho-torres" }
+  ,neusaRecordiBeleza2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47368511000124-neusa-aparecida-recordi" }
+  ,santoAntonioTransportes2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48419690000144-santo-antonio-transportes" }
+  ,julianaFernandezTextil2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48360323000112-juliana-de-paula-fernandez" }
+  ,fernandoCorreaLocacao2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48337631000127-fernando-jose-correa" }
+  ,recantoBelaVista2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48260427000155-recanto-bela-vista" }
+  ,giovaneRamosAutoeletrica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48207613000120-giovane-de-mello-goncalves-ramos" }
+  ,clinicaSanPantalleon2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47250270000114-clinica-san-pantalleon" }
+  ,gisaGestao2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48189213000130-gisa-gestao-empresarial" }
+  ,maycomUtidaRadiologia2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48185594000189-maycom-utida" }
+  ,valdirFrancaAgricola2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48159748000168-valdir-franca" }
+  ,nicolasPerezMusica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48119236000178-nicolas-keder-perez" }
+  ,pisciculturaAleixo2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48094925000175-piscicultura-aleixo" }
+  ,ainoaMendesCosmeticos2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48098824000172-ainoa-okubo-mendes" }
+  ,nmNautica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48086629000122-n-m-nautica" }
+  ,veronicaPaesEsquadrias2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48088043000105-veronica-tavares-paes" }
+  ,josianeOliveiraPapelaria2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48066287000189-josiane-rodrigues-de-oliveira" }
+  ,adrianPereiraBar2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48043704000178-adrian-gabriel-cezar-pereira" }
+  ,fmmaCarlopolis2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/68004272000101-fundo-municipal-do-meio-ambiente-fmma" }
+  ,tiagoCalixtoLimpeza2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47909605000163-tiago-ferreira-calixto" }
+  ,jcgmMateriais2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47751009000106-jcgm-materiais-de-construcao" }
+  ,elizabethMartinezTextil2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47629227000164-elizabeth-aparecida-da-silva-martinez" }
+  ,raizaSilvaEstetica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47544266000169-raiza-da-silva" }
+  ,rodrigoBentoColchoaria2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47505909000165-rodrigo-aparecido-bento" }
+  ,adenilsonLeiteAlvenaria2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47463673000141-adenilson-norberto-leite" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2376,6 +2401,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Estética e Cuidados com a Beleza", "Edkelley Azevedo Pereira", "Centro - Carlópolis", "", "edkelleyPereiraEstetica2022", "servico"]
   ,["Gestão de Saúde", "Lorena M de Souza B Mendes", "Jardim Primavera II - Carlópolis", "", "lorenaMendesSaude2022", "servico"]
   ,["Montagem de Móveis", "Clemilson Vicente Gonçalves", "Vila Teolândia - Carlópolis", "", "clemilsonGoncalvesMoveis2022", "servico"]
+  ,["Gás de Cozinha", "Agostinho Gás", "Vista Alegre - Carlópolis", "", "agostinhoGas2022"]
+  ,["Cabeleireiro e Beleza", "Neusa Aparecida Recordi", "Vista Alegre - Carlópolis", "", "neusaRecordiBeleza2022", "servico"]
+  ,["Transporte Escolar", "Santo Antonio Transportes", "Jardim Americana II - Carlópolis", "", "santoAntonioTransportes2022", "servico"]
+  ,["Acabamento Têxtil", "Juliana de Paula Fernandez", "Vista Alegre - Carlópolis", "", "julianaFernandezTextil2022", "servico"]
+  ,["Locação de Máquinas", "Fernando Jose Correa", "Jardim Americana - Carlópolis", "", "fernandoCorreaLocacao2022", "servico"]
+  ,["Serviços Empresariais", "Recanto Bela Vista", "Água da Limeira - Carlópolis", "", "recantoBelaVista2022", "servico"]
+  ,["Autoelétrica", "Giovane de Mello Goncalves Ramos", "Centro - Carlópolis", "", "giovaneRamosAutoeletrica2022", "servico"]
+  ,["Clínica Médica", "Clínica San Pantalleon", "Centro - Carlópolis", "", "clinicaSanPantalleon2022", "servico"]
+  ,["Gestão Empresarial", "Gisa Gestão Empresarial", "Água da Limeira - Carlópolis", "", "gisaGestao2022", "servico"]
+  ,["Radiologia e Diagnóstico por Imagem", "Maycom Utida", "Novo Horizonte - Carlópolis", "", "maycomUtidaRadiologia2022", "servico"]
+  ,["Serviços Agrícolas", "Valdir França", "Novo Horizonte - Carlópolis", "", "valdirFrancaAgricola2022", "servico"]
+  ,["Produção Musical", "Nicolas Keder Perez", "Centro - Carlópolis", "", "nicolasPerezMusica2022", "servico"]
+  ,["Piscicultura", "Piscicultura Aleixo", "Água da Limeira - Carlópolis", "", "pisciculturaAleixo2022"]
+  ,["Cosméticos e Perfumaria", "Ainoa Okubo Mendes", "Centro - Carlópolis", "", "ainoaMendesCosmeticos2022"]
+  ,["Manutenção Náutica", "N.M Náutica", "Centro - Carlópolis", "", "nmNautica2022", "servico"]
+  ,["Esquadrias Metálicas", "Veronica Tavares Paes", "Jardim Novo Horizonte - Carlópolis", "", "veronicaPaesEsquadrias2022", "servico"]
+  ,["Papelaria", "Josiane Rodrigues de Oliveira", "Centro - Carlópolis", "", "josianeOliveiraPapelaria2022"]
+  ,["Bar", "Adrian Gabriel Cezar Pereira", "Caminho do Vale - Carlópolis", "", "adrianPereiraBar2022"]
+  ,["Órgão Público", "Fundo Municipal do Meio Ambiente - FMMA", "Centro - Carlópolis", "", "fmmaCarlopolis2022", "institucional"]
+  ,["Limpeza", "Tiago Ferreira Calixto", "Vista Alegre - Carlópolis", "", "tiagoCalixtoLimpeza2022", "servico"]
+  ,["Transporte e Materiais de Construção", "JCGM Materiais de Construção", "Jardim Itália - Carlópolis", "", "jcgmMateriais2022", "servico"]
+  ,["Produtos Têxteis", "Elizabeth Aparecida da Silva Martinez", "Centro - Carlópolis", "", "elizabethMartinezTextil2022", "servico"]
+  ,["Estética e Cuidados com a Beleza", "Raiza da Silva", "Centro - Carlópolis", "", "raizaSilvaEstetica2022", "servico"]
+  ,["Colchões e Colchoaria", "Rodrigo Aparecido Bento", "Jardim Vista Alegre - Carlópolis", "", "rodrigoBentoColchoaria2022"]
+  ,["Pedreiro e Alvenaria", "Adenilson Norberto Leite", "Vila Bandeirantes - Carlópolis", "", "adenilsonLeiteAlvenaria2022", "servico"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
