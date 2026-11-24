@@ -1218,6 +1218,31 @@ window.FONTES_CADASTROS_BASICOS = {
   ,raizaSilvaEstetica2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47544266000169-raiza-da-silva" }
   ,rodrigoBentoColchoaria2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47505909000165-rodrigo-aparecido-bento" }
   ,adenilsonLeiteAlvenaria2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/47463673000141-adenilson-norberto-leite" }
+  ,wengelParticipacoes2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48674445000183-wengel-participacoes-ltda" }
+  ,evollutionJeans2022: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/48582199000130-evollution-jeans" }
+  ,pauloCesarSerralheria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51454297000104-paulo-cesar-de-souza" }
+  ,hcmyConsultoria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51441089000162-hcmy-consultoria-empresarial" }
+  ,mosteiroPreciosissimoSangue2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51413592000104-mosteiro-preciosissimo-sangue" }
+  ,brunoMarcenoLavagem2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51302480000186-bruno-henrique-rodrigues-marceno" }
+  ,divaDepizzolTecidos2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51204456000104-diva-de-fatima-depizzol" }
+  ,ivoneLeiteBar2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51204882000148-ivone-candida-dos-reis-leite" }
+  ,igrejaJesusLuz2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/59707594000118-igreja-pentecostal-jesus-a-luz-deste-mundo" }
+  ,partidoLiberalCarlopolis2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51731373000173-partido-liberal-carlopolis-pr-municipal" }
+  ,carolinaBersiSerralheria2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51136416000172-carolina-de-oliveira-bersi-de-souza" }
+  ,daianaMeninBebidas2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51093725000102-daiana-cristina-menin" }
+  ,belTrading2023: { nome: "BEL Trading / site oficial e CNPJ Dados", url: "https://beltrading.com.br/sobre-nos/" }
+  ,eduardaSilvaVestuario2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51088633000134-eduarda-marcela-de-col-silva" }
+  ,muradorDois2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51055632000193-murador-e-logullo-spe-ltda" }
+  ,hSalesIntermediacao2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/51006420000116-h-de-sales-junior-intermediacao-de-negocios" }
+  ,luisGustavoBeleza2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50982352000168-luis-gustavo-silva" }
+  ,fabioFreitasCarnes2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50958535000148-fabio-roberto-reis-de-freitas" }
+  ,cristianeBarbosaDomestico2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50913993000160-cristiane-moreira-barbosa" }
+  ,emanuellePedroAdministrativo2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50864819000175-emannuelle-camila-valim-pedro" }
+  ,sandraCarmelinoBar2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50874696000153-sandra-priscila-soares-carmelino" }
+  ,mjaTreinamentos2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50881243000154-m-j-a-ltda" }
+  ,victorRodriguesBeleza2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50837737000131-victor-hugo-fernandes-rodrigues" }
+  ,metaBusines2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50684512000192-meta-busines-administradora" }
+  ,wesleyPereiraMercado2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/50651286000143-wesley-correa-santos-pereira" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2426,6 +2451,31 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Estética e Cuidados com a Beleza", "Raiza da Silva", "Centro - Carlópolis", "", "raizaSilvaEstetica2022", "servico"]
   ,["Colchões e Colchoaria", "Rodrigo Aparecido Bento", "Jardim Vista Alegre - Carlópolis", "", "rodrigoBentoColchoaria2022"]
   ,["Pedreiro e Alvenaria", "Adenilson Norberto Leite", "Vila Bandeirantes - Carlópolis", "", "adenilsonLeiteAlvenaria2022", "servico"]
+  ,["Administração de Participações", "Wengel Participações Ltda", "Ribeirão do Meio - Carlópolis", "", "wengelParticipacoes2022", "servico"]
+  ,["Confecção e Vestuário", "Evollution Jeans", "Centro - Carlópolis", "", "evollutionJeans2022", "servico"]
+  ,["Serralheria", "Paulo Cesar de Souza", "Centro - Carlópolis", "", "pauloCesarSerralheria2023", "servico"]
+  ,["Consultoria Empresarial", "HCMY - Consultoria Empresarial", "Centro - Carlópolis", "", "hcmyConsultoria2023", "servico"]
+  ,["Instituição Religiosa", "Mosteiro Preciosíssimo Sangue", "Água da Limeira - Carlópolis", "", "mosteiroPreciosissimoSangue2023", "institucional"]
+  ,["Lava-Rápido e Estética Automotiva", "Bruno Henrique Rodrigues Marceno", "Centro - Carlópolis", "", "brunoMarcenoLavagem2023", "servico"]
+  ,["Tecidos e Artigos Têxteis", "Diva de Fatima Depizzol", "Centro - Carlópolis", "", "divaDepizzolTecidos2023"]
+  ,["Bar", "Ivone Candida dos Reis Leite", "Vista Alegre - Carlópolis", "", "ivoneLeiteBar2023"]
+  ,["Instituição Religiosa", "Igreja Pentecostal Jesus a Luz Deste Mundo", "Centro - Carlópolis", "", "igrejaJesusLuz2023", "institucional"]
+  ,["Organização Política", "Partido Liberal - Carlópolis - PR - Municipal", "Centro - Carlópolis", "", "partidoLiberalCarlopolis2023", "institucional"]
+  ,["Esquadrias Metálicas", "Carolina de Oliveira Bersi de Souza", "Vila Bandeirantes - Carlópolis", "", "carolinaBersiSerralheria2023", "servico"]
+  ,["Bebidas", "Daiana Cristina Menin", "Centro - Carlópolis", "", "daianaMeninBebidas2023"]
+  ,["Materiais de Construção", "BEL Trading Ltda", "Rua Paul Harris, 122 - Vista Bella", "(43) 99176-2749", "belTrading2023", "comercio", null, null, "https://beltrading.com.br/wp-content/uploads/2025/02/beltrading-e1765978676998.png", "https://beltrading.com.br/sobre-nos/"]
+  ,["Vestuário e Acessórios", "Eduarda Marcela de Col Silva", "Centro - Carlópolis", "", "eduardaSilvaVestuario2023"]
+  ,["Empreendimentos Imobiliários", "Murador II", "Rua Calil Keder, 583, sala 7-B - Centro", "", "muradorDois2023", "servico"]
+  ,["Intermediação de Negócios", "H de Sales Junior Intermediação de Negócios", "Centro - Carlópolis", "", "hSalesIntermediacao2023", "servico"]
+  ,["Cabeleireiro e Beleza", "Luis Gustavo Silva", "Centro - Carlópolis", "", "luisGustavoBeleza2023", "servico"]
+  ,["Produtos de Carne", "Fabio Roberto Reis de Freitas", "Parque Industrial - Carlópolis", "", "fabioFreitasCarnes2023"]
+  ,["Serviços Domésticos", "Cristiane Moreira Barbosa", "Centro - Carlópolis", "", "cristianeBarbosaDomestico2023", "servico"]
+  ,["Apoio Administrativo", "Emannuelle Camila Valim Pedro", "Centro - Carlópolis", "", "emanuellePedroAdministrativo2023", "servico"]
+  ,["Bar", "Sandra Priscila Soares Carmelino", "Centro - Carlópolis", "", "sandraCarmelinoBar2023"]
+  ,["Cursos e Treinamentos", "M J A Ltda", "Centro - Carlópolis", "", "mjaTreinamentos2023", "servico"]
+  ,["Cabeleireiro e Beleza", "Victor Hugo Fernandes Rodrigues", "Centro - Carlópolis", "", "victorRodriguesBeleza2023", "servico"]
+  ,["Administração de Imóveis", "Meta Busines Administradora", "Garden Club Residence - Carlópolis", "", "metaBusines2023", "servico"]
+  ,["Mercados e Mercearias", "Wesley Correa Santos Pereira", "CTG - Carlópolis", "", "wesleyPereiraMercado2023"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
