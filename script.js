@@ -266,7 +266,7 @@ async function gerarImagemCardImovel(imovel, categoriaAtual) {
   try {
     await garantirHtml2Canvas();
     const corDestaque = "#0095f6";
-    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
+    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/3d%20preto%20cartoon.png";
 
     const titulo = (imovel.titulo || "IMÓVEL DISPONÍVEL").toUpperCase();
     const endereco = imovel.endereco || "Consulte localização";
@@ -414,7 +414,7 @@ async function gerarImagemCardEstabelecimentoLegado(establishment, categoriaAtua
     const nome = (nomeLimpo || "Estabelecimento").toUpperCase();
 
 
-    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/logo_1.png";
+    const logoSiteUrl = window.location.origin + "/images/img_padrao_site/3d%20preto%20cartoon.png";
 
     // --- COLETA DE DADOS ---
     const telefone = getPrimeiroContato(establishment.contact || establishment.whatsapp || establishment.telefone || "");
@@ -1419,7 +1419,7 @@ async function gerarImagemCardEstabelecimento(establishment, categoriaAtual, slu
     dados.imagem,
     establishment.imagemEnquadramento || establishment.imageFit || "auto"
   );
-  const logoSiteUrl = urlAbsolutaArteComercial("images/img_padrao_site/logo_1.png");
+  const logoSiteUrl = urlAbsolutaArteComercial("images/img_padrao_site/3d preto cartoon.png");
   const dialog = document.createElement("div");
   dialog.className = "business-art-dialog";
   dialog.setAttribute("role", "dialog");
@@ -6097,7 +6097,7 @@ Quando você compra de uma empresa local, contrata um profissional da cidade ou 
 
   function novidadeLogoAnunciante(item, anunciante = "") {
     const tipo = normalizeName(item?.destinoTipo || item?.tipo || "");
-    if (tipo.includes("evento") || novidadeEhEvento(item)) return "images/img_padrao_site/logo_1.png";
+    if (tipo.includes("evento") || novidadeEhEvento(item)) return "images/img_padrao_site/3d preto cartoon.png";
     const direto = novidadeValorCampo(item, ["logo", "logoUrl", "perfil", "perfilUrl", "imagemPerfil", "clienteLogo", "profileImage"]);
     if (direto) return direto;
     const cadastro = encontrarCadastroDonoNovidade(item, anunciante);
@@ -9872,7 +9872,7 @@ carlopdiesel:"s",
   ///
   // mostrar onde comer
   function mostrarOndeComer(filtroCategoria = "Todos") {
-    const imagemPadraoOndeComer = "images/img_padrao_site/logo-ola-carlopolis.png.png";
+    const imagemPadraoOndeComer = "images/img_padrao_site/3d preto cartoon.png";
     const categoriasComida = [
       "Abertos", "Açai", "Doces e Chocolates", "Lanchonete", "Padaria", "Pizzaria", "Restaurante", "Salgados para Festas", "Sorveteria",
     ];
@@ -15184,7 +15184,7 @@ plotarPinsImoveis(stateImoveis.filtered);
 
   function vacationPublicCard(item) {
     const images = vacationPublicImages(item);
-    const cardImages = images.length ? images : ["images/img_padrao_site/logo_1.png"];
+    const cardImages = images.length ? images : ["images/img_padrao_site/3d preto cartoon.png"];
     const price = vacationPublicMoney(item.valorDiaria);
     const whatsapp = vacationPublicWhatsapp(item);
     return '<article class="vacation-public-card' + (item.destaque ? " is-featured" : "") + '" data-vacation-id="' + vacationPublicEscape(item.id) + '">' +

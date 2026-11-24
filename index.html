@@ -26,6 +26,9 @@
    <meta name="author" content="Bruno Fabro">
    <meta name="robots" content="index, follow">
    <link rel="canonical" href="https://www.olacarlopolis.com" />
+   <meta property="og:image" content="https://www.olacarlopolis.com/images/img_padrao_site/3d%20preto%20cartoon.png">
+   <meta name="twitter:card" content="summary_large_image">
+   <meta name="twitter:image" content="https://www.olacarlopolis.com/images/img_padrao_site/3d%20preto%20cartoon.png">
 
 
    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,6 +47,8 @@
     "@type": "LocalBusiness",
     "name": "Olá Carlópolis",
     "url": "https://www.olacarlopolis.com",
+    "logo": "https://www.olacarlopolis.com/images/img_padrao_site/3d%20preto%20cartoon.png",
+    "image": "https://www.olacarlopolis.com/images/img_padrao_site/3d%20preto%20cartoon.png",
     "description": "Olá Carlópolis (também conhecido como olacarlopolis ou ola carlopolis) é um site para facilitar a vida da populaçao e dos comercios da cidade de Carlopolis",
     "address": {
       "@type": "PostalAddress",
@@ -56,7 +61,7 @@
 
 
    <!-- Inicio APP -->
-   <link rel="manifest" href="manifest.json">
+   <link rel="manifest" href="manifest.json?v=2">
 
    <!-- Splash screen customizada -->
    <style>
@@ -95,8 +100,9 @@
    <link rel="apple-touch-icon" href="images/img_padrao_site/icon-512.png">-->
 
 
-   <link rel="icon" type="image/png" sizes="192x192" href="images/img_padrao_site/icon-192_2.png">
-   <link rel="apple-touch-icon" href="images/img_padrao_site/icon-512_2.png">
+   <link rel="icon" type="image/png" sizes="1536x1536" href="images/img_padrao_site/3d preto cartoon.png">
+   <link rel="shortcut icon" type="image/png" href="images/img_padrao_site/3d preto cartoon.png">
+   <link rel="apple-touch-icon" sizes="1536x1536" href="images/img_padrao_site/3d preto cartoon.png">
 
 
    <!-- Nome do app (usado como nome do ícone) -->
@@ -110,8 +116,6 @@
    <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
    <!-- FIM APP  -->
-   <link rel="icon" type="image/png" sizes="16x16" href="images/img_padrao_site/favicon.ico">
-
    <meta name="msapplication-TileColor" content="#ffffff">
    <meta name="theme-color" content="#ffffff">
    <!-- Inicio CSS -->
@@ -123,7 +127,7 @@
    <script defer src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 
    <!-- FIM  JAVA -->
-   <link rel="stylesheet" href="style.css?v=654" />
+   <link rel="stylesheet" href="style.css?v=655" />
    <link rel="stylesheet" href="client-gallery.css?v=3" />
 
    <!-- <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>-->
@@ -1719,7 +1723,7 @@
    <script>
       if ('serviceWorker' in navigator) {
          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js?v=1113', { updateViaCache: 'none' })
+            navigator.serviceWorker.register('/service-worker.js?v=1114', { updateViaCache: 'none' })
                .then((reg) => {
                   console.log("✅ Service Worker registrado:", reg.scope);
                })
@@ -1730,7 +1734,7 @@
 
    <!--  JavaScript -->
    <script defer src="basic-listings.js?v=81"></script>
-   <script defer src="script.js?v=870"></script>
+   <script defer src="script.js?v=871"></script>
    <script defer src="item-share.js?v=3"></script>
    <script defer src="client-gallery.js?v=3"></script>
 

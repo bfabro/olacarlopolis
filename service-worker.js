@@ -1,13 +1,11 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-11-24-onde-comer-imagem-padrao-v1113'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-11-24-identidade-oficial-v1114'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
-  '/images/img_padrao_site/logo_1.png',
-  '/images/img_padrao_site/icon-192_2.png',
-  '/images/img_padrao_site/icon-512_2.png',
+  '/images/img_padrao_site/3d preto cartoon.png',
 ];
 
 // Instala e já “assume” a nova versão
