@@ -671,6 +671,24 @@ body {
   padding: 1px 2px 0px 18px;
 }
 
+/* Somente categorias criadas pelos cadastros públicos: permite nomes completos. */
+.submenu .sublink.cadastro-basico-category-link {
+  align-items: flex-start;
+  white-space: normal;
+}
+
+.submenu .sublink.cadastro-basico-category-link .navlink {
+  min-width: 0;
+  padding: 9px 8px 9px 0;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.submenu .sublink.cadastro-basico-category-link .navlink_icon {
+  flex: 0 0 50px;
+}
+
 .bottom_content {
   position: static;
   bottom: 100px;

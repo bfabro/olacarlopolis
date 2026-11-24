@@ -1268,6 +1268,7 @@ window.FONTES_CADASTROS_BASICOS = {
   ,rosangelaSilvaBar2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52085604000181-rosangela-fernandes-da-silva" }
   ,evelynSilvaBeleza2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52067265000100-evelyn-patrocinio-da-silva" }
   ,jfMultimarcas2023: { nome: "CNPJ Dados / dados públicos da Receita Federal", url: "https://cnpjdados.com/ir/consulta-empresa/52046657000193-j-f-multimarcas" }
+  ,sraDiagnostico2023: { nome: "Grupo SRA / site oficial e Receita Federal", url: "https://www.gruposra.com.br/" }
 };
 
 window.CADASTROS_BASICOS_PUBLICOS = [
@@ -2526,6 +2527,7 @@ window.CADASTROS_BASICOS_PUBLICOS = [
   ,["Bar", "Rosangela Fernandes da Silva", "Centro - Carlópolis", "", "rosangelaSilvaBar2023"]
   ,["Cabeleireiro e Beleza", "Evelyn Patrocinio da Silva", "Residencial Murador - Carlópolis", "", "evelynSilvaBeleza2023", "servico"]
   ,["Veículos Seminovos", "J F - Multimarcas", "Novo Horizonte I - Carlópolis", "", "jfMultimarcas2023"]
+  ,["Radiologia e Diagnóstico por Imagem", "SRA - Clínica de Diagnóstico por Imagem Ltda", "Rua Capitão Estácio, 460, sala 40 - Vista Bella", "(43) 4000-1457", "sraDiagnostico2023", "servico", null, null, "https://www.gruposra.com.br/images/logo-sra-header.png", "https://www.gruposra.com.br/"]
 ].map(([categoria, name, address, contact, fonte, tipoCliente = "comercio", duplicateHint = null, addressReviewHint = null, image = "", imageSourceUrl = "", instagram = ""]) => {
   const slug = (value) => String(value || "")
     .toLowerCase()
@@ -2547,4 +2549,4 @@ window.CADASTROS_BASICOS_PUBLICOS = [
     duplicateHint: duplicateHint ? { motivo: duplicateHint[0], conflitaCom: duplicateHint[1] } : null,
     addressReviewHint: addressReviewHint ? { motivo: addressReviewHint[0], conflitaCom: addressReviewHint[1] } : null
   };
-});
+}).filter((cadastro) => String(cadastro.contact || "").trim());

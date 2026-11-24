@@ -24074,6 +24074,45 @@ plotarPinsImoveis(stateImoveis.filtered);
     return Boolean(motivoDuplicidadeCadastroBasico(cadastro, estabelecimento));
   }
 
+  function iconeCategoriaCadastroBasicoPublico(categoria) {
+    const nome = normalizeName(categoria || "");
+    const regras = [
+      [/padaria|confeitaria/, "fa-solid fa-bread-slice"],
+      [/restaurante|lanchonete|alimentacao|comida|espeto|bar/, "fa-solid fa-utensils"],
+      [/mercado|mercearia|hortifruti|alimento/, "fa-solid fa-basket-shopping"],
+      [/roupa|vestuario|confeccao|textil|tecido/, "fa-solid fa-shirt"],
+      [/calcado/, "fa-solid fa-shoe-prints"],
+      [/beleza|estetica|cabeleireiro|manicure/, "fa-solid fa-scissors"],
+      [/saude|medic|clinica|psiquiatr|fisioter|radiolog|diagnost/, "fa-solid fa-notes-medical"],
+      [/farmac/, "fa-solid fa-capsules"],
+      [/veterin|pet/, "fa-solid fa-paw"],
+      [/advoc/, "fa-solid fa-scale-balanced"],
+      [/contab|consultor|administr|gestao|participa/, "fa-solid fa-briefcase"],
+      [/imovel|imobiliar/, "fa-solid fa-house"],
+      [/construcao|pedreiro|alvenaria|revestimento/, "fa-solid fa-trowel-bricks"],
+      [/eletric/, "fa-solid fa-bolt"],
+      [/hidraul|encanador/, "fa-solid fa-faucet-drip"],
+      [/pintura/, "fa-solid fa-paint-roller"],
+      [/serralher|metal|esquadria/, "fa-solid fa-hammer"],
+      [/marcenaria|moveis|madeira/, "fa-solid fa-couch"],
+      [/mecanica|oficina|autoeletric/, "fa-solid fa-screwdriver-wrench"],
+      [/veiculo|automovel|moto|autopeca/, "fa-solid fa-car"],
+      [/transporte|frete|entrega|malote/, "fa-solid fa-truck"],
+      [/agricol|agro|rural/, "fa-solid fa-tractor"],
+      [/informat|tecnologia|computador|comunicacao/, "fa-solid fa-laptop"],
+      [/fotografia|imagem/, "fa-solid fa-camera"],
+      [/papelaria/, "fa-solid fa-pen-ruler"],
+      [/joia|bijuteria|artesanato/, "fa-solid fa-gem"],
+      [/limpeza|domestico/, "fa-solid fa-broom"],
+      [/ensino|curso|treinamento/, "fa-solid fa-graduation-cap"],
+      [/religiosa|igreja|mosteiro/, "fa-solid fa-place-of-worship"],
+      [/politica|publico/, "fa-solid fa-landmark"],
+      [/hotel|pousada|hospedagem/, "fa-solid fa-bed"],
+      [/lazer|marina|nautica|pesca/, "fa-solid fa-sailboat"]
+    ];
+    return (regras.find(([padrao]) => padrao.test(nome)) || [null, "fa-solid fa-store"])[1];
+  }
+
   function aplicarCadastrosBasicosPublicos() {
     const cadastros = Array.isArray(window.CADASTROS_BASICOS_PUBLICOS) ? window.CADASTROS_BASICOS_PUBLICOS : [];
     const fontes = window.FONTES_CADASTROS_BASICOS || {};
@@ -24145,7 +24184,9 @@ plotarPinsImoveis(stateImoveis.filtered);
       let categoria = categories.find((item) => normalizeName(item.title || "") === normalizeName(cadastro.categoria || ""));
       if (!categoria && typeof garantirCategoriaAdmin === "function") {
         categoria = garantirCategoriaAdmin(cadastro.categoria || "Outros", {
-          menuGroup: cadastro.tipoCliente === "servico" ? "servicos" : "comercios"
+          menuGroup: cadastro.tipoCliente === "servico" ? "servicos" : "comercios",
+          icon: iconeCategoriaCadastroBasicoPublico(cadastro.categoria),
+          cadastroBasicoPublico: true
         });
       }
       if (!categoria) {
@@ -25086,6 +25127,7 @@ plotarPinsImoveis(stateImoveis.filtered);
     const link = document.createElement("a");
     link.href = "#";
     link.className = "nav_link sublink";
+    if (meta.cadastroBasicoPublico) link.classList.add("cadastro-basico-category-link");
     link.dataset.adminCategory = slug;
     link.dataset.adminMenuGroup = menuGroupCategoriaAdmin(meta);
     if (meta.parentId) link.dataset.adminParent = meta.parentId;
