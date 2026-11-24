@@ -1,11 +1,12 @@
 /* service-worker.js */
-const CACHE_VERSION = '2026-11-24-identidade-oficial-v1114'; // atualize ao publicar uma nova versao
+const CACHE_VERSION = '2026-11-24-onde-comer-logo-quadrada-v1115'; // atualize ao publicar uma nova versao
 const CACHE_NAME = `olacarlopolis-${CACHE_VERSION}`;
 
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',
   '/images/img_padrao_site/3d preto cartoon.png',
+  '/images/img_padrao_site/ChatGPT Image 30 de ago. de 2026, 02_36_53.png',
 ];
 
 // Instala e já “assume” a nova versão

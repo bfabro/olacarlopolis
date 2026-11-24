@@ -9872,7 +9872,7 @@ carlopdiesel:"s",
   ///
   // mostrar onde comer
   function mostrarOndeComer(filtroCategoria = "Todos") {
-    const imagemPadraoOndeComer = "images/img_padrao_site/3d preto cartoon.png";
+    const imagemPadraoOndeComer = "images/img_padrao_site/ChatGPT Image 30 de ago. de 2026, 02_36_53.png";
     const categoriasComida = [
       "Abertos", "Açai", "Doces e Chocolates", "Lanchonete", "Padaria", "Pizzaria", "Restaurante", "Salgados para Festas", "Sorveteria",
     ];

@@ -3824,7 +3824,8 @@ a:focus {
 
 .onde-comer-img {
   width: 86px;
-  height: 78px;
+  height: 86px;
+  aspect-ratio: 1;
   object-fit: cover;
   border-radius: 8px;
   margin-right: 10px;
@@ -3832,7 +3833,7 @@ a:focus {
 }
 
 .onde-comer-img.onde-comer-img-fallback {
-  padding: 7px;
+  padding: 2px;
   border: 1px solid rgba(7, 45, 91, 0.1);
   background: #fff;
   object-fit: contain;
