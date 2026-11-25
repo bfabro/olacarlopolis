@@ -23,8 +23,8 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("CarloPesca integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(site, /ola-pesca\.css\?v=113/);
-  assert.match(site, /ola-pesca\.js\?v=113/);
+  assert.match(site, /ola-pesca\.css\?v=114/);
+  assert.match(site, /ola-pesca\.js\?v=114/);
   assert.match(site, /CarloPesca/);
   assert.match(source, /CarloPesca/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -36,19 +36,18 @@ test("CarloPesca integra mapa, controles e progresso na tela de Jogos", () => {
   assert.match(css, /touch-action:none/);
 });
 
-test("v113 aproxima o CarloPesca da margem e remove sua vara", () => {
+test("v114 nomeia Neto Saad e o coloca no terceiro quadrado antes do píer", () => {
   const character = core.SHORE_FISHERS.find((fisher) => fisher.spriteSet === "carlopesca");
   assert.ok(character);
-  assert.equal(character.name, "CarloPesca");
+  assert.equal(character.name, "Neto Saad");
   assert.equal(character.fixedSpeech, "Eu peguei o Tucunare dourado de primeira! hahaha");
   assert.equal(core.GOLDEN_FISHER_HINTS.at(-1), character.fixedSpeech);
-  assert.equal(character.x, 11.1 * 32);
-  assert.equal(character.y, 17.1 * 32);
+  assert.equal(character.x, 4.5 * 32);
+  assert.equal(character.y, 10.5 * 32);
   assert.equal(character.hasRod, false);
   assert.equal(core.MAP[Math.floor(character.y / 32)][Math.floor(character.x / 32)], ".");
-  const yas = core.SHORE_FISHERS.find((fisher) => fisher.name === "Yas");
-  assert.ok(Math.hypot(character.x - yas.x, character.y - yas.y) > 6 * 32);
-  assert.ok(character.waterX - character.x < 1.3 * 32);
+  assert.equal(character.x, (7.5 - 3) * 32);
+  assert.equal(character.y, core.PLAYER_START.y);
   assert.match(source, /personagem-carlopesca-v112\.png/);
   assert.match(source, /drawCarloPescaFisherV110/);
   assert.match(source, /const height=82/);
@@ -1335,7 +1334,7 @@ test("v73 diferencia a Piracanjuba e reorganiza personagens e cenário", () => {
   assert.equal(fs.existsSync(new URL("../images/jogos/ola-pesca/piracanjuba-v73.png", import.meta.url)), true);
   assert.match(serviceWorker, /piracanjuba-v73.png/);
   assert.deepEqual(Array.from(core.TRIBUTARY_GUESTS, guest => guest.name), ["Gordo", "Felipe"]);
-  assert.deepEqual(Array.from(core.SHORE_FISHERS, fisher => fisher.name), ["Gustavinho", "Duda", "Ção", "Yas", "Zé", "Jurandir", "CarloPesca"]);
+  assert.deepEqual(Array.from(core.SHORE_FISHERS, fisher => fisher.name), ["Gustavinho", "Duda", "Ção", "Yas", "Zé", "Jurandir", "Neto Saad"]);
   assert.equal(core.TRIBUTARY_GUEST_ROUTES_V73.length, 2);
   assert.ok(core.TRIBUTARY_GUEST_ROUTES_V73.every(route => route.length >= 8));
   assert.ok(core.TRIBUTARY_GUEST_ROUTES_V73.every(route => Math.max(...Array.from(route, point => point[0])) - Math.min(...Array.from(route, point => point[0])) > 6));
@@ -1356,7 +1355,7 @@ test("v73 diferencia a Piracanjuba e reorganiza personagens e cenário", () => {
 });
 
 test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores em terra", () => {
-  assert.deepEqual(Array.from(core.SHORE_FISHERS, fisher => fisher.name), ["Gustavinho", "Duda", "Ção", "Yas", "Zé", "Jurandir", "CarloPesca"]);
+  assert.deepEqual(Array.from(core.SHORE_FISHERS, fisher => fisher.name), ["Gustavinho", "Duda", "Ção", "Yas", "Zé", "Jurandir", "Neto Saad"]);
   assert.ok(source.includes("drawWidth=Math.min(width,height*sourceWidth/sourceHeight)"));
   assert.ok(source.includes("drawWidth=Math.min(width,drawHeight*rect.w/sourceHeight)"));
   assert.ok(source.includes("drawWidth=Math.min(width,drawHeight*rect.w/rect.h)"));
