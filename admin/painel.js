@@ -991,7 +991,7 @@ const viewCopy = {
   combustiveisPrecos: ["Ajustar precos", "Atualize os valores de bomba do posto vinculado ao seu acesso."],
   combustiveisConfig: ["Preço Combustível", "Busque postos da ANP, selecione os publicados e atualize os preços de bomba."],
   sobreNos: ["Sobre nós", "Edite o conteúdo institucional apresentado no site público."],
-  pescaConfig: ["Pesque e Solte", "Gerencie rodadas, campeonatos, etapas e premiações."],
+  pescaConfig: ["CarloPesca", "Gerencie rodadas, campeonatos, etapas e premiações."],
   xadrezConfig: ["Xadrez", "Configure campeonato e premio do jogo de xadrez."],
   usuarios: ["Usuarios", "Crie acessos e vincule clientes."],
   minhaEmpresa: ["Minha empresa", "Edite os dados liberados para seu cadastro."],
@@ -3161,7 +3161,7 @@ async function loadAllData(onProgress = null) {
   state.clientesFinanceiro = clientFinanceMapFromSnapshot(clientesFinanceiroSnap, financeClientId);
   applyClientsSnapshot(clientesSnap, clientesFinanceiroSnap, financeClientId);
   if (canManage) {
-    await syncFishingSponsors().catch((error) => console.warn("Falha ao sincronizar patrocinadores do Pesque e Solte.", error));
+    await syncFishingSponsors().catch((error) => console.warn("Falha ao sincronizar patrocinadores do CarloPesca.", error));
   }
   let scopedClientMetrics = null;
   if (!canManage) {
@@ -11080,7 +11080,7 @@ async function saveFishingChampionship() {
   state.olaPescaConfig = config;
   state.olaPescaDraft = null;
   renderFishingAdmin();
-  showToast("Campeonato salvo e publicado no Pesque e Solte.");
+  showToast("Campeonato salvo e publicado no CarloPesca.");
 }
 
 async function resetFishingFreeRanking() {

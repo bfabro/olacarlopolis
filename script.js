@@ -72,8 +72,8 @@ function carregarLeaflet() {
 
 async function carregarOlaPesca() {
   await Promise.all([
-    carregarEstiloSite("ola-pesca.css?v=109", "ola-pesca-css"),
-    carregarScriptSite("ola-pesca.js?v=109", "ola-pesca-js")
+    carregarEstiloSite("ola-pesca.css?v=110", "ola-pesca-css"),
+    carregarScriptSite("ola-pesca.js?v=110", "ola-pesca-js")
   ]);
 }
 
@@ -82,7 +82,7 @@ async function abrirOlaPesca() {
     await carregarOlaPesca();
     window.mostrarOlaPesca?.();
   } catch (error) {
-    console.error("Nao foi possivel abrir o Ola Pesca.", error);
+    console.error("Nao foi possivel abrir o CarloPesca.", error);
     mostrarToast("Nao foi possivel carregar o jogo agora.");
   }
 }
@@ -8036,7 +8036,7 @@ carlopdiesel:"s",
         <div class="game-item game-item-featured">
           <div class="game-icon"><i class="fa-solid fa-fish" style="color:#0f766e"></i></div>
           <div class="game-body">
-            <div class="game-title">Pesque e Solte</div>
+            <div class="game-title">CarloPesca</div>
             <div class="game-desc">Explore a represa, fisgue 13 espécies, encontre cardumes e supere seus recordes.</div>
           </div>
           <div class="game-actions">

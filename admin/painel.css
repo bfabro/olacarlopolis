@@ -13058,7 +13058,7 @@ button.admin-button-loading::after {
   .terrain-report-metrics { grid-template-columns: 1fr 1fr; }
 }
 
-/* Pesque e Solte: gestão Master de rodadas e campeonatos */
+/* CarloPesca: gestão Master de rodadas e campeonatos */
 .fishing-admin-hero{background:linear-gradient(135deg,#f3fbf7,#e7f4ee)}
 .fishing-admin-status{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:#e8ecea;color:#65736d;font-size:.75rem;font-weight:900}
 .fishing-admin-status.active{background:#d9f3e4;color:#197147}

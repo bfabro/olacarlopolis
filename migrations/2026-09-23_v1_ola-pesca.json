@@ -1,7 +1,7 @@
 {
   "version": "2026-09-23_v1",
   "feature": "ola-pesca",
-  "description": "Estrutura de progresso por usuario do minigame Ola Pesca. Rankings e torneios permanecem desativados no MVP.",
+  "description": "Estrutura de progresso por usuario do minigame CarloPesca. Rankings e torneios permanecem desativados no MVP.",
   "realtimeDatabase": {
     "path": "jogos/olaPesca/users/{uid}",
     "ownerField": "userId",
