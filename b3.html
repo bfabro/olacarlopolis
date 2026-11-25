@@ -7,7 +7,7 @@
   <meta name="description" content="Painel B3 do Olá Carlópolis: commodities, bolsas, tendências, notícias e posicionamento.">
   <title>B3 | Olá Carlópolis</title>
   <link rel="icon" href="images/img_padrao_site/icon-192_2.png">
-  <link rel="stylesheet" href="b3.css?v=24">
+  <link rel="stylesheet" href="b3.css?v=25">
 </head>
 <body>
   <a class="skip-link" href="#conteudo">Ir para o conteúdo</a>
@@ -44,6 +44,7 @@
       <button class="tab" type="button" data-tab="analise" aria-selected="false">Análise</button>
       <button class="tab" type="button" data-tab="daytrade" aria-selected="false">Day Trade</button>
       <button class="tab" type="button" data-tab="noticias" aria-selected="false">Notícias</button>
+      <button class="tab" type="button" data-tab="corretoras" aria-selected="false">Corretoras</button>
       <button class="tab" type="button" data-tab="contratos" aria-selected="false">Contratos &amp; fluxo</button>
     </nav>
 
@@ -284,6 +285,42 @@
       <p class="source-note">Agregação por RSS do Google Notícias, renovada automaticamente a cada cinco minutos. O painel prioriza o dia atual e completa a lista com notícias relevantes das últimas 36 horas quando necessário.</p>
     </section>
 
+    <section class="tab-panel" id="panel-corretoras" data-panel="corretoras" hidden>
+      <div class="section-heading"><div><span class="eyebrow">PARTICIPANTES E DERIVATIVOS</span><h2>Corretoras que ajudam a formar índice e dólar</h2><small class="updated" id="brokersUpdated">Carregando informações…</small></div><p>Doze instituições relevantes para acompanhar no fluxo, com leitura separada de índice e dólar.</p></div>
+      <div class="broker-live-grid" id="brokerLiveSummary"><div class="chart-loading">Buscando índice, dólar, WIN e WDO…</div></div>
+
+      <article class="panel-card broker-ranking-card">
+        <div class="card-title"><div><span class="eyebrow">12 PARTICIPANTES PARA ACOMPANHAR</span><h2>Influência operacional estimada</h2></div><span class="source-pill">Seleção editorial</span></div>
+        <p class="broker-method">A pontuação combina relevância potencial em índice (55%) e dólar (45%), considerando atuação institucional, internacional e de varejo. Não é ranking oficial de volume da B3 nem revela posição comprada ou vendida.</p>
+        <div class="broker-table" id="brokerTable" role="table" aria-label="Corretoras relevantes para índice e dólar"><div class="chart-loading">Montando ranking…</div></div>
+      </article>
+
+      <div class="broker-contract-layout top-gap">
+        <article class="panel-card">
+          <div class="card-title"><div><span class="eyebrow">LEITURA ATUAL</span><h2>Pressão estimada dos contratos</h2></div><span class="updated" id="brokerPressureUpdated">Calculando…</span></div>
+          <div class="broker-contract-switch" aria-label="Escolha do contrato"><button class="is-active" type="button" data-broker-contract="WIN">WIN · Mini-índice</button><button type="button" data-broker-contract="WDO">WDO · Minidólar</button></div>
+          <div id="brokerPressure" class="broker-pressure"><div class="chart-loading">Calculando pressão atual…</div></div>
+          <p class="source-note"><strong>Importante:</strong> esta leitura usa preço e tendência atuais como proxy de pressão. Não representa posição líquida real das corretoras.</p>
+        </article>
+        <article class="panel-card broker-guide">
+          <span class="eyebrow">COMO USAR</span><h2>Dicas para interpretar</h2>
+          <div><b>Persistência vale mais que uma ordem</b><span>Procure repetição, aceitação do preço e continuidade após rompimentos.</span></div>
+          <div><b>Corretora não significa direção própria</b><span>A instituição pode executar clientes, arbitragem, hedge e formador de mercado ao mesmo tempo.</span></div>
+          <div><b>Confirme no contexto</b><span>Compare índice com ações pesadas; no dólar, observe DXY, juros e risco fiscal.</span></div>
+          <div><b>Não some compras e vendas cegamente</b><span>Todo negócio possui dois lados. O efeito depende de quem agride, do preço e da liquidez.</span></div>
+        </article>
+      </div>
+
+      <article class="panel-card broker-history-card top-gap">
+        <div class="card-title"><div><span class="eyebrow">AGRUPAMENTO POR PREGÃO</span><h2>Ajuste e volume diário</h2></div><span class="updated" id="brokerContractUpdated">Buscando histórico D−1…</span></div>
+        <div id="brokerContractChart" class="market-chart"><div class="chart-loading">Carregando histórico do contrato…</div></div>
+        <div class="broker-day-table" id="brokerDayTable" role="table" aria-label="Histórico diário dos contratos"></div>
+      </article>
+
+      <div class="data-warning"><strong>Limite da fonte pública</strong><span>A posição líquida por corretora em tempo real exige market data identificado por participante. Com fontes gratuitas, o painel mostra participantes relevantes, pressão estimada pelas cotações atuais e histórico oficial de fim de dia de WIN/WDO. Confirme o Times &amp; Trades na plataforma da sua corretora.</span></div>
+      <p class="source-note">Referências: busca oficial de participantes da B3, política de market data da B3 e dados de futuros de fim de dia da brapi.dev.</p>
+    </section>
+
     <section class="tab-panel" id="panel-contratos" data-panel="contratos" hidden>
       <div class="section-heading"><div><span class="eyebrow">FECHAMENTO ANTERIOR</span><h2>Contratos em aberto e fluxo</h2></div><span class="updated" id="contractsUpdated">Carregando fechamento D−1…</span></div>
       <div class="d1-futures" id="d1Futures"><div class="chart-loading">Buscando WIN e WDO do último fechamento…</div></div>
@@ -317,6 +354,6 @@
   </main>
 
   <footer><p>Olá Carlópolis · Painel informativo de mercado</p><p>Fontes: B3, Yahoo Finance, TradingView, brapi.dev e veículos via Google Notícias.</p></footer>
-  <script defer src="b3.js?v=24"></script>
+  <script defer src="b3.js?v=25"></script>
 </body>
 </html>

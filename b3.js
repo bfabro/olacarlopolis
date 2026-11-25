@@ -9,7 +9,7 @@
   const percent = (value) => `${Number(value) > 0 ? "+" : ""}${number(value, 2)}%`;
   const dateBR = (value) => { const raw = String(value || ""); const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(raw) ? `${raw}T12:00:00Z` : raw); return new Intl.DateTimeFormat("pt-BR", { timeZone: "UTC" }).format(date); };
   const timeBR = (value) => { const date = new Date(value); return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(date) : "—"; };
-  const state = { tab: "resumo", news: [], newsUpdatedAt: null, newsTodayCount: 0, commodity: "brent", index: "ibov", indexPeriod: "1d", indexPeriodData: null, indexPeriodKey: null, indexPeriodRequests: new Map(), overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", strengthOpenSort: "openContribution", strengthOpenSortDirection: "desc", strengthView: "stocks", premarket: null, premarketPromise: null, premarketCommodity: "brent", usEvents: [], usEventsPromise: null, groups: new Map(), groupRequests: new Map() };
+  const state = { tab: "resumo", news: [], newsUpdatedAt: null, newsTodayCount: 0, commodity: "brent", index: "ibov", indexPeriod: "1d", indexPeriodData: null, indexPeriodKey: null, indexPeriodRequests: new Map(), overview: null, overviewPromise: null, strength: null, strengthPromise: null, strengthTicker: "VALE3", strengthSort: "weight", strengthSortDirection: "desc", strengthOpenSort: "openContribution", strengthOpenSortDirection: "desc", strengthView: "stocks", premarket: null, premarketPromise: null, premarketCommodity: "brent", usEvents: [], usEventsPromise: null, brokers: null, brokersPromise: null, brokerContract: "WIN", groups: new Map(), groupRequests: new Map() };
 
   const commodities = [
     { id: "brent", title: "Petróleo Brent", group: "Energia", icon: "BR", assets: ["PETR4", "PETR3", "PRIO3", "RECV3"], summary: "Alta do Brent tende a elevar a receita em reais das produtoras. Refino, câmbio, política de preços e produção podem alterar o efeito." },
@@ -92,6 +92,7 @@
     if (tab === "bolsas") { ensureOverview().catch(showIndexError); loadIndexPeriod(state.indexPeriod).catch(showIndexError); }
     if (tab === "analise") { ensureOverview().then(renderAnalysis).catch(() => {}); renderTechnical(); }
     if (tab === "daytrade") { ensureOverview().then(renderTradeContext).catch(() => {}); loadUsEvents(); }
+    if (tab === "corretoras") loadBrokers();
     if (tab === "contratos") loadFutures();
     history.replaceState(null, "", `#${tab}`);
   }
@@ -298,7 +299,7 @@
   async function ensureOverview(force = false) {
     if (state.overview && !force) return state.overview; if (state.overviewPromise) return state.overviewPromise;
     const url = force ? `/api/b3-series?live=${Date.now()}` : "/api/b3-series";
-    state.overviewPromise = apiJson(url).then((payload) => { state.overview = payload; renderQuotes(); renderSummaryTrend(); renderIndexSummary(); renderAnalysis(); renderTradeContext(); if (state.tab === "bolsas") renderSelectedIndex(); return payload; }).finally(() => { state.overviewPromise = null; }); return state.overviewPromise;
+    state.overviewPromise = apiJson(url).then((payload) => { state.overview = payload; renderQuotes(); renderSummaryTrend(); renderIndexSummary(); renderAnalysis(); renderTradeContext(); if (state.tab === "bolsas") renderSelectedIndex(); if (state.tab === "corretoras" && state.brokers) renderBrokers(); return payload; }).finally(() => { state.overviewPromise = null; }); return state.overviewPromise;
   }
 
   function renderQuotes() {
@@ -437,6 +438,52 @@
     if (state.newsUpdatedAt) $("#newsUpdatedAt").textContent = `Atualizado às ${new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo", hour: "2-digit", minute: "2-digit", second: "2-digit" }).format(new Date(state.newsUpdatedAt))} · ${state.newsTodayCount} encontradas hoje · automática a cada 5 min`;
   }
 
+  function brokerQuote(asset) { return state.brokers?.quotes?.find((item) => item.asset === asset); }
+  function brokerHistory(asset) { return state.brokers?.history?.find((item) => item.asset === asset); }
+
+  async function loadBrokers(force = false) {
+    if (state.brokers && !force) { renderBrokers(); return state.brokers; }
+    if (state.brokersPromise) return state.brokersPromise;
+    $("#brokerTable").innerHTML = '<div class="chart-loading">Buscando participantes e contratos…</div>';
+    const request = apiJson(`/api/b3-brokers${force ? `?live=${Date.now()}` : ""}`); state.brokersPromise = Promise.all([request, ensureOverview()]).then(([payload]) => { state.brokers = payload; renderBrokers(); return payload; }).catch((error) => { $("#brokerTable").innerHTML = `<div class="chart-error"><strong>Dados de corretoras temporariamente indisponíveis.</strong><span>${esc(error.message)}</span></div>`; throw error; }).finally(() => { state.brokersPromise = null; }); return state.brokersPromise;
+  }
+
+  function renderBrokers() {
+    if (!state.brokers) return; renderBrokerLiveSummary(); renderBrokerRanking(); renderBrokerPressure(); renderBrokerHistory();
+    $("#brokersUpdated").textContent = `Atualizado às ${timeBR(state.brokers.updatedAt)} · preços atuais podem ter atraso`;
+  }
+
+  function renderBrokerLiveSummary() {
+    const ibov = state.overview?.indices?.ibov; const dollar = state.overview?.macro?.usdbrl; const win = brokerQuote("WIN"); const wdo = brokerQuote("WDO");
+    const cards = [
+      { label: "Ibovespa agora", value: ibov ? number(ibov.current, 0) : "—", change: ibov?.change1d, note: ibov ? `Cotação ${timeBR(ibov.marketTime)}` : "Aguardando cotação" },
+      { label: "Dólar agora", value: dollar ? `R$ ${number(dollar.current, 4)}` : "—", change: dollar?.change1d, note: dollar ? `Cotação ${timeBR(dollar.marketTime)}` : "Aguardando cotação" },
+      { label: `${win?.symbol || state.brokers.symbols?.WIN || "WIN"} · volume D−1`, value: win ? number(win.volume) : "—", change: win?.changePercent, note: win ? `${dateBR(win.date)} · ${number(win.trades)} negócios` : "Fim de dia indisponível" },
+      { label: `${wdo?.symbol || state.brokers.symbols?.WDO || "WDO"} · volume D−1`, value: wdo ? number(wdo.volume) : "—", change: wdo?.changePercent, note: wdo ? `${dateBR(wdo.date)} · ${number(wdo.trades)} negócios` : "Fim de dia indisponível" }
+    ];
+    $("#brokerLiveSummary").innerHTML = cards.map((item) => `<article><span>${esc(item.label)}</span><strong>${esc(item.value)}</strong>${Number.isFinite(item.change) ? `<b class="${item.change >= 0 ? "positive" : "negative"}">${percent(item.change)}</b>` : ""}<small>${esc(item.note)}</small></article>`).join("");
+  }
+
+  function renderBrokerRanking() {
+    const rows = [...(state.brokers.brokers || [])].sort((a, b) => b.combinedScore - a.combinedScore);
+    $("#brokerTable").innerHTML = `<div class="broker-row broker-head" role="row"><span>#</span><span>Instituição</span><span>Índice</span><span>Dólar</span><span>Combinado</span><span>O que observar</span></div>${rows.map((item, index) => `<div class="broker-row" role="row"><span>${String(index + 1).padStart(2, "0")}</span><span><b>${esc(item.name)}</b><small>${esc(item.profile)} · ${esc(item.focus)}</small></span><span><b>${number(item.indexScore)}/100</b><i><em style="width:${item.indexScore}%"></em></i></span><span><b>${number(item.dollarScore)}/100</b><i><em style="width:${item.dollarScore}%"></em></i></span><strong>${number(item.combinedScore)}/100</strong><p>${esc(item.watch)}</p></div>`).join("")}`;
+  }
+
+  function renderBrokerPressure() {
+    if (!state.overview) return; const isWin = state.brokerContract === "WIN"; const market = isWin ? state.overview.indices?.ibov : state.overview.macro?.usdbrl; if (!market) return;
+    const fromOpen = market.open > 0 ? (market.current / market.open - 1) * 100 : market.change1d; const signal = market.change1d * .65 + (market.change5d || 0) * .07 + fromOpen * .28; const strength = Math.round(Math.min(95, Math.max(5, 50 + signal * 24))); const direction = strength >= 58 ? "Pressão compradora estimada" : strength <= 42 ? "Pressão vendedora estimada" : "Pressão equilibrada"; const tone = strength >= 58 ? "positive" : strength <= 42 ? "negative" : "neutral";
+    $("#brokerPressure").innerHTML = `<div class="broker-pressure-head"><div><span>${state.brokerContract} · proxy pela cotação atual</span><strong class="${tone}">${direction}</strong></div><b>${strength}/100</b></div><div class="broker-pressure-track"><i class="${tone}" style="width:${strength}%"></i></div><div class="broker-pressure-signals"><span>Variação no dia <b class="${market.change1d >= 0 ? "positive" : "negative"}">${percent(market.change1d)}</b></span><span>Desde a abertura <b class="${fromOpen >= 0 ? "positive" : "negative"}">${percent(fromOpen)}</b></span><span>Em 5 pregões <b class="${market.change5d >= 0 ? "positive" : "negative"}">${percent(market.change5d || 0)}</b></span></div>`;
+    $("#brokerPressureUpdated").textContent = `Cotação ${timeBR(market.marketTime)}`;
+  }
+
+  function renderBrokerHistory() {
+    $$('[data-broker-contract]').forEach((button) => button.classList.toggle("is-active", button.dataset.brokerContract === state.brokerContract)); const history = brokerHistory(state.brokerContract); const quote = brokerQuote(state.brokerContract);
+    if (!history?.points?.length) { $("#brokerContractChart").innerHTML = '<div class="chart-error"><strong>Histórico diário indisponível.</strong><span>O ranking de participantes continua disponível.</span></div>'; $("#brokerDayTable").innerHTML = ""; return; }
+    const series = { label: `${history.symbol} · ajuste`, color: state.brokerContract === "WIN" ? "#0a7a61" : "#2563eb", points: history.points.map((item) => ({ date: item.date, value: item.settlement })) }; renderLineChart($("#brokerContractChart"), [normalizeSeries(series, series.label, series.color)], `Histórico diário do ${history.symbol}`, { intraday: false, caption: "Ajuste normalizado em base 100 · um ponto por pregão", lineWidth: 1.5 });
+    const rows = [...history.points].reverse(); $("#brokerDayTable").innerHTML = `<div class="broker-day-row broker-day-head" role="row"><span>Pregão</span><span>Ajuste</span><span>Variação</span><span>Volume</span><span>Negócios</span></div>${rows.map((item) => `<div class="broker-day-row" role="row"><span>${dateBR(item.date)}</span><strong>${number(item.settlement, state.brokerContract === "WDO" ? 1 : 0)}</strong><strong class="${item.changePercent >= 0 ? "positive" : "negative"}">${percent(item.changePercent)}</strong><strong>${number(item.volume)}</strong><span>${number(item.trades)}</span></div>`).join("")}`;
+    $("#brokerContractUpdated").textContent = `${history.symbol} · ${rows.length} pregões · último ${dateBR(quote?.date || rows[0].date)}`;
+  }
+
   let futuresRequest = null;
   async function loadFutures() {
     if (futuresRequest) return futuresRequest;
@@ -449,6 +496,7 @@
   }
 
   $("#refreshNews").addEventListener("click", () => loadNews(true));
+  $$('[data-broker-contract]').forEach((button) => button.addEventListener("click", () => { state.brokerContract = button.dataset.brokerContract; renderBrokerPressure(); renderBrokerHistory(); }));
   initTicker(); renderCommodities(); renderIndices(); initDayTrade(); initStrength(); initTabs(); updateClock(); setInterval(updateClock, 60000); setInterval(() => { if (!document.hidden) { ensureOverview(true).catch(() => {}); if (state.tab === "forca") { loadStrength(true).catch(() => {}); if (state.strengthView === "commodities") loadPremarket(true).catch(() => {}); } } }, 60000); setInterval(() => { if (!document.hidden) loadNews(true); }, 300000); setInterval(() => { if (!document.hidden && state.tab === "daytrade") loadUsEvents(true).catch(() => {}); }, 900000);
   ensureOverview().catch((error) => { $("#quoteGrid").innerHTML = `<div class="panel-card" style="grid-column:1/-1"><strong>Cotações temporariamente indisponíveis.</strong><p class="source-note">${esc(error.message)}</p></div>`; $("#quotesUpdated").textContent = "Fonte indisponível"; }); loadNews();
 })();

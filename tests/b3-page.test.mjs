@@ -5,10 +5,18 @@ import { readFile } from "node:fs/promises";
 const root = new URL("../", import.meta.url);
 const read = (name) => readFile(new URL(name, root), "utf8");
 
-test("pagina B3 possui as oito secoes e arquivos versionados", async () => {
+test("pagina B3 possui as secoes do painel e arquivos versionados", async () => {
   const html = await read("b3.html");
-  for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
-  assert.match(html, /b3\.css\?v=24/); assert.match(html, /b3\.js\?v=24/);
+  for (const section of ["resumo", "forca", "commodities", "bolsas", "analise", "daytrade", "noticias", "corretoras", "contratos"]) assert.match(html, new RegExp(`data-panel="${section}"`));
+  assert.match(html, /b3\.css\?v=25/); assert.match(html, /b3\.js\?v=25/);
+});
+
+test("corretoras mostra doze participantes, pressao atual e historico diario", async () => {
+  const [html, client, endpoint, css, config, preview] = await Promise.all([read("b3.html"), read("b3.js"), read("netlify/functions/b3-brokers.mjs"), read("b3.css"), read("netlify.toml"), read("scripts/b3-preview.mjs")]);
+  assert.match(html, /data-panel="corretoras"/); assert.match(html, /12 PARTICIPANTES PARA ACOMPANHAR/); assert.match(html, /Limite da fonte pública/); assert.match(html, /data-broker-contract="WIN"/); assert.match(html, /data-broker-contract="WDO"/);
+  assert.match(client, /loadBrokers/); assert.match(client, /renderBrokerPressure/); assert.match(client, /renderBrokerHistory/); assert.match(client, /broker-day-row/);
+  assert.match(endpoint, /const BROKERS = \[/); assert.match(endpoint, /combinedScore/); assert.match(endpoint, /futures\/historical/); assert.match(endpoint, /não é ranking oficial/); assert.equal((endpoint.match(/name: "/g) || []).length, 12);
+  assert.match(css, /broker-live-grid/); assert.match(config, /\/api\/b3-brokers/); assert.match(preview, /b3-brokers\.mjs/);
 });
 
 test("tela forca B3 combina peso, impacto e grafico intradiario", async () => {

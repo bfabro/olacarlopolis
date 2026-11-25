@@ -42,6 +42,11 @@
   status = 200
 
 [[redirects]]
+  from = "/api/b3-brokers"
+  to = "/.netlify/functions/b3-brokers"
+  status = 200
+
+[[redirects]]
   from = "/api/b3-strength"
   to = "/.netlify/functions/b3-strength"
   status = 200
