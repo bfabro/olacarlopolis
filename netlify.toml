@@ -98,11 +98,11 @@
   status = 301
   force = true
 
-# Arquivos principais usam versao na URL; o navegador pode reutiliza-los sem revalidar.
+# O carregador principal deve revalidar para não prender versões antigas dos módulos dinâmicos.
 [[headers]]
   for = "/script.js"
   [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
+    Cache-Control = "public, max-age=0, must-revalidate"
 
 [[headers]]
   for = "/style.css"

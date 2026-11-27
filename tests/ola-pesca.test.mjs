@@ -12,6 +12,7 @@ const panel = fs.readFileSync(new URL("../admin/painel.js", import.meta.url), "u
 const panelHtml = fs.readFileSync(new URL("../admin/painel.html", import.meta.url), "utf8");
 const panelCss = fs.readFileSync(new URL("../admin/painel.css", import.meta.url), "utf8");
 const serviceWorker = fs.readFileSync(new URL("../service-worker.js", import.meta.url), "utf8");
+const netlify = fs.readFileSync(new URL("../netlify.toml", import.meta.url), "utf8");
 const rules = JSON.parse(fs.readFileSync(new URL("../database.rules.json", import.meta.url), "utf8"));
 class FakeImage {
   constructor() { this.complete = false; this.naturalWidth = 0; }
@@ -23,6 +24,9 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("CarloPesca integra mapa, controles e progresso na tela de Jogos", () => {
+  assert.match(html, /script\.js\?v=874/);
+  assert.match(html, /service-worker\.js\?v=1117/);
+  assert.match(netlify, /for = "\/script\.js"[\s\S]*?max-age=0, must-revalidate/);
   assert.match(site, /ola-pesca\.css\?v=116/);
   assert.match(site, /ola-pesca\.js\?v=116/);
   assert.match(site, /CarloPesca/);
