@@ -24,11 +24,11 @@ vm.runInNewContext(source, context);
 const core = context.window.OlaPescaCore;
 
 test("CarloPesca integra mapa, controles e progresso na tela de Jogos", () => {
-  assert.match(html, /script\.js\?v=877/);
-  assert.match(html, /service-worker\.js\?v=1120/);
+  assert.match(html, /script\.js\?v=878/);
+  assert.match(html, /service-worker\.js\?v=1121/);
   assert.match(netlify, /for = "\/script\.js"[\s\S]*?max-age=0, must-revalidate/);
-  assert.match(site, /ola-pesca\.css\?v=119/);
-  assert.match(site, /ola-pesca\.js\?v=119/);
+  assert.match(site, /ola-pesca\.css\?v=120/);
+  assert.match(site, /ola-pesca\.js\?v=120/);
   assert.match(site, /CarloPesca/);
   assert.match(source, /CarloPesca/);
   assert.match(site, /btnJogarOlaPesca/);
@@ -95,7 +95,7 @@ test("v116 reinicia as falas de Neto Saad em cada abertura e entrega a quinta fr
 });
 
 test("v117 cria a Ilha do Ponciano com saída pela Ilha do Churrasco", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.equal(core.PONCIANO_MAP.length, 20);
   assert.equal(core.PONCIANO_MAP[0].length, 32);
   assert.ok(["I", "H"].includes(core.PONCIANO_MAP[10][16]));
@@ -133,12 +133,12 @@ test("v117 permite fisgar a capivara de olho dourado e mostra sua bronca", () =>
 });
 
 test("v118 remodela Ponciano pela referência e usa os monumentos rasterizados", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   const landWidth = (row) => Array.from(core.PONCIANO_MAP[row]).filter(tile => tile !== "W").length;
   assert.equal(landWidth(4), 0);
   assert.ok(landWidth(9) > landWidth(14));
   assert.ok(landWidth(14) > landWidth(17));
-  assert.ok(core.PONCIANO_MAP.join("").includes("H"));
+  assert.equal(core.PONCIANO_MAP.join("").includes("H"), false);
   assert.notEqual(core.PONCIANO_MAP[Math.floor(core.PONCIANO_STONE_BOAT.y / 32)][Math.floor(core.PONCIANO_STONE_BOAT.x / 32)], "W");
   assert.notEqual(core.PONCIANO_MAP[Math.floor(core.PONCIANO_SHARK_STATUE.y / 32)][Math.floor(core.PONCIANO_SHARK_STATUE.x / 32)], "W");
   assert.match(source, /barco-pedra-ponciano-v118\.png/);
@@ -157,12 +157,12 @@ test("v118 melhora as capivaras e dá dicas do Barco de Pedra com novos personag
   assert.ok(core.PONCIANO_CAPYBARAS.filter(item => item.kind === "land").every(item => ["I", "H"].includes(core.PONCIANO_MAP[Math.floor(item.y)][Math.floor(item.x)])));
   assert.match(source, /nearestPoncianoFisherV118/);
   assert.match(source, /showPoncianoFisherSpeechV118/);
-  assert.match(source, /drawPoncianoExclusiveFisherV119/);
+  assert.match(source, /drawPixelFisherV62\(c,\{facing,\.\.\.style,holdingRod:false\}\)/);
   assert.match(source, /Capivaras nadam ao redor da ilha/);
 });
 
 test("v119 libera a entrada da lancha e move o píer para a lateral oeste", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   for (let y = 0; y <= 4; y += 1) assert.equal(core.PONCIANO_MAP[y][16], "W");
   assert.ok(core.PONCIANO_DOCK.boatX / 32 < 7);
   assert.equal(core.PONCIANO_MAP[Math.floor(core.PONCIANO_DOCK.boatY / 32)][Math.floor(core.PONCIANO_DOCK.boatX / 32)], "W");
@@ -175,7 +175,7 @@ test("v119 mantém quatro moradores exclusivos e mostra mãe e filhote nadando",
   assert.equal(core.PONCIANO_FISHERS.length, 4);
   assert.deepEqual(Array.from(core.PONCIANO_FISHERS, fisher => fisher.identity).sort(), ["caue", "mara", "tiao", "zulmira"]);
   assert.ok(core.PONCIANO_FISHERS.every(fisher => ["I", "H"].includes(core.PONCIANO_MAP[Math.floor(fisher.y)][Math.floor(fisher.x)])));
-  assert.match(source, /drawPoncianoFisherV117=function\(c,item,n\)\{drawPoncianoExclusiveFisherV119/);
+  assert.match(source, /poncianoFisherStyleV120/);
   const baby = core.PONCIANO_CAPYBARAS.find(item => item.baby);
   const mother = core.PONCIANO_CAPYBARAS.find(item => item.id === baby.babyOf);
   assert.ok(baby && mother);
@@ -185,7 +185,47 @@ test("v119 mantém quatro moradores exclusivos e mostra mãe e filhote nadando",
     assert.ok(Math.hypot(babyPosition.x - motherPosition.x, babyPosition.y - motherPosition.y) < 32);
     assert.equal(core.PONCIANO_MAP[Math.floor(babyPosition.y / 32)][Math.floor(babyPosition.x / 32)], "W");
   }
-  assert.match(source, /drawImage\(image,820,50,650,610/);
+  assert.match(source, /drawSwimmingCapybaraHeadV120/);
+});
+
+test("v120 liga a ilha à lateral e mantém uma volta navegável até o lado sul", () => {
+  assert.equal(core.PONCIANO_MAP[10][31], "I");
+  assert.equal(core.PONCIANO_MAP[11][31], "I");
+  assert.equal(core.PONCIANO_MAP[12][31], "I");
+  const queue = [[16, 1]];
+  const visited = new Set(["16,1"]);
+  while (queue.length) {
+    const [x, y] = queue.shift();
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nextX = x + dx, nextY = y + dy, key = `${nextX},${nextY}`;
+      if (core.PONCIANO_MAP[nextY]?.[nextX] !== "W" || visited.has(key)) continue;
+      visited.add(key);
+      queue.push([nextX, nextY]);
+    }
+  }
+  assert.equal(visited.has("16,18"), true);
+  assert.match(source, /buildPoncianoMapV120/);
+  assert.match(source, /drawPoncianoPathsV118=function\(\)\{\}/);
+});
+
+test("v120 anima cabeças completas de capivara em rotas livres pela água", () => {
+  for (const capybara of core.PONCIANO_CAPYBARAS.filter(item => item.kind === "water")) {
+    for (let n = 0; n <= 60000; n += 1250) {
+      const position = core.poncianoCapybaraPositionV117(capybara, n);
+      assert.equal(core.PONCIANO_MAP[Math.floor(position.y / 32)]?.[Math.floor(position.x / 32)], "W", `${capybara.id} saiu da água`);
+    }
+  }
+  assert.match(source, /PONCIANO_WATER_ROUTES_V120/);
+  assert.match(source, /ellipse\(-2,-5,17,14/);
+  assert.doesNotMatch(source.slice(source.indexOf("// v120:")), /drawImage\(image,820,50,650,610/);
+});
+
+test("v120 alinha o Barco de Pedra e evita a batalha que travava a capivara dourada", () => {
+  assert.equal(core.PONCIANO_MAP[Math.floor(core.PONCIANO_STONE_BOAT.y / 32)][Math.floor(core.PONCIANO_STONE_BOAT.x / 32)], "I");
+  assert.match(source, /c\.rotate\(-Math\.PI\/6\)/);
+  assert.match(source, /const castV120=cast/);
+  assert.match(source, /g\.mode="capybara-caught";showPoncianoCapybaraCatchV117\(g\)/);
+  assert.match(source, /clearTimeout\(g\.waitTimer\);clearInterval\(g\.battleTimer\)/);
 });
 
 test("v2 amplia a represa e permite pesca livre, barco e arremesso carregado", () => {
@@ -1099,7 +1139,7 @@ test("v44 restringe a galhada ao mapa principal e prepara o compartilhamento len
   assert.doesNotMatch(source, /async function shareLegendaryCatch/);
 });
 test("v45 identifica o mapa, preserva a lancha e cria o matinho dos grandões", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(source, /pesca-help-version/);
   assert.match(source, /mapa versão/);
   assert.match(css, /\.pesca-help-version small\{[^}]*font-size:8px/);
@@ -1498,7 +1538,7 @@ test("v74 preserva proporções, encaixa as varas nas mãos e mantém árvores e
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v75 senta os pescadores no barranco e renova as identidades da ponte", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(source, /BRIDGE_EXTRA_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-ponte-extras-v77\.png"/);
   assert.match(source, /function drawBankSeatBaseV75/);
   assert.match(source, /function drawMapOneSeatedFisherV75/);
@@ -1515,7 +1555,7 @@ test("v75 senta os pescadores no barranco e renova as identidades da ponte", () 
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v76 mostra pernas e pés dos pescadores sentados em bancos", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(source, /function drawFishingBenchV76/);
   assert.match(source, /fillRect\(-21,-13,42,6\)/);
   assert.match(source, /fillRect\(-22,1,44,7\)/);
@@ -1528,7 +1568,7 @@ test("v76 mostra pernas e pés dos pescadores sentados em bancos", () => {
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v77 iguala os dois pescadores inferiores ao padrão visual dos superiores", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(source, /BRIDGE_EXTRA_FISHER_SPRITE="images\/jogos\/ola-pesca\/pescadores-ponte-extras-v77\.png"/);
   assert.match(source, /BRIDGE_EXTRA_FISHER_RECTS_V77=\{river_guide:\{x:128,y:55,w:219,h:407\},gray_veteran:\{x:427,y:55,w:219,h:407\}\}/);
   assert.match(source, /function drawBridgeExtraFisherV77\(c,identity,\{facing="right",seated=false,width=68,height=68,y=-51\}=\{\}\)/);
@@ -1543,7 +1583,7 @@ test("v77 iguala os dois pescadores inferiores ao padrão visual dos superiores"
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v78 encaixa as varas nas mãos e individualiza as pernas sentadas", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(source, /function drawBridgeHeldRodV78/);
   assert.match(source, /gripX=side\*15,gripY=-7,buttX=side\*7,buttY=-4/);
   assert.match(source, /c\.arc\(side\*9,-6,2\.7/);
@@ -1569,7 +1609,7 @@ test("v28 protege configurações e arquivos do ranking para o Master", () => {
   assert.equal(fishingRules.championships.$championshipId.stages.$stageId.ranking[".write"], true);
 });
 test("v80 restaura o modelo visual dos personagens da v71", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(source, /v80: restaura o modelo visual dos pescadores da v71/);
   assert.match(source, /function bridgeLegacyIdentityV80/);
   assert.match(source, /drawLegacyFictionalFisherV69\(c,bridgeLegacyIdentityV80\(identity\),options\)/);
@@ -1588,7 +1628,7 @@ test("v80 restaura o modelo visual dos personagens da v71", () => {
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v81 separa pescadores, calçadas e tráfego no mapa 3", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.equal(core.BRIDGE_SIDEWALK_WIDTH_V81, 28);
   const identities = Array.from(core.BRIDGE_VISUAL_IDENTITIES_V81);
   assert.equal(identities.length, 9);
@@ -1610,7 +1650,7 @@ test("v81 separa pescadores, calçadas e tráfego no mapa 3", () => {
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v82 corrige os nomes de Ção e Yas", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.equal(core.SHORE_FISHERS[2].name, "Ção");
   assert.equal(core.SHORE_FISHERS[2].gender, "woman");
   assert.equal(core.SHORE_FISHERS[3].name, "Yas");
@@ -1621,7 +1661,7 @@ test("v82 corrige os nomes de Ção e Yas", () => {
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v83 inicializa o marcador de novidades no Acesso rápido", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(site, /function inicializarAvisoNovidadesCidade\(\)/);
   assert.match(site, /if \(!botoesNovidadesCidade\(\)\.length\) return;/);
   assert.match(site, /carregarNovidadesCidade\(\)\.catch/);
@@ -1636,7 +1676,7 @@ test("v83 inicializa o marcador de novidades no Acesso rápido", () => {
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v84 alinha o marcador no canto superior direito do botão Novidades", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(siteCss, /\.home-quick-actions \[data-home-quick-action="novidades"\],\s*\.home-quick-actions \[data-home-quick-action="promocoes"\] \{\s*overflow: visible/);
   assert.match(siteCss, /\.home-quick-actions \[data-home-quick-action="novidades"\] \.novidades-alert-badge,\s*\.home-quick-actions \[data-home-quick-action="promocoes"\] \.promocoes-alert-badge \{\s*top: -10px;\s*right: -10px;\s*z-index: 5/);
   assert.match(panel, /numero: 903/);
@@ -1646,7 +1686,7 @@ test("v84 alinha o marcador no canto superior direito do botão Novidades", () =
 });
 
 test("v85 adiciona acompanhamento de clientes exclusivo do Admin Master", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(panelHtml, /data-view="acompanhamentoClientes" data-master="true"/);
   assert.match(panelHtml, /id="acompanhamentoClientesView"/);
   assert.match(panelHtml, /id="clientWorkflowBoard"/);
@@ -1670,7 +1710,7 @@ test("v85 adiciona acompanhamento de clientes exclusivo do Admin Master", () => 
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v86 acrescenta histórico, comentários e ciclo seguro ao acompanhamento", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(panelHtml, /id="clientWorkflowDueSoonCount"/);
   assert.match(panel, /function clientWorkflowHistoryEntries\(task = \{\}\)/);
   assert.match(panel, /function addClientWorkflowComment\(taskId\)/);
@@ -1687,7 +1727,7 @@ test("v86 acrescenta histórico, comentários e ciclo seguro ao acompanhamento",
   assert.match(serviceWorker, /2026-10-21-ola-studio-mvp-v957/);
 });
 test("v87 gera roteiro imprimível para visitas e novos acessos", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(panelHtml, /data-client-workflow-print-visits/);
   assert.match(panelHtml, /Gerar lista para visitas/);
   assert.match(panel, /function printClientWorkflowVisitList\(\)/);
@@ -1706,7 +1746,7 @@ test("v87 gera roteiro imprimível para visitas e novos acessos", () => {
 });
 
 test("v89 mostra a quantidade de promoções novas ou reativadas no Acesso rápido", () => {
-  assert.equal(core.FISHING_MAP_VERSION, 119);
+  assert.equal(core.FISHING_MAP_VERSION, 120);
   assert.match(html, /data-home-quick-action="promocoes"/);
   assert.match(site, /const PROMOCOES_CIDADE_ESTADO_KEY = "ola_carlopolis_promocoes_alerta_v1"/);
   assert.match(site, /function sincronizarAvisoPromocoesCidade\(\{ marcarComoVistas = false \} = \{\}\)/);
