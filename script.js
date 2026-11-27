@@ -72,8 +72,8 @@ function carregarLeaflet() {
 
 async function carregarOlaPesca() {
   await Promise.all([
-    carregarEstiloSite("ola-pesca.css?v=117", "ola-pesca-css"),
-    carregarScriptSite("ola-pesca.js?v=117", "ola-pesca-js")
+    carregarEstiloSite("ola-pesca.css?v=118", "ola-pesca-css"),
+    carregarScriptSite("ola-pesca.js?v=118", "ola-pesca-js")
   ]);
 }
 
